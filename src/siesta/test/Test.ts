@@ -8,13 +8,13 @@ import { Assertion } from "./Result.js"
 export type TestCode = <T extends Test>(t : T) => any
 
 export type TestDescriptor<T extends typeof Test> = string | {
-    name            : string
+    name?           : string
 
     testClass?      : T
 
     env?            : 'generic' | 'browser' | 'nodejs'
 
-    tags            : string[]
+    tags?           : string[]
 }
 
 //---------------------------------------------------------------------------------------------------------------------

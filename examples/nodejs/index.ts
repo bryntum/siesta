@@ -1,15 +1,19 @@
 import { Project } from "../../main.js"
+import { Test as CustomTestClass } from "../../src/siesta/test/Test.js"
 
 const project = Project.new({
-    name                    : 'Siesta test suite'
+    name                    : 'Siesta test suite',
+
+    // global options
+    options                 : { testClass : CustomTestClass }
 })
 
 
 project.planGlob('**/*.t.js')
 
-project.planDir('tests')
+project.planDir('tests', { testClass : CustomTestClass })
 
-project.planFile('some_test.t.js')
+project.planFile('tests2/some_test.t.js', { testClass : CustomTestClass })
 
 project.start()
 
