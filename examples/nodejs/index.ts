@@ -7,5 +7,9 @@ const project = Project.new({
 
 project.planGlob('**/*.t.js')
 
+project.planDir('tests')
+
+project.planFile('some_test.t.js')
+
 project.start()
 

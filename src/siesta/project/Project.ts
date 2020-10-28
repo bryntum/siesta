@@ -14,6 +14,15 @@ export class Project extends Mixin(
 
         }
 
+
+        planDir (dir : string) {
+
+        }
+
+        planFile (file : string) {
+
+        }
+
         async start () {}
     }
 ) {}
