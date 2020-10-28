@@ -12,6 +12,8 @@ export class Project extends Mixin(
 
         options         : TestDescriptor<any>   = undefined
 
+        someProjectOption   : boolean   = false
+
 
         planGlob (glob : string) {
 

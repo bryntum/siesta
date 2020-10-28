@@ -4,7 +4,10 @@ import { Test as CustomTestClass } from "../../src/siesta/test/Test.js"
 const project = Project.new({
     name                    : 'Siesta test suite',
 
-    // global options
+    // global project-specific options as configs
+    someProjectOption       : false,
+
+    // global test-specific options
     options                 : { testClass : CustomTestClass }
 })
 
