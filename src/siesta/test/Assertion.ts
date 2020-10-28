@@ -1,6 +1,6 @@
-import { Base } from "../class/Base.js"
-import { AnyConstructor, Mixin } from "../class/Mixin.js"
-import { TreeNode } from "../tree/ChildNode.js"
+import { Base } from "../../class/Base.js"
+import { AnyConstructor, Mixin } from "../../class/Mixin.js"
+import { TreeNode } from "../../tree/ChildNode.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Assertion extends Mixin(
