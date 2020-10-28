@@ -13,7 +13,7 @@ it('Basic assertions should work', t => {
 
 
 describe({
-    env         : 'generic',
+    env         : 'generic', // 'generic' | 'browser' | 'nodejs'
     tags        : [ 'basic', 'generic', 'data', 'model' ],
     name        : 'Basic assertions should work',
     testClass   : CustomTestClass
