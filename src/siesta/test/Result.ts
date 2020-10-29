@@ -40,8 +40,11 @@ export class Assertion extends Mixin(
     class Assertion extends base {
         name            : string            = ''
 
+        passed          : boolean           = true
 
+        description     : string            = ''
 
+        annotation      : string            = ''
     }
 ) {}
 
