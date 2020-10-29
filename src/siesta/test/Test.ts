@@ -8,15 +8,18 @@ import { Assertion } from "./Result.js"
 //---------------------------------------------------------------------------------------------------------------------
 export type TestCode = <T extends Test>(t : T) => any
 
-export type TestDescriptor<T extends typeof Test> = string | {
+export type TestDescriptor = {
     name?           : string
 
-    testClass?      : T
+    testClass?      : typeof Test
 
     env?            : 'generic' | 'browser' | 'nodejs'
 
     tags?           : string[]
 }
+
+export type TestDescriptorArgument = string | TestDescriptor
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestNode extends Mixin(
@@ -24,6 +27,12 @@ export class TestNode extends Mixin(
     (base : AnyConstructor<TreeNode & Base, typeof TreeNode & typeof Base>) =>
 
     class TestNode extends base {
+        id              : number            = 0
+
+        name            : string            = ''
+
+        tags            : string[]          = []
+
         assertions      : Assertion[]       = []
 
         isTodo          : boolean           = false
@@ -31,6 +40,15 @@ export class TestNode extends Mixin(
         code            : TestCode          = undefined
 
         ongoing         : Promise<any>      = undefined
+
+
+        $rootTest   : Test                  = undefined
+
+        get rootTest () : Test {
+            if (this.$rootTest !== undefined) return this.$rootTest
+
+            return this.$rootTest = this.getRootNode() as Test
+        }
 
 
         addAssertion (assertion : Assertion) {
@@ -72,12 +90,12 @@ export class TestNode extends Mixin(
         }
 
 
-        it<T extends typeof Test> (name : TestDescriptor<T>, code : TestCode) : any {
+        it<T extends typeof Test> (name : TestDescriptorArgument, code : TestCode) : any {
 
         }
 
 
-        describe<T extends typeof Test> (name : TestDescriptor<T>, code : TestCode) : any {
+        describe<T extends typeof Test> (name : TestDescriptorArgument, code : TestCode) : any {
             return this.it(name, code)
         }
 
@@ -88,7 +106,7 @@ export class TestNode extends Mixin(
 
 
         async launch () {
-
+            this.rootTest.context.attach()
         }
     }
 ) {}

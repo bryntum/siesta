@@ -1,5 +1,6 @@
 import { Base } from "../../class/Base.js"
-import { AnyConstructor, Mixin } from "../../class/Mixin.js"
+import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
+import { TreeNode } from "../../tree/TreeNode.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Result extends Mixin(
@@ -58,5 +59,15 @@ export class AssertionAsync extends Mixin(
         ongoing     : Promise<any>                          = undefined
 
         state       : 'pending' | 'resolved' | 'rejected'   = 'pending'
+    }
+) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class TestNode extends Mixin(
+    [ Result, TreeNode ],
+    (base : ClassUnion<typeof Result, typeof TreeNode>) =>
+
+    class TestNode extends base {
     }
 ) {}

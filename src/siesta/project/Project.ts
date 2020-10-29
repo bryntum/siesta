@@ -10,7 +10,7 @@ export class Project extends Mixin(
     class Project extends base {
         name            : string        = ''
 
-        options         : TestDescriptor<any>   = undefined
+        options         : TestDescriptor   = undefined
 
         someProjectOption   : boolean   = false
 
@@ -20,12 +20,12 @@ export class Project extends Mixin(
         }
 
 
-        planDir (dir : string, descriptor? : TestDescriptor<any>) {
+        planDir (dir : string, descriptor? : TestDescriptor) {
 
         }
 
 
-        planFile (file : string, descriptor? : TestDescriptor<any>) {
+        planFile (file : string, descriptor? : TestDescriptor) {
 
         }
 
