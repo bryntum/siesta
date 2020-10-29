@@ -1,4 +1,4 @@
-import { MIN_SMI } from "../util/Helpers.js"
+import { delay, MIN_SMI } from "../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type EnvelopId   = number
@@ -24,13 +24,32 @@ export interface Envelop<Payload = any> {
 }
 
 
+export const remote = () : PropertyDecorator => {
 
+    return function (target : object, fieldName : string) : void {
+    }
+}
+
+
+// export const remote = function () : MethodDecorator {
+//
+//     return function (target : object, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
+//     }
+// }
+
+
+export const local = function () : MethodDecorator {
+
+    return function (target : object, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
+    }
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Channel<Media, Message> {
-    connectionTimeout       : ReturnType<typeof setTimeout>     = undefined
-    connectionInterval      : number                            = 1000
+    maxConnectionAttempts   : number        = Number.MAX_SAFE_INTEGER
+    connectionTimeout       : number        = 10000
+    connectionInterval      : number        = 500
 
 
     async doConnect (media : Media) : Promise<any> {
@@ -39,25 +58,21 @@ export class Channel<Media, Message> {
 
 
     async connect (media : Media) : Promise<any> {
-        let start   = new Date().getTime()
+        let start                   = Date.now()
+        let connectionAttempts      = 0
 
+        do {
+            try {
+                this.doConnect(media)
 
-        return new Promise((resolve, reject) => {
-
-            const connectionAttempt = () => {
-                this.doConnect(media).then(
-                    resolve,
-                    reason => {
-                        if (new Date().getTime() - start > (this.connectionTimeout || 3000))
-                            reject(reason)
-                        else
-                            setTimeout(connectionAttempt, this.connectionInterval)
-                    }
-                )
+                return
+            } catch (e) {
+                await delay(this.connectionInterval)
             }
 
-            connectionAttempt()
-        })
+        } while ( Date.now() - start < this.connectionTimeout && connectionAttempts < this.maxConnectionAttempts)
+
+        throw new Error("Connection failed")
     }
 
 

@@ -64,10 +64,23 @@ export class AssertionAsync extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class TestNode extends Mixin(
+export class TestNodeResult extends Mixin(
     [ Result, TreeNode ],
     (base : ClassUnion<typeof Result, typeof TreeNode>) =>
 
-    class TestNode extends base {
+    class TestNodeResult extends base {
+        // "promote" types from TreeNode
+        parentNode      : TestNodeResult
+        childNodes      : TestNodeResult[]
+
+        id              : number            = 0
+
+        assertions      : Assertion[]       = []
+
+        name            : string            = ''
+
+        tags            : string[]          = []
+
+        isTodo          : boolean           = false
     }
 ) {}

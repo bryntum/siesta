@@ -1,9 +1,8 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
-import { TreeNode } from "../../tree/TreeNode.js"
 import { Agent } from "../agent/Agent.js"
-import { Assertion } from "./Result.js"
+import { Assertion, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type TestCode = <T extends Test>(t : T) => any
@@ -23,19 +22,13 @@ export type TestDescriptorArgument = string | TestDescriptor
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestNode extends Mixin(
-    [ TreeNode, Base ],
-    (base : AnyConstructor<TreeNode & Base, typeof TreeNode & typeof Base>) =>
+    [ TestNodeResult, Base ],
+    (base : ClassUnion<typeof TestNodeResult, typeof Base>) =>
 
     class TestNode extends base {
-        id              : number            = 0
-
-        name            : string            = ''
-
-        tags            : string[]          = []
-
-        assertions      : Assertion[]       = []
-
-        isTodo          : boolean           = false
+        // "promote" types from TreeNode
+        parentNode      : TestNode
+        childNodes      : TestNode[]
 
         code            : TestCode          = undefined
 
