@@ -1,5 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { Agent } from "../agent/Agent.js"
 import { Assertion } from "./Result.js"
@@ -39,7 +40,7 @@ export class TestNode extends Mixin(
 
         pass (description : string = '', annotation : string = '') {
             this.addAssertion(Assertion.new({
-                passed  : true,
+                passed          : true,
                 description,
                 annotation
             }))
@@ -48,7 +49,7 @@ export class TestNode extends Mixin(
 
         fail (description : string = '', annotation : string = '') {
             this.addAssertion(Assertion.new({
-                passed  : false,
+                passed          : false,
                 description,
                 annotation
             }))
@@ -56,12 +57,18 @@ export class TestNode extends Mixin(
 
 
         ok<V> (value : V, description : string = '') {
-
+            this.addAssertion(Assertion.new({
+                passed          : Boolean(value),
+                description
+            }))
         }
 
 
         is<V> (value1 : V, value2 : V, description : string = '') {
-
+            this.addAssertion(Assertion.new({
+                passed          : value1 === value2,
+                description
+            }))
         }
 
 
@@ -94,6 +101,8 @@ export class Test extends Mixin(
     class Test extends base {
 
         agent           : Agent             = undefined
+
+        context         : ExecutionContext  = undefined
 
 
         async setup () {

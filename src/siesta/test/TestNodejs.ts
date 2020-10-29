@@ -4,10 +4,10 @@ import { Test } from "./Test.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class TestNodeJs extends Mixin(
+export class TestNodejs extends Mixin(
     [ Test ],
     (base : AnyConstructor<Test, typeof Test>) =>
 
-    class TestNodeJs extends base {
+    class TestNodejs extends base {
     }
 ) {}
