@@ -50,6 +50,17 @@ export class Base {
 
         return instance as InstanceType<T>
     }
+
+
+    /**
+     * Document me
+     * @param props
+     */
+    static fromPlainObject<T extends typeof Base> (this : T, props? : Partial<InstanceType<T>>) : InstanceType<T> {
+        if (props instanceof this) return props as InstanceType<T>
+
+        return this.new(props)
+    }
 }
 
 

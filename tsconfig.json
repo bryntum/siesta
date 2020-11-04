@@ -11,7 +11,8 @@
             "esnext"
         ],
         "module"                : "esnext",
-        "moduleResolution"      : "Node"
+        "moduleResolution"      : "Node",
+        "allowSyntheticDefaultImports"    : true
     },
 
     "include" : [
@@ -23,6 +24,5 @@
     ],
 
     "exclude" : [
-        "tests/chrono2/todo/**/*.ts"
     ]
 }

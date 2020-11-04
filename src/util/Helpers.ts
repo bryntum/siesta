@@ -1,3 +1,4 @@
+import { AnyConstructor } from "../class/Mixin.js"
 import { CI } from "../collection/Iterator.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -27,6 +28,21 @@ export const isAtomicValue = (value : any) : boolean => Object(value) !== value
 
 //---------------------------------------------------------------------------------------------------------------------
 export const typeOf = (value : any) : string => Object.prototype.toString.call(value).slice(8, -1)
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export type PartialWOC<T> = Omit<Partial<T>, 'constructor'>
+
+//---------------------------------------------------------------------------------------------------------------------
+export const isSubclassOf = (baseclass : AnyConstructor, superclass : AnyConstructor) : boolean => {
+    return superclass.prototype.isPrototypeOf(baseclass.prototype)
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const isSuperclassOf = (superclass : AnyConstructor, baseclass : AnyConstructor) : boolean => {
+    return superclass.prototype.isPrototypeOf(baseclass.prototype)
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------

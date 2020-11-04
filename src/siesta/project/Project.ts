@@ -1,6 +1,76 @@
+import path from 'path'
+import fs from 'fs'
+import glob from 'glob'
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
+import { scanDir } from "../../util/FileSystem.js"
+import { PartialWOC } from "../../util/Helpers.js"
 import { TestDescriptor } from "../test/Test.js"
+import { Dispatcher } from "./Dispatcher.js"
+
+//---------------------------------------------------------------------------------------------------------------------
+export class ProjectPlanItem extends Base {
+    parentItem      : ProjectPlanGroup  = undefined
+
+    id              : string            = ''
+
+    name            : string            = ''
+
+    filename        : string            = ''
+
+    descriptor      : PartialWOC<TestDescriptor>   = TestDescriptor.new()
+
+
+    initialize<T extends ProjectPlanItem> (props? : Partial<T>) {
+        if (props && props.descriptor === undefined) delete props.descriptor
+
+        props && Object.assign(this, props)
+    }
+
+
+    merge (another : ProjectPlanItem) {
+        if (this.parentItem) {
+            if (another.parentItem && this.parentItem !== another.parentItem) throw new Error("Can not merge items")
+        }
+        else if (!another.parentItem) {
+            // do nothing
+        }
+        else {
+            this.parentItem     = another.parentItem
+        }
+
+        if (another.id !== this.id || another.name !== this.name || another.filename !== this.filename) throw new Error("Illegal state")
+
+        this.descriptor.merge(another.descriptor)
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class ProjectPlanGroup extends ProjectPlanItem {
+    items           : ProjectPlanItem[]                 = []
+
+    itemsMap        : Map<string, ProjectPlanItem>      = new Map()
+
+
+    planItem (item : ProjectPlanItem) {
+        const existing      = this.itemsMap.get(item.id)
+
+        if (existing)
+            existing.merge(item)
+        else {
+            this.items.push(item)
+            this.itemsMap.set(item.id, item)
+        }
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class ProjectOptions {
+
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Project extends Mixin(
@@ -8,27 +78,81 @@ export class Project extends Mixin(
     (base : AnyConstructor<Base, typeof Base>) =>
 
     class Project extends base {
-        name            : string        = ''
+        baseDir         : string            = path.dirname(process.argv[ 1 ])
 
-        options         : TestDescriptor   = undefined
+        name            : string            = ''
 
-        someProjectOption   : boolean   = false
+        options         : PartialWOC<TestDescriptor>        = undefined
+
+        plan            : ProjectPlanGroup                  = undefined
+        planMap         : Map<string, ProjectPlanItem>      = new Map()
 
 
-        planGlob (glob : string) {
+        createPlanGroup (dir : string, descriptor? : PartialWOC<TestDescriptor>) : ProjectPlanGroup {
+            const existing      = this.planMap.get(dir)
+
+            if (existing) {
+                if (existing instanceof ProjectPlanGroup) {
+                    if (descriptor) existing.descriptor.merge(descriptor)
+
+                    return existing
+                } else
+                    throw new Error("Plan group already declared as file")
+            }
+
+            const newGroup = ProjectPlanGroup.new({ id : dir, name : path.basename(dir), filename : dir, descriptor })
+
+            this.planMap.set(newGroup.id, newGroup)
+
+            return newGroup
+        }
+
+
+        planGlob (glob : string, descriptor? : PartialWOC<TestDescriptor>) {
+            // glob.sync(glob, { cwd : dirname, matchBase : true, ignore : '**/node_modules/**' })
+        }
+
+
+        planDir (dir : string, descriptor? : PartialWOC<TestDescriptor>) {
+            const dirname       = path.resolve(this.baseDir, dir)
+
+            const planGroup     = this.createPlanGroup(dirname, descriptor)
+
+            scanDir(dirname, (entry : fs.Dirent, filename : string) => {
+                if (/\.t\.m?js$/.test(filename)) this.planFile(filename)
+            })
+        }
+
+
+        planFile (file : string, descriptor? : PartialWOC<TestDescriptor>) {
+            const filename  = path.resolve(this.baseDir, file)
+
+            const stats     = fs.statSync(filename)
+
+            if (!stats.isFile()) throw new Error(`Not a file provided to \`planFile\`: ${file}, base dir: ${this.baseDir}`)
+
+            const dir       = path.dirname(filename)
+            const name      = path.basename(filename)
+
+            const group     = this.createPlanGroup(dir)
+
+            const planItem  = ProjectPlanItem.new({ id : filename, name, filename, descriptor, parentItem : group })
+
+            group.planItem(planItem)
+        }
+
+
+        finalizePlan () {
 
         }
 
 
-        planDir (dir : string, descriptor? : TestDescriptor) {
+        async start () {
+            debugger
 
+            const dispatcher    = Dispatcher.new({ project : this })
+
+            await dispatcher.start()
         }
-
-
-        planFile (file : string, descriptor? : TestDescriptor) {
-
-        }
-
-        async start () {}
     }
 ) {}

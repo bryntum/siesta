@@ -4,19 +4,18 @@ import { Test as CustomTestClass } from "../../src/siesta/test/Test.js"
 const project = Project.new({
     name                    : 'Siesta test suite',
 
-    // global project-specific options as configs
-    someProjectOption       : false,
-
     // global test-specific options
     options                 : { testClass : CustomTestClass }
 })
 
+project.planDir('basic', { tags : [ 'aa' ], testClass : CustomTestClass })
 
-project.planGlob('**/*.t.js')
+project.planFile('basic/assertions.t.js', { tags : [ 'aa', 'bb' ] })
 
-project.planDir('tests', { testClass : CustomTestClass })
+// project.planGlob('advanced/**/*.t.js')
 
-project.planFile('tests2/some_test.t.js', { testClass : CustomTestClass })
+
+project.planFile('advanced/assertions.t.js', { testClass : CustomTestClass })
 
 project.start()
 

@@ -1,23 +1,51 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
+import { isSubclassOf, isSuperclassOf, PartialWOC } from "../../util/Helpers.js"
 import { Agent } from "../agent/Agent.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type TestCode = <T extends Test>(t : T) => any
 
-export type TestDescriptor = {
-    name?           : string
+export class TestDescriptor extends Base {
+    name            : string                = ''
 
-    testClass?      : typeof Test
+    testClass       : typeof Test           = Test
 
-    env?            : 'generic' | 'browser' | 'nodejs'
+    env             : 'generic' | 'browser' | 'nodejs'  = 'generic'
 
-    tags?           : string[]
+    tags            : string[]              = []
+
+    merge (anotherObj : PartialWOC<TestDescriptor>) {
+        const another   = this.constructor.fromPlainObject(anotherObj as Partial<TestDescriptor>)
+
+        if (this.name) {
+            if (another.name !== this.name) throw new Error('Can not merge test descriptor - different `name`')
+        } else {
+            this.name       = another.name
+        }
+
+        if (isSuperclassOf(another.testClass, this.testClass)) {
+            this.testClass      = another.testClass
+        }
+        else if (another.testClass === this.testClass || isSubclassOf(another.testClass, this.testClass)) {
+            // do nothing
+        }
+        else
+            throw new Error("Can not merge descriptor - different `testClass` hierarchies")
+
+        // strip duplicates
+        this.tags           = Array.from(new Set(this.tags.concat(another.tags)))
+    }
 }
 
-export type TestDescriptorArgument = string | TestDescriptor
+export interface TestDescriptor {
+    constructor : typeof TestDescriptor
+}
+
+
+export type TestDescriptorArgument = string | PartialWOC<TestDescriptor>
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -41,29 +69,6 @@ export class TestNode extends Mixin(
             if (this.$rootTest !== undefined) return this.$rootTest
 
             return this.$rootTest = this.getRootNode() as Test
-        }
-
-
-        addAssertion (assertion : Assertion) {
-            this.assertions.push(assertion)
-        }
-
-
-        pass (description : string = '', annotation : string = '') {
-            this.addAssertion(Assertion.new({
-                passed          : true,
-                description,
-                annotation
-            }))
-        }
-
-
-        fail (description : string = '', annotation : string = '') {
-            this.addAssertion(Assertion.new({
-                passed          : false,
-                description,
-                annotation
-            }))
         }
 
 
@@ -110,6 +115,7 @@ export class Test extends Mixin(
     (base : AnyConstructor<TestNode, ClassUnion<typeof TestNode>>) =>
 
     class Test extends base {
+        url             : string            = ''
 
         agent           : Agent             = undefined
 

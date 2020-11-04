@@ -5,13 +5,13 @@ declare const StartTest : any
 StartTest(t => {
 
     t.it('Should be able to use chained iterators', t => {
-        class MyChannel extends Channel<any, any> {
+        class MyChannel extends Channel {
 
             @remote()
             remoteMethod : (arg1 : number, arg2 : string) => Promise<string>
 
             @local()
-            localMethod (arg1 : number) {
+            async localMethod (arg1 : number) {
                 return arg1 + 1
             }
         }

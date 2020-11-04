@@ -1,5 +1,5 @@
-import { it, describe } from "../../main.js"
-import { Test as CustomTestClass } from "../../src/siesta/test/Test.js"
+import { it, describe } from "../../../main.js"
+import { Test as CustomTestClass } from "../../../src/siesta/test/Test.js"
 
 it('Basic assertions should work', t => {
     t.ok(true, 'True is ok')

@@ -82,5 +82,28 @@ export class TestNodeResult extends Mixin(
         tags            : string[]          = []
 
         isTodo          : boolean           = false
+
+
+        addAssertion (assertion : Assertion) {
+            this.assertions.push(assertion)
+        }
+
+
+        pass (description : string = '', annotation : string = '') {
+            this.addAssertion(Assertion.new({
+                passed          : true,
+                description,
+                annotation
+            }))
+        }
+
+
+        fail (description : string = '', annotation : string = '') {
+            this.addAssertion(Assertion.new({
+                passed          : false,
+                description,
+                annotation
+            }))
+        }
     }
 ) {}
