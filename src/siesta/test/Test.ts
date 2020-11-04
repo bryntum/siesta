@@ -1,7 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
-import { isSubclassOf, isSuperclassOf, PartialWOC } from "../../util/Helpers.js"
+import { isSubclassOf, isSuperclassOf } from "../../util/Helpers.js"
 import { Agent } from "../agent/Agent.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
@@ -17,8 +17,8 @@ export class TestDescriptor extends Base {
 
     tags            : string[]              = []
 
-    merge (anotherObj : PartialWOC<TestDescriptor>) {
-        const another   = this.constructor.fromPlainObject(anotherObj as Partial<TestDescriptor>)
+    merge (anotherObj : Partial<TestDescriptor>) {
+        const another   = (this.constructor as typeof TestDescriptor).fromPlainObject(anotherObj as Partial<TestDescriptor>)
 
         if (this.name) {
             if (another.name !== this.name) throw new Error('Can not merge test descriptor - different `name`')
@@ -40,12 +40,7 @@ export class TestDescriptor extends Base {
     }
 }
 
-export interface TestDescriptor {
-    constructor : typeof TestDescriptor
-}
-
-
-export type TestDescriptorArgument = string | PartialWOC<TestDescriptor>
+export type TestDescriptorArgument = string | Partial<TestDescriptor>
 
 
 //---------------------------------------------------------------------------------------------------------------------

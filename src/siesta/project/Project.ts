@@ -4,7 +4,6 @@ import glob from 'glob'
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
 import { scanDir } from "../../util/FileSystem.js"
-import { PartialWOC } from "../../util/Helpers.js"
 import { TestDescriptor } from "../test/Test.js"
 import { Dispatcher } from "./Dispatcher.js"
 
@@ -18,11 +17,16 @@ export class ProjectPlanItem extends Base {
 
     filename        : string            = ''
 
-    descriptor      : PartialWOC<TestDescriptor>   = TestDescriptor.new()
+    descriptor      : Partial<TestDescriptor>   = TestDescriptor.new()
 
 
     initialize<T extends ProjectPlanItem> (props? : Partial<T>) {
-        if (props && props.descriptor === undefined) delete props.descriptor
+        if (props) {
+            if (props.descriptor === undefined)
+                delete props.descriptor
+            else
+                props.descriptor    = TestDescriptor.fromPlainObject(props.descriptor)
+        }
 
         props && Object.assign(this, props)
     }
@@ -82,13 +86,13 @@ export class Project extends Mixin(
 
         name            : string            = ''
 
-        options         : PartialWOC<TestDescriptor>        = undefined
+        options         : Partial<TestDescriptor>           = undefined
 
         plan            : ProjectPlanGroup                  = undefined
         planMap         : Map<string, ProjectPlanItem>      = new Map()
 
 
-        createPlanGroup (dir : string, descriptor? : PartialWOC<TestDescriptor>) : ProjectPlanGroup {
+        createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
             const existing      = this.planMap.get(dir)
 
             if (existing) {
@@ -108,12 +112,14 @@ export class Project extends Mixin(
         }
 
 
-        planGlob (glob : string, descriptor? : PartialWOC<TestDescriptor>) {
-            // glob.sync(glob, { cwd : dirname, matchBase : true, ignore : '**/node_modules/**' })
+        planGlob (globPattern : string, descriptor? : Partial<TestDescriptor>) {
+            const files = glob.sync(globPattern, { cwd : this.baseDir, matchBase : true, ignore : '**/node_modules/**' })
+
+            files.forEach(file => this.planFile(file, descriptor))
         }
 
 
-        planDir (dir : string, descriptor? : PartialWOC<TestDescriptor>) {
+        planDir (dir : string, descriptor? : Partial<TestDescriptor>) {
             const dirname       = path.resolve(this.baseDir, dir)
 
             const planGroup     = this.createPlanGroup(dirname, descriptor)
@@ -124,7 +130,7 @@ export class Project extends Mixin(
         }
 
 
-        planFile (file : string, descriptor? : PartialWOC<TestDescriptor>) {
+        planFile (file : string, descriptor? : Partial<TestDescriptor>) {
             const filename  = path.resolve(this.baseDir, file)
 
             const stats     = fs.statSync(filename)
