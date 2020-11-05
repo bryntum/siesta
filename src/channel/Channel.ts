@@ -139,7 +139,7 @@ export class Channel extends Mixin(
 
             this.awaitingResponse.clear()
 
-            this.doDisconnect()
+            await this.doDisconnect()
 
             this.media      = undefined
         }
@@ -209,7 +209,7 @@ export class Channel extends Mixin(
 
                 if (message.timeout > 0) {
                     timeoutHandler = setTimeout(() => {
-                        // this.debug("Timeout occurred for: " + JSON.stringify(envelop))
+                        this.logger && this.logger.debug("Timeout occurred for: " + JSON.stringify(envelop))
 
                         if (this.awaitingResponse.has(envelop.id)) {
                             this.awaitingResponse.delete(envelop.id)

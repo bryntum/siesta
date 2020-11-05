@@ -9,6 +9,8 @@ import { Assertion, TestNodeResult } from "./Result.js"
 export type TestCode = <T extends Test>(t : T) => any
 
 export class TestDescriptor extends Base {
+    parent          : TestDescriptor        = undefined
+
     name            : string                = ''
 
     testClass       : typeof Test           = Test
@@ -16,6 +18,7 @@ export class TestDescriptor extends Base {
     env             : 'generic' | 'browser' | 'nodejs'  = 'generic'
 
     tags            : string[]              = []
+
 
     merge (anotherObj : Partial<TestDescriptor>) {
         const another   = (this.constructor as typeof TestDescriptor).fromPlainObject(anotherObj as Partial<TestDescriptor>)
@@ -25,6 +28,8 @@ export class TestDescriptor extends Base {
         } else {
             this.name       = another.name
         }
+
+        // TODO can promote `env` from `generic` to either `browser` or `nodejs`, anything else should throw
 
         if (isSuperclassOf(another.testClass, this.testClass)) {
             this.testClass      = another.testClass
@@ -37,6 +42,16 @@ export class TestDescriptor extends Base {
 
         // strip duplicates
         this.tags           = Array.from(new Set(this.tags.concat(another.tags)))
+    }
+
+
+    static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, props? : string | Partial<InstanceType<T>>) : InstanceType<T> {
+        if (typeof props === 'string' || (props instanceof String)) {
+            // @ts-ignore
+            return this.new({ name : props as string })
+        } else {
+            return this.new(props)
+        }
     }
 }
 

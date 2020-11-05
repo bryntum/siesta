@@ -1,9 +1,5 @@
-import path from 'path'
-import fs from 'fs'
-import glob from 'glob'
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
-import { scanDir } from "../../util/FileSystem.js"
 import { TestDescriptor } from "../test/Test.js"
 import { Dispatcher } from "./Dispatcher.js"
 
@@ -82,7 +78,7 @@ export class Project extends Mixin(
     (base : AnyConstructor<Base, typeof Base>) =>
 
     class Project extends base {
-        baseDir         : string            = path.dirname(process.argv[ 1 ])
+        baseDir         : string            = ''
 
         name            : string            = ''
 
@@ -104,47 +100,11 @@ export class Project extends Mixin(
                     throw new Error("Plan group already declared as file")
             }
 
-            const newGroup = ProjectPlanGroup.new({ id : dir, name : path.basename(dir), filename : dir, descriptor })
+            const newGroup = ProjectPlanGroup.new({ id : dir, name : dir, filename : dir, descriptor })
 
             this.planMap.set(newGroup.id, newGroup)
 
             return newGroup
-        }
-
-
-        planGlob (globPattern : string, descriptor? : Partial<TestDescriptor>) {
-            const files = glob.sync(globPattern, { cwd : this.baseDir, matchBase : true, ignore : '**/node_modules/**' })
-
-            files.forEach(file => this.planFile(file, descriptor))
-        }
-
-
-        planDir (dir : string, descriptor? : Partial<TestDescriptor>) {
-            const dirname       = path.resolve(this.baseDir, dir)
-
-            const planGroup     = this.createPlanGroup(dirname, descriptor)
-
-            scanDir(dirname, (entry : fs.Dirent, filename : string) => {
-                if (/\.t\.m?js$/.test(filename)) this.planFile(filename)
-            })
-        }
-
-
-        planFile (file : string, descriptor? : Partial<TestDescriptor>) {
-            const filename  = path.resolve(this.baseDir, file)
-
-            const stats     = fs.statSync(filename)
-
-            if (!stats.isFile()) throw new Error(`Not a file provided to \`planFile\`: ${file}, base dir: ${this.baseDir}`)
-
-            const dir       = path.dirname(filename)
-            const name      = path.basename(filename)
-
-            const group     = this.createPlanGroup(dir)
-
-            const planItem  = ProjectPlanItem.new({ id : filename, name, filename, descriptor, parentItem : group })
-
-            group.planItem(planItem)
         }
 
 
