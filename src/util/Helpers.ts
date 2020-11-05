@@ -31,7 +31,10 @@ export const typeOf = (value : any) : string => Object.prototype.toString.call(v
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type PartialWOC<T> = Omit<Partial<T>, 'constructor'>
+export type PartialWOC<T>       = Omit<Partial<T>, 'constructor'>
+
+export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export const isSubclassOf = (baseclass : AnyConstructor, superclass : AnyConstructor) : boolean => {

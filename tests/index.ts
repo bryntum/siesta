@@ -18,6 +18,13 @@ project.configure({
 
 project.start(
     {
+        group       : 'Channel',
+
+        items       : [
+            'channel/channel.t.js'
+        ]
+    },
+    {
         group       : 'Class',
 
         items       : [

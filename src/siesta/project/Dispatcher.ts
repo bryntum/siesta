@@ -1,5 +1,6 @@
 import { Channel } from "../../channel/Channel.js"
-import { AnyConstructor, Mixin } from "../../class/Mixin.js"
+import { Base } from "../../class/Base.js"
+import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Agent } from "../agent/Agent.js"
 import { Project, ProjectPlanItem } from "./Project.js"
 
@@ -10,8 +11,8 @@ export class AgentData {}
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Dispatcher extends Mixin(
-    [ Channel ],
-    (base : AnyConstructor<Channel, typeof Channel>) =>
+    [ Channel, Base ],
+    (base : ClassUnion<typeof Channel, typeof Base>) =>
 
     class Dispatcher extends base {
         project         : Project                   = undefined
