@@ -145,11 +145,6 @@ export class Channel extends Mixin(
         }
 
 
-        sendMessage (message : unknown) {
-            throw "Abstract method `sendMessage`"
-        }
-
-
         messageToEnvelop (message : unknown) : EnvelopCall | EnvelopResult | undefined {
             throw "Abstract method `messageToEnvelop`"
         }
@@ -157,6 +152,11 @@ export class Channel extends Mixin(
 
         envelopToMessage (envelop : EnvelopCall | EnvelopResult) : unknown {
             throw "Abstract method `envelopToMessage`"
+        }
+
+
+        sendMessage (message : unknown) {
+            throw "Abstract method `sendMessage`"
         }
 
 
@@ -170,11 +170,14 @@ export class Channel extends Mixin(
                 if (!handler) {
                     this.logger && this.logger.debug(`Response for unknown envelop, timeout occurred?\n${ JSON.stringify(envelop) }`)
                 } else {
+                    if (handler[ 3 ] !== null) clearTimeout(handler[ 3 ])
+
                     this.awaitingResponse.delete(inResponseOf)
 
                     handler[ envelop.isRejection ? 1 : 0 ](envelop.payload)
                 }
-            } else {
+            }
+            else if (envelop instanceof EnvelopCall) {
                 const methodName    = envelop.payload[ 0 ]
 
                 if (!this.localMessages[ methodName ]) throw new Error(`No local messages with name: '${ methodName }'`)
@@ -197,6 +200,8 @@ export class Channel extends Mixin(
                 }
 
                 this.sendMessage(this.envelopToMessage(resultingEnvelop))
+            } else {
+                throw new Error(`Failed to convert message to envelop: ${ message }`)
             }
         }
 
@@ -211,11 +216,7 @@ export class Channel extends Mixin(
                     timeoutHandler = setTimeout(() => {
                         this.logger && this.logger.debug("Timeout occurred for: " + JSON.stringify(envelop))
 
-                        if (this.awaitingResponse.has(envelop.id)) {
-                            this.awaitingResponse.delete(envelop.id)
-
-                            reject(new Error("Timeout while waiting for remote call"))
-                        }
+                        reject(new Error("Timeout while waiting for remote call"))
                     }, message.timeout)
                 }
 

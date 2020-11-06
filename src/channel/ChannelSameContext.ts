@@ -31,7 +31,7 @@ export class ChannelSameContext extends Mixin(
         }
 
 
-        async sendMessage (message : any) : Promise<any> {
+        sendMessage (message : unknown) {
             this.media.receiveMessage(message)
         }
     }
