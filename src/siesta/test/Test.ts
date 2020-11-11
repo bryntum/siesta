@@ -1,7 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
-import { isSubclassOf, isSuperclassOf } from "../../util/Helpers.js"
+import { isSubclassOf, isSuperclassOf, typeOf } from "../../util/Helpers.js"
 import { Agent } from "../agent/Agent.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
@@ -10,6 +10,10 @@ export type TestCode = <T extends Test>(t : T) => any
 
 export class TestDescriptor extends Base {
     name            : string                = ''
+
+    title           : string                = ''
+
+    filename        : string                = ''
 
     testClass       : typeof Test           = Test
 
@@ -44,10 +48,11 @@ export class TestDescriptor extends Base {
 
 
     static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, props? : string | Partial<InstanceType<T>>) : InstanceType<T> {
-        if (typeof props === 'string' || (props instanceof String)) {
+        if (typeOf(props) === 'String') {
             // @ts-ignore
             return this.new({ name : props })
         } else {
+            // @ts-ignore
             return this.new(props)
         }
     }

@@ -9,7 +9,7 @@ export class ProjectPlanItem extends Base {
 
     id              : string            = ''
 
-    name            : string            = ''
+    filename        : string            = ''
 
     url             : string            = ''
 
@@ -27,29 +27,42 @@ export class ProjectPlanItem extends Base {
             this.parentItem     = another.parentItem
         }
 
-        if (another.name !== this.name || another.url !== this.url) throw new Error("Can not merge plan items - name or url do not match")
+        if (another.filename !== this.filename || another.url !== this.url) throw new Error("Can not merge plan items - name or url do not match")
 
         this.descriptor.merge(another.descriptor)
     }
 }
 
+export type ProjectPlanItemDescriptor = string | (Partial<TestDescriptor> & { items? : ProjectPlanItemDescriptor[] })
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ProjectPlanGroup extends ProjectPlanItem {
     items           : ProjectPlanItem[]                 = []
 
-    itemsMap        : Map<string, ProjectPlanItem>      = new Map()
+    // itemsMap        : Map<string, ProjectPlanItem>      = new Map()
 
 
     planItem (item : ProjectPlanItem) {
-        const existing      = this.itemsMap.get(item.id)
+        item.parentItem     = this
 
-        if (existing)
-            existing.merge(item)
-        else {
-            this.items.push(item)
-            this.itemsMap.set(item.id, item)
-        }
+        this.items.push(item)
+    }
+}
+
+const PlanItemFromDescriptor = (desc : ProjectPlanItemDescriptor) : ProjectPlanItem | ProjectPlanGroup => {
+    if (typeof desc === 'string') {
+        return ProjectPlanItem.new({
+            filename    : desc
+        })
+    }
+    else if (desc.items !== undefined) {
+        const group = ProjectPlanGroup.new()
+
+        desc.items.forEach(item => group.planItem(PlanItemFromDescriptor(item)))
+
+        return group
+    } else {
+        return ProjectPlanItem.new({ descriptor : TestDescriptor.new(desc) })
     }
 }
 
@@ -72,12 +85,12 @@ export class Project extends Mixin(
 
         options         : Partial<TestDescriptor>           = undefined
 
-        plan            : ProjectPlanGroup                  = undefined
-        planMap         : Map<string, ProjectPlanItem>      = new Map()
+        projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new({ filename : '.' })
+        projectPlanMap  : Map<string, ProjectPlanItem>      = new Map()
 
 
         createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
-            const existing      = this.planMap.get(dir)
+            const existing      = this.projectPlanMap.get(dir)
 
             if (existing) {
                 if (existing instanceof ProjectPlanGroup) {
@@ -88,9 +101,9 @@ export class Project extends Mixin(
                     throw new Error("Plan group already declared as file")
             }
 
-            const newGroup = ProjectPlanGroup.new({ id : dir, name : dir, url : dir, descriptor : TestDescriptor.maybeNew(descriptor) })
+            const newGroup = ProjectPlanGroup.new({ id : dir, filename : dir, url : dir, descriptor : TestDescriptor.maybeNew(descriptor) })
 
-            this.planMap.set(newGroup.id, newGroup)
+            this.projectPlanMap.set(newGroup.id, newGroup)
 
             return newGroup
         }
@@ -98,6 +111,14 @@ export class Project extends Mixin(
 
         finalizePlan () {
 
+        }
+
+
+        plan (...args : (ProjectPlanItemDescriptor | ProjectPlanItemDescriptor[])[]) {
+            const flattened     = args.flat(Number.MAX_SAFE_INTEGER)
+            const descriptors   = flattened.filter(el => Boolean(el))
+
+            descriptors.forEach(item => this.projectPlan.planItem(PlanItemFromDescriptor(item as ProjectPlanItemDescriptor)))
         }
 
 
