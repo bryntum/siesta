@@ -84,13 +84,22 @@ export class Channel extends Mixin(
         localMessages           : object
         remoteMessages          : object
 
-        logger                  : Logger        = undefined
+        $logger                 : Logger        = undefined
 
         maxConnectionAttempts   : number        = Number.MAX_SAFE_INTEGER
         connectionTimeout       : number        = 10000
         connectionInterval      : number        = 500
 
         awaitingResponse        : Map<EnvelopId, [ Function, Function, EnvelopCall, SetTimeoutHandler ]> = new Map()
+
+
+        get logger () : Logger {
+            return this.$logger
+        }
+
+        set logger (value : Logger) {
+            this.$logger    = value
+        }
 
 
         async doConnect (media : this[ 'media' ]) : Promise<any> {

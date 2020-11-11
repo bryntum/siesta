@@ -1,7 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
-import { Agent } from "../agent/Agent.js"
+import { LocalContextProvider } from "../context_provider/LocalContextProvider.js"
 import { TestDescriptorArgument } from "./Descriptor.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
@@ -78,7 +78,7 @@ export class Test extends Mixin(
     class Test extends base {
         url             : string            = ''
 
-        agent           : Agent             = undefined
+        agent           : LocalContextProvider             = undefined
 
         context         : ExecutionContext  = undefined
 

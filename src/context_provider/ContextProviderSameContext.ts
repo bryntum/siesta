@@ -10,6 +10,11 @@ export class ContextProviderSameContext extends Mixin(
 
     class ContextProviderSameContext extends base {
 
+        async setup () {
+            // do nothing
+        }
+
+
         async createContext () : Promise<ExecutionContextSameContext> {
             return ExecutionContextSameContext.new()
         }

@@ -1,13 +1,9 @@
 import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Agent } from "../agent/Agent.js"
-import { ProjectPlanItem } from "./Plan.js"
+import { Logger } from "../../logger/Logger.js"
+import { LocalContextProvider } from "../context_provider/LocalContextProvider.js"
 import { Project } from "./Project.js"
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class AgentData {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -20,9 +16,22 @@ export class Dispatcher extends Mixin(
 
         reporter        : any                       = undefined
 
-        agents          : Map<Agent, AgentData>     = new Map()
+        localContextProviders   : LocalContextProvider[]                   = []
 
-        linearizedPlan  : ProjectPlanItem[]         = []
+        localContextProviderConstructors   : (typeof LocalContextProvider)[]      = []
+
+
+        get logger () : Logger {
+            return this.project.logger
+        }
+
+        set logger (value : Logger) {
+        }
+
+
+        registerLocalContextProvider (localContextProvider : LocalContextProvider) {
+            this.localContextProviders.push(localContextProvider)
+        }
 
 
         async start () {
@@ -33,6 +42,21 @@ export class Dispatcher extends Mixin(
 
 
         async setup () {
+            const lcpSetup      = []
+
+            this.localContextProviderConstructors.forEach(lcpConstructor => {
+                const lcp                   = lcpConstructor.new()
+
+                lcpSetup.push(lcp.setup().then(() => {
+                    this.registerLocalContextProvider(lcp)
+                }, rejected => {
+                    this.logger.debug(`Failed to setup context provider: ${rejected}`)
+                }))
+            })
+
+            await Promise.all(lcpSetup)
+
+            if (this.localContextProviders.length === 0) throw new Error("Dispatcher setup failed - no context providers available")
         }
 
 

@@ -1,5 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
+import { Logger } from "../../logger/Logger.js"
+import { LocalContextProviderSameContext } from "../context_provider/LocalContextProviderSameContext.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { Dispatcher } from "./Dispatcher.js"
 import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor } from "./Plan.js"
@@ -19,6 +21,8 @@ export class Project extends Mixin(
 
         projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new({ descriptor : TestDescriptor.new({ filename : '.' }) })
         projectPlanMap  : Map<string, ProjectPlanItem>      = new Map()
+
+        logger          : Logger            = undefined
 
 
         createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
@@ -50,7 +54,10 @@ export class Project extends Mixin(
 
 
         async start () {
-            const dispatcher    = Dispatcher.new({ project : this })
+            const dispatcher    = Dispatcher.new({
+                project                                 : this,
+                localContextProviderConstructors        : [ LocalContextProviderSameContext ]
+            })
 
             await dispatcher.start()
         }
