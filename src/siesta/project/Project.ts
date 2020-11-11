@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
+import { LocalContextProvider } from "../context_provider/LocalContextProvider.js"
 import { LocalContextProviderSameContext } from "../context_provider/LocalContextProviderSameContext.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { Dispatcher } from "./Dispatcher.js"
@@ -24,25 +25,27 @@ export class Project extends Mixin(
 
         logger          : Logger            = undefined
 
+        localContextProviderConstructors   : (typeof LocalContextProvider)[]      = [ LocalContextProviderSameContext ]
 
-        createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
-            const existing      = this.projectPlanMap.get(dir)
 
-            if (existing) {
-                if (existing instanceof ProjectPlanGroup) {
-                    if (descriptor) existing.descriptor.merge(descriptor)
-
-                    return existing
-                } else
-                    throw new Error("Plan group already declared as file")
-            }
-
-            const newGroup = ProjectPlanGroup.new({ id : dir, filename : dir, url : dir, descriptor : TestDescriptor.maybeNew(descriptor) })
-
-            this.projectPlanMap.set(newGroup.id, newGroup)
-
-            return newGroup
-        }
+        // createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
+        //     const existing      = this.projectPlanMap.get(dir)
+        //
+        //     if (existing) {
+        //         if (existing instanceof ProjectPlanGroup) {
+        //             if (descriptor) existing.descriptor.merge(descriptor)
+        //
+        //             return existing
+        //         } else
+        //             throw new Error("Plan group already declared as file")
+        //     }
+        //
+        //     const newGroup = ProjectPlanGroup.new({ id : dir, filename : dir, url : dir, descriptor : TestDescriptor.maybeNew(descriptor) })
+        //
+        //     this.projectPlanMap.set(newGroup.id, newGroup)
+        //
+        //     return newGroup
+        // }
 
 
         plan (...args : (ProjectPlanItemDescriptor | ProjectPlanItemDescriptor[])[]) {
@@ -56,7 +59,7 @@ export class Project extends Mixin(
         async start () {
             const dispatcher    = Dispatcher.new({
                 project                                 : this,
-                localContextProviderConstructors        : [ LocalContextProviderSameContext ]
+                localContextProviderConstructors        : this.localContextProviderConstructors
             })
 
             await dispatcher.start()

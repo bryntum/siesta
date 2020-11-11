@@ -65,9 +65,19 @@ export type ProjectPlanItemDescriptor = string | (Partial<TestDescriptor> & { it
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ProjectPlanGroup extends ProjectPlanItem {
-    items           : ProjectPlanItem[]                 = []
+    items           : (ProjectPlanItem | ProjectPlanGroup)[]                 = []
 
     // itemsMap        : Map<string, ProjectPlanItem>      = new Map()
+
+
+    leafsAxis () : ProjectPlanItem[] {
+        return this.items.flatMap(item => {
+            if (item instanceof ProjectPlanGroup)
+                return item.leafsAxis()
+            else
+                return item
+        })
+    }
 
 
     planItem (item : ProjectPlanItem) {
