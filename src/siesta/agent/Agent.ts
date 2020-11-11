@@ -9,9 +9,7 @@ export class Agent extends Mixin(
     (base : AnyConstructor<Base, typeof Base>) => {
 
         class Agent extends base {
-            idSource            : number            = 0
-
-
+            // idSource            : number            = 0
 
             dispatcher          : Dispatcher        = undefined
 

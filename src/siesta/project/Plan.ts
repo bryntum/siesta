@@ -41,7 +41,7 @@ export class ProjectPlanItem extends Base {
     }
 
 
-    parentsAxis (reversed : boolean = false) : ProjectPlanGroup[] {
+    parentsAxis (rootFirst : boolean = false) : ProjectPlanGroup[] {
         const res : ProjectPlanGroup[]   = []
 
         let item : ProjectPlanItem       = this
@@ -52,7 +52,7 @@ export class ProjectPlanItem extends Base {
             item        = item.parentItem
         }
 
-        if (reversed) res.reverse()
+        if (rootFirst) res.reverse()
 
         return res
     }

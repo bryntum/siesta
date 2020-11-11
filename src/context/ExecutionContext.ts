@@ -1,5 +1,5 @@
 import { Base } from "../class/Base.js"
-import { AnyConstructor, Mixin } from "../class/Mixin.js"
+import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
 import { Hook } from "../event/Hook.js"
 
 
@@ -22,18 +22,12 @@ export class ExecutionContext extends Mixin(
         }
 
 
-        exceptionHook : Hook<[ this ]>       = new Hook()
-        rejectionHook : Hook<[ this ]>       = new Hook()
+        async evaluate <A extends unknown[], R extends unknown> (func : (...args : A) => R | Promise<R>, ...args : A) : Promise<R> {
+            throw new Error("Abstract method")
+        }
+
+
+        exceptionHook : Hook<[ this, unknown ]>     = undefined
+        rejectionHook : Hook<[ this, unknown ]>     = undefined
     }
 ) {}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class ExecutionContextNodejs extends Mixin(
-    [ Base ],
-    (base : AnyConstructor<Base, typeof Base>) =>
-
-    class ExecutionContextNodejs extends base {
-    }
-) {}
-

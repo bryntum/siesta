@@ -41,11 +41,6 @@ export class Project extends Mixin(
         }
 
 
-        finalizePlan () {
-
-        }
-
-
         plan (...args : (ProjectPlanItemDescriptor | ProjectPlanItemDescriptor[])[]) {
             const flattened     = args.flat(Number.MAX_SAFE_INTEGER)
             const descriptors   = flattened.filter(el => Boolean(el))
@@ -55,8 +50,6 @@ export class Project extends Mixin(
 
 
         async start () {
-            debugger
-
             const dispatcher    = Dispatcher.new({ project : this })
 
             await dispatcher.start()
