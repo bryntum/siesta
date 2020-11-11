@@ -7,11 +7,21 @@ export class ProjectPlanItem extends Base {
 
     id              : string            = ''
 
-    filename        : string            = ''
-
-    url             : string            = ''
+    $url            : string            = undefined
 
     descriptor      : Partial<TestDescriptor>   = TestDescriptor.new()
+
+
+    get filename () : string {
+        return this.descriptor.filename
+    }
+
+
+    get url () : string {
+        if (this.$url !== undefined) return this.$url
+
+        return this.$url = (this.parentsAxis(true) as ProjectPlanItem[]).concat([ this ]).map(item => item.filename).join('/')
+    }
 
 
     merge (another : ProjectPlanItem) {
@@ -28,6 +38,23 @@ export class ProjectPlanItem extends Base {
         if (another.filename !== this.filename || another.url !== this.url) throw new Error("Can not merge plan items - name or url do not match")
 
         this.descriptor.merge(another.descriptor)
+    }
+
+
+    parentsAxis (reversed : boolean = false) : ProjectPlanGroup[] {
+        const res : ProjectPlanGroup[]   = []
+
+        let item : ProjectPlanItem       = this
+
+        while (item) {
+            if (item.parentItem) res.push(item.parentItem)
+
+            item        = item.parentItem
+        }
+
+        if (reversed) res.reverse()
+
+        return res
     }
 }
 
@@ -53,11 +80,15 @@ export class ProjectPlanGroup extends ProjectPlanItem {
 export const PlanItemFromDescriptor = (desc : ProjectPlanItemDescriptor) : ProjectPlanItem | ProjectPlanGroup => {
     if (typeof desc === 'string') {
         return ProjectPlanItem.new({
-            filename    : desc
+            descriptor : TestDescriptor.new({ filename : desc })
         })
     }
     else if (desc.items !== undefined) {
-        const group = ProjectPlanGroup.new()
+        const groupDesc = Object.assign({}, desc)
+
+        delete groupDesc.items
+
+        const group = ProjectPlanGroup.new({ descriptor : TestDescriptor.new(groupDesc) })
 
         desc.items.forEach(item => group.planItem(PlanItemFromDescriptor(item)))
 

@@ -17,7 +17,7 @@ export class Project extends Mixin(
 
         options         : Partial<TestDescriptor>           = undefined
 
-        projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new({ filename : '.' })
+        projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new({ descriptor : TestDescriptor.new({ filename : '.' }) })
         projectPlanMap  : Map<string, ProjectPlanItem>      = new Map()
 
 
