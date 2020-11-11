@@ -1,4 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ContextProvider } from "../../context_provider/ContextProvider.js"
 import { Logger } from "../../logger/Logger.js"
 import { Dispatcher } from "../project/Dispatcher.js"
@@ -17,6 +18,15 @@ export class LocalContextProvider extends Mixin(
             }
 
             set logger (value : Logger) {
+            }
+
+
+            async createTestContext () : Promise<ExecutionContext> {
+                const context       = await this.createContext()
+
+                context.evaluate(() => {})
+
+                return context
             }
         }
 

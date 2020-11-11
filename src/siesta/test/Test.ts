@@ -93,3 +93,8 @@ export class Test extends Mixin(
         }
     }
 ) {}
+
+
+const it = () => {
+
+}

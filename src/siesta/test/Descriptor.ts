@@ -1,5 +1,5 @@
 import { Base } from "../../class/Base.js"
-import { IsolationLevel } from "../../context_provider/ContextProvider.js"
+import { IsolationLevel } from "../../context_provider/IsolationLevel.js"
 import { isSubclassOf, isSuperclassOf, typeOf } from "../../util/Helpers.js"
 import { Test } from "./Test.js"
 
@@ -17,7 +17,7 @@ export class TestDescriptor extends Base {
 
     tags            : string[]              = []
 
-    isolation       : IsolationLevel        = ''
+    isolation       : IsolationLevel        = undefined
 
     // will be applied directly to test instance
     config          : object                = undefined
