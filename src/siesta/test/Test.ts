@@ -1,82 +1,30 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
-import { isSubclassOf, isSuperclassOf, typeOf } from "../../util/Helpers.js"
 import { Agent } from "../agent/Agent.js"
+import { TestDescriptorArgument } from "./Descriptor.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type TestCode = <T extends Test>(t : T) => any
 
-export class TestDescriptor extends Base {
-    name            : string                = ''
-
-    title           : string                = ''
-
-    filename        : string                = ''
-
-    testClass       : typeof Test           = Test
-
-    env             : 'generic' | 'browser' | 'nodejs'  = 'generic'
-
-    tags            : string[]              = []
-
-
-    merge (anotherObj : Partial<TestDescriptor>) {
-        const another   = (this.constructor as typeof TestDescriptor).maybeNew(anotherObj)
-
-        if (this.name) {
-            if (another.name !== this.name) throw new Error('Can not merge test descriptor - `name` does not match')
-        } else {
-            this.name       = another.name
-        }
-
-        // TODO can promote `env` from `generic` to either `browser` or `nodejs`, anything else should throw
-
-        if (isSuperclassOf(another.testClass, this.testClass)) {
-            this.testClass      = another.testClass
-        }
-        else if (another.testClass === this.testClass || isSubclassOf(another.testClass, this.testClass)) {
-            // do nothing
-        }
-        else
-            throw new Error("Can not merge descriptor - different `testClass` hierarchies")
-
-        // strip duplicates
-        this.tags           = Array.from(new Set(this.tags.concat(another.tags)))
-    }
-
-
-    static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, props? : string | Partial<InstanceType<T>>) : InstanceType<T> {
-        if (typeOf(props) === 'String') {
-            // @ts-ignore
-            return this.new({ name : props })
-        } else {
-            // @ts-ignore
-            return this.new(props)
-        }
-    }
-}
-
-export type TestDescriptorArgument = string | Partial<TestDescriptor>
-
 
 //---------------------------------------------------------------------------------------------------------------------
-export class TestNode extends Mixin(
+export class SubTest extends Mixin(
     [ TestNodeResult, Base ],
     (base : ClassUnion<typeof TestNodeResult, typeof Base>) =>
 
-    class TestNode extends base {
+    class SubTest extends base {
         // "promote" types from TreeNode
-        parentNode      : TestNode
-        childNodes      : TestNode[]
+        parentNode      : SubTest
+        childNodes      : SubTest[]
 
         code            : TestCode          = undefined
 
         ongoing         : Promise<any>      = undefined
 
 
-        $rootTest   : Test                  = undefined
+        $rootTest       : Test              = undefined
 
         get rootTest () : Test {
             if (this.$rootTest !== undefined) return this.$rootTest
@@ -124,8 +72,8 @@ export class TestNode extends Mixin(
 
 
 export class Test extends Mixin(
-    [ TestNode ],
-    (base : AnyConstructor<TestNode, ClassUnion<typeof TestNode>>) =>
+    [ SubTest ],
+    (base : AnyConstructor<SubTest, ClassUnion<typeof SubTest>>) =>
 
     class Test extends base {
         url             : string            = ''

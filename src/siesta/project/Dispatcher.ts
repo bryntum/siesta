@@ -2,7 +2,8 @@ import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Agent } from "../agent/Agent.js"
-import { Project, ProjectPlanItem } from "./Project.js"
+import { ProjectPlanItem } from "./Plan.js"
+import { Project} from "./Project.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
