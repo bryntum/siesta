@@ -6,7 +6,7 @@ import { Hook } from "../event/Hook.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ExecutionContext extends Mixin(
     [ Base ],
-    (base : AnyConstructor<Base, typeof Base>) =>
+    (base : ClassUnion<typeof Base>) =>
 
     class ExecutionContext extends base {
         attachedTo  : any       = undefined
