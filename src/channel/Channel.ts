@@ -42,7 +42,7 @@ const ensureMessagesStorage = (target : Channel) => {
 
 export const remote = (messageDesc : Partial<Message> = Message.new()) : PropertyDecorator => {
 
-    const message       = Message.fromPlainObject(messageDesc)
+    const message       = Message.maybeNew(messageDesc)
 
     return function (target : Channel, propertyKey : string) : void {
         const { remoteMessages } = ensureMessagesStorage(target)

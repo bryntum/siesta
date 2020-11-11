@@ -9,8 +9,6 @@ import { Assertion, TestNodeResult } from "./Result.js"
 export type TestCode = <T extends Test>(t : T) => any
 
 export class TestDescriptor extends Base {
-    parent          : TestDescriptor        = undefined
-
     name            : string                = ''
 
     testClass       : typeof Test           = Test
@@ -21,10 +19,10 @@ export class TestDescriptor extends Base {
 
 
     merge (anotherObj : Partial<TestDescriptor>) {
-        const another   = (this.constructor as typeof TestDescriptor).fromPlainObject(anotherObj as Partial<TestDescriptor>)
+        const another   = (this.constructor as typeof TestDescriptor).maybeNew(anotherObj)
 
         if (this.name) {
-            if (another.name !== this.name) throw new Error('Can not merge test descriptor - different `name`')
+            if (another.name !== this.name) throw new Error('Can not merge test descriptor - `name` does not match')
         } else {
             this.name       = another.name
         }
@@ -48,7 +46,7 @@ export class TestDescriptor extends Base {
     static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, props? : string | Partial<InstanceType<T>>) : InstanceType<T> {
         if (typeof props === 'string' || (props instanceof String)) {
             // @ts-ignore
-            return this.new({ name : props as string })
+            return this.new({ name : props })
         } else {
             return this.new(props)
         }
@@ -141,4 +139,4 @@ export class Test extends Mixin(
 
         }
     }
-){}
+) {}

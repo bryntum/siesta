@@ -46,7 +46,7 @@ export class ProjectNodejs extends Mixin(
 
             const group     = this.createPlanGroup(dir)
 
-            const planItem  = ProjectPlanItem.new({ id : filename, name, filename, descriptor, parentItem : group })
+            const planItem  = ProjectPlanItem.new({ id : filename, name, url: filename, descriptor, parentItem : group })
 
             group.planItem(planItem)
         }

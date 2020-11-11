@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------------------------------------
 /**
- * This is a base class, providing the type-safe static constructor [[new]]. This is very convenient when using
+ * This is a base class, providing the type-safe static constructors [[new]] and [[maybeNew]]. This is very convenient when using
  * [[Mixin|mixins]], as mixins can not have types in the constructors.
  */
 export class Base {
@@ -53,13 +53,15 @@ export class Base {
 
 
     /**
-     * Document me
+     * This is a type-safe static constructor method, accepting a single argument. If that argument is already an instance
+     * of this class - it is returned right away, otherwise the [[new]] constructor is used for instantiation.
      * @param props
      */
-    static fromPlainObject<T extends typeof Base> (this : T, props? : Partial<InstanceType<T>>) : InstanceType<T> {
-        if (props instanceof this) return props as InstanceType<T>
-
-        return this.new(props)
+    static maybeNew<T extends typeof Base> (this : T, props? : Partial<InstanceType<T>>) : InstanceType<T> {
+        if (props instanceof this)
+            return props as InstanceType<T>
+        else
+            return this.new(props)
     }
 }
 

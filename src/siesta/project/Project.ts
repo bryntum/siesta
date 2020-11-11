@@ -11,26 +11,14 @@ export class ProjectPlanItem extends Base {
 
     name            : string            = ''
 
-    filename        : string            = ''
+    url             : string            = ''
 
     descriptor      : Partial<TestDescriptor>   = TestDescriptor.new()
 
 
-    initialize<T extends ProjectPlanItem> (props? : Partial<T>) {
-        if (props) {
-            if (props.descriptor === undefined)
-                delete props.descriptor
-            else
-                props.descriptor    = TestDescriptor.fromPlainObject(props.descriptor)
-        }
-
-        props && Object.assign(this, props)
-    }
-
-
     merge (another : ProjectPlanItem) {
         if (this.parentItem) {
-            if (another.parentItem && this.parentItem !== another.parentItem) throw new Error("Can not merge items")
+            if (another.parentItem && this.parentItem !== another.parentItem) throw new Error("Can not merge plan items - parent items do not match")
         }
         else if (!another.parentItem) {
             // do nothing
@@ -39,7 +27,7 @@ export class ProjectPlanItem extends Base {
             this.parentItem     = another.parentItem
         }
 
-        if (another.id !== this.id || another.name !== this.name || another.filename !== this.filename) throw new Error("Illegal state")
+        if (another.name !== this.name || another.url !== this.url) throw new Error("Can not merge plan items - name or url do not match")
 
         this.descriptor.merge(another.descriptor)
     }
@@ -78,7 +66,7 @@ export class Project extends Mixin(
     (base : AnyConstructor<Base, typeof Base>) =>
 
     class Project extends base {
-        baseDir         : string            = ''
+        baseUrl         : string            = ''
 
         name            : string            = ''
 
@@ -100,7 +88,7 @@ export class Project extends Mixin(
                     throw new Error("Plan group already declared as file")
             }
 
-            const newGroup = ProjectPlanGroup.new({ id : dir, name : dir, filename : dir, descriptor })
+            const newGroup = ProjectPlanGroup.new({ id : dir, name : dir, url : dir, descriptor : TestDescriptor.maybeNew(descriptor) })
 
             this.planMap.set(newGroup.id, newGroup)
 

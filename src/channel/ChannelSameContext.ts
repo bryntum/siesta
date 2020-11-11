@@ -11,9 +11,9 @@ export class ChannelSameContext extends Mixin(
 
         messageToEnvelop (message : any) : EnvelopCall | EnvelopResult | undefined {
             if (message.inResponseOf !== undefined)
-                return EnvelopResult.fromPlainObject(message)
+                return EnvelopResult.maybeNew(message)
             else
-                return EnvelopCall.fromPlainObject(message)
+                return EnvelopCall.maybeNew(message)
         }
 
 
