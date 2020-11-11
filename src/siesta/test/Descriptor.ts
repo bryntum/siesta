@@ -16,6 +16,9 @@ export class TestDescriptor extends Base {
 
     tags            : string[]              = []
 
+    // will be applied directly to test instance
+    config          : object                = undefined
+
 
     merge (anotherObj : Partial<TestDescriptor>) {
         const another   = (this.constructor as typeof TestDescriptor).maybeNew(anotherObj)
