@@ -11,6 +11,14 @@ export class ExecutionContextSameContext extends Mixin(
         async evaluate <A extends unknown[], R extends unknown> (func : (...args : A) => R | Promise<R>, ...args : A) : Promise<R> {
             return await func(...args)
         }
+
+
+        async setup () {
+        }
+
+
+        async destroy () {
+        }
     }
 ) {}
 

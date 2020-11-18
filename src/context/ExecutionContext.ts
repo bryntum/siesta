@@ -26,8 +26,17 @@ export class ExecutionContext extends Mixin(
             throw new Error("Abstract method")
         }
 
-
         exceptionHook : Hook<[ this, unknown ]>     = undefined
         rejectionHook : Hook<[ this, unknown ]>     = undefined
+
+
+        async setup () {
+            throw new Error("Abstract method")
+        }
+
+
+        async destroy () {
+            throw new Error("Abstract method")
+        }
     }
 ) {}

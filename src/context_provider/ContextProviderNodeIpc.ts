@@ -1,17 +1,20 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { ExecutionContext } from "../context/ExecutionContext.js"
 import { ExecutionContextSameContext } from "../context/ExecutionContextSameContext.js"
 import { ContextProvider } from "./ContextProvider.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ContextProviderSameContext extends Mixin(
+export class ContextProviderNodeIpc extends Mixin(
     [ ContextProvider ],
     (base : ClassUnion<typeof ContextProvider>) =>
 
-    class ContextProviderSameContext extends base {
+    class ContextProviderNodeIpc extends base {
+
+        contexts        : any
+
 
         async setup () {
-            // do nothing
         }
 
 

@@ -24,7 +24,11 @@ export class LocalContextProvider extends Mixin(
             async createTestContext () : Promise<ExecutionContext> {
                 const context       = await this.createContext()
 
-                context.evaluate(() => {})
+                context.evaluate(() => {
+                    globalThis.__SIESTA__ = {
+                        communicate : 'IPC'
+                    }
+                })
 
                 return context
             }

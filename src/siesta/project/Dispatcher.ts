@@ -68,8 +68,14 @@ export class Dispatcher extends Mixin(
 
 
         async launchProjectPlanItem (item : ProjectPlanItem) {
+            console.log("launch project item: ", item.url)
 
-            debugger
+            const context       = await this.createTestContext()
+        }
+
+
+        async createTestContext () {
+            return await this.localContextProviders[ 0 ].createTestContext()
         }
 
     }
