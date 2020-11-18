@@ -14,6 +14,11 @@ export class ContextProvider extends Mixin(
         }
 
 
+        async destroy () {
+            throw new Error("Abstract method")
+        }
+
+
         async createContext () : Promise<ExecutionContext> {
             throw new Error("Abstract method")
         }

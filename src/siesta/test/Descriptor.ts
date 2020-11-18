@@ -17,6 +17,8 @@ export class TestDescriptor extends Base {
 
     tags            : string[]              = []
 
+    isTodo          : boolean               = false
+
     isolation       : IsolationLevel        = undefined
 
     // will be applied directly to test instance

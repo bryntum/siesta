@@ -73,15 +73,7 @@ export class TestNodeResult extends Mixin(
         parentNode      : TestNodeResult
         childNodes      : TestNodeResult[]
 
-        id              : number            = 0
-
         assertions      : Assertion[]       = []
-
-        name            : string            = ''
-
-        tags            : string[]          = []
-
-        isTodo          : boolean           = false
 
 
         addAssertion (assertion : Assertion) {

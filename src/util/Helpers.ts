@@ -128,3 +128,9 @@ export const isGeneratorFunction = function (func : any) : boolean {
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export const isNodejs = function () : boolean {
+    // TODO refine this, `process` can be defined in browser too
+    return typeof process !== undefined
+}
+

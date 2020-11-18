@@ -1,6 +1,27 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 
+/*
+
+iso
+---
+SameContext
+NewContext
+
+
+node
+----
+NewProcess
+
+
+browser
+-------
+Popup
+
+
+*/
+
+
 //---------------------------------------------------------------------------------------------------------------------
 export class IsolationLevel extends Mixin(
     [ Base ],

@@ -3,6 +3,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { LocalContextProvider } from "../context_provider/LocalContextProvider.js"
+import { ProjectPlanItem } from "./Plan.js"
 import { Project } from "./Project.js"
 
 
@@ -42,19 +43,15 @@ export class Dispatcher extends Mixin(
 
 
         async setup () {
-            const lcpSetup      = []
+            await Promise.all(this.localContextProviderConstructors.map(lcpConstructor => {
+                const lcp                   = lcpConstructor.new({ dispatcher : this })
 
-            this.localContextProviderConstructors.forEach(lcpConstructor => {
-                const lcp                   = lcpConstructor.new()
-
-                lcpSetup.push(lcp.setup().then(() => {
+                return lcp.setup().then(() => {
                     this.registerLocalContextProvider(lcp)
                 }, rejected => {
                     this.logger.debug(`Failed to setup context provider: ${rejected}`)
-                }))
-            })
-
-            await Promise.all(lcpSetup)
+                })
+            }))
 
             if (this.localContextProviders.length === 0) throw new Error("Dispatcher setup failed - no context providers available")
         }
@@ -62,6 +59,17 @@ export class Dispatcher extends Mixin(
 
         async launch () {
             const projectPlanItems      = this.project.projectPlan.leafsAxis()
+
+            for (const item of projectPlanItems) {
+                await this.launchProjectPlanItem(item)
+            }
         }
+
+
+        async launchProjectPlanItem (item : ProjectPlanItem) {
+
+            debugger
+        }
+
     }
 ) {}

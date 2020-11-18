@@ -1,8 +1,9 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
+import { isNodejs } from "../../util/Helpers.js"
 import { LocalContextProvider } from "../context_provider/LocalContextProvider.js"
-import { TestDescriptorArgument } from "./Descriptor.js"
+import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -11,17 +12,24 @@ export type TestCode = <T extends Test>(t : T) => any
 
 //---------------------------------------------------------------------------------------------------------------------
 export class SubTest extends Mixin(
-    [ TestNodeResult, Base ],
-    (base : ClassUnion<typeof TestNodeResult, typeof Base>) =>
+    [ TestNodeResult ],
+    (base : ClassUnion<typeof TestNodeResult>) =>
 
     class SubTest extends base {
-        // "promote" types from TreeNode
+        // "upgrade" types from TreeNode
         parentNode      : SubTest
         childNodes      : SubTest[]
 
         code            : TestCode          = undefined
 
+
         ongoing         : Promise<any>      = undefined
+
+
+        descriptor      : TestDescriptor    = undefined
+
+
+        pendingSubTests : SubTest[]         = []
 
 
         $rootTest       : Test              = undefined
@@ -50,7 +58,11 @@ export class SubTest extends Mixin(
 
 
         it<T extends typeof Test> (name : TestDescriptorArgument, code : TestCode) : any {
+            const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
 
+            const test      = SubTest.new({ descriptor, code })
+
+            this.parentNode.pendingSubTests.push(test)
         }
 
 
@@ -60,12 +72,15 @@ export class SubTest extends Mixin(
 
 
         async start () {
+            console.log("START SUB TEST")
+
+            await this.launch()
 
         }
 
 
         async launch () {
-            this.rootTest.context.attach()
+            // this.rootTest.context.attach()
         }
     }
 ) {}
@@ -73,14 +88,23 @@ export class SubTest extends Mixin(
 
 export class Test extends Mixin(
     [ SubTest ],
-    (base : AnyConstructor<SubTest, ClassUnion<typeof SubTest>>) =>
+    (base : ClassUnion<typeof SubTest>) =>
 
     class Test extends base {
-        url             : string            = ''
+        agent           : LocalContextProvider              = undefined
 
-        agent           : LocalContextProvider             = undefined
+        context         : ExecutionContext                  = undefined
 
-        context         : ExecutionContext  = undefined
+
+        async start () {
+            console.log("START TOP TEST")
+
+            await this.setup()
+
+            await super.start()
+
+            await this.tearDown()
+        }
 
 
         async setup () {
@@ -95,6 +119,46 @@ export class Test extends Mixin(
 ) {}
 
 
-const it = () => {
+export const it = (name : TestDescriptorArgument, code : TestCode) => {
+    const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
 
+    const test      = SubTest.new({ descriptor, code })
+
+    globalTestEnv.tests.push(test)
+
+    console.log("YO")
 }
+
+
+export class TestEnvironmentContext extends Base {
+    tests       : SubTest[]         = []
+
+
+    initialize<T extends Base> (props? : Partial<T>) {
+        super.initialize(props)
+
+        if (isNodejs()) {
+            (async () => {
+                const path                  = await import('path')
+                const processFilename       = process.argv[ 1 ]
+
+                if (/\.t\.js$/.test(processFilename)) {
+                    const topTest           = Test.new({
+                        descriptor : TestDescriptor.new({ filename : path.basename(processFilename) })
+                    })
+
+                    Promise.resolve().then(() => {
+                        topTest.pendingSubTests = this.tests
+
+                        topTest.start()
+                    })
+                }
+            })()
+        }
+    }
+}
+
+
+export const globalTestEnv : TestEnvironmentContext = TestEnvironmentContext.new()
+
+
