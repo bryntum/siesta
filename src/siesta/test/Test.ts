@@ -1,13 +1,11 @@
 import { Base } from "../../class/Base.js"
-import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { ExecutionContext } from "../../context/ExecutionContext.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { isNodejs } from "../../util/Helpers.js"
-import { LocalContextProvider } from "../context_provider/LocalContextProvider.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export type TestCode = <T extends Test>(t : T) => any
+export type TestCode = <T extends SubTest>(t : T) => any
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -80,20 +78,21 @@ export class SubTest extends Mixin(
 
 
         async launch () {
-            // this.rootTest.context.attach()
+            this.code(this)
         }
     }
 ) {}
 
 
+//---------------------------------------------------------------------------------------------------------------------
 export class Test extends Mixin(
     [ SubTest ],
     (base : ClassUnion<typeof SubTest>) =>
 
     class Test extends base {
-        agent           : LocalContextProvider              = undefined
-
-        context         : ExecutionContext                  = undefined
+        // agent           : LocalContextProvider              = undefined
+        //
+        // context         : ExecutionContext                  = undefined
 
 
         async start () {
@@ -119,17 +118,7 @@ export class Test extends Mixin(
 ) {}
 
 
-export const it = (name : TestDescriptorArgument, code : TestCode) => {
-    const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
-
-    const test      = SubTest.new({ descriptor, code })
-
-    globalTestEnv.tests.push(test)
-
-    console.log("YO")
-}
-
-
+//---------------------------------------------------------------------------------------------------------------------
 export class TestEnvironmentContext extends Base {
     tests       : SubTest[]         = []
 
@@ -144,7 +133,8 @@ export class TestEnvironmentContext extends Base {
 
                 if (/\.t\.js$/.test(processFilename)) {
                     const topTest           = Test.new({
-                        descriptor : TestDescriptor.new({ filename : path.basename(processFilename) })
+                        descriptor      : TestDescriptor.new({ filename : path.basename(processFilename) }),
+                        code            : () => {}
                     })
 
                     Promise.resolve().then(() => {
@@ -158,7 +148,18 @@ export class TestEnvironmentContext extends Base {
     }
 }
 
-
 export const globalTestEnv : TestEnvironmentContext = TestEnvironmentContext.new()
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export const it = (name : TestDescriptorArgument, code : TestCode) => {
+    const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
+
+    const test      = SubTest.new({ descriptor, code })
+
+    globalTestEnv.tests.push(test)
+
+    console.log("YO")
+}
+
+export const describe = it
