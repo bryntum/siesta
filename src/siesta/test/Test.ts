@@ -2,6 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { isNodejs } from "../../util/Helpers.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
+import { Reporter } from "./reporter/Reporter.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -10,24 +11,31 @@ export type TestCode = <T extends SubTest>(t : T) => any
 
 //---------------------------------------------------------------------------------------------------------------------
 export class SubTest extends Mixin(
-    [ TestNodeResult ],
-    (base : ClassUnion<typeof TestNodeResult>) =>
+    [ TestNodeResult/*, TestDescriptor*/ ],
+    (base : ClassUnion<typeof TestNodeResult/*, typeof TestDescriptor*/>) =>
 
     class SubTest extends base {
         // "upgrade" types from TreeNode
         parentNode      : SubTest
         childNodes      : SubTest[]
 
-        code            : TestCode          = undefined
-
+        code            : TestCode          = (t : SubTest) => {}
 
         ongoing         : Promise<any>      = undefined
 
-
         descriptor      : TestDescriptor    = undefined
 
-
         pendingSubTests : SubTest[]         = []
+
+        reporter            : Reporter              = Reporter.new()
+
+
+        addAssertion (assertion : Assertion) {
+            super.addAssertion(assertion)
+
+            this.reporter.onAssertionStarted(this, assertion)
+            this.reporter.onAssertionFinished(this, assertion)
+        }
 
 
         $rootTest       : Test              = undefined
@@ -41,6 +49,7 @@ export class SubTest extends Mixin(
 
         ok<V> (value : V, description : string = '') {
             this.addAssertion(Assertion.new({
+                name            : 'ok',
                 passed          : Boolean(value),
                 description
             }))
@@ -49,13 +58,14 @@ export class SubTest extends Mixin(
 
         is<V> (value1 : V, value2 : V, description : string = '') {
             this.addAssertion(Assertion.new({
+                name            : 'is',
                 passed          : value1 === value2,
                 description
             }))
         }
 
 
-        it<T extends typeof Test> (name : TestDescriptorArgument, code : TestCode) : any {
+        it (name : TestDescriptorArgument, code : TestCode) : any {
             const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
 
             const test      = SubTest.new({ descriptor, code })
@@ -64,21 +74,24 @@ export class SubTest extends Mixin(
         }
 
 
-        describe<T extends typeof Test> (name : TestDescriptorArgument, code : TestCode) : any {
+        describe (name : TestDescriptorArgument, code : TestCode) : any {
             return this.it(name, code)
         }
 
 
         async start () {
-            console.log("START SUB TEST")
-
             await this.launch()
-
         }
 
 
         async launch () {
             this.code(this)
+
+            while (this.pendingSubTests.length) {
+                const subTest       = this.pendingSubTests.shift()
+
+                await subTest.start()
+            }
         }
     }
 ) {}
@@ -94,10 +107,10 @@ export class Test extends Mixin(
         //
         // context         : ExecutionContext                  = undefined
 
+        reporter            : Reporter              = Reporter.new()
+
 
         async start () {
-            console.log("START TOP TEST")
-
             await this.setup()
 
             await super.start()
@@ -133,18 +146,21 @@ export class TestEnvironmentContext extends Base {
 
                 if (/\.t\.js$/.test(processFilename)) {
                     const topTest           = Test.new({
-                        descriptor      : TestDescriptor.new({ filename : path.basename(processFilename) }),
-                        code            : () => {}
+                        descriptor      : TestDescriptor.new({ filename : path.basename(processFilename) })
                     })
 
-                    Promise.resolve().then(() => {
-                        topTest.pendingSubTests = this.tests
+                    await Promise.resolve()
 
-                        topTest.start()
-                    })
+                    topTest.pendingSubTests = this.tests
+
+                    topTest.start()
                 }
             })()
         }
+    }
+
+
+    async launchStandaloneNodejsTest () {
     }
 }
 
@@ -158,8 +174,6 @@ export const it = (name : TestDescriptorArgument, code : TestCode) => {
     const test      = SubTest.new({ descriptor, code })
 
     globalTestEnv.tests.push(test)
-
-    console.log("YO")
 }
 
 export const describe = it

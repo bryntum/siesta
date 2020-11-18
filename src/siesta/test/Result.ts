@@ -1,5 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
+import { LogLevel } from "../../logger/Logger.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -18,6 +19,9 @@ export class LogMessage extends Mixin(
     (base : AnyConstructor<Result, typeof Result>) =>
 
     class LogMessage extends base {
+        level       : LogLevel      = LogLevel.log
+
+        message     : string        = ''
     }
 ) {}
 
@@ -83,6 +87,7 @@ export class TestNodeResult extends Mixin(
 
         pass (description : string = '', annotation : string = '') {
             this.addAssertion(Assertion.new({
+                name            : 'pass',
                 passed          : true,
                 description,
                 annotation
@@ -92,6 +97,7 @@ export class TestNodeResult extends Mixin(
 
         fail (description : string = '', annotation : string = '') {
             this.addAssertion(Assertion.new({
+                name            : 'fail',
                 passed          : false,
                 description,
                 annotation
