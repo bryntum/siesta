@@ -18,6 +18,13 @@ project.configure({
 
 project.start(
     {
+        group       : 'Serializable',
+
+        items       : [
+            'serializable/serializable.t.js'
+        ]
+    },
+    {
         group       : 'Channel',
 
         items       : [
