@@ -122,7 +122,7 @@ export class Channel extends Mixin(
 
                     this.logger && this.logger.debug(`Connection attempt: ${ connectionAttempts }`)
 
-                    this.doConnect()
+                    await this.doConnect()
 
                     this.connected      = true
 

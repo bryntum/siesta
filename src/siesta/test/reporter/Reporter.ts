@@ -50,12 +50,12 @@ export class Reporter extends Mixin(
         }
 
 
-        onAssertionStarted (test : SubTest, assertion : Assertion) {
+        onAssertionStart (test : SubTest, assertion : Assertion) {
             console.log("Assertion: ", assertion.name, "passed : ", assertion.passed)
         }
 
 
-        onAssertionFinished (test : SubTest, assertion : Assertion) {
+        onAssertionFinish (test : SubTest, assertion : Assertion) {
         }
     }
 ) {}

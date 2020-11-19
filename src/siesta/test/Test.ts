@@ -33,8 +33,8 @@ export class SubTest extends Mixin(
         addAssertion (assertion : Assertion) {
             super.addAssertion(assertion)
 
-            this.reporter.onAssertionStarted(this, assertion)
-            this.reporter.onAssertionFinished(this, assertion)
+            this.reporter.onAssertionStart(this, assertion)
+            this.reporter.onAssertionFinish(this, assertion)
         }
 
 
