@@ -5,11 +5,11 @@ import { Logger } from "../../logger/Logger.js"
 import { Dispatcher } from "../project/Dispatcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class LocalContextProvider extends Mixin(
+export class TestContextProvider extends Mixin(
     [ ContextProvider ],
     (base : ClassUnion<typeof ContextProvider>) => {
 
-        class LocalContextProvider extends base {
+        class TestContextProvider extends base {
             dispatcher      : Dispatcher        = undefined
 
 
@@ -24,16 +24,16 @@ export class LocalContextProvider extends Mixin(
             async createTestContext () : Promise<ExecutionContext> {
                 const context       = await this.createContext()
 
-                context.evaluate(() => {
-                    globalThis.__SIESTA__ = {
-                        communicate : 'IPC'
-                    }
-                })
+                // context.evaluate(() => {
+                //     globalThis.__SIESTA__ = {
+                //         communicate : 'IPC'
+                //     }
+                // })
 
                 return context
             }
         }
 
-        return LocalContextProvider
+        return TestContextProvider
     }
 ) {}

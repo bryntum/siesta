@@ -1,9 +1,7 @@
+import { default as child_process } from "child_process"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { ExecutionContext } from "../context/ExecutionContext.js"
-import { ExecutionContextRemote } from "../context/ExecutionContextRemote.js"
-import { ExecutionContextSameContext } from "../context/ExecutionContextSameContext.js"
+import { ExecutionContextRemoteNodeIpc } from "../context/ExecutionContextRemoteNodeIpc.js"
 import { ContextProvider } from "./ContextProvider.js"
-
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProviderNodeIpc extends Mixin(
@@ -11,9 +9,6 @@ export class ContextProviderNodeIpc extends Mixin(
     (base : ClassUnion<typeof ContextProvider>) =>
 
     class ContextProviderNodeIpc extends base {
-
-        contexts        : any
-
 
         async setup () {
         }
@@ -24,8 +19,18 @@ export class ContextProviderNodeIpc extends Mixin(
         }
 
 
-        async createContext () : Promise<ExecutionContextRemote> {
-            return //ExecutionContextSameContext.new()
+        async createContext () : Promise<ExecutionContextRemoteNodeIpc> {
+            const childProcess  = child_process.fork(
+                import.meta.url
+                    .replace(/^file:/, '')
+                    .replace(/ContextProviderNodeIpc.js$/, 'ContextProviderNodeIpcSeed.js')
+            )
+
+            const context       = ExecutionContextRemoteNodeIpc.new({ media : childProcess })
+
+            await context.setup()
+
+            return context
         }
     }
 ) {}

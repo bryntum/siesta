@@ -2,7 +2,7 @@ import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
-import { LocalContextProvider } from "../context_provider/LocalContextProvider.js"
+import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { Reporter } from "../test/reporter/Reporter.js"
 import { ProjectPlanItem } from "./Plan.js"
 import { Project } from "./Project.js"
@@ -18,9 +18,9 @@ export class Dispatcher extends Mixin(
 
         reporter        : Reporter                  = undefined
 
-        localContextProviders   : LocalContextProvider[]                   = []
+        testContextProviders   : TestContextProvider[]                   = []
 
-        localContextProviderConstructors   : (typeof LocalContextProvider)[]      = []
+        testContextProviderConstructors   : (typeof TestContextProvider)[]      = []
 
 
         get logger () : Logger {
@@ -31,8 +31,8 @@ export class Dispatcher extends Mixin(
         }
 
 
-        registerLocalContextProvider (localContextProvider : LocalContextProvider) {
-            this.localContextProviders.push(localContextProvider)
+        registerTestContextProvider (localContextProvider : TestContextProvider) {
+            this.testContextProviders.push(localContextProvider)
         }
 
 
@@ -44,17 +44,17 @@ export class Dispatcher extends Mixin(
 
 
         async setup () {
-            await Promise.all(this.localContextProviderConstructors.map(lcpConstructor => {
-                const lcp                   = lcpConstructor.new({ dispatcher : this })
+            await Promise.all(this.testContextProviderConstructors.map(tcpConstructor => {
+                const tcp                   = tcpConstructor.new({ dispatcher : this })
 
-                return lcp.setup().then(() => {
-                    this.registerLocalContextProvider(lcp)
+                return tcp.setup().then(() => {
+                    this.registerTestContextProvider(tcp)
                 }, rejected => {
                     this.logger.debug(`Failed to setup context provider: ${rejected}`)
                 })
             }))
 
-            if (this.localContextProviders.length === 0) throw new Error("Dispatcher setup failed - no context providers available")
+            if (this.testContextProviders.length === 0) throw new Error("Dispatcher setup failed - no context providers available")
         }
 
 
@@ -71,11 +71,13 @@ export class Dispatcher extends Mixin(
             console.log("launch project item: ", item.url)
 
             const context       = await this.createTestContext()
+
+            debugger
         }
 
 
         async createTestContext () {
-            return await this.localContextProviders[ 0 ].createTestContext()
+            return await this.testContextProviders[ 0 ].createTestContext()
         }
 
     }

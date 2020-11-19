@@ -1,8 +1,9 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
-import { LocalContextProvider } from "../context_provider/LocalContextProvider.js"
-import { LocalContextProviderSameContext } from "../context_provider/LocalContextProviderSameContext.js"
+import { TestContextProvider } from "../context_provider/TestContextProvider.js"
+import { TestContextProviderNodeIpc } from "../context_provider/TestContextProviderNodeIpc.js"
+import { TestContextProviderSameContext } from "../context_provider/TestContextProviderSameContext.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { Dispatcher } from "./Dispatcher.js"
 import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor } from "./Plan.js"
@@ -25,7 +26,7 @@ export class Project extends Mixin(
 
         logger          : Logger            = undefined
 
-        localContextProviderConstructors   : (typeof LocalContextProvider)[]      = [ LocalContextProviderSameContext ]
+        testContextProviderConstructors   : (typeof TestContextProvider)[]      = [ TestContextProviderNodeIpc ]
 
 
         // createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
@@ -59,7 +60,7 @@ export class Project extends Mixin(
         async start () {
             const dispatcher    = Dispatcher.new({
                 project                                 : this,
-                localContextProviderConstructors        : this.localContextProviderConstructors
+                testContextProviderConstructors         : this.testContextProviderConstructors
             })
 
             await dispatcher.start()
