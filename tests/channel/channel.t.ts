@@ -31,8 +31,11 @@ StartTest(t => {
         const server    = new Server()
         const worker    = new Worker()
 
-        server.connect(worker)
-        worker.connect(server)
+        server.media    = worker
+        worker.media    = server
+
+        server.connect()
+        worker.connect()
 
         t.is(await worker.sum(1, 1), 2)
         t.is(await worker.multiply(1, 3), 3)
@@ -72,8 +75,11 @@ StartTest(t => {
         const server    = new Server()
         const worker    = new Worker()
 
-        server.connect(worker)
-        worker.connect(server)
+        server.media    = worker
+        worker.media    = server
+
+        server.connect()
+        worker.connect()
 
         try {
             t.is(await worker.multiply(1, 3), 3)

@@ -80,6 +80,7 @@ export class Channel extends Mixin(
 
     class Channel extends base {
         media                   : unknown       = undefined
+        connected               : boolean       = false
 
         localMessages           : object
         remoteMessages          : object
@@ -102,13 +103,15 @@ export class Channel extends Mixin(
         }
 
 
-        async doConnect (media : this[ 'media' ]) : Promise<any> {
+        async doConnect () : Promise<any> {
             throw "Abstract method `doConnect`"
         }
 
 
-        async connect (media : this[ 'media' ]) : Promise<any> {
-            if (this.media !== undefined) throw new Error("Already connected")
+        async connect () : Promise<any> {
+            const media     = this.media
+
+            if (this.connected) throw new Error("Already connected")
 
             let start                   = Date.now()
             let connectionAttempts      = 0
@@ -119,9 +122,9 @@ export class Channel extends Mixin(
 
                     this.logger && this.logger.debug(`Connection attempt: ${ connectionAttempts }`)
 
-                    this.doConnect(media)
+                    this.doConnect()
 
-                    this.media  = media
+                    this.connected      = true
 
                     return
                 } catch (e) {
@@ -150,7 +153,7 @@ export class Channel extends Mixin(
 
             await this.doDisconnect()
 
-            this.media      = undefined
+            this.connected      = false
         }
 
 
@@ -216,7 +219,7 @@ export class Channel extends Mixin(
 
 
         async callRemote (envelop : EnvelopCall, message : Message) : Promise<unknown> {
-            if (!this.media) throw new Error("Not connected to media")
+            if (!this.connected) throw new Error("Not connected to media")
 
             return new Promise((resolve, reject) => {
                 let timeoutHandler : SetTimeoutHandler  = null

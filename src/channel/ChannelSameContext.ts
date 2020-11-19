@@ -22,7 +22,7 @@ export class ChannelSameContext extends Mixin(
         }
 
 
-        async doConnect (media : this[ 'media' ]) : Promise<any> {
+        async doConnect () : Promise<any> {
             // do nothing
         }
 

@@ -1,5 +1,6 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { ExecutionContext } from "../context/ExecutionContext.js"
+import { ExecutionContextRemote } from "../context/ExecutionContextRemote.js"
 import { ExecutionContextSameContext } from "../context/ExecutionContextSameContext.js"
 import { ContextProvider } from "./ContextProvider.js"
 
@@ -23,8 +24,8 @@ export class ContextProviderNodeIpc extends Mixin(
         }
 
 
-        async createContext () : Promise<ExecutionContextSameContext> {
-            return ExecutionContextSameContext.new()
+        async createContext () : Promise<ExecutionContextRemote> {
+            return //ExecutionContextSameContext.new()
         }
     }
 ) {}
