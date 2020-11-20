@@ -3,7 +3,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
-import { Reporter } from "../test/reporter/Reporter.js"
+import { ChannelTestReporter } from "../test/ReporterChannel.js"
 import { ProjectPlanItem } from "./Plan.js"
 import { Project } from "./Project.js"
 
@@ -16,7 +16,7 @@ export class Dispatcher extends Mixin(
     class Dispatcher extends base {
         project         : Project                   = undefined
 
-        reporter        : Reporter                  = undefined
+        reporter        : ChannelTestReporter                  = undefined
 
         testContextProviders   : TestContextProvider[]                   = []
 

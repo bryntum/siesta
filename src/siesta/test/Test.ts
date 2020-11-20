@@ -2,7 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { isNodejs } from "../../util/Helpers.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { Reporter } from "./reporter/Reporter.js"
+import { ChannelTestReporter } from "./ReporterChannel.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -16,25 +16,25 @@ export class SubTest extends Mixin(
 
     class SubTest extends base {
         // "upgrade" types from TreeNode
-        parentNode      : SubTest
-        childNodes      : SubTest[]
+        parentNode          : SubTest
+        childNodes          : SubTest[]
 
-        code            : TestCode          = (t : SubTest) => {}
+        code                : TestCode          = (t : SubTest) => {}
 
-        ongoing         : Promise<any>      = undefined
+        ongoing             : Promise<any>      = undefined
 
-        descriptor      : TestDescriptor    = undefined
+        descriptor          : TestDescriptor    = undefined
 
-        pendingSubTests : SubTest[]         = []
+        pendingSubTests     : SubTest[]         = []
 
-        reporter            : Reporter              = Reporter.new()
+        reporter            : ChannelTestReporter              = undefined
 
 
         addAssertion (assertion : Assertion) {
             super.addAssertion(assertion)
 
-            this.reporter.onAssertionStart(this, assertion)
-            this.reporter.onAssertionFinish(this, assertion)
+            // this.reporter.onAssertion(this, assertion)
+            // this.reporter.onAssertionFinish(this, assertion)
         }
 
 
@@ -107,7 +107,7 @@ export class Test extends Mixin(
         //
         // context         : ExecutionContext                  = undefined
 
-        reporter            : Reporter              = Reporter.new()
+        reporter            : ChannelTestReporter              = ChannelTestReporter.new()
 
 
         async start () {

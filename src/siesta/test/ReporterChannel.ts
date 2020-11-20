@@ -1,7 +1,7 @@
 import { Channel, local, remote } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Assertion } from "./Result.js"
+import { Assertion, AssertionAsync, Exception, LogMessage, TestNodeResult } from "./Result.js"
 import { SubTest } from "./Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -68,31 +68,28 @@ export class ChannelTestReporter extends Mixin(
 
         class ChannelTestReporter extends base {
             @remote()
-            onAssertionStarted : () => Promise<any>
+            onTopTestStart : (testNode : TestNodeResult) => Promise<any>
 
             @remote()
-            onTopTestStart : () => Promise<any>
+            onTopTestFinish : (testNodeId : string) => Promise<any>
 
             @remote()
-            onTopTestFinish : () => Promise<any>
+            onSubTestStart : (testNode : TestNodeResult) => Promise<any>
 
             @remote()
-            onSubTestStart : () => Promise<any>
+            onSubTestFinish : (testNodeId : string) => Promise<any>
 
             @remote()
-            onSubTestFinish : () => Promise<any>
+            onException : (exception : Exception) => Promise<any>
 
             @remote()
-            onException : () => Promise<any>
+            onLogMessage : (logMessage : LogMessage) => Promise<any>
 
             @remote()
-            onLogMessage : () => Promise<any>
+            onAssertion : (testNodeId : string, assertion : Assertion) => Promise<any>
 
             @remote()
-            onAssertionStart : (test : SubTest, assertion : Assertion) => Promise<any>
-
-            @remote()
-            onAssertionFinish : (test : SubTest, assertion : Assertion) => Promise<any>
+            onAssertionFinish : (testNodeId : string, assertion : AssertionAsync) => Promise<any>
         }
 
         return ChannelTestReporter

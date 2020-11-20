@@ -17,6 +17,11 @@ export class Serializable extends Mixin(
 
             return json
         }
+
+
+        static fromJSON<T extends typeof Serializable> (this : T, json : string) : InstanceType<T> {
+            return JSON.parse(json, reviver)
+        }
     }
 ) {}
 
