@@ -8,6 +8,8 @@ export class ContextProvider extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class ContextProvider extends base {
+        contextClass        : ExecutionContext
+
 
         async setup () {
             throw new Error("Abstract method")
@@ -19,7 +21,7 @@ export class ContextProvider extends Mixin(
         }
 
 
-        async createContext () : Promise<ExecutionContext> {
+        async createContext () : Promise<this[ 'contextClass' ]> {
             throw new Error("Abstract method")
         }
     }

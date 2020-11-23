@@ -9,6 +9,15 @@ export class ContextProviderNodeIpc extends Mixin(
     (base : ClassUnion<typeof ContextProvider>) =>
 
     class ContextProviderNodeIpc extends base {
+        seedUrl         : string            = import.meta.url
+            .replace(/^file:\\\\/, '')
+            .replace(/context_provider\/ContextProviderNodeIpc.js$/, 'context/ExecutionContextRemoteNodeIpc.js')
+
+        seedSymbol      : string            = 'ExecutionContextRemoteNodeIpcChild'
+
+
+        parentChannelClass : typeof ExecutionContextRemoteNodeIpc   = ExecutionContextRemoteNodeIpc
+
 
         async setup () {
         }
@@ -20,16 +29,27 @@ export class ContextProviderNodeIpc extends Mixin(
 
 
         async createContext () : Promise<ExecutionContextRemoteNodeIpc> {
-            // TODO there's no need to have a separate file for seeding the child process?
-            // one can use `--eval` option of node executable to evaluate a script (along with
-            // --input-type=module)
             const childProcess  = child_process.fork(
-                import.meta.url
-                    .replace(/^file:/, '')
-                    .replace(/ContextProviderNodeIpc.js$/, 'ContextProviderNodeIpcSeed.js')
+                '',
+                {
+                    execArgv : [
+                        // '--unhandled-rejections=strict',
+                        // '--trace-warnings',
+                        // '--inspect-brk=127.0.0.1:9339',
+                        '--input-type', 'module',
+                        '--eval', [
+                            `import { ${this.seedSymbol} } from "${this.seedUrl}"`,
+                            // `debugger`,
+                            // `console.log('ContextProviderNodeIpc seed launched`,
+                            `const context = ${this.seedSymbol}.new()`,
+                            `context.connect()`,
+                            // `console.log('ContextProviderNodeIpc seed connect call issued`,
+                        ].join('\n')
+                    ]
+                }
             )
 
-            const context       = ExecutionContextRemoteNodeIpc.new({ media : childProcess })
+            const context       = this.parentChannelClass.new({ media : childProcess })
 
             await context.setup()
 

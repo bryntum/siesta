@@ -9,19 +9,24 @@ import { Dispatcher } from "./Dispatcher.js"
 import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor } from "./Plan.js"
 
 
+import path from 'path'
+
+
 //---------------------------------------------------------------------------------------------------------------------
 export class Project extends Mixin(
     [ Base ],
     (base : AnyConstructor<Base, typeof Base>) =>
 
     class Project extends base {
-        baseUrl         : string            = ''
+        baseUrl         : string            = ''//path.dirname(process.argv[ 1 ])
 
         name            : string            = ''
 
         options         : Partial<TestDescriptor>           = undefined
 
-        projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new({ descriptor : TestDescriptor.new({ filename : '.' }) })
+        projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new({
+            descriptor : TestDescriptor.new({ filename : path.dirname(process.argv[ 1 ]),  })
+        })
         projectPlanMap  : Map<string, ProjectPlanItem>      = new Map()
 
         logger          : Logger            = undefined

@@ -11,6 +11,7 @@ export class ChannelNodeIpcParent extends Mixin(
         media                   : ChildProcess
 
         messageListener         : (...args : any[]) => void      = undefined
+        exitListener            : (...args : any[]) => void      = undefined
 
 
         messageToEnvelop (message : any) : EnvelopCall | EnvelopResult | undefined {
@@ -29,7 +30,7 @@ export class ChannelNodeIpcParent extends Mixin(
         async doConnect () : Promise<any> {
             this.media.addListener('message', this.messageListener = this.receiveMessage.bind(this))
 
-            this.media.on('exit', () => {
+            this.media.addListener('exit', this.exitListener = () => {
                 this.logger && this.logger.debug('NodeJS child process exit')
 
                 this.disconnect()
@@ -38,9 +39,15 @@ export class ChannelNodeIpcParent extends Mixin(
 
 
         async doDisconnect () : Promise<any> {
-            this.messageListener && this.media.removeListener('message', this.messageListener)
+            if (this.connected) {
+                this.media.removeListener('message', this.messageListener)
+                this.media.removeListener('exit', this.exitListener)
 
-            this.messageListener    = undefined
+                this.messageListener    = undefined
+                this.exitListener       = undefined
+
+                this.media.disconnect()
+            }
         }
 
 

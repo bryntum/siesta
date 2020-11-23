@@ -3,7 +3,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
-import { ChannelTestReporter } from "../test/ReporterChannel.js"
+import { ChannelTestReporter } from "../test/channel/Reporter.js"
 import { ProjectPlanItem } from "./Plan.js"
 import { Project } from "./Project.js"
 
@@ -71,6 +71,12 @@ export class Dispatcher extends Mixin(
             console.log("launch project item: ", item.url)
 
             const context       = await this.createTestContext()
+
+            debugger
+
+            await context.launchTest(item.url)
+
+            context.destroy()
 
             debugger
         }

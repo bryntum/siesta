@@ -2,7 +2,8 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { isNodejs } from "../../util/Helpers.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { ChannelTestReporter } from "./ReporterChannel.js"
+import { ChannelTestReporter } from "./channel/Reporter.js"
+import { TestLaunchTestSide } from "./Launcher.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -69,7 +70,7 @@ export class SubTest extends Mixin(
 
             const test      = SubTest.new({ descriptor, code, parentNode : this, reporter : this.reporter })
 
-            this.parentNode.pendingSubTests.push(test)
+            this.pendingSubTests.push(test)
         }
 
 
@@ -112,7 +113,7 @@ export class Test extends Mixin(
         //
         // context         : ExecutionContext                  = undefined
 
-        reporter            : ChannelTestReporter              = ChannelTestReporter.new()
+        reporter            : ChannelTestReporter              = undefined
 
 
         async start () {
@@ -144,7 +145,7 @@ export class TestEnvironmentContext extends Base {
     get topTest () : Test {
         if (this.$topTest !== undefined) return this.$topTest
 
-        return
+        return this.$topTest = this.buildTopTest()
     }
 
     set topTest (value : Test) {
@@ -170,7 +171,9 @@ export class TestEnvironmentContext extends Base {
             const processFilename       = process.argv[ 1 ]
 
             const topTest           = this.topTest = Test.new({
-                descriptor      : TestDescriptor.new({ filename : processFilename })
+                descriptor      : TestDescriptor.new({ filename : processFilename }),
+
+                reporter        : TestLaunchTestSide.new()
             })
 
             return topTest
