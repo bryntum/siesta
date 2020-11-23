@@ -33,8 +33,7 @@ export class SubTest extends Mixin(
         addAssertion (assertion : Assertion) {
             super.addAssertion(assertion)
 
-            // this.reporter.onAssertion(this, assertion)
-            // this.reporter.onAssertionFinish(this, assertion)
+            this.reporter.onAssertion(this.id, assertion)
         }
 
 
@@ -68,7 +67,7 @@ export class SubTest extends Mixin(
         it (name : TestDescriptorArgument, code : TestCode) : any {
             const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
 
-            const test      = SubTest.new({ descriptor, code })
+            const test      = SubTest.new({ descriptor, code, parentNode : this, reporter : this.reporter })
 
             this.parentNode.pendingSubTests.push(test)
         }
@@ -80,15 +79,21 @@ export class SubTest extends Mixin(
 
 
         async start () {
+            this.reporter.onSubTestStart(this)
+
             await this.launch()
+
+            this.reporter.onSubTestFinish(this.descriptor.filename)
         }
 
 
         async launch () {
-            this.code(this)
+            await this.code(this)
 
             while (this.pendingSubTests.length) {
                 const subTest       = this.pendingSubTests.shift()
+
+                this.childNodes.push(subTest)
 
                 await subTest.start()
             }
@@ -133,34 +138,50 @@ export class Test extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestEnvironmentContext extends Base {
-    tests       : SubTest[]         = []
+    $topTest     : Test              = undefined
+
+
+    get topTest () : Test {
+        if (this.$topTest !== undefined) return this.$topTest
+
+        return
+    }
+
+    set topTest (value : Test) {
+        this.$topTest = value
+    }
 
 
     initialize<T extends Base> (props? : Partial<T>) {
         super.initialize(props)
 
         if (isNodejs()) {
-            (async () => {
-                const path                  = await import('path')
-                const processFilename       = process.argv[ 1 ]
+            const processFilename       = process.argv[ 1 ]
 
-                if (/\.t\.js$/.test(processFilename)) {
-                    const topTest           = Test.new({
-                        descriptor      : TestDescriptor.new({ filename : path.basename(processFilename) })
-                    })
+            if (/\.t\.js$/.test(processFilename)) {
+                this.launchStandaloneNodejsTest()
+            }
+        }
+    }
 
-                    await Promise.resolve()
 
-                    topTest.pendingSubTests = this.tests
+    buildTopTest () : Test {
+        if (isNodejs()) {
+            const processFilename       = process.argv[ 1 ]
 
-                    topTest.start()
-                }
-            })()
+            const topTest           = this.topTest = Test.new({
+                descriptor      : TestDescriptor.new({ filename : processFilename })
+            })
+
+            return topTest
         }
     }
 
 
     async launchStandaloneNodejsTest () {
+        await Promise.resolve()
+
+        this.topTest.start()
     }
 }
 
@@ -169,11 +190,7 @@ export const globalTestEnv : TestEnvironmentContext = TestEnvironmentContext.new
 
 //---------------------------------------------------------------------------------------------------------------------
 export const it = (name : TestDescriptorArgument, code : TestCode) => {
-    const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
-
-    const test      = SubTest.new({ descriptor, code })
-
-    globalTestEnv.tests.push(test)
+    globalTestEnv.topTest.it(name, code)
 }
 
 export const describe = it

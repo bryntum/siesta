@@ -20,6 +20,9 @@ export class ContextProviderNodeIpc extends Mixin(
 
 
         async createContext () : Promise<ExecutionContextRemoteNodeIpc> {
+            // TODO there's no need to have a separate file for seeding the child process?
+            // one can use `--eval` option of node executable to evaluate a script (along with
+            // --input-type=module)
             const childProcess  = child_process.fork(
                 import.meta.url
                     .replace(/^file:/, '')

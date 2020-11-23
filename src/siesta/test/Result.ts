@@ -73,6 +73,8 @@ export class TestNodeResult extends Mixin(
     (base : ClassUnion<typeof Result, typeof TreeNode>) =>
 
     class TestNodeResult extends base {
+        id              : string
+
         // "promote" types from TreeNode
         parentNode      : TestNodeResult
         childNodes      : TestNodeResult[]
@@ -102,6 +104,15 @@ export class TestNodeResult extends Mixin(
                 description,
                 annotation
             }))
+        }
+
+
+        toJSON () {
+            const obj : any     = Object.assign({}, this)
+
+            obj.parentNode      = this.parentNode ? this.parentNode.id : undefined
+
+            return obj
         }
     }
 ) {}

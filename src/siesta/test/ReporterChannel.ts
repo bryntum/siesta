@@ -67,11 +67,11 @@ export class ChannelTestReporter extends Mixin(
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
         class ChannelTestReporter extends base {
-            @remote()
-            onTopTestStart : (testNode : TestNodeResult) => Promise<any>
-
-            @remote()
-            onTopTestFinish : (testNodeId : string) => Promise<any>
+            // @remote()
+            // onTopTestStart : (testNode : TestNodeResult) => Promise<any>
+            //
+            // @remote()
+            // onTopTestFinish : (testNodeId : string) => Promise<any>
 
             @remote()
             onSubTestStart : (testNode : TestNodeResult) => Promise<any>
@@ -80,10 +80,10 @@ export class ChannelTestReporter extends Mixin(
             onSubTestFinish : (testNodeId : string) => Promise<any>
 
             @remote()
-            onException : (exception : Exception) => Promise<any>
+            onException : (testNodeId : string, exception : Exception) => Promise<any>
 
             @remote()
-            onLogMessage : (logMessage : LogMessage) => Promise<any>
+            onLogMessage : (testNodeId : string, logMessage : LogMessage) => Promise<any>
 
             @remote()
             onAssertion : (testNodeId : string, assertion : Assertion) => Promise<any>
