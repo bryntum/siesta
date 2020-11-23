@@ -39,15 +39,13 @@ export class ChannelNodeIpcParent extends Mixin(
 
 
         async doDisconnect () : Promise<any> {
-            if (this.connected) {
-                this.media.removeListener('message', this.messageListener)
-                this.media.removeListener('exit', this.exitListener)
+            this.media.removeListener('message', this.messageListener)
+            this.media.removeListener('exit', this.exitListener)
 
-                this.messageListener    = undefined
-                this.exitListener       = undefined
+            this.messageListener    = undefined
+            this.exitListener       = undefined
 
-                this.media.disconnect()
-            }
+            this.media.disconnect()
         }
 
 
