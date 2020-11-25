@@ -1,4 +1,5 @@
 import { ChannelNodeIpcChild, ChannelNodeIpcParent } from "../../../channel/ChannelNodeIpc.js"
+import { ChannelSerializableJSON } from "../../../channel/ChannelSerializable.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { ExecutionContextRemoteNodeIpc, ExecutionContextRemoteNodeIpcChild } from "../../../context/ExecutionContextRemoteNodeIpc.js"
 import { TestLaunchLauncherSide, TestLaunchTestSide } from "../Launcher.js"
@@ -7,12 +8,12 @@ import { TestLaunchLauncherSide, TestLaunchTestSide } from "../Launcher.js"
 export class TestContextNodeIpc extends Mixin(
     [
         ExecutionContextRemoteNodeIpc,
-        ChannelNodeIpcParent,
+        ChannelSerializableJSON,
         TestLaunchLauncherSide
     ],
     (base : ClassUnion<
         typeof ExecutionContextRemoteNodeIpc,
-        typeof ChannelNodeIpcParent,
+        typeof ChannelSerializableJSON,
         typeof TestLaunchLauncherSide
     >) => {
 
@@ -28,12 +29,12 @@ export class TestContextNodeIpc extends Mixin(
 export class TestContextNodeIpcChild extends Mixin(
     [
         ExecutionContextRemoteNodeIpcChild,
-        ChannelNodeIpcChild,
+        ChannelSerializableJSON,
         TestLaunchTestSide
     ],
     (base : ClassUnion<
         typeof ExecutionContextRemoteNodeIpcChild,
-        typeof ChannelNodeIpcChild,
+        typeof ChannelSerializableJSON,
         typeof TestLaunchTestSide>
     ) => {
 
