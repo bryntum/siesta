@@ -6,6 +6,12 @@ import { TestDescriptor } from "./Descriptor.js"
 import { globalTestEnv, Test } from "./Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
+// make sure we actually import these class symbols (and not just types),
+// so that their `registerSerializableClass()` calls are made
+
+TestDescriptor
+
+//---------------------------------------------------------------------------------------------------------------------
 export class TestLaunchLauncherSide extends Mixin(
     [ ChannelTestLauncher, ExecutionContextRemote ],
     (base : ClassUnion<typeof ChannelTestLauncher, typeof ExecutionContextRemote>) => {
@@ -32,13 +38,15 @@ export class TestLaunchTestSide extends Mixin(
             @local()
             async launchTest (testUrl : string, testDescriptor : TestDescriptor) {
                 const topTest           = globalTestEnv.topTest = Test.new({
-                    descriptor      : TestDescriptor.maybeNew(testDescriptor),
+                    descriptor      : testDescriptor,
 
                     reporter        : this
                 })
                 try {
                     await import(testUrl)
                     debugger
+
+                    globalTestEnv.topTest   = undefined
 
                     await topTest.start()
 

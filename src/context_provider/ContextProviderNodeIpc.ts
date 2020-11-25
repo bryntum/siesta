@@ -35,7 +35,7 @@ export class ContextProviderNodeIpc extends Mixin(
                     execArgv : [
                         // '--unhandled-rejections=strict',
                         // '--trace-warnings',
-                        // '--inspect-brk=127.0.0.1:9339',
+                        '--inspect-brk=127.0.0.1:9339',
                         '--input-type', 'module',
                         '--eval', [
                             `import { ${this.seedSymbol} } from "${this.seedUrl}"`,

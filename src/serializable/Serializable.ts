@@ -11,6 +11,8 @@ export class Serializable extends Mixin(
 
 
         toJSON (key : string) : Partial<this> {
+            if (!this.$class) throw new Error(`Missing serializable class id: ${this.constructor}`)
+
             const json  = Object.assign({}, this)
 
             json.$class = this.$class

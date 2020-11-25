@@ -1,6 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { IsolationLevel } from "../../context_provider/IsolationLevel.js"
-import { Serializable } from "../../serializable/Serializable.js"
+import { registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
 import { isSubclassOf, isSuperclassOf, typeOf } from "../../util/Helpers.js"
 import { Test } from "./Test.js"
 
@@ -63,5 +63,7 @@ export class TestDescriptor extends Serializable.mix(Base) {
         }
     }
 }
+
+registerSerializableClass('TestDescriptor', TestDescriptor)
 
 export type TestDescriptorArgument = string | Partial<TestDescriptor>

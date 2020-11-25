@@ -5,6 +5,15 @@ import { Assertion, AssertionAsync, Exception, LogMessage, TestNodeResult } from
 import { SubTest } from "../Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
+// make sure we actually import these class symbols (and not just types),
+// so that their `registerSerializableClass()` calls are made
+
+Assertion
+AssertionAsync
+Exception
+LogMessage
+
+//---------------------------------------------------------------------------------------------------------------------
 export class ChannelTestLauncher extends Mixin(
     [ Channel, Base ],
     (base : ClassUnion<typeof Channel, typeof Base>) => {
