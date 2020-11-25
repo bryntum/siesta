@@ -10,7 +10,7 @@ export class Serializable extends Mixin(
         $class      : string
 
 
-        toJSON () {
+        toJSON (key : string) : Partial<this> {
             const json  = Object.assign({}, this)
 
             json.$class = this.$class

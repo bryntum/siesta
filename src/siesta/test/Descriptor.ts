@@ -1,10 +1,11 @@
 import { Base } from "../../class/Base.js"
 import { IsolationLevel } from "../../context_provider/IsolationLevel.js"
+import { Serializable } from "../../serializable/Serializable.js"
 import { isSubclassOf, isSuperclassOf, typeOf } from "../../util/Helpers.js"
 import { Test } from "./Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class TestDescriptor extends Base {
+export class TestDescriptor extends Serializable.mix(Base) {
     name            : string                = ''
 
     title           : string                = ''

@@ -49,8 +49,8 @@ export class ChannelTestLauncher extends Mixin(
             }
 
             @local()
-            onAssertion (test : SubTest, assertion : Assertion) : Promise<any> {
-                console.log("ON ASSERTION START")
+            onAssertion (/*test : SubTest, */assertion : Assertion) : Promise<any> {
+                console.log("ON ASSERTION START", assertion)
 
                 return
             }
@@ -91,7 +91,7 @@ export class ChannelTestReporter extends Mixin(
             onLogMessage : (testNodeId : string, logMessage : LogMessage) => Promise<any>
 
             @remote()
-            onAssertion : (/*testNodeId : string, assertion : Assertion*/) => Promise<any>
+            onAssertion : (/*testNodeId : string, */assertion : Assertion) => Promise<any>
 
             @remote()
             onAssertionFinish : (testNodeId : string, assertion : AssertionAsync) => Promise<any>

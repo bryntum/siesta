@@ -1,11 +1,12 @@
 import { ChildProcess, Serializable } from "child_process"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Channel, EnvelopCall, EnvelopResult } from "./Channel.js"
+import { ChannelSerializable } from "./ChannelSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ChannelNodeIpcParent extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) =>
+    [ ChannelSerializable ],
+    (base : ClassUnion<typeof ChannelSerializable>) =>
 
     class ChannelNodeIpcParent extends base {
         media                   : ChildProcess
@@ -14,17 +15,17 @@ export class ChannelNodeIpcParent extends Mixin(
         exitListener            : (...args : any[]) => void      = undefined
 
 
-        messageToEnvelop (message : any) : EnvelopCall | EnvelopResult | undefined {
-            if (message.inResponseOf !== undefined)
-                return EnvelopResult.new(message)
-            else
-                return EnvelopCall.new(message)
-        }
-
-
-        envelopToMessage (envelop : EnvelopCall | EnvelopResult) : unknown {
-            return envelop
-        }
+        // messageToEnvelop (message : any) : EnvelopCall | EnvelopResult | undefined {
+        //     if (message.inResponseOf !== undefined)
+        //         return EnvelopResult.new(message)
+        //     else
+        //         return EnvelopCall.new(message)
+        // }
+        //
+        //
+        // envelopToMessage (envelop : EnvelopCall | EnvelopResult) : unknown {
+        //     return envelop
+        // }
 
 
         async doConnect () : Promise<any> {
@@ -58,8 +59,8 @@ export class ChannelNodeIpcParent extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ChannelNodeIpcChild extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) =>
+    [ ChannelSerializable ],
+    (base : ClassUnion<typeof ChannelSerializable>) =>
 
     class ChannelNodeIpcChild extends base {
         media                   : NodeJS.Process                = process
@@ -67,17 +68,17 @@ export class ChannelNodeIpcChild extends Mixin(
         messageListener         : (...args : any[]) => void     = undefined
 
 
-        messageToEnvelop (message : any) : EnvelopCall | EnvelopResult | undefined {
-            if (message.inResponseOf !== undefined)
-                return EnvelopResult.new(message)
-            else
-                return EnvelopCall.new(message)
-        }
-
-
-        envelopToMessage (envelop : EnvelopCall | EnvelopResult) : unknown {
-            return envelop
-        }
+        // messageToEnvelop (message : any) : EnvelopCall | EnvelopResult | undefined {
+        //     if (message.inResponseOf !== undefined)
+        //         return EnvelopResult.new(message)
+        //     else
+        //         return EnvelopCall.new(message)
+        // }
+        //
+        //
+        // envelopToMessage (envelop : EnvelopCall | EnvelopResult) : unknown {
+        //     return envelop
+        // }
 
 
         async doConnect () : Promise<any> {

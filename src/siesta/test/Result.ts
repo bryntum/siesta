@@ -1,12 +1,13 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
+import { registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Result extends Mixin(
-    [ Base ],
-    (base : AnyConstructor<Base, typeof Base>) =>
+    [ Serializable, Base ],
+    (base : ClassUnion<typeof Serializable, typeof Base>) =>
 
     class Result extends base {
     }
@@ -25,6 +26,7 @@ export class LogMessage extends Mixin(
     }
 ) {}
 
+registerSerializableClass('LogMessage', LogMessage)
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Exception extends Mixin(
@@ -36,6 +38,7 @@ export class Exception extends Mixin(
     }
 ) {}
 
+registerSerializableClass('Exception', Exception)
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Assertion extends Mixin(
@@ -53,6 +56,7 @@ export class Assertion extends Mixin(
     }
 ) {}
 
+registerSerializableClass('Assertion', Assertion)
 
 //---------------------------------------------------------------------------------------------------------------------
 export class AssertionAsync extends Mixin(
@@ -63,9 +67,19 @@ export class AssertionAsync extends Mixin(
         ongoing     : Promise<any>                          = undefined
 
         state       : 'pending' | 'resolved' | 'rejected'   = 'pending'
+
+
+        toJSON (key : string) : Partial<this> {
+            const jsonObj       = super.toJSON(key)
+
+            delete jsonObj.ongoing
+
+            return jsonObj
+        }
     }
 ) {}
 
+registerSerializableClass('AssertionAsync', AssertionAsync)
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestNodeResult extends Mixin(

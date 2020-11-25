@@ -34,7 +34,7 @@ export class SubTest extends Mixin(
         addAssertion (assertion : Assertion) {
             super.addAssertion(assertion)
 
-            this.reporter.onAssertion(/*this.id, assertion*/)
+            this.reporter.onAssertion(/*this.id, */assertion)
         }
 
 
