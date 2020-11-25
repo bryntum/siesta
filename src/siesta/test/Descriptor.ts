@@ -6,8 +6,6 @@ import { Test } from "./Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestDescriptor extends Serializable.mix(Base) {
-    name            : string                = ''
-
     title           : string                = ''
 
     filename        : string                = ''
@@ -31,10 +29,10 @@ export class TestDescriptor extends Serializable.mix(Base) {
     merge (anotherObj : Partial<TestDescriptor>) {
         const another   = (this.constructor as typeof TestDescriptor).maybeNew(anotherObj)
 
-        if (this.name) {
-            if (another.name !== this.name) throw new Error('Can not merge test descriptor - `name` does not match')
+        if (this.filename) {
+            if (another.filename !== this.filename) throw new Error('Can not merge test descriptor - `name` does not match')
         } else {
-            this.name       = another.name
+            this.filename       = another.filename
         }
 
         // TODO can promote `env` from `generic` to either `browser` or `nodejs`, anything else should throw

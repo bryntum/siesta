@@ -62,7 +62,13 @@ export class Project extends Mixin(
         }
 
 
+        async setup () {
+        }
+
+
         async start () {
+            await this.setup()
+
             const dispatcher    = Dispatcher.new({
                 project                                 : this,
                 testContextProviderConstructors         : this.testContextProviderConstructors

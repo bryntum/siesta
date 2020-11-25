@@ -6,7 +6,7 @@ console.log("ADVANCED")
 describe({
     env         : 'generic', // 'generic' | 'browser' | 'nodejs'
     tags        : [ 'basic', 'generic', 'data', 'model' ],
-    name        : 'Basic assertions should work',
+    title       : 'Basic assertions should work',
 }, t => {
     t.ok(true, 'True is ok')
 

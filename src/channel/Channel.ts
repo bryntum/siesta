@@ -234,7 +234,7 @@ export class Channel extends Mixin(
         }
 
 
-        async callRemote (envelop : EnvelopCall, message : Message) : Promise<unknown> {
+        async callRemote (envelop : EnvelopCall, message : Message) : Promise<void> {
             if (!this.connected) throw new Error("Not connected to media")
 
             return new Promise((resolve, reject) => {
