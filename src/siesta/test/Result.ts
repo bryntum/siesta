@@ -4,7 +4,7 @@ import { LogLevel } from "../../logger/Logger.js"
 import { registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { TestDescriptor } from "./Descriptor.js"
-import { nextInternalId } from "./InternalIdSource.js"
+import { InternalId, nextInternalId } from "./InternalIdSource.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Result extends Mixin(
@@ -12,6 +12,7 @@ export class Result extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Base>) =>
 
     class Result extends base {
+        internalId      : number            = nextInternalId()
     }
 ) {}
 
@@ -91,8 +92,6 @@ export class TestNodeResult extends Mixin(
     class TestNodeResult extends base {
         frozen          : boolean           = false
 
-        internalId      : number            = nextInternalId()
-
         descriptor      : TestDescriptor    = undefined
 
         // "promote" types from TreeNode
@@ -101,13 +100,16 @@ export class TestNodeResult extends Mixin(
 
         resultLog       : Result[]          = []
 
+        resultMap       : Map<InternalId, Result>   = new Map()
 
-        addResult (assertion : Result) {
+
+        addResult (result : Result) {
             if (this.frozen) {
                 throw new Error("Adding assertion after test finalization")
             }
 
-            this.resultLog.push(assertion)
+            this.resultLog.push(result)
+            this.resultMap.set(result.internalId, result)
         }
 
 

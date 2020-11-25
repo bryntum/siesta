@@ -29,10 +29,10 @@ export class SubTest extends Mixin(
         reporter            : TestReporterChild = undefined
 
 
-        addResult (assertion : Result) {
-            super.addResult(assertion)
+        addResult (result : Result) {
+            super.addResult(result)
 
-            this.reporter.onAssertion(this.internalId, assertion)
+            this.reporter.onResult(this.internalId, result)
         }
 
 

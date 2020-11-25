@@ -24,21 +24,15 @@ export class TestReporterParent extends Mixin(
 
             currentTestNodeResult       : TestNodeResult        = undefined
 
-
-            @local()
-            onAssertionStarted () : Promise<any> {
-                return
-            }
-
-            @local()
-            onTopTestStart () : Promise<any> {
-                return
-            }
-
-            @local()
-            onTopTestFinish () : Promise<any> {
-                return
-            }
+            // @local()
+            // onTopTestStart () : Promise<any> {
+            //     return
+            // }
+            //
+            // @local()
+            // onTopTestFinish () : Promise<any> {
+            //     return
+            // }
 
             @local()
             onSubTestStart (testNodeId : InternalId, parentTestNodeId : InternalId, descriptor : TestDescriptor) {
@@ -76,26 +70,34 @@ export class TestReporterParent extends Mixin(
                 return
             }
 
-            @local()
-            onException () : Promise<any> {
-                return
-            }
 
             @local()
-            onLogMessage () : Promise<any> {
-                return
-            }
-
-            @local()
-            onAssertion (testNodeId : InternalId, assertion : Result) : Promise<any> {
+            onResult (testNodeId : InternalId, assertion : Result) {
                 console.log("ON ASSERTION START", assertion)
 
-                return
+                if (!this.currentTestNodeResult || this.currentTestNodeResult.internalId !== testNodeId) {
+                    throw new Error("Parent node id mismatch for test result")
+                }
+
+                this.currentTestNodeResult.addResult(assertion)
             }
 
+
             @local()
-            onAssertionFinish (test : SubTest, assertion : Assertion) : Promise<any> {
-                return
+            onAssertionFinish (testNodeId : InternalId, assertion : AssertionAsync) {
+                if (!this.currentTestNodeResult || this.currentTestNodeResult.internalId !== testNodeId) {
+                    throw new Error("Parent node id mismatch for asynchronous test result finalization")
+                }
+
+                if (!this.currentTestNodeResult.frozen) {
+                    throw new Error("Parent test node already frozen")
+                }
+
+                if (!this.currentTestNodeResult.resultMap.has(assertion.internalId)) {
+                    throw new Error("Missing asynchronous assertion in current test node result")
+                }
+
+                // TODO - update assertion
             }
         }
 
@@ -123,13 +125,7 @@ export class TestReporterChild extends Mixin(
             onSubTestFinish : (testNodeId : InternalId) => Promise<any>
 
             @remote()
-            onException : (testNodeId : InternalId, exception : Exception) => Promise<any>
-
-            @remote()
-            onLogMessage : (testNodeId : InternalId, logMessage : LogMessage) => Promise<any>
-
-            @remote()
-            onAssertion : (testNodeId : InternalId, assertion : Result) => Promise<any>
+            onResult : (testNodeId : InternalId, assertion : Result) => Promise<any>
 
             @remote()
             onAssertionFinish : (testNodeId : InternalId, assertion : AssertionAsync) => Promise<any>
