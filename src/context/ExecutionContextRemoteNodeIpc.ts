@@ -1,4 +1,3 @@
-import { local, remote } from "../channel/Channel.js"
 import { ChannelHandshakeChild, ChannelHandshakeParent } from "../channel/ChannelHandshake.js"
 import { ChannelNodeIpcChild, ChannelNodeIpcParent } from "../channel/ChannelNodeIpc.js"
 import { Base } from "../class/Base.js"

@@ -1,9 +1,9 @@
 import { local, remote } from "../../../channel/Channel.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { ExecutionContextRemote, ExecutionContextRemoteChild } from "../../../context/ExecutionContextRemote.js"
-import { TestReporterParent, TestReporterChild } from "./TestReporter.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { globalTestEnv, Test } from "../Test.js"
+import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 // make sure we actually import these class symbols (and not just types),

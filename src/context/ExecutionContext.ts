@@ -1,5 +1,5 @@
 import { Base } from "../class/Base.js"
-import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
+import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Hook } from "../event/Hook.js"
 
 

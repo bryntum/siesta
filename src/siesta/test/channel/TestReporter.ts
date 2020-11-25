@@ -1,7 +1,7 @@
 import { Channel, local, remote } from "../../../channel/Channel.js"
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { Assertion, AssertionAsync, Exception, LogMessage, TestNodeResult } from "../Result.js"
+import { Assertion, AssertionAsync, Exception, LogMessage } from "../Result.js"
 import { SubTest } from "../Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,5 @@
-import { Base } from "../../class/Base.js"
-import { AnyConstructor, Mixin } from "../../class/Mixin.js"
-import { Test } from "./Test.js"
+import { AnyConstructor, Mixin } from "../../../class/Mixin.js"
+import { Test } from "../Test.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
