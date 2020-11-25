@@ -34,7 +34,7 @@ export class SubTest extends Mixin(
         addAssertion (assertion : Assertion) {
             super.addAssertion(assertion)
 
-            this.reporter.onAssertion(this.id, assertion)
+            this.reporter.onAssertion(/*this.id, assertion*/)
         }
 
 
@@ -80,11 +80,11 @@ export class SubTest extends Mixin(
 
 
         async start () {
-            this.reporter.onSubTestStart(this)
+            this.reporter.onSubTestStart(/*this*/)
 
             await this.launch()
 
-            this.reporter.onSubTestFinish(this.descriptor.filename)
+            this.reporter.onSubTestFinish(/*this.descriptor.filename*/)
         }
 
 
@@ -139,53 +139,55 @@ export class Test extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestEnvironmentContext extends Base {
-    $topTest     : Test              = undefined
+    topTest             : Test              = undefined
 
-
-    get topTest () : Test {
-        if (this.$topTest !== undefined) return this.$topTest
-
-        return this.$topTest = this.buildTopTest()
-    }
-
-    set topTest (value : Test) {
-        this.$topTest = value
-    }
-
-
-    initialize<T extends Base> (props? : Partial<T>) {
-        super.initialize(props)
-
-        if (isNodejs()) {
-            const processFilename       = process.argv[ 1 ]
-
-            if (/\.t\.js$/.test(processFilename)) {
-                this.launchStandaloneNodejsTest()
-            }
-        }
-    }
-
-
-    buildTopTest () : Test {
-        if (isNodejs()) {
-            const processFilename       = process.argv[ 1 ]
-
-            const topTest           = this.topTest = Test.new({
-                descriptor      : TestDescriptor.new({ filename : processFilename }),
-
-                reporter        : TestLaunchTestSide.new()
-            })
-
-            return topTest
-        }
-    }
-
-
-    async launchStandaloneNodejsTest () {
-        await Promise.resolve()
-
-        this.topTest.start()
-    }
+    // $topTest     : Test              = undefined
+    //
+    //
+    // get topTest () : Test {
+    //     if (this.$topTest !== undefined) return this.$topTest
+    //
+    //     return this.$topTest = this.buildTopTest()
+    // }
+    //
+    // set topTest (value : Test) {
+    //     this.$topTest = value
+    // }
+    //
+    //
+    // initialize<T extends Base> (props? : Partial<T>) {
+    //     super.initialize(props)
+    //
+    //     if (isNodejs()) {
+    //         const processFilename       = process.argv[ 1 ]
+    //
+    //         if (/\.t\.js$/.test(processFilename)) {
+    //             this.launchStandaloneNodejsTest()
+    //         }
+    //     }
+    // }
+    //
+    //
+    // buildTopTest () : Test {
+    //     if (isNodejs()) {
+    //         const processFilename       = process.argv[ 1 ]
+    //
+    //         const topTest           = this.topTest = Test.new({
+    //             descriptor      : TestDescriptor.new({ filename : processFilename }),
+    //
+    //             reporter        : TestLaunchTestSide.new()
+    //         })
+    //
+    //         return topTest
+    //     }
+    // }
+    //
+    //
+    // async launchStandaloneNodejsTest () {
+    //     await Promise.resolve()
+    //
+    //     this.topTest.start()
+    // }
 }
 
 export const globalTestEnv : TestEnvironmentContext = TestEnvironmentContext.new()
@@ -193,6 +195,8 @@ export const globalTestEnv : TestEnvironmentContext = TestEnvironmentContext.new
 
 //---------------------------------------------------------------------------------------------------------------------
 export const it = (name : TestDescriptorArgument, code : TestCode) => {
+    if (!globalTestEnv.topTest) throw new Error("No global test instance")
+
     globalTestEnv.topTest.it(name, code)
 }
 

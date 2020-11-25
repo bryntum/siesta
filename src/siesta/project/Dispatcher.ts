@@ -16,7 +16,7 @@ export class Dispatcher extends Mixin(
     class Dispatcher extends base {
         project         : Project                   = undefined
 
-        reporter        : ChannelTestReporter                  = undefined
+        // reporter        : ChannelTestReporter                  = undefined
 
         testContextProviders   : TestContextProvider[]                   = []
 
@@ -74,7 +74,7 @@ export class Dispatcher extends Mixin(
 
             debugger
 
-            await context.launchTest(item.url)
+            await context.launchTest(item.url, item.descriptor)
 
             context.destroy()
 

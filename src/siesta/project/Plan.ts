@@ -9,7 +9,7 @@ export class ProjectPlanItem extends Base {
 
     $url            : string            = undefined
 
-    descriptor      : Partial<TestDescriptor>   = TestDescriptor.new()
+    descriptor      : TestDescriptor    = TestDescriptor.new()
 
 
     get filename () : string {

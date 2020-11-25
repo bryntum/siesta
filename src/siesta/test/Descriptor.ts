@@ -11,6 +11,8 @@ export class TestDescriptor extends Base {
 
     filename        : string                = ''
 
+    url             : string                = ''
+
     testClass       : typeof Test           = Test
 
     env             : 'generic' | 'browser' | 'nodejs'  = 'generic'

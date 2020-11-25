@@ -57,9 +57,9 @@ export class Base {
      * of this class - it is returned right away, otherwise the [[new]] constructor is used for instantiation.
      * @param props
      */
-    static maybeNew<T extends typeof Base> (this : T, props? : Partial<InstanceType<T>>) : InstanceType<T> {
+    static maybeNew<T extends typeof Base> (this : T, props? : Partial<InstanceType<T>> | InstanceType<T>) : InstanceType<T> {
         if (props instanceof this)
-            return props as InstanceType<T>
+            return props
         else
             return this.new(props)
     }

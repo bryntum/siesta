@@ -10,6 +10,7 @@ export class ChannelTestLauncher extends Mixin(
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
         class ChannelTestLauncher extends base {
+
             @local()
             onAssertionStarted () : Promise<any> {
                 return
@@ -27,6 +28,8 @@ export class ChannelTestLauncher extends Mixin(
 
             @local()
             onSubTestStart () : Promise<any> {
+                console.log("ON SUBTEST START")
+
                 return
             }
 
@@ -46,7 +49,9 @@ export class ChannelTestLauncher extends Mixin(
             }
 
             @local()
-            onAssertionStart (test : SubTest, assertion : Assertion) : Promise<any> {
+            onAssertion (test : SubTest, assertion : Assertion) : Promise<any> {
+                console.log("ON ASSERTION START")
+
                 return
             }
 
@@ -74,10 +79,10 @@ export class ChannelTestReporter extends Mixin(
             // onTopTestFinish : (testNodeId : string) => Promise<any>
 
             @remote()
-            onSubTestStart : (testNode : TestNodeResult) => Promise<any>
+            onSubTestStart : (/*testNode : TestNodeResult*/) => Promise<any>
 
             @remote()
-            onSubTestFinish : (testNodeId : string) => Promise<any>
+            onSubTestFinish : (/*testNodeId : string*/) => Promise<any>
 
             @remote()
             onException : (testNodeId : string, exception : Exception) => Promise<any>
@@ -86,7 +91,7 @@ export class ChannelTestReporter extends Mixin(
             onLogMessage : (testNodeId : string, logMessage : LogMessage) => Promise<any>
 
             @remote()
-            onAssertion : (testNodeId : string, assertion : Assertion) => Promise<any>
+            onAssertion : (/*testNodeId : string, assertion : Assertion*/) => Promise<any>
 
             @remote()
             onAssertionFinish : (testNodeId : string, assertion : AssertionAsync) => Promise<any>
