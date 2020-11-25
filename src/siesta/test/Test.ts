@@ -2,16 +2,18 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TestReporterChild } from "./channel/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { Assertion, TestNodeResult } from "./Result.js"
+import { nextInternalId } from "./InternalIdSource.js"
+import { Assertion, Result, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type TestCode = <T extends SubTest>(t : T) => any
 
 
+
 //---------------------------------------------------------------------------------------------------------------------
 export class SubTest extends Mixin(
-    [ TestNodeResult/*, TestDescriptor*/ ],
-    (base : ClassUnion<typeof TestNodeResult/*, typeof TestDescriptor*/>) =>
+    [ TestNodeResult ],
+    (base : ClassUnion<typeof TestNodeResult>) =>
 
     class SubTest extends base {
         // "upgrade" types from TreeNode
@@ -22,17 +24,15 @@ export class SubTest extends Mixin(
 
         ongoing             : Promise<any>      = undefined
 
-        descriptor          : TestDescriptor    = undefined
-
         pendingSubTests     : SubTest[]         = []
 
         reporter            : TestReporterChild = undefined
 
 
-        addAssertion (assertion : Assertion) {
-            super.addAssertion(assertion)
+        addResult (assertion : Result) {
+            super.addResult(assertion)
 
-            this.reporter.onAssertion(/*this.id, */assertion)
+            this.reporter.onAssertion(this.internalId, assertion)
         }
 
 
@@ -46,7 +46,7 @@ export class SubTest extends Mixin(
 
 
         ok<V> (value : V, description : string = '') {
-            this.addAssertion(Assertion.new({
+            this.addResult(Assertion.new({
                 name            : 'ok',
                 passed          : Boolean(value),
                 description
@@ -55,7 +55,7 @@ export class SubTest extends Mixin(
 
 
         is<V> (value1 : V, value2 : V, description : string = '') {
-            this.addAssertion(Assertion.new({
+            this.addResult(Assertion.new({
                 name            : 'is',
                 passed          : value1 === value2,
                 description
@@ -78,11 +78,11 @@ export class SubTest extends Mixin(
 
 
         async start () {
-            this.reporter.onSubTestStart(/*this*/)
+            this.reporter.onSubTestStart(this.internalId, this.parentNode ? this.parentNode.internalId : null, this.descriptor)
 
             await this.launch()
 
-            this.reporter.onSubTestFinish(/*this.descriptor.filename*/)
+            this.reporter.onSubTestFinish(this.internalId)
         }
 
 

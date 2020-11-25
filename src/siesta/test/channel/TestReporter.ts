@@ -1,7 +1,9 @@
 import { Channel, local, remote } from "../../../channel/Channel.js"
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { Assertion, AssertionAsync, Exception, LogMessage } from "../Result.js"
+import { TestDescriptor } from "../Descriptor.js"
+import { InternalId } from "../InternalIdSource.js"
+import { Assertion, AssertionAsync, Exception, LogMessage, Result, TestNodeResult } from "../Result.js"
 import { SubTest } from "../Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -20,6 +22,9 @@ export class TestReporterParent extends Mixin(
 
         class TestReporterParent extends base {
 
+            currentTestNodeResult       : TestNodeResult        = undefined
+
+
             @local()
             onAssertionStarted () : Promise<any> {
                 return
@@ -36,14 +41,38 @@ export class TestReporterParent extends Mixin(
             }
 
             @local()
-            onSubTestStart () : Promise<any> {
-                console.log("ON SUBTEST START")
+            onSubTestStart (testNodeId : InternalId, parentTestNodeId : InternalId, descriptor : TestDescriptor) {
+                console.log("ON SUBTEST START", descriptor)
 
-                return
+                if (this.currentTestNodeResult) {
+                    if (this.currentTestNodeResult.internalId !== parentTestNodeId) {
+                        throw new Error("Parent test node internal id mismatch")
+                    }
+
+                    const newNode       = TestNodeResult.new({
+                        internalId      : testNodeId,
+
+                        parentNode      : this.currentTestNodeResult,
+
+                        descriptor      : descriptor
+                    })
+
+                    this.currentTestNodeResult.childNodes.push(newNode)
+
+                    this.currentTestNodeResult  = newNode
+                } else {
+                    const newNode       = TestNodeResult.new({
+                        internalId      : testNodeId,
+
+                        descriptor      : descriptor
+                    })
+
+                    this.currentTestNodeResult  = newNode
+                }
             }
 
             @local()
-            onSubTestFinish () : Promise<any> {
+            onSubTestFinish (testNodeId : InternalId) : Promise<any> {
                 return
             }
 
@@ -58,7 +87,7 @@ export class TestReporterParent extends Mixin(
             }
 
             @local()
-            onAssertion (/*test : SubTest, */assertion : Assertion) : Promise<any> {
+            onAssertion (testNodeId : InternalId, assertion : Result) : Promise<any> {
                 console.log("ON ASSERTION START", assertion)
 
                 return
@@ -88,22 +117,22 @@ export class TestReporterChild extends Mixin(
             // onTopTestFinish : (testNodeId : string) => Promise<any>
 
             @remote()
-            onSubTestStart : (/*testNode : TestNodeResult*/) => Promise<any>
+            onSubTestStart : (testNodeId : InternalId, parentTestNodeId : InternalId, descriptor : TestDescriptor) => Promise<any>
 
             @remote()
-            onSubTestFinish : (/*testNodeId : string*/) => Promise<any>
+            onSubTestFinish : (testNodeId : InternalId) => Promise<any>
 
             @remote()
-            onException : (testNodeId : string, exception : Exception) => Promise<any>
+            onException : (testNodeId : InternalId, exception : Exception) => Promise<any>
 
             @remote()
-            onLogMessage : (testNodeId : string, logMessage : LogMessage) => Promise<any>
+            onLogMessage : (testNodeId : InternalId, logMessage : LogMessage) => Promise<any>
 
             @remote()
-            onAssertion : (/*testNodeId : string, */assertion : Assertion) => Promise<any>
+            onAssertion : (testNodeId : InternalId, assertion : Result) => Promise<any>
 
             @remote()
-            onAssertionFinish : (testNodeId : string, assertion : AssertionAsync) => Promise<any>
+            onAssertionFinish : (testNodeId : InternalId, assertion : AssertionAsync) => Promise<any>
         }
 
         return TestReporterChild

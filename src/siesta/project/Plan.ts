@@ -23,6 +23,10 @@ export class ProjectPlanItem extends Base {
         return this.$url = (this.parentsAxis(true) as ProjectPlanItem[]).concat([ this ]).map(item => item.filename).join('/')
     }
 
+    set url (value : string) {
+        this.$url       = value
+    }
+
 
     merge (another : ProjectPlanItem) {
         if (this.parentItem) {

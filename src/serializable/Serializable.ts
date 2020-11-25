@@ -44,7 +44,7 @@ export const lookupSerializableClass = (id : string) : typeof Serializable => {
 
 //---------------------------------------------------------------------------------------------------------------------
 export const reviver = function (key : string | number, value : number | string | boolean | object) {
-    if (typeof value === 'object') {
+    if (typeof value === 'object' && value !== null) {
         const $class        = (value as any).$class
 
         if ($class !== undefined) {
