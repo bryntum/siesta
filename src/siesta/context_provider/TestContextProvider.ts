@@ -3,7 +3,7 @@ import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ContextProvider } from "../../context_provider/ContextProvider.js"
 import { Logger } from "../../logger/Logger.js"
 import { Dispatcher } from "../project/Dispatcher.js"
-import { TestLaunchLauncherSide } from "../test/Launcher.js"
+import { TestLauncherParent } from "../test/channel/TestLauncher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestContextProvider extends Mixin(
@@ -11,7 +11,7 @@ export class TestContextProvider extends Mixin(
     (base : ClassUnion<typeof ContextProvider>) => {
 
         class TestContextProvider extends base {
-            contextClass        : TestLaunchLauncherSide
+            contextClass        : TestLauncherParent
 
             dispatcher      : Dispatcher        = undefined
 
@@ -24,7 +24,7 @@ export class TestContextProvider extends Mixin(
             }
 
 
-            async createTestContext () : Promise<TestLaunchLauncherSide> {
+            async createTestContext () : Promise<TestLauncherParent> {
                 const context       = await this.createContext()
 
                 // context.evaluate(() => {

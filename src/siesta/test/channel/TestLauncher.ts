@@ -1,9 +1,9 @@
-import { local, remote } from "../../channel/Channel.js"
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { ExecutionContextRemote, ExecutionContextRemoteChild } from "../../context/ExecutionContextRemote.js"
-import { ChannelTestLauncher, ChannelTestReporter } from "./channel/Reporter.js"
-import { TestDescriptor } from "./Descriptor.js"
-import { globalTestEnv, Test } from "./Test.js"
+import { local, remote } from "../../../channel/Channel.js"
+import { ClassUnion, Mixin } from "../../../class/Mixin.js"
+import { ExecutionContextRemote, ExecutionContextRemoteChild } from "../../../context/ExecutionContextRemote.js"
+import { TestReporterParent, TestReporterChild } from "./TestReporter.js"
+import { TestDescriptor } from "../Descriptor.js"
+import { globalTestEnv, Test } from "../Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 // make sure we actually import these class symbols (and not just types),
@@ -12,26 +12,26 @@ import { globalTestEnv, Test } from "./Test.js"
 TestDescriptor
 
 //---------------------------------------------------------------------------------------------------------------------
-export class TestLaunchLauncherSide extends Mixin(
-    [ ChannelTestLauncher, ExecutionContextRemote ],
-    (base : ClassUnion<typeof ChannelTestLauncher, typeof ExecutionContextRemote>) => {
+export class TestLauncherParent extends Mixin(
+    [ TestReporterParent, ExecutionContextRemote ],
+    (base : ClassUnion<typeof TestReporterParent, typeof ExecutionContextRemote>) => {
 
-        class TestLaunchLauncherSide extends base {
+        class TestLauncherParent extends base {
             @remote()
             launchTest : (testUrl : string, testDescriptor : TestDescriptor) => Promise<any>
         }
 
-        return TestLaunchLauncherSide
+        return TestLauncherParent
     }
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class TestLaunchTestSide extends Mixin(
-    [ ChannelTestReporter, ExecutionContextRemoteChild ],
-    (base : ClassUnion<typeof ChannelTestReporter, typeof ExecutionContextRemoteChild>) => {
+export class TestLauncherChild extends Mixin(
+    [ TestReporterChild, ExecutionContextRemoteChild ],
+    (base : ClassUnion<typeof TestReporterChild, typeof ExecutionContextRemoteChild>) => {
 
-        class TestLaunchTestSide extends base {
+        class TestLauncherChild extends base {
             topTest         : Test              = undefined
 
 
@@ -57,7 +57,7 @@ export class TestLaunchTestSide extends Mixin(
             }
         }
 
-        return TestLaunchTestSide
+        return TestLauncherChild
     }
 ) {}
 

@@ -14,11 +14,11 @@ Exception
 LogMessage
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelTestLauncher extends Mixin(
+export class TestReporterParent extends Mixin(
     [ Channel, Base ],
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
-        class ChannelTestLauncher extends base {
+        class TestReporterParent extends base {
 
             @local()
             onAssertionStarted () : Promise<any> {
@@ -70,17 +70,17 @@ export class ChannelTestLauncher extends Mixin(
             }
         }
 
-        return ChannelTestLauncher
+        return TestReporterParent
     }
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelTestReporter extends Mixin(
+export class TestReporterChild extends Mixin(
     [ Channel, Base ],
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
-        class ChannelTestReporter extends base {
+        class TestReporterChild extends base {
             // @remote()
             // onTopTestStart : (testNode : TestNodeResult) => Promise<any>
             //
@@ -106,7 +106,7 @@ export class ChannelTestReporter extends Mixin(
             onAssertionFinish : (testNodeId : string, assertion : AssertionAsync) => Promise<any>
         }
 
-        return ChannelTestReporter
+        return TestReporterChild
     }
 ) {}
 

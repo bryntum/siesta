@@ -1,20 +1,19 @@
-import { ChannelNodeIpcChild, ChannelNodeIpcParent } from "../../../channel/ChannelNodeIpc.js"
 import { ChannelSerializableJSON } from "../../../channel/ChannelSerializable.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { ExecutionContextRemoteNodeIpc, ExecutionContextRemoteNodeIpcChild } from "../../../context/ExecutionContextRemoteNodeIpc.js"
-import { TestLaunchLauncherSide, TestLaunchTestSide } from "../Launcher.js"
+import { TestLauncherChild, TestLauncherParent } from "../channel/TestLauncher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestContextNodeIpc extends Mixin(
     [
         ExecutionContextRemoteNodeIpc,
         ChannelSerializableJSON,
-        TestLaunchLauncherSide
+        TestLauncherParent
     ],
     (base : ClassUnion<
         typeof ExecutionContextRemoteNodeIpc,
         typeof ChannelSerializableJSON,
-        typeof TestLaunchLauncherSide
+        typeof TestLauncherParent
     >) => {
 
         class TestContextNodeIpc extends base {
@@ -30,13 +29,13 @@ export class TestContextNodeIpcChild extends Mixin(
     [
         ExecutionContextRemoteNodeIpcChild,
         ChannelSerializableJSON,
-        TestLaunchTestSide
+        TestLauncherChild
     ],
     (base : ClassUnion<
         typeof ExecutionContextRemoteNodeIpcChild,
         typeof ChannelSerializableJSON,
-        typeof TestLaunchTestSide>
-    ) => {
+        typeof TestLauncherChild
+    >) => {
 
         class TestContextNodeIpcChild extends base {
         }

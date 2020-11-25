@@ -9,11 +9,11 @@ export class ContextProviderNodeIpc extends Mixin(
     (base : ClassUnion<typeof ContextProvider>) =>
 
     class ContextProviderNodeIpc extends base {
-        seedUrl         : string            = import.meta.url
+        childChannelClassUrl         : string            = import.meta.url
             .replace(/^file:\\\\/, '')
             .replace(/context_provider\/ContextProviderNodeIpc.js$/, 'context/ExecutionContextRemoteNodeIpc.js')
 
-        seedSymbol      : string            = 'ExecutionContextRemoteNodeIpcChild'
+        childChannelClassSymbol      : string            = 'ExecutionContextRemoteNodeIpcChild'
 
 
         parentChannelClass : typeof ExecutionContextRemoteNodeIpc   = ExecutionContextRemoteNodeIpc
@@ -38,10 +38,10 @@ export class ContextProviderNodeIpc extends Mixin(
                         // '--inspect-brk=127.0.0.1:9339',
                         '--input-type', 'module',
                         '--eval', [
-                            `import { ${this.seedSymbol} } from "${this.seedUrl}"`,
+                            `import { ${this.childChannelClassSymbol} } from "${this.childChannelClassUrl}"`,
                             // `debugger`,
                             // `console.log('ContextProviderNodeIpc seed launched`,
-                            `const context = ${this.seedSymbol}.new()`,
+                            `const context = ${this.childChannelClassSymbol}.new()`,
                             `context.connect()`,
                             // `console.log('ContextProviderNodeIpc seed connect call issued`,
                         ].join('\n')

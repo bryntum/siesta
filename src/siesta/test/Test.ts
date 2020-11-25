@@ -1,9 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { isNodejs } from "../../util/Helpers.js"
+import { TestReporterChild } from "./channel/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { ChannelTestReporter } from "./channel/Reporter.js"
-import { TestLaunchTestSide } from "./Launcher.js"
 import { Assertion, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -28,7 +26,7 @@ export class SubTest extends Mixin(
 
         pendingSubTests     : SubTest[]         = []
 
-        reporter            : ChannelTestReporter              = undefined
+        reporter            : TestReporterChild = undefined
 
 
         addAssertion (assertion : Assertion) {
@@ -109,11 +107,7 @@ export class Test extends Mixin(
     (base : ClassUnion<typeof SubTest>) =>
 
     class Test extends base {
-        // agent           : LocalContextProvider              = undefined
-        //
-        // context         : ExecutionContext                  = undefined
-
-        reporter            : ChannelTestReporter              = undefined
+        reporter            : TestReporterChild              = undefined
 
 
         async start () {
@@ -138,59 +132,11 @@ export class Test extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class TestEnvironmentContext extends Base {
+export class GlobalTestEnvironment extends Base {
     topTest             : Test              = undefined
-
-    // $topTest     : Test              = undefined
-    //
-    //
-    // get topTest () : Test {
-    //     if (this.$topTest !== undefined) return this.$topTest
-    //
-    //     return this.$topTest = this.buildTopTest()
-    // }
-    //
-    // set topTest (value : Test) {
-    //     this.$topTest = value
-    // }
-    //
-    //
-    // initialize<T extends Base> (props? : Partial<T>) {
-    //     super.initialize(props)
-    //
-    //     if (isNodejs()) {
-    //         const processFilename       = process.argv[ 1 ]
-    //
-    //         if (/\.t\.js$/.test(processFilename)) {
-    //             this.launchStandaloneNodejsTest()
-    //         }
-    //     }
-    // }
-    //
-    //
-    // buildTopTest () : Test {
-    //     if (isNodejs()) {
-    //         const processFilename       = process.argv[ 1 ]
-    //
-    //         const topTest           = this.topTest = Test.new({
-    //             descriptor      : TestDescriptor.new({ filename : processFilename }),
-    //
-    //             reporter        : TestLaunchTestSide.new()
-    //         })
-    //
-    //         return topTest
-    //     }
-    // }
-    //
-    //
-    // async launchStandaloneNodejsTest () {
-    //     await Promise.resolve()
-    //
-    //     this.topTest.start()
-    // }
 }
 
-export const globalTestEnv : TestEnvironmentContext = TestEnvironmentContext.new()
+export const globalTestEnv : GlobalTestEnvironment = GlobalTestEnvironment.new()
 
 
 //---------------------------------------------------------------------------------------------------------------------

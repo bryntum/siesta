@@ -10,11 +10,11 @@ export class TestContextProviderNodeIpc extends Mixin(
     (base : ClassUnion<typeof TestContextProvider, typeof ContextProviderNodeIpc>) => {
 
         class TestContextProviderNodeIpc extends base {
-            seedUrl         : string            = import.meta.url
+            childChannelClassUrl         : string            = import.meta.url
                 .replace(/^file:/, '')
                 .replace(/context_provider\/TestContextProviderNodeIpc.js$/, 'test/context/TestContextNodeIpc.js')
 
-            seedSymbol      : string            = 'TestContextNodeIpcChild'
+            childChannelClassSymbol      : string            = 'TestContextNodeIpcChild'
 
             parentChannelClass : typeof ExecutionContextRemoteNodeIpc   = TestContextNodeIpc
         }

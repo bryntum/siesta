@@ -3,7 +3,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
-import { ChannelTestReporter } from "../test/channel/Reporter.js"
+import { TestReporterChild } from "../test/channel/TestReporter.js"
 import { ProjectPlanItem } from "./Plan.js"
 import { Project } from "./Project.js"
 
