@@ -2,7 +2,6 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TestReporterChild } from "./channel/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { nextInternalId } from "./InternalIdSource.js"
 import { Assertion, Result, TestNodeResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------

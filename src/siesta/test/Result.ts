@@ -90,6 +90,8 @@ export class TestNodeResult extends Mixin(
     (base : ClassUnion<typeof Result, typeof TreeNode>) =>
 
     class TestNodeResult extends base {
+        // TODO should probably have separate flag for assertions??
+        // (I guess still valid to throw exceptions even if can not add assertions??)
         frozen          : boolean           = false
 
         descriptor      : TestDescriptor    = undefined
@@ -100,16 +102,23 @@ export class TestNodeResult extends Mixin(
 
         resultLog       : Result[]          = []
 
-        resultMap       : Map<InternalId, Result>   = new Map()
+        resultMap       : Map<InternalId, number>   = new Map()
 
 
         addResult (result : Result) {
-            if (this.frozen) {
-                throw new Error("Adding assertion after test finalization")
-            }
+            if (this.frozen) throw new Error("Adding result after test finalization")
 
             this.resultLog.push(result)
-            this.resultMap.set(result.internalId, result)
+            this.resultMap.set(result.internalId, this.resultLog.length - 1)
+        }
+
+
+        updateResult (result : Result) {
+            if (this.frozen) throw new Error("Updating result after test finalization")
+
+            if (!this.resultMap.has(result.internalId)) throw new Error("Result to update does not exists")
+
+            this.resultLog[ this.resultMap.get(result.internalId) ] = result
         }
 
 
