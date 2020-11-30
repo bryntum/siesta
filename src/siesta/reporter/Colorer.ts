@@ -59,4 +59,9 @@ export class Colorer extends Base {
     text (text : string) : string {
         throw new Error("implement me")
     }
+
+
+    write (text : string) {
+        throw new Error("implement me")
+    }
 }

@@ -22,7 +22,7 @@ export class Project extends Mixin(
         options         : Partial<TestDescriptor>           = undefined
 
         projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new({
-            descriptor : TestDescriptor.new({ filename : path.dirname(process.argv[ 1 ]),  })
+            descriptor : TestDescriptor.new({ filename : path.dirname(process.argv[ 1 ]), url : path.dirname(process.argv[ 1 ]) })
         })
         projectPlanMap  : Map<string, ProjectPlanItem>      = new Map()
 

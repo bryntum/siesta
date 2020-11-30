@@ -159,7 +159,17 @@ export class TestNodeResult extends Mixin(
         $passed   : boolean       = undefined
 
         get passed () : boolean {
-            return this.$passed
+            if (this.$passed !== undefined) return this.$passed
+
+            let passed : boolean    = true
+
+            this.resultLog.forEach(result => {
+                if (result instanceof Exception) passed = false
+
+                if ((result instanceof Assertion) && !result.passed) passed = false
+            })
+
+            return this.$passed     = passed
         }
     }
 ) {}

@@ -3,6 +3,9 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
+import { ColorerNodejs } from "../reporter/ColorerNodejs.js"
+import { Reporter } from "../reporter/Reporter.js"
+import { TestLauncherParent } from "../test/channel/TestLauncher.js"
 import { ProjectPlanItem } from "./Plan.js"
 import { Project } from "./Project.js"
 
@@ -15,9 +18,11 @@ export class Dispatcher extends Mixin(
     class Dispatcher extends base {
         project         : Project                   = undefined
 
-        testContextProviders   : TestContextProvider[]                   = []
+        testContextProviders   : TestContextProvider[]                          = []
 
         testContextProviderConstructors   : (typeof TestContextProvider)[]      = []
+
+        reporter            : Reporter      = undefined
 
 
         get logger () : Logger {
@@ -41,6 +46,8 @@ export class Dispatcher extends Mixin(
 
 
         async setup () {
+            this.reporter       = Reporter.new({ c : ColorerNodejs.new() })
+
             await Promise.all(this.testContextProviderConstructors.map(tcpConstructor => {
                 const tcp                   = tcpConstructor.new({ dispatcher : this })
 
@@ -65,13 +72,17 @@ export class Dispatcher extends Mixin(
 
 
         async launchProjectPlanItem (item : ProjectPlanItem) {
-            console.log("launch project item: ", item.url)
+            if (!item.descriptor.url) item.descriptor.url = item.url
+
+            console.log("launch project item: ", item.descriptor.url)
 
             const context       = await this.createTestContext()
 
+            context.reporter    = this.reporter
+
             debugger
 
-            await context.launchTest(item.url, item.descriptor)
+            await context.launchTest(item.descriptor)
 
             context.destroy()
 
@@ -79,7 +90,7 @@ export class Dispatcher extends Mixin(
         }
 
 
-        async createTestContext () {
+        async createTestContext () : Promise<TestLauncherParent> {
             return await this.testContextProviders[ 0 ].createTestContext()
         }
 

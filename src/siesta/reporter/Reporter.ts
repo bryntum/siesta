@@ -1,6 +1,9 @@
+import { local } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { TestNodeResult } from "../test/Result.js"
+import { TestDescriptor } from "../test/Descriptor.js"
+import { InternalId } from "../test/InternalIdSource.js"
+import { AssertionAsync, Result, TestNodeResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -37,8 +40,6 @@ export class ReportingSequence extends Base {
 }
 
 
-const c = Colorer.new()
-
 //---------------------------------------------------------------------------------------------------------------------
 export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 
@@ -55,30 +56,56 @@ export class Reporter extends Mixin(
 
         streaming           : ReporterStreaming         = 'after_completion'
 
-        resultsCompleted    : TestNodeResult[]          = []
-        resultsRunning      : TestNodeResult[]          = []
+        resultsCompleted    : Set<TestNodeResult>       = new Set()
+        resultsRunning      : Set<TestNodeResult>       = new Set()
 
         activeTestNode      : TestNodeResult            = undefined
 
         indentLevelsStack   : number[]                  = [ 0 ]
 
+        c                   : Colorer                   = undefined
 
-        testNodeTemplate (testNode : TestNodeResult) {
+
+        testNodeTemplate (testNode : TestNodeResult) : string {
             return `${ this.testNodeState(testNode) } ${this.testNodeUrl(testNode)}`
         }
 
 
         testNodeState (testNode : TestNodeResult) : string {
             if (testNode.state === 'completed') {
-                return testNode.passed ? c.bgGreen.black.text(' PASS ') : c.bgRed.black.text('FAIL')
+                return testNode.passed ? this.c.bgGreen.black.text(' PASS ') : this.c.bgRed.black.text('FAIL')
             } else {
-                return 'RUNS'
+                return this.c.bgYellowBright.black.text(' RUNS ')
             }
         }
 
 
         testNodeUrl (testNode : TestNodeResult) : string {
+            console.log("URL = ", testNode.descriptor.url)
+
             return testNode.descriptor.url
+        }
+
+
+
+        onSubTestStart (testNode : TestNodeResult) {
+            this.resultsRunning.add(testNode)
+        }
+
+        onSubTestFinish (testNode : TestNodeResult) {
+            if (!this.resultsRunning.has(testNode)) throw new Error("Test completed before starting")
+
+            this.resultsRunning.delete(testNode)
+
+            this.resultsCompleted.add(testNode)
+
+            if (!testNode.parentNode) this.c.write(this.testNodeTemplate(testNode))
+        }
+
+        onResult (testNode : TestNodeResult, assertion : Result) {
+        }
+
+        onAssertionFinish (testNode : TestNodeResult, assertion : AssertionAsync) {
         }
     }
 ) {}

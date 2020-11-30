@@ -1,6 +1,7 @@
 import { local, remote } from "../../../channel/Channel.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { ExecutionContextRemote, ExecutionContextRemoteChild } from "../../../context/ExecutionContextRemote.js"
+import { Reporter } from "../../reporter/Reporter.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { globalTestEnv, Test } from "../Test.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
@@ -18,7 +19,7 @@ export class TestLauncherParent extends Mixin(
 
         class TestLauncherParent extends base {
             @remote()
-            launchTest : (testUrl : string, testDescriptor : TestDescriptor) => Promise<any>
+            launchTest : (testDescriptor : TestDescriptor) => Promise<any>
         }
 
         return TestLauncherParent
@@ -36,14 +37,14 @@ export class TestLauncherChild extends Mixin(
 
 
             @local()
-            async launchTest (testUrl : string, testDescriptor : TestDescriptor) {
+            async launchTest (testDescriptor : TestDescriptor) {
                 const topTest           = globalTestEnv.topTest = Test.new({
                     descriptor      : testDescriptor,
 
                     reporter        : this
                 })
                 try {
-                    await import(testUrl)
+                    await import(testDescriptor.url)
                     debugger
 
                     globalTestEnv.topTest   = undefined

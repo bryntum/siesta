@@ -1,6 +1,7 @@
 import { Channel, local, remote } from "../../../channel/Channel.js"
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
+import { Reporter } from "../../reporter/Reporter.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { InternalId } from "../InternalIdSource.js"
 import { Assertion, AssertionAsync, Exception, LogMessage, Result, TestNodeResult } from "../Result.js"
@@ -22,6 +23,9 @@ export class TestReporterParent extends Mixin(
 
         class TestReporterParent extends base {
 
+            reporter        : Reporter          = undefined
+
+
             currentTestNodeResult       : TestNodeResult        = undefined
 
             // @local()
@@ -36,7 +40,7 @@ export class TestReporterParent extends Mixin(
 
             @local()
             onSubTestStart (testNodeId : InternalId, parentTestNodeId : InternalId, descriptor : TestDescriptor) {
-                console.log("ON SUBTEST START", descriptor)
+                // console.log("ON SUBTEST START", descriptor)
 
                 if (this.currentTestNodeResult) {
                     if (this.currentTestNodeResult.internalId !== parentTestNodeId) {
@@ -64,6 +68,8 @@ export class TestReporterParent extends Mixin(
 
                     this.currentTestNodeResult  = newNode
                 }
+
+                this.reporter.onSubTestStart(this.currentTestNodeResult)
             }
 
             @local()
@@ -73,20 +79,25 @@ export class TestReporterParent extends Mixin(
                 }
 
                 this.currentTestNodeResult.frozen   = true
+                this.currentTestNodeResult.state    = "completed"
+
+                this.reporter.onSubTestFinish(this.currentTestNodeResult)
 
                 this.currentTestNodeResult          = this.currentTestNodeResult.parentNode
             }
 
 
             @local()
-            onResult (testNodeId : InternalId, assertion : Result) {
-                console.log("ON ASSERTION START", assertion)
+            onResult (testNodeId : InternalId, result : Result) {
+                // console.log("ON ASSERTION START", result)
 
                 if (!this.currentTestNodeResult || this.currentTestNodeResult.internalId !== testNodeId) {
                     throw new Error("Parent node id mismatch for test result")
                 }
 
-                this.currentTestNodeResult.addResult(assertion)
+                this.currentTestNodeResult.addResult(result)
+
+                this.reporter.onResult(this.currentTestNodeResult, result)
             }
 
 
@@ -101,6 +112,8 @@ export class TestReporterParent extends Mixin(
                 }
 
                 this.currentTestNodeResult.updateResult(assertion)
+
+                this.reporter.onAssertionFinish(this.currentTestNodeResult, assertion)
             }
         }
 
