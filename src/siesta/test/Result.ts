@@ -167,6 +167,8 @@ export class TestNodeResult extends Mixin(
                 if (result instanceof Exception) passed = false
 
                 if ((result instanceof Assertion) && !result.passed) passed = false
+
+                if ((result instanceof TestNodeResult) && !result.passed) passed = false
             })
 
             return this.$passed     = passed

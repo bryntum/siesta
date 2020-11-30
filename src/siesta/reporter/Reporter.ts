@@ -67,7 +67,13 @@ export class Reporter extends Mixin(
 
 
         testNodeTemplate (testNode : TestNodeResult) : string {
-            return `${ this.testNodeState(testNode) } ${this.testNodeUrl(testNode)}`
+            const header    = `${ this.testNodeState(testNode) } ${this.testNodeUrl(testNode)}`
+
+            if (this.detailing === 'subtest' || this.detailing === 'assertion') {
+                // this.
+            }
+
+            return header
         }
 
 
