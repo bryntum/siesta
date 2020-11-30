@@ -85,6 +85,9 @@ export class AssertionAsync extends Mixin(
 registerSerializableClass('AssertionAsync', AssertionAsync)
 
 //---------------------------------------------------------------------------------------------------------------------
+export type TestNodeState   = 'created' | 'running' | 'completed'
+
+
 export class TestNodeResult extends Mixin(
     [ Result, TreeNode ],
     (base : ClassUnion<typeof Result, typeof TreeNode>) =>
@@ -93,6 +96,8 @@ export class TestNodeResult extends Mixin(
         // TODO should probably have separate flag for assertions??
         // (I guess still valid to throw exceptions even if can not add assertions??)
         frozen          : boolean           = false
+
+        state           : TestNodeState     = 'created'
 
         descriptor      : TestDescriptor    = undefined
 
@@ -148,6 +153,13 @@ export class TestNodeResult extends Mixin(
             obj.parentNode      = this.parentNode ? this.parentNode.internalId : undefined
 
             return obj
+        }
+
+
+        $passed   : boolean       = undefined
+
+        get passed () : boolean {
+            return this.$passed
         }
     }
 ) {}

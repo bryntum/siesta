@@ -45,10 +45,10 @@ export class TestReporterParent extends Mixin(
 
                     const newNode       = TestNodeResult.new({
                         internalId      : testNodeId,
+                        descriptor      : descriptor,
+                        state           : 'running',
 
-                        parentNode      : this.currentTestNodeResult,
-
-                        descriptor      : descriptor
+                        parentNode      : this.currentTestNodeResult
                     })
 
                     this.currentTestNodeResult.childNodes.push(newNode)
@@ -57,8 +57,9 @@ export class TestReporterParent extends Mixin(
                 } else {
                     const newNode       = TestNodeResult.new({
                         internalId      : testNodeId,
+                        descriptor      : descriptor,
+                        state           : 'running',
 
-                        descriptor      : descriptor
                     })
 
                     this.currentTestNodeResult  = newNode

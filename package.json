@@ -23,17 +23,24 @@
   "author": "Nickolay Platonov, Bryntum",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^4.1.0",
     "esm": "^3.2.25",
-    "tslib": "^2.0.3",
-    "glob": "^7.1.6"
+    "glob": "^7.1.6",
+    "tslib": "^2.0.3"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
     "@types/node": "^14.14.10",
     "siesta-lite": "^5.5.1",
+    "snowpack": "^2.17.1",
     "tslint": "^6.1.3",
     "typedoc": "git://github.com/bryntum/typedoc.git#custom",
     "typedoc-default-themes": "git://github.com/bryntum/typedoc-default-themes.git",
     "typescript": "^4.1.2"
+  },
+  "snowpack": {
+    "installOptions" : {
+      "polyfillNode" : true
+    }
   }
 }

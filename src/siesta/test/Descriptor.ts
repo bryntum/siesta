@@ -54,7 +54,7 @@ export class TestDescriptor extends Serializable.mix(Base) {
     static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, props? : string | Partial<InstanceType<T>>) : InstanceType<T> {
         if (typeOf(props) === 'String') {
             // @ts-ignore
-            return this.new({ name : props })
+            return this.new({ title : props })
         } else {
             // @ts-ignore
             return this.new(props)
