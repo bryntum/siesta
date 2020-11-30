@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TestNodeResult } from "../test/Result.js"
+import { Colorer } from "./Colorer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type Color   = string
@@ -36,12 +37,7 @@ export class ReportingSequence extends Base {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
-export class Colorer extends Base {
-
-}
-
-
+const c = Colorer.new()
 
 //---------------------------------------------------------------------------------------------------------------------
 export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
@@ -74,7 +70,7 @@ export class Reporter extends Mixin(
 
         testNodeState (testNode : TestNodeResult) : string {
             if (testNode.state === 'completed') {
-                return testNode.passed ? 'PASS' : 'FAIL'
+                return testNode.passed ? c.bgGreen.black.text(' PASS ') : c.bgRed.black.text('FAIL')
             } else {
                 return 'RUNS'
             }
