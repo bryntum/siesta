@@ -3,7 +3,7 @@ import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { exclude, registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
 import { TestDescriptor } from "./Descriptor.js"
-import { InternalId, nextInternalId } from "./InternalIdSource.js"
+import { LUID, luid } from "./LUID.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Result extends Mixin(
@@ -11,7 +11,7 @@ export class Result extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Base>) =>
 
     class Result extends base {
-        internalId      : number            = nextInternalId()
+        localId     : number            = luid()
     }
 ) {}
 
@@ -105,7 +105,7 @@ export class TestNodeResult extends Mixin(
 
         resultLog       : Result[]          = []
 
-        resultMap       : Map<InternalId, number>   = new Map()
+        resultMap       : Map<LUID, number>   = new Map()
 
         $root           : TestNodeResult    = undefined
 
@@ -126,16 +126,16 @@ export class TestNodeResult extends Mixin(
             if (result instanceof TestNodeResult) this.$childNodes = undefined
 
             this.resultLog.push(result)
-            this.resultMap.set(result.internalId, this.resultLog.length - 1)
+            this.resultMap.set(result.localId, this.resultLog.length - 1)
         }
 
 
         updateResult (result : Result) {
             if (this.frozen) throw new Error("Updating result after test finalization")
 
-            if (!this.resultMap.has(result.internalId)) throw new Error("Result to update does not exists")
+            if (!this.resultMap.has(result.localId)) throw new Error("Result to update does not exists")
 
-            this.resultLog[ this.resultMap.get(result.internalId) ] = result
+            this.resultLog[ this.resultMap.get(result.localId) ] = result
         }
 
 
@@ -162,7 +162,7 @@ export class TestNodeResult extends Mixin(
         toJSON () {
             const obj : any     = Object.assign({}, this)
 
-            obj.parentNode      = this.parentNode ? this.parentNode.internalId : undefined
+            obj.parentNode      = this.parentNode ? this.parentNode.localId : undefined
 
             return obj
         }

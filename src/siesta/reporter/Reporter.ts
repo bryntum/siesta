@@ -1,10 +1,7 @@
-import { local } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { relative } from "../../util/Path.js"
 import { Project } from "../project/Project.js"
-import { TestDescriptor } from "../test/Descriptor.js"
-import { InternalId } from "../test/InternalIdSource.js"
 import { AssertionAsync, Result, TestNodeResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
 

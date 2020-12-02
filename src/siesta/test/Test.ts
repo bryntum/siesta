@@ -30,7 +30,7 @@ export class SubTest extends Mixin(
         addResult (result : Result) {
             super.addResult(result)
 
-            if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.internalId, result)
+            if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.localId, result)
         }
 
 
@@ -67,11 +67,11 @@ export class SubTest extends Mixin(
 
 
         async start () {
-            this.reporter.onSubTestStart(this.internalId, this.parentNode ? this.parentNode.internalId : null, this.descriptor)
+            this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
             await this.launch()
 
-            this.reporter.onSubTestFinish(this.internalId)
+            this.reporter.onSubTestFinish(this.localId)
         }
 
 
