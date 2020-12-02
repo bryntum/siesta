@@ -77,7 +77,7 @@ export function split<Element> (iterable : Iterable<Element>) : [ Iterable<Eleme
 
 //---------------------------------------------------------------------------------------------------------------------
 export function* inBatchesBySize<Element> (iterator : Iterable<Element>, batchSize : number) : Iterable<Element[]> {
-    if (batchSize < 0) throw new Error("Batch size needs to a natural number")
+    if (batchSize < 1) throw new Error("Batch size needs to a natural number")
     batchSize   = batchSize | 0
 
     const runningBatch : Element[]  = []
@@ -164,15 +164,7 @@ export function reduce<Element, Result> (iterator : Iterable<Element>, func : (a
 
 //---------------------------------------------------------------------------------------------------------------------
 export function* uniqueOnly<Element> (iterator : Iterable<Element>) : Iterable<Element> {
-    const seen      = new Set<Element>()
-
-    for (const el of iterator) {
-        if (!seen.has(el)) {
-            seen.add(el)
-
-            yield el
-        }
-    }
+    return uniqueOnlyBy(iterator, i => i)
 }
 
 
@@ -378,10 +370,6 @@ export class ChainedIteratorClass<T> {
         //@ts-ignore
         return new Map(this)
     }
-
-    // toMap<K, V> () : T extends [ K, V ] ? Map<K, V> : never  {
-    //     return new Map<K, V>(this.iterable as (T extends [ K, V ] ? Iterable<T> : never)) as (T extends [ K, V ] ? Map<K, V> : never)
-    // }
 
 
     flush () {

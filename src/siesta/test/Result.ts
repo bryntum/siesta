@@ -1,7 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
-import { registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
+import { exclude, registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
 import { TestDescriptor } from "./Descriptor.js"
 import { LUID, luid } from "./LUID.js"
 
@@ -30,6 +30,7 @@ export class LogMessage extends Mixin(
 
 registerSerializableClass('LogMessage', LogMessage)
 
+
 //---------------------------------------------------------------------------------------------------------------------
 export class Exception extends Mixin(
     [ Serializable, Result ],
@@ -41,6 +42,7 @@ export class Exception extends Mixin(
 ) {}
 
 registerSerializableClass('Exception', Exception)
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Assertion extends Mixin(
@@ -60,26 +62,20 @@ export class Assertion extends Mixin(
 
 registerSerializableClass('Assertion', Assertion)
 
+
 //---------------------------------------------------------------------------------------------------------------------
 export class AssertionAsync extends Mixin(
     [ Serializable, Result ],
-    (base : ClassUnion<typeof Serializable, typeof Result>) =>
+    (base : ClassUnion<typeof Serializable, typeof Result>) => {
 
     class AssertionAsync extends base {
+        @exclude()
         ongoing     : Promise<any>                          = undefined
 
         state       : 'pending' | 'resolved' | 'rejected'   = 'pending'
-
-
-        toJSON (key : string) : Partial<this> {
-            const jsonObj       = super.toJSON(key)
-
-            delete jsonObj.ongoing
-
-            return jsonObj
-        }
     }
-) {}
+    return AssertionAsync
+}) {}
 
 registerSerializableClass('AssertionAsync', AssertionAsync)
 
@@ -88,6 +84,7 @@ export type TestNodeState   = 'created' | 'running' | 'completed'
 
 // serializable leaf nodes
 export type TestResultLeaf  = Exception | LogMessage | Assertion | AssertionAsync
+
 // non-serializable tree node - the serializable part is `descriptor`
 export type TestResultTree  = TestNodeResult
 
@@ -128,7 +125,7 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        isRoot () : boolean {
+        get isRoot () : boolean {
             return !this.parentNode
         }
 

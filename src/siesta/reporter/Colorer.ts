@@ -1,6 +1,8 @@
 import { Base } from "../../class/Base.js"
 
 export class Colorer extends Base {
+    get noop () : Colorer { return this }
+
     get reset () : Colorer { return this.deriveColorer('reset') }
     get bold () : Colorer { return this.deriveColorer('bold') }
     get dim () : Colorer { return this.deriveColorer('dim') }

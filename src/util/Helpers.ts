@@ -33,6 +33,7 @@ export const typeOf = (value : any) : string => Object.prototype.toString.call(v
 //---------------------------------------------------------------------------------------------------------------------
 export type PartialWOC<T>       = Omit<Partial<T>, 'constructor'>
 
+//---------------------------------------------------------------------------------------------------------------------
 export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
 
 
@@ -78,17 +79,6 @@ export const copySetInto = <V>(sourceSet : Set<V>, targetSet : Set<V>) : Set<V> 
     for (const value of sourceSet) targetSet.add(value)
 
     return targetSet
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export const copyArray = <T>(array : T[]) : T[] => {
-    const len       = array.length
-    const res       = new Array(len)
-
-    for (let i = 0; i < len; i++) res[ i ] = array[ i ]
-
-    return res
 }
 
 

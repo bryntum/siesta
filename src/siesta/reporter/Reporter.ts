@@ -6,45 +6,45 @@ import { Project } from "../project/Project.js"
 import { Assertion, AssertionAsync, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
 
-//---------------------------------------------------------------------------------------------------------------------
-export type Color   = string
-
-//---------------------------------------------------------------------------------------------------------------------
-export class Style extends Base {
-    fgColor         : Color         = ''
-    bgColor         : Color         = ''
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-export class IncreaseIndent extends Base {
-    by              : number        = 0
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-export class SetIndent extends Base {
-    to              : number        = 0
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class CancelPreviousIndent extends Base {
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export type ReportingCommand    = string | Style | IncreaseIndent | SetIndent | CancelPreviousIndent
-
-
-export class ReportingSequence extends Base {
-    commands        : ReportingCommand[]        = []
-}
+// //---------------------------------------------------------------------------------------------------------------------
+// export type Color   = string
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export class Style extends Base {
+//     fgColor         : Color         = ''
+//     bgColor         : Color         = ''
+// }
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export class IncreaseIndent extends Base {
+//     by              : number        = 0
+// }
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export class SetIndent extends Base {
+//     to              : number        = 0
+// }
+//
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export class CancelPreviousIndent extends Base {
+// }
+//
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export type ReportingCommand    = string | Style | IncreaseIndent | SetIndent | CancelPreviousIndent
+//
+//
+// export class ReportingSequence extends Base {
+//     commands        : ReportingCommand[]        = []
+// }
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TextBlock extends Base {
     text            : string[][]        = [ [] ]
 
 
-    addSamelineText (str : string) {
+    addSameLineText (str : string) {
         this.text[ this.text.length - 1 ].push(str)
     }
 
@@ -55,8 +55,8 @@ export class TextBlock extends Base {
 
 
     push (...strings : string[]) {
-        strings.forEach(string => saneSplit(string, '\n').forEach((el, index, array) => {
-            this.addSamelineText(el)
+        strings.forEach(string => saneSplit(string, '\n').forEach((str, index, array) => {
+            this.addSameLineText(str)
 
             if (index !== array.length - 1) this.addNewLine()
         }))
@@ -74,16 +74,7 @@ export class TextBlock extends Base {
 }
 
 
-export class TreeFormatter extends Base {
-}
-
-
-
 //---------------------------------------------------------------------------------------------------------------------
-export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
-
-// export type ReporterStreaming   = 'live' | 'after_completion'
-
 export class ReporterTheme extends Base {
     reporter    : Reporter      = undefined
 
@@ -123,7 +114,7 @@ export class ReporterTheme extends Base {
 
     testNodeState (testNode : TestNodeResult) : string {
         if (testNode.state === 'completed') {
-            if (testNode.isRoot()) {
+            if (testNode.isRoot) {
                 return testNode.passed ? this.testFilePass(testNode) : this.testFileFail(testNode)
             } else {
                 return testNode.passed ? this.subTestPass(testNode) : this.subTestFail(testNode)
@@ -135,9 +126,8 @@ export class ReporterTheme extends Base {
 
 
     testNodeUrl (testNode : TestNodeResult) : string {
-        const rel = relative(this.project.baseUrl, testNode.descriptor.url)
-
-        const match = /(.*?\/)?([^/]+)/.exec(rel)
+        const rel       = relative(this.project.baseUrl, testNode.descriptor.url)
+        const match     = /(.*?\/)?([^/]+)/.exec(rel)
 
         return this.c.gray.text(match[ 1 ] || '') + this.c.whiteBright.text(match[ 2 ])
     }
@@ -156,11 +146,20 @@ export class ReporterTheme extends Base {
 
         return text
     }
+
+
+    treeLine (str : string) : string {
+        return this.c.gray.text(str)
+    }
 }
 
 
 export const defaultReporterTheme   = ReporterTheme.new()
 
+//---------------------------------------------------------------------------------------------------------------------
+export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
+
+// export type ReporterStreaming   = 'live' | 'after_completion'
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
@@ -187,6 +186,7 @@ export class Reporter extends Mixin(
         c                   : Colorer                   = undefined
         t                   : ReporterTheme             = defaultReporterTheme
 
+
         initialize () {
             super.initialize(...arguments)
 
@@ -194,27 +194,30 @@ export class Reporter extends Mixin(
         }
 
 
+        needToShowResult (result : TestResult) : boolean {
+            if (
+                this.detailing === 'assertion' && (result instanceof Assertion || result instanceof TestNodeResult)
+                ||
+                this.detailing === 'subtest' && (result instanceof TestNodeResult)
+            ) {
+                return this.includePassed || !result.passed
+            } else {
+                return true
+            }
+        }
+
+
         testNodeTemplate (testNode : TestNodeResult, isLastNode : boolean = false) : TextBlock {
             let text : TextBlock     = TextBlock.new()
 
             if (testNode.parentNode) {
-                text.push(`${ this.t.testNodeState(testNode) } ${this.c[ this.detailing === 'assertion' ? 'underline' : 'reset' ].text(testNode.descriptor.title)}`)
+                text.push(`${ this.t.testNodeState(testNode) } ${this.c[ this.detailing === 'assertion' ? 'underline' : 'noop' ].text(testNode.descriptor.title)}`)
             } else {
                 text.push(`${ this.t.testNodeState(testNode) } ${this.t.testNodeUrl(testNode)}`)
             }
 
             if (this.detailing === 'assertion' || this.detailing === 'subtest') {
-                const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => {
-                    if (
-                        this.detailing === 'assertion' && (result instanceof Assertion || result instanceof TestNodeResult)
-                        ||
-                        this.detailing === 'subtest' && (result instanceof TestNodeResult)
-                    ) {
-                        return this.includePassed || !result.passed
-                    } else {
-                        return true
-                    }
-                })
+                const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result))
 
                 nodesToShow.forEach((result, index) => {
                     const isLast            = index === nodesToShow.length - 1
@@ -230,12 +233,10 @@ export class Reporter extends Mixin(
                                     TextBlock.new()
 
                     childTextBlock.text.forEach((strings, index) => {
-                        const isFirstLine       = index === 0
-
-                        if (isFirstLine) {
-                            strings.unshift(isLast && isLastNode ? this.c.gray.text('└─') : this.c.gray.text('├─'))
+                        if (index === 0) {
+                            strings.unshift(isLast && isLastNode ? this.t.treeLine('└─') : this.t.treeLine('├─'))
                         } else {
-                            strings.unshift(isLast && isLastNode ? '  ' : this.c.gray.text('│ '))
+                            strings.unshift(isLast && isLastNode ? '  ' : this.t.treeLine('│ '))
                         }
                     })
 
@@ -248,11 +249,11 @@ export class Reporter extends Mixin(
 
 
         onSubTestStart (testNode : TestNodeResult) {
-            if (!testNode.parentNode) this.resultsRunning.add(testNode)
+            if (testNode.isRoot) this.resultsRunning.add(testNode)
         }
 
         onSubTestFinish (testNode : TestNodeResult) {
-            if (!testNode.parentNode) {
+            if (testNode.isRoot) {
                 if (!this.resultsRunning.has(testNode)) throw new Error("Test completed before starting")
 
                 this.resultsRunning.delete(testNode)

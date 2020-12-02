@@ -4,6 +4,7 @@
 // }
 
 
+// TODO just a stub for now
 export const relative = (baseUrl : string, url : string) : string => {
     baseUrl = baseUrl.replace(/\/?$/, '/')
 
