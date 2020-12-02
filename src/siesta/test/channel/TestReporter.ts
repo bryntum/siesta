@@ -4,8 +4,7 @@ import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { Reporter } from "../../reporter/Reporter.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { LUID } from "../LUID.js"
-import { Assertion, AssertionAsync, Exception, LogMessage, Result, TestNodeResult, TestResultLeaf } from "../Result.js"
-import { SubTest } from "../Test.js"
+import { Assertion, AssertionAsync, Exception, LogMessage, TestNodeResult, TestResultLeaf } from "../Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 // make sure we actually import these class symbols (and not just types),

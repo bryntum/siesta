@@ -1,17 +1,17 @@
 import { Base } from "../../class/Base.js"
-import { AnyConstructor, Mixin } from "../../class/Mixin.js"
+import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { TestContextProviderNodeIpc } from "../context_provider/TestContextProviderNodeIpc.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { Dispatcher } from "./Dispatcher.js"
-import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor } from "./Plan.js"
+import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItemDescriptor } from "./Plan.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Project extends Mixin(
     [ Base ],
-    (base : AnyConstructor<Base, typeof Base>) =>
+    (base : ClassUnion<typeof Base>) =>
 
     class Project extends base {
         baseUrl         : string            = ''
