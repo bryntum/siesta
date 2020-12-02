@@ -1,8 +1,10 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
+import { TestLauncherChild } from "./channel/TestLauncher.js"
 import { TestReporterChild } from "./channel/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { Assertion, TestNodeResult, TestResult } from "./Result.js"
+import { Assertion, LogMessage, TestNodeResult, TestResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type TestCode = <T extends Test>(t : T) => any
@@ -11,8 +13,8 @@ export type TestCode = <T extends Test>(t : T) => any
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Test extends Mixin(
-    [ TestNodeResult ],
-    (base : ClassUnion<typeof TestNodeResult>) =>
+    [ TestNodeResult, Logger ],
+    (base : ClassUnion<typeof TestNodeResult, typeof Logger>) =>
 
     class Test extends base {
         // "upgrade" types from TreeNode
@@ -31,6 +33,14 @@ export class Test extends Mixin(
             super.addResult(result)
 
             if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.localId, result)
+        }
+
+
+        printLogMessage (method : LogMethod, ...message) {
+            this.addResult(LogMessage.new({
+                level       : LogLevel[ method ],
+                message     : [ ...message ].join(' ')
+            }))
         }
 
 
@@ -101,7 +111,16 @@ export class Test extends Mixin(
 
 
         static it (name : TestDescriptorArgument, code : TestCode) {
-            if (!globalTestEnv.topTest) throw new Error("No global test instance")
+            if (!globalTestEnv.topTest) {
+                if (!globalTestEnv.topTestDescriptor) throw new Error("No top test descriptor")
+                if (!globalTestEnv.launcher) throw new Error("No test launcher")
+
+                globalTestEnv.topTest   = this.new({
+                    descriptor      : globalTestEnv.topTestDescriptor,
+
+                    reporter        : globalTestEnv.launcher
+                })
+            }
 
             globalTestEnv.topTest.it(name, code)
         }
@@ -116,7 +135,18 @@ export class Test extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class GlobalTestEnvironment extends Base {
+    launcher            : TestLauncherChild = undefined
+
     topTest             : Test              = undefined
+
+    topTestDescriptor   : TestDescriptor    = undefined
+
+
+    clear () {
+        this.launcher           = undefined
+        this.topTest            = undefined
+        this.topTestDescriptor  = undefined
+    }
 }
 
 export const globalTestEnv : GlobalTestEnvironment = GlobalTestEnvironment.new()

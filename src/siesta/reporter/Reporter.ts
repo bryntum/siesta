@@ -1,9 +1,10 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { LogLevel } from "../../logger/Logger.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
 import { Project } from "../project/Project.js"
-import { Assertion, AssertionAsync, Result, TestNodeResult, TestResult } from "../test/Result.js"
+import { Assertion, AssertionAsync, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
 
 // //---------------------------------------------------------------------------------------------------------------------
@@ -111,6 +112,10 @@ export class ReporterTheme extends Base {
         return this.c.red.text('✘')
     }
 
+    logMessage (message : LogMessage) : string {
+        return this.c.yellow.text('⚠')
+    }
+
 
     testNodeState (testNode : TestNodeResult) : string {
         if (testNode.state === 'completed') {
@@ -142,6 +147,21 @@ export class ReporterTheme extends Base {
             this.c.whiteBright.text(`[${ assertion.name }]`),
             ' ',
             assertion.description
+        )
+
+        return text
+    }
+
+
+    logMessageTemplate (message : LogMessage) : TextBlock {
+        let text : TextBlock     = TextBlock.new()
+
+        text.push(
+            this.logMessage(message),
+            ' ',
+            this.c.whiteBright.text(`[${ LogLevel[ message.level ] }]`),
+            ' ',
+            message.message
         )
 
         return text
@@ -230,7 +250,11 @@ export class Reporter extends Mixin(
                                 ?
                                     this.t.assertionTemplate(result)
                                 :
-                                    TextBlock.new()
+                                (result instanceof LogMessage)
+                                    ?
+                                        this.t.logMessageTemplate(result)
+                                    :
+                                        TextBlock.new()
 
                     childTextBlock.text.forEach((strings, index) => {
                         if (index === 0) {

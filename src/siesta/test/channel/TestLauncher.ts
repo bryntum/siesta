@@ -35,22 +35,30 @@ export class TestLauncherChild extends Mixin(
 
             @local()
             async launchTest (testDescriptor : TestDescriptor) {
-                const topTest           = globalTestEnv.topTest = Test.new({
-                    descriptor      : testDescriptor,
+                if (globalTestEnv.topTest) throw new Error("Test context is already running a test")
 
-                    reporter        : this
-                })
+                globalTestEnv.topTestDescriptor = testDescriptor
+                globalTestEnv.launcher          = this
+
                 try {
                     await import(testDescriptor.url)
                     //debugger
 
-                    globalTestEnv.topTest   = undefined
+                    // there might be no `topTest` if test file does not contain any calls
+                    // to static `it` method of any test class
+                    const topTest = globalTestEnv.topTest || Test.new({
+                        descriptor      : testDescriptor,
+
+                        reporter        : this
+                    })
 
                     await topTest.start()
 
                 } catch (e) {
                     //debugger
                     console.log(e)
+                } finally {
+                    globalTestEnv.clear()
                 }
             }
         }
