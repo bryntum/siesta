@@ -1,7 +1,7 @@
 import { it } from "../../../main.js"
+import { CustomTest } from "../src/CustomTest.js"
 
-console.log("BASIC")
 
-it('Basic assertions should work', t => {
+CustomTest.describe('Basic assertions should work', t => {
     t.ok(true, 'True is ok')
 })

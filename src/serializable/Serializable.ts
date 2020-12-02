@@ -9,11 +9,17 @@ export class Serializable extends Mixin(
     class Serializable extends base {
         $class      : string
 
+        $excludedProperties     : object
+
 
         toJSON (key : string) : Partial<this> {
             if (!this.$class) throw new Error(`Missing serializable class id: ${this.constructor}`)
 
-            const json  = Object.assign({}, this)
+            const json : Partial<this> = {}
+
+            for (const [ key, propValue ] of Object.entries(this)) {
+                if (!this.$excludedProperties || !this.$excludedProperties[ key ]) json[ key ] = propValue
+            }
 
             json.$class = this.$class
 
@@ -39,6 +45,19 @@ export const registerSerializableClass = (id : string, cls : typeof Serializable
 
 export const lookupSerializableClass = (id : string) : typeof Serializable => {
     return serializableClasses.get(id)
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const exclude = () : PropertyDecorator => {
+
+    return function (target : Serializable, propertyKey : string) : void {
+        if (!target.hasOwnProperty('$excludedProperties')) {
+            target.$excludedProperties = Object.create(target.$excludedProperties || null)
+        }
+
+        target.$excludedProperties[ propertyKey ] = true
+    }
 }
 
 

@@ -1,8 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
-import { registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
-import { TreeNode } from "../../tree/TreeNode.js"
+import { exclude, registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
 import { TestDescriptor } from "./Descriptor.js"
 import { InternalId, nextInternalId } from "./InternalIdSource.js"
 
@@ -87,10 +86,11 @@ registerSerializableClass('AssertionAsync', AssertionAsync)
 //---------------------------------------------------------------------------------------------------------------------
 export type TestNodeState   = 'created' | 'running' | 'completed'
 
-
+// TODO `TestNodeResult` is supposed to be not serializable currently
+// this is to avoid resolving references, like `parentNode`
 export class TestNodeResult extends Mixin(
-    [ Result, TreeNode ],
-    (base : ClassUnion<typeof Result, typeof TreeNode>) =>
+    [ Result ],
+    (base : ClassUnion<typeof Result>) => {
 
     class TestNodeResult extends base {
         // TODO should probably have separate flag for assertions??
@@ -101,17 +101,29 @@ export class TestNodeResult extends Mixin(
 
         descriptor      : TestDescriptor    = undefined
 
-        // "promote" types from TreeNode
         parentNode      : TestNodeResult
-        childNodes      : TestNodeResult[]
 
         resultLog       : Result[]          = []
 
         resultMap       : Map<InternalId, number>   = new Map()
 
+        $root           : TestNodeResult    = undefined
+
+        get root () : TestNodeResult {
+            if (this.$root !== undefined) return this.$root
+
+            let root : TestNodeResult       = this
+
+            while (root.parentNode) root    = root.parentNode
+
+            return this.$root = root
+        }
+
 
         addResult (result : Result) {
             if (this.frozen) throw new Error("Adding result after test finalization")
+
+            if (result instanceof TestNodeResult) this.$childNodes = undefined
 
             this.resultLog.push(result)
             this.resultMap.set(result.internalId, this.resultLog.length - 1)
@@ -173,5 +185,18 @@ export class TestNodeResult extends Mixin(
 
             return this.$passed     = passed
         }
+
+
+        $childNodes   : TestNodeResult[]       = undefined
+
+        get childNodes () : TestNodeResult[] {
+            if (this.$childNodes !== undefined) return this.$childNodes
+
+            return this.$childNodes = (this.resultLog as TestNodeResult[]).filter(result => {
+                return result instanceof TestNodeResult
+            })
+        }
     }
-) {}
+
+    return TestNodeResult
+}) {}

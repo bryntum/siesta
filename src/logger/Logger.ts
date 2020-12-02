@@ -13,7 +13,6 @@ export class Logger extends Base {
 
 
     printLn (...message : string[]) {
-        throw "Abstract method"
     }
 
 

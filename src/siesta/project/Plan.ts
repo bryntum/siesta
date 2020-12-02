@@ -5,44 +5,53 @@ import { TestDescriptor } from "../test/Descriptor.js"
 export class ProjectPlanItem extends Base {
     parentItem      : ProjectPlanGroup  = undefined
 
-    id              : string            = ''
-
-    $url            : string            = undefined
-
     descriptor      : TestDescriptor    = TestDescriptor.new()
 
 
-    get filename () : string {
-        return this.descriptor.filename
-    }
+    normalizeDescriptor () {
+        const descriptor        = this.descriptor
 
+        if (!descriptor.url && !descriptor.filename) throw new Error("Descriptor needs to have either `filename` or `url` property defined")
 
-    get url () : string {
-        if (this.$url !== undefined) return this.$url
+        if (!descriptor.url) {
+            let urlParts        = [ descriptor.filename ]
 
-        return this.$url = (this.parentsAxis(true) as ProjectPlanItem[]).concat([ this ]).map(item => item.filename).join('/')
-    }
+            let group           = this.parentItem
 
-    set url (value : string) {
-        this.$url       = value
-    }
+            while (group) {
+                if (group.descriptor.url) {
+                    urlParts.push(group.descriptor.url)
 
+                    group       = null
+                } else {
+                    urlParts.push(group.descriptor.filename)
 
-    merge (another : ProjectPlanItem) {
-        if (this.parentItem) {
-            if (another.parentItem && this.parentItem !== another.parentItem) throw new Error("Can not merge plan items - parent items do not match")
+                    group       = group.parentItem
+                }
+            }
+
+            urlParts.reverse()
+
+            descriptor.url      = urlParts.join('/')
         }
-        else if (!another.parentItem) {
-            // do nothing
-        }
-        else {
-            this.parentItem     = another.parentItem
-        }
-
-        if (another.filename !== this.filename || another.url !== this.url) throw new Error("Can not merge plan items - name or url do not match")
-
-        this.descriptor.merge(another.descriptor)
     }
+
+
+    // merge (another : ProjectPlanItem) {
+    //     if (this.parentItem) {
+    //         if (another.parentItem && this.parentItem !== another.parentItem) throw new Error("Can not merge plan items - parent items do not match")
+    //     }
+    //     else if (!another.parentItem) {
+    //         // do nothing
+    //     }
+    //     else {
+    //         this.parentItem     = another.parentItem
+    //     }
+    //
+    //     if (another.filename !== this.filename || another.url !== this.url) throw new Error("Can not merge plan items - name or url do not match")
+    //
+    //     this.descriptor.merge(another.descriptor)
+    // }
 
 
     parentsAxis (rootFirst : boolean = false) : ProjectPlanGroup[] {

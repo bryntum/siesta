@@ -1,11 +1,10 @@
-import { Project } from "../../main.js"
-import { Test as CustomTestClass } from "../../src/siesta/test/Test.js"
+import { GetIsomorphicProjectClass } from "../../main.js"
 
-const project = Project.new({
+const project = (await GetIsomorphicProjectClass()).new({
     name                    : 'Siesta test suite',
 
     // global test-specific options
-    options                 : { testClass : CustomTestClass }
+    options                 : {}
 })
 
 project.plan([
@@ -13,7 +12,6 @@ project.plan([
         filename    : 'advanced',
 
         tags        : [ 'advanced' ],
-        testClass   : CustomTestClass,
 
         items       : [
             'advanced_test.t.js'
@@ -23,7 +21,6 @@ project.plan([
         filename    : 'basic',
 
         tags        : [ 'basic' ],
-        testClass   : CustomTestClass,
 
         items       : [
             {

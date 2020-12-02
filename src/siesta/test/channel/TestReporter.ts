@@ -55,7 +55,7 @@ export class TestReporterParent extends Mixin(
                         parentNode      : this.currentTestNodeResult
                     })
 
-                    this.currentTestNodeResult.childNodes.push(newNode)
+                    this.currentTestNodeResult.addResult(newNode)
 
                     this.currentTestNodeResult  = newNode
                 } else {

@@ -1,3 +1,4 @@
+import path from 'path'
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Project } from "./Project.js"
 
@@ -8,6 +9,12 @@ export class ProjectNodejs extends Mixin(
     (base : ClassUnion<typeof Project>) =>
 
     class ProjectNodejs extends base {
+
+        async setupBaseUrl () : Promise<string> {
+            return path.dirname(process.argv[ 1 ])
+        }
+
+
         // baseDir         : string            = path.dirname(process.argv[ 1 ])
         //
         //

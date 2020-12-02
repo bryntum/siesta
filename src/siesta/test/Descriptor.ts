@@ -12,8 +12,6 @@ export class TestDescriptor extends Serializable.mix(Base) {
 
     url             : string                = ''
 
-    testClass       : typeof Test           = Test
-
     env             : 'generic' | 'browser' | 'nodejs'  = 'generic'
 
     tags            : string[]              = []
@@ -26,29 +24,29 @@ export class TestDescriptor extends Serializable.mix(Base) {
     config          : object                = undefined
 
 
-    merge (anotherObj : Partial<TestDescriptor>) {
-        const another   = (this.constructor as typeof TestDescriptor).maybeNew(anotherObj)
-
-        if (this.filename) {
-            if (another.filename !== this.filename) throw new Error('Can not merge test descriptor - `name` does not match')
-        } else {
-            this.filename       = another.filename
-        }
-
-        // TODO can promote `env` from `generic` to either `browser` or `nodejs`, anything else should throw
-
-        if (isSuperclassOf(another.testClass, this.testClass)) {
-            this.testClass      = another.testClass
-        }
-        else if (another.testClass === this.testClass || isSubclassOf(another.testClass, this.testClass)) {
-            // do nothing
-        }
-        else
-            throw new Error("Can not merge descriptor - different `testClass` hierarchies")
-
-        // strip duplicates
-        this.tags           = Array.from(new Set(this.tags.concat(another.tags)))
-    }
+    // merge (anotherObj : Partial<TestDescriptor>) {
+    //     const another   = (this.constructor as typeof TestDescriptor).maybeNew(anotherObj)
+    //
+    //     if (this.filename) {
+    //         if (another.filename !== this.filename) throw new Error('Can not merge test descriptor - `name` does not match')
+    //     } else {
+    //         this.filename       = another.filename
+    //     }
+    //
+    //     // TODO can promote `env` from `generic` to either `browser` or `nodejs`, anything else should throw
+    //
+    //     if (isSuperclassOf(another.testClass, this.testClass)) {
+    //         this.testClass      = another.testClass
+    //     }
+    //     else if (another.testClass === this.testClass || isSubclassOf(another.testClass, this.testClass)) {
+    //         // do nothing
+    //     }
+    //     else
+    //         throw new Error("Can not merge descriptor - different `testClass` hierarchies")
+    //
+    //     // strip duplicates
+    //     this.tags           = Array.from(new Set(this.tags.concat(another.tags)))
+    // }
 
 
     static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, props? : string | Partial<InstanceType<T>>) : InstanceType<T> {

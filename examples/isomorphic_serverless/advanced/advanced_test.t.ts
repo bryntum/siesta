@@ -1,8 +1,5 @@
 import { describe } from "../../../main.js"
 
-console.log("ADVANCED")
-
-
 describe({
     env         : 'generic', // 'generic' | 'browser' | 'nodejs'
     tags        : [ 'basic', 'generic', 'data', 'model' ],

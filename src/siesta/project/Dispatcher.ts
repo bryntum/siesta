@@ -46,7 +46,7 @@ export class Dispatcher extends Mixin(
 
 
         async setup () {
-            this.reporter       = Reporter.new({ c : ColorerNodejs.new() })
+            this.reporter       = Reporter.new({ c : ColorerNodejs.new(), project : this.project })
 
             await Promise.all(this.testContextProviderConstructors.map(tcpConstructor => {
                 const tcp                   = tcpConstructor.new({ dispatcher : this })
@@ -72,9 +72,9 @@ export class Dispatcher extends Mixin(
 
 
         async launchProjectPlanItem (item : ProjectPlanItem) {
-            if (!item.descriptor.url) item.descriptor.url = item.url
+            item.normalizeDescriptor()
 
-            console.log("launch project item: ", item.descriptor.url)
+            this.logger.log("Launching project item: ", item.descriptor.url)
 
             const context       = await this.createTestContext()
 

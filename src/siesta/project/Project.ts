@@ -1,4 +1,3 @@
-import path from 'path'
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
@@ -15,18 +14,16 @@ export class Project extends Mixin(
     (base : AnyConstructor<Base, typeof Base>) =>
 
     class Project extends base {
-        baseUrl         : string            = ''//path.dirname(process.argv[ 1 ])
+        baseUrl         : string            = ''
 
         name            : string            = ''
 
         options         : Partial<TestDescriptor>           = undefined
 
-        projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new({
-            descriptor : TestDescriptor.new({ filename : path.dirname(process.argv[ 1 ]), url : path.dirname(process.argv[ 1 ]) })
-        })
-        projectPlanMap  : Map<string, ProjectPlanItem>      = new Map()
+        projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new()
+        // projectPlanMap  : Map<string, ProjectPlanItem>      = new Map()
 
-        logger          : Logger            = undefined
+        logger          : Logger            = Logger.new()
 
         testContextProviderConstructors   : (typeof TestContextProvider)[]      = [ TestContextProviderNodeIpc ]
 
@@ -52,14 +49,21 @@ export class Project extends Mixin(
 
 
         plan (...args : (ProjectPlanItemDescriptor | ProjectPlanItemDescriptor[])[]) {
-            const flattened     = args.flat(Number.MAX_SAFE_INTEGER)
-            const descriptors   = flattened.filter(el => Boolean(el))
+            const descriptors   = args.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el))
 
             descriptors.forEach(item => this.projectPlan.planItem(PlanItemFromDescriptor(item as ProjectPlanItemDescriptor)))
         }
 
 
         async setup () {
+            if (!this.baseUrl) this.baseUrl = await this.setupBaseUrl()
+
+            this.projectPlan.descriptor.url = this.baseUrl
+        }
+
+
+        async setupBaseUrl () : Promise<string> {
+            throw new Error("Implement me")
         }
 
 

@@ -17,7 +17,6 @@ export class SubTest extends Mixin(
     class SubTest extends base {
         // "upgrade" types from TreeNode
         parentNode          : SubTest
-        childNodes          : SubTest[]
 
         code                : TestCode          = (t : SubTest) => {}
 
@@ -31,16 +30,7 @@ export class SubTest extends Mixin(
         addResult (result : Result) {
             super.addResult(result)
 
-            this.reporter.onResult(this.internalId, result)
-        }
-
-
-        $rootTest       : Test              = undefined
-
-        get rootTest () : Test {
-            if (this.$rootTest !== undefined) return this.$rootTest
-
-            return this.$rootTest = this.getRootNode() as Test
+            if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.internalId, result)
         }
 
 
@@ -91,7 +81,7 @@ export class SubTest extends Mixin(
             while (this.pendingSubTests.length) {
                 const subTest       = this.pendingSubTests.shift()
 
-                this.childNodes.push(subTest)
+                this.addResult(subTest)
 
                 await subTest.start()
             }
@@ -125,6 +115,18 @@ export class Test extends Mixin(
 
         async tearDown () {
 
+        }
+
+
+        static it (name : TestDescriptorArgument, code : TestCode) {
+            if (!globalTestEnv.topTest) throw new Error("No global test instance")
+
+            globalTestEnv.topTest.it(name, code)
+        }
+
+
+        static describe (name : TestDescriptorArgument, code : TestCode) {
+            return this.it(name, code)
         }
     }
 ) {}
