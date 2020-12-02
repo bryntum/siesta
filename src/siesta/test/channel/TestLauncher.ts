@@ -33,8 +33,6 @@ export class TestLauncherChild extends Mixin(
     (base : ClassUnion<typeof TestReporterChild, typeof ExecutionContextRemoteChild>) => {
 
         class TestLauncherChild extends base {
-            topTest         : Test              = undefined
-
 
             @local()
             async launchTest (testDescriptor : TestDescriptor) {
