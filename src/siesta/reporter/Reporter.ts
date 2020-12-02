@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
 import { Project } from "../project/Project.js"
-import { AssertionAsync, Result, TestNodeResult } from "../test/Result.js"
+import { Assertion, AssertionAsync, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -54,12 +54,12 @@ export class TextBlock extends Base {
     }
 
 
-    push (str : string) {
-        saneSplit(str, '\n').forEach((el, index, array) => {
+    push (...strings : string[]) {
+        strings.forEach(string => saneSplit(string, '\n').forEach((el, index, array) => {
             this.addSamelineText(el)
 
             if (index !== array.length - 1) this.addNewLine()
-        })
+        }))
     }
 
 
@@ -84,6 +84,83 @@ export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 
 // export type ReporterStreaming   = 'live' | 'after_completion'
 
+export class ReporterTheme extends Base {
+    reporter    : Reporter      = undefined
+
+    get c () : Colorer {
+        return this.reporter.c
+    }
+
+    get project () : Project {
+        return this.reporter.project
+    }
+
+
+    testFilePass (testNode : TestNodeResult) : string {
+        return this.c.green.inverse.text(' PASS ')
+    }
+
+    testFileFail (testNode : TestNodeResult) : string {
+        return this.c.red.inverse.text(' FAIL ')
+    }
+
+    subTestPass (testNode : TestNodeResult) : string {
+        return this.c.green.text('✔')
+    }
+
+    subTestFail (testNode : TestNodeResult) : string {
+        return this.c.red.text('✘')
+    }
+
+    assertionPass (assertion : Assertion) : string {
+        return this.c.green.text('✔')
+    }
+
+    assertionFail (assertion : Assertion) : string {
+        return this.c.red.text('✘')
+    }
+
+
+    testNodeState (testNode : TestNodeResult) : string {
+        if (testNode.state === 'completed') {
+            if (testNode.isRoot()) {
+                return testNode.passed ? this.testFilePass(testNode) : this.testFileFail(testNode)
+            } else {
+                return testNode.passed ? this.subTestPass(testNode) : this.subTestFail(testNode)
+            }
+        } else {
+            return this.c.bgYellowBright.black.text(' RUNS ')
+        }
+    }
+
+
+    testNodeUrl (testNode : TestNodeResult) : string {
+        const rel = relative(this.project.baseUrl, testNode.descriptor.url)
+
+        const match = /(.*?\/)?([^/]+)/.exec(rel)
+
+        return this.c.gray.text(match[ 1 ] || '') + this.c.whiteBright.text(match[ 2 ])
+    }
+
+
+    assertionTemplate (assertion : Assertion) : TextBlock {
+        let text : TextBlock     = TextBlock.new()
+
+        text.push(
+            assertion.passed ? this.assertionPass(assertion) : this.assertionFail(assertion),
+            ' ',
+            this.c.whiteBright.text(`[${ assertion.name }]`),
+            ' ',
+            assertion.description
+        )
+
+        return text
+    }
+}
+
+
+export const defaultReporterTheme   = ReporterTheme.new()
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
@@ -93,7 +170,7 @@ export class Reporter extends Mixin(
     class Reporter extends base {
         project             : Project                   = undefined
 
-        detailing           : ReporterDetailing         = 'subtest'
+        detailing           : ReporterDetailing         = 'assertion'
         includePassed       : boolean                   = true
 
         // streaming           : ReporterStreaming         = 'after_completion'
@@ -108,27 +185,49 @@ export class Reporter extends Mixin(
         indentLevelsStack   : number[]                  = [ 0 ]
 
         c                   : Colorer                   = undefined
+        t                   : ReporterTheme             = defaultReporterTheme
+
+        initialize () {
+            super.initialize(...arguments)
+
+            this.t.reporter     = this
+        }
 
 
         testNodeTemplate (testNode : TestNodeResult, isLastNode : boolean = false) : TextBlock {
             let text : TextBlock     = TextBlock.new()
 
             if (testNode.parentNode) {
-                text.push(`${ this.testNodeState(testNode) } ${testNode.descriptor.title}`)
+                text.push(`${ this.t.testNodeState(testNode) } ${this.c[ this.detailing === 'assertion' ? 'underline' : 'reset' ].text(testNode.descriptor.title)}`)
             } else {
-                text.push(`${ this.testNodeState(testNode) } ${this.testNodeUrl(testNode)}`)
+                text.push(`${ this.t.testNodeState(testNode) } ${this.t.testNodeUrl(testNode)}`)
             }
 
-            if (this.detailing === 'subtest') {
-                const nodesToShow   = testNode.childNodes.filter(childTestNode => {
-                    return this.includePassed || !childTestNode.passed
+            if (this.detailing === 'assertion' || this.detailing === 'subtest') {
+                const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => {
+                    if (
+                        this.detailing === 'assertion' && (result instanceof Assertion || result instanceof TestNodeResult)
+                        ||
+                        this.detailing === 'subtest' && (result instanceof TestNodeResult)
+                    ) {
+                        return this.includePassed || !result.passed
+                    } else {
+                        return true
+                    }
                 })
 
-                nodesToShow.forEach((childTestNode, index) => {
-                    const isFirst           = index === 0
+                nodesToShow.forEach((result, index) => {
                     const isLast            = index === nodesToShow.length - 1
 
-                    const childTextBlock    = this.testNodeTemplate(childTestNode, isLast)
+                    const childTextBlock    = (result instanceof TestNodeResult)
+                        ?
+                            this.testNodeTemplate(result, isLast)
+                        :
+                            (result instanceof Assertion)
+                                ?
+                                    this.t.assertionTemplate(result)
+                                :
+                                    TextBlock.new()
 
                     childTextBlock.text.forEach((strings, index) => {
                         const isFirstLine       = index === 0
@@ -136,44 +235,16 @@ export class Reporter extends Mixin(
                         if (isFirstLine) {
                             strings.unshift(isLast && isLastNode ? this.c.gray.text('└─') : this.c.gray.text('├─'))
                         } else {
-                            strings.unshift(isLastNode ? '  ' : this.c.gray.text('│ '))
+                            strings.unshift(isLast && isLastNode ? '  ' : this.c.gray.text('│ '))
                         }
                     })
 
                     text.pullFrom(childTextBlock)
                 })
             }
-            else if (this.detailing === 'assertion') {
-                // testNode.resultLog.forEach(result => {
-                //     if (result instanceof TestNodeResult) {}
-                //
-                //     if (this.includePassed || !childTestNode.passed) {
-                //         text += this.c.gray.text('\n├─') + this.testNodeTemplate(childTestNode)
-                //     }
-                // })
-            }
 
             return text
         }
-
-
-        testNodeState (testNode : TestNodeResult) : string {
-            if (testNode.state === 'completed') {
-                return testNode.passed ? this.c.green.text('✔') : this.c.red.text('✘')
-            } else {
-                return this.c.bgYellowBright.black.text(' RUNS ')
-            }
-        }
-
-
-        testNodeUrl (testNode : TestNodeResult) : string {
-            const rel = relative(this.project.baseUrl, testNode.descriptor.url)
-
-            const match = /(.*?\/)?([^/]+)/.exec(rel)
-
-            return this.c.gray.text(match[ 1 ] || '') + this.c.whiteBright.text(match[ 2 ])
-        }
-
 
 
         onSubTestStart (testNode : TestNodeResult) {

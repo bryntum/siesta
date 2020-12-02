@@ -122,9 +122,14 @@ export class TestNodeResult extends Mixin(
             let depth                   = 0
             let node : TestNodeResult   = this
 
-            while (node.parentNode) node    = node.parentNode
+            while (node.parentNode) { node = node.parentNode; depth++ }
 
             return this.$depth = depth
+        }
+
+
+        isRoot () : boolean {
+            return !this.parentNode
         }
 
 
