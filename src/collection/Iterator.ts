@@ -164,7 +164,7 @@ export function reduce<Element, Result> (iterator : Iterable<Element>, func : (a
 
 //---------------------------------------------------------------------------------------------------------------------
 export function* uniqueOnly<Element> (iterator : Iterable<Element>) : Iterable<Element> {
-    return uniqueOnlyBy(iterator, i => i)
+    yield* uniqueOnlyBy(iterator, i => i)
 }
 
 
