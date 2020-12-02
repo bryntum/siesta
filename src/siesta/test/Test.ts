@@ -2,7 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TestReporterChild } from "./channel/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { Assertion, Result, TestNodeResult } from "./Result.js"
+import { Assertion, Result, TestNodeResult, TestResult } from "./Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type TestCode = <T extends SubTest>(t : T) => any
@@ -20,14 +20,14 @@ export class SubTest extends Mixin(
 
         code                : TestCode          = (t : SubTest) => {}
 
-        ongoing             : Promise<any>      = undefined
+        // ongoing             : Promise<any>      = undefined
 
         pendingSubTests     : SubTest[]         = []
 
         reporter            : TestReporterChild = undefined
 
 
-        addResult (result : Result) {
+        addResult (result : TestResult) {
             super.addResult(result)
 
             if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.localId, result)

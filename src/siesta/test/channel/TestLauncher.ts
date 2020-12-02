@@ -45,14 +45,14 @@ export class TestLauncherChild extends Mixin(
                 })
                 try {
                     await import(testDescriptor.url)
-                    debugger
+                    //debugger
 
                     globalTestEnv.topTest   = undefined
 
                     await topTest.start()
 
                 } catch (e) {
-                    debugger
+                    //debugger
                     console.log(e)
                 }
             }

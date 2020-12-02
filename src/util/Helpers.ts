@@ -137,3 +137,11 @@ export const isNodejs = function () : boolean {
         && typeof window === 'undefined'
 }
 
+
+//---------------------------------------------------------------------------------------------------------------------
+export const saneSplit = function (str : string, split : string | RegExp) : string[] {
+    if (str === '') return []
+
+    return str.split(split)
+}
+

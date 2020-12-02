@@ -4,7 +4,7 @@ import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { Reporter } from "../../reporter/Reporter.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { LUID } from "../LUID.js"
-import { Assertion, AssertionAsync, Exception, LogMessage, Result, TestNodeResult } from "../Result.js"
+import { Assertion, AssertionAsync, Exception, LogMessage, Result, TestNodeResult, TestResultLeaf } from "../Result.js"
 import { SubTest } from "../Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ export class TestReporterParent extends Mixin(
                     }
 
                     const newNode       = TestNodeResult.new({
-                        localId      : testNodeId,
+                        localId         : testNodeId,
                         descriptor      : descriptor,
                         state           : 'running',
 
@@ -60,10 +60,9 @@ export class TestReporterParent extends Mixin(
                     this.currentTestNodeResult  = newNode
                 } else {
                     const newNode       = TestNodeResult.new({
-                        localId      : testNodeId,
+                        localId         : testNodeId,
                         descriptor      : descriptor,
                         state           : 'running',
-
                     })
 
                     this.currentTestNodeResult  = newNode
@@ -88,9 +87,7 @@ export class TestReporterParent extends Mixin(
 
 
             @local()
-            onResult (testNodeId : LUID, result : Result) {
-                // console.log("ON ASSERTION START", result)
-
+            onResult (testNodeId : LUID, result : TestResultLeaf) {
                 if (!this.currentTestNodeResult || this.currentTestNodeResult.localId !== testNodeId) {
                     throw new Error("Parent node id mismatch for test result")
                 }
@@ -141,7 +138,7 @@ export class TestReporterChild extends Mixin(
             onSubTestFinish : (testNodeId : LUID) => Promise<any>
 
             @remote()
-            onResult : (testNodeId : LUID, assertion : Result) => Promise<any>
+            onResult : (testNodeId : LUID, result : TestResultLeaf) => Promise<any>
 
             @remote()
             onAssertionFinish : (testNodeId : LUID, assertion : AssertionAsync) => Promise<any>

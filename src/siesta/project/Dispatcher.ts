@@ -65,6 +65,8 @@ export class Dispatcher extends Mixin(
         async launch () {
             const projectPlanItems      = this.project.projectPlan.leafsAxis()
 
+            this.reporter.planned   = projectPlanItems.length
+
             for (const item of projectPlanItems) {
                 await this.launchProjectPlanItem(item)
             }
@@ -80,13 +82,13 @@ export class Dispatcher extends Mixin(
 
             context.reporter    = this.reporter
 
-            debugger
+            //debugger
 
             await context.launchTest(item.descriptor)
 
             context.destroy()
 
-            debugger
+            //debugger
         }
 
 

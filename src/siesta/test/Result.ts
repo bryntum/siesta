@@ -1,14 +1,14 @@
 import { Base } from "../../class/Base.js"
-import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
-import { exclude, registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
+import { registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
 import { TestDescriptor } from "./Descriptor.js"
 import { LUID, luid } from "./LUID.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Result extends Mixin(
-    [ Serializable, Base ],
-    (base : ClassUnion<typeof Serializable, typeof Base>) =>
+    [ Base ],
+    (base : ClassUnion<typeof Base>) =>
 
     class Result extends base {
         localId     : number            = luid()
@@ -18,8 +18,8 @@ export class Result extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class LogMessage extends Mixin(
-    [ Result ],
-    (base : AnyConstructor<Result, typeof Result>) =>
+    [ Serializable, Result ],
+    (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class LogMessage extends base {
         level       : LogLevel      = LogLevel.log
@@ -32,8 +32,8 @@ registerSerializableClass('LogMessage', LogMessage)
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Exception extends Mixin(
-    [ Result ],
-    (base : AnyConstructor<Result, typeof Result>) =>
+    [ Serializable, Result ],
+    (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class Exception extends base {
         exception       : Error         = undefined
@@ -44,8 +44,8 @@ registerSerializableClass('Exception', Exception)
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Assertion extends Mixin(
-    [ Result ],
-    (base : AnyConstructor<Result, typeof Result>) =>
+    [ Serializable, Result ],
+    (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class Assertion extends base {
         name            : string            = ''
@@ -62,8 +62,8 @@ registerSerializableClass('Assertion', Assertion)
 
 //---------------------------------------------------------------------------------------------------------------------
 export class AssertionAsync extends Mixin(
-    [ Assertion ],
-    (base : AnyConstructor<Assertion, typeof Assertion>) =>
+    [ Serializable, Result ],
+    (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class AssertionAsync extends base {
         ongoing     : Promise<any>                          = undefined
@@ -86,8 +86,14 @@ registerSerializableClass('AssertionAsync', AssertionAsync)
 //---------------------------------------------------------------------------------------------------------------------
 export type TestNodeState   = 'created' | 'running' | 'completed'
 
-// TODO `TestNodeResult` is supposed to be not serializable currently
-// this is to avoid resolving references, like `parentNode`
+// serializable leaf nodes
+export type TestResultLeaf  = Exception | LogMessage | Assertion | AssertionAsync
+// non-serializable tree node - the serializable part is `descriptor`
+export type TestResultTree  = TestNodeResult
+
+export type TestResult      = TestResultLeaf | TestResultTree
+
+
 export class TestNodeResult extends Mixin(
     [ Result ],
     (base : ClassUnion<typeof Result>) => {
@@ -101,11 +107,26 @@ export class TestNodeResult extends Mixin(
 
         descriptor      : TestDescriptor    = undefined
 
-        parentNode      : TestNodeResult
+        parentNode      : TestNodeResult    = undefined
 
-        resultLog       : Result[]          = []
+        resultLog       : TestResult[]      = []
 
-        resultMap       : Map<LUID, number>   = new Map()
+        resultMap       : Map<LUID, number> = new Map()
+
+
+        $depth           : number    = undefined
+
+        get depth () : number {
+            if (this.$depth !== undefined) return this.$depth
+
+            let depth                   = 0
+            let node : TestNodeResult   = this
+
+            while (node.parentNode) node    = node.parentNode
+
+            return this.$depth = depth
+        }
+
 
         $root           : TestNodeResult    = undefined
 
@@ -120,7 +141,7 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        addResult (result : Result) {
+        addResult (result : TestResult) {
             if (this.frozen) throw new Error("Adding result after test finalization")
 
             if (result instanceof TestNodeResult) this.$childNodes = undefined
@@ -130,7 +151,7 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        updateResult (result : Result) {
+        updateResult (result : TestResult) {
             if (this.frozen) throw new Error("Updating result after test finalization")
 
             if (!this.resultMap.has(result.localId)) throw new Error("Result to update does not exists")
@@ -159,13 +180,13 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        toJSON () {
-            const obj : any     = Object.assign({}, this)
-
-            obj.parentNode      = this.parentNode ? this.parentNode.localId : undefined
-
-            return obj
-        }
+        // toJSON () {
+        //     const obj : any     = Object.assign({}, this)
+        //
+        //     obj.parentNode      = this.parentNode ? this.parentNode.localId : undefined
+        //
+        //     return obj
+        // }
 
 
         $passed   : boolean       = undefined
