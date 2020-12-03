@@ -153,13 +153,26 @@ export class ReporterTheme extends Base {
     }
 
 
+    logMessageMethod (message : LogMessage) : string {
+        switch (message.level) {
+            case LogLevel.error :
+                return this.c.red.inverse.text(` ${ LogLevel[ message.level ].toUpperCase() } `)
+            case LogLevel.warn :
+                return this.c.redBright.inverse.text(` ${ LogLevel[ message.level ].toUpperCase() } `)
+
+            default :
+                LogLevel[ message.level ]
+        }
+    }
+
+
     logMessageTemplate (message : LogMessage) : TextBlock {
         let text : TextBlock     = TextBlock.new()
 
         text.push(
             this.logMessage(message),
             ' ',
-            this.c.whiteBright.text(`[${ LogLevel[ message.level ] }]`),
+            this.c.whiteBright.text(this.logMessageMethod(message)),
             ' ',
             message.message
         )
