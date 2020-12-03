@@ -1,6 +1,7 @@
 import readline from "readline"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit, SetIntervalHandler } from "../../util/Helpers.js"
+import { hideCursor, showCursor } from "../../util_nodejs/Terminal.js"
 import { TestNodeResult } from "../test/Result.js"
 import { Reporter } from "./Reporter.js"
 
@@ -20,14 +21,24 @@ export class ReporterNodejs extends Mixin(
         spinnerChars    : number                        = 0
 
 
-        print (str : string) {
-            console.log(str)
+        print (str : string, includeNewLine : boolean = true) {
+            process.stdout.write(str)
 
-            if (this.isPrintingFooter) this.footerLines += saneSplit(str, '\n').length
+            if (includeNewLine) process.stdout.write('\n')
+
+            if (this.isPrintingFooter) {
+                this.footerLines += Array.from(str.matchAll(/\n/g)).length
+
+                if (includeNewLine) this.footerLines++
+            }
         }
 
 
         onTestSuiteStart () {
+            // process.stdout.write(hideCursor)
+
+            process.on('SIGTERM', () => process.stdout.write(showCursor))
+
             this.spinnerInterval    = setInterval(this.onSpinnerTick.bind(this), this.spinner.interval)
 
             super.onTestSuiteStart()
@@ -37,6 +48,8 @@ export class ReporterNodejs extends Mixin(
 
 
         onTestSuiteFinish () {
+            process.stdout.write(showCursor)
+
             clearInterval(this.spinnerInterval)
 
             this.revertFooter()
@@ -66,8 +79,8 @@ export class ReporterNodejs extends Mixin(
 
         revertFooter () {
             for (let i = 1; i <= this.footerLines; i++) {
-                readline.moveCursor(process.stdout, 0, -1, () => {})
                 readline.clearLine(process.stdout, 0, () => {})
+                readline.moveCursor(process.stdout, 0, -1, () => {})
             }
 
             this.footerLines    = 0
@@ -83,6 +96,7 @@ export class ReporterNodejs extends Mixin(
             this.print(this.t.testSuiteFooter().toString())
 
             this.printProgressBar()
+            this.print(' ', false)
             this.printSpinner()
 
             this.isPrintingFooter   = false
@@ -90,18 +104,18 @@ export class ReporterNodejs extends Mixin(
 
 
         printProgressBar () {
-            this.print(this.t.progressBar())
+            this.print(this.t.progressBar(), false)
         }
 
 
         printSpinner () {
-            // if (this.spinnerChars > 0) console.log('\b'.repeat(this.spinnerChars))
-            //
-            // const spinnerText       = this.t.spinner()
-            //
-            // this.print(spinnerText)
-            //
-            // this.spinnerChars       = spinnerText.length
+            if (this.spinnerChars > 0) process.stdout.write('\b'.repeat(this.spinnerChars))
+
+            const spinnerText       = this.t.spinner()
+
+            this.print(spinnerText, false)
+
+            this.spinnerChars       = spinnerText.length
         }
 
 
