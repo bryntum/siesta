@@ -1,7 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ContextProvider } from "../../context_provider/ContextProvider.js"
 import { Logger } from "../../logger/Logger.js"
-import { Dispatcher } from "../project/Dispatcher.js"
+import { Launch } from "../project/Launch.js"
 import { TestLauncherParent } from "../test/channel/TestLauncher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ export class TestContextProvider extends Mixin(
         class TestContextProvider extends base {
             contextClass        : TestLauncherParent
 
-            dispatcher      : Dispatcher        = undefined
+            dispatcher      : Launch        = undefined
 
 
             get logger () : Logger {

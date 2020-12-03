@@ -4,8 +4,8 @@ import { Logger } from "../../logger/Logger.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { TestContextProviderNodeIpc } from "../context_provider/TestContextProviderNodeIpc.js"
 import { TestDescriptor } from "../test/Descriptor.js"
-import { Dispatcher } from "./Dispatcher.js"
-import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItemDescriptor } from "./Plan.js"
+import { Launch } from "./Launch.js"
+import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor } from "./Plan.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -70,12 +70,19 @@ export class Project extends Mixin(
         async start () {
             await this.setup()
 
-            const dispatcher    = Dispatcher.new({
+            await this.launch(this.projectPlan.leafsAxis())
+        }
+
+
+        async launch (planItemsToLaunch : ProjectPlanItem[]) {
+            const launch    = Launch.new({
                 project                                 : this,
+                projectPlanItemsToLaunch                : planItemsToLaunch,
+
                 testContextProviderConstructors         : this.testContextProviderConstructors
             })
 
-            await dispatcher.start()
+            await launch.start()
         }
     }
 ) {}

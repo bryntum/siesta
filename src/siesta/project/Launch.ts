@@ -11,12 +11,14 @@ import { Project } from "./Project.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class Dispatcher extends Mixin(
+export class Launch extends Mixin(
     [ Channel, Base ],
     (base : ClassUnion<typeof Channel, typeof Base>) =>
 
-    class Dispatcher extends base {
-        project         : Project                   = undefined
+    class Launch extends base {
+        project         : Project                                   = undefined
+
+        projectPlanItemsToLaunch        : ProjectPlanItem[]         = []
 
         testContextProviders   : TestContextProvider[]                          = []
 
@@ -63,7 +65,7 @@ export class Dispatcher extends Mixin(
 
 
         async launch () {
-            const projectPlanItems      = this.project.projectPlan.leafsAxis()
+            const projectPlanItems      = this.projectPlanItemsToLaunch
 
             this.reporter.planned   = projectPlanItems.length
 
