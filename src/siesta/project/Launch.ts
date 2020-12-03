@@ -48,7 +48,7 @@ export class Launch extends Mixin(
 
 
         async setup () {
-            this.reporter       = Reporter.new({ c : ColorerNodejs.new(), launch : this })
+            this.reporter       = this.project.reporterClass.new({ c : ColorerNodejs.new(), launch : this })
 
             await Promise.all(this.testContextProviderConstructors.map(tcpConstructor => {
                 const tcp                   = tcpConstructor.new({ dispatcher : this })

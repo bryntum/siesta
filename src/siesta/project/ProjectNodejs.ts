@@ -2,6 +2,8 @@ import path from 'path'
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
+import { Reporter } from "../reporter/Reporter.js"
+import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { Project } from "./Project.js"
 
 
@@ -13,6 +15,9 @@ export class ProjectNodejs extends Mixin(
     class ProjectNodejs extends base {
 
         logger          : Logger            = LoggerConsole.new({ logLevel : LogLevel.warn })
+
+        reporterClass   : typeof Reporter   = ReporterNodejs
+
 
         async setupBaseUrl () : Promise<string> {
             return path.dirname(process.argv[ 1 ])

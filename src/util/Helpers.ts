@@ -35,6 +35,7 @@ export type PartialWOC<T>       = Omit<Partial<T>, 'constructor'>
 
 //---------------------------------------------------------------------------------------------------------------------
 export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
+export type SetIntervalHandler  = ReturnType<typeof setInterval>
 
 
 //---------------------------------------------------------------------------------------------------------------------

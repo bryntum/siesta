@@ -13,9 +13,4 @@ export class ColorerNodejs extends Colorer {
     text (text : string) : string {
         return this.currentChalk(text)
     }
-
-
-    write (text : string) {
-        console.log(this.currentChalk(text))
-    }
 }

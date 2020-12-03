@@ -1,5 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { queueable, QueueableMethods } from "../../class/QueueableMethods.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
@@ -75,6 +76,39 @@ export class TextBlock extends Base {
     }
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+export class Spinner extends Base {
+    interval        : number        = 200
+
+    frames          : string[]      = []
+
+    currentFrameIndex   : number    = 0
+
+
+    get frame () : string {
+        return this.frames[ this.currentFrameIndex ]
+    }
+
+
+    tick () {
+        this.currentFrameIndex++
+
+        if (this.currentFrameIndex >= this.frames.length) this.currentFrameIndex = 0
+    }
+}
+
+
+export const clockSpinner = Spinner.new({
+    frames  : [
+        "🕛", "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚"
+    ]
+})
+
+export const arrowSpinner = Spinner.new({
+    frames  : [
+        "←", "↖", "↑", "↗", "→", "↘", "↓", "↙"
+    ]
+})
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterTheme extends Base {
@@ -88,6 +122,10 @@ export class ReporterTheme extends Base {
         return this.reporter.launch.project
     }
 
+    get launch () : Launch {
+        return this.reporter.launch
+    }
+
 
     testFilePass (testNode : TestNodeResult) : string {
         return this.c.green.inverse.text(' PASS ')
@@ -97,6 +135,11 @@ export class ReporterTheme extends Base {
         return this.c.red.inverse.text(' FAIL ')
     }
 
+    testFileRunning (testNode : TestNodeResult) : string {
+        return this.c.yellowBright.inverse.text(' RUNS ')
+    }
+
+
     subTestPass (testNode : TestNodeResult) : string {
         return this.c.green.text('✔')
     }
@@ -105,6 +148,7 @@ export class ReporterTheme extends Base {
         return this.c.red.text('✘')
     }
 
+
     assertionPass (assertion : Assertion) : string {
         return this.c.green.text('✔')
     }
@@ -112,6 +156,7 @@ export class ReporterTheme extends Base {
     assertionFail (assertion : Assertion) : string {
         return this.c.red.text('✘')
     }
+
 
     logMessage (message : LogMessage) : string {
         return this.c.yellow.text('⚠')
@@ -190,18 +235,52 @@ export class ReporterTheme extends Base {
     testSuiteHeader () : string {
         return `Launching test suite: ${ this.c.underline.text(this.project.title) }\n`
     }
-}
 
+
+    testSuiteFooter () : TextBlock {
+        let text : TextBlock     = TextBlock.new()
+
+        text.push('\n')
+
+        this.reporter.resultsRunning.forEach(testNodeResult => {
+            text.push(
+                this.testFileRunning(testNodeResult),
+                ' ',
+                this.testNodeUrl(testNodeResult)
+            )
+        })
+
+        text.push('\n')
+
+        text.push(
+            this.c.whiteBright.text('Test suite : 1 pass'),
+            '\n',
+            this.progressBar()
+        )
+
+
+        return text
+    }
+
+
+    progressBar () : string {
+        return `░`.repeat(50)
+    }
+
+
+    spinner () : string {
+        return this.reporter.spinner.frame
+    }
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 
-// export type ReporterStreaming   = 'live' | 'after_completion'
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
-    [ Base ],
-    (base : ClassUnion<typeof Base>) =>
+    [ QueueableMethods, Base ],
+    (base : ClassUnion<typeof QueueableMethods, typeof Base>) => {
 
     class Reporter extends base {
         launch              : Launch                    = undefined
@@ -209,17 +288,13 @@ export class Reporter extends Mixin(
         detailing           : ReporterDetailing         = 'assertion'
         includePassed       : boolean                   = true
 
-        // streaming           : ReporterStreaming         = 'after_completion'
-
         resultsCompleted    : Set<TestNodeResult>       = new Set()
         resultsRunning      : Set<TestNodeResult>       = new Set()
 
-        // activeTestNode      : TestNodeResult            = undefined
-
-        // indentLevelsStack   : number[]                  = [ 0 ]
-
         c                   : Colorer                   = undefined
         t                   : ReporterTheme             = ReporterTheme.new({ reporter : this })
+
+        spinner             : Spinner                   = clockSpinner
 
 
         needToShowResult (result : TestResult) : boolean {
@@ -250,19 +325,20 @@ export class Reporter extends Mixin(
                 nodesToShow.forEach((result, index) => {
                     const isLast            = index === nodesToShow.length - 1
 
-                    const childTextBlock    = (result instanceof TestNodeResult)
-                        ?
-                            this.testNodeTemplate(result, isLast)
-                        :
-                            (result instanceof Assertion)
-                                ?
-                                    this.t.assertionTemplate(result)
-                                :
-                                (result instanceof LogMessage)
+                    const childTextBlock    =
+                        (result instanceof Assertion)
+                            ?
+                                this.t.assertionTemplate(result)
+                            :
+                                (result instanceof TestNodeResult)
                                     ?
-                                        this.t.logMessageTemplate(result)
+                                        this.testNodeTemplate(result, isLast)
                                     :
-                                        TextBlock.new()
+                                    (result instanceof LogMessage)
+                                        ?
+                                            this.t.logMessageTemplate(result)
+                                        :
+                                            TextBlock.new()
 
                     childTextBlock.text.forEach((strings, index) => {
                         if (index === 0) {
@@ -280,11 +356,13 @@ export class Reporter extends Mixin(
         }
 
 
-        onSubTestStart (testNode : TestNodeResult) {
+        @queueable()
+        async onSubTestStart (testNode : TestNodeResult) {
             if (testNode.isRoot) this.resultsRunning.add(testNode)
         }
 
-        onSubTestFinish (testNode : TestNodeResult) {
+        @queueable()
+        async onSubTestFinish (testNode : TestNodeResult) {
             if (testNode.isRoot) {
                 if (!this.resultsRunning.has(testNode)) throw new Error("Test completed before starting")
 
@@ -292,25 +370,36 @@ export class Reporter extends Mixin(
 
                 this.resultsCompleted.add(testNode)
 
-                this.c.write(this.testNodeTemplate(testNode, this.resultsCompleted.size === this.launch.projectPlanItemsToLaunch.length).toString())
+                this.print(this.testNodeTemplate(testNode, this.resultsCompleted.size === this.launch.projectPlanItemsToLaunch.length).toString())
             }
         }
 
-        onResult (testNode : TestNodeResult, assertion : Result) {
+        @queueable()
+        async onResult (testNode : TestNodeResult, assertion : Result) {
         }
 
 
-        onAssertionFinish (testNode : TestNodeResult, assertion : AssertionAsync) {
+        @queueable()
+        async onAssertionFinish (testNode : TestNodeResult, assertion : AssertionAsync) {
         }
 
 
-        onTestSuiteStart () {
-            this.c.write(this.t.testSuiteHeader())
+        @queueable()
+        async onTestSuiteStart () {
+            this.print(this.t.testSuiteHeader())
         }
 
 
-        onTestSuiteFinish () {
+        @queueable()
+        async onTestSuiteFinish () {
+            this.print(this.t.testSuiteFooter().toString())
+        }
 
+
+        print (str : string) {
+            throw new Error("Abstract method")
         }
     }
-) {}
+
+    return Reporter
+}) {}
