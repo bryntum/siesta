@@ -185,10 +185,13 @@ export class ReporterTheme extends Base {
     treeLine (str : string) : string {
         return this.c.gray.text(str)
     }
+
+
+    testSuiteHeader () : string {
+        return `Launching test suite: ${ this.c.underline.text(this.project.title) }\n`
+    }
 }
 
-
-export const defaultReporterTheme   = ReporterTheme.new()
 
 //---------------------------------------------------------------------------------------------------------------------
 export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
@@ -211,19 +214,12 @@ export class Reporter extends Mixin(
         resultsCompleted    : Set<TestNodeResult>       = new Set()
         resultsRunning      : Set<TestNodeResult>       = new Set()
 
-        activeTestNode      : TestNodeResult            = undefined
+        // activeTestNode      : TestNodeResult            = undefined
 
-        indentLevelsStack   : number[]                  = [ 0 ]
+        // indentLevelsStack   : number[]                  = [ 0 ]
 
         c                   : Colorer                   = undefined
-        t                   : ReporterTheme             = defaultReporterTheme
-
-
-        initialize () {
-            super.initialize(...arguments)
-
-            this.t.reporter     = this
-        }
+        t                   : ReporterTheme             = ReporterTheme.new({ reporter : this })
 
 
         needToShowResult (result : TestResult) : boolean {
@@ -303,7 +299,18 @@ export class Reporter extends Mixin(
         onResult (testNode : TestNodeResult, assertion : Result) {
         }
 
+
         onAssertionFinish (testNode : TestNodeResult, assertion : AssertionAsync) {
+        }
+
+
+        onTestSuiteStart () {
+            this.c.write(this.t.testSuiteHeader())
+        }
+
+
+        onTestSuiteFinish () {
+
         }
     }
 ) {}

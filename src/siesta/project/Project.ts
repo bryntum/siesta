@@ -16,9 +16,9 @@ export class Project extends Mixin(
     class Project extends base {
         baseUrl         : string            = ''
 
-        name            : string            = ''
+        title           : string            = ''
 
-        options         : Partial<TestDescriptor>           = undefined
+        descriptor      : Partial<TestDescriptor>           = undefined
 
         projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new()
         // projectPlanMap  : Map<string, ProjectPlanItem>      = new Map()

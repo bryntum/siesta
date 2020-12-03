@@ -1,10 +1,10 @@
 import { GetIsomorphicProjectClass } from "../../main.js"
 
 const project = (await GetIsomorphicProjectClass()).new({
-    name                    : 'Siesta test suite',
+    title                   : 'Isomorphic test suite example',
 
     // global test-specific options
-    options                 : {}
+    descriptor              : {}
 })
 
 project.plan([
