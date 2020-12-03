@@ -1,10 +1,8 @@
+import readline from "readline"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { queueable } from "../../class/QueueableMethods.js"
-import { SetIntervalHandler, SetTimeoutHandler } from "../../util/Helpers.js"
+import { saneSplit, SetIntervalHandler } from "../../util/Helpers.js"
 import { TestNodeResult } from "../test/Result.js"
 import { Reporter } from "./Reporter.js"
-
-import readline from "readline"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterNodejs extends Mixin(
@@ -19,19 +17,17 @@ export class ReporterNodejs extends Mixin(
 
         footerLines     : number                        = 0
 
-        // rl              : readline.Interface            = undefined
+        spinnerChars    : number                        = 0
 
 
         print (str : string) {
             console.log(str)
 
-            if (this.isPrintingFooter) this.footerLines++
+            if (this.isPrintingFooter) this.footerLines += saneSplit(str, '\n').length
         }
 
 
-        @queueable()
-        async onTestSuiteStart () {
-            // this.rl                 = readline.createInterface({ input : process.stdin, output : process.stdout })
+        onTestSuiteStart () {
             this.spinnerInterval    = setInterval(this.onSpinnerTick.bind(this), this.spinner.interval)
 
             super.onTestSuiteStart()
@@ -40,10 +36,8 @@ export class ReporterNodejs extends Mixin(
         }
 
 
-        @queueable()
-        async onTestSuiteFinish () {
+        onTestSuiteFinish () {
             clearInterval(this.spinnerInterval)
-            // this.rl.close()
 
             this.revertFooter()
 
@@ -51,36 +45,37 @@ export class ReporterNodejs extends Mixin(
         }
 
 
-        @queueable()
-        async onSubTestStart (testNode : TestNodeResult) {
+        onSubTestStart (testNode : TestNodeResult) {
+            if (testNode.isRoot) this.revertFooter()
+
             super.onSubTestStart(testNode)
 
             // to update the "RUNS" section
-            this.printFooter()
+            if (testNode.isRoot) this.printFooter()
         }
 
 
-        @queueable()
-        async onSubTestFinish (testNode : TestNodeResult) {
+        onSubTestFinish (testNode : TestNodeResult) {
+            if (testNode.isRoot) this.revertFooter()
+
             super.onSubTestFinish(testNode)
 
-            if (testNode.isRoot) {
-                this.printFooter()
-            }
+            if (testNode.isRoot) this.printFooter()
         }
 
 
-        @queueable()
-        async revertFooter () {
-            if (this.footerLines > 0) {
-                await new Promise<void>(resolve => readline.moveCursor(process.stdout, 0, -this.footerLines, resolve))
-                await new Promise<void>(resolve => readline.clearScreenDown(process.stdout, resolve))
+        revertFooter () {
+            for (let i = 1; i <= this.footerLines; i++) {
+                readline.moveCursor(process.stdout, 0, -1, () => {})
+                readline.clearLine(process.stdout, 0, () => {})
             }
+
+            this.footerLines    = 0
+            this.spinnerChars   = 0
         }
 
 
-        @queueable()
-        async printFooter () {
+        printFooter () {
             this.revertFooter()
 
             this.isPrintingFooter   = true
@@ -94,22 +89,26 @@ export class ReporterNodejs extends Mixin(
         }
 
 
-        @queueable()
-        async printProgressBar () {
+        printProgressBar () {
             this.print(this.t.progressBar())
         }
 
 
-        @queueable()
-        async printSpinner () {
-            this.print(this.t.spinner())
+        printSpinner () {
+            // if (this.spinnerChars > 0) console.log('\b'.repeat(this.spinnerChars))
+            //
+            // const spinnerText       = this.t.spinner()
+            //
+            // this.print(spinnerText)
+            //
+            // this.spinnerChars       = spinnerText.length
         }
 
 
         onSpinnerTick () {
-            this.spinner.tick()
+            this.printSpinner()
 
-            this.print(this.t.spinner())
+            this.spinner.tick()
         }
     }
 

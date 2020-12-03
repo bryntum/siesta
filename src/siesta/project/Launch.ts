@@ -2,6 +2,7 @@ import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
+import { delay } from "../../util/Helpers.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { ColorerNodejs } from "../reporter/ColorerNodejs.js"
 import { Reporter } from "../reporter/Reporter.js"
@@ -91,6 +92,8 @@ export class Launch extends Mixin(
             await context.launchTest(item.descriptor)
 
             context.destroy()
+
+            await delay(1000)
 
             //debugger
         }

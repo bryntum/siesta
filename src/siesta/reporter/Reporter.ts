@@ -1,6 +1,5 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { queueable, QueueableMethods } from "../../class/QueueableMethods.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
@@ -112,7 +111,10 @@ export const arrowSpinner = Spinner.new({
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterTheme extends Base {
-    reporter    : Reporter      = undefined
+    reporter    : Reporter              = undefined
+
+    progressBarTotalLength : number     = 50
+
 
     get c () : Colorer {
         return this.reporter.c
@@ -240,7 +242,7 @@ export class ReporterTheme extends Base {
     testSuiteFooter () : TextBlock {
         let text : TextBlock     = TextBlock.new()
 
-        text.push('\n')
+        if (this.reporter.resultsRunning.size > 0) text.push('\n')
 
         this.reporter.resultsRunning.forEach(testNodeResult => {
             text.push(
@@ -254,17 +256,16 @@ export class ReporterTheme extends Base {
 
         text.push(
             this.c.whiteBright.text('Test suite : 1 pass'),
-            '\n',
-            this.progressBar()
         )
-
 
         return text
     }
 
 
     progressBar () : string {
-        return `░`.repeat(50)
+        const completedChars = Math.round(this.reporter.resultsCompleted.size / this.launch.projectPlanItemsToLaunch.length * this.progressBarTotalLength)
+
+        return this.c.bgGreen.text(' '.repeat(completedChars)) + '░'.repeat(this.progressBarTotalLength - completedChars)
     }
 
 
@@ -279,8 +280,8 @@ export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
-    [ QueueableMethods, Base ],
-    (base : ClassUnion<typeof QueueableMethods, typeof Base>) => {
+    [ Base ],
+    (base : ClassUnion<typeof Base>) => {
 
     class Reporter extends base {
         launch              : Launch                    = undefined
@@ -356,13 +357,11 @@ export class Reporter extends Mixin(
         }
 
 
-        @queueable()
-        async onSubTestStart (testNode : TestNodeResult) {
+        onSubTestStart (testNode : TestNodeResult) {
             if (testNode.isRoot) this.resultsRunning.add(testNode)
         }
 
-        @queueable()
-        async onSubTestFinish (testNode : TestNodeResult) {
+        onSubTestFinish (testNode : TestNodeResult) {
             if (testNode.isRoot) {
                 if (!this.resultsRunning.has(testNode)) throw new Error("Test completed before starting")
 
@@ -374,24 +373,20 @@ export class Reporter extends Mixin(
             }
         }
 
-        @queueable()
-        async onResult (testNode : TestNodeResult, assertion : Result) {
+        onResult (testNode : TestNodeResult, assertion : Result) {
         }
 
 
-        @queueable()
-        async onAssertionFinish (testNode : TestNodeResult, assertion : AssertionAsync) {
+        onAssertionFinish (testNode : TestNodeResult, assertion : AssertionAsync) {
         }
 
 
-        @queueable()
-        async onTestSuiteStart () {
+        onTestSuiteStart () {
             this.print(this.t.testSuiteHeader())
         }
 
 
-        @queueable()
-        async onTestSuiteFinish () {
+        onTestSuiteFinish () {
             this.print(this.t.testSuiteFooter().toString())
         }
 

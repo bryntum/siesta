@@ -15,14 +15,14 @@ export class QueueableMethods extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const queueable = function () : MethodDecorator {
+export const queued = function () : MethodDecorator {
 
-    return function (target : QueueableMethods, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
-        const originalMethod    = target[ propertyKey ]
+    return function (target : QueueableMethods, propertyKey : string, descriptor : TypedPropertyDescriptor<any>) : void {
+        const originalMethod    = descriptor.value
 
-        target[ propertyKey ] = async function (this : QueueableMethods) {
+        descriptor.value = async function (this : QueueableMethods, ...args : unknown[]) {
             return this.$queue = this.$queue.then(() => {
-                return originalMethod.apply(this, arguments)
+                return originalMethod.apply(this, args)
             })
         }
     }
