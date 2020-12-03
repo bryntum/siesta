@@ -1,10 +1,11 @@
 import { describe } from "../../../main.js"
+import { delay } from "../../../src/util/Helpers.js"
 
 describe({
     env         : 'generic', // 'generic' | 'browser' | 'nodejs'
     tags        : [ 'basic', 'generic', 'data', 'model' ],
     title       : 'Basic assertions should work',
-}, t => {
+}, async t => {
     t.ok(true, 'True is ok')
 
     // t.is(null, undefined, 'Null is undefined')
@@ -13,6 +14,8 @@ describe({
     //
     // t.is(new Date(2010, 1, 1), new Date(2010, 1, 1), 't.is works for dates')
 
+
+    await delay(3000)
 
     t.it('Sub test #1', t => {
         t.ok(true, 'True is ok')

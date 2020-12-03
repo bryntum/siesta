@@ -93,8 +93,6 @@ export class Launch extends Mixin(
 
             context.destroy()
 
-            await delay(1000)
-
             //debugger
         }
 

@@ -24,8 +24,9 @@ project.plan([
 
         items       : [
             {
-                filename    : 'basic_test.t.js'
-            }
+                filename    : 'basic_test.t.js',
+            },
+            'another_test.t.js'
         ]
     }
 ])

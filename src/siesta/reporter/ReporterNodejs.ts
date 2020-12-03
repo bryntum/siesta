@@ -35,9 +35,11 @@ export class ReporterNodejs extends Mixin(
 
 
         onTestSuiteStart () {
-            // process.stdout.write(hideCursor)
+            process.stdout.write(hideCursor)
 
             process.on('SIGTERM', () => process.stdout.write(showCursor))
+            process.on('SIGINT', () => { process.stdout.write(showCursor); process.exit(1) })
+            process.on('exit', () => process.stdout.write(showCursor))
 
             this.spinnerInterval    = setInterval(this.onSpinnerTick.bind(this), this.spinner.interval)
 
@@ -80,7 +82,8 @@ export class ReporterNodejs extends Mixin(
         revertFooter () {
             for (let i = 1; i <= this.footerLines; i++) {
                 readline.clearLine(process.stdout, 0, () => {})
-                readline.moveCursor(process.stdout, 0, -1, () => {})
+                // stick cursor at the beginning of the previous line
+                readline.moveCursor(process.stdout, -Number.MAX_SAFE_INTEGER, -1, () => {})
             }
 
             this.footerLines    = 0

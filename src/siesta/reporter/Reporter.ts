@@ -65,6 +65,11 @@ export class TextBlock extends Base {
     }
 
 
+    pushLn (...strings : string[]) {
+        this.push(...strings, '\n')
+    }
+
+
     pullFrom (another : TextBlock) {
         this.text.push(...another.text)
     }
@@ -242,10 +247,10 @@ export class ReporterTheme extends Base {
     testSuiteFooter () : TextBlock {
         let text : TextBlock     = TextBlock.new()
 
-        if (this.reporter.resultsRunning.size > 0) text.push('\n')
+        if (this.reporter.resultsRunning.size > 0 && this.reporter.resultsCompleted.size > 0) text.push('\n')
 
         this.reporter.resultsRunning.forEach(testNodeResult => {
-            text.push(
+            text.pushLn(
                 this.testFileRunning(testNodeResult),
                 ' ',
                 this.testNodeUrl(testNodeResult)
@@ -254,9 +259,20 @@ export class ReporterTheme extends Base {
 
         text.push('\n')
 
-        text.push(
-            this.c.whiteBright.text('Test suite : 1 pass'),
+        text.pushLn(
+            this.c.whiteBright.text(`Test suite : `),
+                this.c.green.text(String(this.reporter.filesPassed) + ' passed, '),
+                this.c.red.text(String(this.reporter.filesFailed) + ' failed, '),
+
+                this.c.whiteBright.text(String(this.launch.projectPlanItemsToLaunch.length) + ' total'),
         )
+
+        text.push(
+            this.c.whiteBright.text('Time       : '),
+            String(Date.now() - this.reporter.startTime.getTime()),
+            'ms'
+        )
+
 
         return text
     }
@@ -289,6 +305,9 @@ export class Reporter extends Mixin(
         detailing           : ReporterDetailing         = 'assertion'
         includePassed       : boolean                   = true
 
+        filesPassed         : number                    = 0
+        filesFailed         : number                    = 0
+
         resultsCompleted    : Set<TestNodeResult>       = new Set()
         resultsRunning      : Set<TestNodeResult>       = new Set()
 
@@ -296,6 +315,8 @@ export class Reporter extends Mixin(
         t                   : ReporterTheme             = ReporterTheme.new({ reporter : this })
 
         spinner             : Spinner                   = clockSpinner
+
+        startTime           : Date                      = undefined
 
 
         needToShowResult (result : TestResult) : boolean {
@@ -369,6 +390,8 @@ export class Reporter extends Mixin(
 
                 this.resultsCompleted.add(testNode)
 
+                this[ testNode.passed ? 'filesPassed' : 'filesFailed' ]++
+
                 this.print(this.testNodeTemplate(testNode, this.resultsCompleted.size === this.launch.projectPlanItemsToLaunch.length).toString())
             }
         }
@@ -382,6 +405,8 @@ export class Reporter extends Mixin(
 
 
         onTestSuiteStart () {
+            this.startTime      = new Date()
+
             this.print(this.t.testSuiteHeader())
         }
 
