@@ -3,6 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
+import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
 import { Assertion, AssertionAsync, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
@@ -84,7 +85,7 @@ export class ReporterTheme extends Base {
     }
 
     get project () : Project {
-        return this.reporter.project
+        return this.reporter.launch.project
     }
 
 
@@ -161,7 +162,7 @@ export class ReporterTheme extends Base {
                 return this.c.redBright.inverse.text(` ${ LogLevel[ message.level ].toUpperCase() } `)
 
             default :
-                LogLevel[ message.level ]
+                return this.c.inverse.text(` ${ LogLevel[ message.level ].toUpperCase() } `)
         }
     }
 
@@ -200,7 +201,7 @@ export class Reporter extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class Reporter extends base {
-        project             : Project                   = undefined
+        launch              : Launch                    = undefined
 
         detailing           : ReporterDetailing         = 'assertion'
         includePassed       : boolean                   = true
@@ -209,8 +210,6 @@ export class Reporter extends Mixin(
 
         resultsCompleted    : Set<TestNodeResult>       = new Set()
         resultsRunning      : Set<TestNodeResult>       = new Set()
-
-        planned             : number                    = 0
 
         activeTestNode      : TestNodeResult            = undefined
 
@@ -297,7 +296,7 @@ export class Reporter extends Mixin(
 
                 this.resultsCompleted.add(testNode)
 
-                this.c.write(this.testNodeTemplate(testNode, this.resultsCompleted.size === this.planned).toString())
+                this.c.write(this.testNodeTemplate(testNode, this.resultsCompleted.size === this.launch.projectPlanItemsToLaunch.length).toString())
             }
         }
 

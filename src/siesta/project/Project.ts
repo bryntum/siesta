@@ -27,6 +27,9 @@ export class Project extends Mixin(
 
         testContextProviderConstructors   : (typeof TestContextProvider)[]      = [ TestContextProviderNodeIpc ]
 
+        setupDone       : boolean           = false
+        setupPromise    : Promise<any>      = undefined
+
 
         // createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
         //     const existing      = this.projectPlanMap.get(dir)
@@ -68,13 +71,19 @@ export class Project extends Mixin(
 
 
         async start () {
-            await this.setup()
-
             await this.launch(this.projectPlan.leafsAxis())
         }
 
 
         async launch (planItemsToLaunch : ProjectPlanItem[]) {
+            if (!this.setupDone) {
+                // setup may be already started (by another launch)
+                await (this.setupPromise || (this.setupPromise = this.setup()))
+
+                this.setupDone      = true
+                this.setupPromise   = undefined
+            }
+
             const launch    = Launch.new({
                 project                                 : this,
                 projectPlanItemsToLaunch                : planItemsToLaunch,

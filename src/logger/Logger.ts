@@ -17,7 +17,7 @@ export class Logger extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class Logger extends base {
-        logLevel        : LogLevel = LogLevel.warn
+        logLevel        : LogLevel = LogLevel.log
 
 
         printLogMessage (method : LogMethod, ...message : string[]) {

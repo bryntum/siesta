@@ -10,9 +10,13 @@ CustomTest.describe('Basic assertions should work', t => {
 CustomTest.describe('Basic assertions should work #2', t => {
     t.ok(true, 'True is ok')
 
-    t.log("Log message")
+    t.error("Error message")
 
     t.warn("Warning message")
 
-    t.error("Error message")
+    t.log("Log message")
+
+    t.debug("Debug message")
+
+    t.info("Info message")
 })
