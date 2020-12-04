@@ -1,17 +1,17 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
-import { CommonAssertions } from "./assertion/Common.js"
+import { Async } from "./assertion/Async.js"
 import { TestLauncherChild } from "./channel/TestLauncher.js"
 import { TestReporterChild } from "./channel/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { Assertion, LogMessage, TestNodeResult, TestResult } from "./Result.js"
+import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, LogMessage, TestNodeResult, TestResult } from "./Result.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Test extends Mixin(
-    [ TestNodeResult, Logger, CommonAssertions ],
-    (base : ClassUnion<typeof TestNodeResult, typeof Logger, typeof CommonAssertions>) =>
+    [ TestNodeResult, Logger, Async ],
+    (base : ClassUnion<typeof TestNodeResult, typeof Logger, typeof Async>) =>
 
     class Test extends base {
         // "upgrade" types from TreeNode
@@ -26,10 +26,21 @@ export class Test extends Mixin(
         reporter            : TestReporterChild     = undefined
 
 
-        addResult (result : TestResult) {
+        addResult (result : TestResult) : TestResult {
             super.addResult(result)
 
             if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.localId, result)
+
+            return result
+        }
+
+
+        addAsyncResolution (resolution : AssertionAsyncResolution) : AssertionAsyncResolution {
+            super.addAsyncResolution(resolution)
+
+            this.reporter.onAssertionFinish(this.localId, resolution)
+
+            return resolution
         }
 
 

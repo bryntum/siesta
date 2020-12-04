@@ -1,5 +1,4 @@
 import { describe } from "../../../main.js"
-import { delay } from "../../../src/util/Helpers.js"
 
 describe({
     env         : 'generic', // 'generic' | 'browser' | 'nodejs'
@@ -15,11 +14,9 @@ describe({
     // t.is(new Date(2010, 1, 1), new Date(2010, 1, 1), 't.is works for dates')
 
 
-    await delay(3000)
-
     const start     = Date.now()
 
-    await t.waitFor(() => Date.now() - start > 3000)
+    await t.waitFor(() => Date.now() - start > 3000, 'Wait for 3s')
 
     t.it('Sub test #1', t => {
         t.ok(true, 'True is ok')

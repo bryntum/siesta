@@ -5,7 +5,7 @@ import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
 import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
-import { Assertion, AssertionAsync, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
+import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
 
 // //---------------------------------------------------------------------------------------------------------------------
@@ -400,7 +400,7 @@ export class Reporter extends Mixin(
         }
 
 
-        onAssertionFinish (testNode : TestNodeResult, assertion : AssertionAsync) {
+        onAssertionFinish (testNode : TestNodeResult, assertion : AssertionAsyncResolution) {
         }
 
 

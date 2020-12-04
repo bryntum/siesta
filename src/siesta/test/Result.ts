@@ -37,7 +37,7 @@ export class Exception extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class Exception extends base {
-        exception       : Error         = undefined
+        exception       : unknown           = undefined
     }
 ) {}
 
@@ -52,7 +52,15 @@ export class Assertion extends Mixin(
     class Assertion extends base {
         name            : string            = ''
 
-        passed          : boolean           = true
+        $passed         : boolean           = true
+
+        get passed () : boolean {
+            return this.$passed
+        }
+
+        set passed (value : boolean) {
+            this.$passed = value
+        }
 
         description     : string            = ''
 
@@ -64,26 +72,50 @@ registerSerializableClass('Assertion', Assertion)
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class AssertionAsync extends Mixin(
+export class AssertionAsyncCreation extends Mixin(
+    [ Assertion, Serializable, Result ],
+    (base : ClassUnion<typeof Assertion, typeof Serializable, typeof Result>) => {
+
+    class AssertionAsyncCreation extends base {
+        resolution      : AssertionAsyncResolution  = undefined
+
+        get passed () : boolean {
+            return this.resolution.passed
+        }
+
+        set passed (value : boolean) {
+        }
+    }
+    return AssertionAsyncCreation
+}) {}
+
+registerSerializableClass('AssertionAsync', AssertionAsyncCreation)
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class AssertionAsyncResolution extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) => {
 
-    class AssertionAsync extends base {
-        @exclude()
-        ongoing     : Promise<any>                          = undefined
+    class AssertionAsyncResolution extends base {
+        creationId      : LUID              = undefined
 
-        state       : 'pending' | 'resolved' | 'rejected'   = 'pending'
+        passed          : boolean           = true
+
+        timeoutHappened : boolean           = false
     }
-    return AssertionAsync
+    return AssertionAsyncResolution
 }) {}
 
-registerSerializableClass('AssertionAsync', AssertionAsync)
+registerSerializableClass('AssertionAsyncResolution', AssertionAsyncResolution)
+
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export type TestNodeState   = 'created' | 'running' | 'completed'
 
 // serializable leaf nodes
-export type TestResultLeaf  = Exception | LogMessage | Assertion | AssertionAsync
+export type TestResultLeaf  = Exception | LogMessage | Assertion | AssertionAsyncCreation
 
 // non-serializable tree node - the serializable part is `descriptor`
 export type TestResultTree  = TestNodeResult
@@ -108,7 +140,7 @@ export class TestNodeResult extends Mixin(
 
         resultLog       : TestResult[]      = []
 
-        resultMap       : Map<LUID, number> = new Map()
+        resultMap       : Map<LUID, TestResult> = new Map()
 
 
         $depth           : number    = undefined
@@ -143,22 +175,28 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        addResult (result : TestResult) {
+        addResult (result : TestResult) : TestResult {
             if (this.frozen) throw new Error("Adding result after test finalization")
 
             if (result instanceof TestNodeResult) this.$childNodes = undefined
 
             this.resultLog.push(result)
-            this.resultMap.set(result.localId, this.resultLog.length - 1)
+            this.resultMap.set(result.localId, result)
+
+            return result
         }
 
 
-        updateResult (result : TestResult) {
-            if (this.frozen) throw new Error("Updating result after test finalization")
+        addAsyncResolution (resolution : AssertionAsyncResolution) : AssertionAsyncResolution {
+            if (this.frozen) throw new Error("Adding async resolution after test finalization")
 
-            if (!this.resultMap.has(result.localId)) throw new Error("Result to update does not exists")
+            if (!this.resultMap.has(resolution.creationId)) throw new Error("Result to update does not exists")
 
-            this.resultLog[ this.resultMap.get(result.localId) ] = result
+            const creation  = this.resultMap.get(resolution.creationId) as AssertionAsyncCreation
+
+            creation.resolution = resolution
+
+            return resolution
         }
 
 
@@ -180,15 +218,6 @@ export class TestNodeResult extends Mixin(
                 annotation
             }))
         }
-
-
-        // toJSON () {
-        //     const obj : any     = Object.assign({}, this)
-        //
-        //     obj.parentNode      = this.parentNode ? this.parentNode.localId : undefined
-        //
-        //     return obj
-        // }
 
 
         $passed   : boolean       = undefined

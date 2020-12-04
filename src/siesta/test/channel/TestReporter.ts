@@ -2,25 +2,38 @@ import { Channel, local, remote } from "../../../channel/Channel.js"
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { Reporter } from "../../reporter/Reporter.js"
+import { AssertionWaitFor } from "../assertion/Async.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { LUID } from "../LUID.js"
-import { Assertion, AssertionAsync, Exception, LogMessage, TestNodeResult, TestResultLeaf } from "../Result.js"
+import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResultLeaf } from "../Result.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 // make sure we actually import these class symbols (and not just types),
 // so that their `registerSerializableClass()` calls are made
 
 Assertion
-AssertionAsync
+AssertionAsyncCreation
+AssertionAsyncResolution
+AssertionWaitFor
 Exception
 LogMessage
+
+interface TestReporterChannel {
+    onSubTestStart : (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => any
+
+    onSubTestFinish : (testNodeId : LUID) => any
+
+    onResult : (testNodeId : LUID, result : TestResultLeaf) => any
+
+    onAssertionFinish : (testNodeId : LUID, assertion : AssertionAsyncResolution) => any
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestReporterParent extends Mixin(
     [ Channel, Base ],
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
-        class TestReporterParent extends base {
+        class TestReporterParent extends base implements TestReporterChannel {
 
             reporter        : Reporter          = undefined
 
@@ -98,16 +111,12 @@ export class TestReporterParent extends Mixin(
 
 
             @local()
-            onAssertionFinish (testNodeId : LUID, assertion : AssertionAsync) {
+            onAssertionFinish (testNodeId : LUID, assertion : AssertionAsyncResolution) {
                 if (!this.currentTestNodeResult || this.currentTestNodeResult.localId !== testNodeId) {
                     throw new Error("Parent node id mismatch for asynchronous test result finalization")
                 }
 
-                if (!this.currentTestNodeResult.resultMap.has(assertion.localId)) {
-                    throw new Error("Missing asynchronous assertion in current test node result")
-                }
-
-                this.currentTestNodeResult.updateResult(assertion)
+                this.currentTestNodeResult.addAsyncResolution(assertion)
 
                 this.reporter.onAssertionFinish(this.currentTestNodeResult, assertion)
             }
@@ -123,24 +132,18 @@ export class TestReporterChild extends Mixin(
     [ Channel, Base ],
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
-        class TestReporterChild extends base {
-            // @remote()
-            // onTopTestStart : (testNode : TestNodeResult) => Promise<any>
-            //
-            // @remote()
-            // onTopTestFinish : (testNodeId : string) => Promise<any>
+        class TestReporterChild extends base implements TestReporterChannel {
+            @remote()
+            onSubTestStart : (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => any
 
             @remote()
-            onSubTestStart : (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => Promise<any>
+            onSubTestFinish : (testNodeId : LUID) => any
 
             @remote()
-            onSubTestFinish : (testNodeId : LUID) => Promise<any>
+            onResult : (testNodeId : LUID, result : TestResultLeaf) => any
 
             @remote()
-            onResult : (testNodeId : LUID, result : TestResultLeaf) => Promise<any>
-
-            @remote()
-            onAssertionFinish : (testNodeId : LUID, assertion : AssertionAsync) => Promise<any>
+            onAssertionFinish : (testNodeId : LUID, assertion : AssertionAsyncResolution) => any
         }
 
         return TestReporterChild

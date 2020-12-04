@@ -40,6 +40,10 @@ const serializableClasses = new Map<string, typeof Serializable>()
 export const registerSerializableClass = (id : string, cls : typeof Serializable) => {
     cls.prototype.$class        = id
 
+    if (serializableClasses.has(id) && serializableClasses.get(id) !== cls) {
+        throw new Error(`Serializable class with id: [${id}] already registered`)
+    }
+
     serializableClasses.set(id, cls)
 }
 

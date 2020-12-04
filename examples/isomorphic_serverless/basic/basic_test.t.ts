@@ -11,7 +11,7 @@ CustomTest.describe('Basic assertions should work', async t => {
 
 
 CustomTest.describe('Basic assertions should work #2', async t => {
-    await delay(3000)
+    await delay(1000)
 
     t.ok(true, 'True is ok')
 
