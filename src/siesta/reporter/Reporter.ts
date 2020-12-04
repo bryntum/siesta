@@ -269,8 +269,7 @@ export class ReporterTheme extends Base {
 
         text.push(
             this.c.whiteBright.text('Time       : '),
-            String(Date.now() - this.reporter.startTime.getTime()),
-            'ms'
+            humanReadableDuration(Date.now() - this.reporter.startTime.getTime())
         )
 
 
@@ -423,3 +422,26 @@ export class Reporter extends Mixin(
 
     return Reporter
 }) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const humanReadableDuration = (milliSeconds : number) : string => {
+    let durationStr         = `${ milliSeconds }ms`
+
+    if (milliSeconds >= 1000) {
+        const seconds       = Math.floor(milliSeconds / 1000)
+        durationStr         = `${ seconds }s`
+
+        if (seconds >= 60) {
+            const minutes   = Math.floor(seconds / 60)
+            durationStr     = `${ minutes }m ${ seconds % 60 }s`
+
+            if (minutes >= 60) {
+                const hours     = Math.floor(minutes / 60)
+                durationStr     = `${ hours }h ${ minutes % 60 }m`
+            }
+        }
+    }
+
+    return durationStr
+}
