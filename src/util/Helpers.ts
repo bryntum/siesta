@@ -34,6 +34,10 @@ export const typeOf = (value : any) : string => Object.prototype.toString.call(v
 export type PartialWOC<T>       = Omit<Partial<T>, 'constructor'>
 
 //---------------------------------------------------------------------------------------------------------------------
+export type OrPromise<T>        = T | Promise<T>
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
 export type SetIntervalHandler  = ReturnType<typeof setInterval>
 

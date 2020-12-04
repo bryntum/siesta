@@ -1,32 +1,29 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
+import { CommonAssertions } from "./assertion/Common.js"
 import { TestLauncherChild } from "./channel/TestLauncher.js"
 import { TestReporterChild } from "./channel/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
 import { Assertion, LogMessage, TestNodeResult, TestResult } from "./Result.js"
 
-//---------------------------------------------------------------------------------------------------------------------
-export type TestCode = <T extends Test>(t : T) => any
-
-
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Test extends Mixin(
-    [ TestNodeResult, Logger ],
-    (base : ClassUnion<typeof TestNodeResult, typeof Logger>) =>
+    [ TestNodeResult, Logger, CommonAssertions ],
+    (base : ClassUnion<typeof TestNodeResult, typeof Logger, typeof CommonAssertions>) =>
 
     class Test extends base {
         // "upgrade" types from TreeNode
         parentNode          : Test
 
-        code                : TestCode          = (t : Test) => {}
+        code                : (t : this) => any     = t => {}
 
         // ongoing             : Promise<any>      = undefined
 
-        pendingSubTests     : Test[]         = []
+        pendingSubTests     : Test[]            = []
 
-        reporter            : TestReporterChild = undefined
+        reporter            : TestReporterChild     = undefined
 
 
         addResult (result : TestResult) {
@@ -62,16 +59,20 @@ export class Test extends Mixin(
         }
 
 
-        it (name : TestDescriptorArgument, code : TestCode) : any {
+        it (name : TestDescriptorArgument, code : (t : this) => any) : this {
             const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
 
-            const test      = Test.new({ descriptor, code, parentNode : this, reporter : this.reporter })
+            const cls       = this.constructor as typeof Test
+
+            const test      = cls.new({ descriptor, code, parentNode : this, reporter : this.reporter })
 
             this.pendingSubTests.push(test)
+
+            return test as this
         }
 
 
-        describe (name : TestDescriptorArgument, code : TestCode) : any {
+        describe (name : TestDescriptorArgument, code : (t : this) => any) : this {
             return this.it(name, code)
         }
 
@@ -102,6 +103,7 @@ export class Test extends Mixin(
         }
 
 
+        // TODO should have timeout property
         async setup () {
         }
 
@@ -110,23 +112,23 @@ export class Test extends Mixin(
         }
 
 
-        static it (name : TestDescriptorArgument, code : TestCode) {
+        static it<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
             if (!globalTestEnv.topTest) {
                 if (!globalTestEnv.topTestDescriptor) throw new Error("No top test descriptor")
                 if (!globalTestEnv.launcher) throw new Error("No test launcher")
 
                 globalTestEnv.topTest   = this.new({
                     descriptor      : globalTestEnv.topTestDescriptor,
-
-                    reporter        : globalTestEnv.launcher
-                })
+                    // TS can't figure out types compatibility
+                    reporter        : globalTestEnv.launcher as TestReporterChild
+                } as Partial<InstanceType<T>>)
             }
 
-            globalTestEnv.topTest.it(name, code)
+            return globalTestEnv.topTest.it(name, code) as InstanceType<T>
         }
 
 
-        static describe (name : TestDescriptorArgument, code : TestCode) {
+        static describe<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
             return this.it(name, code)
         }
     }
@@ -153,7 +155,7 @@ export const globalTestEnv : GlobalTestEnvironment = GlobalTestEnvironment.new()
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const it = (name : TestDescriptorArgument, code : TestCode) => {
+export const it = (name : TestDescriptorArgument, code : (t : Test) => any) : Test => {
     return Test.it(name, code)
 }
 

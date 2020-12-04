@@ -17,6 +17,10 @@ describe({
 
     await delay(3000)
 
+    const start     = Date.now()
+
+    await t.waitFor(() => Date.now() - start > 3000)
+
     t.it('Sub test #1', t => {
         t.ok(true, 'True is ok')
 

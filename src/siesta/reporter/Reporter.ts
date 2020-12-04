@@ -262,7 +262,7 @@ export class ReporterTheme extends Base {
         text.pushLn(
             this.c.whiteBright.text(`Test suite : `),
                 this.c.green.text(String(this.reporter.filesPassed) + ' passed, '),
-                this.c.red.text(String(this.reporter.filesFailed) + ' failed, '),
+                this.c[ this.reporter.filesFailed > 0 ? 'red' : 'noop' ].text(String(this.reporter.filesFailed) + ' failed, '),
 
                 this.c.whiteBright.text(String(this.launch.projectPlanItemsToLaunch.length) + ' total'),
         )
