@@ -2,9 +2,7 @@ import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
-import { delay } from "../../util/Helpers.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
-import { ColorerNodejs } from "../reporter/ColorerNodejs.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestLauncherParent } from "../test/channel/TestLauncher.js"
 import { ProjectPlanItem } from "./Plan.js"
@@ -49,7 +47,7 @@ export class Launch extends Mixin(
 
 
         async setup () {
-            this.reporter       = this.project.reporterClass.new({ c : ColorerNodejs.new(), launch : this })
+            this.reporter       = this.project.reporterClass.new({ c : this.project.colorerClass.new(), launch : this })
 
             await Promise.all(this.testContextProviderConstructors.map(tcpConstructor => {
                 const tcp                   = tcpConstructor.new({ dispatcher : this })

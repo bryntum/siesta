@@ -2,7 +2,7 @@ import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { registerSerializableClass } from "../../../serializable/Serializable.js"
 import { delay, OrPromise } from "../../../util/Helpers.js"
 import { isFunction } from "../../../util/Typeguards.js"
-import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception, TestNodeResult } from "../Result.js"
+import { AssertionAsyncCreation, AssertionAsyncResolution, Exception, TestNodeResult } from "../Result.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -49,9 +49,9 @@ export class Async extends Mixin(
                 condition           = arg
             } else {
                 condition           = arg.condition
-                timeout             = arg.timeout || timeout
+                timeout             = arg.timeout ?? timeout
                 desc                = arg.description
-                pollInterval        = arg.interval
+                pollInterval        = arg.interval ?? pollInterval
             }
 
 
@@ -117,6 +117,9 @@ export class Async extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
+
+// experiment - separate class per assertion
+
 export class AssertionWaitFor extends AssertionAsyncCreation {
     name            : string        = 'waitFor'
 

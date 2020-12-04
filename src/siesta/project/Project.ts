@@ -3,6 +3,7 @@ import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { TestContextProviderNodeIpc } from "../context_provider/TestContextProviderNodeIpc.js"
+import { Colorer } from "../reporter/Colorer.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { Launch } from "./Launch.js"
@@ -26,12 +27,13 @@ export class Project extends Mixin(
 
         logger          : Logger            = Logger.new()
 
-        testContextProviderConstructors   : (typeof TestContextProvider)[]      = [ TestContextProviderNodeIpc ]
+        testContextProviderConstructors   : (typeof TestContextProvider)[]      = []
 
         setupDone       : boolean           = false
         setupPromise    : Promise<any>      = undefined
 
         reporterClass   : typeof Reporter   = undefined
+        colorerClass    : typeof Colorer    = undefined
 
 
         // createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {

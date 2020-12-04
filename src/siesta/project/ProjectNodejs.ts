@@ -2,6 +2,10 @@ import path from 'path'
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
+import { TestContextProvider } from "../context_provider/TestContextProvider.js"
+import { TestContextProviderNodeIpc } from "../context_provider/TestContextProviderNodeIpc.js"
+import { Colorer } from "../reporter/Colorer.js"
+import { ColorerNodejs } from "../reporter/ColorerNodejs.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { Project } from "./Project.js"
@@ -17,6 +21,9 @@ export class ProjectNodejs extends Mixin(
         logger          : Logger            = LoggerConsole.new({ logLevel : LogLevel.warn })
 
         reporterClass   : typeof Reporter   = ReporterNodejs
+        colorerClass    : typeof Colorer    = ColorerNodejs
+
+        testContextProviderConstructors   : (typeof TestContextProvider)[]      = [ TestContextProviderNodeIpc ]
 
 
         async setupBaseUrl () : Promise<string> {

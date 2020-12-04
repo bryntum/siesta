@@ -1,5 +1,7 @@
 import { GetIsomorphicProjectClass } from "../../main.js"
 
+(async () => {
+
 const project = (await GetIsomorphicProjectClass()).new({
     title                   : 'Isomorphic test suite example',
 
@@ -32,4 +34,6 @@ project.plan([
 ])
 
 project.start()
+
+})()
 
