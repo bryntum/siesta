@@ -26,7 +26,7 @@ export class ProjectNodejs extends Mixin(
         testContextProviderConstructors   : (typeof TestContextProvider)[]      = [ TestContextProviderNodeIpc ]
 
 
-        setupBaseUrl () : string {
+        buildBaseUrl () : string {
             return path.dirname(process.argv[ 1 ])
         }
 

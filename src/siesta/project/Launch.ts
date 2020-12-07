@@ -5,6 +5,7 @@ import { Logger } from "../../logger/Logger.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestLauncherParent } from "../test/channel/TestLauncher.js"
+import { TestDescriptor } from "../test/Descriptor.js"
 import { ProjectPlanItem } from "./Plan.js"
 import { Project } from "./Project.js"
 
@@ -50,7 +51,7 @@ export class Launch extends Mixin(
             this.reporter       = this.project.reporterClass.new({ c : this.project.colorerClass.new(), launch : this })
 
             await Promise.all(this.testContextProviderConstructors.map(tcpConstructor => {
-                const tcp                   = tcpConstructor.new({ dispatcher : this })
+                const tcp                   = tcpConstructor.new({ launch : this })
 
                 return tcp.setup().then(() => {
                     this.registerTestContextProvider(tcp)
@@ -81,7 +82,7 @@ export class Launch extends Mixin(
 
             this.logger.log("Launching project item: ", item.descriptor.url)
 
-            const context       = await this.createTestContext()
+            const context       = await this.createTestContext(item.descriptor)
 
             context.reporter    = this.reporter
 
@@ -95,8 +96,8 @@ export class Launch extends Mixin(
         }
 
 
-        async createTestContext () : Promise<TestLauncherParent> {
-            return await this.testContextProviders[ 0 ].createTestContext()
+        async createTestContext (desc : TestDescriptor) : Promise<TestLauncherParent> {
+            return await this.testContextProviders[ 0 ].createTestContext(desc)
         }
 
     }

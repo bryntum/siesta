@@ -3,6 +3,7 @@ import { ContextProvider } from "../../context_provider/ContextProvider.js"
 import { Logger } from "../../logger/Logger.js"
 import { Launch } from "../project/Launch.js"
 import { TestLauncherParent } from "../test/channel/TestLauncher.js"
+import { TestDescriptor } from "../test/Descriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestContextProvider extends Mixin(
@@ -12,18 +13,18 @@ export class TestContextProvider extends Mixin(
         class TestContextProvider extends base {
             contextClass        : TestLauncherParent
 
-            dispatcher      : Launch        = undefined
+            launch              : Launch        = undefined
 
 
             get logger () : Logger {
-                return this.dispatcher.project.logger
+                return this.launch.project.logger
             }
 
             set logger (value : Logger) {
             }
 
 
-            async createTestContext () : Promise<TestLauncherParent> {
+            async createTestContext (desc : TestDescriptor) : Promise<TestLauncherParent> {
                 const context       = await this.createContext()
 
                 // context.evaluate(() => {

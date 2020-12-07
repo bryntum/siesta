@@ -1,6 +1,6 @@
-import { default as child_process } from "child_process"
+import { ChannelBrowserMessagePort } from "../channel/ChannelBrowserMessagePort.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { ExecutionContextRemoteNodeIpc } from "../context/ExecutionContextRemoteNodeIpc.js"
+import { ExecutionContextRemote } from "../context/ExecutionContextRemote.js"
 import { ContextProvider } from "./ContextProvider.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -16,10 +16,22 @@ export class ContextProviderBrowserIframe extends Mixin(
         childChannelClassSymbol      : string            = 'ExecutionContextRemoteNodeIpcChild'
 
 
-        parentChannelClass : typeof ExecutionContextRemoteNodeIpc   = ExecutionContextRemoteNodeIpc
+        parentChannelClass : typeof ChannelBrowserMessagePort   = ChannelBrowserMessagePort
+
+        iframeSrc       : string            = ''
 
 
         async setup () {
+            if (document.readyState === 'complete') return
+
+            return new Promise<void>(resolve => {
+                let listener
+
+                window.addEventListener('load', listener = () => {
+                    window.removeEventListener('load', listener)
+                    resolve()
+                })
+            })
         }
 
 
@@ -28,30 +40,22 @@ export class ContextProviderBrowserIframe extends Mixin(
         }
 
 
-        async createContext () : Promise<ExecutionContextRemoteNodeIpc> {
-            const childProcess  = child_process.fork(
-                '',
-                {
-                    execArgv : [
-                        // '--unhandled-rejections=strict',
-                        // '--trace-warnings',
-                        // '--inspect-brk=127.0.0.1:9339',
-                        '--input-type', 'module',
-                        '--eval', [
-                            `import { ${this.childChannelClassSymbol} } from "${this.childChannelClassUrl}"`,
-                            // `debugger`,
-                            // `console.log('ContextProviderBrowserIframe seed launched`,
-                            `const context = ${this.childChannelClassSymbol}.new()`,
-                            `context.connect()`,
-                            // `console.log('ContextProviderBrowserIframe seed connect call issued`,
-                        ].join('\n')
-                    ]
-                }
-            )
+        async createContext () : Promise<ExecutionContextRemote> {
+            const iframe        = document.createElement('iframe')
 
-            const context       = this.parentChannelClass.new({ media : childProcess })
+            iframe.src          = this.iframeSrc
 
-            await context.setup()
+            await new Promise(resolve => {
+                document.body.appendChild(iframe)
+
+                iframe.addEventListener('load', resolve)
+            })
+
+            const messageChannel        = new MessageChannel()
+
+            const context       = this.parentChannelClass.new({ media : messageChannel.port1 })
+
+            iframe.contentWindow.postMessage(null, '*', [ messageChannel.port2 ])
 
             return context
         }

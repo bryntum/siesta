@@ -1,6 +1,5 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { Hook } from "../event/Hook.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -9,25 +8,28 @@ export class ExecutionContext extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class ExecutionContext extends base {
-        attachedTo  : any       = undefined
-
-
-        attach () {
-
-        }
-
-
-        detach () {
-
-        }
+        // TODO the idea was to abstract the handling of "unhandled" exceptions/rejections
+        // however it went to `ExecutionContextRemote`
+        
+        // attachedTo  : any       = undefined
+        //
+        //
+        // attach () {
+        //
+        // }
+        //
+        //
+        // detach () {
+        //
+        // }
+        // exceptionHook : Hook<[ this, unknown ]>     = undefined
+        // rejectionHook : Hook<[ this, unknown ]>     = undefined
 
 
         async evaluate <A extends unknown[], R extends unknown> (func : (...args : A) => R | Promise<R>, ...args : A) : Promise<R> {
             throw new Error("Abstract method")
         }
 
-        exceptionHook : Hook<[ this, unknown ]>     = undefined
-        rejectionHook : Hook<[ this, unknown ]>     = undefined
 
 
         async setup () {
