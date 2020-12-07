@@ -12,11 +12,16 @@ import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 TestDescriptor
 
 //---------------------------------------------------------------------------------------------------------------------
+interface TestLauncher {
+    launchTest (testDescriptor : TestDescriptor) : Promise<any>
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherParent extends Mixin(
     [ TestReporterParent, ExecutionContextRemote ],
     (base : ClassUnion<typeof TestReporterParent, typeof ExecutionContextRemote>) => {
 
-        class TestLauncherParent extends base {
+        class TestLauncherParent extends base implements TestLauncher {
             @remote()
             launchTest : (testDescriptor : TestDescriptor) => Promise<any>
         }
@@ -31,7 +36,7 @@ export class TestLauncherChild extends Mixin(
     [ TestReporterChild, ExecutionContextRemoteChild ],
     (base : ClassUnion<typeof TestReporterChild, typeof ExecutionContextRemoteChild>) => {
 
-        class TestLauncherChild extends base {
+        class TestLauncherChild extends base implements TestLauncher {
 
             @local()
             async launchTest (testDescriptor : TestDescriptor) {

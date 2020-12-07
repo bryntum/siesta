@@ -64,13 +64,13 @@ export class Project extends Mixin(
 
 
         async setup () {
-            if (!this.baseUrl) this.baseUrl = await this.setupBaseUrl()
+            if (!this.baseUrl) this.baseUrl = this.buildBaseUrl()
 
             this.projectPlan.descriptor.url = this.baseUrl
         }
 
 
-        async setupBaseUrl () : Promise<string> {
+        buildBaseUrl () : string {
             throw new Error("Implement me")
         }
 

@@ -18,14 +18,16 @@ AssertionWaitFor
 Exception
 LogMessage
 
+
+//---------------------------------------------------------------------------------------------------------------------
 interface TestReporterChannel {
-    onSubTestStart : (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => any
+    onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor)
 
-    onSubTestFinish : (testNodeId : LUID) => any
+    onSubTestFinish (testNodeId : LUID)
 
-    onResult : (testNodeId : LUID, result : TestResultLeaf) => any
+    onResult (testNodeId : LUID, result : TestResultLeaf)
 
-    onAssertionFinish : (testNodeId : LUID, assertion : AssertionAsyncResolution) => any
+    onAssertionFinish (testNodeId : LUID, assertion : AssertionAsyncResolution)
 }
 
 //---------------------------------------------------------------------------------------------------------------------

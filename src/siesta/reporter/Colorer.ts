@@ -1,5 +1,7 @@
 import { Base } from "../../class/Base.js"
 
+
+//---------------------------------------------------------------------------------------------------------------------
 export class Colorer extends Base {
     get noop () : Colorer { return this }
 
