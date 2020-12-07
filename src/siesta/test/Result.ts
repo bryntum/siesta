@@ -200,26 +200,6 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        pass (description : string = '', annotation : string = '') {
-            this.addResult(Assertion.new({
-                name            : 'pass',
-                passed          : true,
-                description,
-                annotation
-            }))
-        }
-
-
-        fail (description : string = '', annotation : string = '') {
-            this.addResult(Assertion.new({
-                name            : 'fail',
-                passed          : false,
-                description,
-                annotation
-            }))
-        }
-
-
         $passed   : boolean       = undefined
 
         get passed () : boolean {

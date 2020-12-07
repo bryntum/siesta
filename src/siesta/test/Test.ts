@@ -52,6 +52,26 @@ export class Test extends Mixin(
         }
 
 
+        pass (description : string = '', annotation : string = '') {
+            this.addResult(Assertion.new({
+                name            : 'pass',
+                passed          : true,
+                description,
+                annotation
+            }))
+        }
+
+
+        fail (description : string = '', annotation : string = '') {
+            this.addResult(Assertion.new({
+                name            : 'fail',
+                passed          : false,
+                description,
+                annotation
+            }))
+        }
+
+
         ok<V> (value : V, description : string = '') {
             this.addResult(Assertion.new({
                 name            : 'ok',

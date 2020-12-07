@@ -52,13 +52,15 @@ export class TestContextProviderBrowserIframe extends Mixin(
                 // for some reason TypeScript does not have `eval` on `Window`
                 const page                  = iframe.contentWindow as Window & { eval : (string) => any }
 
-                const seed = async function () {
-                    // @ts-ignore
-                    const mod       = await import('X')
+                const seed = async function (url) {
+                    const mod       = await import(url)
 
-                    window.addEventListener('message', event => {
+                    let listener
+
+                    window.addEventListener('message', listener = event => {
                         if (event.data === 'SIESTA_INIT_CONTEXT' && event.ports.length > 0) {
-                            // TODO need to import/create specific "channel" instance
+                            window.removeEventListener('message', listener)
+
                             const channel = mod.TestRecipeBrowserIframeChild.new({ media : event.ports[ 0 ] })
 
                             channel.connect()
@@ -67,7 +69,7 @@ export class TestContextProviderBrowserIframe extends Mixin(
                 }
 
                 try {
-                    await page.eval('(' + seed.toString().replace(/'X'/, '"' + childChannelModuleUrl + '"') + ')()')
+                    await page.eval(`(${ seed.toString() })("${ childChannelModuleUrl }")`)
                 } catch (e) {
                     debugger
                 }

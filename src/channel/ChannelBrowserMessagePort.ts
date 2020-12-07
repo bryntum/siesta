@@ -4,8 +4,8 @@ import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ChannelBrowserMessagePort extends Mixin(
-    [ Channel, Base ],
-    (base : ClassUnion<typeof Channel, typeof Base>) =>
+    [ Channel ],
+    (base : ClassUnion<typeof Channel>) =>
 
     class ChannelBrowserMessagePort extends base {
         media                   : MessagePort                   = undefined
