@@ -38,6 +38,7 @@ export class TestContextProviderBrowserIframe extends Mixin(
                 const iframe        = document.createElement('iframe')
 
                 iframe.src          = 'about:blank'
+                iframe.style.border = '0'
 
                 await new Promise(resolve => {
                     iframe.addEventListener('load', resolve)
@@ -71,6 +72,8 @@ export class TestContextProviderBrowserIframe extends Mixin(
                 try {
                     await page.eval(`(${ seed.toString() })("${ childChannelModuleUrl }")`)
                 } catch (e) {
+                    // exception here probably means iframe is cross-domain
+                    // TODO in such case it is supposed to opt-in somehow for communicating with test suite
                     debugger
                 }
 
