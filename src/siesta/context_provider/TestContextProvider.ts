@@ -1,5 +1,5 @@
+import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { ContextProvider } from "../../context_provider/ContextProvider.js"
 import { Logger } from "../../logger/Logger.js"
 import { Launch } from "../project/Launch.js"
 import { TestLauncherParent } from "../test/channel/TestLauncher.js"
@@ -7,13 +7,20 @@ import { TestDescriptor } from "../test/Descriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestContextProvider extends Mixin(
-    [ ContextProvider ],
-    (base : ClassUnion<typeof ContextProvider>) => {
+    [ Base ],
+    (base : ClassUnion<typeof Base>) => {
 
         class TestContextProvider extends base {
-            contextClass        : TestLauncherParent
-
             launch              : Launch        = undefined
+
+            async setup () {
+                throw new Error("Abstract method")
+            }
+
+
+            async destroy () {
+                throw new Error("Abstract method")
+            }
 
 
             get logger () : Logger {
@@ -25,15 +32,7 @@ export class TestContextProvider extends Mixin(
 
 
             async createTestContext (desc : TestDescriptor) : Promise<TestLauncherParent> {
-                const context       = await this.createContext()
-
-                // context.evaluate(() => {
-                //     globalThis.__SIESTA__ = {
-                //         communicate : 'IPC'
-                //     }
-                // })
-
-                return context
+                throw new Error("Abstract method")
             }
         }
 

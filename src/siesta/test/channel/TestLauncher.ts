@@ -1,6 +1,7 @@
 import { local, remote } from "../../../channel/Channel.js"
+import { ChannelEvaluateChild, ChannelEvaluateParent } from "../../../channel/ChannelEvaluate.js"
+import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { ExecutionContextRemote, ExecutionContextRemoteChild } from "../../../context/ExecutionContextRemote.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { globalTestEnv, Test } from "../Test.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
@@ -18,8 +19,8 @@ interface TestLauncher {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherParent extends Mixin(
-    [ TestReporterParent, ExecutionContextRemote ],
-    (base : ClassUnion<typeof TestReporterParent, typeof ExecutionContextRemote>) => {
+    [ TestReporterParent, ChannelEvaluateParent ],
+    (base : ClassUnion<typeof TestReporterParent, typeof ChannelEvaluateParent>) => {
 
         class TestLauncherParent extends base implements TestLauncher {
             @remote()
@@ -33,8 +34,8 @@ export class TestLauncherParent extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherChild extends Mixin(
-    [ TestReporterChild, ExecutionContextRemoteChild ],
-    (base : ClassUnion<typeof TestReporterChild, typeof ExecutionContextRemoteChild>) => {
+    [ TestReporterChild, ChannelEvaluateChild ],
+    (base : ClassUnion<typeof TestReporterChild, typeof ChannelEvaluateChild>) => {
 
         class TestLauncherChild extends base implements TestLauncher {
 

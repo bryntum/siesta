@@ -1,46 +1,46 @@
+import { ChannelBrowserMessagePort } from "../../../channel/ChannelBrowserMessagePort.js"
 import { ChannelSerializableJSON } from "../../../channel/ChannelSerializable.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { ExecutionContextRemoteNodeIpc, ExecutionContextRemoteNodeIpcChild } from "../../../context/ExecutionContextRemoteNodeIpc.js"
 import { TestLauncherChild, TestLauncherParent } from "../channel/TestLauncher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class TestContextNodeIpc extends Mixin(
+export class TestRecipeBrowserIframeParent extends Mixin(
     [
-        ExecutionContextRemoteNodeIpc,
+        ChannelBrowserMessagePort,
         ChannelSerializableJSON,
         TestLauncherParent
     ],
     (base : ClassUnion<
-        typeof ExecutionContextRemoteNodeIpc,
+        typeof ChannelBrowserMessagePort,
         typeof ChannelSerializableJSON,
         typeof TestLauncherParent
     >) => {
 
-        class TestContextNodeIpc extends base {
+        class TestRecipeBrowserIframeParent extends base {
         }
 
-        return TestContextNodeIpc
+        return TestRecipeBrowserIframeParent
     }
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class TestContextNodeIpcChild extends Mixin(
+export class TestRecipeBrowserIframeChild extends Mixin(
     [
-        ExecutionContextRemoteNodeIpcChild,
+        ChannelBrowserMessagePort,
         ChannelSerializableJSON,
         TestLauncherChild
     ],
     (base : ClassUnion<
-        typeof ExecutionContextRemoteNodeIpcChild,
+        typeof ChannelBrowserMessagePort,
         typeof ChannelSerializableJSON,
         typeof TestLauncherChild
     >) => {
 
-        class TestContextNodeIpcChild extends base {
+        class TestRecipeBrowserIframeChild extends base {
         }
 
-        return TestContextNodeIpcChild
+        return TestRecipeBrowserIframeChild
     }
 ) {}
 

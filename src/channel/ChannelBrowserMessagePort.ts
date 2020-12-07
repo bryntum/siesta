@@ -1,5 +1,6 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { TestRecipeBrowserIframeChild } from "../siesta/test/recipe/TestContextBrowserIframe.js"
 import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -39,9 +40,9 @@ export class ChannelBrowserMessagePort extends Mixin(
 
 
 window.addEventListener('message', event => {
-    if (event.ports.length > 0) {
+    if (event.data === 'SIESTA_INIT_CONTEXT' && event.ports.length > 0) {
         // TODO need to import/create specific "channel" instance
-        const channel = ChannelBrowserMessagePort.new({ media : event.ports[ 0 ] })
+        const channel = TestRecipeBrowserIframeChild.new({ media : event.ports[ 0 ] })
 
         channel.connect()
     }

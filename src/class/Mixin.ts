@@ -290,9 +290,15 @@ export type ClassUnion<
     C2 extends AnyConstructor = ZeroBaseClassConstructor,
     C3 extends AnyConstructor = ZeroBaseClassConstructor,
     C4 extends AnyConstructor = ZeroBaseClassConstructor,
-    C5 extends AnyConstructor = ZeroBaseClassConstructor
+    C5 extends AnyConstructor = ZeroBaseClassConstructor,
+    C6 extends AnyConstructor = ZeroBaseClassConstructor,
+    C7 extends AnyConstructor = ZeroBaseClassConstructor,
+    C8 extends AnyConstructor = ZeroBaseClassConstructor,
+    C9 extends AnyConstructor = ZeroBaseClassConstructor,
+    C10 extends AnyConstructor = ZeroBaseClassConstructor
 > =
-    (new (...input : any[]) => InstanceType<C1> & InstanceType<C2> & InstanceType<C3> & InstanceType<C4> & InstanceType<C5>) & SuppressNew<C1 & C2 & C3 & C4 & C5>
+    (new (...input : any[]) => InstanceType<C1> & InstanceType<C2> & InstanceType<C3> & InstanceType<C4> & InstanceType<C5> & InstanceType<C6> & InstanceType<C7> & InstanceType<C8> & InstanceType<C9> & InstanceType<C10>)
+        & SuppressNew<C1 & C2 & C3 & C4 & C5 & C6 & C7 & C8 & C9 & C10>
 
 
 //---------------------------------------------------------------------------------------------------------------------

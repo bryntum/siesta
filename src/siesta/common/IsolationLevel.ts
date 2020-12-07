@@ -1,5 +1,5 @@
-import { Base } from "../class/Base.js"
-import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { Base } from "../../class/Base.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 
 /*
 

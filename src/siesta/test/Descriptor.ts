@@ -1,5 +1,5 @@
 import { Base } from "../../class/Base.js"
-import { IsolationLevel } from "../../context_provider/IsolationLevel.js"
+import { IsolationLevel } from "../common/IsolationLevel.js"
 import { registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
 import { typeOf } from "../../util/Helpers.js"
 

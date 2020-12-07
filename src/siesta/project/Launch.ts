@@ -90,7 +90,7 @@ export class Launch extends Mixin(
 
             await context.launchTest(item.descriptor)
 
-            context.destroy()
+            context.disconnect()
 
             //debugger
         }
