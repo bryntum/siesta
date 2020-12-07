@@ -15,7 +15,9 @@ export class ChannelBrowserMessagePort extends Mixin(
 
 
         async doConnect () : Promise<any> {
-            this.media.addEventListener('message', this.messageListener = this.receiveMessage.bind(this))
+            this.media.addEventListener('message', this.messageListener = (e : MessageEvent) => {
+                this.receiveMessage(e.data)
+            })
 
             this.media.start()
         }
@@ -39,11 +41,11 @@ export class ChannelBrowserMessagePort extends Mixin(
 
 
 
-window.addEventListener('message', event => {
-    if (event.data === 'SIESTA_INIT_CONTEXT' && event.ports.length > 0) {
-        // TODO need to import/create specific "channel" instance
-        const channel = TestRecipeBrowserIframeChild.new({ media : event.ports[ 0 ] })
-
-        channel.connect()
-    }
-})
+// window.addEventListener('message', event => {
+//     if (event.data === 'SIESTA_INIT_CONTEXT' && event.ports.length > 0) {
+//         // TODO need to import/create specific "channel" instance
+//         const channel = TestRecipeBrowserIframeChild.new({ media : event.ports[ 0 ] })
+//
+//         channel.connect()
+//     }
+// })

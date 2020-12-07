@@ -2,6 +2,7 @@ import { it } from "../../../main.js"
 import { delay } from "../../../src/util/Helpers.js"
 import { CustomTest } from "../src/CustomTest.js"
 
+// console.log("BASIC")
 
 CustomTest.describe('Basic assertions should work', async t => {
     t.ok(true, 'True is ok')

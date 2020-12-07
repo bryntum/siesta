@@ -1,8 +1,4 @@
-import readline from "readline"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { saneSplit, SetIntervalHandler } from "../../util/Helpers.js"
-import { hideCursor, showCursor } from "../../util_nodejs/Terminal.js"
-import { TestNodeResult } from "../test/Result.js"
 import { Reporter } from "./Reporter.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -19,21 +15,22 @@ export class ReporterBrowser extends Mixin(
         // footerLines     : number                        = 0
         //
         // spinnerChars    : number                        = 0
-        //
-        //
-        // print (str : string, includeNewLine : boolean = true) {
-        //     process.stdout.write(str)
-        //
-        //     if (includeNewLine) process.stdout.write('\n')
-        //
-        //     if (this.isPrintingFooter) {
-        //         this.footerLines += Array.from(str.matchAll(/\n/g)).length
-        //
-        //         if (includeNewLine) this.footerLines++
-        //     }
-        // }
-        //
-        //
+
+
+        print (str : string, includeNewLine : boolean = true) {
+            console.log(str)
+            // process.stdout.write(str)
+            //
+            // if (includeNewLine) process.stdout.write('\n')
+            //
+            // if (this.isPrintingFooter) {
+            //     this.footerLines += Array.from(str.matchAll(/\n/g)).length
+            //
+            //     if (includeNewLine) this.footerLines++
+            // }
+        }
+
+
         // onTestSuiteStart () {
         //     process.stdout.write(hideCursor)
         //

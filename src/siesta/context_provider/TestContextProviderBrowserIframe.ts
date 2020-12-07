@@ -1,7 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TestLauncherParent } from "../test/channel/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
-import { TestRecipeBrowserIframeParent } from "../test/recipe/TestRecipeBrowserIframe.js"
+import { TestRecipeBrowserIframeChild, TestRecipeBrowserIframeParent } from "../test/recipe/TestRecipeBrowserIframe.js"
 import { TestContextProvider } from "./TestContextProvider.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -10,13 +10,6 @@ export class TestContextProviderBrowserIframe extends Mixin(
     (base : ClassUnion<typeof TestContextProvider>) => {
 
         class TestContextProviderBrowserIframe extends base {
-            childChannelClassUrl         : string            = import.meta.url
-                .replace(/^file:/, '')
-                .replace(/context_provider\/TestContextProviderBrowserIframe.js$/, 'test/context/TestContextNodeIpc.js')
-
-            childChannelClassSymbol      : string            = 'TestContextNodeIpcChild'
-
-
 
             async setup () {
                 if (document.readyState === 'complete') return
@@ -38,25 +31,53 @@ export class TestContextProviderBrowserIframe extends Mixin(
 
 
             async createTestContext (desc : TestDescriptor) : Promise<TestLauncherParent> {
+                const childChannelModuleUrl : string        = import.meta.url
+                    .replace(/^file:/, '')
+                    .replace(/context_provider\/TestContextProviderBrowserIframe.js$/, 'test/recipe/TestRecipeBrowserIframe.js')
+
                 const iframe        = document.createElement('iframe')
 
-                iframe.src          = desc.url
+                iframe.src          = 'about:blank'
 
                 await new Promise(resolve => {
-                    document.body.appendChild(iframe)
-
                     iframe.addEventListener('load', resolve)
+
+                    document.body.appendChild(iframe)
                 })
 
                 const messageChannel        = new MessageChannel()
 
-                const context       = TestRecipeBrowserIframeParent.new({ media : messageChannel.port1 })
+                const context               = TestRecipeBrowserIframeParent.new({ media : messageChannel.port1 })
 
-                iframe.contentWindow.postMessage('SIESTA_INIT_CONTEXT', '*', [ messageChannel.port2 ])
+                // for some reason TypeScript does not have `eval` on `Window`
+                const page                  = iframe.contentWindow as Window & { eval : (string) => any }
+
+                const seed = async function () {
+                    // @ts-ignore
+                    const mod       = await import('X')
+
+                    window.addEventListener('message', event => {
+                        if (event.data === 'SIESTA_INIT_CONTEXT' && event.ports.length > 0) {
+                            // TODO need to import/create specific "channel" instance
+                            const channel = mod.TestRecipeBrowserIframeChild.new({ media : event.ports[ 0 ] })
+
+                            channel.connect()
+                        }
+                    })
+                }
+
+                try {
+                    await page.eval('(' + seed.toString().replace(/'X'/, '"' + childChannelModuleUrl + '"') + ')()')
+                } catch (e) {
+                    debugger
+                }
+
+                page.postMessage('SIESTA_INIT_CONTEXT', '*', [ messageChannel.port2 ])
+
+                await context.connect()
 
                 return context
             }
-
         }
 
         return TestContextProviderBrowserIframe

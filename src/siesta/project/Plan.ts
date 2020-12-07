@@ -20,7 +20,7 @@ export class ProjectPlanItem extends Base {
 
             while (group) {
                 if (group.descriptor.url) {
-                    urlParts.push(group.descriptor.url)
+                    urlParts.push(group.descriptor.url.replace(/\/$/, ''))
 
                     group       = null
                 } else {
