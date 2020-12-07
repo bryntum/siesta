@@ -1,6 +1,5 @@
 import { local, remote } from "../../../channel/Channel.js"
 import { ChannelEvaluateChild, ChannelEvaluateParent } from "../../../channel/ChannelEvaluate.js"
-import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { globalTestEnv, Test } from "../Test.js"

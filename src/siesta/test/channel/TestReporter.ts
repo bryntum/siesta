@@ -1,5 +1,4 @@
 import { Channel, local, remote } from "../../../channel/Channel.js"
-import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { Reporter } from "../../reporter/Reporter.js"
 import { AssertionWaitFor } from "../assertion/Async.js"
@@ -32,8 +31,8 @@ interface TestReporterChannel {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestReporterParent extends Mixin(
-    [ Channel, Base ],
-    (base : ClassUnion<typeof Channel, typeof Base>) => {
+    [ Channel ],
+    (base : ClassUnion<typeof Channel>) => {
 
         class TestReporterParent extends base implements TestReporterChannel {
 
@@ -131,8 +130,8 @@ export class TestReporterParent extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestReporterChild extends Mixin(
-    [ Channel, Base ],
-    (base : ClassUnion<typeof Channel, typeof Base>) => {
+    [ Channel ],
+    (base : ClassUnion<typeof Channel>) => {
 
         class TestReporterChild extends base implements TestReporterChannel {
             @remote()
