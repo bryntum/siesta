@@ -1,6 +1,6 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { TestRecipeBrowserIframeChild } from "../siesta/test/recipe/TestContextBrowserIframe.js"
+import { TestRecipeBrowserIframeChild } from "../siesta/test/recipe/TestRecipeBrowserIframe.js"
 import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------

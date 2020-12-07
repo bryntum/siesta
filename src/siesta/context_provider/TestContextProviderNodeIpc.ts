@@ -2,7 +2,7 @@ import  child_process from "child_process"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TestLauncherParent } from "../test/channel/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
-import { TestRecipeNodeIpcParent } from "../test/recipe/TestContextNodeIpc.js"
+import { TestRecipeNodeIpcParent } from "../test/recipe/TestRecipeNodeIpc.js"
 import { TestContextProvider } from "./TestContextProvider.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -13,7 +13,7 @@ export class TestContextProviderNodeIpc extends Mixin(
         class TestContextProviderNodeIpc extends base {
             childChannelClassUrl         : string            = import.meta.url
                 .replace(/^file:/, '')
-                .replace(/context_provider\/TestContextProviderNodeIpc.js$/, 'test/recipe/TestContextNodeIpc.js')
+                .replace(/context_provider\/TestContextProviderNodeIpc.js$/, 'test/recipe/TestRecipeNodeIpc.js')
 
             childChannelClassSymbol      : string            = 'TestRecipeNodeIpcChild'
 

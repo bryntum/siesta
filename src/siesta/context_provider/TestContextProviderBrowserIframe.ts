@@ -1,7 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TestLauncherParent } from "../test/channel/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
-import { TestRecipeBrowserIframeParent } from "../test/recipe/TestContextBrowserIframe.js"
+import { TestRecipeBrowserIframeParent } from "../test/recipe/TestRecipeBrowserIframe.js"
 import { TestContextProvider } from "./TestContextProvider.js"
 
 //---------------------------------------------------------------------------------------------------------------------
