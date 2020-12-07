@@ -6,12 +6,12 @@ import { CustomTest } from "../src/CustomTest.js"
 CustomTest.describe('Basic assertions should work', async t => {
     t.ok(true, 'True is ok')
 
-    await delay(1000)
+    await delay(500)
 })
 
 
 CustomTest.describe('Basic assertions should work #2', async t => {
-    await delay(3000)
+    await delay(500)
 
     t.ok(true, 'True is ok')
 

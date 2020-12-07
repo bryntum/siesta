@@ -16,7 +16,7 @@ describe({
 
     const start     = Date.now()
 
-    await t.waitFor(() => Date.now() - start > 1000, 'Wait for 3s')
+    await t.waitFor(() => Date.now() - start > 500, 'Wait for 3s')
 
     t.it('Sub test #1', t => {
         t.ok(true, 'True is ok')
