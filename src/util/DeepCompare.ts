@@ -10,7 +10,7 @@ export class PlaceHolder extends Mixin(
 
     class PlaceHolder extends base {
 
-        equalsTo (obj : unknown) : boolean {
+        * equalsToGen (v : unknown) : Generator<Difference> {
             throw new Error("Abstract method")
         }
     }
@@ -80,24 +80,38 @@ export class DifferenceMissingArrayEntry extends Difference {
 }
 
 
-// //---------------------------------------------------------------------------------------------------------------------
-// export class CompareResult extends Base {
-//     result      : boolean       = true
-//
-//     maxDifferences  : number    = Number.MAX_SAFE_INTEGER
-//
-//     differences : Difference[]  = []
-//
-//
-//     addDifference (diff : Difference) : boolean {
-//         this.differences.push(diff)
-//
-//         if (this.differences.length >= this.maxDifferences) return true
-//
-//         return false
-//     }
-// }
+export class DifferenceFunctionSources extends Difference {
+    func1           : Function      = undefined
+    func2           : Function      = undefined
+}
 
+
+export class DifferenceRegExp extends Difference {
+    regexp1         : RegExp        = undefined
+    regexp2         : RegExp        = undefined
+
+    source          : boolean       = undefined
+    dotAll          : boolean       = undefined
+    global          : boolean       = undefined
+    ignoreCase      : boolean       = undefined
+    multiline       : boolean       = undefined
+    sticky          : boolean       = undefined
+    unicode         : boolean       = undefined
+}
+
+
+export class DifferenceDate extends Difference {
+    date1           : Date          = undefined
+    date2           : Date          = undefined
+}
+
+
+export class DifferenceValuesAreDifferent extends Difference {
+    v1          : unknown       = undefined
+    v2          : unknown       = undefined
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 export type DeepCompareOptions = {
     includePropertiesFromPrototypeChain : boolean
 }
@@ -141,7 +155,7 @@ export const compareDeepGen = function * (
     else if (type1 === 'Set') {
         yield* compareSetDeepGen(v1 as Set<unknown>, v2 as Set<unknown>, options, keyPath)
     }
-    else if (type1 == 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction') {
+    else if (type1 == 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
         yield* compareFunctionDeepGen(v1 as Function, v2 as Function, options, keyPath)
     }
     else if (type1 == 'RegExp') {
@@ -149,6 +163,10 @@ export const compareDeepGen = function * (
     }
     else if (type1 == 'Date') {
         yield* compareDateDeepGen(v1 as Date, v2 as Date, options, keyPath)
+    }
+    // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer, Promise, Generator, AsyncGenerator
+    else {
+        yield* comparePrimitivesGen(v1, v2, options, keyPath)
     }
 }
 
@@ -165,7 +183,7 @@ export const compareArrayDeepGen = function * (array1 : unknown[], array2 : unkn
     const maxLength     = Math.max(array1.length, array2.length)
 
     for (let i = minLength; i < maxLength; i++) {
-        yield DifferenceMissingArrayEntry.new({ array1, array2, missingIndex : i, missingIn : array2.length === maxLength ? '1' : '2' })
+        yield DifferenceMissingArrayEntry.new({ array1, array2, missingIndex : i, missingIn : array2.length === maxLength ? '1' : '2', keyPath })
     }
 }
 
@@ -175,13 +193,13 @@ export const compareArrayDeepGen = function * (array1 : unknown[], array2 : unkn
 export const compareSetDeepGen = function * (set1 : Set<unknown>, set2 : Set<unknown>, options : DeepCompareOptions, keyPath : PathSegment[] = []) : Generator<Difference> {
     for (const item1 of set1) {
         if (!set2.has(item1)) {
-            yield DifferenceMissingSetElement.new({ set1, set2, missingElement : item1, missingIn : '2' })
+            yield DifferenceMissingSetElement.new({ set1, set2, missingElement : item1, missingIn : '2', keyPath })
         }
     }
 
     for (const item2 of set2) {
         if (!set1.has(item2)) {
-            yield DifferenceMissingSetElement.new({ set1, set2, missingElement : item2, missingIn : '1' })
+            yield DifferenceMissingSetElement.new({ set1, set2, missingElement : item2, missingIn : '1', keyPath })
         }
     }
 }
@@ -193,7 +211,7 @@ export const compareObjectDeepGen = function * (object1 : ArbitraryObject, objec
 
     for (const [ key1, value1 ] of Object.entries(object1)) {
         if (!object2.hasOwnProperty(key1))
-            yield DifferenceMissingObjectKey.new({ object1, object2, missingKey : key1, missingIn : '2' })
+            yield DifferenceMissingObjectKey.new({ object1, object2, missingKey : key1, missingIn : '2', keyPath })
         else {
             seen.add(key1)
 
@@ -203,7 +221,7 @@ export const compareObjectDeepGen = function * (object1 : ArbitraryObject, objec
 
     for (const [ key2, value2 ] of Object.entries(object2)) {
         if (!object1.hasOwnProperty(key2))
-            yield DifferenceMissingObjectKey.new({ object1, object2, missingKey : key2, missingIn : '1' })
+            yield DifferenceMissingObjectKey.new({ object1, object2, missingKey : key2, missingIn : '1', keyPath })
         else {
             if (!seen.has(key2))
                 yield* compareDeepGen(value2, object1[ key2 ], options, keyPath.concat(PathSegment.new({ type : 'object', key : key2 })))
@@ -218,7 +236,7 @@ export const compareMapDeepGen = function * (map1 : Map<unknown, unknown>, map2 
 
     for (const [ key1, value1 ] of map1) {
         if (!map2.has(key1))
-            yield DifferenceMissingMapKey.new({ map1, map2, missingKey : key1, missingIn : '2' })
+            yield DifferenceMissingMapKey.new({ map1, map2, missingKey : key1, missingIn : '2', keyPath })
         else {
             seen.add(key1)
 
@@ -228,7 +246,7 @@ export const compareMapDeepGen = function * (map1 : Map<unknown, unknown>, map2 
 
     for (const [ key2, value2 ] of map2) {
         if (!map1.has(key2))
-            yield DifferenceMissingMapKey.new({ map1, map2, missingKey : key2, missingIn : '1' })
+            yield DifferenceMissingMapKey.new({ map1, map2, missingKey : key2, missingIn : '1', keyPath })
         else {
             if (!seen.has(key2))
                 yield* compareDeepGen(value2, map1.get(key2), options, keyPath.concat(PathSegment.new({ type : 'map', key : key2 })))
@@ -239,33 +257,40 @@ export const compareMapDeepGen = function * (map1 : Map<unknown, unknown>, map2 
 
 //---------------------------------------------------------------------------------------------------------------------
 export const compareFunctionDeepGen = function * (func1 : Function, func2 : Function, options : DeepCompareOptions, keyPath : PathSegment[] = []) : Generator<Difference> {
-    return obj1.toString() == obj2.toString() && (!strict || this.compareObjects(obj1, obj2, strict, false, true))
+    if (func1.toString() !== func2.toString())
+        yield DifferenceFunctionSources.new({ func1, func2, keyPath })
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export const compareRegExpDeepGen = function * (regexp1 : RegExp, regexp2 : RegExp, options : DeepCompareOptions, keyPath : PathSegment[] = []) : Generator<Difference> {
-    return obj1.source == obj2.source && obj1.global == obj2.global && obj1.ignoreCase == obj2.ignoreCase
-        && obj1.multiline == obj2.multiline && (!strict || this.compareObjects(obj1, obj2, strict, false, true))
+    const regexpProps   = [ 'source', 'dotAll', 'global', 'ignoreCase', 'multiline', 'sticky', 'unicode' ]
+
+    if (regexpProps.some(propertyName => regexp1[ propertyName ] !== regexp2[ propertyName])) {
+        yield DifferenceRegExp.new({
+            regexp1, regexp2,
+            ...Object.fromEntries(regexpProps.map(propertyName => [ propertyName, regexp1[ propertyName ] === regexp2[ propertyName] ])),
+            keyPath
+        })
+    }
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export const compareDateDeepGen = function * (date1 : Date, date2 : Date, options : DeepCompareOptions, keyPath : PathSegment[] = []) : Generator<Difference> {
-    return !Boolean(obj1 - obj2) && (!strict || this.compareObjects(obj1, obj2, strict, false, true))
+    if (date1.getTime() !== date2.getTime())
+        yield DifferenceDate.new({ date1, date2, keyPath })
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const comparePrimitives = (obj1 : unknown, obj2 : unknown) : boolean => {
-    if (obj1 === obj2) return true
+export const comparePrimitivesGen = function * (v1 : unknown, v2 : unknown, options : DeepCompareOptions, keyPath : PathSegment[] = []) : Generator<Difference> {
+    if (v1 !== v2) yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath })
 
-    if (obj1 instanceof PlaceHolder && obj2 instanceof PlaceHolder)
-        return obj1.equalsTo(obj2)
-    else if (obj1 instanceof PlaceHolder)
-        return obj1.equalsTo(obj2)
-    else if (obj2 instanceof PlaceHolder)
-        return obj2.equalsTo(obj1)
-
-    return false
+    // if (v1 instanceof PlaceHolder && v2 instanceof PlaceHolder)
+    //     return v1.equalsTo(v2)
+    // else if (v1 instanceof PlaceHolder)
+    //     return v1.equalsTo(v2)
+    // else if (v2 instanceof PlaceHolder)
+    //     return v2.equalsTo(v1)
 }

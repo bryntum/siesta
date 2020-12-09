@@ -18,6 +18,13 @@ project.configure({
 
 project.start(
     {
+        group       : 'Deep compare',
+
+        items       : [
+            'deep_compare/deep_compare.t.js'
+        ]
+    },
+    {
         group       : 'Serializable',
 
         items       : [
