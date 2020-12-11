@@ -23,7 +23,10 @@ describe({
 
         t.is(null, undefined, 'Null is undefined')
 
-        t.is(1, 2, '1 is 2')
+        // @ts-ignore
+        t.isDeeply(1, '2', '1 is 2')
+
+        t.isDeeply({ prop1 : 1 }, { prop1 : '2' }, '1 is 2')
 
         t.is(new Date(2010, 1, 1), new Date(2010, 1, 1), 't.is works for dates')
     })

@@ -4,7 +4,12 @@ import { Colorer } from "./Colorer.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ColorerBrowser extends Colorer {
 
-    deriveColorer (styleName : string) : Colorer {
+    deriveColorerViaMethod (method : string, ...args : unknown[]) : Colorer {
+        return this
+    }
+
+
+    deriveColorerViaProperty (styleName : string) : Colorer {
         return this
     }
 

@@ -10,3 +10,8 @@ export const isFunction = (a : any) : a is AnyFunction => {
 export const isNumber = (a : any) : a is number => {
     return Number(a) === a
 }
+
+//---------------------------------------------------------------------------------------------------------------------
+export const isString = (a : any) : a is string => {
+    return typeOf(a) === 'String'
+}

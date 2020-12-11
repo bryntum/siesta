@@ -166,7 +166,7 @@ export class ReporterTheme extends Base {
 
 
     logMessage (message : LogMessage) : string {
-        return this.c.yellow.text('⚠')
+        return this.c.yellow.text('ⓘ')
     }
 
 
@@ -199,7 +199,7 @@ export class ReporterTheme extends Base {
             ' ',
             this.c.whiteBright.text(`[${ assertion.name }]`),
             ' ',
-            assertion.description
+            assertion.annotation?.toString() ?? assertion.description
         )
 
         return text

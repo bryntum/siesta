@@ -29,6 +29,8 @@ export const isAtomicValue = (value : any) : boolean => Object(value) !== value
 //---------------------------------------------------------------------------------------------------------------------
 export const typeOf = (value : any) : string => Object.prototype.toString.call(value).slice(8, -1)
 
+//---------------------------------------------------------------------------------------------------------------------
+export const constructorNameOf = (value : any) : string => Object.getPrototypeOf(value).constructor.name
 
 //---------------------------------------------------------------------------------------------------------------------
 export type PartialWOC<T>       = Omit<Partial<T>, 'constructor'>

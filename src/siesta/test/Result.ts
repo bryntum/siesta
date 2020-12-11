@@ -2,6 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { exclude, registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
+import { XmlElement } from "../../util/XmlElement.js"
 import { TestDescriptor } from "./Descriptor.js"
 import { LUID, luid } from "./LUID.js"
 
@@ -64,7 +65,7 @@ export class Assertion extends Mixin(
 
         description     : string            = ''
 
-        annotation      : string            = ''
+        annotation      : XmlElement        = undefined
     }
 ) {}
 

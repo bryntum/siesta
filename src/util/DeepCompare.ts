@@ -1,6 +1,7 @@
 import { Base } from "../class/Base.js"
 import { AnyConstructor, Mixin } from "../class/Mixin.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "./Helpers.js"
+import { span, xml, XmlNode } from "./XmlElement.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -21,6 +22,25 @@ export class PathSegment extends Base {
     type            : 'object' | 'array' | 'map'    = 'object'
 
     key             : unknown                       = undefined
+
+    asXmlNode () : XmlNode[] {
+        let str : string    = undefined
+
+        switch (this.type) {
+            case "object" :
+                str = String(this.key)
+                break
+
+            case "array" :
+                str = `[ ${ this.key } ]`
+                break
+
+            case "map" :
+                str = `.get(${ this.key })`
+        }
+
+        return [ str ]
+    }
 }
 
 
@@ -28,6 +48,19 @@ export class PathSegment extends Base {
 //---------------------------------------------------------------------------------------------------------------------
 export class Difference extends Base {
     keyPath     : PathSegment[] = []
+
+    asXmlNode () : XmlNode[] {
+        throw new Error("Abstract method")
+    }
+
+
+    keyPathXmlNode () : XmlNode {
+        if (this.keyPath.length === 0) {
+            return span("difference_key_path", 'root')
+        } else {
+            return span("difference_key_path", ...this.keyPath.flatMap(pathSegment => pathSegment.asXmlNode()))
+        }
+    }
 }
 
 
@@ -37,6 +70,25 @@ export class DifferenceTypesAreDifferent extends Difference {
 
     type1       : string        = ''
     type2       : string        = ''
+
+
+    asXmlNode () : XmlNode[] {
+        return [
+            'The values at ', this.keyPathXmlNode(), ' have different types:',
+            xml({ tag : 'ul', class : 'difference_got_expected', childNodes : [
+                xml({ tag : 'li', class : 'difference_got', childNodes : [
+                    span('difference_title', 'Got      : '),
+                    span('difference_value', this.type1),
+                    ' ',
+                    span('difference_value', this.type1)
+                ] }),
+                xml({ tag : 'li', class : 'difference_expected', childNodes : [
+                    span('difference_title', 'Expected : '),
+                    span('difference_value', this.type2)
+                ] })
+            ] })
+        ]
+    }
 }
 
 

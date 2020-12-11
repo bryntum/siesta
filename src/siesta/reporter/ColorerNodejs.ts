@@ -7,7 +7,12 @@ export class ColorerNodejs extends Colorer {
     currentChalk    : any               = chalk
 
 
-    deriveColorer (styleName : string) : Colorer {
+    deriveColorerViaMethod (method : string, ...args : unknown[]) : Colorer {
+        return ColorerNodejs.new({ currentChalk : this.currentChalk[ method ](...args) })
+    }
+
+
+    deriveColorerViaProperty (styleName : string) : Colorer {
         return ColorerNodejs.new({ currentChalk : this.currentChalk[ styleName ] })
     }
 

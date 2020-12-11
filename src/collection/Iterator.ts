@@ -336,6 +336,11 @@ export class ChainedIteratorClass<T> {
     }
 
 
+    take (howMany : number) : T[] {
+        return Array.from(takeWhile(this, (el, index) => index < howMany))
+    }
+
+
     * [Symbol.iterator] () : IterableIterator<T> {
         let iterable    = this.iterable
 

@@ -2,16 +2,27 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { Async } from "./assertion/Async.js"
+import { Compare } from "./assertion/Compare.js"
 import { TestLauncherChild } from "./channel/TestLauncher.js"
 import { TestReporterChild } from "./channel/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, LogMessage, TestNodeResult, TestResult } from "./Result.js"
+import { Assertion, AssertionAsyncResolution, LogMessage, TestNodeResult, TestResult } from "./Result.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Test extends Mixin(
-    [ TestNodeResult, Logger, Async ],
-    (base : ClassUnion<typeof TestNodeResult, typeof Logger, typeof Async>) =>
+    [
+        TestNodeResult,
+        Logger,
+        Async,
+        Compare
+    ],
+    (base : ClassUnion<
+        typeof TestNodeResult,
+        typeof Logger,
+        typeof Async,
+        typeof Compare
+    >) =>
 
     class Test extends base {
         // "upgrade" types from TreeNode
@@ -52,39 +63,19 @@ export class Test extends Mixin(
         }
 
 
-        pass (description : string = '', annotation : string = '') {
+        pass (description : string = '') {
             this.addResult(Assertion.new({
                 name            : 'pass',
                 passed          : true,
-                description,
-                annotation
-            }))
-        }
-
-
-        fail (description : string = '', annotation : string = '') {
-            this.addResult(Assertion.new({
-                name            : 'fail',
-                passed          : false,
-                description,
-                annotation
-            }))
-        }
-
-
-        ok<V> (value : V, description : string = '') {
-            this.addResult(Assertion.new({
-                name            : 'ok',
-                passed          : Boolean(value),
                 description
             }))
         }
 
 
-        is<V> (value1 : V, value2 : V, description : string = '') {
+        fail (description : string = '') {
             this.addResult(Assertion.new({
-                name            : 'is',
-                passed          : value1 === value2,
+                name            : 'fail',
+                passed          : false,
                 description
             }))
         }
