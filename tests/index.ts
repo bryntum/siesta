@@ -25,6 +25,13 @@ project.start(
         ]
     },
     {
+        group       : 'Serializer',
+
+        items       : [
+            'serializer/serializer.t.js'
+        ]
+    },
+    {
         group       : 'Serializable',
 
         items       : [

@@ -19,7 +19,7 @@ export class DataVisitor extends Mixin(
                 this.visitOutOfDepthValue(value, depth + 1)
             }
             else if (isAtomicValue(value)) {
-                this.visitAtomicValue(value, depth + 1)
+                this.visitAtomicValueEntry(value, depth + 1)
             }
             else if (this.visited.has(value)) {
                 this.visitAlreadyVisited(value, depth + 1)
@@ -34,6 +34,15 @@ export class DataVisitor extends Mixin(
 
 
         visitAtomicValue (value : unknown, depth : number) {
+        }
+
+
+        visitAtomicValueEntry (value : unknown, depth : number) {
+            const specificVisitorMethod     = `visit${ uppercaseFirst(typeOf(value)) }`
+
+            const visitMethod       = this[ specificVisitorMethod ] || this.visitAtomicValue
+
+            visitMethod.call(this, value, depth)
         }
 
 
@@ -53,17 +62,25 @@ export class DataVisitor extends Mixin(
 
 
         visitObject (object : object, depth : number) {
-            Object.entries(object).forEach(([ key, value ], index) => {
-                this.visitObjectEntryKey(key, value, object, index, depth)
-                this.visitObjectEntryKey(key, value, object, index, depth)
+            const entries = Object.entries(object)
+
+            entries.forEach(([ key, value ], index) => {
+                this.visitObjectEntryKey(key, value, object, index, entries, depth)
+                this.visitObjectEntryValue(key, value, object, index, entries, depth)
             })
         }
 
-        visitObjectEntryKey (key : ArbitraryObjectKey, value : unknown, object : object, index : number, depth : number) {
+        visitObjectEntryKey (
+            key : ArbitraryObjectKey, value : unknown, object : object, index : number,
+            entries : [ ArbitraryObjectKey, unknown ][], depth : number
+        ) {
             this.visitAtomicValue(key, depth)
         }
 
-        visitObjectEntryValue (key : ArbitraryObjectKey, value : unknown, object : object, index : number, depth : number) {
+        visitObjectEntryValue (
+            key : ArbitraryObjectKey, value : unknown, object : object, index : number,
+            entries : [ ArbitraryObjectKey, unknown ][], depth : number
+        ) {
             this.visit(value, depth)
         }
 

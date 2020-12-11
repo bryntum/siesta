@@ -1,6 +1,7 @@
 import { Base } from "../class/Base.js"
 import { AnyConstructor, Mixin } from "../class/Mixin.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "./Helpers.js"
+import { Serializer } from "./Serializer.js"
 import { span, xml, XmlNode } from "./XmlElement.js"
 
 
@@ -80,11 +81,13 @@ export class DifferenceTypesAreDifferent extends Difference {
                     span('difference_title', 'Got      : '),
                     span('difference_value', this.type1),
                     ' ',
-                    span('difference_value', this.type1)
+                    span('difference_value', Serializer.serialize(this.v1, 4, 4))
                 ] }),
                 xml({ tag : 'li', class : 'difference_expected', childNodes : [
                     span('difference_title', 'Expected : '),
-                    span('difference_value', this.type2)
+                    span('difference_value', this.type2),
+                    ' ',
+                    span('difference_value', Serializer.serialize(this.v2, 4, 4))
                 ] })
             ] })
         ]
