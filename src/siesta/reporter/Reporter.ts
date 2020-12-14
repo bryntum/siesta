@@ -7,39 +7,9 @@ import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
 import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
+import { Printer } from "./Printer.js"
+import { randomSpinner, Spinner } from "./Spinner.js"
 
-// //---------------------------------------------------------------------------------------------------------------------
-// export type Color   = string
-//
-// //---------------------------------------------------------------------------------------------------------------------
-// export class Style extends Base {
-//     fgColor         : Color         = ''
-//     bgColor         : Color         = ''
-// }
-//
-// //---------------------------------------------------------------------------------------------------------------------
-// export class IncreaseIndent extends Base {
-//     by              : number        = 0
-// }
-//
-// //---------------------------------------------------------------------------------------------------------------------
-// export class SetIndent extends Base {
-//     to              : number        = 0
-// }
-//
-//
-// //---------------------------------------------------------------------------------------------------------------------
-// export class CancelPreviousIndent extends Base {
-// }
-//
-//
-// //---------------------------------------------------------------------------------------------------------------------
-// export type ReportingCommand    = string | Style | IncreaseIndent | SetIndent | CancelPreviousIndent
-//
-//
-// export class ReportingSequence extends Base {
-//     commands        : ReportingCommand[]        = []
-// }
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TextBlock extends Base {
@@ -80,39 +50,6 @@ export class TextBlock extends Base {
     }
 }
 
-//---------------------------------------------------------------------------------------------------------------------
-export class Spinner extends Base {
-    interval        : number        = 200
-
-    frames          : string[]      = []
-
-    currentFrameIndex   : number    = 0
-
-
-    get frame () : string {
-        return this.frames[ this.currentFrameIndex ]
-    }
-
-
-    tick () {
-        this.currentFrameIndex++
-
-        if (this.currentFrameIndex >= this.frames.length) this.currentFrameIndex = 0
-    }
-}
-
-
-export const clockSpinner = Spinner.new({
-    frames  : [
-        "🕛", "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚"
-    ]
-})
-
-export const arrowSpinner = Spinner.new({
-    frames  : [
-        "←", "↖", "↑", "↗", "→", "↘", "↓", "↙"
-    ]
-})
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterTheme extends Base {
@@ -196,10 +133,10 @@ export class ReporterTheme extends Base {
 
         text.push(
             assertion.passed ? this.assertionPass(assertion) : this.assertionFail(assertion),
+            // ' ',
+            // this.c.whiteBright.text(`[${ assertion.name }]`),
             ' ',
-            this.c.whiteBright.text(`[${ assertion.name }]`),
-            ' ',
-            assertion.annotation?.toString() ?? assertion.description
+            assertion.annotation ? this.reporter.xmlElToString(assertion.annotation) : assertion.description
         )
 
         return text
@@ -295,8 +232,8 @@ export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
-    [ Base ],
-    (base : ClassUnion<typeof Base>) => {
+    [ Printer, Base ],
+    (base : ClassUnion<typeof Printer, typeof Base>) => {
 
     class Reporter extends base {
         launch              : Launch                    = undefined
@@ -313,7 +250,7 @@ export class Reporter extends Mixin(
         c                   : Colorer                   = undefined
         t                   : ReporterTheme             = ReporterTheme.new({ reporter : this })
 
-        spinner             : Spinner                   = clockSpinner
+        spinner             : Spinner                   = randomSpinner()
 
         startTime           : Date                      = undefined
 

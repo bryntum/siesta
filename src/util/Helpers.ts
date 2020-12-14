@@ -29,19 +29,24 @@ export const isAtomicValue = (value : any) : boolean => Object(value) !== value
 //---------------------------------------------------------------------------------------------------------------------
 export const typeOf = (value : any) : string => Object.prototype.toString.call(value).slice(8, -1)
 
+
 //---------------------------------------------------------------------------------------------------------------------
 export const constructorNameOf = (value : any) : string => Object.getPrototypeOf(value).constructor.name
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export type PartialWOC<T>       = Omit<Partial<T>, 'constructor'>
 
+
 //---------------------------------------------------------------------------------------------------------------------
 export type OrPromise<T>        = T | Promise<T>
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export type ArbitraryObjectKey  = string | number | symbol
 
 export type ArbitraryObject     =  { [ key in ArbitraryObjectKey ] : unknown }
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
@@ -146,3 +151,8 @@ export const saneSplit = function (str : string, split : string | RegExp) : stri
     return str.split(split)
 }
 
+
+//---------------------------------------------------------------------------------------------------------------------
+export const randomElement = <V>(array : V[]) : V => {
+    return array[ Math.floor(array.length * Math.random()) ]
+}

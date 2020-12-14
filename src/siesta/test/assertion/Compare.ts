@@ -84,7 +84,7 @@ const assertion_source = (line : number, file : string) : XmlElement =>
     ]})
 
 const differenceTemplate = (difference : Difference) : XmlElement => {
-    return xml({ tag : 'li', class : 'is_deeply_difference', childNodes : difference.asXmlNode() })
+    return xml({ tag : 'li', class : 'difference', childNodes : difference.asXmlNode() })
 }
 
 
