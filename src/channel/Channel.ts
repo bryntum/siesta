@@ -75,6 +75,7 @@ export const local = function (message : Partial<Message> = Message.new()) : Met
     }
 }
 
+// TODO rename "Channel" to "Port"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Channel extends Mixin(

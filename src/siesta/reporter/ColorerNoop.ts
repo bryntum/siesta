@@ -2,7 +2,7 @@ import { Colorer } from "./Colorer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ColorerBrowser extends Colorer {
+export class ColorerNoop extends Colorer {
 
     deriveColorerViaMethod (method : string, ...args : unknown[]) : Colorer {
         return this

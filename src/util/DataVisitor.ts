@@ -1,6 +1,8 @@
 import { AnyConstructor, Mixin } from "../class/Mixin.js"
 import { ArbitraryObjectKey, isAtomicValue, typeOf, uppercaseFirst } from "./Helpers.js"
 
+// TODO should return from every method similar to how its done in the Data.Visitor2
+// this will allow to clone the structure for example
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DataVisitor extends Mixin(

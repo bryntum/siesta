@@ -4,7 +4,7 @@ import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { TestContextProviderBrowserIframe } from "../context_provider/TestContextProviderBrowserIframe.js"
 import { Colorer } from "../reporter/Colorer.js"
-import { ColorerBrowser } from "../reporter/ColorerBrowser.js"
+import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { ReporterBrowser } from "../reporter/ReporterBrowser.js"
 import { Project } from "./Project.js"
@@ -20,7 +20,7 @@ export class ProjectBrowser extends Mixin(
         logger          : Logger            = LoggerConsole.new({ logLevel : LogLevel.warn })
 
         reporterClass   : typeof Reporter   = ReporterBrowser
-        colorerClass    : typeof Colorer    = ColorerBrowser
+        colorerClass    : typeof Colorer    = ColorerNoop
 
 
         testContextProviderConstructors   : (typeof TestContextProvider)[]      = [ TestContextProviderBrowserIframe ]
