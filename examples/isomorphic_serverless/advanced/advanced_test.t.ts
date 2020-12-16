@@ -26,7 +26,7 @@ describe({
         // @ts-ignore
         t.isDeeply(1, '2', '1 is 2')
 
-        t.isDeeply({ prop1 : 1 }, { prop1 : '2' }, '1 is 2')
+        t.isDeeply({ prop1 : 1, prop2 : new Date() }, { prop1 : '2', prop2 : 11 }, '1 is 2')
 
         t.is(new Date(2010, 1, 1), new Date(2010, 1, 1), 't.is works for dates')
     })

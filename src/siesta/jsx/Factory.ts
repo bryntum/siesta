@@ -1,9 +1,21 @@
-import { isArray } from "../../util/Typeguards.js"
+import { isArray, isString } from "../../util/Typeguards.js"
 import { XmlElement, XmlNode, XmlStream } from "./XmlElement.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 const FragmentSymbol  = Symbol('Fragment')
+
+const normalizeXmlStream    = (stream : XmlStream[]) : XmlStream => {
+    return stream
+        .flat(Number.MAX_SAFE_INTEGER)
+        .filter(el => el !== false && el !== undefined && el !== null)
+        .map(el => {
+            if (isString(el) || (el instanceof XmlElement))
+                return el
+            else
+                return String(el)
+        })
+}
 
 
 export namespace SiestaJSX {
@@ -15,9 +27,13 @@ export namespace SiestaJSX {
         : XmlStream
     {
         if (tagName === FragmentSymbol) {
-            return children
+            return normalizeXmlStream(children)
         } else {
-            return XmlElement.new({ tagName : tagName, attributes : attributes, childNodes : children.flat(Number.MAX_SAFE_INTEGER) })
+            return XmlElement.new({
+                tagName     : tagName,
+                attributes  : attributes,
+                childNodes  : normalizeXmlStream(children) as XmlNode[]
+            })
         }
     }
 

@@ -3,6 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
+import { SiestaJSX } from "../jsx/Factory.js"
 import { span, xml, XmlElement, XmlNode, XmlStream } from "../jsx/XmlElement.js"
 import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
@@ -10,7 +11,6 @@ import { Assertion, AssertionAsyncResolution, LogMessage, Result, TestNodeResult
 import { Colorer } from "./Colorer.js"
 import { Printer } from "./Printer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
-
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TextBlock extends Base {
@@ -155,16 +155,17 @@ export class ReporterTheme extends Base {
     }
 
 
-    assertionTemplate (assertion : Assertion) : XmlNode {
-        let text : XmlElement     = XmlElement.new({ tagName : 'div', class : 'assertion' })
-
-        text.appendChild(
-            assertion.passed ? this.assertionPass(assertion) : this.assertionFail(assertion),
-            ' ',
-            assertion.description
-        )
-
-        return text
+    assertionTemplate (assertion : Assertion) : XmlStream {
+        return <div class="assertion">
+            <span class={`assertion_icon ${ assertion.passed ? 'assertion_icon_passed' : 'assertion_icon_failed' }`}>
+                { assertion.passed ? '✔' : '✘' }
+            </span>
+            { ' ' }
+            [<span class="assertion_name">{ assertion.name }</span> at line <span class="assertion_source_line">{ String(assertion.sourceLine) }</span>]
+            { ' ' }
+            <span class="assertion_description">{ assertion.description }</span>
+            { assertion.annotation }
+        </div>
     }
 
 
@@ -308,23 +309,21 @@ export class Reporter extends Mixin(
                 nodesToShow.forEach((result, index) => {
                     const isLast            = index === nodesToShow.length - 1
 
-                    node.appendChild(
-                        xml({ tagName : 'leaf', childNodes: [
-                            (result instanceof Assertion)
-                                ?
-                                    this.t.assertionTemplate(result)
-                                :
-                                    (result instanceof TestNodeResult)
+                    node.appendChild(<leaf>{
+                        (result instanceof Assertion)
+                            ?
+                                this.t.assertionTemplate(result)
+                            :
+                                (result instanceof TestNodeResult)
+                                    ?
+                                        this.testNodeTemplateXml(result, isLast)
+                                    :
+                                    (result instanceof LogMessage)
                                         ?
-                                            this.testNodeTemplateXml(result, isLast)
+                                            this.t.logMessageTemplate(result)
                                         :
-                                        (result instanceof LogMessage)
-                                            ?
-                                                this.t.logMessageTemplate(result)
-                                            :
-                                                span('', 'Unknown element')
-                        ] })
-                    )
+                                            span('', 'Unknown element')
+                    }</leaf>)
                 })
             }
 

@@ -65,6 +65,9 @@ export class Assertion extends Mixin(
 
         description     : string            = ''
 
+        sourceFile      : string            = 'some/source/file.js'
+        sourceLine      : number            = 123
+
         annotation      : XmlStream         = undefined
     }
 ) {}
