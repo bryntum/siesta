@@ -59,36 +59,3 @@ export class Compare extends Mixin(
         }
     }
 ) {}
-
-
-
-
-//---------------------------------------------------------------------------------------------------------------------
-/* samples of failing assertions:
-
-is:
-
-[is] Assertion description at line 537 of `source/file.t.js`
-got      : 123
-expected : 1234
-
-
-isDeeply:
-
-[isDeeply] Assertion description at line 537 of `source/file.t.js`
-
-Provided value is different from the expected. List of differences:
-
-- prop1[ 5 ] is different:
-    got      : 'asd'
-    expected : 'das'
-- prop1.prop2 is an array of length 5 and expected array has length of 3
-    extra elements [3..4]: [ 13, 11 ] [[no more than 5]]
-
-- prop2.prop3 is an array of length 3 and expected array has length of 5
-    missing elements [3..4]: [ 13, 11 ] [[no more than 5]]
-
-- prop2.get({ id : 13, ... }[[no more than 2, prefer `id/type/key/`).prop3[ 4 ] is different:
-    got      : 'asd'
-    expected : 'das'
- */

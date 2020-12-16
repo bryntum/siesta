@@ -4,7 +4,7 @@ import { LogLevel } from "../../logger/Logger.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
 import { SiestaJSX } from "../jsx/Factory.js"
-import { span, xml, XmlElement, XmlNode, XmlStream } from "../jsx/XmlElement.js"
+import { streamToElement, XmlElement, XmlStream } from "../jsx/XmlElement.js"
 import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
 import { Assertion, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
@@ -102,48 +102,39 @@ export class ReporterTheme extends Base {
     }
 
 
-    testFilePass (testNode : TestNodeResult) : XmlNode {
-        return span('test_file_pass', ' PASS ')
+    testFilePass (testNode : TestNodeResult) : XmlStream {
+        return <span class='test_file_pass'> PASS </span>
     }
 
-    testFileFail (testNode : TestNodeResult) : XmlNode {
-        return span('test_file_fail', ' FAIL ')
+    testFileFail (testNode : TestNodeResult) : XmlStream {
+        return <span class='test_file_fail'> FAIL </span>
     }
 
-    testFileRunning (testNode : TestNodeResult) : string {
-        return this.c.yellowBright.inverse.text(' RUNS ')
+    subTestPass (testNode : TestNodeResult) : XmlStream {
+        return <span class='sub_test_pass'>✔</span>
     }
 
-
-    subTestPass (testNode : TestNodeResult) : XmlNode {
-        return span('sub_test_pass', '✔')
-    }
-
-    subTestFail (testNode : TestNodeResult) : XmlNode {
-        return span('sub_test_fail', '✘')
+    subTestFail (testNode : TestNodeResult) : XmlStream {
+        return <span class='sub_test_fail'>✘</span>
     }
 
 
-    assertionPass (assertion : Assertion) : XmlNode {
-        return span('this.c.green.text', '✔')
-    }
-
-    assertionFail (assertion : Assertion) : XmlNode {
-        return span('this.c.red.text', '✘')
+    logMessage (message : LogMessage) : XmlStream {
+        return <span class='this.c.yellow.text'>ⓘ</span>
     }
 
 
-    logMessage (message : LogMessage) : XmlNode {
-        return span('this.c.yellow.text', 'ⓘ')
-    }
-
-
-    testNodeState (testNode : TestNodeResult) : XmlNode {
+    testNodeState (testNode : TestNodeResult) : XmlStream {
         if (testNode.isRoot) {
             return testNode.passed ? this.testFilePass(testNode) : this.testFileFail(testNode)
         } else {
             return testNode.passed ? this.subTestPass(testNode) : this.subTestFail(testNode)
         }
+    }
+
+
+    testFileRunning (testNode : TestNodeResult) : string {
+        return this.c.yellowBright.inverse.text(' RUNS ')
     }
 
 
@@ -169,39 +160,21 @@ export class ReporterTheme extends Base {
     }
 
 
-    logMessageMethod (message : LogMessage) : string {
-        switch (message.level) {
-            case LogLevel.error :
-                return this.c.red.inverse.text(` ${ LogLevel[ message.level ].toUpperCase() } `)
-            case LogLevel.warn :
-                return this.c.redBright.inverse.text(` ${ LogLevel[ message.level ].toUpperCase() } `)
-
-            default :
-                return this.c.inverse.text(` ${ LogLevel[ message.level ].toUpperCase() } `)
-        }
+    logMessageTemplate (message : LogMessage) : XmlStream {
+        return <div class="log_message">
+            <span class='log_message_icon'>ⓘ</span>
+            { ' ' }
+            <span class={ `log_message_${ LogLevel[ message.level ].toLowerCase() }` }>{ LogLevel[ message.level ].toUpperCase() }</span>
+            { ' ' }
+            { message.message }
+        </div>
     }
 
 
-    logMessageTemplate (message : LogMessage) : XmlElement {
-        return span('',
-            this.logMessage(message),
-            ' ',
-            this.c.whiteBright.text(this.logMessageMethod(message)),
-            ' ',
-            message.message
-        )
-    }
-
-
-    treeLine (str : string) : string {
-        return this.c.gray.text(str)
-    }
-
-
-    testSuiteHeader () : XmlElement {
-        return xml({ tagName : 'div', childNodes : [
-            `Launching test suite: ${ this.c.underline.text(this.project.title) }`
-        ] })
+    testSuiteHeader () : XmlStream {
+        return <div>
+            Launching test suite: <span class="project_title">{ this.project.title }</span>
+        </div>
     }
 
 
@@ -322,7 +295,7 @@ export class Reporter extends Mixin(
                                         ?
                                             this.t.logMessageTemplate(result)
                                         :
-                                            span('', 'Unknown element')
+                                            <span>Unknown element</span>
                     }</leaf>)
                 })
             }
@@ -360,7 +333,7 @@ export class Reporter extends Mixin(
         onTestSuiteStart () {
             this.startTime      = new Date()
 
-            this.write(this.t.testSuiteHeader())
+            this.write(streamToElement(this.t.testSuiteHeader()))
         }
 
 

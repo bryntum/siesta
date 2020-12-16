@@ -77,15 +77,9 @@ const escapeTable = {
 
 export const escapeXml = (xmlStr : string) : string => xmlStr.replace(/[&<>"']/g, match => escapeTable[ match ])
 
-//---------------------------------------------------------------------------------------------------------------------
-// noise reducers
-export const xml = (props? : Partial<XmlElement>) : XmlElement => XmlElement.new(props)
-
-export const span = (cls : string | string[], ...childNodes : XmlNode[]) : XmlElement => XmlElement.new({ tagName : 'span', class : cls, childNodes })
-
 
 //---------------------------------------------------------------------------------------------------------------------
-const streamToElement   = (stream : XmlStream) : XmlElement => {
+export const streamToElement   = (stream : XmlStream) : XmlElement => {
     if (isString(stream)) {
         return <span>{ stream }</span> as XmlElement
     }
