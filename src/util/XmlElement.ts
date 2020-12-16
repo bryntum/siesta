@@ -34,8 +34,8 @@ export class XmlElement extends Mixin(
         }
 
 
-        appendChild (child : XmlNode) : XmlNode {
-            this.childNodes.push(child)
+        appendChild (...child : XmlNode[]) : XmlNode[] {
+            this.childNodes.push(...child)
 
             return child
         }

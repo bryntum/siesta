@@ -2,8 +2,9 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
-import { XmlElement } from "../../util/XmlElement.js"
+import { XmlElement, XmlNode } from "../../util/XmlElement.js"
 import { Colorer } from "./Colorer.js"
+import { TextBlock } from "./Reporter.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -29,24 +30,70 @@ export class Printer extends Mixin(
 
         c           : Colorer       = undefined
 
+        treeIndentationLevel        : number    = 2
 
-        print (el : XmlElement) {
+
+        print (str : string) {
             throw new Error("Abstract method")
         }
 
 
-        xmlElToString (el : XmlElement) : string {
-            const res   = el.childNodes.map(node => {
-                if (isString(node)) {
-                    return node
-                } else {
-                    return this.xmlElToString(node)
-                }
-            })
+        render (el : XmlNode) : TextBlock {
+            if (isString(el)) {
+                const res   = TextBlock.new()
 
-            const c     = this.getRulesFor(el).reduce((colorer, rule) => rule(colorer), this.c)
+                res.push(el)
 
-            return c.text(res.join(''))
+                return res
+            } else {
+                const res   = TextBlock.new(/*{ c : this.c, rules : this.getRulesFor(el) }*/)
+
+                let context : 'inline' | 'opened_block' | 'closed_block' = 'opened_block'
+
+                el.childNodes.forEach((node, index, array) => {
+                    // TODO last node can be a string?
+                    const isLast        = index === array.length - 1
+                    const block         = this.render(node)
+
+                    if (el.tag === 'ul' && !isString(node) && node.tag === 'li') {
+                        block.indentMut(this.treeIndentationLevel)
+                    }
+
+                    if (el.tag === 'tree' && !isString(node) && node.tag === 'leaf') {
+                        block.indentAsTreeLeafMut(this.treeIndentationLevel, isLast)
+                    }
+
+                    if (this.getDisplayType(node) === 'inline') {
+                        context         = 'inline'
+                    } else {
+                        if (context === 'inline' || context === 'closed_block') {
+                            context         = 'closed_block'
+
+                            block.text.unshift([])
+                        } else if (context === 'opened_block') {
+                            context         = 'closed_block'
+                        }
+                    }
+
+                    res.pullFrom(block)
+                })
+
+                res.colorizeMut(this.getRulesFor(el).reduce((colorer, rule) => rule(colorer), this.c))
+
+                return res
+            }
+        }
+
+
+        getDisplayType (el : XmlNode) : 'block' | 'inline' {
+            if (isString(el)) {
+                return 'inline'
+            } else {
+                if (el.tag === 'div' || el.tag === 'ul' || el.tag === 'li' || el.tag === 'tree' || el.tag === 'leaf')
+                    return 'block'
+                else
+                    return 'inline'
+            }
         }
 
 
@@ -57,8 +104,8 @@ export class Printer extends Mixin(
         }
 
 
-        write (str : string) {
-            throw new Error("Abstract method")
+        write (el : XmlElement) {
+            this.print(this.render(el).toString())
         }
     }
 ){}
@@ -75,3 +122,10 @@ defaultStyles.add('assertion_source_line', c => c.keyword('yellow'))
 defaultStyles.add('assertion_source_file', c => c.keyword('cyan'))
 defaultStyles.add('difference', c => c.keyword('gray'))
 defaultStyles.add('difference_key_path', c => c.keyword('white'))
+
+defaultStyles.add('test_file_pass', c => c.keyword('green').inverse)
+defaultStyles.add('test_file_fail', c => c.keyword('red').inverse)
+
+defaultStyles.add('sub_test_pass', c => c.keyword('green'))
+defaultStyles.add('sub_test_fail', c => c.keyword('red'))
+

@@ -3,9 +3,10 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
+import { span, xml, XmlElement, XmlNode } from "../../util/XmlElement.js"
 import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
-import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
+import { Assertion, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
 import { Printer } from "./Printer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
@@ -41,12 +42,42 @@ export class TextBlock extends Base {
 
 
     pullFrom (another : TextBlock) {
-        this.text.push(...another.text)
+        const [ firstLine, ...otherLines ]  = another.text
+
+        this.text[ this.text.length - 1 ].push(...firstLine)
+
+        this.text.push(...otherLines)
     }
 
 
     toString () : string {
         return this.text.map(parts => parts.join('')).join('\n')
+    }
+
+
+    colorizeMut (c : Colorer) {
+        this.text.forEach((line, index) => this.text[ index ] = [ c.text(line.join('')) ])
+    }
+
+
+    indentMut (howMany : number) {
+        const indenter  = ' '.repeat(howMany)
+
+        this.text.forEach(line => line.unshift(indenter))
+    }
+
+
+    indentAsTreeLeafMut (howMany : number, isLast : boolean) {
+        const indenterPlain     = ' '.repeat(howMany - 1)
+        const indenterTree      = '─'.repeat(howMany - 1)
+
+        this.text.forEach((line, index) => {
+            if (index === 0) {
+                line.unshift(isLast ? '└' + indenterTree : '├' + indenterTree)
+            } else {
+                line.unshift(isLast ? ' ' + indenterPlain : '│' + indenterPlain)
+            }
+        })
     }
 }
 
@@ -71,12 +102,12 @@ export class ReporterTheme extends Base {
     }
 
 
-    testFilePass (testNode : TestNodeResult) : string {
-        return this.c.green.inverse.text(' PASS ')
+    testFilePass (testNode : TestNodeResult) : XmlNode {
+        return span('test_file_pass', ' PASS ')
     }
 
-    testFileFail (testNode : TestNodeResult) : string {
-        return this.c.red.inverse.text(' FAIL ')
+    testFileFail (testNode : TestNodeResult) : XmlNode {
+        return span('test_file_fail', ' FAIL ')
     }
 
     testFileRunning (testNode : TestNodeResult) : string {
@@ -84,38 +115,34 @@ export class ReporterTheme extends Base {
     }
 
 
-    subTestPass (testNode : TestNodeResult) : string {
-        return this.c.green.text('✔')
+    subTestPass (testNode : TestNodeResult) : XmlNode {
+        return span('sub_test_pass', '✔')
     }
 
-    subTestFail (testNode : TestNodeResult) : string {
-        return this.c.red.text('✘')
-    }
-
-
-    assertionPass (assertion : Assertion) : string {
-        return this.c.green.text('✔')
-    }
-
-    assertionFail (assertion : Assertion) : string {
-        return this.c.red.text('✘')
+    subTestFail (testNode : TestNodeResult) : XmlNode {
+        return span('sub_test_fail', '✘')
     }
 
 
-    logMessage (message : LogMessage) : string {
-        return this.c.yellow.text('ⓘ')
+    assertionPass (assertion : Assertion) : XmlNode {
+        return span('this.c.green.text', '✔')
+    }
+
+    assertionFail (assertion : Assertion) : XmlNode {
+        return span('this.c.red.text', '✘')
     }
 
 
-    testNodeState (testNode : TestNodeResult) : string {
-        if (testNode.state === 'completed') {
-            if (testNode.isRoot) {
-                return testNode.passed ? this.testFilePass(testNode) : this.testFileFail(testNode)
-            } else {
-                return testNode.passed ? this.subTestPass(testNode) : this.subTestFail(testNode)
-            }
+    logMessage (message : LogMessage) : XmlNode {
+        return span('this.c.yellow.text', 'ⓘ')
+    }
+
+
+    testNodeState (testNode : TestNodeResult) : XmlNode {
+        if (testNode.isRoot) {
+            return testNode.passed ? this.testFilePass(testNode) : this.testFileFail(testNode)
         } else {
-            return this.c.bgYellowBright.black.text(' RUNS ')
+            return testNode.passed ? this.subTestPass(testNode) : this.subTestFail(testNode)
         }
     }
 
@@ -128,15 +155,15 @@ export class ReporterTheme extends Base {
     }
 
 
-    assertionTemplate (assertion : Assertion) : TextBlock {
-        let text : TextBlock     = TextBlock.new()
+    assertionTemplate (assertion : Assertion) : XmlNode {
+        if (assertion.annotation) return assertion.annotation
 
-        text.push(
+        let text : XmlElement     = XmlElement.new({ tag : 'div', class : 'assertion' })
+
+        text.appendChild(
             assertion.passed ? this.assertionPass(assertion) : this.assertionFail(assertion),
-            // ' ',
-            // this.c.whiteBright.text(`[${ assertion.name }]`),
             ' ',
-            assertion.annotation ? this.reporter.xmlElToString(assertion.annotation) : assertion.description
+            assertion.description
         )
 
         return text
@@ -156,18 +183,14 @@ export class ReporterTheme extends Base {
     }
 
 
-    logMessageTemplate (message : LogMessage) : TextBlock {
-        let text : TextBlock     = TextBlock.new()
-
-        text.push(
+    logMessageTemplate (message : LogMessage) : XmlNode {
+        return span('',
             this.logMessage(message),
             ' ',
             this.c.whiteBright.text(this.logMessageMethod(message)),
             ' ',
             message.message
         )
-
-        return text
     }
 
 
@@ -176,8 +199,10 @@ export class ReporterTheme extends Base {
     }
 
 
-    testSuiteHeader () : string {
-        return `Launching test suite: ${ this.c.underline.text(this.project.title) }\n`
+    testSuiteHeader () : XmlElement {
+        return xml({ tag : 'div', childNodes : [
+            `Launching test suite: ${ this.c.underline.text(this.project.title) }`
+        ] })
     }
 
 
@@ -268,13 +293,15 @@ export class Reporter extends Mixin(
         }
 
 
-        testNodeTemplate (testNode : TestNodeResult, isLastNode : boolean = false) : TextBlock {
-            let text : TextBlock     = TextBlock.new()
+        testNodeTemplateXml (testNode : TestNodeResult, isLastNode : boolean = false) : XmlElement {
+            let node : XmlElement       = XmlElement.new({ tag : 'tree' })
 
-            if (testNode.parentNode) {
-                text.push(`${ this.t.testNodeState(testNode) } ${this.c[ this.detailing === 'assertion' ? 'underline' : 'noop' ].text(testNode.descriptor.title)}`)
+            node.setAttribute('isLastNode', isLastNode)
+
+            if (testNode.isRoot) {
+                node.appendChild(this.t.testNodeState(testNode), ' ', this.t.testNodeUrl(testNode))
             } else {
-                text.push(`${ this.t.testNodeState(testNode) } ${this.t.testNodeUrl(testNode)}`)
+                node.appendChild(this.t.testNodeState(testNode), ' ', this.c[ this.detailing === 'assertion' ? 'underline' : 'noop' ].text(testNode.descriptor.title))
             }
 
             if (this.detailing === 'assertion' || this.detailing === 'subtest') {
@@ -283,34 +310,27 @@ export class Reporter extends Mixin(
                 nodesToShow.forEach((result, index) => {
                     const isLast            = index === nodesToShow.length - 1
 
-                    const childTextBlock    =
-                        (result instanceof Assertion)
-                            ?
-                                this.t.assertionTemplate(result)
-                            :
-                                (result instanceof TestNodeResult)
-                                    ?
-                                        this.testNodeTemplate(result, isLast)
-                                    :
-                                    (result instanceof LogMessage)
+                    node.appendChild(
+                        xml({ tag : 'leaf', childNodes: [
+                            (result instanceof Assertion)
+                                ?
+                                    this.t.assertionTemplate(result)
+                                :
+                                    (result instanceof TestNodeResult)
                                         ?
-                                            this.t.logMessageTemplate(result)
+                                            this.testNodeTemplateXml(result, isLast)
                                         :
-                                            TextBlock.new()
-
-                    childTextBlock.text.forEach((strings, index) => {
-                        if (index === 0) {
-                            strings.unshift(isLast && isLastNode ? this.t.treeLine('└─') : this.t.treeLine('├─'))
-                        } else {
-                            strings.unshift(isLast && isLastNode ? '  ' : this.t.treeLine('│ '))
-                        }
-                    })
-
-                    text.pullFrom(childTextBlock)
+                                        (result instanceof LogMessage)
+                                            ?
+                                                this.t.logMessageTemplate(result)
+                                            :
+                                                span('', 'Unknown element')
+                        ] })
+                    )
                 })
             }
 
-            return text
+            return node
         }
 
 
@@ -328,7 +348,7 @@ export class Reporter extends Mixin(
 
                 this[ testNode.passed ? 'filesPassed' : 'filesFailed' ]++
 
-                this.print(this.testNodeTemplate(testNode, this.resultsCompleted.size === this.launch.projectPlanItemsToLaunch.length).toString())
+                this.write(this.testNodeTemplateXml(testNode, this.resultsCompleted.size === this.launch.projectPlanItemsToLaunch.length))
             }
         }
 
@@ -343,17 +363,12 @@ export class Reporter extends Mixin(
         onTestSuiteStart () {
             this.startTime      = new Date()
 
-            this.print(this.t.testSuiteHeader())
+            this.write(this.t.testSuiteHeader())
         }
 
 
         onTestSuiteFinish () {
             this.print(this.t.testSuiteFooter().toString())
-        }
-
-
-        print (str : string) {
-            throw new Error("Abstract method")
         }
     }
 
@@ -363,22 +378,23 @@ export class Reporter extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export const humanReadableDuration = (milliSeconds : number) : string => {
-    let durationStr         = `${ milliSeconds }ms`
-
     if (milliSeconds >= 1000) {
         const seconds       = Math.floor(milliSeconds / 1000)
-        durationStr         = `${ seconds }s`
 
         if (seconds >= 60) {
             const minutes   = Math.floor(seconds / 60)
-            durationStr     = `${ minutes }m ${ seconds % 60 }s`
 
             if (minutes >= 60) {
                 const hours     = Math.floor(minutes / 60)
-                durationStr     = `${ hours }h ${ minutes % 60 }m`
-            }
-        }
-    }
 
-    return durationStr
+                return `${ hours }h ${ minutes % 60 }m`
+            } else {
+                return `${ minutes }m ${ seconds % 60 }s`
+            }
+        } else {
+            return `${ seconds }s`
+        }
+    } else {
+        return `${ milliSeconds }ms`
+    }
 }

@@ -1,8 +1,7 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { CI } from "../../../collection/Iterator.js"
-import { registerSerializableClass } from "../../../serializable/Serializable.js"
 import { compareDeepGen, Difference } from "../../../util/DeepCompare.js"
-import { xml, XmlElement, XmlNode } from "../../../util/XmlElement.js"
+import { span, xml, XmlElement, XmlNode } from "../../../util/XmlElement.js"
 import { Assertion, TestNodeResult } from "../Result.js"
 
 
@@ -41,7 +40,7 @@ export class Compare extends Mixin(
                     passed          : false,
                     description,
 
-                    annotation      : isDeeplyFormatter(description, differences)
+                    annotation      : isDeeplyAnnotationTemplate(description, differences)
                 }))
 
             } else {
@@ -56,7 +55,7 @@ export class Compare extends Mixin(
 ) {}
 
 
-const isDeeplyFormatter = (description : string, differences : Difference[]) : XmlElement => {
+const isDeeplyAnnotationTemplate = (description : string, differences : Difference[]) : XmlElement => {
     return assertion(
         assertion_name('isDeeply'), ' ',
         assertion_description(description),
@@ -70,18 +69,13 @@ const assertion = (...childNodes : XmlNode[]) : XmlElement =>
     xml({ tag : 'div', class : 'assertion', childNodes })
 
 const assertion_name = (name : string) : XmlElement =>
-    xml({ tag : 'span', class : 'assertion_name', childNodes : [ name ] })
+    span('assertion_name', name)
 
 const assertion_description = (description : string) : XmlElement =>
-    xml({ tag : 'span', class : 'assertion_description', childNodes : [ description ]})
+    span('assertion_description', description)
 
 const assertion_source = (line : number, file : string) : XmlElement =>
-    xml({ tag : 'span', class : 'assertion_source', childNodes : [
-        'at ',
-        xml({ tag : 'span', class : 'assertion_source_file', childNodes : [ file ] }),
-        ':',
-        xml({ tag : 'span', class : 'assertion_source_line', childNodes : [ String(line) ] }),
-    ]})
+    span('assertion_source', 'at ', span('assertion_source_file', file), ':', span('assertion_source_line', String(line)))
 
 const differenceTemplate = (difference : Difference) : XmlElement => {
     return xml({ tag : 'li', class : 'difference', childNodes : difference.asXmlNode() })
