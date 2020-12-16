@@ -1,5 +1,8 @@
-import { span, xml, XmlElement, XmlNode } from "../../../util/XmlElement.js"
+import { ArbitraryObject } from "../../../util/Helpers.js"
+import { span, xml, XmlElement, XmlNode } from "../../jsx/XmlElement.js"
+import { SiestaJSX } from "../../jsx/Factory.js"
 import { Assertion } from "../Result.js"
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export const assertionTemplate = (ass : Assertion) : XmlElement => {
@@ -12,7 +15,7 @@ export const assertionTemplate = (ass : Assertion) : XmlElement => {
 
 
 export const assertion = (...childNodes : XmlNode[]) : XmlElement =>
-    xml({ tag : 'div', class : 'assertion', childNodes })
+    xml({ tagName : 'div', class : 'assertion', childNodes })
 
 export const assertion_name = (name : string) : XmlElement =>
     span('assertion_name', name)

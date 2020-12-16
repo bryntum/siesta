@@ -1,7 +1,8 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { CI } from "../../../collection/Iterator.js"
 import { compareDeepGen, Difference } from "../../../util/DeepCompare.js"
-import { span, xml, XmlElement, XmlNode } from "../../../util/XmlElement.js"
+import { SiestaJSX } from "../../jsx/Factory.js"
+import { span, xml, XmlElement, XmlNode, XmlStream } from "../../jsx/XmlElement.js"
 import { Assertion, TestNodeResult } from "../Result.js"
 
 
@@ -55,18 +56,18 @@ export class Compare extends Mixin(
 ) {}
 
 
-const isDeeplyAnnotationTemplate = (description : string, differences : Difference[]) : XmlElement => {
+const isDeeplyAnnotationTemplate = (description : string, differences : Difference[]) : XmlStream => {
     return assertion(
         assertion_name('isDeeply'), ' ',
         assertion_description(description),
         assertion_source(123, 'source/file.js'),
-        xml({ tag : 'ul', childNodes : differences.map(differenceTemplate) })
+        xml({ tagName : 'ul', childNodes : differences.map(differenceTemplate) })
     )
 }
 
 
-const assertion = (...childNodes : XmlNode[]) : XmlElement =>
-    xml({ tag : 'div', class : 'assertion', childNodes })
+const assertion = (...childNodes : XmlNode[]) : XmlStream =>
+    <div class='assertion'>{ childNodes }</div>
 
 const assertion_name = (name : string) : XmlElement =>
     span('assertion_name', name)
@@ -78,7 +79,7 @@ const assertion_source = (line : number, file : string) : XmlElement =>
     span('assertion_source', 'at ', span('assertion_source_file', file), ':', span('assertion_source_line', String(line)))
 
 const differenceTemplate = (difference : Difference) : XmlElement => {
-    return xml({ tag : 'li', class : 'difference', childNodes : difference.asXmlNode() })
+    return xml({ tagName : 'li', class : 'difference', childNodes : difference.asXmlNode() })
 }
 
 

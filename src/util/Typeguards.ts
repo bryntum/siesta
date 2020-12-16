@@ -15,3 +15,8 @@ export const isNumber = (a : any) : a is number => {
 export const isString = (a : any) : a is string => {
     return typeOf(a) === 'String'
 }
+
+//---------------------------------------------------------------------------------------------------------------------
+export const isArray = (a : any) : a is unknown[] => {
+    return typeOf(a) === 'Array'
+}

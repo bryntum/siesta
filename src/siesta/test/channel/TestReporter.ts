@@ -1,6 +1,6 @@
 import { Channel, local, remote } from "../../../channel/Channel.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { XmlElement } from "../../../util/XmlElement.js"
+import { XmlElement } from "../../jsx/XmlElement.js"
 import { Reporter } from "../../reporter/Reporter.js"
 import { AssertionWaitFor } from "../assertion/Async.js"
 import { TestDescriptor } from "../Descriptor.js"

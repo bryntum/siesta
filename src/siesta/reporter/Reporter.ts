@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
-import { span, xml, XmlElement, XmlNode } from "../../util/XmlElement.js"
+import { span, xml, XmlElement, XmlNode, XmlStream } from "../jsx/XmlElement.js"
 import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
 import { Assertion, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
@@ -156,9 +156,7 @@ export class ReporterTheme extends Base {
 
 
     assertionTemplate (assertion : Assertion) : XmlNode {
-        if (assertion.annotation) return assertion.annotation
-
-        let text : XmlElement     = XmlElement.new({ tag : 'div', class : 'assertion' })
+        let text : XmlElement     = XmlElement.new({ tagName : 'div', class : 'assertion' })
 
         text.appendChild(
             assertion.passed ? this.assertionPass(assertion) : this.assertionFail(assertion),
@@ -183,7 +181,7 @@ export class ReporterTheme extends Base {
     }
 
 
-    logMessageTemplate (message : LogMessage) : XmlNode {
+    logMessageTemplate (message : LogMessage) : XmlElement {
         return span('',
             this.logMessage(message),
             ' ',
@@ -200,7 +198,7 @@ export class ReporterTheme extends Base {
 
 
     testSuiteHeader () : XmlElement {
-        return xml({ tag : 'div', childNodes : [
+        return xml({ tagName : 'div', childNodes : [
             `Launching test suite: ${ this.c.underline.text(this.project.title) }`
         ] })
     }
@@ -294,7 +292,7 @@ export class Reporter extends Mixin(
 
 
         testNodeTemplateXml (testNode : TestNodeResult, isLastNode : boolean = false) : XmlElement {
-            let node : XmlElement       = XmlElement.new({ tag : 'tree' })
+            let node : XmlElement       = XmlElement.new({ tagName : 'tree' })
 
             node.setAttribute('isLastNode', isLastNode)
 
@@ -311,7 +309,7 @@ export class Reporter extends Mixin(
                     const isLast            = index === nodesToShow.length - 1
 
                     node.appendChild(
-                        xml({ tag : 'leaf', childNodes: [
+                        xml({ tagName : 'leaf', childNodes: [
                             (result instanceof Assertion)
                                 ?
                                     this.t.assertionTemplate(result)

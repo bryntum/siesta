@@ -2,7 +2,7 @@ import { Base } from "../class/Base.js"
 import { AnyConstructor, Mixin } from "../class/Mixin.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "./Helpers.js"
 import { Serializer } from "./Serializer.js"
-import { span, xml, XmlNode } from "./XmlElement.js"
+import { span, xml, XmlNode } from "../siesta/jsx/XmlElement.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -76,14 +76,14 @@ export class DifferenceTypesAreDifferent extends Difference {
     asXmlNode () : XmlNode[] {
         return [
             'The values at ', this.keyPathXmlNode(), ' have different types:',
-            xml({ tag : 'ul', class : 'difference_got_expected', childNodes : [
-                xml({ tag : 'li', class : 'difference_got', childNodes : [
+            xml({ tagName : 'ul', class : 'difference_got_expected', childNodes : [
+                xml({ tagName : 'li', class : 'difference_got', childNodes : [
                     span('difference_title', 'Got      : '),
                     span('difference_value', this.type1),
                     ' ',
                     span('difference_value', Serializer.serialize(this.v1, 4, 4))
                 ] }),
-                xml({ tag : 'li', class : 'difference_expected', childNodes : [
+                xml({ tagName : 'li', class : 'difference_expected', childNodes : [
                     span('difference_title', 'Expected : '),
                     span('difference_value', this.type2),
                     ' ',

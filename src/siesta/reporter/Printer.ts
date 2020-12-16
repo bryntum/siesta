@@ -2,7 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
-import { XmlElement, XmlNode } from "../../util/XmlElement.js"
+import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { Colorer } from "./Colorer.js"
 import { TextBlock } from "./Reporter.js"
 
@@ -46,7 +46,7 @@ export class Printer extends Mixin(
 
                 return res
             } else {
-                const res   = TextBlock.new(/*{ c : this.c, rules : this.getRulesFor(el) }*/)
+                const res   = TextBlock.new()
 
                 let context : 'inline' | 'opened_block' | 'closed_block' = 'opened_block'
 
@@ -55,11 +55,11 @@ export class Printer extends Mixin(
                     const isLast        = index === array.length - 1
                     const block         = this.render(node)
 
-                    if (el.tag === 'ul' && !isString(node) && node.tag === 'li') {
+                    if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {
                         block.indentMut(this.treeIndentationLevel)
                     }
 
-                    if (el.tag === 'tree' && !isString(node) && node.tag === 'leaf') {
+                    if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
                         block.indentAsTreeLeafMut(this.treeIndentationLevel, isLast)
                     }
 
@@ -89,7 +89,7 @@ export class Printer extends Mixin(
             if (isString(el)) {
                 return 'inline'
             } else {
-                if (el.tag === 'div' || el.tag === 'ul' || el.tag === 'li' || el.tag === 'tree' || el.tag === 'leaf')
+                if (el.tagName === 'div' || el.tagName === 'ul' || el.tagName === 'li' || el.tagName === 'tree' || el.tagName === 'leaf')
                     return 'block'
                 else
                     return 'inline'

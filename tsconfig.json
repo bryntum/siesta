@@ -3,7 +3,10 @@
 //        "importHelpers"             : true,
         "experimentalDecorators"    : true,
 
-        "target"                : "es2017",
+        "jsx"                   : "react",
+        "jsxFactory"            : "SiestaJSX.createElement",
+        "jsxFragmentFactory"    : "SiestaJSX.Fragment",
+        "target": "es2017",
 //        "strictNullChecks"      : true,
 
         "sourceMap"             : false,
@@ -19,6 +22,7 @@
     "include" : [
         "main.ts",
         "src/**/*.ts",
+        "src/**/*.tsx",
         "tests/**/*.ts",
         "benchmarks/**/*.ts",
         "examples/**/*.ts"
