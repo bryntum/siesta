@@ -1,8 +1,9 @@
 import { Base } from "../class/Base.js"
 import { AnyConstructor, Mixin } from "../class/Mixin.js"
+import { SiestaJSX } from "../siesta/jsx/Factory.js"
+import { XmlNode, XmlStream } from "../siesta/jsx/XmlElement.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "./Helpers.js"
 import { Serializer } from "./Serializer.js"
-import { span, xml, XmlNode } from "../siesta/jsx/XmlElement.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -50,16 +51,16 @@ export class PathSegment extends Base {
 export class Difference extends Base {
     keyPath     : PathSegment[] = []
 
-    asXmlNode () : XmlNode[] {
+    asXmlNode () : XmlStream {
         throw new Error("Abstract method")
     }
 
 
-    keyPathXmlNode () : XmlNode {
+    keyPathXmlNode () : XmlStream {
         if (this.keyPath.length === 0) {
-            return span("difference_key_path", 'root')
+            return <span class="difference_key_path">root</span>
         } else {
-            return span("difference_key_path", ...this.keyPath.flatMap(pathSegment => pathSegment.asXmlNode()))
+            return <span class="difference_key_path">{ ...this.keyPath.flatMap(pathSegment => pathSegment.asXmlNode()) }</span>
         }
     }
 }
@@ -73,23 +74,23 @@ export class DifferenceTypesAreDifferent extends Difference {
     type2       : string        = ''
 
 
-    asXmlNode () : XmlNode[] {
+    asXmlNode () : XmlStream {
         return [
             'The values at ', this.keyPathXmlNode(), ' have different types:',
-            xml({ tagName : 'ul', class : 'difference_got_expected', childNodes : [
-                xml({ tagName : 'li', class : 'difference_got', childNodes : [
-                    span('difference_title', 'Got      : '),
-                    span('difference_value', this.type1),
-                    ' ',
-                    span('difference_value', Serializer.serialize(this.v1, 4, 4))
-                ] }),
-                xml({ tagName : 'li', class : 'difference_expected', childNodes : [
-                    span('difference_title', 'Expected : '),
-                    span('difference_value', this.type2),
-                    ' ',
-                    span('difference_value', Serializer.serialize(this.v2, 4, 4))
-                ] })
-            ] })
+            <ul class='difference_got_expected'>
+                <li class='difference_got'>
+                    <span class="difference_title">Got      : </span>
+                    <span class="difference_value">{ this.type1 },</span>
+                    {' '}
+                    <span class="difference_value">{ Serializer.serialize(this.v1, 4, 4) }</span>
+                </li>
+                <li class='difference_expected'>
+                    <span class="difference_title">Expected : </span>
+                    <span class="difference_value">{ this.type2 },</span>
+                    {' '}
+                    <span class="difference_value">{ Serializer.serialize(this.v2, 4, 4) }</span>
+                </li>
+            </ul>
         ]
     }
 }

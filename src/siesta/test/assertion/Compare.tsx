@@ -1,8 +1,7 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { CI } from "../../../collection/Iterator.js"
-import { compareDeepGen, Difference } from "../../../util/DeepCompare.js"
+import { compareDeepGen } from "../../../util/DeepCompare.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
-import { XmlStream } from "../../jsx/XmlElement.js"
 import { Assertion, TestNodeResult } from "../Result.js"
 
 
@@ -42,7 +41,11 @@ export class Compare extends Mixin(
 
                     annotation      : <div>
                         Provided values are different. Here are { Math.min(differences.length, 5) } initial difference(s) from { differences.length } total
-                        <ul>{ differences.map(difference => <li class="difference">{ difference.asXmlNode() }</li>) }</ul>
+                        <ul>{
+                            differences.map(difference =>
+                                <li class="difference">{ difference.asXmlNode() }</li>
+                            )
+                        }</ul>
                     </div>
                 }))
 
