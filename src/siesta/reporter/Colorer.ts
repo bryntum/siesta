@@ -55,8 +55,10 @@ export class Colorer extends Base {
     get bgWhiteBright () : Colorer { return this.deriveColorerViaProperty('bgWhiteBright') }
 
     keyword (keyword : string) : Colorer { return this.deriveColorerViaMethod('keyword', keyword) }
+    bgKeyword (keyword : string) : Colorer { return this.deriveColorerViaMethod('bgKeyword', keyword) }
 
     rgb (red : number, green : number, blue : number) : Colorer { return this.deriveColorerViaMethod('rgb', red, green, blue) }
+    bgRgb (red : number, green : number, blue : number) : Colorer { return this.deriveColorerViaMethod('bgRgb', red, green, blue) }
 
 
     deriveColorerViaMethod (method : string, ...args : unknown[]) : Colorer {

@@ -53,6 +53,6 @@ export namespace SiestaJSX {
 //---------------------------------------------------------------------------------------------------------------------
 declare global {
     namespace JSX {
-        type Element        = XmlStream
+        type Element        = XmlElement
     }
 }

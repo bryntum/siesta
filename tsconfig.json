@@ -23,6 +23,7 @@
         "main.ts",
         "src/**/*.ts",
         "src/**/*.tsx",
+        "scripts/**/*.ts",
         "tests/**/*.ts",
         "benchmarks/**/*.ts",
         "examples/**/*.ts"

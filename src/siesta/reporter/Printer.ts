@@ -3,21 +3,13 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
+import { styles } from "../test/assertion/terminal.js"
 import { Colorer } from "./Colorer.js"
 import { TextBlock } from "./Reporter.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export type ColorerRule = (c : Colorer) => Colorer
-
-//---------------------------------------------------------------------------------------------------------------------
-export class StyleMap extends Base {
-    styles      : Map<string, ColorerRule>     = new Map()
-
-    add (className : string, rule : ColorerRule) {
-        this.styles.set(className, rule)
-    }
-}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -26,7 +18,7 @@ export class Printer extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class Printer extends base {
-        styles      : StyleMap      = defaultStyles
+        styles      : Map<string, ColorerRule>  = styles
 
         c           : Colorer       = undefined
 
@@ -99,7 +91,7 @@ export class Printer extends Mixin(
 
         getRulesFor (el : XmlElement) : ColorerRule[] {
             return saneSplit(el.attributes.class ?? '', /\s+/)
-                .map(className => this.styles.styles.get(className))
+                .map(className => this.styles.get(className))
                 .filter(rule => Boolean(rule))
         }
 
@@ -109,23 +101,3 @@ export class Printer extends Mixin(
         }
     }
 ){}
-
-
-
-
-const defaultStyles = StyleMap.new()
-
-defaultStyles.add('assertion', c => c.keyword('gray'))
-defaultStyles.add('assertion_name', c => c.keyword('white'))
-defaultStyles.add('assertion_source', c => c.keyword('gray'))
-defaultStyles.add('assertion_source_line', c => c.keyword('yellow'))
-defaultStyles.add('assertion_source_file', c => c.keyword('cyan'))
-defaultStyles.add('difference', c => c.keyword('gray'))
-defaultStyles.add('difference_key_path', c => c.keyword('white'))
-
-defaultStyles.add('test_file_pass', c => c.keyword('green').inverse)
-defaultStyles.add('test_file_fail', c => c.keyword('red').inverse)
-
-defaultStyles.add('sub_test_pass', c => c.keyword('green'))
-defaultStyles.add('sub_test_fail', c => c.keyword('red'))
-

@@ -1,0 +1,104 @@
+/*
+
+Supported styles:
+
+- `color`, as
+    color   : rgb(11, 22, 33)
+    color   : #abcdef
+    color   : white
+
+- `background-color` in the same format
+
+- `text-decoration: underline` (the only recognized value is `underline`)
+
+*/
+
+.project_title {
+    text-decoration: underline
+}
+
+.test_file_url_dirname {
+    color   : gray;
+}
+
+.test_file_url_filename {
+    color   : white;
+}
+
+.test_file_pass {
+    color               : black;
+    background-color    : green;
+}
+
+.test_file_fail {
+    color               : black;
+    background-color    : red;
+}
+
+.sub_test_pass {
+    color               : green;
+}
+
+.sub_test_fail {
+    color               : red;
+}
+
+
+.assertion_icon_pass {
+    color               : green;
+}
+
+.assertion_icon_fail {
+    color               : red;
+}
+
+.assertion_name {
+    color: antiquewhite;
+}
+
+.assertion_source_line {
+    color : yellow;
+}
+
+.assertion_description {
+    color : white
+}
+
+
+.log_message_icon {
+    color : moccasin;
+}
+
+
+.log_message_error {
+    background-color : red;
+    color: black;
+}
+
+.log_message_warn {
+    background-color : hotpink;
+    color: black;
+}
+
+.log_message_log {
+    background-color : aquamarine;
+    color: black;
+}
+
+.log_message_debug {
+    background-color : gray;
+    color: black;
+}
+
+.log_message_info {
+    background-color : darkgray;
+    color: black;
+}
+
+/*.is_deeply_difference {*/
+/*    color : gray;*/
+/*}*/
+
+/*.is_deeply_difference_key_path {*/
+/*    color: white;*/
+/*}*/

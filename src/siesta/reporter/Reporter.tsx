@@ -119,11 +119,6 @@ export class ReporterTheme extends Base {
     }
 
 
-    logMessage (message : LogMessage) : XmlStream {
-        return <span class='this.c.yellow.text'>ⓘ</span>
-    }
-
-
     testNodeState (testNode : TestNodeResult) : XmlStream {
         if (testNode.isRoot) {
             return testNode.passed ? this.testFilePass(testNode) : this.testFileFail(testNode)
@@ -138,17 +133,19 @@ export class ReporterTheme extends Base {
     }
 
 
-    testNodeUrl (testNode : TestNodeResult) : string {
+    testNodeUrl (testNode : TestNodeResult) : XmlElement {
         const rel       = relative(this.project.baseUrl, testNode.descriptor.url)
         const match     = /(.*?\/)?([^/]+)/.exec(rel)
 
-        return this.c.gray.text(match[ 1 ] || '') + this.c.whiteBright.text(match[ 2 ])
+        return <span>
+            <span class="test_file_url_dirname">{ match[ 1 ] || '' }</span><span class="test_file_url_filename">{ match[ 2 ] }</span>
+        </span>
     }
 
 
     assertionTemplate (assertion : Assertion) : XmlStream {
         return <div class="assertion">
-            <span class={`assertion_icon ${ assertion.passed ? 'assertion_icon_passed' : 'assertion_icon_failed' }`}>
+            <span class={`assertion_icon ${ assertion.passed ? 'assertion_icon_pass' : 'assertion_icon_fail' }`}>
                 { assertion.passed ? '✔' : '✘' }
             </span>
             { ' ' }
@@ -164,7 +161,7 @@ export class ReporterTheme extends Base {
         return <div class="log_message">
             <span class='log_message_icon'>ⓘ</span>
             { ' ' }
-            <span class={ `log_message_${ LogLevel[ message.level ].toLowerCase() }` }>{ LogLevel[ message.level ].toUpperCase() }</span>
+            <span class={ `log_message_${ LogLevel[ message.level ].toLowerCase() }` }> { LogLevel[ message.level ].toUpperCase() } </span>
             { ' ' }
             { message.message }
         </div>
@@ -187,7 +184,7 @@ export class ReporterTheme extends Base {
             text.pushLn(
                 this.testFileRunning(testNodeResult),
                 ' ',
-                this.testNodeUrl(testNodeResult)
+                this.reporter.render(this.testNodeUrl(testNodeResult)).toString()
             )
         })
 
@@ -266,7 +263,7 @@ export class Reporter extends Mixin(
 
 
         testNodeTemplateXml (testNode : TestNodeResult, isLastNode : boolean = false) : XmlElement {
-            let node : XmlElement       = XmlElement.new({ tagName : 'tree' })
+            let node : XmlElement       = <tree></tree>
 
             node.setAttribute('isLastNode', isLastNode)
 
