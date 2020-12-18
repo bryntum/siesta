@@ -12,6 +12,17 @@ declare const StartTest : any
 StartTest(t => {
 
     t.it('Deep compare should work', async t => {
+        // TODO should support comparing circular data structures
+
+        // const a1    = { a : undefined }
+        // a1.a        = a1
+        //
+        // const a2    = { a : undefined }
+        // a2.a        = a2
+
+        // t.isDeeply(a1, a2)
+
+        // t.isDeeply(CI(compareDeepGen(a1, a2)).toArray(), [])
 
         t.isDeeply(CI(compareDeepGen(1, 1)).toArray(), [])
 

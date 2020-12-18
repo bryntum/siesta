@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { AnyConstructor, Mixin } from "../class/Mixin.js"
 import { SiestaJSX } from "../siesta/jsx/Factory.js"
-import { XmlNode, XmlStream } from "../siesta/jsx/XmlElement.js"
+import { XmlElement, XmlNode, XmlStream } from "../siesta/jsx/XmlElement.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "./Helpers.js"
 import { Serializer } from "./Serializer.js"
 
@@ -30,7 +30,7 @@ export class PathSegment extends Base {
 
         switch (this.type) {
             case "object" :
-                str = String(this.key)
+                str = `.${ this.key }`
                 break
 
             case "array" :
@@ -51,12 +51,12 @@ export class PathSegment extends Base {
 export class Difference extends Base {
     keyPath     : PathSegment[] = []
 
-    asXmlNode () : XmlStream {
+    asXmlNode () : XmlElement {
         throw new Error("Abstract method")
     }
 
 
-    keyPathXmlNode () : XmlStream {
+    keyPathXmlNode () : XmlElement {
         if (this.keyPath.length === 0) {
             return <span class="difference_key_path">root</span>
         } else {
@@ -74,24 +74,20 @@ export class DifferenceTypesAreDifferent extends Difference {
     type2       : string        = ''
 
 
-    asXmlNode () : XmlStream {
-        return [
-            'The values at ', this.keyPathXmlNode(), ' have different types:',
-            <ul class='difference_got_expected'>
+    asXmlNode () : XmlElement {
+        return <div>
+            The values at { this.keyPathXmlNode() } have different types:
+            <unl class='difference_got_expected'>
                 <li class='difference_got'>
-                    <span class="difference_title">Got      : </span>
-                    <span class="difference_value">{ this.type1 },</span>
-                    {' '}
+                    <span class="difference_title">Got value of <span class="ligther_smooth_accent_color">`{ this.type1 }`</span>     : </span>
                     <span class="difference_value">{ Serializer.serialize(this.v1, 4, 4) }</span>
                 </li>
                 <li class='difference_expected'>
-                    <span class="difference_title">Expected : </span>
-                    <span class="difference_value">{ this.type2 },</span>
-                    {' '}
+                    <span class="difference_title">Expected value of <span class="ligther_smooth_accent_color">`{ this.type2 }`</span>: </span>
                     <span class="difference_value">{ Serializer.serialize(this.v2, 4, 4) }</span>
                 </li>
-            </ul>
-        ]
+            </unl>
+        </div>
     }
 }
 
@@ -126,13 +122,44 @@ export class DifferenceMissingObjectKey extends Difference {
 }
 
 
-export class DifferenceMissingArrayEntry extends Difference {
+export class DifferenceArrayLengthIsDifferent extends Difference {
     array1          : unknown[]     = undefined
     array2          : unknown[]     = undefined
 
-    missingIndex    : number        = undefined
+    startingFrom    : number        = undefined
 
-    missingIn       : '1' | '2'     = '1'
+    type            : 'extra' | 'missing'   = undefined
+
+
+    asXmlNode () : XmlElement {
+        const minLength     = Math.min(this.array1.length, this.array2.length)
+
+        return <div>
+            <p>The arrays at { this.keyPathXmlNode() } have different length.</p>
+            <p>We have an array of length <span class="ligther_smooth_accent_color">{ this.array1.length }</span>
+                &nbsp;and expect an array of length <span class="ligther_smooth_accent_color">{ this.array2.length }</span>
+            </p>
+            {
+                minLength > 0
+                    ?
+                <p>Indicies [ 0...{ minLength - 1 } ] present in both arrays</p>
+                    :
+                ''
+            }
+            <p>{
+                this.type === 'extra'
+                    ?
+                `Extra elements, missing in the expected array`
+                    :
+                `Missing elements, present in the expected array`
+            }:</p>
+            <unl>{
+                (this.type === 'extra' ? this.array1 : this.array2).slice(this.startingFrom).map((el, index) =>
+                    <li><span>[ { index + this.startingFrom } ]</span> : { Serializer.serialize(el, 4, 4) }</li>
+                )
+            }</unl>
+        </div>
+    }
 }
 
 
@@ -165,6 +192,22 @@ export class DifferenceDate extends Difference {
 export class DifferenceValuesAreDifferent extends Difference {
     v1          : unknown       = undefined
     v2          : unknown       = undefined
+
+    asXmlNode () : XmlElement {
+        return <div>
+            The values at { this.keyPathXmlNode() } are different:
+            <unl class='difference_got_expected'>
+                <li class='difference_got'>
+                    <span class="difference_title">Got      : </span>
+                    <span class="difference_value">{ Serializer.serialize(this.v1, 4, 4) }</span>
+                </li>
+                <li class='difference_expected'>
+                    <span class="difference_title">Expected : </span>
+                    <span class="difference_value">{ Serializer.serialize(this.v2, 4, 4) }</span>
+                </li>
+            </unl>
+        </div>
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -238,9 +281,14 @@ export const compareArrayDeepGen = function * (array1 : unknown[], array2 : unkn
 
     const maxLength     = Math.max(array1.length, array2.length)
 
-    for (let i = minLength; i < maxLength; i++) {
-        yield DifferenceMissingArrayEntry.new({ array1, array2, missingIndex : i, missingIn : array2.length === maxLength ? '1' : '2', keyPath })
-    }
+    if (maxLength > minLength)
+        yield DifferenceArrayLengthIsDifferent.new({
+            keyPath,
+            array1,
+            array2,
+            type            : array1.length === maxLength ? 'extra' : 'missing',
+            startingFrom    : minLength
+        })
 }
 
 

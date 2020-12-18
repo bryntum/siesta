@@ -60,10 +60,16 @@ export class TextBlock extends Base {
     }
 
 
-    indentMut (howMany : number) {
+    indentMut (howMany : number, includeMarker : boolean = true) {
         const indenter  = ' '.repeat(howMany)
 
-        this.text.forEach(line => line.unshift(indenter))
+        this.text.forEach((line, index) => {
+            if (index === 0 && includeMarker) {
+                line.unshift('·' + indenter.slice(1))
+            } else {
+                line.unshift(indenter)
+            }
+        })
     }
 
 
@@ -150,8 +156,7 @@ export class ReporterTheme extends Base {
             </span>
             { ' ' }
             [<span class="assertion_name">{ assertion.name }</span>]
-            { ' ' }
-            <span class="assertion_description">{ assertion.description }</span>
+            <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
             { ' ' }
             at line <span class="assertion_source_line">{ assertion.sourceLine }</span>
             { assertion.annotation }

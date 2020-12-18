@@ -11,26 +11,33 @@ const project = (await GetIsomorphicProjectClass()).new({
 
 project.plan([
     {
-        filename    : 'advanced',
-
-        tags        : [ 'advanced' ],
+        filename    : 'assertions',
 
         items       : [
-            'advanced_test.t.js'
+            'is_deeply.t.js'
         ]
     },
-    {
-        filename    : 'basic',
-
-        tags        : [ 'basic' ],
-
-        items       : [
-            {
-                filename    : 'basic_test.t.js',
-            },
-            'another_test.t.js'
-        ]
-    }
+    // {
+    //     filename    : 'advanced',
+    //
+    //     tags        : [ 'advanced' ],
+    //
+    //     items       : [
+    //         'advanced_test.t.js'
+    //     ]
+    // },
+    // {
+    //     filename    : 'basic',
+    //
+    //     tags        : [ 'basic' ],
+    //
+    //     items       : [
+    //         {
+    //             filename    : 'basic_test.t.js',
+    //         },
+    //         'another_test.t.js'
+    //     ]
+    // }
 ])
 
 project.start()

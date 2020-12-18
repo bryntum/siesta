@@ -33,6 +33,8 @@ $accent_color: whitesmoke;
 
 $smooth_accent_color: #e9c46a;
 
+$ligther_smooth_accent_color: color.scale($smooth_accent_color, $lightness: 25%);
+
 $darker_fail_color: color.scale($main_fail_color, $lightness: -25%);
 $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
 
@@ -147,4 +149,9 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
 
 .progress_bar_completed_failed {
     background-color: $darker_fail_color;
+}
+
+
+.ligther_smooth_accent_color {
+    color : $ligther_smooth_accent_color;
 }

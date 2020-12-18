@@ -24,6 +24,10 @@ export class Printer extends Mixin(
 
         treeIndentationLevel        : number    = 2
 
+        blockLevelElements          : Set<string> = new Set([
+            'div', 'ul', 'unl', 'li', 'tree', 'leaf', 'p'
+        ])
+
 
         print (str : string) {
             throw new Error("Abstract method")
@@ -48,7 +52,11 @@ export class Printer extends Mixin(
                     const block         = this.render(node)
 
                     if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {
-                        block.indentMut(this.treeIndentationLevel)
+                        block.indentMut(this.treeIndentationLevel, true)
+                    }
+
+                    if (el.tagName === 'unl' && !isString(node) && node.tagName === 'li') {
+                        block.indentMut(this.treeIndentationLevel, false)
                     }
 
                     if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
@@ -81,7 +89,7 @@ export class Printer extends Mixin(
             if (isString(el)) {
                 return 'inline'
             } else {
-                if (el.tagName === 'div' || el.tagName === 'ul' || el.tagName === 'li' || el.tagName === 'tree' || el.tagName === 'leaf')
+                if (this.blockLevelElements.has(el.tagName))
                     return 'block'
                 else
                     return 'inline'
