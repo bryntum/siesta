@@ -1,21 +1,20 @@
 import cssom from 'cssom'
 import fs from 'fs'
 import path from 'path'
+import sass from 'sass'
 import url from 'url'
 
 
 //---------------------------------------------------------------------------------------------------------------------
-const scriptDir  = path.dirname(url.fileURLToPath(import.meta.url))
+const scriptDir     = path.dirname(url.fileURLToPath(import.meta.url))
+const stylingDir    = path.resolve(scriptDir, '../src/siesta/reporter/styling')
 
-const assertionsCss = fs.readFileSync(
-    path.resolve(scriptDir, '../src/siesta/test/assertion/terminal.css'),
-    { encoding : 'utf8' }
-)
+const css           = sass.renderSync({ file : path.resolve(stylingDir, 'terminal.scss') })
 
-const stylesheet            = cssom.parse(assertionsCss)
+const stylesheet    = cssom.parse(css.css.toString())
 
 //---------------------------------------------------------------------------------------------------------------------
-const output                = [ 'export const styles = new Map()' ]
+const output                = [ 'export const styles = new Map()', '\n' ]
 
 for (const rule of stylesheet.cssRules) {
     if (rule instanceof cssom.CSSStyleRule) {
@@ -44,17 +43,17 @@ for (const rule of stylesheet.cssRules) {
             console.log("Ignoring css rule - only single class selectors are supported: ", rule)
         }
     } else {
-        console.log("Ignoring css rule: ", rule)
+        console.log("//----------------------")
+        console.log("Ignoring css rule - only style rules are processed: ", rule)
     }
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 fs.writeFileSync(
-    path.resolve(scriptDir, '../src/siesta/test/assertion/terminal.ts'),
+    path.resolve(stylingDir, 'terminal.ts'),
     output.join('\n')
 )
 
-console.log("Successfully written to output file")
 
 //---------------------------------------------------------------------------------------------------------------------
 function styleToColorer (styleName : string, styleValue : string) : string | undefined {

@@ -1,0 +1,150 @@
+/*
+
+Only supports selectors from a single class name for now:
+
+    .some_class {}
+
+Any other selectors like: '.some_class .another_class' are explicitly not supported
+
+Supported styles:
+
+- `color`, as
+    color   : rgb(11, 22, 33)
+    color   : #abcdef
+    color   : white
+
+- `background-color` in the same format
+
+- `text-decoration: underline` (the only recognized value is `underline`)
+
+*/
+
+@use "sass:color";
+
+$main_fail_color: #e76f51;
+$main_pass_color: #2a9d8f;
+
+$complementary_to_fail_color: #f4a261;
+$complementary_to_pass_color: #e9c46a;
+
+$deccent_color: #264653;
+
+$accent_color: whitesmoke;
+
+$smooth_accent_color: #e9c46a;
+
+$darker_fail_color: color.scale($main_fail_color, $lightness: -25%);
+$darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
+
+.project_title {
+    text-decoration: underline
+}
+
+.test_file_url_dirname {
+    color   : gray;
+}
+
+.test_file_url_filename {
+    color   : $accent_color;
+}
+
+.test_file_pass {
+    color               : black;
+    background-color    : $main_pass_color;
+}
+
+.test_file_fail {
+    color               : black;
+    background-color    : $main_fail_color;
+}
+
+.test_file_runs {
+    color               : black;
+    background-color    : $complementary_to_pass_color;
+}
+
+.sub_test_pass {
+    color               : $main_pass_color;
+}
+
+.sub_test_fail {
+    color               : $main_fail_color;
+}
+
+
+.assertion_icon_pass {
+    color               : $main_pass_color;
+}
+
+.assertion_icon_fail {
+    color               : $main_fail_color;
+}
+
+.assertion_name {
+    color: $smooth_accent_color;
+}
+
+.assertion_source_line {
+    color : $smooth_accent_color;
+}
+
+.assertion_description {
+    color : $accent_color
+}
+
+
+.log_message_icon {
+    color : $complementary_to_fail_color;
+}
+
+
+.log_message_error {
+    background-color : $main_fail_color;
+    color: black;
+}
+
+.log_message_warn {
+    background-color : $complementary_to_fail_color;
+    color: black;
+}
+
+.log_message_log {
+    background-color : $complementary_to_pass_color;
+    color: black;
+}
+
+.log_message_debug {
+    background-color : $main_pass_color;
+    color: black;
+}
+
+.log_message_info {
+    background-color : $deccent_color;
+    color: black;
+}
+
+
+.difference_key_path {
+    color   : $accent_color;
+}
+
+
+.summary {
+    color : $accent_color;
+}
+
+.summary_tests_passed {
+    color : $main_pass_color
+}
+
+.summary_tests_failed {
+    color : $main_fail_color
+}
+
+.progress_bar_completed_passed {
+    background-color: $darker_pass_color;
+}
+
+.progress_bar_completed_failed {
+    background-color: $darker_fail_color;
+}

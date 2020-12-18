@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
-import { styles } from "../test/assertion/terminal.js"
+import { styles } from "./styling/terminal.js"
 import { Colorer } from "./Colorer.js"
 import { TextBlock } from "./Reporter.js"
 
