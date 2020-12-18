@@ -128,8 +128,8 @@ export class ReporterTheme extends Base {
     }
 
 
-    testFileRunning (testNode : TestNodeResult) : string {
-        return this.c.yellowBright.inverse.text(' RUNS ')
+    testFileRunning (testNode : TestNodeResult) : XmlElement {
+        return <div class="test_file_runs"> RUNS </div>
     }
 
 
@@ -149,9 +149,11 @@ export class ReporterTheme extends Base {
                 { assertion.passed ? '✔' : '✘' }
             </span>
             { ' ' }
-            [<span class="assertion_name">{ assertion.name }</span> at line <span class="assertion_source_line">{ String(assertion.sourceLine) }</span>]
+            [<span class="assertion_name">{ assertion.name }</span>]
             { ' ' }
             <span class="assertion_description">{ assertion.description }</span>
+            { ' ' }
+            at line <span class="assertion_source_line">{ assertion.sourceLine }</span>
             { assertion.annotation }
         </div>
     }
@@ -171,47 +173,48 @@ export class ReporterTheme extends Base {
     testSuiteHeader () : XmlStream {
         return <div>
             Launching test suite: <span class="project_title">{ this.project.title }</span>
+            <div></div>
         </div>
     }
 
 
-    testSuiteFooter () : TextBlock {
-        let text : TextBlock     = TextBlock.new()
+    testSuiteFooter () : XmlElement {
+        let text : XmlElement       = <div></div>
 
-        if (this.reporter.resultsRunning.size > 0 && this.reporter.resultsCompleted.size > 0) text.push('\n')
+        if (this.reporter.resultsRunning.size > 0 && this.reporter.resultsCompleted.size > 0) text.appendChild(<div></div>)
 
         this.reporter.resultsRunning.forEach(testNodeResult => {
-            text.pushLn(
+            text.appendChild(
                 this.testFileRunning(testNodeResult),
                 ' ',
-                this.reporter.render(this.testNodeUrl(testNodeResult)).toString()
+                this.testNodeUrl(testNodeResult)
             )
         })
 
-        text.push('\n')
+        text.appendChild(<div></div>)
 
-        text.pushLn(
-            this.c.whiteBright.text(`Test suite : `),
-                this.c.green.text(String(this.reporter.filesPassed) + ' passed, '),
-                this.c[ this.reporter.filesFailed > 0 ? 'red' : 'noop' ].text(String(this.reporter.filesFailed) + ' failed, '),
-
-                this.c.whiteBright.text(String(this.launch.projectPlanItemsToLaunch.length) + ' total'),
-        )
-
-        text.push(
-            this.c.whiteBright.text('Time       : '),
-            humanReadableDuration(Date.now() - this.reporter.startTime.getTime())
-        )
-
+        text.appendChild(<div class="summary">
+            { 'Test suite : ' }
+            <span class="summary_tests_passed">{ this.reporter.filesPassed } passed, </span>
+            <span class={ this.reporter.filesFailed > 0 ? "summary_tests_failed" : '' }>{ this.reporter.filesFailed } failed, </span>
+            <span class="summary_tests_total">{ this.launch.projectPlanItemsToLaunch.length } total</span>
+            <div>
+                { 'Time       : ' }
+                { humanReadableDuration(Date.now() - this.reporter.startTime.getTime()) }
+            </div>
+        </div>)
 
         return text
     }
 
 
-    progressBar () : string {
+    progressBar () : XmlElement {
         const completedChars = Math.round(this.reporter.resultsCompleted.size / this.launch.projectPlanItemsToLaunch.length * this.progressBarTotalLength)
 
-        return this.c.bgGreen.text(' '.repeat(completedChars)) + '░'.repeat(this.progressBarTotalLength - completedChars)
+        return <span>
+            <span class={ this.reporter.filesFailed > 0 ? 'progress_bar_completed_failed' : 'progress_bar_completed_passed' }>{ ' '.repeat(completedChars) }</span>
+            <span class="progress_bar_pending">{ '░'.repeat(this.progressBarTotalLength - completedChars) }</span>
+        </span>
     }
 
 
@@ -335,7 +338,7 @@ export class Reporter extends Mixin(
 
 
         onTestSuiteFinish () {
-            this.print(this.t.testSuiteFooter().toString())
+            this.write(this.t.testSuiteFooter())
         }
     }
 

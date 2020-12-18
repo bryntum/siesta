@@ -22,83 +22,102 @@ Supported styles:
 }
 
 .test_file_url_filename {
-    color   : white;
+    color   : whitesmoke;
 }
 
 .test_file_pass {
     color               : black;
-    background-color    : green;
+    background-color    : #2a9d8f;
 }
 
 .test_file_fail {
     color               : black;
-    background-color    : red;
+    background-color    : #e76f51;
+}
+
+.test_file_runs {
+    color               : black;
+    background-color    : #E9C46A;
 }
 
 .sub_test_pass {
-    color               : green;
+    color               : #2a9d8f;
 }
 
 .sub_test_fail {
-    color               : red;
+    color               : #e76f51;
 }
 
 
 .assertion_icon_pass {
-    color               : green;
+    color               : #2a9d8f;
 }
 
 .assertion_icon_fail {
-    color               : red;
+    color               : #e76f51;
 }
 
 .assertion_name {
-    color: antiquewhite;
+    color: #AF8F37;
 }
 
 .assertion_source_line {
-    color : yellow;
+    color : #AF8F37;
 }
 
 .assertion_description {
-    color : white
+    color : whitesmoke
 }
 
 
 .log_message_icon {
-    color : moccasin;
+    color : #f4a261;
 }
 
 
 .log_message_error {
-    background-color : red;
+    background-color : #e76f51;
     color: black;
 }
 
 .log_message_warn {
-    background-color : hotpink;
+    background-color : #f4a261;
     color: black;
 }
 
 .log_message_log {
-    background-color : aquamarine;
+    background-color : #e9c46a;
     color: black;
 }
 
 .log_message_debug {
-    background-color : gray;
+    background-color : #2a9d8f;
     color: black;
 }
 
 .log_message_info {
-    background-color : darkgray;
+    background-color : #264653;
     color: black;
 }
 
-/*.is_deeply_difference {*/
-/*    color : gray;*/
-/*}*/
 
-/*.is_deeply_difference_key_path {*/
-/*    color: white;*/
-/*}*/
+.difference_key_path {
+    color   : white;
+}
+
+
+.summary_tests_passed {
+    color : #2a9d8f
+}
+
+.summary_tests_failed {
+    color : #e76f51
+}
+
+.progress_bar_completed_passed {
+    background-color: #2a9d8f;
+}
+
+.progress_bar_completed_failed {
+    background-color: #e76f51;
+}

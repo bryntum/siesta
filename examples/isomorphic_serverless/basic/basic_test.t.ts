@@ -1,4 +1,4 @@
-import { it } from "../../../main.js"
+import { LogLevel } from "../../../src/logger/Logger.js"
 import { delay } from "../../../src/util/Helpers.js"
 import { CustomTest } from "../src/CustomTest.js"
 
@@ -12,6 +12,8 @@ CustomTest.describe('Basic assertions should work', async t => {
 
 
 CustomTest.describe('Basic assertions should work #2', async t => {
+    t.logLevel  = LogLevel.info
+
     await delay(500)
 
     t.ok(true, 'True is ok')

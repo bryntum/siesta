@@ -37,16 +37,16 @@ export namespace SiestaJSX {
         }
     }
 
-
-    export function appendChild (parent : XmlElement, child : false | XmlNode | XmlNode[]) {
-        if (child === undefined || child === null || child === false) {
-            // do nothing
-        } else if (isArray(child)) {
-            parent.childNodes.push(...child.flat(Number.MAX_SAFE_INTEGER))
-        } else {
-            parent.childNodes.push(child)
-        }
-    }
+    // is this method needed?
+    // export function appendChild (parent : XmlElement, child : false | XmlNode | XmlNode[]) {
+    //     if (child === undefined || child === null || child === false) {
+    //         // do nothing
+    //     } else if (isArray(child)) {
+    //         parent.childNodes.push(...child.flat(Number.MAX_SAFE_INTEGER))
+    //     } else {
+    //         parent.childNodes.push(child)
+    //     }
+    // }
 }
 
 

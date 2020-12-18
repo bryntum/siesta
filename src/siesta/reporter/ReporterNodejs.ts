@@ -96,7 +96,7 @@ export class ReporterNodejs extends Mixin(
 
             this.isPrintingFooter   = true
 
-            this.print(this.t.testSuiteFooter().toString())
+            this.write(this.t.testSuiteFooter())
 
             this.printProgressBar()
             this.print(' ', false)
@@ -107,7 +107,7 @@ export class ReporterNodejs extends Mixin(
 
 
         printProgressBar () {
-            this.print(this.t.progressBar(), false)
+            this.print(this.render(this.t.progressBar()).toString(), false)
         }
 
 
