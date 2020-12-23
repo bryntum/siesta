@@ -155,3 +155,8 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
 .ligther_smooth_accent_color {
     color : $ligther_smooth_accent_color;
 }
+
+
+.typename {
+    color : $smooth_accent_color;
+}

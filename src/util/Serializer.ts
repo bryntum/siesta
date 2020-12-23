@@ -59,7 +59,7 @@ export class Serializer extends Mixin(
 
 
         visitDate (value : Date, depth : number) {
-            this.write(String(value))
+            this.write(dateToString(value))
         }
 
 
@@ -84,12 +84,14 @@ export class Serializer extends Mixin(
 
 
         visitFunction (value : Function, depth : number) {
-            this.write(value.toString().replace(/\{.*\}$/, '{ ... }'))
+            this.write(functionSources(value)/*.replace(/\{.*\}$/, '{ ... }')*/)
         }
 
 
         visitObject (object : object, depth : number) {
-            this.write('{')
+            const constructorName   = constructorNameOf(object)
+
+            this.write(constructorName !== 'Object' ? constructorName + ' {' : '{')
 
             super.visitObject(object, depth)
 
@@ -100,6 +102,8 @@ export class Serializer extends Mixin(
             key : ArbitraryObjectKey, value : unknown, object : object, index : number,
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
         ) {
+            if (index === 0) this.write(' ')
+
             if (index < this.maxWide) {
                 this.write('"')
 
@@ -113,11 +117,19 @@ export class Serializer extends Mixin(
             key : ArbitraryObjectKey, value : unknown, object : object, index : number,
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
         ) {
+            const lastEntryIndex    = entries.length - 1
+
             if (index < this.maxWide) super.visitObjectEntryValue(key, value, object, index, entries, depth)
 
-            if (index === this.maxWide) this.write(this.outOfWideSymbol)
+            if (index === this.maxWide && this.maxWide <= lastEntryIndex) {
+                this.write(this.outOfWideSymbol)
+            }
 
-            if (index < this.maxWide - 1 && index < entries.length - 1) this.write(', ')
+            if (index === this.maxWide || this.maxWide > lastEntryIndex && index === lastEntryIndex) {
+                this.write(' ')
+            }
+
+            if (index < this.maxWide - 1 && index < lastEntryIndex) this.write(', ')
         }
 
 
@@ -181,7 +193,7 @@ export class Serializer extends Mixin(
             if (index < this.maxWide - 1 && index < map.size - 1) this.write(', ')
         }
 
-
+        // TODO should accept an object of properties for Serializer class instead of an argument for every property
         static serialize (value : unknown, maxDepth : number = Number.MAX_SAFE_INTEGER, maxWide : number = Number.MAX_SAFE_INTEGER) : string {
             const serializer = this.new({ maxDepth, maxWide })
 
@@ -192,3 +204,39 @@ export class Serializer extends Mixin(
     }
 ){}
 
+
+const functionSources = (func : Function) : string => {
+    const sources                       = func.toString().split('\n')
+
+    let minCommonLeadingWhitespace      = Infinity
+
+    sources.forEach((line, index) => {
+        // ignore first line, which won't have the common leading whitespace
+        if (index === 0) return
+
+        const leadingWhitespaceMatch  = /^(\s*)/.exec(line)
+
+        if (leadingWhitespaceMatch) {
+            const leadingWhitespace   = leadingWhitespaceMatch[ 1 ]
+
+            // ignore whitespace-only lines
+            if (leadingWhitespace === line) return
+
+            if (leadingWhitespace.length < minCommonLeadingWhitespace) minCommonLeadingWhitespace  = leadingWhitespace.length
+        }
+    })
+
+    if (minCommonLeadingWhitespace < Infinity) sources.forEach((line, index) => {
+        // ignore first line, which won't have the common leading whitespace
+        if (index === 0) return
+
+        sources[ index ]    = line.slice(minCommonLeadingWhitespace)
+    })
+
+    return sources.join('\n')
+}
+
+
+const dateToString = (date : Date) : string => {
+    return `${ date.getFullYear() }-${ date.getMonth() }-${ date.getDate() } ${ date.getHours() }:${ date.getMinutes() }:${ date.getSeconds() }.${ date.getMilliseconds() }`
+}

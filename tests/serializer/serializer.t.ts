@@ -7,8 +7,19 @@ StartTest(t => {
     t.it('Serialization should work', async t => {
         t.is(Serializer.serialize("2"), '"2"')
 
-        t.is(Serializer.serialize({ prop1 : [ Symbol('a'), /a/m ] }), '{"prop1": [Symbol(a), /a/m]}')
+        t.is(Serializer.serialize({ prop1 : [ Symbol('a'), /a/m ] }), '{ "prop1": [Symbol(a), /a/m] }')
     })
+
+
+    t.it('Should include class name into serialization', async t => {
+
+        class SomeClass {
+            a : number          = 1
+        }
+
+        t.is(Serializer.serialize(new SomeClass()), 'SomeClass { "a": 1 }')
+    })
+
 })
 
 
