@@ -14,7 +14,7 @@ const css           = sass.renderSync({ file : path.resolve(stylingDir, 'termina
 const stylesheet    = cssom.parse(css.css.toString())
 
 //---------------------------------------------------------------------------------------------------------------------
-const output                = [ 'export const styles = new Map()', '\n' ]
+const output                = [ 'export const styles = new Map()', '' ]
 
 for (const rule of stylesheet.cssRules) {
     if (rule instanceof cssom.CSSStyleRule) {

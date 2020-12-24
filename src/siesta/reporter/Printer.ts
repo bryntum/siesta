@@ -35,19 +35,14 @@ export class Printer extends Mixin(
 
 
         render (el : XmlNode) : TextBlock {
+            const res   = TextBlock.new()
+
             if (isString(el)) {
-                const res   = TextBlock.new()
-
                 res.push(el)
-
-                return res
             } else {
-                const res   = TextBlock.new()
-
                 let context : 'inline' | 'opened_block' | 'closed_block' = 'opened_block'
 
                 el.childNodes.forEach((node, index, array) => {
-                    // TODO last node can be a string?
                     const isLast        = index === array.length - 1
                     const block         = this.render(node)
 
@@ -64,7 +59,7 @@ export class Printer extends Mixin(
                     }
 
                     if (this.getDisplayType(node) === 'inline') {
-                        context         = 'inline'
+                        context             = 'inline'
                     } else {
                         if (context === 'inline' || context === 'closed_block') {
                             context         = 'closed_block'
@@ -79,9 +74,9 @@ export class Printer extends Mixin(
                 })
 
                 res.colorizeMut(this.getRulesFor(el).reduce((colorer, rule) => rule(colorer), this.c))
-
-                return res
             }
+
+            return res
         }
 
 
@@ -89,10 +84,7 @@ export class Printer extends Mixin(
             if (isString(el)) {
                 return 'inline'
             } else {
-                if (this.blockLevelElements.has(el.tagName))
-                    return 'block'
-                else
-                    return 'inline'
+                return this.blockLevelElements.has(el.tagName) ? 'block' : 'inline'
             }
         }
 
