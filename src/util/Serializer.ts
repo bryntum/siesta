@@ -12,8 +12,11 @@ export class Serializer extends Mixin(
     class Serializer extends base {
 
         maxWide                 : number    = Number.MAX_SAFE_INTEGER
+
         // TODO
         includeFunctionSources  : boolean   = true
+        maxStringLength         : number    = Number.MAX_SAFE_INTEGER
+        // eof TODO
 
         outOfDepthSymbol    : string        = '🠗'
         outOfWideSymbol     : string        = '...'
@@ -233,12 +236,17 @@ export class Serializer extends Mixin(
         }
 
 
+        toString () : string {
+            return this.result.join('')
+        }
+
+
         static serialize <T extends typeof Serializer> (this : T, value : unknown, props? : Partial<InstanceType<T>>) : string {
             const serializer = this.new(props)
 
             serializer.visit(value)
 
-            return serializer.result.join('')
+            return serializer.toString()
         }
     }
 ){}
