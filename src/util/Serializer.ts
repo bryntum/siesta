@@ -148,19 +148,15 @@ export class Serializer extends Mixin(
             key : ArbitraryObjectKey, value : unknown, object : object, index : number,
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
         ) {
-            const lastEntryIndex    = entries.length - 1
+            if (index < this.maxWide) {
+                super.visitObjectEntryValue(key, value, object, index, entries, depth)
 
-            if (index < this.maxWide) super.visitObjectEntryValue(key, value, object, index, entries, depth)
-
-            if (index === this.maxWide && this.maxWide <= lastEntryIndex) {
+                if (index < entries.length - 1) this.write(', ')
+            }
+            else if (index === this.maxWide)
                 this.write(this.outOfWideSymbol)
-            }
 
-            if (index === this.maxWide || this.maxWide > lastEntryIndex && index === lastEntryIndex) {
-                this.write(' ')
-            }
-
-            if (index < this.maxWide - 1 && index < lastEntryIndex) this.write(', ')
+            if (index === entries.length - 1) this.write(' ')
         }
 
 
@@ -173,55 +169,63 @@ export class Serializer extends Mixin(
         }
 
         visitArrayEntry<V> (value : V, array : V[], index : number, depth : number) {
-            if (index < this.maxWide) super.visitArrayEntry(value, array, index, depth)
+            if (index < this.maxWide) {
+                super.visitArrayEntry(value, array, index, depth)
 
-            if (index === this.maxWide) this.write(this.outOfWideSymbol)
-
-            if (index < this.maxWide - 1 && index < array.length - 1) this.write(', ')
+                if (index < array.length - 1) this.write(', ')
+            }
+            else if (index === this.maxWide)
+                this.write(this.outOfWideSymbol)
         }
 
 
         visitSet (set : Set<unknown>, depth : number) : any {
-            this.write('Set(' + set.size + ') {')
+            const space     = set.size > 0 ? ' ' : ''
+
+            this.write(`Set(${ set.size }) {${ space }`)
 
             super.visitSet(set, depth)
 
-            this.write('}')
+            this.write(`${ space }}`)
         }
 
         visitSetElement<V> (value : V, set : Set<V>, index : number, depth : number) {
-            if (index < this.maxWide) super.visitSetElement(value, set, index, depth)
+            if (index < this.maxWide) {
+                super.visitSetElement(value, set, index, depth)
 
-            if (index === this.maxWide) this.write(this.outOfWideSymbol)
-
-            if (index < this.maxWide - 1 && index < set.size - 1) this.write(', ')
+                if (index < set.size - 1) this.write(', ')
+            }
+            else if (index === this.maxWide)
+                this.write(this.outOfWideSymbol)
         }
 
 
         visitMap (map : Map<unknown, unknown>, depth : number) : any {
-            this.write('Map(' + map.size + ') {')
+            const space     = map.size > 0 ? ' ' : ''
+
+            this.write(`Map(${ map.size }) {${ space }`)
 
             super.visitMap(map, depth)
 
-            this.write('}')
+            this.write(`${ space }}`)
         }
 
         visitMapEntryKey<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
             if (index < this.maxWide) {
-                this.write('[')
-
                 super.visitMapEntryKey(key, value, map, index, depth)
 
-                this.write('] => ')
+                this.write(' => ')
             }
         }
 
         visitMapEntryValue<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
-            if (index < this.maxWide) super.visitMapEntryValue(key, value, map, index, depth)
+            if (index < this.maxWide) {
+                super.visitMapEntryValue(key, value, map, index, depth)
 
-            if (index === this.maxWide) this.write(this.outOfWideSymbol)
-
-            if (index < this.maxWide - 1 && index < map.size - 1) this.write(', ')
+                if (index < map.size - 1) this.write(', ')
+            }
+            else if (index === this.maxWide)
+                this.write(this.outOfWideSymbol)
         }
 
         // TODO should accept an object of properties for Serializer class instead of an argument for every property
