@@ -43,17 +43,17 @@ export class Compare extends Mixin(
                     description,
 
                     annotation      : <div>
-                        Provided values are different. Here {
-                            differences.length === 1
-                                ?
-                            'is the difference found'
-                                :
-                            differences.length <= this.maxIsDeeplyDifferences
-                                ?
-                            'are the differences found'
-                                :
-                            `are the ${ this.maxIsDeeplyDifferences } differences from ${ differences.length } total`
-                        }:
+                        {/*Provided values are different. Here {*/}
+                        {/*    differences.length === 1*/}
+                        {/*        ?*/}
+                        {/*    'is the difference found'*/}
+                        {/*        :*/}
+                        {/*    differences.length <= this.maxIsDeeplyDifferences*/}
+                        {/*        ?*/}
+                        {/*    'are the differences found'*/}
+                        {/*        :*/}
+                        {/*    `are the ${ this.maxIsDeeplyDifferences } differences from ${ differences.length } total`*/}
+                        {/*}:*/}
                         <ul>{
                             differences.map(difference =>
                                 <li class="difference">{ difference.asXmlNode() }</li>

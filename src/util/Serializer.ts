@@ -11,13 +11,30 @@ export class Serializer extends Mixin(
 
     class Serializer extends base {
 
-        maxWide         : number            = Number.MAX_SAFE_INTEGER
+        maxWide                 : number    = Number.MAX_SAFE_INTEGER
+        // TODO
+        includeFunctionSources  : boolean   = true
 
-        circularSymbol      : string        = '[Circular]'
         outOfDepthSymbol    : string        = '🠗'
         outOfWideSymbol     : string        = '...'
 
-        result          : string[]      = []
+        result              : string[]      = []
+
+        refCounter          : number        = 1
+
+        references          : Map<unknown, number>  = new Map()
+
+
+        beforeVisit (value : unknown, depth : number) {
+            this.visited.set(value, [ this.result.length, undefined ])
+        }
+
+
+        afterVisit (value : unknown, depth : number, visitResult : unknown) {
+            const currentMarker     = this.visited.get(value)
+
+            currentMarker[ 1 ]      = this.result.length - 1
+        }
 
 
         write (str : string) {
@@ -26,7 +43,7 @@ export class Serializer extends Mixin(
 
 
         visitOutOfDepthValue (value : unknown, depth : number) {
-            this.write(`${ this.outOfDepthSymbol } ${ constructorNameOf(value) }`)
+            this.write(`${ this.outOfDepthSymbol } ${ constructorNameOf(value) || typeOf(value) }`)
         }
 
 
@@ -36,7 +53,21 @@ export class Serializer extends Mixin(
 
 
         visitAlreadyVisited (value : unknown, depth : number) {
-            this.write(this.circularSymbol)
+            const valueReference    = this.references.get(value)
+
+            if (valueReference !== undefined) {
+                this.write(`[Circular *${ valueReference }]`)
+            } else {
+                const currentMarker     = this.visited.get(value)
+
+                const refCount          = this.refCounter++
+
+                this.references.set(value, refCount)
+
+                this.result[ currentMarker[ 0 ] ] = `<ref *${ refCount }> ${ this.result[ currentMarker[ 0 ] ] }`
+
+                this.write(`[Circular *${ refCount }]`)
+            }
         }
 
 
@@ -88,7 +119,7 @@ export class Serializer extends Mixin(
         }
 
 
-        visitObject (object : object, depth : number) {
+        visitObject (object : object, depth : number) : any {
             const constructorName   = constructorNameOf(object)
 
             this.write(constructorName !== 'Object' ? constructorName + ' {' : '{')
@@ -133,7 +164,7 @@ export class Serializer extends Mixin(
         }
 
 
-        visitArray (array : unknown[], depth : number) {
+        visitArray (array : unknown[], depth : number) : any {
             this.write('[')
 
             super.visitArray(array, depth)
@@ -150,7 +181,7 @@ export class Serializer extends Mixin(
         }
 
 
-        visitSet (set : Set<unknown>, depth : number) {
+        visitSet (set : Set<unknown>, depth : number) : any {
             this.write('Set(' + set.size + ') {')
 
             super.visitSet(set, depth)
@@ -167,7 +198,7 @@ export class Serializer extends Mixin(
         }
 
 
-        visitMap (map : Map<unknown, unknown>, depth : number) {
+        visitMap (map : Map<unknown, unknown>, depth : number) : any {
             this.write('Map(' + map.size + ') {')
 
             super.visitMap(map, depth)

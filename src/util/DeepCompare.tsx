@@ -41,6 +41,9 @@ export class PathSegment extends Base {
 
             case "map_key" :
                 str = `.get(${ Serializer.serialize(this.key, 4, 4) })`
+
+            case "set_element" :
+                str = `.set_element(${ Serializer.serialize(this.key, 4, 4) })`
         }
 
         return [ str ]
@@ -53,17 +56,21 @@ export class PathSegment extends Base {
 export class Difference extends Base {
     keyPath     : PathSegment[] = []
 
+
     asXmlNode () : XmlElement {
         throw new Error("Abstract method")
     }
 
 
     keyPathXmlNode () : XmlElement {
-        if (this.keyPath.length === 0) {
-            return <span class="difference_key_path">root</span>
-        } else {
-            return <span class="difference_key_path">{ ...this.keyPath.flatMap(pathSegment => pathSegment.asXmlNode()) }</span>
-        }
+        return this.keyPathTemplate(this.keyPath)
+    }
+
+
+    keyPathTemplate (keyPath : PathSegment[]) : XmlElement {
+        return <span class="difference_key_path">{
+            keyPath.length === 0 ? 'root' : keyPath.flatMap(pathSegment => pathSegment.asXmlNode())
+        }</span>
     }
 }
 
@@ -105,6 +112,42 @@ export class DifferenceReachability extends Difference {
     asXmlNode () : XmlElement {
         return <div>
             The values at { this.keyPathXmlNode() } have different reachability:
+            <ul className='difference_got_expected'>
+                <li class='difference_got'>
+                    {
+                        this.v1Path !== undefined ?
+                            <p>
+                                <span class="difference_title">The value on left has been already reached from (cyclic visit): </span>
+                                <span class="difference_value">{ this.keyPathTemplate(this.v1Path) }</span>
+                            </p>
+                        :
+                            <p>
+                                <span class="difference_title">The value on left has been encountered first time: </span>
+                            </p>
+                    }
+                    <p>
+                        <span class="difference_title">Value on left  : </span>
+                        <span class="difference_value">{ Serializer.serialize(this.v1, 4, 4) }</span>
+                    </p>
+                </li>
+                <li class='difference_expected'>
+                    {
+                        this.v2Path !== undefined ?
+                            <p>
+                                <span class="difference_title">The value on right has been already reached from (cyclic visit): </span>
+                                <span class="difference_value">{ this.keyPathTemplate(this.v2Path) }</span>
+                            </p>
+                        :
+                            <p>
+                                <span class="difference_title">The value on left has been encountered first time: </span>
+                            </p>
+                    }
+                    <p>
+                        <span class="difference_title">Value on right : </span>
+                        <span class="difference_value">{ Serializer.serialize(this.v2, 4, 4) }</span>
+                    </p>
+                </li>
+            </ul>
         </div>
     }
 }
@@ -300,6 +343,23 @@ export class DifferenceRegExp extends Difference {
     multiline       : boolean       = undefined
     sticky          : boolean       = undefined
     unicode         : boolean       = undefined
+
+
+    asXmlNode () : XmlElement {
+        return <div>
+            <p>The <span class="typename">`RegExp`</span>s at { this.keyPathXmlNode() } are different:</p>
+            <unl className='difference_got_expected'>
+                <li class='difference_got'>
+                    <span class="difference_title">Got      : </span>
+                    <span class="difference_value">{ Serializer.serialize(this.regexp1, 4, 4) }</span>
+                </li>
+                <li class='difference_expected'>
+                    <span class="difference_title">Expected : </span>
+                    <span class="difference_value">{ Serializer.serialize(this.regexp2, 4, 4) }</span>
+                </li>
+            </unl>
+        </div>
+    }
 }
 
 
@@ -429,7 +489,8 @@ export const compareDeepGen = function * (
 
     if (v1Visit && !v2Visit || !v1Visit && v2Visit || v1Visit && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
         yield DifferenceReachability.new({
-            v1, v2, keyPath : state.keyPathSnapshot(),
+            v1, v2,
+            keyPath     : state.keyPathSnapshot(),
             v1Path      : v1Visit !== undefined ? v1Visit[ 1 ] : undefined,
             v2Path      : v2Visit !== undefined ? v2Visit[ 1 ] : undefined,
         })
