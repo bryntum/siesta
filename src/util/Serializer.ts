@@ -228,9 +228,9 @@ export class Serializer extends Mixin(
                 this.write(this.outOfWideSymbol)
         }
 
-        // TODO should accept an object of properties for Serializer class instead of an argument for every property
-        static serialize (value : unknown, maxDepth : number = Number.MAX_SAFE_INTEGER, maxWide : number = Number.MAX_SAFE_INTEGER) : string {
-            const serializer = this.new({ maxDepth, maxWide })
+
+        static serialize <T extends typeof Serializer> (this : T, value : unknown, props? : Partial<InstanceType<T>>) : string {
+            const serializer = this.new(props)
 
             serializer.visit(value)
 

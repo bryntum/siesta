@@ -12,13 +12,13 @@ StartTest(t => {
 
 
     t.it('Should not show "out of wide" properties', async t => {
-        t.is(Serializer.serialize({ prop1 : 1, prop2 : 2, prop3 : 3 }, 1, 2), '{ "prop1": 1, "prop2": 2, ... }')
+        t.is(Serializer.serialize({ prop1 : 1, prop2 : 2, prop3 : 3 }, { maxDepth : 1, maxWide : 2 }), '{ "prop1": 1, "prop2": 2, ... }')
 
-        t.is(Serializer.serialize([ 1, 2, 3 ], 1, 2), '[1, 2, ...]')
+        t.is(Serializer.serialize([ 1, 2, 3 ], { maxDepth : 1, maxWide : 2 }), '[1, 2, ...]')
 
-        t.is(Serializer.serialize(new Set([ 1, 2, 3 ]), 1, 2), 'Set(3) { 1, 2, ... }')
+        t.is(Serializer.serialize(new Set([ 1, 2, 3 ]), { maxDepth : 1, maxWide : 2 }), 'Set(3) { 1, 2, ... }')
 
-        t.is(Serializer.serialize(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]), 1, 2), 'Map(3) { 1 => 1, 2 => 2, ... }')
+        t.is(Serializer.serialize(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]), { maxDepth : 1, maxWide : 2 }), 'Map(3) { 1 => 1, 2 => 2, ... }')
     })
 
 
@@ -27,8 +27,6 @@ StartTest(t => {
         class SomeClass {
             a : number          = 1
         }
-
-        console.log(Serializer.serialize(window, 1, 4))
 
         t.is(Serializer.serialize(new SomeClass()), 'SomeClass { "a": 1 }')
     })

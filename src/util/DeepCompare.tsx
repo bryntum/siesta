@@ -40,10 +40,10 @@ export class PathSegment extends Base {
                 break
 
             case "map_key" :
-                str = `.get(${ Serializer.serialize(this.key, 4, 4) })`
+                str = `.get(${ Serializer.serialize(this.key, { maxDepth : 4, maxWide : 4 }) })`
 
             case "set_element" :
-                str = `.set_element(${ Serializer.serialize(this.key, 4, 4) })`
+                str = `.set_element(${ Serializer.serialize(this.key, { maxDepth : 4, maxWide : 4 }) })`
         }
 
         return [ str ]
@@ -89,11 +89,11 @@ export class DifferenceTypesAreDifferent extends Difference {
             <unl class='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got value of <span class="typename">`{ this.type1 }`</span>     : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.v1, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.v1, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected value of <span class="typename">`{ this.type2 }`</span>: </span>
-                    <span class="difference_value">{ Serializer.serialize(this.v2, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.v2, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
             </unl>
         </div>
@@ -127,7 +127,7 @@ export class DifferenceReachability extends Difference {
                     }
                     <p>
                         <span class="difference_title">Value on left  : </span>
-                        <span class="difference_value">{ Serializer.serialize(this.v1, 4, 4) }</span>
+                        <span class="difference_value">{ Serializer.serialize(this.v1, { maxDepth : 4, maxWide : 4 }) }</span>
                     </p>
                 </li>
                 <li class='difference_expected'>
@@ -144,7 +144,7 @@ export class DifferenceReachability extends Difference {
                     }
                     <p>
                         <span class="difference_title">Value on right : </span>
-                        <span class="difference_value">{ Serializer.serialize(this.v2, 4, 4) }</span>
+                        <span class="difference_value">{ Serializer.serialize(this.v2, { maxDepth : 4, maxWide : 4 }) }</span>
                     </p>
                 </li>
             </ul>
@@ -173,7 +173,7 @@ export class DifferenceSet<V = unknown> extends Difference {
                     this.onlyIn1.size > 0 && <li>
                         Elements present only in the set we got (missing in the expected set)
                         <ul>{
-                            Array.from(this.onlyIn1).map(el => <li>{ Serializer.serialize(el, 4, 4) }</li>)
+                            Array.from(this.onlyIn1).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) }</li>)
                         }</ul>
                     </li>
                 }
@@ -181,7 +181,7 @@ export class DifferenceSet<V = unknown> extends Difference {
                     this.onlyIn2.size > 0 && <li>
                         Elements present only in the set we expect (missing in the set we got)
                         <ul>{
-                            Array.from(this.onlyIn2).map(el => <li>{ Serializer.serialize(el, 4, 4) }</li>)
+                            Array.from(this.onlyIn2).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) }</li>)
                         }</ul>
                     </li>
                 }
@@ -210,7 +210,7 @@ export class DifferenceMap<K = unknown, V = unknown> extends Difference {
                     this.onlyIn1.size > 0 && <li>
                         Keys present only in the map we got (missing in the expected map)
                         <ul>
-                            { CI(this.onlyIn1).take(5).map(el => <li>{ Serializer.serialize(el, 4, 4) } : { Serializer.serialize(this.map1.get(el), 4, 4) }</li>) }
+                            { CI(this.onlyIn1).take(5).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) } : { Serializer.serialize(this.map1.get(el), { maxDepth : 4, maxWide : 4 }) }</li>) }
                             { this.onlyIn1.size > 5 && <li>... 5 from { this.onlyIn1.size } are shown</li> }
                         </ul>
                     </li>
@@ -219,7 +219,7 @@ export class DifferenceMap<K = unknown, V = unknown> extends Difference {
                     this.onlyIn2.size > 0 && <li>
                         Keys present only in the map we expect (missing in the map we got)
                         <ul>
-                            { CI(this.onlyIn2).take(5).map(el => <li>{ Serializer.serialize(el, 4, 4) } : { Serializer.serialize(this.map2.get(el), 4, 4) }</li>) }
+                            { CI(this.onlyIn2).take(5).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) } : { Serializer.serialize(this.map2.get(el), { maxDepth : 4, maxWide : 4 }) }</li>) }
                             { this.onlyIn2.size > 5 && <li>... 5 from { this.onlyIn2.size } are shown</li> }
                         </ul>
                     </li>
@@ -249,7 +249,7 @@ export class DifferenceObject extends Difference {
                     this.onlyIn1.size > 0 && <li>
                         Keys present only in the object we got (missing in the expected object)
                         <ul>
-                            { CI(this.onlyIn1).take(5).map(el => <li>{ Serializer.serialize(el, 4, 4) } : { Serializer.serialize(this.object1[ el as any ], 4, 4) }</li>) }
+                            { CI(this.onlyIn1).take(5).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) } : { Serializer.serialize(this.object1[ el as any ], { maxDepth : 4, maxWide : 4 }) }</li>) }
                             { this.onlyIn1.size > 5 && <li>... 5 from { this.onlyIn1.size } are shown</li> }
                         </ul>
                     </li>
@@ -258,7 +258,7 @@ export class DifferenceObject extends Difference {
                     this.onlyIn2.size > 0 && <li>
                         Elements present only in the set we expect (missing in the set we got)
                         <ul>
-                            { CI(this.onlyIn2).take(5).map(el => <li>{ Serializer.serialize(el, 4, 4) } : { Serializer.serialize(this.object2[ el as any ], 4, 4) }</li>) }
+                            { CI(this.onlyIn2).take(5).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) } : { Serializer.serialize(this.object2[ el as any ], { maxDepth : 4, maxWide : 4 }) }</li>) }
                             { this.onlyIn2.size > 5 && <li>... 5 from { this.onlyIn2.size } are shown</li> }
                         </ul>
                     </li>
@@ -302,7 +302,7 @@ export class DifferenceArrayLengthIsDifferent extends Difference {
             }:</p>
             <unl>{
                 (this.type === 'extra' ? this.array1 : this.array2).slice(this.startingFrom).map((el, index) =>
-                    <li><span>[ { index + this.startingFrom } ]</span> : { Serializer.serialize(el, 4, 4) }</li>
+                    <li><span>[ { index + this.startingFrom } ]</span> : { Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) }</li>
                 )
             }</unl>
         </div>
@@ -320,11 +320,11 @@ export class DifferenceFunction extends Difference {
             <unl className='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got      : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.func1, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.func1, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.func2, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.func2, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
             </unl>
         </div>
@@ -351,11 +351,11 @@ export class DifferenceRegExp extends Difference {
             <unl className='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got      : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.regexp1, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.regexp1, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.regexp2, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.regexp2, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
             </unl>
         </div>
@@ -374,11 +374,11 @@ export class DifferenceDate extends Difference {
             <unl className='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got      : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.date1, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.date1, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.date2, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.date2, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
             </unl>
         </div>
@@ -396,11 +396,11 @@ export class DifferenceValuesAreDifferent extends Difference {
             <unl class='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got      : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.v1, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.v1, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.v2, 4, 4) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.v2, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
             </unl>
         </div>
