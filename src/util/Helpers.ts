@@ -156,3 +156,7 @@ export const saneSplit = function (str : string, split : string | RegExp) : stri
 export const randomElement = <V>(array : V[]) : V => {
     return array[ Math.floor(array.length * Math.random()) ]
 }
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const escapeRegExp = (source : string) : string => source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')

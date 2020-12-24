@@ -40,7 +40,9 @@ export class Compare extends Mixin(
                 this.addResult(Assertion.new({
                     name            : 'isDeeply',
                     passed          : false,
+                    sourceLine      : this.getSourceLine(),
                     description,
+
 
                     annotation      : <div>
                         {/*Provided values are different. Here {*/}
@@ -66,6 +68,7 @@ export class Compare extends Mixin(
                 this.addResult(Assertion.new({
                     name            : 'isDeeply',
                     passed          : true,
+                    sourceLine      : this.getSourceLine(),
                     description
                 }))
             }

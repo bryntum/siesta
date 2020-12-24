@@ -67,6 +67,7 @@ export class Test extends Mixin(
             this.addResult(Assertion.new({
                 name            : 'pass',
                 passed          : true,
+                sourceLine      : this.getSourceLine(),
                 description
             }))
         }
@@ -76,6 +77,7 @@ export class Test extends Mixin(
             this.addResult(Assertion.new({
                 name            : 'fail',
                 passed          : false,
+                sourceLine      : this.getSourceLine(),
                 description
             }))
         }

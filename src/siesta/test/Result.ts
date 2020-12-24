@@ -1,8 +1,9 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
-import { exclude, registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
-import { XmlElement, XmlStream } from "../jsx/XmlElement.js"
+import { serializable, Serializable } from "../../serializable/Serializable.js"
+import { escapeRegExp } from "../../util/Helpers.js"
+import { XmlElement } from "../jsx/XmlElement.js"
 import { TestDescriptor } from "./Descriptor.js"
 import { LUID, luid } from "./LUID.js"
 
@@ -18,6 +19,7 @@ export class Result extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
+@serializable('LogMessage')
 export class LogMessage extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
@@ -29,10 +31,9 @@ export class LogMessage extends Mixin(
     }
 ) {}
 
-registerSerializableClass('LogMessage', LogMessage)
-
 
 //---------------------------------------------------------------------------------------------------------------------
+@serializable('Exception')
 export class Exception extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
@@ -42,10 +43,9 @@ export class Exception extends Mixin(
     }
 ) {}
 
-registerSerializableClass('Exception', Exception)
-
 
 //---------------------------------------------------------------------------------------------------------------------
+@serializable('Assertion')
 export class Assertion extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
@@ -65,17 +65,15 @@ export class Assertion extends Mixin(
 
         description     : string            = ''
 
-        sourceFile      : string            = 'some/source/file.js'
-        sourceLine      : number            = 123
+        sourceLine      : number            = undefined
 
-        annotation      : XmlStream         = undefined
+        annotation      : XmlElement        = undefined
     }
 ) {}
 
-registerSerializableClass('Assertion', Assertion)
-
 
 //---------------------------------------------------------------------------------------------------------------------
+@serializable('AssertionAsync')
 export class AssertionAsyncCreation extends Mixin(
     [ Assertion, Serializable, Result ],
     (base : ClassUnion<typeof Assertion, typeof Serializable, typeof Result>) => {
@@ -93,10 +91,9 @@ export class AssertionAsyncCreation extends Mixin(
     return AssertionAsyncCreation
 }) {}
 
-registerSerializableClass('AssertionAsync', AssertionAsyncCreation)
-
 
 //---------------------------------------------------------------------------------------------------------------------
+@serializable('AssertionAsyncResolution')
 export class AssertionAsyncResolution extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) => {
@@ -110,8 +107,6 @@ export class AssertionAsyncResolution extends Mixin(
     }
     return AssertionAsyncResolution
 }) {}
-
-registerSerializableClass('AssertionAsyncResolution', AssertionAsyncResolution)
 
 
 
@@ -145,6 +140,32 @@ export class TestNodeResult extends Mixin(
         resultLog       : TestResult[]      = []
 
         resultMap       : Map<LUID, TestResult> = new Map()
+
+
+        get url () : string {
+            return this.root.descriptor.url
+        }
+
+        $sourceLineExtractor       : RegExp            = undefined
+
+        get sourceLineExtractor () : RegExp {
+            if (this.$sourceLineExtractor !== undefined) return this.$sourceLineExtractor
+
+            return this.$sourceLineExtractor = new RegExp(escapeRegExp(this.url) + ':(\\d+)')
+        }
+
+
+        getSourceLine () : number | undefined {
+            const stack         = new Error().stack
+
+            if (stack) {
+                const match     = stack.match(this.sourceLineExtractor)
+
+                if (match) return Number(match[ 1 ])
+            }
+
+            return undefined
+        }
 
 
         $depth           : number    = undefined
