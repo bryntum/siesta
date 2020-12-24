@@ -34,8 +34,8 @@ StartTest(t => {
         server.media    = worker
         worker.media    = server
 
-        server.connect()
-        worker.connect()
+        await server.connect()
+        await worker.connect()
 
         t.is(await worker.sum(1, 1), 2)
         t.is(await worker.multiply(1, 3), 3)
@@ -43,8 +43,8 @@ StartTest(t => {
         t.is(await server.sum(1, 1), 2)
         t.is(await server.multiply(1, 3), 3)
 
-        server.disconnect()
-        worker.disconnect()
+        await server.disconnect()
+        await worker.disconnect()
 
         t.is(await worker.sum(1, 1), 2)
         t.is(await server.multiply(1, 3), 3)
@@ -78,8 +78,8 @@ StartTest(t => {
         server.media    = worker
         worker.media    = server
 
-        server.connect()
-        worker.connect()
+        await server.connect()
+        await worker.connect()
 
         try {
             t.is(await worker.multiply(1, 3), 3)

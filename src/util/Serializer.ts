@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { DataVisitor } from "./DataVisitor.js"
-import { ArbitraryObjectKey, constructorNameOf, typeOf, uppercaseFirst } from "./Helpers.js"
+import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf, uppercaseFirst } from "./Helpers.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -43,7 +43,11 @@ export class Serializer extends Mixin(
 
 
         visitOutOfDepthValue (value : unknown, depth : number) {
-            this.write(`${ this.outOfDepthSymbol } ${ constructorNameOf(value) || typeOf(value) }`)
+            if (isAtomicValue(value)) {
+                this.visitAtomicValue(value, depth)
+            } else {
+                this.write(`${ this.outOfDepthSymbol } ${ constructorNameOf(value) || typeOf(value) } {...}`)
+            }
         }
 
 
