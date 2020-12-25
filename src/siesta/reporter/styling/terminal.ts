@@ -1,6 +1,5 @@
 export const styles = new Map()
 
-
 styles.set('project_title', c => c.underline)
 styles.set('test_file_url_dirname', c => c.keyword("gray"))
 styles.set('test_file_url_filename', c => c.keyword("whitesmoke"))
@@ -28,3 +27,4 @@ styles.set('progress_bar_completed_passed', c => c.bgRgb(0x20, 0x76, 0x6b))
 styles.set('progress_bar_completed_failed', c => c.bgRgb(0xce, 0x40, 0x1c))
 styles.set('ligther_smooth_accent_color', c => c.rgb(0xef, 0xd3, 0x8f))
 styles.set('typename', c => c.rgb(0xe9, 0xc4, 0x6a))
+styles.set('tree_line', c => c.rgb(0x40, 0x40, 0x40))

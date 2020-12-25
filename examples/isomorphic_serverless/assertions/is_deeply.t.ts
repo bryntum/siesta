@@ -1,6 +1,10 @@
 import { describe } from "../../../main.js"
+import { delay } from "../../../src/util/Helpers.js"
 
-describe('`isDeeply`assertion should work', t => {
+describe('`isDeeply`assertion should work', async t => {
+
+    await delay(500)
+
     t.it('Compare primitives', t => {
         t.isDeeply(1, 1)
 

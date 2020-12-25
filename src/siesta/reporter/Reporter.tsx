@@ -73,15 +73,15 @@ export class TextBlock extends Base {
     }
 
 
-    indentAsTreeLeafMut (howMany : number, isLast : boolean) {
+    indentAsTreeLeafMut (howMany : number, isLast : boolean, c : Colorer) {
         const indenterPlain     = ' '.repeat(howMany - 1)
         const indenterTree      = '─'.repeat(howMany - 1)
 
         this.text.forEach((line, index) => {
             if (index === 0) {
-                line.unshift(isLast ? '└' + indenterTree : '├' + indenterTree)
+                line.unshift(c.text(isLast ? '└' + indenterTree : '├' + indenterTree))
             } else {
-                line.unshift(isLast ? ' ' + indenterPlain : '│' + indenterPlain)
+                line.unshift(c.text(isLast ? ' ' + indenterPlain : '│' + indenterPlain))
             }
         })
     }

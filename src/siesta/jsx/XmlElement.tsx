@@ -60,7 +60,12 @@ export class XmlElement extends Mixin(
         }
 
 
-        setAttribute (name, value) {
+        getAttribute (name : string) : any {
+            return this.attributes[ name ]
+        }
+
+
+        setAttribute (name : string, value : any) {
             this.attributes[ name ] = value
         }
     }

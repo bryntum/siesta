@@ -156,7 +156,11 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     color : $ligther_smooth_accent_color;
 }
 
-
 .typename {
     color : $smooth_accent_color;
+}
+
+
+.tree_line {
+    color : #404040;
 }

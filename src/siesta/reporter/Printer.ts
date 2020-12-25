@@ -55,7 +55,11 @@ export class Printer extends Mixin(
                     }
 
                     if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
-                        block.indentAsTreeLeafMut(this.treeIndentationLevel, isLast)
+                        const attr          = el.getAttribute('isLastNode')
+
+                        const isLastNode    = attr !== undefined ? attr && isLast : isLast
+
+                        block.indentAsTreeLeafMut(this.treeIndentationLevel, isLastNode, this.styles.get('tree_line')(this.c))
                     }
 
                     if (this.getDisplayType(node) === 'inline') {

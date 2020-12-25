@@ -32,7 +32,6 @@ export class TestContextProviderBrowserIframe extends Mixin(
 
             async createTestContext (desc : TestDescriptor) : Promise<TestLauncherParent> {
                 const childChannelModuleUrl : string        = import.meta.url
-                    .replace(/^file:/, '')
                     .replace(/context_provider\/TestContextProviderBrowserIframe.js$/, 'test/recipe/TestRecipeBrowserIframe.js')
 
                 const iframe        = document.createElement('iframe')
