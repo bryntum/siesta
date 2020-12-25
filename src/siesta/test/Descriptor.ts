@@ -1,9 +1,10 @@
 import { Base } from "../../class/Base.js"
-import { IsolationLevel } from "../common/IsolationLevel.js"
-import { registerSerializableClass, Serializable } from "../../serializable/Serializable.js"
+import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { typeOf } from "../../util/Helpers.js"
+import { IsolationLevel } from "../common/IsolationLevel.js"
 
 //---------------------------------------------------------------------------------------------------------------------
+@serializable('TestDescriptor')
 export class TestDescriptor extends Serializable.mix(Base) {
     title           : string                = ''
 
@@ -58,7 +59,5 @@ export class TestDescriptor extends Serializable.mix(Base) {
         }
     }
 }
-
-registerSerializableClass('TestDescriptor', TestDescriptor)
 
 export type TestDescriptorArgument = string | Partial<TestDescriptor>

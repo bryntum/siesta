@@ -1,16 +1,15 @@
-import { registerSerializableClass, reviver, Serializable } from "../../src/serializable/Serializable.js"
+import { reviver, serializable, Serializable } from "../../src/serializable/Serializable.js"
 
 declare const StartTest : any
 
 StartTest(t => {
 
     t.it('Basic serialization should work', async t => {
+        @serializable('someclass')
         class SomeClass extends Serializable {
             prop1       : number    = 1
             prop2       : string    = '2'
         }
-
-        registerSerializableClass('someclass', SomeClass)
 
         const someClass     = new SomeClass()
 
@@ -23,17 +22,15 @@ StartTest(t => {
 
 
     t.it('Nested basic serialization should work', async t => {
+        @serializable('someclass1')
         class SomeClass1 extends Serializable {
             prop1       : number    = 1
         }
 
-        registerSerializableClass('someclass1', SomeClass1)
-
+        @serializable('someclass2')
         class SomeClass2 extends Serializable {
             prop2       : SomeClass1    = new SomeClass1()
         }
-
-        registerSerializableClass('someclass2', SomeClass2)
 
         const someClass     = new SomeClass2()
 
@@ -49,17 +46,15 @@ StartTest(t => {
 
 
     t.it('Serialization of nested array property should work', async t => {
+        @serializable('someclass11')
         class SomeClass1 extends Serializable {
             prop1       : number    = 1
         }
 
-        registerSerializableClass('someclass11', SomeClass1)
-
+        @serializable('someclass22')
         class SomeClass2 extends Serializable {
             prop2       : SomeClass1[]      = [ new SomeClass1() ]
         }
-
-        registerSerializableClass('someclass22', SomeClass2)
 
         const someClass     = new SomeClass2()
 

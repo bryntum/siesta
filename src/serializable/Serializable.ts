@@ -37,8 +37,7 @@ export class Serializable extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 const serializableClasses = new Map<string, typeof Serializable>()
 
-// TODO replace all usages of this function with decorator
-export const registerSerializableClass = (id : string, cls : typeof Serializable) => {
+const registerSerializableClass = (id : string, cls : typeof Serializable) => {
     cls.prototype.$class        = id
 
     if (serializableClasses.has(id) && serializableClasses.get(id) !== cls) {

@@ -1,5 +1,5 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { registerSerializableClass } from "../../../serializable/Serializable.js"
+import { serializable } from "../../../serializable/Serializable.js"
 import { delay, OrPromise } from "../../../util/Helpers.js"
 import { isFunction } from "../../../util/Typeguards.js"
 import { AssertionAsyncCreation, AssertionAsyncResolution, Exception, TestNodeResult } from "../Result.js"
@@ -120,6 +120,7 @@ export class Async extends Mixin(
 
 // experiment - separate class per assertion
 
+@serializable('AssertionWaitFor')
 export class AssertionWaitFor extends AssertionAsyncCreation {
     name            : string        = 'waitFor'
 
@@ -128,5 +129,3 @@ export class AssertionWaitFor extends AssertionAsyncCreation {
         return this.resolution.passed
     }
 }
-
-registerSerializableClass('AssertionWaitFor', AssertionWaitFor)
