@@ -1,4 +1,3 @@
-import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Channel } from "./Channel.js"
 
