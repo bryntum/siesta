@@ -9,7 +9,7 @@ import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception,
 
 //---------------------------------------------------------------------------------------------------------------------
 // make sure we actually import these class symbols (and not just types),
-// so that their `registerSerializableClass()` calls are made
+// so that their `@serializable()` decorator calls are made
 
 Assertion
 AssertionAsyncCreation
@@ -37,7 +37,7 @@ export class TestReporterParent extends Mixin(
 
         class TestReporterParent extends base implements TestReporterChannel {
 
-            reporter        : Reporter          = undefined
+            reporter                    : Reporter              = undefined
 
             topTestNodeResult           : TestNodeResult        = undefined
 
@@ -55,8 +55,6 @@ export class TestReporterParent extends Mixin(
 
             @local()
             onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) {
-                // console.log("ON SUBTEST START", descriptor)
-
                 if (this.currentTestNodeResult) {
                     if (this.currentTestNodeResult.localId !== parentTestNodeId) {
                         throw new Error("Parent test node internal id mismatch")

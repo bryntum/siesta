@@ -23,6 +23,7 @@ export class Spinner extends Base {
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
 export const clockSpinner = Spinner.new({
     frames  : [
         "🕛", "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚"
@@ -35,7 +36,6 @@ export const arrowSpinner = Spinner.new({
     ]
 })
 
-
 export const barSpinner = Spinner.new({
     frames  : [
         '▉', '▊', '▋', '▌', '▍', '▎', '▏', '▎', '▍', '▌', '▋', '▊', '▉'
@@ -43,7 +43,7 @@ export const barSpinner = Spinner.new({
 })
 
 
-
+//---------------------------------------------------------------------------------------------------------------------
 export const spinners   = [ clockSpinner, arrowSpinner, barSpinner ]
 
 export const randomSpinner = () => randomElement(spinners)
