@@ -1,15 +1,16 @@
 import { GetIsomorphicProjectClass } from "../../main.js"
 
+// top-level await wrapper
 (async () => {
 
 const project = (await GetIsomorphicProjectClass()).new({
-    title                   : 'Isomorphic test suite example',
+    title                   : 'Isomorphic serverless test suite example',
 
     // global test-specific options
     descriptor              : {}
 })
 
-project.plan([
+project.plan(
     {
         filename    : 'basic',
 
@@ -38,9 +39,10 @@ project.plan([
             'advanced_test.t.js'
         ]
     },
-])
+)
 
 project.start()
 
+// top-level await wrapper
 })()
 
