@@ -3,21 +3,17 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
-import { styles } from "./styling/terminal.js"
-import { Colorer } from "./Colorer.js"
+import { Colorer, ColorerRule } from "./Colorer.js"
 import { TextBlock } from "./Reporter.js"
+import { styles } from "./styling/terminal.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type ColorerRule = (c : Colorer) => Colorer
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class Printer extends Mixin(
+export class XmlRenderer extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
 
-    class Printer extends base {
+    class XmlRenderer extends base {
         styles      : Map<string, ColorerRule>  = styles
 
         c           : Colorer       = undefined
@@ -27,11 +23,6 @@ export class Printer extends Mixin(
         blockLevelElements          : Set<string> = new Set([
             'div', 'ul', 'unl', 'li', 'tree', 'leaf', 'p'
         ])
-
-
-        print (str : string) {
-            throw new Error("Abstract method")
-        }
 
 
         render (el : XmlNode) : TextBlock {
@@ -97,11 +88,6 @@ export class Printer extends Mixin(
             return saneSplit(el.attributes.class ?? '', /\s+/)
                 .map(className => this.styles.get(className))
                 .filter(rule => Boolean(rule))
-        }
-
-
-        write (el : XmlElement) {
-            this.print(this.render(el).toString())
         }
     }
 ){}

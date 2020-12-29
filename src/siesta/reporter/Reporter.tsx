@@ -9,7 +9,7 @@ import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
 import { Assertion, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
-import { Printer } from "./Printer.js"
+import { XmlRenderer } from "./XmlRenderer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -234,8 +234,8 @@ export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
-    [ Printer, Base ],
-    (base : ClassUnion<typeof Printer, typeof Base>) => {
+    [ XmlRenderer, Base ],
+    (base : ClassUnion<typeof XmlRenderer, typeof Base>) => {
 
     class Reporter extends base {
         launch              : Launch                    = undefined
@@ -255,6 +255,16 @@ export class Reporter extends Mixin(
         spinner             : Spinner                   = randomSpinner()
 
         startTime           : Date                      = undefined
+
+
+        print (str : string) {
+            throw new Error("Abstract method")
+        }
+
+
+        write (el : XmlElement) {
+            this.print(this.render(el).toString())
+        }
 
 
         needToShowResult (result : TestResult) : boolean {
