@@ -41,9 +41,11 @@ export class PathSegment extends Base {
 
             case "map_key" :
                 str = `.get(${ Serializer.serialize(this.key, { maxDepth : 4, maxWide : 4 }) })`
+                break
 
             case "set_element" :
                 str = `.set_element(${ Serializer.serialize(this.key, { maxDepth : 4, maxWide : 4 }) })`
+                break
         }
 
         return [ str ]
@@ -269,7 +271,7 @@ export class DifferenceObject extends Difference {
 }
 
 
-export class DifferenceArrayLengthIsDifferent extends Difference {
+export class DifferenceArray extends Difference {
     array1          : unknown[]     = undefined
     array2          : unknown[]     = undefined
 
@@ -296,9 +298,9 @@ export class DifferenceArrayLengthIsDifferent extends Difference {
             <p>{
                 this.type === 'extra'
                     ?
-                `Extra elements, missing in the expected array`
+                `We got extra elements, missing in the expected array`
                     :
-                `Missing elements, present in the expected array`
+                `Elements missing in the array we got, present in the expected array`
             }:</p>
             <unl>{
                 (this.type === 'extra' ? this.array1 : this.array2).slice(this.startingFrom).map((el, index) =>
@@ -556,6 +558,16 @@ export const compareArrayDeepGen = function * (
     : Generator<Difference>
 {
     const minLength     = Math.min(array1.length, array2.length)
+    const maxLength     = Math.max(array1.length, array2.length)
+
+    if (maxLength > minLength)
+        yield DifferenceArray.new({
+            keyPath         : state.keyPathSnapshot(),
+            array1,
+            array2,
+            type            : array1.length === maxLength ? 'extra' : 'missing',
+            startingFrom    : minLength
+        })
 
     for (let i = 0; i < minLength; i++) {
         state.keyPath.push(PathSegment.new({ type : 'array_index', key : i }))
@@ -564,17 +576,6 @@ export const compareArrayDeepGen = function * (
 
         state.keyPath.pop()
     }
-
-    const maxLength     = Math.max(array1.length, array2.length)
-
-    if (maxLength > minLength)
-        yield DifferenceArrayLengthIsDifferent.new({
-            keyPath         : state.keyPathSnapshot(),
-            array1,
-            array2,
-            type            : array1.length === maxLength ? 'extra' : 'missing',
-            startingFrom    : minLength
-        })
 }
 
 
@@ -585,6 +586,8 @@ export const compareKeys = function <K, V>(
 )
     : { common1 : K[], common2 : K[], onlyIn1 : Set<unknown>, onlyIn2 : Set<unknown> }
 {
+    const pathSegmentType   = setMap1 instanceof Map ? 'map_key' : 'set_element'
+
     const common1           = [] as K[]
     const common2           = [] as K[]
     const onlyIn1           = new Set<K>()
@@ -602,7 +605,7 @@ export const compareKeys = function <K, V>(
         else if (Array.from(onlyIn2).some(item2 => {
             const innerState = state.in()
 
-            innerState.push(PathSegment.new({ type : 'set_element', key : item2 }))
+            innerState.push(PathSegment.new({ type : pathSegmentType, key : item2 }))
 
             const equal = CI(compareDeepGen(item1, item2, options, innerState)).take(1).length === 0
 
