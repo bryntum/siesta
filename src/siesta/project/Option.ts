@@ -17,13 +17,13 @@ export class Option extends Mixin(
 
         type        : OptionAtomType        = 'string'
 
-        // maps are supposed to always   be Map<string, type>
+        // maps are supposed to have string keys
         structure   : OptionStructureType   = 'atom'
 
 
         applyInputValue (
             optionValue         : string,
-            existingEntry       : { value : unknown },
+            valueEntry          : { value : unknown },
             optionNameSegments  : string[],
             errors              : OptionParseError[],
             warnings            : OptionParseWarning[]
@@ -45,9 +45,9 @@ export class Option extends Mixin(
                     return
                 }
 
-                if (existingEntry.value === undefined) existingEntry.value = new Map();
+                if (valueEntry.value === undefined) valueEntry.value = new Map();
 
-                (existingEntry.value as Map<string, unknown>).set(keyValueParseRes.key, parseRes.value)
+                (valueEntry.value as Map<string, unknown>).set(keyValueParseRes.key, parseRes.value)
             } else {
                 const parseRes  = this.parseAtomValue(optionValue)
 
@@ -59,25 +59,25 @@ export class Option extends Mixin(
 
                 if (this.structure === 'atom') {
 
-                    if (existingEntry.value !== undefined)
-                        if (existingEntry.value !== parseRes.value) {
-                            warnings.push({ warning : OptionsParseWarnings.ExistingValueOverwritten, option : this, value : existingEntry.value })
+                    if (valueEntry.value !== undefined)
+                        if (valueEntry.value !== parseRes.value) {
+                            warnings.push({ warning : OptionsParseWarnings.ExistingValueOverwritten, option : this, value : valueEntry.value })
                         }
                         else {
-                            warnings.push({ warning : OptionsParseWarnings.SameValueEncountered, option : this, value : existingEntry.value })
+                            warnings.push({ warning : OptionsParseWarnings.SameValueEncountered, option : this, value : valueEntry.value })
                         }
 
-                    existingEntry.value = parseRes.value
+                    valueEntry.value = parseRes.value
                 }
                 else if (this.structure === 'array') {
-                    if (existingEntry.value === undefined) existingEntry.value = [];
+                    if (valueEntry.value === undefined) valueEntry.value = [];
 
-                    (existingEntry.value as unknown[]).push(parseRes.value)
+                    (valueEntry.value as unknown[]).push(parseRes.value)
                 }
                 else if (this.structure === 'set') {
-                    if (existingEntry.value === undefined) existingEntry.value = new Set();
+                    if (valueEntry.value === undefined) valueEntry.value = new Set();
 
-                    (existingEntry.value as Set<unknown>).add(parseRes.value)
+                    (valueEntry.value as Set<unknown>).add(parseRes.value)
                 }
             }
         }
@@ -108,7 +108,7 @@ export class Option extends Mixin(
                 if (/^\s*true|enable|yes|1\s*$/i.test(input)) {
                     return { value : true }
                 }
-                else if (/\s*false|disable|no|0\s*$/i.test(input)) {
+                else if (/^\s*false|disable|no|0\s*$/i.test(input) || /^\s*$/i.test(input)) {
                     return { value : false }
                 }
                 else {
@@ -177,6 +177,7 @@ export const option = (config? : Partial<Option>, optionCls : typeof Option = Op
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
 export function parseOptions (
     input : string[], knownOptions : { [ key : string ] : Option }
 ) : {
