@@ -2,6 +2,7 @@
     "compilerOptions" : {
 //        "importHelpers"             : true,
         "experimentalDecorators"    : true,
+        "noImplicitThis"        : true,
 
         "jsx"                   : "react",
         "jsxFactory"            : "SiestaJSX.createElement",
