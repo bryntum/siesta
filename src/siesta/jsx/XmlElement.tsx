@@ -7,7 +7,7 @@ import { SiestaJSX } from "./Factory.js"
 //---------------------------------------------------------------------------------------------------------------------
 export type XmlNode = string | XmlElement
 
-export type XmlStream = XmlNode | (XmlNode | XmlStream)[]
+export type XmlStream = XmlNode | XmlStream[]
 
 
 @serializable('XmlElement')

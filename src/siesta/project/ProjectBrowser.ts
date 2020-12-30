@@ -7,13 +7,14 @@ import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { ReporterBrowser } from "../reporter/ReporterBrowser.js"
+import { option } from "./Option.js"
 import { Project } from "./Project.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ProjectBrowser extends Mixin(
     [ Project ],
-    (base : ClassUnion<typeof Project>) =>
+    (base : ClassUnion<typeof Project>) => {
 
     class ProjectBrowser extends base {
 
@@ -26,6 +27,11 @@ export class ProjectBrowser extends Mixin(
         testContextProviderConstructors   : (typeof TestContextProvider)[]      = [ TestContextProviderBrowserIframe ]
 
 
+        @option({ type : 'string', structure : 'map' })
+        browserArg      : Map<string, string>   = new Map()
+
+
+
         buildBaseUrl () : string {
             const url           = new URL(window.location.href)
 
@@ -34,5 +40,12 @@ export class ProjectBrowser extends Mixin(
 
             return url.href
         }
+
+
+        buildInputArgs () : string[] {
+            return []
+        }
     }
-) {}
+
+    return ProjectBrowser
+}) {}

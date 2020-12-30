@@ -1,19 +1,19 @@
 import { Base } from "../../class/Base.js"
-import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
-import { TestContextProviderNodeIpc } from "../context_provider/TestContextProviderNodeIpc.js"
 import { Colorer } from "../reporter/Colorer.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { Launch } from "./Launch.js"
+import { HasOptions, option, parseOptions } from "./Option.js"
 import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor } from "./Plan.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Project extends Mixin(
-    [ Base ],
-    (base : ClassUnion<typeof Base>) =>
+    [ HasOptions, Base ],
+    (base : ClassUnion<typeof HasOptions, typeof Base>) => {
 
     class Project extends base {
         baseUrl         : string            = ''
@@ -34,6 +34,14 @@ export class Project extends Mixin(
 
         reporterClass   : typeof Reporter   = undefined
         colorerClass    : typeof Colorer    = undefined
+
+        @option({ type : 'boolean' })
+        noColor         : boolean           = false
+
+        inputArgs       : string[]          = undefined
+
+        @option({ type : 'string', structure : 'map' })
+        map             : boolean           = false
 
 
         // createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
@@ -57,20 +65,39 @@ export class Project extends Mixin(
 
 
         plan (...args : (ProjectPlanItemDescriptor | ProjectPlanItemDescriptor[])[]) {
-            const descriptors   = args.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el))
+            const descriptors : ProjectPlanItemDescriptor[]  = args.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el)) as any
 
-            descriptors.forEach(item => this.projectPlan.planItem(PlanItemFromDescriptor(item as ProjectPlanItemDescriptor)))
+            descriptors.forEach(item => this.projectPlan.planItem(PlanItemFromDescriptor(item)))
         }
 
 
         async setup () {
             if (!this.baseUrl) this.baseUrl = this.buildBaseUrl()
 
-            this.projectPlan.descriptor.url = this.baseUrl
+            const desc              = TestDescriptor.maybeNew(this.descriptor)
+
+            desc.url                = this.baseUrl
+
+            this.projectPlan.descriptor = desc
+
+            this.descriptor         = desc
+
+            if (this.inputArgs === undefined) this.inputArgs = this.buildInputArgs()
+
+            const parseRes          = parseOptions(this.inputArgs, this.$options)
+
+            if (parseRes.errors.length) {
+
+            }
         }
 
 
         buildBaseUrl () : string {
+            throw new Error("Implement me")
+        }
+
+
+        buildInputArgs () : string[] {
             throw new Error("Implement me")
         }
 
@@ -80,7 +107,7 @@ export class Project extends Mixin(
         }
 
 
-        async launch (planItemsToLaunch : ProjectPlanItem[]) {
+        async launch (planItemsToLaunch : ProjectPlanItem[]) : Promise<Launch> {
             if (!this.setupDone) {
                 // setup may be already started (by another launch)
                 await (this.setupPromise || (this.setupPromise = this.setup()))
@@ -97,6 +124,10 @@ export class Project extends Mixin(
             })
 
             await launch.start()
+
+            return launch
         }
     }
-) {}
+
+    return Project
+}) {}
