@@ -99,7 +99,7 @@ export class ReporterTheme extends Base {
     }
 
 
-    testSuiteHeader () : XmlStream {
+    testSuiteHeader () : XmlElement {
         return <div>
             Launching test suite: <span class="project_title">{ this.project.title }</span>
             <div></div>
@@ -186,8 +186,13 @@ export class Reporter extends Mixin(
         }
 
 
+        printLn (str : string) {
+            this.print(str + '\n')
+        }
+
+
         write (el : XmlElement) {
-            this.print(this.render(el).toString())
+            this.printLn(this.render(el).toString())
         }
 
 
@@ -272,7 +277,7 @@ export class Reporter extends Mixin(
         onTestSuiteStart () {
             this.startTime      = new Date()
 
-            this.write(streamToElement(this.t.testSuiteHeader()))
+            this.write(this.t.testSuiteHeader())
         }
 
 

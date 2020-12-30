@@ -17,7 +17,7 @@ export class ReporterBrowser extends Mixin(
         // spinnerChars    : number                        = 0
 
 
-        print (str : string, includeNewLine : boolean = true) {
+        print (str : string) {
             console.log(str)
             // process.stdout.write(str)
             //

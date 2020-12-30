@@ -135,7 +135,7 @@ export class XmlRenderer extends Mixin(
                         if (context === 'inline' || context === 'closed_block') {
                             context         = 'closed_block'
 
-                            block.text.unshift([])
+                            res.addNewLine()
                         } else if (context === 'opened_block') {
                             context         = 'closed_block'
                         }

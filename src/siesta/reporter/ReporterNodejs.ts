@@ -21,15 +21,11 @@ export class ReporterNodejs extends Mixin(
         spinnerChars    : number                        = 0
 
 
-        print (str : string, includeNewLine : boolean = true) {
+        print (str : string) {
             process.stdout.write(str)
-
-            if (includeNewLine) process.stdout.write('\n')
 
             if (this.isPrintingFooter) {
                 this.footerLines += Array.from(str.matchAll(/\n/g)).length
-
-                if (includeNewLine) this.footerLines++
             }
         }
 
@@ -99,7 +95,7 @@ export class ReporterNodejs extends Mixin(
             this.write(this.t.testSuiteFooter())
 
             this.printProgressBar()
-            this.print(' ', false)
+            this.print(' ')
             this.printSpinner()
 
             this.isPrintingFooter   = false
@@ -107,7 +103,7 @@ export class ReporterNodejs extends Mixin(
 
 
         printProgressBar () {
-            this.print(this.render(this.t.progressBar()).toString(), false)
+            this.print(this.render(this.t.progressBar()).toString())
         }
 
 
@@ -116,7 +112,7 @@ export class ReporterNodejs extends Mixin(
 
             const spinnerText       = this.t.spinner()
 
-            this.print(spinnerText, false)
+            this.print(spinnerText)
 
             this.spinnerChars       = spinnerText.length
         }
