@@ -1,22 +1,25 @@
 {
     "compilerOptions" : {
-//        "importHelpers"             : true,
         "experimentalDecorators"    : true,
-        "noImplicitThis"        : true,
 
-        "jsx"                   : "react",
-        "jsxFactory"            : "SiestaJSX.createElement",
-        "jsxFragmentFactory"    : "SiestaJSX.Fragment",
-        "target": "es2017",
-//        "strictNullChecks"      : true,
+        "noImplicitThis"            : true,
+        "strictBindCallApply"       : true,
 
-        "sourceMap"             : false,
-        "lib"                   : [
+        "jsx"                       : "react",
+        "jsxFactory"                : "SiestaJSX.createElement",
+        "jsxFragmentFactory"        : "SiestaJSX.Fragment",
+
+        "target"                    : "es2017",
+        "sourceMap"                 : false,
+
+        "lib"                       : [
             "esnext",
             "dom"
         ],
-        "module"                : "esnext",
-        "moduleResolution"      : "Node",
+
+        "module"                    : "esnext",
+        "moduleResolution"          : "node",
+
         "allowSyntheticDefaultImports"    : true
     },
 
