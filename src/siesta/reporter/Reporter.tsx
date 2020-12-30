@@ -1,7 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
-import { saneSplit } from "../../util/Helpers.js"
 import { relative } from "../../util/Path.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { streamToElement, XmlElement, XmlStream } from "../jsx/XmlElement.js"
@@ -9,83 +8,8 @@ import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
 import { Assertion, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
-import { XmlRenderer } from "./XmlRenderer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
-
-//---------------------------------------------------------------------------------------------------------------------
-export class TextBlock extends Base {
-    text            : string[][]        = [ [] ]
-
-
-    addSameLineText (str : string) {
-        this.text[ this.text.length - 1 ].push(str)
-    }
-
-
-    addNewLine () {
-        this.text.push([])
-    }
-
-
-    push (...strings : string[]) {
-        strings.forEach(string => saneSplit(string, '\n').forEach((str, index, array) => {
-            this.addSameLineText(str)
-
-            if (index !== array.length - 1) this.addNewLine()
-        }))
-    }
-
-
-    pushLn (...strings : string[]) {
-        this.push(...strings, '\n')
-    }
-
-
-    pullFrom (another : TextBlock) {
-        const [ firstLine, ...otherLines ]  = another.text
-
-        this.text[ this.text.length - 1 ].push(...firstLine)
-
-        this.text.push(...otherLines)
-    }
-
-
-    toString () : string {
-        return this.text.map(parts => parts.join('')).join('\n')
-    }
-
-
-    colorizeMut (c : Colorer) {
-        this.text.forEach((line, index) => this.text[ index ] = [ c.text(line.join('')) ])
-    }
-
-
-    indentMut (howMany : number, includeMarker : boolean = true) {
-        const indenter  = ' '.repeat(howMany)
-
-        this.text.forEach((line, index) => {
-            if (index === 0 && includeMarker) {
-                line.unshift('·' + indenter.slice(1))
-            } else {
-                line.unshift(indenter)
-            }
-        })
-    }
-
-
-    indentAsTreeLeafMut (howMany : number, isLast : boolean, c : Colorer) {
-        const indenterPlain     = ' '.repeat(howMany - 1)
-        const indenterTree      = '─'.repeat(howMany - 1)
-
-        this.text.forEach((line, index) => {
-            if (index === 0) {
-                line.unshift(c.text(isLast ? '└' + indenterTree : '├' + indenterTree))
-            } else {
-                line.unshift(c.text(isLast ? ' ' + indenterPlain : '│' + indenterPlain))
-            }
-        })
-    }
-}
+import { XmlRenderer } from "./XmlRenderer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
