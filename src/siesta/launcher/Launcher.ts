@@ -2,6 +2,7 @@ import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
+import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { ProjectPlanItem } from "../project/Plan.js"
 import { Project } from "../project/Project.js"
@@ -10,10 +11,9 @@ import { TestLauncherParent } from "../test/channel/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export enum ExitCodes {
-    'PASSED'        = 0,  // all tests passed
-    'FAILED'        = 1,  // test suite completed, some failures
-    'TIMEOUT'       = 2,  // some test does not complete within timeout
+
+// Exit codes:
+// 0 - all tests passed
 // 1 - there were test failures
 // 2 - inactivity timeout while running the test suite
 // 3 - no supported browsers available on this machine
@@ -23,12 +23,22 @@ export enum ExitCodes {
 // 7 - exception thrown
 // 8 - exit after printing version
 // 9 - java is not installed or not available in PATH
+
+export enum ExitCodes {
+    /**
+     * Test suite completed successfully, all tests passed
+     */
+    'PASSED'        = 0,
+    /**
+     * Test suite completed successfully, some tests failed
+     */
+    'FAILED'        = 1,
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
-    [ Base ],
-    (base : ClassUnion<typeof Base>) =>
+    [ LoggerConsole, Base ],
+    (base : ClassUnion<typeof LoggerConsole, typeof Base>) =>
 
     class Launcher extends base {
         projectFileUrl      : string            = ''
@@ -62,42 +72,33 @@ export class Launcher extends Mixin(
         async start () : Promise<ExitCodes> {
             await this.setup()
 
-            // await this.launch()
+            return await this.launch()
+        }
 
-            return ExitCodes.PASSED
+
+        async prepareOptions () {
         }
 
 
         async setup () {
-            // this.reporter       = this.project.reporterClass.new({ c : this.project.colorerClass.new(), launch : this })
-            //
-            // await Promise.all(this.testContextProviderConstructors.map(tcpConstructor => {
-            //     const tcp                   = tcpConstructor.new({ launch : this })
-            //
-            //     return tcp.setup().then(() => {
-            //         this.registerTestContextProvider(tcp)
-            //     }, rejected => {
-            //         this.logger.debug(`Failed to setup context provider: ${rejected}`)
-            //     })
-            // }))
-            //
-            // if (this.testContextProviders.length === 0) throw new Error("Dispatcher setup failed - no context providers available")
+            await this.prepareOptions()
         }
 
 
-        // async launch () {
-        //     this.reporter.onTestSuiteStart()
-        //
-        //     const projectPlanItems      = this.projectPlanItemsToLaunch
-        //
-        //     for (const item of projectPlanItems) {
-        //         await this.launchProjectPlanItem(item)
-        //     }
-        //
-        //     this.reporter.onTestSuiteFinish()
-        // }
-        //
-        //
+        async launch () : Promise<ExitCodes> {
+            return ExitCodes.PASSED
+            // this.reporter.onTestSuiteStart()
+            //
+            // const projectPlanItems      = this.projectPlanItemsToLaunch
+            //
+            // for (const item of projectPlanItems) {
+            //     await this.launchProjectPlanItem(item)
+            // }
+            //
+            // this.reporter.onTestSuiteFinish()
+        }
+
+
         // async launchProjectPlanItem (item : ProjectPlanItem) {
         //     item.normalizeDescriptor()
         //
