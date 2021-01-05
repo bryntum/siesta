@@ -1,13 +1,13 @@
 import { ChildProcess, Serializable } from "child_process"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { Channel } from "./Channel.js"
+import { Port } from "./Port.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelNodeIpcParent extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) =>
+export class PortNodeIpcParent extends Mixin(
+    [ Port ],
+    (base : ClassUnion<typeof Port>) =>
 
-    class ChannelNodeIpcParent extends base {
+    class PortNodeIpcParent extends base {
         media                   : ChildProcess
 
         messageListener         : (...args : any[]) => void      = undefined
@@ -44,11 +44,11 @@ export class ChannelNodeIpcParent extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelNodeIpcChild extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) =>
+export class PortNodeIpcChild extends Mixin(
+    [ Port ],
+    (base : ClassUnion<typeof Port>) =>
 
-    class ChannelNodeIpcChild extends base {
+    class PortNodeIpcChild extends base {
         media                   : NodeJS.Process                = process
 
         messageListener         : (...args : any[]) => void     = undefined

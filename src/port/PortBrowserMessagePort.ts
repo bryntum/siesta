@@ -1,12 +1,12 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { Channel } from "./Channel.js"
+import { Port } from "./Port.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelBrowserMessagePort extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) =>
+export class PortBrowserMessagePort extends Mixin(
+    [ Port ],
+    (base : ClassUnion<typeof Port>) =>
 
-    class ChannelBrowserMessagePort extends base {
+    class PortBrowserMessagePort extends base {
         media                   : MessagePort                   = undefined
 
         messageListener         : (...args : any[]) => void     = undefined

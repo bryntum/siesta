@@ -33,7 +33,7 @@ export class EnvelopResult extends Base {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-const ensureMessagesStorage = (target : Channel) => {
+const ensureMessagesStorage = (target : Port) => {
     if (!target.hasOwnProperty('localMessages')) {
         target.localMessages    = Object.create(target.localMessages || null)
         target.remoteMessages   = Object.create(target.remoteMessages || null)
@@ -43,18 +43,19 @@ const ensureMessagesStorage = (target : Channel) => {
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
 export const remote = (messageDesc : Partial<Message> = Message.new()) : PropertyDecorator => {
 
     const message       = Message.maybeNew(messageDesc)
 
-    return function (target : Channel, propertyKey : string) : void {
+    return function (target : Port, propertyKey : string) : void {
         const { remoteMessages } = ensureMessagesStorage(target)
 
         remoteMessages[ propertyKey ] = message
 
         Object.defineProperty(target, propertyKey, {
 
-            value   : function (this : Channel) : Promise<unknown> {
+            value   : function (this : Port) : Promise<unknown> {
                 return this.callRemote(
                     EnvelopCall.new({
                         payload     : [ propertyKey, ...arguments ]
@@ -68,21 +69,20 @@ export const remote = (messageDesc : Partial<Message> = Message.new()) : Propert
 
 export const local = function (message : Partial<Message> = Message.new()) : MethodDecorator {
 
-    return function (target : Channel, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
+    return function (target : Port, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
         const { localMessages } = ensureMessagesStorage(target)
 
         localMessages[ propertyKey ] = message
     }
 }
 
-// TODO rename "Channel" to "Port"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class Channel extends Mixin(
+export class Port extends Mixin(
     [],
     (base : AnyConstructor) =>
 
-    class Channel extends base {
+    class Port extends base {
         media                   : unknown       = undefined
         connected               : boolean       = false
 

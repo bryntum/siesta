@@ -1,13 +1,13 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { ChannelSerializablePlain } from "./ChannelSerializable.js"
+import { PortSerializablePlain } from "./PortSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelSameContext extends Mixin(
-    [ ChannelSerializablePlain ],
-    (base : ClassUnion<typeof ChannelSerializablePlain>) =>
+export class PortSameContext extends Mixin(
+    [ PortSerializablePlain ],
+    (base : ClassUnion<typeof PortSerializablePlain>) =>
 
-    class ChannelSameContext extends base {
-        media           : ChannelSameContext
+    class PortSameContext extends base {
+        media           : PortSameContext
 
 
         async doConnect () : Promise<any> {

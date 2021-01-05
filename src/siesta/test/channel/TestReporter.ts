@@ -1,4 +1,4 @@
-import { Channel, local, remote } from "../../../channel/Channel.js"
+import { Port, local, remote } from "../../../port/Port.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { Reporter } from "../../reporter/Reporter.js"
@@ -32,8 +32,8 @@ interface TestReporterChannel {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestReporterParent extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) => {
+    [ Port ],
+    (base : ClassUnion<typeof Port>) => {
 
         class TestReporterParent extends base implements TestReporterChannel {
 
@@ -130,8 +130,8 @@ export class TestReporterParent extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestReporterChild extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) => {
+    [ Port ],
+    (base : ClassUnion<typeof Port>) => {
 
         class TestReporterChild extends base implements TestReporterChannel {
             @remote()

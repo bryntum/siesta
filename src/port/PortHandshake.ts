@@ -1,19 +1,19 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { Channel, local, remote } from "./Channel.js"
+import { Port, local, remote } from "./Port.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-interface ChannelHandshake {
+interface PortHandshake {
     childConnected ()
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelHandshakeParent extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) => {
+export class PortHandshakeParent extends Mixin(
+    [ Port ],
+    (base : ClassUnion<typeof Port>) => {
 
-        class ChannelHandshakeParent extends base implements ChannelHandshake {
+        class PortHandshakeParent extends base implements PortHandshake {
             childConnectedResolve : Function        = undefined
 
 
@@ -35,17 +35,17 @@ export class ChannelHandshakeParent extends Mixin(
             }
         }
 
-        return ChannelHandshakeParent
+        return PortHandshakeParent
     }
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelHandshakeChild extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) => {
+export class PortHandshakeChild extends Mixin(
+    [ Port ],
+    (base : ClassUnion<typeof Port>) => {
 
-        class ChannelHandshakeChild extends base implements ChannelHandshake {
+        class PortHandshakeChild extends base implements PortHandshake {
             @remote()
             childConnected : () => Promise<any>
 
@@ -57,7 +57,7 @@ export class ChannelHandshakeChild extends Mixin(
             }
         }
 
-        return ChannelHandshakeChild
+        return PortHandshakeChild
     }
 ) {}
 

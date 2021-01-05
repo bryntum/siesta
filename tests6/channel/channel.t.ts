@@ -1,9 +1,9 @@
 import { it } from "../../main.js"
-import { local, remote } from "../../src/channel/Channel.js"
-import { ChannelSameContext } from "../../src/channel/ChannelSameContext.js"
+import { local, remote } from "../../src/port/Port.js"
+import { PortSameContext } from "../../src/port/PortSameContext.js"
 
 it('Same context channel should work', async t => {
-    class Server extends ChannelSameContext {
+    class Server extends PortSameContext {
 
         @remote()
         sum : (arg1 : number, arg2 : number) => Promise<number>
@@ -14,7 +14,7 @@ it('Same context channel should work', async t => {
         }
     }
 
-    class Worker extends ChannelSameContext {
+    class Worker extends PortSameContext {
 
         @remote()
         multiply : (arg1 : number, arg2 : number) => Promise<number>
@@ -57,14 +57,14 @@ it('Same context channel should work', async t => {
 
 
 it('Should handle exceptions in remote calls', async t => {
-    class Server extends ChannelSameContext {
+    class Server extends PortSameContext {
         @local()
         async multiply (arg1 : number, arg2 : number) : Promise<number> {
             throw new Error("exception")
         }
     }
 
-    class Worker extends ChannelSameContext {
+    class Worker extends PortSameContext {
         @remote()
         multiply : (arg1 : number, arg2 : number) => Promise<number>
     }

@@ -1,4 +1,4 @@
-import { Channel } from "../../channel/Channel.js"
+import { Port } from "../../port/Port.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
@@ -12,8 +12,8 @@ import { Project } from "./Project.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Launch extends Mixin(
-    [ Channel, Base ],
-    (base : ClassUnion<typeof Channel, typeof Base>) =>
+    [ Port, Base ],
+    (base : ClassUnion<typeof Port, typeof Base>) =>
 
     class Launch extends base {
         project         : Project                                   = undefined

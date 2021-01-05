@@ -1,13 +1,13 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { reviver } from "../serializable/Serializable.js"
-import { Channel, EnvelopCall, EnvelopResult } from "./Channel.js"
+import { Port, EnvelopCall, EnvelopResult } from "./Port.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelSerializableJSON extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) =>
+export class PortSerializableJSON extends Mixin(
+    [ Port ],
+    (base : ClassUnion<typeof Port>) =>
 
-    class ChannelSerializableJSON extends base {
+    class PortSerializableJSON extends base {
 
         messageToEnvelop (message : string) : EnvelopCall | EnvelopResult | undefined {
             const obj : any      = JSON.parse(message, reviver)
@@ -27,11 +27,11 @@ export class ChannelSerializableJSON extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelSerializablePlain extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) =>
+export class PortSerializablePlain extends Mixin(
+    [ Port ],
+    (base : ClassUnion<typeof Port>) =>
 
-    class ChannelSerializablePlain extends base {
+    class PortSerializablePlain extends base {
 
         messageToEnvelop (message : any) : EnvelopCall | EnvelopResult | undefined {
             if (message.inResponseOf !== undefined)

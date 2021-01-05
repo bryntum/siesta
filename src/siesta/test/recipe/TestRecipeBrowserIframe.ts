@@ -1,6 +1,6 @@
-import { ChannelBrowserMessagePort } from "../../../channel/ChannelBrowserMessagePort.js"
-import { ChannelHandshakeChild, ChannelHandshakeParent } from "../../../channel/ChannelHandshake.js"
-import { ChannelSerializableJSON } from "../../../channel/ChannelSerializable.js"
+import { PortBrowserMessagePort } from "../../../port/PortBrowserMessagePort.js"
+import { PortHandshakeChild, PortHandshakeParent } from "../../../port/PortHandshake.js"
+import { PortSerializableJSON } from "../../../port/PortSerializable.js"
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { TestLauncherChild, TestLauncherParent } from "../channel/TestLauncher.js"
@@ -8,16 +8,16 @@ import { TestLauncherChild, TestLauncherParent } from "../channel/TestLauncher.j
 //---------------------------------------------------------------------------------------------------------------------
 export class TestRecipeBrowserIframeParent extends Mixin(
     [
-        ChannelBrowserMessagePort,
-        ChannelHandshakeParent,
-        ChannelSerializableJSON,
+        PortBrowserMessagePort,
+        PortHandshakeParent,
+        PortSerializableJSON,
         TestLauncherParent,
         Base
     ],
     (base : ClassUnion<
-        typeof ChannelBrowserMessagePort,
-        typeof ChannelHandshakeParent,
-        typeof ChannelSerializableJSON,
+        typeof PortBrowserMessagePort,
+        typeof PortHandshakeParent,
+        typeof PortSerializableJSON,
         typeof TestLauncherParent,
         typeof Base
     >) => {
@@ -33,16 +33,16 @@ export class TestRecipeBrowserIframeParent extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 export class TestRecipeBrowserIframeChild extends Mixin(
     [
-        ChannelBrowserMessagePort,
-        ChannelHandshakeChild,
-        ChannelSerializableJSON,
+        PortBrowserMessagePort,
+        PortHandshakeChild,
+        PortSerializableJSON,
         TestLauncherChild,
         Base
     ],
     (base : ClassUnion<
-        typeof ChannelBrowserMessagePort,
-        typeof ChannelHandshakeChild,
-        typeof ChannelSerializableJSON,
+        typeof PortBrowserMessagePort,
+        typeof PortHandshakeChild,
+        typeof PortSerializableJSON,
         typeof TestLauncherChild,
         typeof Base
     >) => {

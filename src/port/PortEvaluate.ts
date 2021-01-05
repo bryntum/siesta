@@ -1,18 +1,18 @@
-import { Channel, local, remote } from "./Channel.js"
+import { Port, local, remote } from "./Port.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-interface ChannelEvaluate {
+interface PortEvaluate {
     doEvaluate (functionSource : string, args : unknown[]) : Promise<unknown>
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelEvaluateParent extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) => {
+export class PortEvaluateParent extends Mixin(
+    [ Port ],
+    (base : ClassUnion<typeof Port>) => {
 
-        class ChannelEvaluateParent extends base implements ChannelEvaluate {
+        class PortEvaluateParent extends base implements PortEvaluate {
 
             @remote()
             doEvaluate : (functionSource : string, args : unknown[]) => Promise<unknown>
@@ -23,17 +23,17 @@ export class ChannelEvaluateParent extends Mixin(
             }
         }
 
-        return ChannelEvaluateParent
+        return PortEvaluateParent
     }
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ChannelEvaluateChild extends Mixin(
-    [ Channel ],
-    (base : ClassUnion<typeof Channel>) => {
+export class PortEvaluateChild extends Mixin(
+    [ Port ],
+    (base : ClassUnion<typeof Port>) => {
 
-        class ChannelEvaluateChild extends base implements ChannelEvaluate {
+        class PortEvaluateChild extends base implements PortEvaluate {
 
             @local()
             async doEvaluate (functionSource : string, args : unknown[]) : Promise<unknown> {
@@ -43,7 +43,7 @@ export class ChannelEvaluateChild extends Mixin(
             }
         }
 
-        return ChannelEvaluateChild
+        return PortEvaluateChild
     }
 ) {}
 

@@ -1,6 +1,6 @@
-import { ChannelHandshakeChild, ChannelHandshakeParent } from "../../../channel/ChannelHandshake.js"
-import { ChannelNodeIpcChild, ChannelNodeIpcParent } from "../../../channel/ChannelNodeIpc.js"
-import { ChannelSerializableJSON } from "../../../channel/ChannelSerializable.js"
+import { PortHandshakeChild, PortHandshakeParent } from "../../../port/PortHandshake.js"
+import { PortNodeIpcChild, PortNodeIpcParent } from "../../../port/PortNodeIpc.js"
+import { PortSerializableJSON } from "../../../port/PortSerializable.js"
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { TestLauncherChild, TestLauncherParent } from "../channel/TestLauncher.js"
@@ -8,16 +8,16 @@ import { TestLauncherChild, TestLauncherParent } from "../channel/TestLauncher.j
 //---------------------------------------------------------------------------------------------------------------------
 export class TestRecipeNodeIpcParent extends Mixin(
     [
-        ChannelNodeIpcParent,
-        ChannelHandshakeParent,
-        ChannelSerializableJSON,
+        PortNodeIpcParent,
+        PortHandshakeParent,
+        PortSerializableJSON,
         TestLauncherParent,
         Base
     ],
     (base : ClassUnion<
-        typeof ChannelNodeIpcParent,
-        typeof ChannelHandshakeParent,
-        typeof ChannelSerializableJSON,
+        typeof PortNodeIpcParent,
+        typeof PortHandshakeParent,
+        typeof PortSerializableJSON,
         typeof TestLauncherParent,
         typeof Base
     >) => {
@@ -33,16 +33,16 @@ export class TestRecipeNodeIpcParent extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 export class TestRecipeNodeIpcChild extends Mixin(
     [
-        ChannelNodeIpcChild,
-        ChannelHandshakeChild,
-        ChannelSerializableJSON,
+        PortNodeIpcChild,
+        PortHandshakeChild,
+        PortSerializableJSON,
         TestLauncherChild,
         Base
     ],
     (base : ClassUnion<
-        typeof ChannelNodeIpcChild,
-        typeof ChannelHandshakeChild,
-        typeof ChannelSerializableJSON,
+        typeof PortNodeIpcChild,
+        typeof PortHandshakeChild,
+        typeof PortSerializableJSON,
         typeof TestLauncherChild,
         typeof Base
     >) => {
