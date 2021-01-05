@@ -176,17 +176,15 @@ export const option = (config? : Partial<Option>, optionCls : typeof Option = Op
     }
 }
 
+export type OptionsParseResult = {
+    argv        : string[],
+    opts        : Map<string, { option : Option, value : unknown }>,
+    errors      : OptionParseError[],
+    warnings    : OptionParseWarning[]
+}
 
 //---------------------------------------------------------------------------------------------------------------------
-export function parseOptions (
-    input : string[], knownOptions : { [ key : string ] : Option }
-) : {
-        argv        : string[],
-        opts        : Map<string, { option : Option, value : unknown }>,
-        errors      : OptionParseError[],
-        warnings    : OptionParseWarning[]
-    }
-{
+export function parseOptions (input : string[], knownOptions : { [ key : string ] : Option }) : OptionsParseResult {
     let currentOption : Option
 
     const argv : string[]   = []

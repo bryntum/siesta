@@ -9,6 +9,7 @@ import { Project } from "../project/Project.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestLauncherParent } from "../test/channel/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
+import { parseOptions } from "./Option.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +30,7 @@ export enum ExitCodes {
      * Test suite completed successfully, all tests passed
      */
     'PASSED'        = 0,
+
     /**
      * Test suite completed successfully, some tests failed
      */
@@ -43,7 +45,7 @@ export class Launcher extends Mixin(
     class Launcher extends base {
         projectFileUrl      : string            = ''
 
-        inputArguments
+        inputArguments      : string[]          = []
 
         // project         : Project                                   = undefined
         //
@@ -77,6 +79,11 @@ export class Launcher extends Mixin(
 
 
         async prepareOptions () {
+            const parseResult       = parseOptions(this.inputArguments, {})
+
+            const provider : any    = null
+
+            await provider.createContext()
         }
 
 
