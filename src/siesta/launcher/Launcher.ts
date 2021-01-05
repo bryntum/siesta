@@ -7,7 +7,7 @@ import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { ProjectPlanItem } from "../project/Plan.js"
 import { Project } from "../project/Project.js"
 import { Reporter } from "../reporter/Reporter.js"
-import { TestLauncherParent } from "../test/channel/TestLauncher.js"
+import { TestLauncherParent } from "../test/port/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { parseOptions } from "./Option.js"
 

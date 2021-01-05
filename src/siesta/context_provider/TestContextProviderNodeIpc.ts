@@ -1,6 +1,6 @@
 import  child_process from "child_process"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { TestLauncherParent } from "../test/channel/TestLauncher.js"
+import { TestLauncherParent } from "../test/port/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { TestRecipeNodeIpcParent } from "../test/recipe/TestRecipeNodeIpc.js"
 import { TestContextProvider } from "./TestContextProvider.js"

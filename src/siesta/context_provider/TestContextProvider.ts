@@ -2,7 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { Launch } from "../project/Launch.js"
-import { TestLauncherParent } from "../test/channel/TestLauncher.js"
+import { TestLauncherParent } from "../test/port/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@ import { PortNodeIpcChild, PortNodeIpcParent } from "../../../port/PortNodeIpc.j
 import { PortSerializableJSON } from "../../../port/PortSerializable.js"
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { TestLauncherChild, TestLauncherParent } from "../channel/TestLauncher.js"
+import { TestLauncherChild, TestLauncherParent } from "../port/TestLauncher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestRecipeNodeIpcParent extends Mixin(

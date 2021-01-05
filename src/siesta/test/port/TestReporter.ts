@@ -20,7 +20,7 @@ LogMessage
 XmlElement
 
 //---------------------------------------------------------------------------------------------------------------------
-interface TestReporterChannel {
+interface TestReporter {
     onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor)
 
     onSubTestFinish (testNodeId : LUID)
@@ -35,7 +35,7 @@ export class TestReporterParent extends Mixin(
     [ Port ],
     (base : ClassUnion<typeof Port>) => {
 
-        class TestReporterParent extends base implements TestReporterChannel {
+        class TestReporterParent extends base implements TestReporter {
 
             reporter                    : Reporter              = undefined
 
@@ -43,15 +43,6 @@ export class TestReporterParent extends Mixin(
 
             currentTestNodeResult       : TestNodeResult        = undefined
 
-            // @local()
-            // onTopTestStart () : Promise<any> {
-            //     return
-            // }
-            //
-            // @local()
-            // onTopTestFinish () : Promise<any> {
-            //     return
-            // }
 
             @local()
             onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) {
@@ -133,7 +124,7 @@ export class TestReporterChild extends Mixin(
     [ Port ],
     (base : ClassUnion<typeof Port>) => {
 
-        class TestReporterChild extends base implements TestReporterChannel {
+        class TestReporterChild extends base implements TestReporter {
             @remote()
             onSubTestStart : (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => any
 
