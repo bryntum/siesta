@@ -27,8 +27,8 @@ export class ProjectBrowser extends Mixin(
         testContextProviderConstructors   : (typeof TestContextProvider)[]      = [ TestContextProviderBrowserIframe ]
 
 
-        @option({ type : 'string', structure : 'map' })
-        browserArg      : Map<string, string>   = new Map()
+        // @option({ type : 'string', structure : 'map' })
+        // browserArg      : Map<string, string>   = new Map()
 
 
 
@@ -42,9 +42,9 @@ export class ProjectBrowser extends Mixin(
         }
 
 
-        buildInputArgs () : string[] {
-            return []
-        }
+        // buildInputArgs () : string[] {
+        //     return []
+        // }
     }
 
     return ProjectBrowser

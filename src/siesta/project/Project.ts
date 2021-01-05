@@ -35,13 +35,13 @@ export class Project extends Mixin(
         reporterClass   : typeof Reporter   = undefined
         colorerClass    : typeof Colorer    = undefined
 
-        @option({ type : 'boolean' })
-        noColor         : boolean           = false
-
-        inputArgs       : string[]          = undefined
-
-        @option({ type : 'string', structure : 'map' })
-        map             : boolean           = false
+        // @option({ type : 'boolean' })
+        // noColor         : boolean           = false
+        //
+        // inputArgs       : string[]          = undefined
+        //
+        // @option({ type : 'string', structure : 'map' })
+        // map             : boolean           = false
 
 
         // createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
@@ -82,13 +82,13 @@ export class Project extends Mixin(
 
             this.descriptor         = desc
 
-            if (this.inputArgs === undefined) this.inputArgs = this.buildInputArgs()
-
-            const parseRes          = parseOptions(this.inputArgs, this.$options)
-
-            if (parseRes.errors.length) {
-
-            }
+            // if (this.inputArgs === undefined) this.inputArgs = this.buildInputArgs()
+            //
+            // const parseRes          = parseOptions(this.inputArgs, this.$options)
+            //
+            // if (parseRes.errors.length) {
+            //
+            // }
         }
 
 
@@ -97,9 +97,9 @@ export class Project extends Mixin(
         }
 
 
-        buildInputArgs () : string[] {
-            throw new Error("Implement me")
-        }
+        // buildInputArgs () : string[] {
+        //     throw new Error("Implement me")
+        // }
 
 
         async start () {

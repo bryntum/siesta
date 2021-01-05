@@ -31,9 +31,9 @@ export class ProjectNodejs extends Mixin(
         }
 
 
-        buildInputArgs () : string[] {
-            return process.argv.slice(2)
-        }
+        // buildInputArgs () : string[] {
+        //     return process.argv.slice(2)
+        // }
 
         // planGlob (globPattern : string, descriptor? : Partial<TestDescriptor>) {
         //     const files = glob.sync(globPattern, { cwd : this.baseDir, matchBase : true, ignore : '**/node_modules/**' })

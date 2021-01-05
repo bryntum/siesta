@@ -3,6 +3,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
+import { Channel } from "../channel/Channel.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { ProjectPlanItem } from "../project/Plan.js"
 import { Project } from "../project/Project.js"
@@ -10,6 +11,7 @@ import { Reporter } from "../reporter/Reporter.js"
 import { TestLauncherParent } from "../test/port/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { parseOptions } from "./Option.js"
+import { ChannelProjectExtractor } from "./ProjectExtractor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -81,14 +83,21 @@ export class Launcher extends Mixin(
         async prepareOptions () {
             const parseResult       = parseOptions(this.inputArguments, {})
 
-            const provider : any    = null
 
-            await provider.createContext()
+
         }
 
 
         async setup () {
             await this.prepareOptions()
+
+            const channel : ChannelProjectExtractor    = null
+
+            await channel.setup()
+
+            const parentPort    = channel.parentPort
+
+            const project = await parentPort.extractProject('', new Map())
         }
 
 
