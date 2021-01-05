@@ -17,17 +17,18 @@ project.plan(
         tags        : [ 'basic' ],
 
         items       : [
-            {
-                filename    : 'basic_test.t.js',
-            },
-            'another_test.t.js'
+            // {
+            //     filename    : 'basic_test.t.js',
+            // },
+            // 'another_test.t.js'
         ]
     },
     {
         filename    : 'assertions',
 
         items       : [
-            'is_deeply.t.js'
+            // 'is_deeply.t.js',
+            'like.t.js'
         ]
     },
     {
@@ -36,7 +37,7 @@ project.plan(
         tags        : [ 'advanced' ],
 
         items       : [
-            'advanced_test.t.js'
+            // 'advanced_test.t.js'
         ]
     },
 )

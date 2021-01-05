@@ -193,7 +193,7 @@ export class Channel extends Mixin(
                     if (envelop.isRejection) {
                         const rejection     = this.recreateRejection(envelop)
 
-                        console.log("REJECTION: ", rejection)
+                        // console.log("REJECTION: ", rejection)
 
                         handler[ 1 ](rejection)
                     } else {

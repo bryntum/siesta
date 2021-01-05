@@ -20,3 +20,8 @@ export const isString = (a : any) : a is string => {
 export const isArray = (a : any) : a is unknown[] => {
     return typeOf(a) === 'Array'
 }
+
+//---------------------------------------------------------------------------------------------------------------------
+export const isRegExp = (a : any) : a is RegExp => {
+    return typeOf(a) === 'RegExp'
+}

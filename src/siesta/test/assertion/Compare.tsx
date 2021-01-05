@@ -1,6 +1,9 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { CI } from "../../../collection/Iterator.js"
 import { compareDeepGen } from "../../../util/DeepCompare.js"
+import { typeOf } from "../../../util/Helpers.js"
+import { Serializer } from "../../../util/Serializer.js"
+import { isRegExp } from "../../../util/Typeguards.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
 import { Assertion, TestNodeResult } from "../Result.js"
 
@@ -25,10 +28,26 @@ export class Compare extends Mixin(
 
 
         is<V> (value1 : V, value2 : V, description : string = '') {
+            const passed        = value1 === value2
+
             this.addResult(Assertion.new({
                 name            : 'is',
-                passed          : value1 === value2,
-                description
+                passed,
+                sourceLine      : this.getSourceLine(),
+                description,
+
+                annotation      : passed ? null : <div>
+                    <unl class='difference_got_expected'>
+                        <li class='difference_got'>
+                            <span class="difference_title">Got    : </span>
+                            <span class="difference_value">{ Serializer.serialize(value1, { maxDepth : 4, maxWide : 4 }) }</span>
+                        </li>
+                        <li class='difference_expected'>
+                            <span class="difference_title">Expect : </span>
+                            <span class="difference_value">{ Serializer.serialize(value2, { maxDepth : 4, maxWide : 4 }) }</span>
+                        </li>
+                    </unl>
+                </div>
             }))
         }
 
@@ -71,6 +90,68 @@ export class Compare extends Mixin(
                     sourceLine      : this.getSourceLine(),
                     description
                 }))
+            }
+        }
+
+
+        like (string : string, pattern : RegExp | string, desc : string = '') {
+
+            if (isRegExp(pattern)) {
+                if (pattern.test(string)) {
+                    this.addResult(Assertion.new({
+                        name            : 'like',
+                        passed          : true,
+                        sourceLine      : this.getSourceLine(),
+                        description     : desc
+                    }))
+                } else {
+                    this.addResult(Assertion.new({
+                        name            : 'like',
+                        passed          : false,
+                        sourceLine      : this.getSourceLine(),
+                        description     : desc,
+                        annotation      : <div>
+                            <unl class='difference_got_expected'>
+                                <li class='difference_got'>
+                                    <span class="difference_title">Got string             : </span>
+                                    <span class="difference_value">{ Serializer.serialize(string, { maxDepth : 4, maxWide : 4 }) }</span>
+                                </li>
+                                <li class='difference_expected'>
+                                    <span class="difference_title">Expect string matching : </span>
+                                    <span class="difference_value">{ Serializer.serialize(pattern, { maxDepth : 4, maxWide : 4 }) }</span>
+                                </li>
+                            </unl>
+                        </div>
+                    }))
+                }
+            } else {
+                if (String(string).indexOf(pattern) !== -1) {
+                    this.addResult(Assertion.new({
+                        name            : 'like',
+                        passed          : true,
+                        sourceLine      : this.getSourceLine(),
+                        description     : desc
+                    }))
+                } else {
+                    this.addResult(Assertion.new({
+                        name            : 'like',
+                        passed          : false,
+                        sourceLine      : this.getSourceLine(),
+                        description     : desc,
+                        annotation      : <div>
+                            <unl class='difference_got_expected'>
+                                <li class='difference_got'>
+                                    <span class="difference_title">Got string               : </span>
+                                    <span class="difference_value">{ Serializer.serialize(string, { maxDepth : 4, maxWide : 4 }) }</span>
+                                </li>
+                                <li class='difference_expected'>
+                                    <span class="difference_title">Expect string containing : </span>
+                                    <span class="difference_value">{ Serializer.serialize(pattern, { maxDepth : 4, maxWide : 4 }) }</span>
+                                </li>
+                            </unl>
+                        </div>
+                    }))
+                }
             }
         }
     }

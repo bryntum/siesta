@@ -12,6 +12,13 @@ const project = (await GetIsomorphicProjectClass()).new({
 
 project.plan(
     {
+        filename    : 'channel',
+
+        items       : [
+            'channel.t.js'
+        ]
+    },
+    {
         filename    : 'options',
 
         items       : [
