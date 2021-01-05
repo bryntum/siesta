@@ -1,5 +1,5 @@
 import { it } from "../../main.js"
-import { Option, OptionsParseErrors, parseOptions } from "../../src/siesta/project/Option.js"
+import { Option, OptionsParseErrors, parseOptions } from "../../src/siesta/launcher/Option.js"
 
 const string    = Option.new({ name : 'string', type : 'string' })
 const number    = Option.new({ name : 'number', type : 'number' })

@@ -6,7 +6,7 @@ import { Colorer } from "../reporter/Colorer.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { Launch } from "./Launch.js"
-import { HasOptions, option, parseOptions } from "./Option.js"
+import { HasOptions, option, parseOptions } from "../launcher/Option.js"
 import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor } from "./Plan.js"
 
 

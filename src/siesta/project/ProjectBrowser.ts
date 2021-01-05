@@ -7,7 +7,7 @@ import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { ReporterBrowser } from "../reporter/ReporterBrowser.js"
-import { option } from "./Option.js"
+import { option } from "../launcher/Option.js"
 import { Project } from "./Project.js"
 
 
