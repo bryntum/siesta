@@ -10,6 +10,12 @@ export class ChannelNodeIpc extends Mixin(
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
         class ChannelNodeIpc extends base {
+            // childChannelClassUrl         : string            = import.meta.url
+            //     .replace(/^file:/, '')
+            //     .replace(/context_provider\/TestContextProviderNodeIpc.js$/, 'test/recipe/TestRecipeNodeIpc.js')
+            //
+            // childChannelClassSymbol      : string            = 'TestRecipeNodeIpcChild'
+
             parentPort              : PortNodeIpcParent     = undefined
 
             parentPortClass         : typeof PortNodeIpcParent  = PortNodeIpcParent

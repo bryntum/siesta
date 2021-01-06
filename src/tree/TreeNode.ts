@@ -1,82 +1,93 @@
-import { Base } from "../class/Base.js"
-
-//---------------------------------------------------------------------------------------------------------------------
-export type TreeNode = ParentNode | LeafNode
+import { AnyConstructor, Mixin } from "../class/Mixin.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class LeafNode extends Base {
-    parentNode      : ParentNode          = undefined
-}
+export class LeafNode extends Mixin(
+    [],
+    (base : AnyConstructor) =>
+
+    class LeafNode extends base {
+        parentNode      : ParentNode          = undefined
+    }
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ParentNode extends Base {
-    parentNode      : ParentNode        = undefined
+export class ParentNode extends Mixin(
+    [],
+    (base : AnyConstructor) =>
 
-    childNodes      : TreeNode[]        = []
+    class ParentNode extends base {
+        parentNode      : ParentNode        = undefined
 
-    Leaf            : LeafNode
+        // can not use `this[ 'Child' ]` here - TS can't figure out the type discrimination in `traverse`
+        childNodes      : (this[ 'Leaf' ] | this[ 'parentNode' ])[]        = []
 
-
-    getRootNode () : ParentNode {
-        let root : ParentNode           = this
-
-        while (root.parentNode) root    = root.parentNode
-
-        return root
-    }
+        Leaf            : LeafNode
+        Child           : this[ 'Leaf' ] | this[ 'parentNode' ]
 
 
-    isRootNode () : boolean {
-        return !Boolean(this.parentNode)
-    }
+        getRootNode () : ParentNode {
+            let root : ParentNode           = this
 
+            while (root.parentNode) root    = root.parentNode
 
-    forEachChildNode (func : (node : TreeNode) => any) : false | undefined {
-        const childNodes      = this.childNodes
-
-        for (let i = 0; i < childNodes.length; i++)
-            if (func(childNodes[ i ]) === false) return false
-    }
-
-
-    traverse (func : (node : TreeNode) => any, includeThis : boolean = true) : false | undefined {
-        if (includeThis && func(this) === false) return false
-
-        const childNodes      = this.childNodes
-
-        for (let i = 0; i < childNodes.length; i++) {
-            const childNode     = childNodes[ i ]
-
-            if (childNode instanceof LeafNode) {
-                if (func(childNode) === false) return false
-            }
-            else {
-                if (childNode.traverse(func, true) === false) return false
-            }
-        }
-    }
-
-
-    parentsAxis (rootFirst : boolean = false) : this[ 'parentNode' ][] {
-        const res : this[ 'parentNode' ][]      = []
-
-        let item : this[ 'parentNode' ]         = this
-
-        while (item) {
-            if (item.parentNode) res.push(item.parentNode)
-
-            item        = item.parentNode
+            return root
         }
 
-        if (rootFirst) res.reverse()
 
-        return res
+        isRootNode () : boolean {
+            return !Boolean(this.parentNode)
+        }
+
+
+        forEachChildNode (func : (node : this[ 'Child' ]) => any) : false | undefined {
+            const childNodes      = this.childNodes
+
+            for (let i = 0; i < childNodes.length; i++)
+                if (func(childNodes[ i ]) === false) return false
+        }
+
+
+        traverse (func : (node : this[ 'Child' ]) => any, includeThis : boolean = true) : false | undefined {
+            if (includeThis && func(this) === false) return false
+
+            const childNodes      = this.childNodes
+
+            for (let i = 0; i < childNodes.length; i++) {
+                const childNode     = childNodes[ i ]
+
+                if (childNode instanceof LeafNode) {
+                    if (func(childNode) === false) return false
+                }
+                else {
+                    if (childNode.traverse(func, true) === false) return false
+                }
+            }
+        }
+
+
+        parentsAxis (rootFirst : boolean = false) : this[ 'parentNode' ][] {
+            const res : this[ 'parentNode' ][]      = []
+
+            let item : this[ 'parentNode' ]         = this
+
+            while (item) {
+                if (item.parentNode) res.push(item.parentNode)
+
+                item        = item.parentNode
+            }
+
+            if (rootFirst) res.reverse()
+
+            return res
+        }
+
+
+        leafsAxis () : this[ 'Leaf' ][] {
+            return this.childNodes.flatMap(node => (node instanceof LeafNode) ? [ node ] : node.leafsAxis())
+        }
     }
+) {}
 
 
-    leafsAxis () : this[ 'Leaf' ][] {
-        return this.childNodes.flatMap(node => (node instanceof LeafNode) ? [ node ] : node.leafsAxis())
-    }
-}

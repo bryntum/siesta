@@ -1,5 +1,5 @@
 import { Base } from "../../class/Base.js"
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { PortBrowserMessagePort } from "../../port/PortBrowserMessagePort.js"
 import { Channel } from "./Channel.js"
 
@@ -44,13 +44,19 @@ export class ChannelBrowserIframe extends Mixin(
 
 
             async setup () {
+                await this.awaitDomReady()
+
                 const iframe        = this.createIframe()
 
+                let listener : AnyFunction
+
                 await new Promise(resolve => {
-                    iframe.addEventListener('load', resolve)
+                    iframe.addEventListener('load', listener = resolve)
 
                     this.addIframeToDocument(iframe)
                 })
+
+                iframe.removeEventListener('load', listener)
 
                 const messageChannel        = new MessageChannel()
 
@@ -67,7 +73,7 @@ export class ChannelBrowserIframe extends Mixin(
                     let listener
 
                     window.addEventListener('message', listener = event => {
-                        if (event.data === 'SIESTA_INIT_CONTEXT' && event.ports.length > 0) {
+                        if (event.data === '__SIESTA_INIT_CONTEXT__' && event.ports.length > 0) {
                             window.removeEventListener('message', listener)
 
                             const channel = new mod[ symbol ]
@@ -87,7 +93,7 @@ export class ChannelBrowserIframe extends Mixin(
                     debugger
                 }
 
-                page.postMessage('SIESTA_INIT_CONTEXT', '*', [ messageChannel.port2 ])
+                page.postMessage('__SIESTA_INIT_CONTEXT__', '*', [ messageChannel.port2 ])
 
                 await parentPort.connect()
 

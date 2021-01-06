@@ -1,6 +1,6 @@
 import { Port } from "../../port/Port.js"
 import { Base } from "../../class/Base.js"
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ClassUnion, identity, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { Channel } from "../channel/Channel.js"
@@ -11,7 +11,7 @@ import { Reporter } from "../reporter/Reporter.js"
 import { TestLauncherParent } from "../test/port/TestLauncher.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { parseOptions } from "./Option.js"
-import { ChannelProjectExtractor } from "./ProjectExtractor.js"
+import { ChannelProjectExtractor, ProjectExtractorParent } from "./ProjectExtractor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -88,16 +88,38 @@ export class Launcher extends Mixin(
         }
 
 
+        $targetContextChannelClass : typeof Channel  = undefined
+
+        get targetContextChannelClass () : typeof Channel {
+            return
+        }
+
+
+        $projectExtractorChannelClass : typeof ChannelProjectExtractor  = undefined
+
+        get projectExtractorChannelClass () : typeof ChannelProjectExtractor {
+            return class ProjectExtractorImplementation extends Mixin(
+                [ ChannelProjectExtractor, this.targetContextChannelClass ],
+                (base : ClassUnion<typeof ChannelProjectExtractor, typeof Channel>) =>
+
+                class ProjectExtractorImplementation extends base {
+                }
+            ) {}
+        }
+
+
         async setup () {
             await this.prepareOptions()
 
-            const channel : ChannelProjectExtractor    = null
+            const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
 
             await channel.setup()
 
             const parentPort    = channel.parentPort
 
-            const project = await parentPort.extractProject('', new Map())
+            const project       = await parentPort.extractProject('', new Map())
+
+            console.log(project)
         }
 
 

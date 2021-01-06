@@ -4,8 +4,8 @@ import { Port } from "../../port/Port.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Channel extends Mixin(
-    [ Base ],
-    (base : ClassUnion<typeof Base>) => {
+    [ /*Base */],
+    (base : ClassUnion/*<typeof Base>*/) => {
 
         class Channel extends base {
             childPortClassUrl       : string                = ''

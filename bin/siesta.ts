@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { Launcher } from "../src/siesta/launcher/Launcher.js"
+import { LauncherNodejs } from "../src/siesta/launcher/LauncherNodejs.js"
 
-const launcher  = Launcher.new({})
+const launcher  = LauncherNodejs.new({})
 
 launcher.start().then(exitCode => process.exit(exitCode))
 

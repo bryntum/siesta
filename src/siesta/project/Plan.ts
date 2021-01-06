@@ -1,8 +1,9 @@
+import { Base } from "../../class/Base.js"
 import { LeafNode, ParentNode } from "../../tree/TreeNode.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ProjectPlanItem extends LeafNode {
+export class ProjectPlanItem extends LeafNode.mix(Base) {
     parentNode      : ProjectPlanGroup
 
     descriptor      : TestDescriptor    = TestDescriptor.new()
@@ -43,12 +44,10 @@ export type ProjectPlanItemDescriptor = string | (Partial<TestDescriptor> & { it
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ProjectPlanGroup extends ParentNode {
+export class ProjectPlanGroup extends ParentNode.mix(Base) {
     parentNode      : ProjectPlanGroup
 
     descriptor      : TestDescriptor    = TestDescriptor.new()
-
-    childNodes      : (ProjectPlanItem | ProjectPlanGroup)[]
 
     Leaf            : ProjectPlanItem
 
