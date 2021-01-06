@@ -35,15 +35,19 @@ export class ProjectExtractorChild extends Mixin(
             async extractProject (projectUrl : string, options : Map<string, unknown>) : Promise<Project> {
                 globalThis.__SIESTA_PROJECT_EXTRACTOR_CONTEXT__ = true
 
+                let res : Project
+
                 try {
                     await import(projectUrl)
+
+                    res     = globalThis.__SIESTA_PROJECT_EXTRACTOR_CONTEXT__
                 } catch (e) {
                     //debugger
                     console.log(e)
                 } finally {
                 }
 
-                return
+                return res
             }
         }
 

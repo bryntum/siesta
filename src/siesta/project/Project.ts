@@ -11,6 +11,21 @@ import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItem, ProjectPlanI
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export class ProjectOptions extends Mixin(
+    [ HasOptions, Base ],
+    (base : ClassUnion<typeof HasOptions, typeof Base>) => {
+
+    class ProjectOptions extends base {
+        @option({ type : 'boolean' })
+        noColor         : boolean           = false
+
+    }
+
+    return ProjectOptions
+}) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export class Project extends Mixin(
     [ HasOptions, Base ],
     (base : ClassUnion<typeof HasOptions, typeof Base>) => {
@@ -20,6 +35,7 @@ export class Project extends Mixin(
 
         title           : string            = ''
 
+        test            : Partial<TestDescriptor>           = undefined
         descriptor      : Partial<TestDescriptor>           = undefined
 
         projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new()
@@ -35,9 +51,6 @@ export class Project extends Mixin(
         reporterClass   : typeof Reporter   = undefined
         colorerClass    : typeof Colorer    = undefined
 
-        // @option({ type : 'boolean' })
-        // noColor         : boolean           = false
-        //
         // inputArgs       : string[]          = undefined
         //
         // @option({ type : 'string', structure : 'map' })
@@ -103,7 +116,11 @@ export class Project extends Mixin(
 
 
         async start () {
-            await this.launch(this.projectPlan.leafsAxis())
+            if (globalThis.__SIESTA_PROJECT_EXTRACTOR_CONTEXT__ === true) {
+                globalThis.__SIESTA_PROJECT_EXTRACTOR_CONTEXT__ = this
+            } else {
+                await this.launch(this.projectPlan.leafsAxis())
+            }
         }
 
 

@@ -1,9 +1,9 @@
-import { Base } from "../../class/Base.js"
+import { LeafNode, ParentNode } from "../../tree/TreeNode.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ProjectPlanItem extends Base {
-    parentItem      : ProjectPlanGroup  = undefined
+export class ProjectPlanItem extends LeafNode {
+    parentNode      : ProjectPlanGroup
 
     descriptor      : TestDescriptor    = TestDescriptor.new()
 
@@ -16,7 +16,7 @@ export class ProjectPlanItem extends Base {
         if (!descriptor.url) {
             let urlParts        = [ descriptor.filename ]
 
-            let group           = this.parentItem
+            let group           = this.parentNode
 
             while (group) {
                 if (group.descriptor.url) {
@@ -26,7 +26,7 @@ export class ProjectPlanItem extends Base {
                 } else {
                     urlParts.push(group.descriptor.filename)
 
-                    group       = group.parentItem
+                    group       = group.parentNode
                 }
             }
 
@@ -34,40 +34,6 @@ export class ProjectPlanItem extends Base {
 
             descriptor.url      = urlParts.join('/')
         }
-    }
-
-
-    // merge (another : ProjectPlanItem) {
-    //     if (this.parentItem) {
-    //         if (another.parentItem && this.parentItem !== another.parentItem) throw new Error("Can not merge plan items - parent items do not match")
-    //     }
-    //     else if (!another.parentItem) {
-    //         // do nothing
-    //     }
-    //     else {
-    //         this.parentItem     = another.parentItem
-    //     }
-    //
-    //     if (another.filename !== this.filename || another.url !== this.url) throw new Error("Can not merge plan items - name or url do not match")
-    //
-    //     this.descriptor.merge(another.descriptor)
-    // }
-
-
-    parentsAxis (rootFirst : boolean = false) : ProjectPlanGroup[] {
-        const res : ProjectPlanGroup[]   = []
-
-        let item : ProjectPlanItem       = this
-
-        while (item) {
-            if (item.parentItem) res.push(item.parentItem)
-
-            item        = item.parentItem
-        }
-
-        if (rootFirst) res.reverse()
-
-        return res
     }
 }
 
@@ -77,28 +43,24 @@ export type ProjectPlanItemDescriptor = string | (Partial<TestDescriptor> & { it
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ProjectPlanGroup extends ProjectPlanItem {
-    items           : (ProjectPlanItem | ProjectPlanGroup)[]                 = []
+export class ProjectPlanGroup extends ParentNode {
+    parentNode      : ProjectPlanGroup
 
-    // itemsMap        : Map<string, ProjectPlanItem>      = new Map()
+    descriptor      : TestDescriptor    = TestDescriptor.new()
 
+    childNodes      : (ProjectPlanItem | ProjectPlanGroup)[]
 
-    leafsAxis () : ProjectPlanItem[] {
-        return this.items.flatMap(item => {
-            if (item instanceof ProjectPlanGroup)
-                return item.leafsAxis()
-            else
-                return item
-        })
-    }
+    Leaf            : ProjectPlanItem
 
 
-    planItem (item : ProjectPlanItem) {
-        item.parentItem     = this
+    planItem (item : ProjectPlanItem | ProjectPlanGroup) {
+        item.parentNode     = this
 
-        this.items.push(item)
+        this.childNodes.push(item)
     }
 }
+
+
 
 export const PlanItemFromDescriptor = (desc : ProjectPlanItemDescriptor) : ProjectPlanItem | ProjectPlanGroup => {
     if (typeof desc === 'string') {
