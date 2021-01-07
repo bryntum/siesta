@@ -1,9 +1,11 @@
 import { Base } from "../../class/Base.js"
+import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { LeafNode, ParentNode } from "../../tree/TreeNode.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ProjectPlanItem extends LeafNode.mix(Base) {
+@serializable('ProjectPlanItem')
+export class ProjectPlanItem extends Serializable.mix(LeafNode.mix(Base)) {
     parentNode      : ProjectPlanGroup
 
     descriptor      : TestDescriptor    = TestDescriptor.new()
@@ -44,7 +46,8 @@ export type ProjectPlanItemDescriptor = string | (Partial<TestDescriptor> & { it
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ProjectPlanGroup extends ParentNode.mix(Base) {
+@serializable('ProjectPlanGroup')
+export class ProjectPlanGroup extends Serializable.mix(ParentNode.mix(Base)) {
     parentNode      : ProjectPlanGroup
 
     descriptor      : TestDescriptor    = TestDescriptor.new()
