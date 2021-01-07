@@ -176,6 +176,8 @@ export const option = (config? : Partial<Option>, optionCls : typeof Option = Op
     }
 }
 
+
+//---------------------------------------------------------------------------------------------------------------------
 export type OptionsParseResult = {
     argv        : string[],
     opts        : Map<string, { option : Option, value : unknown }>,
@@ -183,7 +185,7 @@ export type OptionsParseResult = {
     warnings    : OptionParseWarning[]
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+
 export function parseOptions (input : string[], knownOptions : { [ key : string ] : Option }) : OptionsParseResult {
     let currentOption : Option
 
@@ -261,4 +263,60 @@ export function parseOptions (input : string[], knownOptions : { [ key : string 
     forceFinishCurrentOption()
 
     return { argv, opts, errors, warnings }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export type OptionsParseResult2 = {
+    argv        : string[],
+    opts        : { key : string, value : string }[]
+}
+
+export function parseOptions2 (input : string[]) : OptionsParseResult2 {
+    let currentOption : string
+
+    const argv : string[]                               = []
+    const opts : { key : string, value : string }[]     = []
+
+
+    const forceFinishCurrentOption = () => {
+        if (currentOption) {
+            opts.push({ key : currentOption, value : undefined })
+
+            currentOption   = undefined
+        }
+    }
+
+    for (let i = 0; i < input.length; i++) {
+        const arg       = input[ i ]
+
+        if (arg === '--') break
+
+        const match     = /^\s*--([\w_\-.]+)(?:=(.*))?/.exec(arg)
+
+        if (match) {
+            forceFinishCurrentOption()
+
+            const optionName : string       = match[ 1 ]
+            const optionValue : string      = match[ 2 ]
+
+            if (optionValue !== undefined) {
+                opts.push({ key : optionName, value : optionValue })
+            } else {
+                currentOption               = optionName
+            }
+        }
+        else if (currentOption) {
+            opts.push({ key : currentOption, value : arg })
+
+            currentOption                   = undefined
+        }
+        else {
+            argv.push(arg)
+        }
+    }
+
+    forceFinishCurrentOption()
+
+    return { argv, opts }
 }
