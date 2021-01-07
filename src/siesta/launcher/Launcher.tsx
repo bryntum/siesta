@@ -1,17 +1,16 @@
-import { Port } from "../../port/Port.js"
 import { Base } from "../../class/Base.js"
-import { ClassUnion, identity, Mixin } from "../../class/Mixin.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { Channel } from "../channel/Channel.js"
 import { TestContextProvider } from "../context_provider/TestContextProvider.js"
-import { ProjectPlanItem } from "../project/Plan.js"
-import { Project } from "../project/Project.js"
+import { SiestaJSX } from "../jsx/Factory.js"
+import { XmlElement } from "../jsx/XmlElement.js"
+import { Colorer } from "../reporter/Colorer.js"
+import { Printer } from "../reporter/Printer.js"
 import { Reporter } from "../reporter/Reporter.js"
-import { TestLauncherParent } from "../test/port/TestLauncher.js"
-import { TestDescriptor } from "../test/Descriptor.js"
-import { parseOptions } from "./Option.js"
-import { ChannelProjectExtractor, ProjectExtractorParent } from "./ProjectExtractor.js"
+import { parseOptions2 } from "./Option.js"
+import { ChannelProjectExtractor } from "./ProjectExtractor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -37,26 +36,49 @@ export enum ExitCodes {
      * Test suite completed successfully, some tests failed
      */
     'FAILED'        = 1,
+
+    /**
+     * Incorrect command-line arguments, test suite did not start
+     */
+    'INCORRECT_ARGUMENTS'   = 2,
 }
+
+
+export class LauncherError extends Error {
+    annotation          : XmlElement    = undefined
+
+    exitCode            : ExitCodes     = undefined
+
+    static new<T extends typeof LauncherError> (this : T, props? : Partial<InstanceType<T>>) : InstanceType<T> {
+        const instance      = new this()
+
+        props && Object.assign(instance, props)
+
+        return instance as InstanceType<T>
+    }
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
-    [ LoggerConsole, Base ],
-    (base : ClassUnion<typeof LoggerConsole, typeof Base>) =>
+    [ Printer, LoggerConsole, Base ],
+    (base : ClassUnion<typeof Printer, typeof LoggerConsole, typeof Base>) =>
 
     class Launcher extends base {
         projectFileUrl      : string            = ''
 
         inputArguments      : string[]          = []
 
+
+
         // project         : Project                                   = undefined
         //
         // projectPlanItemsToLaunch        : ProjectPlanItem[]         = []
-        //
+
         // testContextProviders   : TestContextProvider[]                          = []
-        //
-        // testContextProviderConstructors   : (typeof TestContextProvider)[]      = []
-        //
+
+        channelConstructors     : (typeof Channel)[]      = []
+
         // reporter            : Reporter      = undefined
         //
         //
@@ -74,41 +96,69 @@ export class Launcher extends Mixin(
 
 
         async start () : Promise<ExitCodes> {
-            await this.setup()
+            try {
+                await this.setup()
+            } catch (e) {
+                if (e instanceof LauncherError) {
+                    this.write(e.annotation)
+
+                    return e.exitCode
+                } else {
+
+                }
+            }
 
             return await this.launch()
         }
 
 
         async prepareOptions () {
-            const parseResult       = parseOptions(this.inputArguments, {})
+            const parseResult       = parseOptions2(this.inputArguments)
 
-
-
+            if (parseResult.argv.length === 0) {
+                throw LauncherError.new({
+                    annotation      : <div><span class="log_message_error">ERROR</span>:No argument for project file url</div>,
+                    exitCode        : ExitCodes.INCORRECT_ARGUMENTS
+                })
+            }
         }
 
 
         $targetContextChannelClass : typeof Channel  = undefined
 
         get targetContextChannelClass () : typeof Channel {
-            return
+            throw new Error("Abstract method called")
         }
 
 
         $projectExtractorChannelClass : typeof ChannelProjectExtractor  = undefined
 
         get projectExtractorChannelClass () : typeof ChannelProjectExtractor {
-            return class ProjectExtractorImplementation extends Mixin(
+            return class ChannelProjectExtractorImplementation extends Mixin(
                 [ ChannelProjectExtractor, this.targetContextChannelClass ],
                 (base : ClassUnion<typeof ChannelProjectExtractor, typeof Channel>) =>
 
-                class ProjectExtractorImplementation extends base {
+                class ChannelProjectExtractorImplementation extends base {
                 }
             ) {}
         }
 
 
         async setup () {
+            // this.reporter       = this.project.reporterClass.new({ c : this.project.colorerClass.new(), launch : this })
+            //
+            // await Promise.all(this.testContextProviderConstructors.map(tcpConstructor => {
+            //     const tcp                   = tcpConstructor.new({ launch : this })
+            //
+            //     return tcp.setup().then(() => {
+            //         this.registerTestContextProvider(tcp)
+            //     }, rejected => {
+            //         this.logger.debug(`Failed to setup context provider: ${rejected}`)
+            //     })
+            // }))
+            //
+            // if (this.testContextProviders.length === 0) throw new Error("Dispatcher setup failed - no context providers available")
+
             await this.prepareOptions()
 
             const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
@@ -117,7 +167,7 @@ export class Launcher extends Mixin(
 
             const parentPort    = channel.parentPort
 
-            const project       = await parentPort.extractProject('', new Map())
+            const project       = await parentPort.extractProject('')
 
             console.log(project)
         }
@@ -159,6 +209,18 @@ export class Launcher extends Mixin(
         // async createTestContext (desc : TestDescriptor) : Promise<TestLauncherParent> {
         //     return await this.testContextProviders[ 0 ].createTestContext(desc)
         // }
+
+
+        logger          : Logger            = Logger.new()
+
+        testContextProviderConstructors   : (typeof TestContextProvider)[]      = []
+
+        setupDone       : boolean           = false
+        setupPromise    : Promise<any>      = undefined
+
+        reporterClass   : typeof Reporter   = undefined
+        colorerClass    : typeof Colorer    = undefined
+
 
     }
 ) {}
