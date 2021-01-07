@@ -1,5 +1,5 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { reviver } from "../serializable/Serializable.js"
+import { parse, stringify } from "../serializable/Serializable.js"
 import { EnvelopCall, EnvelopResult, Media } from "./Port.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -10,7 +10,7 @@ export class MediaSerializableJSON extends Mixin(
     class MediaSerializableJSON extends base {
 
         messageToEnvelop (message : string) : EnvelopCall | EnvelopResult | undefined {
-            const obj : any      = JSON.parse(message, reviver)
+            const obj : any      = parse(message)
 
             if (obj.inResponseOf !== undefined)
                 return EnvelopResult.new(obj)
@@ -20,7 +20,7 @@ export class MediaSerializableJSON extends Mixin(
 
 
         envelopToMessage (envelop : EnvelopCall | EnvelopResult) : string {
-            return JSON.stringify(envelop)
+            return stringify(envelop)
         }
     }
 ){}
