@@ -1,10 +1,5 @@
-import { AnyConstructor, Mixin } from "../class/Mixin.js"
+import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
 import { ArbitraryObjectKey, isAtomicValue, typeOf, uppercaseFirst } from "./Helpers.js"
-
-// TODO should return from every method similar to how its done in the Data.Visitor2
-// this will allow to clone the structure for example
-
-const VisitInProgress = Symbol('VisitInProgress')
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DataVisitor extends Mixin(
@@ -18,13 +13,17 @@ export class DataVisitor extends Mixin(
         visited         : Map<unknown, unknown>     = new Map()
 
 
-        beforeVisit (value : unknown, depth : number) {
-            this.visited.set(value, VisitInProgress)
+        beforeVisit (value : unknown, depth : number) : unknown {
+            this.visited.set(value, value)
+
+            return value
         }
 
 
-        afterVisit (value : unknown, depth : number, visitResult : unknown) {
+        afterVisit (value : unknown, depth : number, visitResult : unknown) : unknown {
             this.visited.set(value, visitResult)
+
+            return visitResult
         }
 
 
@@ -68,17 +67,15 @@ export class DataVisitor extends Mixin(
 
 
         visitNotVisited (value : unknown, depth : number) {
-            this.beforeVisit(value, depth)
+            const newValue                  = this.beforeVisit(value, depth)
 
-            const specificVisitorMethod     = `visit${ uppercaseFirst(typeOf(value)) }`
+            const specificVisitorMethod     = `visit${ uppercaseFirst(typeOf(newValue)) }`
 
             const visitMethod               = this[ specificVisitorMethod ] || this.visitObject
 
-            const visitResult               = visitMethod.call(this, value, depth)
+            const visitResult               = visitMethod.call(this, newValue, depth)
 
-            this.afterVisit(value, depth, visitResult)
-
-            return visitResult
+            return this.afterVisit(newValue, depth, visitResult)
         }
 
 
@@ -96,15 +93,15 @@ export class DataVisitor extends Mixin(
         visitObjectEntryKey (
             key     : ArbitraryObjectKey, value : unknown, object : object, index : number,
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
-        ) {
-            this.visitAtomicValue(key, depth)
+        ) : any {
+            return this.visitAtomicValue(key, depth)
         }
 
         visitObjectEntryValue (
             key     : ArbitraryObjectKey, value : unknown, object : object, index : number,
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
         ) {
-            this.visit(value, depth)
+            return this.visit(value, depth)
         }
 
 
@@ -115,7 +112,7 @@ export class DataVisitor extends Mixin(
         }
 
         visitArrayEntry<V> (value : V, array : V[], index : number, depth : number) {
-            this.visit(value, depth)
+            return this.visit(value, depth)
         }
 
 
@@ -128,7 +125,7 @@ export class DataVisitor extends Mixin(
         }
 
         visitSetElement<V> (value : V, set : Set<V>, index : number, depth : number) {
-            this.visit(value, depth)
+            return this.visit(value, depth)
         }
 
 
@@ -144,12 +141,146 @@ export class DataVisitor extends Mixin(
         }
 
         visitMapEntryKey<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
-            this.visit(value, depth)
+            return this.visit(value, depth)
         }
 
         visitMapEntryValue<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
-            this.visit(value, depth)
+            return this.visit(value, depth)
         }
     }
 ){}
 
+
+//---------------------------------------------------------------------------------------------------------------------
+export class Mapper extends Mixin(
+    [ DataVisitor ],
+    (base : ClassUnion<typeof DataVisitor>) =>
+
+    class Mapper extends base {
+
+        visitObject (object : object, depth : number) : any {
+            const entries   = Object.entries(object)
+
+            const newObject = Object.create(Object.getPrototypeOf(object))
+
+            entries.forEach(([ key, value ], index) => {
+                newObject[ this.visitObjectEntryKey(key, value, object, index, entries, depth) ] =
+                    this.visitObjectEntryValue(key, value, object, index, entries, depth)
+            })
+
+            return newObject
+        }
+
+
+        visitArray (array : unknown[], depth : number) : any {
+            return array.map((value, index) => this.visitArrayEntry(value, array, index, depth))
+        }
+
+
+        visitSet (set : Set<unknown>, depth : number) : any {
+            let index : number      = 0
+
+            const newSet            = new Set()
+
+            for (const value of set) {
+                newSet.add(this.visitSetElement(value, set, index++, depth))
+            }
+
+            return newSet
+        }
+
+
+        visitMap (map : Map<unknown, unknown>, depth : number) : any {
+            let index : number      = 0
+
+            const newMap            = new Map()
+
+            for (const [ key, value ] of map) {
+                newMap.set(
+                    this.visitMapEntryKey(key, value, map, index, depth),
+                    this.visitMapEntryValue(key, value, map, index++, depth)
+                )
+            }
+
+            return newMap
+        }
+    }
+) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class Mutator extends Mixin(
+    [ DataVisitor ],
+    (base : ClassUnion<typeof DataVisitor>) =>
+
+    class Mutator extends base {
+
+        visitObject (object : object, depth : number) : any {
+            const entries   = Object.entries(object)
+
+            entries.forEach(([ key, value ], index) => {
+                const visitedKey    = this.visitObjectEntryKey(key, value, object, index, entries, depth)
+                const visitedValue  = this.visitObjectEntryValue(key, value, object, index, entries, depth)
+
+                if (visitedKey !== key) {
+                    delete object[ key ]
+                    object[ visitedKey ] = visitedValue
+                }
+                else if (visitedValue !== value) {
+                    object[ visitedKey ] = visitedValue
+                }
+            })
+
+            return object
+        }
+
+
+        visitArray (array : unknown[], depth : number) : any {
+            array.forEach((value, index) => array[ index ] = this.visitArrayEntry(value, array, index, depth))
+
+            return array
+        }
+
+
+        visitSet (set : Set<unknown>, depth : number) : any {
+            let index : number      = 0
+
+            // prefetch the collection before mutating it
+            const elements          = Array.from(set)
+
+            elements.forEach(value => {
+                const visited       = this.visitSetElement(value, set, index++, depth)
+
+                if (visited !== value) {
+                    set.delete(value)
+                    set.add(visited)
+                }
+            })
+
+            return set
+        }
+
+
+        visitMap (map : Map<unknown, unknown>, depth : number) : any {
+            let index : number      = 0
+
+            // prefetch the collection before mutating it
+            const entries          = Array.from(map.entries())
+
+            entries.forEach(([ key, value ]) => {
+                const visitedKey    = this.visitMapEntryKey(key, value, map, index, depth)
+                const visitedValue  = this.visitMapEntryValue(visitedKey, value, map, index++, depth)
+
+                if (visitedKey !== key) {
+                    map.delete(key)
+                    map.set(visitedKey, visitedValue)
+                }
+                else if (visitedValue !== value) {
+                    map.set(visitedKey, visitedValue)
+                }
+            })
+
+            return map
+        }
+    }
+) {}

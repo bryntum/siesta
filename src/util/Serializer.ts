@@ -30,13 +30,17 @@ export class Serializer extends Mixin(
 
         beforeVisit (value : unknown, depth : number) {
             this.visited.set(value, [ this.result.length, undefined ])
+
+            return value
         }
 
 
-        afterVisit (value : unknown, depth : number, visitResult : unknown) {
+        afterVisit (value : unknown, depth : number, visitResult : unknown) : unknown {
             const currentMarker     = this.visited.get(value)
 
             currentMarker[ 1 ]      = this.result.length - 1
+
+            return visitResult
         }
 
 
