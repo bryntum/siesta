@@ -162,10 +162,11 @@ export class Serializable extends Mixin(
             return json
         }
 
-
-        static fromJSON<T extends typeof Serializable> (this : T, json : string) : InstanceType<T> {
-            return JSON.parse(json, reviver)
-        }
+        // TODO should probably accept a JSON object instead of string
+        // to be called by reviver - to allow customization of the "revivification"
+        // static fromJSON<T extends typeof Serializable> (this : T, json : string) : InstanceType<T> {
+        //     return JSON.parse(json, reviver)
+        // }
     }
 ) {}
 
