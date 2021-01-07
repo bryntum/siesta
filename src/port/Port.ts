@@ -83,7 +83,7 @@ export class Port extends Mixin(
     (base : AnyConstructor) =>
 
     class Port extends base {
-        media                   : unknown       = undefined
+        media                   : Media         = undefined
         connected               : boolean       = false
 
         localMessages           : object
@@ -107,18 +107,13 @@ export class Port extends Mixin(
         }
 
 
-        async doConnect () : Promise<any> {
-            throw "Abstract method `doConnect`"
-        }
-
-
         async connect () : Promise<any> {
-            const media     = this.media
-
             if (this.connected) throw new Error("Already connected")
 
             let start                   = Date.now()
             let connectionAttempts      = 0
+
+            this.media.port             = this
 
             do {
                 try {
@@ -126,7 +121,7 @@ export class Port extends Mixin(
 
                     this.logger && this.logger.debug(`Connection attempt: ${ connectionAttempts }`)
 
-                    await this.doConnect()
+                    await this.media.doConnect()
 
                     this.connected      = true
 
@@ -143,11 +138,6 @@ export class Port extends Mixin(
         }
 
 
-        async doDisconnect () : Promise<any> {
-            throw "Abstract method `doDisconnect`"
-        }
-
-
         async disconnect () : Promise<any> {
             this.awaitingResponse.forEach(value => {
                 value[ 1 ](new Error("Channel disconnected during the call"))
@@ -155,30 +145,13 @@ export class Port extends Mixin(
 
             this.awaitingResponse.clear()
 
-            await this.doDisconnect()
+            await this.media.doDisconnect()
 
             this.connected      = false
         }
 
 
-        messageToEnvelop (message : unknown) : EnvelopCall | EnvelopResult | undefined {
-            throw "Abstract method `messageToEnvelop`"
-        }
-
-
-        envelopToMessage (envelop : EnvelopCall | EnvelopResult) : unknown {
-            throw "Abstract method `envelopToMessage`"
-        }
-
-
-        sendMessage (message : unknown) {
-            throw "Abstract method `sendMessage`"
-        }
-
-
-        async receiveMessage (message : unknown) {
-            const envelop       = this.messageToEnvelop(message)
-
+        async receiveEnvelop (envelop : EnvelopCall | EnvelopResult) {
             if (envelop instanceof EnvelopResult) {
                 const inResponseOf  = envelop.inResponseOf
                 const handler       = this.awaitingResponse.get(inResponseOf)
@@ -228,9 +201,7 @@ export class Port extends Mixin(
                     })
                 }
 
-                this.sendMessage(this.envelopToMessage(resultingEnvelop))
-            } else {
-                throw new Error(`Failed to convert message to envelop: ${ message }`)
+                this.media.sendEnvelop(resultingEnvelop)
             }
         }
 
@@ -243,6 +214,8 @@ export class Port extends Mixin(
 
                 if (message.timeout > 0) {
                     timeoutHandler = setTimeout(() => {
+                        this.awaitingResponse.delete(envelop.id)
+
                         this.logger && this.logger.debug("Timeout occurred for: " + JSON.stringify(envelop))
 
                         reject(new Error("Timeout while waiting for remote call"))
@@ -251,7 +224,7 @@ export class Port extends Mixin(
 
                 this.awaitingResponse.set(envelop.id, [ resolve, reject, envelop, timeoutHandler ])
 
-                this.sendMessage(this.envelopToMessage(envelop))
+                this.media.sendEnvelop(envelop)
 
                 if (!message.requiresResult) resolve()
             })
@@ -269,3 +242,44 @@ export class Port extends Mixin(
     }
 ){}
 
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class Media extends Mixin(
+    [],
+    (base : AnyConstructor) =>
+
+    class Media extends base {
+        port            : Port      = undefined
+
+
+        async doConnect () : Promise<any> {
+            throw "Abstract method `doConnect`"
+        }
+
+
+        async doDisconnect () : Promise<any> {
+            throw "Abstract method `doDisconnect`"
+        }
+
+
+        messageToEnvelop (message : unknown) : EnvelopCall | EnvelopResult | undefined {
+            throw "Abstract method `messageToEnvelop`"
+        }
+
+
+        envelopToMessage (envelop : EnvelopCall | EnvelopResult) : unknown {
+            throw "Abstract method `envelopToMessage`"
+        }
+
+
+        sendMessage (message : unknown) {
+            throw "Abstract method `sendMessage`"
+        }
+
+
+        sendEnvelop (envelop : EnvelopCall | EnvelopResult) {
+            this.sendMessage(this.envelopToMessage(envelop))
+        }
+    }
+) {}

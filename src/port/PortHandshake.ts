@@ -17,7 +17,7 @@ export class PortHandshakeParent extends Mixin(
             childConnectedResolve : Function        = undefined
 
 
-            // TODO should have a timeout how long to wait for child connection
+            // TODO should have a timeout for how long to wait for child connection
             async connect () : Promise<any> {
                 this.childConnectedResolve      = undefined
 
