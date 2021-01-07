@@ -1,6 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { PortBrowserMessagePort } from "../../port/PortBrowserMessagePort.js"
+import { MediaBrowserMessagePort } from "../../port/MediaBrowserMessagePort.js"
 import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -9,9 +9,8 @@ export class ChannelBrowserIframe extends Mixin(
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
         class ChannelBrowserIframe extends base {
-            parentPort              : PortBrowserMessagePort     = undefined
-
-            parentPortClass         : typeof PortBrowserMessagePort  = PortBrowserMessagePort
+            parentMedia             : MediaBrowserMessagePort           = undefined
+            parentMediaClass        : typeof MediaBrowserMessagePort    = MediaBrowserMessagePort
 
 
             async awaitDomReady () {
@@ -46,6 +45,7 @@ export class ChannelBrowserIframe extends Mixin(
             async setup () {
                 await this.awaitDomReady()
 
+                //-----------------------------
                 const iframe        = this.createIframe()
 
                 let listener : AnyFunction
@@ -58,15 +58,16 @@ export class ChannelBrowserIframe extends Mixin(
 
                 iframe.removeEventListener('load', listener)
 
+                //-----------------------------
                 const messageChannel        = new MessageChannel()
 
-                const parentPort            = new this.parentPortClass
+                const parentMedia           = this.parentMedia = new this.parentMediaClass()
+                parentMedia.messagePort     = messageChannel.port1
 
-                parentPort.media            = messageChannel.port1
+                const parentPort            = this.parentPort = new this.parentPortClass
+                parentPort.media            = parentMedia
 
-                // for some reason TypeScript does not have `eval` on `Window`
-                const page                  = iframe.contentWindow as Window & { eval : (string) => any }
-
+                //-----------------------------
                 const seed = async function (url, symbol) {
                     const mod       = await import(url)
 
@@ -85,6 +86,9 @@ export class ChannelBrowserIframe extends Mixin(
                     })
                 }
 
+                // for some reason TypeScript does not have `eval` on `Window`
+                const page                  = iframe.contentWindow as Window & { eval : (string) => any }
+
                 try {
                     await page.eval(`(${ seed.toString() })("${ this.childPortClassUrl }", "${ this.childPortClassSymbol }")`)
                 } catch (e) {
@@ -96,8 +100,6 @@ export class ChannelBrowserIframe extends Mixin(
                 page.postMessage('__SIESTA_INIT_CONTEXT__', '*', [ messageChannel.port2 ])
 
                 await parentPort.connect()
-
-                this.parentPort     = parentPort
             }
         }
 

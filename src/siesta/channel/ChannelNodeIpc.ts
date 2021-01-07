@@ -1,7 +1,7 @@
 import child_process from "child_process"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { PortNodeIpcParent } from "../../port/PortNodeIpc.js"
+import { MediaNodeIpcParent } from "../../port/MediaNodeIpc.js"
 import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -10,15 +10,12 @@ export class ChannelNodeIpc extends Mixin(
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
         class ChannelNodeIpc extends base {
-            // childChannelClassUrl         : string            = import.meta.url
-            //     .replace(/^file:/, '')
-            //     .replace(/context_provider\/TestContextProviderNodeIpc.js$/, 'test/recipe/TestRecipeNodeIpc.js')
-            //
-            // childChannelClassSymbol      : string            = 'TestRecipeNodeIpcChild'
+            childMediaClassUrl      : string                = import.meta.url
+                .replace(/siesta\/channel\/ChannelNodeIpc.js$/, 'port/MediaNodeIpc.js')
+            childMediaClassSymbol   : string                = 'MediaNodeIpcChild'
 
-            parentPort              : PortNodeIpcParent     = undefined
-
-            parentPortClass         : typeof PortNodeIpcParent  = PortNodeIpcParent
+            parentMedia             : MediaNodeIpcParent     = undefined
+            parentMediaClass        : typeof MediaNodeIpcParent  = MediaNodeIpcParent
 
 
             async setup () {
@@ -29,23 +26,26 @@ export class ChannelNodeIpc extends Mixin(
                             // '--inspect-brk=127.0.0.1:9339',
                             '--input-type', 'module',
                             '--eval', [
-                                `import { ${this.childPortClassSymbol} } from "${this.childPortClassUrl}"`,
+                                `import { ${ this.childPortClassSymbol } } from "${ this.childPortClassUrl }"`,
+                                `import { ${ this.childMediaClassSymbol } } from "${ this.childMediaClassUrl }"`,
 
-                                `const context = ${this.childPortClassSymbol}.new()`,
+                                `const media    = new ${ this.childMediaClassSymbol }()`,
+                                `const port     = new ${ this.childPortClassSymbol }()`,
 
-                                `context.connect()`,
+                                `port.media     = media`,
+                                `port.connect()`,
                             ].join('\n')
                         ]
                     }
                 )
 
-                const parentPort        = new this.parentPortClass
+                const parentMedia           = this.parentMedia = new this.parentMediaClass()
+                parentMedia.childProcess    = childProcess
 
-                parentPort.media        = childProcess
+                const parentPort            = this.parentPort = new this.parentPortClass
+                parentPort.media            = parentMedia
 
                 await parentPort.connect()
-
-                this.parentPort         = parentPort
             }
         }
 

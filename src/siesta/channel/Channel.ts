@@ -1,20 +1,23 @@
-import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Port } from "../../port/Port.js"
+import { Media, Port } from "../../port/Port.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Channel extends Mixin(
-    [ /*Base */],
-    (base : ClassUnion/*<typeof Base>*/) => {
+    [],
+    (base : ClassUnion) => {
 
         class Channel extends base {
             childPortClassUrl       : string                = ''
-
             childPortClassSymbol    : string                = ''
 
-            parentPort              : Port                  = undefined
+            childMediaClassUrl      : string                = ''
+            childMediaClassSymbol   : string                = ''
 
+            parentPort              : Port                  = undefined
             parentPortClass         : typeof Port           = Port
+
+            parentMedia             : Media                 = undefined
+            parentMediaClass        : typeof Media          = Media
 
 
             async setup () {
