@@ -3,13 +3,13 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { relative } from "../../util/Path.js"
 import { SiestaJSX } from "../jsx/Factory.js"
-import { streamToElement, XmlElement, XmlStream } from "../jsx/XmlElement.js"
+import { XmlElement, XmlStream } from "../jsx/XmlElement.js"
 import { Launch } from "../project/Launch.js"
 import { Project } from "../project/Project.js"
 import { Assertion, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
+import { Printer } from "./Printer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
-import { XmlRenderer } from "./XmlRenderer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -158,8 +158,8 @@ export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
-    [ XmlRenderer, Base ],
-    (base : ClassUnion<typeof XmlRenderer, typeof Base>) => {
+    [ Printer, Base ],
+    (base : ClassUnion<typeof Printer, typeof Base>) => {
 
     class Reporter extends base {
         launch              : Launch                    = undefined
@@ -179,21 +179,6 @@ export class Reporter extends Mixin(
         spinner             : Spinner                   = randomSpinner()
 
         startTime           : Date                      = undefined
-
-
-        print (str : string) {
-            throw new Error("Abstract method")
-        }
-
-
-        printLn (str : string) {
-            this.print(str + '\n')
-        }
-
-
-        write (el : XmlElement) {
-            this.printLn(this.render(el).toString())
-        }
 
 
         needToShowResult (result : TestResult) : boolean {

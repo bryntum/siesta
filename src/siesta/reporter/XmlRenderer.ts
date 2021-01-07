@@ -4,6 +4,7 @@ import { saneSplit } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { Colorer, ColorerRule } from "./Colorer.js"
+import { ColorerNoop } from "./ColorerNoop.js"
 import { styles } from "./styling/terminal.js"
 
 
@@ -92,7 +93,7 @@ export class XmlRenderer extends Mixin(
     class XmlRenderer extends base {
         styles      : Map<string, ColorerRule>  = styles
 
-        c           : Colorer       = undefined
+        c           : Colorer       = ColorerNoop.new()
 
         treeIndentationLevel        : number    = 2
 
