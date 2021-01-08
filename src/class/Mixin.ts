@@ -232,7 +232,7 @@ class MixinState {
         ).cls
 
         const minimalClass : MixinClass = Object.assign(minimalClassConstructor, {
-            [MixinInstanceOfProperty]         : this.identitySymbol,
+            [MixinInstanceOfProperty] : this.identitySymbol,
             [MixinStateProperty]    : this,
             mix                     : this.mixinLambda,
             derive                  : (base) => Mixin([ minimalClass, base ], base => class extends base {}),
@@ -249,7 +249,7 @@ class MixinState {
 
     toString () : string {
         return this.walkDepthState.linearizedByTopoLevelsSource.reduce(
-            (acc : string, mixin : MixinState) => `${mixin.name}(${acc})`,
+            (acc : string, mixin : MixinState) => `${ mixin.name }(${ acc })`,
             this.baseClass.name
         )
     }
