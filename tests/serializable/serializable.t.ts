@@ -1,13 +1,6 @@
-import {
-    Collapser,
-    Expander,
-    parse,
-    reviver,
-    serializable,
-    Serializable,
-    setReferenceIdSource,
-    stringify
-} from "../../src/serializable/Serializable.js"
+import { Base } from "../../src/class/Base.js"
+import { ClassUnion, Mixin } from "../../src/class/Mixin.js"
+import { Collapser, Expander, parse, serializable, Serializable, setReferenceIdSource, stringify } from "../../src/serializable/Serializable.js"
 
 declare const StartTest : any
 
@@ -17,6 +10,7 @@ StartTest(t => {
         const a             = { a : undefined }
         a.a                 = a
 
+        //---------------------
         setReferenceIdSource(0)
 
         t.isDeeply(
@@ -27,6 +21,7 @@ StartTest(t => {
             }
         )
 
+        //---------------------
         setReferenceIdSource(0)
 
         const b             = []
@@ -42,7 +37,7 @@ StartTest(t => {
     })
 
 
-    t.it('Should be able to collapse cyclic structures', async t => {
+    t.it('Collapse/expand on cyclic structure should re-create it', async t => {
         const a             = { a : undefined }
         a.a                 = a
 
@@ -54,8 +49,28 @@ StartTest(t => {
     })
 
 
+    t.it('Should throw exception if `@serializable` class does not include Serializable mixin', async t => {
+        t.throwsOk(() => {
+            @serializable()
+            class SomeClass {
+                prop1       : number    = 1
+                prop2       : string    = '2'
+            }
+        }, 'Serializable')
+
+
+        t.throwsOk(() => {
+            @serializable()
+            class SomeClass2 extends Mixin(
+                [ Base ],
+                (base : ClassUnion<typeof Base>) => class SomeClass2 extends base {}
+            ) {}
+        }, 'Serializable')
+    })
+
+
     t.it('Basic serialization should work', async t => {
-        @serializable('someclass')
+        @serializable({ id : 'someclass' })
         class SomeClass extends Serializable {
             prop1       : number    = 1
             prop2       : string    = '2'
@@ -72,12 +87,12 @@ StartTest(t => {
 
 
     t.it('Nested basic serialization should work', async t => {
-        @serializable('someclass1')
+        @serializable({ id : 'someclass1' })
         class SomeClass1 extends Serializable {
             prop1       : number    = 1
         }
 
-        @serializable('someclass2')
+        @serializable({ id : 'someclass2' })
         class SomeClass2 extends Serializable {
             prop2       : SomeClass1    = new SomeClass1()
         }
@@ -96,12 +111,12 @@ StartTest(t => {
 
 
     t.it('Serialization of nested array property should work', async t => {
-        @serializable('someclass11')
+        @serializable({ id : 'someclass11' })
         class SomeClass1 extends Serializable {
             prop1       : number    = 1
         }
 
-        @serializable('someclass22')
+        @serializable({ id : 'someclass22' })
         class SomeClass2 extends Serializable {
             prop2       : SomeClass1[]      = [ new SomeClass1() ]
         }
@@ -117,17 +132,16 @@ StartTest(t => {
         t.isInstanceOf(revived.prop2[ 0 ], SomeClass1)
 
         t.is(revived.prop2[ 0 ].prop1, 1, 'Correct nested value')
-        t.is(revived.prop2[ 0 ].prop1, 1, 'Correct nested value')
     })
 
 
     t.it('Serialization of cyclic data structures should work', async t => {
-        @serializable('someclass111')
+        @serializable({ id : 'someclass111' })
         class SomeClass1 extends Serializable {
             another         : SomeClass2    = undefined
         }
 
-        @serializable('someclass222')
+        @serializable({ id : 'someclass222' })
         class SomeClass2 extends Serializable {
             another         : SomeClass1    = undefined
         }
@@ -143,7 +157,6 @@ StartTest(t => {
         t.isInstanceOf(revived, SomeClass1)
         t.isInstanceOf(revived.another, SomeClass2)
 
-        t.is(revived.another.another, revived)
         t.is(revived.another.another, revived)
     })
 
