@@ -213,7 +213,7 @@ export type SerializationMode = 'optIn' | 'optOut'
 export const serializable = (opts? : { id? : string, mode? : SerializationMode }) : ClassDecorator => {
     // @ts-ignore
     return <T extends typeof Serializable>(target : T) : T => {
-        if (!Serializable.prototype.isPrototypeOf(target.prototype))
+        if (!(target.prototype instanceof Serializable))
             throw new Error(`The class [${ target.name }] is decorated with @serializable, but does not include the Serializable mixin.`)
 
         registerSerializableClass(
