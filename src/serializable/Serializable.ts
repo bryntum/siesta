@@ -1,6 +1,7 @@
 import { Base } from "../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
 import { DataVisitor, Mapper, Mutator } from "../util/DataVisitor.js"
+import { ArbitraryObject } from "../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type JsonReferenceId = number
@@ -66,7 +67,7 @@ export class Collapser extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ExpanderPhase1 extends Mixin(
+class ExpanderPhase1 extends Mixin(
     [ Mapper, Base ],
     (base : ClassUnion<typeof Mapper, typeof Base>) =>
 
@@ -144,7 +145,9 @@ export class Serializable extends Mixin(
 
     class Serializable extends base {
         $class                  : string
+        $mode                   : SerializationMode
 
+        $includedProperties     : object
         $excludedProperties     : object
 
 
@@ -153,20 +156,32 @@ export class Serializable extends Mixin(
 
             const json : any = {}
 
-            for (const [ key, propValue ] of Object.entries(this)) {
-                if (!this.$excludedProperties || !this.$excludedProperties[ key ]) json[ key ] = propValue
-            }
+            if (this.$mode === 'optOut')
+                for (const [ key, propValue ] of Object.entries(this)) {
+                    if (!this.$excludedProperties || !this.$excludedProperties[ key ]) json[ key ] = propValue
+                }
+            else if (this.$includedProperties)
+                for (const key in this.$includedProperties) {
+                    json[ key ] = this[ key ]
+                }
 
             json.$class         = this.$class
 
             return json
         }
 
-        // TODO should probably accept a JSON object instead of string
-        // to be called by reviver - to allow customization of the "revivification"
-        // static fromJSON<T extends typeof Serializable> (this : T, json : string) : InstanceType<T> {
-        //     return JSON.parse(json, reviver)
-        // }
+        // does not call actual constructor for a purpose - class "revivification"
+        // supposed to be pure
+        // also when this method is called the cyclic references are not resolved yet
+        static fromJSON<T extends typeof Serializable> (this : T, json : object) : InstanceType<T> {
+            const instance  = Object.create(this.prototype)
+
+            for (const [ key, value ] of Object.entries(json)) {
+                if (key !== '$class') instance[ key ] = value
+            }
+
+            return instance
+        }
     }
 ) {}
 
@@ -174,11 +189,14 @@ export class Serializable extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 const serializableClasses = new Map<string, typeof Serializable>()
 
-const registerSerializableClass = (id : string, cls : typeof Serializable) => {
+const registerSerializableClass = (options : { id : string, mode : SerializationMode }, cls : typeof Serializable) => {
+    const id                    = options.id
+
     cls.prototype.$class        = id
+    cls.prototype.$mode         = options.mode
 
     if (serializableClasses.has(id) && serializableClasses.get(id) !== cls) {
-        throw new Error(`Serializable class with id: [${id}] already registered`)
+        throw new Error(`Serializable class with id: [${ id }] already registered`)
     }
 
     serializableClasses.set(id, cls)
@@ -188,11 +206,17 @@ export const lookupSerializableClass = (id : string) : typeof Serializable => {
     return serializableClasses.get(id)
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+export type SerializationMode = 'optIn' | 'optOut'
 
-export const serializable = (id : string) : ClassDecorator => {
+
+export const serializable = (opts? : { id? : string, mode? : SerializationMode }) : ClassDecorator => {
     // @ts-ignore
     return <T extends typeof Serializable>(target : T) : T => {
-        registerSerializableClass(id, target)
+        registerSerializableClass(
+            { id : opts?.id ?? target.constructor.name, mode : opts?.mode ?? 'optOut' },
+            target
+        )
 
         return target
     }
@@ -211,24 +235,29 @@ export const exclude = () : PropertyDecorator => {
     }
 }
 
+export const include = () : PropertyDecorator => {
+
+    return function (target : Serializable, propertyKey : string) : void {
+        if (!target.hasOwnProperty('$includedProperties')) {
+            target.$includedProperties = Object.create(target.$includedProperties || null)
+        }
+
+        target.$includedProperties[ propertyKey ] = true
+    }
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------
-export const reviver = function (key : string | number, value : number | string | boolean | object) {
+export const reviver = function (key : string | number, value : number | string | boolean | ArbitraryObject) {
     if (typeof value === 'object' && value !== null) {
-        const $class        = (value as any).$class
+        const $class        = value.$class as string
 
         if ($class !== undefined) {
             const cls       = lookupSerializableClass($class)
 
-            if (!cls) throw new Error(`Unknown serializable class id: ${$class}`)
+            if (!cls) throw new Error(`Unknown serializable class id: ${ $class }`)
 
-            const instance  = Object.create(cls.prototype)
-
-            for (const [ key, propValue ] of Object.entries(value)) {
-                if (key !== '$class') instance[ key ] = propValue
-            }
-
-            return instance
+            return cls.fromJSON(value)
         }
     }
 
