@@ -10,7 +10,7 @@ export type XmlNode = string | XmlElement
 export type XmlStream = XmlNode | XmlStream[]
 
 
-@serializable('XmlElement')
+@serializable()
 export class XmlElement extends Mixin(
     [ Serializable, Base ],
     (base : ClassUnion<typeof Serializable, typeof Base>) =>

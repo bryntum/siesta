@@ -102,6 +102,7 @@ export class Async extends Mixin(
                     return { conditionIsMet : false, result : undefined, exception : e }
                 }
 
+                // TODO always waits even if condition is met
                 await delay(interval)
 
                 if (Date.now() - start >= timeout) {
@@ -120,7 +121,7 @@ export class Async extends Mixin(
 
 // experiment - separate class per assertion
 
-@serializable('AssertionWaitFor')
+@serializable()
 export class AssertionWaitFor extends AssertionAsyncCreation {
     name            : string        = 'waitFor'
 

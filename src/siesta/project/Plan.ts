@@ -4,7 +4,7 @@ import { LeafNode, ParentNode } from "../../tree/TreeNode.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable('ProjectPlanItem')
+@serializable()
 export class ProjectPlanItem extends Serializable.mix(LeafNode.mix(Base)) {
     parentNode      : ProjectPlanGroup
 
@@ -42,11 +42,7 @@ export class ProjectPlanItem extends Serializable.mix(LeafNode.mix(Base)) {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type ProjectPlanItemDescriptor = string | (Partial<TestDescriptor> & { items? : ProjectPlanItemDescriptor[] })
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable('ProjectPlanGroup')
+@serializable()
 export class ProjectPlanGroup extends Serializable.mix(ParentNode.mix(Base)) {
     parentNode      : ProjectPlanGroup
 
@@ -63,8 +59,10 @@ export class ProjectPlanGroup extends Serializable.mix(ParentNode.mix(Base)) {
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export type ProjectPlanItemDescriptor = string | (Partial<TestDescriptor> & { items? : ProjectPlanItemDescriptor[] })
 
-export const PlanItemFromDescriptor = (desc : ProjectPlanItemDescriptor) : ProjectPlanItem | ProjectPlanGroup => {
+export const ProjectPlanItemFromDescriptor = (desc : ProjectPlanItemDescriptor) : ProjectPlanItem | ProjectPlanGroup => {
     if (typeof desc === 'string') {
         return ProjectPlanItem.new({
             descriptor : TestDescriptor.new({ filename : desc })
@@ -77,7 +75,7 @@ export const PlanItemFromDescriptor = (desc : ProjectPlanItemDescriptor) : Proje
 
         const group = ProjectPlanGroup.new({ descriptor : TestDescriptor.new(groupDesc) })
 
-        desc.items.forEach(item => group.planItem(PlanItemFromDescriptor(item)))
+        desc.items.forEach(item => group.planItem(ProjectPlanItemFromDescriptor(item)))
 
         return group
     } else {

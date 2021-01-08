@@ -2,10 +2,11 @@ import { Base } from "../../class/Base.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { typeOf } from "../../util/Helpers.js"
 import { IsolationLevel } from "../common/IsolationLevel.js"
+import { HasOptions, option } from "../launcher/Option.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable('TestDescriptor')
-export class TestDescriptor extends Serializable.mix(Base) {
+@serializable()
+export class TestDescriptor extends Serializable.mix(HasOptions.mix(Base)) {
     title           : string                = ''
 
     filename        : string                = ''
@@ -22,6 +23,9 @@ export class TestDescriptor extends Serializable.mix(Base) {
 
     // will be applied directly to test instance
     config          : object                = undefined
+
+    @option()
+    autoCheckGlobals    : boolean           = false
 
 
     // merge (anotherObj : Partial<TestDescriptor>) {
