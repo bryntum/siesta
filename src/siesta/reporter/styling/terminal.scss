@@ -164,3 +164,7 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
 .tree_line {
     color : #404040;
 }
+
+.accented {
+    color : $accent_color;
+}
