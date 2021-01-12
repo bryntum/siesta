@@ -2,6 +2,7 @@ import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { local, remote } from "../../../port/Port.js"
 import { PortEvaluateChild, PortEvaluateParent } from "../../../port/PortEvaluate.js"
+import { PortHandshakeChild, PortHandshakeParent } from "../../../port/PortHandshake.js"
 import { Channel } from "../../channel/Channel.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { globalTestEnv, Test } from "../Test.js"
@@ -20,8 +21,8 @@ interface TestLauncher {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherParent extends Mixin(
-    [ TestReporterParent, PortEvaluateParent ],
-    (base : ClassUnion<typeof TestReporterParent, typeof PortEvaluateParent>) => {
+    [ TestReporterParent, PortEvaluateParent, PortHandshakeParent ],
+    (base : ClassUnion<typeof TestReporterParent, typeof PortEvaluateParent, typeof PortHandshakeParent>) => {
 
         class TestLauncherParent extends base implements TestLauncher {
             @remote()
@@ -35,8 +36,8 @@ export class TestLauncherParent extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherChild extends Mixin(
-    [ TestReporterChild, PortEvaluateChild ],
-    (base : ClassUnion<typeof TestReporterChild, typeof PortEvaluateChild>) => {
+    [ TestReporterChild, PortEvaluateChild, PortHandshakeChild ],
+    (base : ClassUnion<typeof TestReporterChild, typeof PortEvaluateChild, typeof PortHandshakeChild>) => {
 
         class TestLauncherChild extends base implements TestLauncher {
 

@@ -1,9 +1,11 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { local, Port, remote } from "../../port/Port.js"
+import { local, remote } from "../../port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../port/PortHandshake.js"
 import { Channel } from "../channel/Channel.js"
+import { SiestaJSX } from "../jsx/Factory.js"
 import { Project, ProjectDescriptor, projectExtraction } from "../project/Project.js"
+import { ExitCodes, LauncherError } from "./Launcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 interface ProjectExtractor {
@@ -43,8 +45,15 @@ export class ProjectExtractorChild extends Mixin(
 
                     res                         = await promise
                 } catch (e) {
-                    //debugger
-                    console.log(e)
+                    throw LauncherError.new({
+                        annotation      : <div>
+                            <span class="log_message_error"> ERROR </span> <span class="accented">Exception importing project file - wrong path/URL?</span>
+                            <div>
+                                { e }
+                            </div>
+                        </div>,
+                        exitCode        : ExitCodes.EXCEPTION_IN_PROJECT_FILE
+                    })
                 }
 
                 return res.asProjectDescriptor()

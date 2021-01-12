@@ -1,3 +1,4 @@
+import path from 'path'
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Channel } from "../channel/Channel.js"
 import { ChannelNodeIpc } from "../channel/ChannelNodeIpc.js"
@@ -15,13 +16,13 @@ export class LauncherNodejs extends Mixin(
 
     class LauncherNodejs extends base {
 
-        c           : Colorer       = ColorerNodejs.new()
+        c               : Colorer               = ColorerNodejs.new()
 
         reporterClass   : typeof Reporter       = ReporterNodejs
         colorerClass    : typeof Colorer        = ColorerNodejs
 
 
-        channelConstructors     : (typeof Channel)[]      = [ ChannelNodeIpc ]
+        // channelConstructors     : (typeof Channel)[]      = [ ChannelNodeIpc ]
 
 
         get targetContextChannelClass () : typeof Channel {
@@ -31,6 +32,22 @@ export class LauncherNodejs extends Mixin(
 
         print (str : string) {
             process.stdout.write(str)
+        }
+
+
+        prepareProjectFileUrl (url : string) : string {
+            if (/https?:/i.test(url)) {
+
+            }
+            else if (/file:/.test(url)) {
+
+            }
+            else {
+                // assume plain fs path here
+                return path.resolve(url)
+            }
+
+            return url
         }
     }
 ) {}

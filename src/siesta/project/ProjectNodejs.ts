@@ -10,9 +10,9 @@ export class ProjectNodejs extends Mixin(
 
     class ProjectNodejs extends base {
 
-        buildBaseUrl () : string {
-            return path.dirname(process.argv[ 1 ])
-        }
+        // buildBaseUrl () : string {
+        //     return '.'
+        // }
 
 
         // buildInputArgs () : string[] {

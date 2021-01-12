@@ -2,6 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
+import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { Channel } from "../channel/Channel.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement } from "../jsx/XmlElement.js"
@@ -40,24 +41,22 @@ export enum ExitCodes {
     'FAILED'        = 1,
 
     /**
+     * Test suite completed successfully, some tests failed
+     */
+    'EXCEPTION_IN_PROJECT_FILE'   = 2,
+
+    /**
      * Incorrect command-line arguments, test suite did not start
      */
     'INCORRECT_ARGUMENTS'   = 6,
 }
 
 
-export class LauncherError extends Error {
+@serializable()
+export class LauncherError extends Serializable.mix(Base) {
     annotation          : XmlElement    = undefined
 
     exitCode            : ExitCodes     = undefined
-
-    static new<T extends typeof LauncherError> (this : T, props? : Partial<InstanceType<T>>) : InstanceType<T> {
-        const instance      = new this()
-
-        props && Object.assign(instance, props)
-
-        return instance as InstanceType<T>
-    }
 }
 
 
@@ -67,7 +66,7 @@ export class Launcher extends Mixin(
     (base : ClassUnion<typeof Printer, typeof LoggerConsole, typeof Base>) =>
 
     class Launcher extends base {
-        logger              : Logger            = LoggerConsole.new({ logLevel : LogLevel.warn })
+        logger              : Logger            = LoggerConsole.new({ logLevel : LogLevel.log })
 
         projectFileUrl      : string            = ''
 
@@ -103,7 +102,9 @@ export class Launcher extends Mixin(
 
             if (parseResult.argv.length === 0) {
                 throw LauncherError.new({
-                    annotation      : <div><span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url</span></div>,
+                    annotation      : <div>
+                        <span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url</span>
+                    </div>,
                     exitCode        : ExitCodes.INCORRECT_ARGUMENTS
                 })
             }
@@ -140,7 +141,18 @@ export class Launcher extends Mixin(
 
             const parentPort        = channel.parentPort
 
-            this.projectDescriptor  = await parentPort.extractProject(parseResult.argv[ 0 ])
+            const projectUrl        = this.prepareProjectFileUrl(parseResult.argv[ 0 ])
+
+            this.projectDescriptor  = await parentPort.extractProject(projectUrl)
+
+            this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
+
+            parentPort.disconnect()
+        }
+
+
+        prepareProjectFileUrl (url : string) : string {
+            return url
         }
 
 

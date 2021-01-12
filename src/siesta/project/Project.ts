@@ -108,7 +108,7 @@ export class Project extends Mixin(
 
 
         buildBaseUrl () : string {
-            throw new Error("Implement me")
+            return '.'
         }
 
 

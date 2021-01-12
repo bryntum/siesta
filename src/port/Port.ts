@@ -281,5 +281,10 @@ export class Media extends Mixin(
         sendEnvelop (envelop : EnvelopCall | EnvelopResult) {
             this.sendMessage(this.envelopToMessage(envelop))
         }
+
+
+        receiveMessage (message : any) {
+            this.port.receiveEnvelop(this.messageToEnvelop(message))
+        }
     }
 ) {}
