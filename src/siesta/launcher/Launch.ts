@@ -12,8 +12,8 @@ import { Launcher } from "./Launcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Launch extends Mixin(
-    [ Port, Base ],
-    (base : ClassUnion<typeof Port, typeof Base>) =>
+    [ Base ],
+    (base : ClassUnion<typeof Base>) =>
 
     class Launch extends base {
         launcher                    : Launcher              = undefined

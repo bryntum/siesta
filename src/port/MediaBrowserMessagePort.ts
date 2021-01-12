@@ -1,12 +1,12 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { Media } from "./Port.js"
+import { MediaSerializableJSON } from "./MediaSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class MediaBrowserMessagePort extends Mixin(
-    [ Media ],
-    (base : ClassUnion<typeof Media>) =>
+export class MediaBrowserMessagePortChild extends Mixin(
+    [ MediaSerializableJSON ],
+    (base : ClassUnion<typeof MediaSerializableJSON>) =>
 
-    class MediaBrowserMessagePort extends base {
+    class MediaBrowserMessagePortChild extends base {
         messagePort             : MessagePort                   = undefined
 
         messageListener         : (...args : any[]) => void     = undefined
@@ -32,6 +32,24 @@ export class MediaBrowserMessagePort extends Mixin(
 
         sendMessage (message : any) {
             this.messagePort.postMessage(message)
+        }
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class MediaBrowserMessagePortParent extends Mixin(
+    [ MediaBrowserMessagePortChild ],
+    (base : ClassUnion<typeof MediaBrowserMessagePortChild>) =>
+
+    class MediaBrowserMessagePortParent extends base {
+        iframe          : HTMLIFrameElement     = undefined
+
+
+        async doDisconnect () : Promise<any> {
+            super.doDisconnect()
+
+            this.iframe.remove()
         }
     }
 ){}

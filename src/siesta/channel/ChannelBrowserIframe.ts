@@ -1,6 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaBrowserMessagePort } from "../../port/MediaBrowserMessagePort.js"
+import { MediaBrowserMessagePortChild, MediaBrowserMessagePortParent } from "../../port/MediaBrowserMessagePort.js"
 import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -9,8 +9,12 @@ export class ChannelBrowserIframe extends Mixin(
     (base : ClassUnion<typeof Channel, typeof Base>) => {
 
         class ChannelBrowserIframe extends base {
-            parentMedia             : MediaBrowserMessagePort           = undefined
-            parentMediaClass        : typeof MediaBrowserMessagePort    = MediaBrowserMessagePort
+            childMediaClassUrl      : string                = import.meta.url
+                .replace(/siesta\/channel\/ChannelBrowserIframe.js$/, 'port/MediaBrowserMessagePort.js')
+            childMediaClassSymbol   : string                = 'MediaBrowserMessagePortChild'
+
+            parentMedia             : MediaBrowserMessagePortParent           = undefined
+            parentMediaClass        : typeof MediaBrowserMessagePortParent    = MediaBrowserMessagePortParent
 
 
             async awaitDomReady () {
@@ -63,13 +67,17 @@ export class ChannelBrowserIframe extends Mixin(
 
                 const parentMedia           = this.parentMedia = new this.parentMediaClass()
                 parentMedia.messagePort     = messageChannel.port1
+                parentMedia.iframe          = iframe
 
                 const parentPort            = this.parentPort = new this.parentPortClass
                 parentPort.media            = parentMedia
 
                 //-----------------------------
-                const seed = async function (url, symbol) {
-                    const mod       = await import(url)
+                const seed = async function (
+                    modulePortUrl : string, portClassSymbol : string,
+                    moduleMediaUrl : string, mediaClassSymbol : string
+                ) {
+                    const [ modulePort, moduleMedia ]   = await Promise.all([ import(modulePortUrl), import(moduleMediaUrl) ])
 
                     let listener
 
@@ -77,11 +85,14 @@ export class ChannelBrowserIframe extends Mixin(
                         if (event.data === '__SIESTA_INIT_CONTEXT__' && event.ports.length > 0) {
                             window.removeEventListener('message', listener)
 
-                            const channel = new mod[ symbol ]
+                            const media     = new moduleMedia[ mediaClassSymbol ]
+                            const port      = new modulePort[ portClassSymbol ]
 
-                            channel.media = event.ports[ 0 ]
+                            media.messagePort   = event.ports[ 0 ]
 
-                            channel.connect()
+                            port.media      = media
+
+                            port.connect()
                         }
                     })
                 }
@@ -90,7 +101,14 @@ export class ChannelBrowserIframe extends Mixin(
                 const page                  = iframe.contentWindow as Window & { eval : (string) => any }
 
                 try {
-                    await page.eval(`(${ seed.toString() })("${ this.childPortClassUrl }", "${ this.childPortClassSymbol }")`)
+                    await page.eval(`
+                        (${ seed.toString() })(
+                            "${ this.childPortClassUrl }", 
+                            "${ this.childPortClassSymbol }", 
+                            "${ this.childMediaClassUrl }", 
+                            "${ this.childMediaClassSymbol }"
+                        )
+                    `)
                 } catch (e) {
                     // exception here probably means iframe is cross-domain
                     // TODO in such case it is supposed to opt-in somehow for communicating with test suite

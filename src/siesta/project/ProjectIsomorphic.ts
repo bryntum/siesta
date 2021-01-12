@@ -16,7 +16,11 @@ export class ProjectIsomorphic extends Mixin(
             if (!this.actualProject) {
                 const cls           = await this.getIsomorphicProjectClass()
 
-                this.actualProject  = cls.new(this)
+                const config        = Object.assign({}, this)
+
+                delete config.launcherClass
+
+                this.actualProject  = cls.new(config)
             }
 
             return this.actualProject.start()

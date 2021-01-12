@@ -6,7 +6,7 @@
   "module": "main.js",
   "type": "module",
   "bin": {
-    "siesta" : "bin/siesta.js"
+    "siesta": "bin/siesta.js"
   },
   "scripts": {
     "chrome_bench": "google-chrome-stable --js-flags=\"--expose-gc\" $1",
@@ -27,7 +27,8 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.0",
-    "glob": "^7.1.6"
+    "glob": "^7.1.6",
+    "puppeteer": "^5.5.0"
   },
   "devDependencies": {
     "cssom": "^0.4.4",

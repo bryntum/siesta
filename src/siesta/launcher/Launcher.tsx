@@ -133,21 +133,21 @@ export class Launcher extends Mixin(
 
 
         async setup () {
-            const parseResult       = await this.prepareOptions()
-
-            const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
-
-            await channel.setup()
-
-            const parentPort        = channel.parentPort
-
-            const projectUrl        = this.prepareProjectFileUrl(parseResult.argv[ 0 ])
-
-            this.projectDescriptor  = await parentPort.extractProject(projectUrl)
-
-            this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
-
-            await parentPort.disconnect()
+            // const parseResult       = await this.prepareOptions()
+            //
+            // const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
+            //
+            // await channel.setup()
+            //
+            // const parentPort        = channel.parentPort
+            //
+            // const projectUrl        = this.prepareProjectFileUrl(parseResult.argv[ 0 ])
+            //
+            // this.projectDescriptor  = await parentPort.extractProject(projectUrl)
+            //
+            // this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
+            //
+            // await parentPort.disconnect()
         }
 
 

@@ -1,7 +1,8 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { include, serializable, Serializable } from "../../serializable/Serializable.js"
-import { Launch } from "../launcher/Launch.js"
+import { Launcher } from "../launcher/Launcher.js"
+import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
 import { HasOptions, option } from "../launcher/Option.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor, ProjectPlanItemFromDescriptor } from "./Plan.js"
@@ -55,6 +56,8 @@ export class Project extends Mixin(
 
         setupDone       : boolean           = false
         setupPromise    : Promise<any>      = undefined
+
+        launcherClass   : typeof Launcher   = undefined
 
 
         // createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
@@ -123,26 +126,14 @@ export class Project extends Mixin(
         }
 
 
-        async launch (planItemsToLaunch : ProjectPlanItem[]) : Promise<Launch> {
-            return
-            // if (!this.setupDone) {
-            //     // setup may be already started (by another launch)
-            //     await (this.setupPromise || (this.setupPromise = this.setup()))
-            //
-            //     this.setupDone      = true
-            //     this.setupPromise   = undefined
-            // }
-            //
-            // const launch    = Launch.new({
-            //     project                                 : this,
-            //     projectPlanItemsToLaunch                : planItemsToLaunch,
-            //
-            //     testContextProviderConstructors         : this.testContextProviderConstructors
-            // })
-            //
-            // await launch.start()
-            //
-            // return launch
+        async launch (planItemsToLaunch : ProjectPlanItem[]) : Promise<Launcher> {
+            const launcher  = this.launcherClass.new({
+                projectDescriptor       : this.asProjectDescriptor()
+            })
+
+            await launcher.start()
+
+            return launcher
         }
 
 
