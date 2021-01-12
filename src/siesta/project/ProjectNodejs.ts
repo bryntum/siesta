@@ -1,5 +1,6 @@
-import path from 'path'
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { Launcher } from "../launcher/Launcher.js"
+import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
 import { Project } from "./Project.js"
 
 
@@ -9,6 +10,8 @@ export class ProjectNodejs extends Mixin(
     (base : ClassUnion<typeof Project>) =>
 
     class ProjectNodejs extends base {
+
+        launcherClass   : typeof Launcher   = LauncherNodejs
 
         // buildBaseUrl () : string {
         //     return '.'

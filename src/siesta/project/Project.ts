@@ -121,12 +121,12 @@ export class Project extends Mixin(
             if (projectExtraction.resolve) {
                 projectExtraction.resolve(this)
             } else {
-                await this.launch(this.projectPlan.leafsAxis())
+                await this.launchStandalone()
             }
         }
 
 
-        async launch (planItemsToLaunch : ProjectPlanItem[]) : Promise<Launcher> {
+        async launchStandalone () : Promise<Launcher> {
             const launcher  = this.launcherClass.new({
                 projectDescriptor       : this.asProjectDescriptor()
             })

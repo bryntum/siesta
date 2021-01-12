@@ -39,19 +39,23 @@ export class LauncherNodejs extends Mixin(
         async setup () {
             const parseResult       = await this.prepareOptions()
 
-            const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
+            // `projectDescriptor` might be already provided
+            // if project file is launched directly as node executable
+            if (!this.projectDescriptor) {
+                const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
 
-            await channel.setup()
+                await channel.setup()
 
-            const parentPort        = channel.parentPort
+                const parentPort        = channel.parentPort
 
-            const projectUrl        = this.prepareProjectFileUrl(parseResult.argv[ 0 ])
+                const projectUrl        = this.prepareProjectFileUrl(parseResult.argv[ 0 ])
 
-            this.projectDescriptor  = await parentPort.extractProject(projectUrl)
+                this.projectDescriptor  = await parentPort.extractProject(projectUrl)
 
-            this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
+                this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
 
-            await parentPort.disconnect()
+                await parentPort.disconnect()
+            }
         }
 
 
