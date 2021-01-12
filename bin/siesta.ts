@@ -12,4 +12,6 @@ const launcher  = LauncherNodejs.new({
     inputArguments      : process.argv.slice(2)
 })
 
-launcher.start().then(exitCode => process.exit(exitCode))
+// we just set the `exitCode` property and not call `process.exit()` directly,
+// because some output might not be processed yet
+launcher.start().then(exitCode => process.exitCode = exitCode)

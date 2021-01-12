@@ -61,15 +61,15 @@ export class Launch extends Mixin(
 
 
         async launch () {
-            // this.reporter.onTestSuiteStart()
+            this.reporter.onTestSuiteStart()
 
-            // const projectPlanItems      = this.projectPlanItemsToLaunch
-            //
-            // for (const item of projectPlanItems) {
-            //     await this.launchProjectPlanItem(item)
-            // }
-            //
-            // this.reporter.onTestSuiteFinish()
+            const projectPlanItems      = this.projectPlanItemsToLaunch
+
+            for (const item of projectPlanItems) {
+                await this.launchProjectPlanItem(item)
+            }
+
+            this.reporter.onTestSuiteFinish()
         }
 
 

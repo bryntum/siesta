@@ -66,7 +66,7 @@ export class Launcher extends Mixin(
     (base : ClassUnion<typeof Printer, typeof LoggerConsole, typeof Base>) =>
 
     class Launcher extends base {
-        logger              : Logger            = LoggerConsole.new({ logLevel : LogLevel.log })
+        logger              : Logger            = LoggerConsole.new({ logLevel : LogLevel.warn })
 
         projectFileUrl      : string            = ''
 
@@ -147,7 +147,7 @@ export class Launcher extends Mixin(
 
             this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
 
-            parentPort.disconnect()
+            await parentPort.disconnect()
         }
 
 
