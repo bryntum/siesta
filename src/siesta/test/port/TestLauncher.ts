@@ -1,6 +1,8 @@
+import { Base } from "../../../class/Base.js"
+import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { local, remote } from "../../../port/Port.js"
 import { PortEvaluateChild, PortEvaluateParent } from "../../../port/PortEvaluate.js"
-import { ClassUnion, Mixin } from "../../../class/Mixin.js"
+import { Channel } from "../../channel/Channel.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { globalTestEnv, Test } from "../Test.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
@@ -73,3 +75,19 @@ export class TestLauncherChild extends Mixin(
 ) {}
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export class ChannelTestLauncher extends Mixin(
+    [ Channel, Base ],
+    (base : ClassUnion<typeof Channel, typeof Base>) => {
+
+        class ChannelTestLauncher extends base {
+            parentPort              : TestLauncherParent                = undefined
+            parentPortClass         : typeof TestLauncherParent         = TestLauncherParent
+
+            childPortClassUrl       : string                            = import.meta.url
+            childPortClassSymbol    : string                            = 'TestLauncherChild'
+        }
+
+        return ChannelTestLauncher
+    }
+) {}

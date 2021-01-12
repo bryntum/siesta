@@ -1,12 +1,9 @@
-import { GetIsomorphicProjectClass } from "../main.js"
+import { ProjectIsomorphic } from "../src/siesta/project/ProjectIsomorphic.js"
 
-// top-level `await` wrapper
-(async () => {
+const project = ProjectIsomorphic.new({
+    title                   : 'Siesta 6 isomorphic test suite',
 
-const project = (await GetIsomorphicProjectClass()).new({
-    title               : 'Siesta 6 isomorphic test suite',
-
-    test                : {}
+    testDescriptor          : {}
 })
 
 project.plan(
@@ -27,7 +24,3 @@ project.plan(
 )
 
 project.start()
-
-// top-level `await` wrapper
-})()
-

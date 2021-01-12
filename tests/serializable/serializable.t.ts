@@ -66,6 +66,15 @@ StartTest(t => {
                 (base : ClassUnion<typeof Base>) => class SomeClass2 extends base {}
             ) {}
         }, 'Serializable')
+
+
+        t.livesOk(() => {
+            @serializable()
+            class SomeClass3 extends Mixin(
+                [ Serializable, Base ],
+                (base : ClassUnion<typeof Serializable, typeof Base>) => class SomeClass3 extends base {}
+            ) {}
+        }, 'Serializable')
     })
 
 

@@ -3,6 +3,8 @@ import { Channel } from "../channel/Channel.js"
 import { ChannelNodeIpc } from "../channel/ChannelNodeIpc.js"
 import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNodejs } from "../reporter/ColorerNodejs.js"
+import { Reporter } from "../reporter/Reporter.js"
+import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { Launcher } from "./Launcher.js"
 
 
@@ -14,6 +16,10 @@ export class LauncherNodejs extends Mixin(
     class LauncherNodejs extends base {
 
         c           : Colorer       = ColorerNodejs.new()
+
+        reporterClass   : typeof Reporter       = ReporterNodejs
+        colorerClass    : typeof Colorer        = ColorerNodejs
+
 
         channelConstructors     : (typeof Channel)[]      = [ ChannelNodeIpc ]
 

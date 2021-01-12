@@ -217,7 +217,7 @@ export const serializable = (opts? : { id? : string, mode? : SerializationMode }
             throw new Error(`The class [${ target.name }] is decorated with @serializable, but does not include the Serializable mixin.`)
 
         registerSerializableClass(
-            { id : opts?.id ?? target.constructor.name, mode : opts?.mode ?? 'optOut' },
+            { id : opts?.id ?? target.name, mode : opts?.mode ?? 'optOut' },
             target
         )
 

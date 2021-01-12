@@ -4,8 +4,8 @@ import { LogLevel } from "../../logger/Logger.js"
 import { relative } from "../../util/Path.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement, XmlStream } from "../jsx/XmlElement.js"
-import { Launch } from "../project/Launch.js"
-import { Project } from "../project/Project.js"
+import { Launch } from "../launcher/Launch.js"
+import { ProjectDescriptor } from "../project/Project.js"
 import { Assertion, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
 import { Printer } from "./Printer.js"
@@ -23,8 +23,8 @@ export class ReporterTheme extends Base {
         return this.reporter.c
     }
 
-    get project () : Project {
-        return this.reporter.launch.project
+    get projectDescriptor () : ProjectDescriptor {
+        return this.reporter.launch.projectDescriptor
     }
 
     get launch () : Launch {
@@ -64,7 +64,7 @@ export class ReporterTheme extends Base {
 
 
     testNodeUrl (testNode : TestNodeResult) : XmlElement {
-        const rel       = relative(this.project.baseUrl, testNode.descriptor.url)
+        const rel       = relative(this.projectDescriptor.projectPlan.descriptor.url, testNode.descriptor.url)
         const match     = /(.*?\/)?([^/]+)/.exec(rel)
 
         return <span>
@@ -101,7 +101,7 @@ export class ReporterTheme extends Base {
 
     testSuiteHeader () : XmlElement {
         return <div>
-            Launching test suite: <span class="project_title">{ this.project.title }</span>
+            Launching test suite: <span class="project_title">{ this.projectDescriptor.projectPlan.descriptor.title }</span>
             <div></div>
         </div>
     }

@@ -1,14 +1,16 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Logger } from "../../logger/Logger.js"
+import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { Channel } from "../channel/Channel.js"
-import { TestContextProvider } from "../context_provider/TestContextProvider.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement } from "../jsx/XmlElement.js"
+import { ProjectDescriptor } from "../project/Project.js"
 import { Colorer } from "../reporter/Colorer.js"
+import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Printer } from "../reporter/Printer.js"
 import { Reporter } from "../reporter/Reporter.js"
+import { Launch } from "./Launch.js"
 import { parseOptions2 } from "./Option.js"
 import { ChannelProjectExtractor } from "./ProjectExtractor.js"
 
@@ -40,7 +42,7 @@ export enum ExitCodes {
     /**
      * Incorrect command-line arguments, test suite did not start
      */
-    'INCORRECT_ARGUMENTS'   = 2,
+    'INCORRECT_ARGUMENTS'   = 6,
 }
 
 
@@ -65,34 +67,18 @@ export class Launcher extends Mixin(
     (base : ClassUnion<typeof Printer, typeof LoggerConsole, typeof Base>) =>
 
     class Launcher extends base {
+        logger              : Logger            = LoggerConsole.new({ logLevel : LogLevel.warn })
+
         projectFileUrl      : string            = ''
 
         inputArguments      : string[]          = []
 
+        reporterClass       : typeof Reporter       = undefined
+        colorerClass        : typeof Colorer        = ColorerNoop
 
-
-        // project         : Project                                   = undefined
-        //
-        // projectPlanItemsToLaunch        : ProjectPlanItem[]         = []
-
-        // testContextProviders   : TestContextProvider[]                          = []
+        projectDescriptor   : ProjectDescriptor = undefined
 
         channelConstructors     : (typeof Channel)[]      = []
-
-        // reporter            : Reporter      = undefined
-        //
-        //
-        // get logger () : Logger {
-        //     return this.project.logger
-        // }
-        //
-        // set logger (value : Logger) {
-        // }
-        //
-        //
-        // registerTestContextProvider (localContextProvider : TestContextProvider) {
-        //     this.testContextProviders.push(localContextProvider)
-        // }
 
 
         async start () : Promise<ExitCodes> {
@@ -104,7 +90,7 @@ export class Launcher extends Mixin(
 
                     return e.exitCode
                 } else {
-
+                    throw e
                 }
             }
 
@@ -117,14 +103,14 @@ export class Launcher extends Mixin(
 
             if (parseResult.argv.length === 0) {
                 throw LauncherError.new({
-                    annotation      : <div><span class="log_message_error">ERROR</span>:No argument for project file url</div>,
+                    annotation      : <div><span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url</span></div>,
                     exitCode        : ExitCodes.INCORRECT_ARGUMENTS
                 })
             }
+
+            return parseResult
         }
 
-
-        $targetContextChannelClass : typeof Channel  = undefined
 
         get targetContextChannelClass () : typeof Channel {
             throw new Error("Abstract method called")
@@ -134,93 +120,42 @@ export class Launcher extends Mixin(
         $projectExtractorChannelClass : typeof ChannelProjectExtractor  = undefined
 
         get projectExtractorChannelClass () : typeof ChannelProjectExtractor {
-            return class ChannelProjectExtractorImplementation extends Mixin(
+            if (this.$projectExtractorChannelClass !== undefined) return this.$projectExtractorChannelClass
+
+            return this.$projectExtractorChannelClass = class ChannelProjectExtractorImplementation extends Mixin(
                 [ ChannelProjectExtractor, this.targetContextChannelClass ],
                 (base : ClassUnion<typeof ChannelProjectExtractor, typeof Channel>) =>
 
-                class ChannelProjectExtractorImplementation extends base {
-                }
+                class ChannelProjectExtractorImplementation extends base {}
             ) {}
         }
 
 
         async setup () {
-            // this.reporter       = this.project.reporterClass.new({ c : this.project.colorerClass.new(), launch : this })
-            //
-            // await Promise.all(this.testContextProviderConstructors.map(tcpConstructor => {
-            //     const tcp                   = tcpConstructor.new({ launch : this })
-            //
-            //     return tcp.setup().then(() => {
-            //         this.registerTestContextProvider(tcp)
-            //     }, rejected => {
-            //         this.logger.debug(`Failed to setup context provider: ${rejected}`)
-            //     })
-            // }))
-            //
-            // if (this.testContextProviders.length === 0) throw new Error("Dispatcher setup failed - no context providers available")
-
-            await this.prepareOptions()
+            const parseResult       = await this.prepareOptions()
 
             const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
 
             await channel.setup()
 
-            const parentPort    = channel.parentPort
+            const parentPort        = channel.parentPort
 
-            const project       = await parentPort.extractProject('')
-
-            console.log(project)
+            this.projectDescriptor  = await parentPort.extractProject(parseResult.argv[ 0 ])
         }
 
 
         async launch () : Promise<ExitCodes> {
+            const launch    = Launch.new({
+                launcher                                : this,
+                projectDescriptor                       : this.projectDescriptor,
+                projectPlanItemsToLaunch                : this.projectDescriptor.projectPlan.leafsAxis(),
+
+                targetContextChannelClass               : this.targetContextChannelClass
+            })
+
+            await launch.start()
+
             return ExitCodes.PASSED
-            // this.reporter.onTestSuiteStart()
-            //
-            // const projectPlanItems      = this.projectPlanItemsToLaunch
-            //
-            // for (const item of projectPlanItems) {
-            //     await this.launchProjectPlanItem(item)
-            // }
-            //
-            // this.reporter.onTestSuiteFinish()
         }
-
-
-        // async launchProjectPlanItem (item : ProjectPlanItem) {
-        //     item.normalizeDescriptor()
-        //
-        //     this.logger.log("Launching project item: ", item.descriptor.url)
-        //
-        //     const context       = await this.createTestContext(item.descriptor)
-        //
-        //     context.reporter    = this.reporter
-        //
-        //     //debugger
-        //
-        //     await context.launchTest(item.descriptor)
-        //
-        //     context.disconnect()
-        //
-        //     //debugger
-        // }
-        //
-        //
-        // async createTestContext (desc : TestDescriptor) : Promise<TestLauncherParent> {
-        //     return await this.testContextProviders[ 0 ].createTestContext(desc)
-        // }
-
-
-        logger          : Logger            = Logger.new()
-
-        testContextProviderConstructors   : (typeof TestContextProvider)[]      = []
-
-        setupDone       : boolean           = false
-        setupPromise    : Promise<any>      = undefined
-
-        reporterClass   : typeof Reporter   = undefined
-        colorerClass    : typeof Colorer    = undefined
-
-
     }
 ) {}

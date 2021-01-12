@@ -1,24 +1,22 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Logger } from "../../logger/Logger.js"
-import { TestContextProvider } from "../context_provider/TestContextProvider.js"
-import { Colorer } from "../reporter/Colorer.js"
-import { Reporter } from "../reporter/Reporter.js"
+import { include, serializable, Serializable } from "../../serializable/Serializable.js"
+import { Launch } from "../launcher/Launch.js"
+import { HasOptions, option } from "../launcher/Option.js"
 import { TestDescriptor } from "../test/Descriptor.js"
-import { Launch } from "./Launch.js"
-import { HasOptions, option, parseOptions } from "../launcher/Option.js"
-import { PlanItemFromDescriptor, ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor } from "./Plan.js"
+import { ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor, ProjectPlanItemFromDescriptor } from "./Plan.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+@serializable({ mode : 'optIn' })
 export class ProjectOptions extends Mixin(
-    [ HasOptions, Base ],
-    (base : ClassUnion<typeof HasOptions, typeof Base>) => {
+    [ Serializable, HasOptions, Base ],
+    (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof Base>) => {
 
     class ProjectOptions extends base {
+        @include()
         @option({ type : 'boolean' })
         noColor         : boolean           = false
-
     }
 
     return ProjectOptions
@@ -26,35 +24,37 @@ export class ProjectOptions extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class ProjectDescriptor extends Mixin(
+    [ Serializable, Base ],
+    (base : ClassUnion<typeof Serializable, typeof Base>) => {
+
+    class ProjectDescriptor extends base {
+        projectPlan     : ProjectPlanGroup          = undefined
+
+        options         : ProjectOptions            = undefined
+    }
+
+    return ProjectDescriptor
+}) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export class Project extends Mixin(
-    [ HasOptions, Base ],
-    (base : ClassUnion<typeof HasOptions, typeof Base>) => {
+    [ ProjectOptions ],
+    (base : ClassUnion<typeof ProjectOptions>) => {
 
     class Project extends base {
         baseUrl         : string            = ''
 
         title           : string            = ''
 
-        test            : Partial<TestDescriptor>           = undefined
-        descriptor      : Partial<TestDescriptor>           = undefined
+        testDescriptor  : Partial<TestDescriptor>           = undefined
 
         projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new()
-        // projectPlanMap  : Map<string, ProjectPlanItem>      = new Map()
-
-        logger          : Logger            = Logger.new()
-
-        testContextProviderConstructors   : (typeof TestContextProvider)[]      = []
 
         setupDone       : boolean           = false
         setupPromise    : Promise<any>      = undefined
-
-        reporterClass   : typeof Reporter   = undefined
-        colorerClass    : typeof Colorer    = undefined
-
-        // inputArgs       : string[]          = undefined
-        //
-        // @option({ type : 'string', structure : 'map' })
-        // map             : boolean           = false
 
 
         // createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
@@ -80,28 +80,30 @@ export class Project extends Mixin(
         plan (...args : (ProjectPlanItemDescriptor | ProjectPlanItemDescriptor[])[]) {
             const descriptors : ProjectPlanItemDescriptor[]  = args.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el)) as any
 
-            descriptors.forEach(item => this.projectPlan.planItem(PlanItemFromDescriptor(item)))
+            descriptors.forEach(item => this.projectPlan.planItem(ProjectPlanItemFromDescriptor(item)))
+        }
+
+
+        async performSetup ()  {
+            if (!this.setupDone) {
+                // setup may be already started (by another launch)
+                await (this.setupPromise || (this.setupPromise = this.setup()))
+
+                this.setupDone      = true
+                this.setupPromise   = undefined
+            }
         }
 
 
         async setup () {
             if (!this.baseUrl) this.baseUrl = this.buildBaseUrl()
 
-            const desc              = TestDescriptor.maybeNew(this.descriptor)
+            const desc                  = TestDescriptor.maybeNew(this.testDescriptor)
 
-            desc.url                = this.baseUrl
+            desc.url                    = this.baseUrl
+            desc.title                  = this.title
 
             this.projectPlan.descriptor = desc
-
-            this.descriptor         = desc
-
-            // if (this.inputArgs === undefined) this.inputArgs = this.buildInputArgs()
-            //
-            // const parseRes          = parseOptions(this.inputArgs, this.$options)
-            //
-            // if (parseRes.errors.length) {
-            //
-            // }
         }
 
 
@@ -110,14 +112,11 @@ export class Project extends Mixin(
         }
 
 
-        // buildInputArgs () : string[] {
-        //     throw new Error("Implement me")
-        // }
-
-
         async start () {
-            if (globalThis.__SIESTA_PROJECT_EXTRACTOR_CONTEXT__ === true) {
-                globalThis.__SIESTA_PROJECT_EXTRACTOR_CONTEXT__ = this
+            await this.performSetup()
+
+            if (projectExtraction.resolve) {
+                projectExtraction.resolve(this)
             } else {
                 await this.launch(this.projectPlan.leafsAxis())
             }
@@ -125,26 +124,38 @@ export class Project extends Mixin(
 
 
         async launch (planItemsToLaunch : ProjectPlanItem[]) : Promise<Launch> {
-            if (!this.setupDone) {
-                // setup may be already started (by another launch)
-                await (this.setupPromise || (this.setupPromise = this.setup()))
+            return
+            // if (!this.setupDone) {
+            //     // setup may be already started (by another launch)
+            //     await (this.setupPromise || (this.setupPromise = this.setup()))
+            //
+            //     this.setupDone      = true
+            //     this.setupPromise   = undefined
+            // }
+            //
+            // const launch    = Launch.new({
+            //     project                                 : this,
+            //     projectPlanItemsToLaunch                : planItemsToLaunch,
+            //
+            //     testContextProviderConstructors         : this.testContextProviderConstructors
+            // })
+            //
+            // await launch.start()
+            //
+            // return launch
+        }
 
-                this.setupDone      = true
-                this.setupPromise   = undefined
-            }
 
-            const launch    = Launch.new({
-                project                                 : this,
-                projectPlanItemsToLaunch                : planItemsToLaunch,
-
-                testContextProviderConstructors         : this.testContextProviderConstructors
+        asProjectDescriptor () : ProjectDescriptor {
+            return ProjectDescriptor.new({
+                projectPlan     : this.projectPlan,
+                options         : ProjectOptions.new(this)
             })
-
-            await launch.start()
-
-            return launch
         }
     }
 
     return Project
 }) {}
+
+
+export const projectExtraction : { resolve : (p : Project) => any } = { resolve : undefined }

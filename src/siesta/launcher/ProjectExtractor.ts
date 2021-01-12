@@ -3,11 +3,11 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { local, Port, remote } from "../../port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../port/PortHandshake.js"
 import { Channel } from "../channel/Channel.js"
-import { Project } from "../project/Project.js"
+import { Project, ProjectDescriptor, projectExtraction } from "../project/Project.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 interface ProjectExtractor {
-    extractProject (projectUrl : string) : Promise<Project>
+    extractProject (projectUrl : string) : Promise<ProjectDescriptor>
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ export class ProjectExtractorParent extends Mixin(
         class ProjectExtractorParent extends base implements ProjectExtractor {
 
             @remote()
-            extractProject : (projectUrl : string) => Promise<Project>
+            extractProject : (projectUrl : string) => Promise<ProjectDescriptor>
         }
 
         return ProjectExtractorParent
@@ -33,22 +33,21 @@ export class ProjectExtractorChild extends Mixin(
 
         class ProjectExtractorChild extends base implements ProjectExtractor {
             @local()
-            async extractProject (projectUrl : string) : Promise<Project> {
-                globalThis.__SIESTA_PROJECT_EXTRACTOR_CONTEXT__ = true
+            async extractProject (projectUrl : string) : Promise<ProjectDescriptor> {
+                const promise                   = new Promise<Project>(resolve => projectExtraction.resolve = resolve)
 
                 let res : Project
 
                 try {
                     await import(projectUrl)
 
-                    res     = globalThis.__SIESTA_PROJECT_EXTRACTOR_CONTEXT__
+                    res                         = await promise
                 } catch (e) {
                     //debugger
                     console.log(e)
-                } finally {
                 }
 
-                return res
+                return res.asProjectDescriptor()
             }
         }
 
@@ -66,8 +65,8 @@ export class ChannelProjectExtractor extends Mixin(
             parentPort              : ProjectExtractorParent            = undefined
             parentPortClass         : typeof ProjectExtractorParent     = ProjectExtractorParent
 
-            childPortClassUrl       : string                = import.meta.url
-            childPortClassSymbol    : string                = 'ProjectExtractorChild'
+            childPortClassUrl       : string                            = import.meta.url
+            childPortClassSymbol    : string                            = 'ProjectExtractorChild'
         }
 
         return ChannelProjectExtractor

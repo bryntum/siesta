@@ -2,6 +2,12 @@
 
 import { LauncherNodejs } from "../src/siesta/launcher/LauncherNodejs.js"
 
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('Unhandled promise rejection, reason:', reason)
+
+    process.exit(9)
+})
+
 const launcher  = LauncherNodejs.new({
     inputArguments      : process.argv.slice(2)
 })
