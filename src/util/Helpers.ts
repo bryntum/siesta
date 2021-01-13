@@ -160,3 +160,13 @@ export const randomElement = <V>(array : V[]) : V => {
 
 //---------------------------------------------------------------------------------------------------------------------
 export const escapeRegExp = (source : string) : string => source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const objectEntriesDeep = (source : object) : [ string, unknown ][] => {
+    const res : [ string, unknown ][]   = []
+
+    for (const key in source) res.push([ key, source[ key ]])
+
+    return res
+}
