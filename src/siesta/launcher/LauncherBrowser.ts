@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Channel } from "../channel/Channel.js"
-import { ChannelBrowserIframe } from "../channel/ChannelBrowserIframe.js"
+import { Channel } from "../../channel/Channel.js"
+import { ChannelBrowserIframe } from "../../channel/ChannelBrowserIframe.js"
 import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Reporter } from "../reporter/Reporter.js"

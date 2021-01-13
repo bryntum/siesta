@@ -1,7 +1,7 @@
 import path from 'path'
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Channel } from "../channel/Channel.js"
-import { ChannelNodeIpc } from "../channel/ChannelNodeIpc.js"
+import { Channel } from "../../channel/Channel.js"
+import { ChannelNodeIpc } from "../../channel/ChannelNodeIpc.js"
 import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNodejs } from "../reporter/ColorerNodejs.js"
 import { Reporter } from "../reporter/Reporter.js"

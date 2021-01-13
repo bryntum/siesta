@@ -1,7 +1,7 @@
-import { Base } from "../../class/Base.js"
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaSameContext } from "../../port/MediaSameContext.js"
-import { Media, Port } from "../../port/Port.js"
+import { Base } from "../class/Base.js"
+import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { MediaSameContext } from "../port/MediaSameContext.js"
+import { Media, Port } from "../port/Port.js"
 import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 import child_process from "child_process"
-import { Base } from "../../class/Base.js"
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaNodeIpcParent } from "../../port/MediaNodeIpc.js"
+import { Base } from "../class/Base.js"
+import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { MediaNodeIpcParent } from "../port/MediaNodeIpc.js"
 import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------
