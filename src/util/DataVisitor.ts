@@ -141,7 +141,7 @@ export class DataVisitor extends Mixin(
         }
 
         visitMapEntryKey<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
-            return this.visit(value, depth)
+            return this.visit(key, depth)
         }
 
         visitMapEntryValue<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
