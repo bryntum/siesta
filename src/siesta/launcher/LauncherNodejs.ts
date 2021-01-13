@@ -36,6 +36,20 @@ export class LauncherNodejs extends Mixin(
         }
 
 
+        $projectExtractorChannelClass : typeof ChannelProjectExtractor  = undefined
+
+        get projectExtractorChannelClass () : typeof ChannelProjectExtractor {
+            if (this.$projectExtractorChannelClass !== undefined) return this.$projectExtractorChannelClass
+
+            return this.$projectExtractorChannelClass = class ChannelProjectExtractorImplementation extends Mixin(
+                [ ChannelProjectExtractor, this.targetContextChannelClass ],
+                (base : ClassUnion<typeof ChannelProjectExtractor, typeof Channel>) =>
+
+                class ChannelProjectExtractorImplementation extends base {}
+            ) {}
+        }
+
+
         async setup () {
             const parseResult       = await this.prepareOptions()
 

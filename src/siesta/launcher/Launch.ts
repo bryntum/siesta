@@ -1,13 +1,12 @@
+import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
-import { Port } from "../../port/Port.js"
-import { Channel } from "../../channel/Channel.js"
 import { ProjectPlanItem } from "../project/Plan.js"
 import { ProjectDescriptor } from "../project/Project.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { ChannelTestLauncher } from "../test/port/TestLauncher.js"
-import { Launcher } from "./Launcher.js"
+import { ExitCodes, Launcher } from "./Launcher.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -89,6 +88,11 @@ export class Launch extends Mixin(
             await testLauncher.launchTest(item.descriptor)
 
             testLauncher.disconnect()
+        }
+
+
+        getExitCode () : ExitCodes {
+            return ExitCodes.PASSED
         }
     }
 ) {}

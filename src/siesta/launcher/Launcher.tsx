@@ -6,6 +6,7 @@ import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { Channel } from "../../channel/Channel.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement } from "../jsx/XmlElement.js"
+import { ProjectPlanItem } from "../project/Plan.js"
 import { ProjectDescriptor } from "../project/Project.js"
 import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNoop } from "../reporter/ColorerNoop.js"
@@ -68,7 +69,7 @@ export class Launcher extends Mixin(
     class Launcher extends base {
         logger              : Logger            = LoggerConsole.new({ logLevel : LogLevel.warn })
 
-        projectFileUrl      : string            = ''
+        // projectFileUrl      : string            = ''
 
         inputArguments      : string[]          = []
 
@@ -77,23 +78,18 @@ export class Launcher extends Mixin(
 
         projectDescriptor   : ProjectDescriptor = undefined
 
-        channelConstructors     : (typeof Channel)[]      = []
+        // channelConstructors     : (typeof Channel)[]      = []
+
+        setupDone       : boolean           = false
+        setupPromise    : Promise<any>      = undefined
 
 
-        async start () : Promise<ExitCodes> {
-            try {
-                await this.setup()
-            } catch (e) {
-                if (e instanceof LauncherError) {
-                    this.write(e.annotation)
 
-                    return e.exitCode
-                } else {
-                    throw e
-                }
-            }
+        async start () : Promise<Launch> {
+            // need to await for setup, because `projectDescriptor` might not be available yet
+            await this.performSetup()
 
-            return await this.launch()
+            return await this.launch(this.projectDescriptor.projectPlan.leafsAxis())
         }
 
 
@@ -118,56 +114,35 @@ export class Launcher extends Mixin(
         }
 
 
-        $projectExtractorChannelClass : typeof ChannelProjectExtractor  = undefined
+        async performSetup ()  {
+            if (!this.setupDone) {
+                // setup may be already started (by another launch)
+                await (this.setupPromise || (this.setupPromise = this.setup()))
 
-        get projectExtractorChannelClass () : typeof ChannelProjectExtractor {
-            if (this.$projectExtractorChannelClass !== undefined) return this.$projectExtractorChannelClass
-
-            return this.$projectExtractorChannelClass = class ChannelProjectExtractorImplementation extends Mixin(
-                [ ChannelProjectExtractor, this.targetContextChannelClass ],
-                (base : ClassUnion<typeof ChannelProjectExtractor, typeof Channel>) =>
-
-                class ChannelProjectExtractorImplementation extends base {}
-            ) {}
+                this.setupDone      = true
+                this.setupPromise   = undefined
+            }
         }
 
 
         async setup () {
-            // const parseResult       = await this.prepareOptions()
-            //
-            // const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
-            //
-            // await channel.setup()
-            //
-            // const parentPort        = channel.parentPort
-            //
-            // const projectUrl        = this.prepareProjectFileUrl(parseResult.argv[ 0 ])
-            //
-            // this.projectDescriptor  = await parentPort.extractProject(projectUrl)
-            //
-            // this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
-            //
-            // await parentPort.disconnect()
         }
 
 
-        prepareProjectFileUrl (url : string) : string {
-            return url
-        }
+        async launch (projectPlanItemsToLaunch : ProjectPlanItem[]) : Promise<Launch> {
+            await this.performSetup()
 
-
-        async launch () : Promise<ExitCodes> {
             const launch    = Launch.new({
                 launcher                                : this,
                 projectDescriptor                       : this.projectDescriptor,
-                projectPlanItemsToLaunch                : this.projectDescriptor.projectPlan.leafsAxis(),
+                projectPlanItemsToLaunch,
 
                 targetContextChannelClass               : this.targetContextChannelClass
             })
 
             await launch.start()
 
-            return ExitCodes.PASSED
+            return launch
         }
     }
 ) {}

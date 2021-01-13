@@ -10,7 +10,7 @@ export class ChannelBrowserIframe extends Mixin(
 
         class ChannelBrowserIframe extends base {
             childMediaClassUrl      : string                = import.meta.url
-                .replace(/siesta\/channel\/ChannelBrowserIframe.js$/, 'port/MediaBrowserMessagePort.js')
+                .replace(/channel\/ChannelBrowserIframe.js$/, 'port/MediaBrowserMessagePort.js')
             childMediaClassSymbol   : string                = 'MediaBrowserMessagePortChild'
 
             parentMedia             : MediaBrowserMessagePortParent           = undefined

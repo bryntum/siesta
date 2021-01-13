@@ -2,10 +2,9 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { include, serializable, Serializable } from "../../serializable/Serializable.js"
 import { Launcher } from "../launcher/Launcher.js"
-import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
 import { HasOptions, option } from "../launcher/Option.js"
 import { TestDescriptor } from "../test/Descriptor.js"
-import { ProjectPlanGroup, ProjectPlanItem, ProjectPlanItemDescriptor, ProjectPlanItemFromDescriptor } from "./Plan.js"
+import { ProjectPlanGroup, ProjectPlanItemDescriptor, ProjectPlanItemFromDescriptor } from "./Plan.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -46,38 +45,13 @@ export class Project extends Mixin(
     (base : ClassUnion<typeof ProjectOptions>) => {
 
     class Project extends base {
-        baseUrl         : string            = ''
-
         title           : string            = ''
 
         testDescriptor  : Partial<TestDescriptor>           = undefined
 
         projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new()
 
-        setupDone       : boolean           = false
-        setupPromise    : Promise<any>      = undefined
-
         launcherClass   : typeof Launcher   = undefined
-
-
-        // createPlanGroup (dir : string, descriptor? : Partial<TestDescriptor>) : ProjectPlanGroup {
-        //     const existing      = this.projectPlanMap.get(dir)
-        //
-        //     if (existing) {
-        //         if (existing instanceof ProjectPlanGroup) {
-        //             if (descriptor) existing.descriptor.merge(descriptor)
-        //
-        //             return existing
-        //         } else
-        //             throw new Error("Plan group already declared as file")
-        //     }
-        //
-        //     const newGroup = ProjectPlanGroup.new({ id : dir, filename : dir, url : dir, descriptor : TestDescriptor.maybeNew(descriptor) })
-        //
-        //     this.projectPlanMap.set(newGroup.id, newGroup)
-        //
-        //     return newGroup
-        // }
 
 
         plan (...args : (ProjectPlanItemDescriptor | ProjectPlanItemDescriptor[])[]) {
@@ -87,36 +61,30 @@ export class Project extends Mixin(
         }
 
 
-        async performSetup ()  {
-            if (!this.setupDone) {
-                // setup may be already started (by another launch)
-                await (this.setupPromise || (this.setupPromise = this.setup()))
-
-                this.setupDone      = true
-                this.setupPromise   = undefined
-            }
-        }
-
-
         async setup () {
-            if (!this.baseUrl) this.baseUrl = this.buildBaseUrl()
+            // if (!this.baseUrl) this.baseUrl = this.buildBaseUrl()
 
             const desc                  = TestDescriptor.maybeNew(this.testDescriptor)
 
-            desc.url                    = this.baseUrl
+            desc.url                    = '.'
             desc.title                  = this.title
 
             this.projectPlan.descriptor = desc
         }
 
 
-        buildBaseUrl () : string {
-            return '.'
+        // buildBaseUrl () : string {
+        //     return '.'
+        // }
+
+
+        buildInputArguments () : string[] {
+            return []
         }
 
 
         async start () {
-            await this.performSetup()
+            await this.setup()
 
             if (projectExtraction.resolve) {
                 projectExtraction.resolve(this)
@@ -128,7 +96,9 @@ export class Project extends Mixin(
 
         async launchStandalone () : Promise<Launcher> {
             const launcher  = this.launcherClass.new({
-                projectDescriptor       : this.asProjectDescriptor()
+                projectDescriptor       : this.asProjectDescriptor(),
+
+                inputArguments          : this.buildInputArguments()
             })
 
             await launcher.start()

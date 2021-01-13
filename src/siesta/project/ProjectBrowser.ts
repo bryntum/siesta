@@ -14,19 +14,20 @@ export class ProjectBrowser extends Mixin(
         launcherClass   : typeof Launcher   = LauncherBrowser
 
 
-        buildBaseUrl () : string {
-            const url           = new URL(window.location.href)
-
-            url.hash            = ''
-            url.search          = ''
-
-            return url.href
-        }
-
-
-        // buildInputArgs () : string[] {
-        //     return []
+        // buildBaseUrl () : string {
+        //     const url           = new URL(window.location.href)
+        //
+        //     url.hash            = ''
+        //     url.search          = ''
+        //
+        //     return url.href
         // }
+
+
+        buildInputArguments () : string[] {
+            // TODO should extract search params from location.href here
+            return []
+        }
     }
 
     return ProjectBrowser

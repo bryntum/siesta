@@ -11,7 +11,7 @@ export class ChannelNodeIpc extends Mixin(
 
         class ChannelNodeIpc extends base {
             childMediaClassUrl      : string                = import.meta.url
-                .replace(/siesta\/channel\/ChannelNodeIpc.js$/, 'port/MediaNodeIpc.js')
+                .replace(/channel\/ChannelNodeIpc.js$/, 'port/MediaNodeIpc.js')
             childMediaClassSymbol   : string                = 'MediaNodeIpcChild'
 
             parentMedia             : MediaNodeIpcParent     = undefined
