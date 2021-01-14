@@ -209,29 +209,27 @@ export class Reporter extends Mixin(
                 node.appendChild(this.t.testNodeState(testNode), ' ', this.c[ this.detail === 'assertion' ? 'underline' : 'noop' ].text(testNode.descriptor.title))
             }
 
-            if (this.detail === 'assertion' || this.detail === 'subtest') {
-                const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result))
+            const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result))
 
-                nodesToShow.forEach((result, index) => {
-                    const isLast            = index === nodesToShow.length - 1
+            nodesToShow.forEach((result, index) => {
+                const isLast            = index === nodesToShow.length - 1
 
-                    node.appendChild(<leaf>{
-                        (result instanceof Assertion)
-                            ?
-                                this.t.assertionTemplate(result)
-                            :
-                                (result instanceof TestNodeResult)
+                node.appendChild(<leaf>{
+                    (result instanceof Assertion)
+                        ?
+                            this.t.assertionTemplate(result)
+                        :
+                            (result instanceof TestNodeResult)
+                                ?
+                                    this.testNodeTemplateXml(result, isLast)
+                                :
+                                (result instanceof LogMessage)
                                     ?
-                                        this.testNodeTemplateXml(result, isLast)
+                                        this.t.logMessageTemplate(result)
                                     :
-                                    (result instanceof LogMessage)
-                                        ?
-                                            this.t.logMessageTemplate(result)
-                                        :
-                                            <span>Unknown element</span>
-                    }</leaf>)
-                })
-            }
+                                        <span>Unknown element</span>
+                }</leaf>)
+            })
 
             return node
         }

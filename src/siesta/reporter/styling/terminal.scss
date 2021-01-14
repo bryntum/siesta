@@ -169,6 +169,9 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     color : $accent_color;
 }
 
+.accented_value {
+    color : $ligther_smooth_accent_color;
+}
 
 .option_name {
     color : $accent_color;

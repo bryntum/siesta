@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { CI } from "../../collection/Iterator.js"
+import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -74,12 +75,12 @@ export class Option extends Mixin(
                 if (this.structure === 'atom') {
 
                     if (valueEntry.value !== undefined)
-                        if (valueEntry.value !== parseRes.value) {
-                            warnings.push({ warning : OptionsParseWarningCodes.ExistingValueOverwritten, option : this, value : valueEntry.value })
-                        }
-                        else {
-                            warnings.push({ warning : OptionsParseWarningCodes.SameValueEncountered, option : this, value : valueEntry.value })
-                        }
+                        warnings.push({
+                            warning             : OptionsParseWarningCodes.ExistingValueOverwritten,
+                            option              : this,
+                            value               : valueEntry.value,
+                            overwrittenWith     : parseRes.value
+                        })
 
                     valueEntry.value = parseRes.value
                 }
@@ -106,7 +107,17 @@ export class Option extends Mixin(
                         return
                     }
 
-                    valueEntry.value    = this.enumeration.find(enumMember => enumMember.toLowerCase() === optionValue.toLowerCase())
+                    const newValue      = this.enumeration.find(enumMember => enumMember.toLowerCase() === optionValue.toLowerCase())
+
+                    if (valueEntry.value !== undefined)
+                        warnings.push({
+                            warning             : OptionsParseWarningCodes.ExistingValueOverwritten,
+                            option              : this,
+                            value               : valueEntry.value,
+                            overwrittenWith     : newValue
+                        })
+
+                    valueEntry.value    = newValue
                 }
             }
         }
@@ -153,8 +164,7 @@ export class Option extends Mixin(
 
 export enum OptionsParseWarningCodes {
     UnknownOption               = 'UnknownOption',
-    ExistingValueOverwritten    = 'ExistingValueOverwritten',
-    SameValueEncountered        = 'SameValueEncountered'
+    ExistingValueOverwritten    = 'ExistingValueOverwritten'
 }
 
 
@@ -175,7 +185,9 @@ export type OptionParseError = {
 export type OptionParseWarning = {
     warning     : OptionsParseWarningCodes,
     option      : Option,
-    value?      : unknown
+
+    value?              : unknown,
+    overwrittenWith?    : unknown
 }
 
 
@@ -345,3 +357,18 @@ export class OptionsBag extends Base {
         this.entries    = this.entries.filter(entry => !predicate(entry))
     }
 }
+
+
+export const unknownOption = (warning : OptionParseWarning) : XmlElement => <div>
+    <span class="log_message_warn"> WARNING </span> Unknown option: <span class="accented">{ warning.option.name }</span>
+</div>
+
+export const existingValueOverwritten = (warning : OptionParseWarning) : XmlElement => <div>
+    <span class="log_message_warn"> WARNING </span> The value of option <span class="accented">--{ warning.option.name }</span>,
+    { ' ' }<span class="accented_value">{ warning.value }</span> is overwritten with <span class="accented_value">{ warning.overwrittenWith }</span>
+</div>
+
+export const optionWarningTemplateByCode = new Map<OptionsParseWarningCodes, (warning : OptionParseWarning) => XmlElement>([
+    [ OptionsParseWarningCodes.UnknownOption, unknownOption ],
+    [ OptionsParseWarningCodes.ExistingValueOverwritten, existingValueOverwritten ]
+])

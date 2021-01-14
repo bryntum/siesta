@@ -8,7 +8,7 @@ import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNodejs } from "../reporter/ColorerNodejs.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
-import { ExitCodes, Launcher, LauncherError, OptionsGroupPrimary } from "./Launcher.js"
+import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary } from "./Launcher.js"
 import { option } from "./Option.js"
 import { ChannelProjectExtractor } from "./ProjectExtractor.js"
 
@@ -21,12 +21,23 @@ export class LauncherNodejs extends Mixin(
     class LauncherNodejs extends base {
 
         @option({
+            type        : 'string',
             group       : OptionsGroupPrimary,
             help        : <span>
                 Project file url
             </span>
         })
         project             : string            = ''
+
+        @option({
+            type        : 'boolean',
+            group       : OptionsGroupOutput,
+            help        : <span>
+                Project file url
+            </span>
+        })
+        noColor         : boolean           = false
+
 
         c               : Colorer               = ColorerNodejs.new()
 
@@ -61,13 +72,13 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        async setup () {
-            await super.setup()
+        prepareLauncherOptions () {
+            super.prepareLauncherOptions()
 
             const projectFileUrl    = this.project || this.argv[ 0 ]
 
             if (!projectFileUrl) throw LauncherError.new({
-                exitCode : ExitCodes.INCORRECT_ARGUMENTS,
+                exitCode        : ExitCodes.INCORRECT_ARGUMENTS,
                 annotation      : <div>
                     <p><span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url </span></p>
                     <unl>
@@ -83,6 +94,18 @@ export class LauncherNodejs extends Mixin(
                 </div>,
             })
 
+            if (!this.project) this.project = this.argv[ 0 ]
+        }
+
+
+        prepareProjectOptions () {
+            super.prepareProjectOptions()
+        }
+
+
+        async setupInner () {
+            await super.setupInner()
+
             // `projectDescriptor` might be already provided
             // if project file is launched directly as node executable
             if (!this.projectDescriptor) {
@@ -93,7 +116,7 @@ export class LauncherNodejs extends Mixin(
                 const parentPort            = channel.parentPort
 
                 try {
-                    const projectUrl        = this.prepareProjectFileUrl(projectFileUrl)
+                    const projectUrl        = this.prepareProjectFileUrl(this.project)
 
                     this.projectDescriptor  = await parentPort.extractProject(projectUrl)
 

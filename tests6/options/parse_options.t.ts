@@ -1,5 +1,5 @@
 import { it } from "../../main.js"
-import { Option, OptionsBag, OptionsParseErrorCodes } from "../../src/siesta/launcher/Option.js"
+import { Option, OptionsBag, OptionsParseErrorCodes, OptionsParseWarningCodes } from "../../src/siesta/launcher/Option.js"
 
 const string    = Option.new({ name : 'string', type : 'string' })
 const number    = Option.new({ name : 'number', type : 'number' })
@@ -60,9 +60,31 @@ it('Should set boolean options w/o value to true', async t => {
             values      : new Map<Option, unknown>([
                 [ boolean, true ]
             ])
+        }
+    )
+})
+
+
+it('Should detect overwritten values', async t => {
+    const bag2       = OptionsBag.new({
+        input   : [ '--string=string', '--string=strung' ]
+    })
+
+    t.isDeeply(
+        bag2.extractOptions([ string ]),
+        {
+            errors      : [],
+            warnings    : [
+                { warning : OptionsParseWarningCodes.ExistingValueOverwritten, option : string, value : 'string', overwrittenWith : 'strung' },
+            ],
+            values      : new Map<Option, unknown>([
+                [ string, 'strung' ]
+            ])
         },
         'Should detect invalid input'
     )
+
+    t.isDeeply(bag2.entries, [], 'Should remove all duplicated entries')
 })
 
 

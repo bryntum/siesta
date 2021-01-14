@@ -166,7 +166,7 @@ export const escapeRegExp = (source : string) : string => source.replace(/[.*+?^
 export const objectEntriesDeep = (source : object) : [ string, unknown ][] => {
     const res : [ string, unknown ][]   = []
 
-    for (const key in source) res.push([ key, source[ key ]])
+    for (const key in source) res.push([ key, source[ key ] ])
 
     return res
 }

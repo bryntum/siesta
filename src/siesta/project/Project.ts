@@ -16,7 +16,7 @@ export class ProjectOptions extends Mixin(
     class ProjectOptions extends base {
         @include()
         @option({ type : 'boolean' })
-        noColor         : boolean           = false
+        desc            : boolean           = false
     }
 
     return ProjectOptions

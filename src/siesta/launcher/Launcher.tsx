@@ -15,7 +15,16 @@ import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Printer } from "../reporter/Printer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { Launch } from "./Launch.js"
-import { HasOptions, Option, option, OptionGroup, OptionsBag } from "./Option.js"
+import {
+    HasOptions,
+    Option,
+    option,
+    OptionGroup,
+    OptionParseWarning,
+    OptionsBag,
+    OptionsParseWarningCodes,
+    optionWarningTemplateByCode
+} from "./Option.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -134,7 +143,7 @@ export class Launcher extends Mixin(
 
             </span>
         })
-        detail          : ReporterDetailing = 'subtest'
+        detail          : ReporterDetailing = 'file'
 
 
         get argv () : string [] {
@@ -150,7 +159,7 @@ export class Launcher extends Mixin(
         }
 
 
-        prepareOptions () {
+        prepareLauncherOptions () {
             this.optionsBag     = OptionsBag.new({ input : this.inputArguments })
 
             const extractRes    = this.optionsBag.extractOptions(
@@ -162,12 +171,17 @@ export class Launcher extends Mixin(
             })
 
             extractRes.warnings.forEach(warning => {
-                console.log(warning)
+                this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
             })
 
             if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
             extractRes.values.forEach((value, option) => this[ option.name ] = value)
+        }
+
+
+        prepareProjectOptions () {
+
         }
 
 
@@ -188,7 +202,28 @@ export class Launcher extends Mixin(
 
 
         async setup () {
-            this.prepareOptions()
+            this.prepareLauncherOptions()
+
+            await this.setupInner()
+
+            this.prepareProjectOptions()
+
+            if (this.optionsBag.entries.length) {
+                const warnings = CI(this.optionsBag.entries).map(entry => entry.key).uniqueOnly().map(optionName => {
+                    const warning : OptionParseWarning = {
+                        warning     : OptionsParseWarningCodes.UnknownOption,
+                        option      : Option.new({ name : optionName })
+                    }
+
+                    return warning
+                }).toArray().forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
+
+                this.print('\n')
+            }
+        }
+
+
+        async setupInner () {
         }
 
 
