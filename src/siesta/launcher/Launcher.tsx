@@ -13,9 +13,9 @@ import { ProjectDescriptor } from "../project/Project.js"
 import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Printer } from "../reporter/Printer.js"
-import { Reporter } from "../reporter/Reporter.js"
+import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { Launch } from "./Launch.js"
-import { HasOptions, Option, option, OptionGroup, OptionsBag, parseOptions } from "./Option.js"
+import { HasOptions, Option, option, OptionGroup, OptionsBag } from "./Option.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -76,6 +76,11 @@ export const OptionsGroupPrimary  = OptionGroup.new({
     weight      : 1000
 })
 
+export const OptionsGroupOutput  = OptionGroup.new({
+    name        : 'Output',
+    weight      : 900
+})
+
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
     [ HasOptions, Printer, LoggerConsole, Base ],
@@ -102,14 +107,37 @@ export class Launcher extends Mixin(
             group       : OptionsGroupFiltering,
             structure   : "array",
             help        : <span>
-                This option specifies a RegExp source, to which the test file URL needs to match, to be included in the suite launch.
-                It can be repeated multiple times, meaning the URL needs to match any of the provided RegExps.
+                This option specifies a RegExp source, to which the test file URL needs to match, to be <span class="accented">included</span> in the suite launch.
+                It can be repeated multiple times, meaning the URL to be included can match any of the provided RegExps.
             </span>
         })
         include         : string[]          = []
 
-        @option({ group : OptionsGroupFiltering, structure : "array" })
+        @option({
+            group       : OptionsGroupFiltering,
+            structure   : "array",
+            help        : <span>
+                This option specifies a RegExp source, to which the test file URL needs to match, to be <span class="accented">excluded</span> in the suite launch.
+                It can be repeated multiple times, meaning the URL to be excluded can match any of the provided RegExps.
+            </span>
+        })
         exclude         : string[]          = []
+
+        @option({
+            group       : OptionsGroupOutput,
+            help        : <span>
+
+            </span>
+        })
+        detail          : ReporterDetailing = 'subtest'
+
+        @option({
+            group       : OptionsGroupOutput,
+            help        : <span>
+
+            </span>
+        })
+        includePassed   : boolean           = false
 
 
         get argv () : string [] {
@@ -141,6 +169,8 @@ export class Launcher extends Mixin(
             })
 
             if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
+
+            extractRes.values.forEach((value, option) => this[ option.name ] = value)
         }
 
 

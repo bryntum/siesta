@@ -4,9 +4,9 @@ import { CI } from "../../collection/Iterator.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-type OptionAtomType         = 'boolean' | 'string' | 'number'
+export type OptionAtomType         = 'boolean' | 'string' | 'number'
 
-type OptionStructureType    = 'map' | 'array' | 'set' | 'atom'
+export type OptionStructureType    = 'map' | 'array' | 'set' | 'atom'
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ export class HasOptions extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const initOptionsStorage = (proto : HasOptions) => {
+const initOptionsStorage = (proto : HasOptions) => {
     if (!proto.hasOwnProperty('$options')) proto.$options = Object.create(proto.$options || null)
 }
 
@@ -194,12 +194,12 @@ export const option = (config? : Partial<Option>, optionCls : typeof Option = Op
 //---------------------------------------------------------------------------------------------------------------------
 type OptionValueEntry = { key : string, value : string }
 
-export type OptionsParseResult = {
+type OptionsParseResult = {
     argv        : string[],
     opts        : OptionValueEntry[]
 }
 
-export function parseOptions (input : string[]) : OptionsParseResult {
+function parseOptions (input : string[]) : OptionsParseResult {
     let currentOption : string
 
     const argv : string[]                               = []

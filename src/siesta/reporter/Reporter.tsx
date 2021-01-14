@@ -164,8 +164,12 @@ export class Reporter extends Mixin(
     class Reporter extends base {
         launch              : Launch                    = undefined
 
-        detailing           : ReporterDetailing         = 'assertion'
-        includePassed       : boolean                   = true
+        get detail () : ReporterDetailing {
+            return this.launch.launcher.detail
+        }
+        get includePassed () : boolean {
+            return this.launch.launcher.includePassed
+        }
 
         filesPassed         : number                    = 0
         filesFailed         : number                    = 0
@@ -182,12 +186,11 @@ export class Reporter extends Mixin(
 
 
         needToShowResult (result : TestResult) : boolean {
-            if (
-                this.detailing === 'assertion' && (result instanceof Assertion || result instanceof TestNodeResult)
-                ||
-                this.detailing === 'subtest' && (result instanceof TestNodeResult)
-            ) {
-                return this.includePassed || !result.passed
+            if (result instanceof Assertion) {
+                return this.detail === 'assertion' ? this.includePassed || !result.passed : !result.passed
+            }
+            else if (result instanceof TestNodeResult) {
+                return this.detail === 'subtest' || this.detail === 'assertion' ? this.detail === 'assertion' ? true : this.includePassed || !result.passed : !result.passed
             } else {
                 return true
             }
@@ -202,10 +205,10 @@ export class Reporter extends Mixin(
             if (testNode.isRoot) {
                 node.appendChild(this.t.testNodeState(testNode), ' ', this.t.testNodeUrl(testNode))
             } else {
-                node.appendChild(this.t.testNodeState(testNode), ' ', this.c[ this.detailing === 'assertion' ? 'underline' : 'noop' ].text(testNode.descriptor.title))
+                node.appendChild(this.t.testNodeState(testNode), ' ', this.c[ this.detail === 'assertion' ? 'underline' : 'noop' ].text(testNode.descriptor.title))
             }
 
-            if (this.detailing === 'assertion' || this.detailing === 'subtest') {
+            if (this.detail === 'assertion' || this.detail === 'subtest') {
                 const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result))
 
                 nodesToShow.forEach((result, index) => {
