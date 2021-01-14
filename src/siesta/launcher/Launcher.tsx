@@ -104,6 +104,7 @@ export class Launcher extends Mixin(
         setupPromise    : Promise<any>      = undefined
 
         @option({
+            type        : 'string',
             group       : OptionsGroupFiltering,
             structure   : "array",
             help        : <span>
@@ -115,6 +116,7 @@ export class Launcher extends Mixin(
 
         @option({
             group       : OptionsGroupFiltering,
+            type        : 'string',
             structure   : "array",
             help        : <span>
                 This option specifies a RegExp source, to which the test file URL needs to match, to be <span class="accented">excluded</span> in the suite launch.
@@ -124,6 +126,9 @@ export class Launcher extends Mixin(
         exclude         : string[]          = []
 
         @option({
+            type        : 'string',
+            structure   : 'enum',
+            enumeration : [ 'file', 'subtest', 'assertion' ],
             group       : OptionsGroupOutput,
             help        : <span>
 
@@ -132,6 +137,7 @@ export class Launcher extends Mixin(
         detail          : ReporterDetailing = 'subtest'
 
         @option({
+            type        : 'boolean',
             group       : OptionsGroupOutput,
             help        : <span>
 

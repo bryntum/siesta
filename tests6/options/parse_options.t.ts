@@ -47,3 +47,22 @@ it('Should detect errors in invalid input', async t => {
 })
 
 
+it('Should set boolean options w/o value to true', async t => {
+    const bag2       = OptionsBag.new({
+        input   : [ '--string=str', 'argv2', '--number', '123', '--boolean' ]
+    })
+
+    t.isDeeply(
+        bag2.extractOptions([ boolean ]),
+        {
+            errors      : [],
+            warnings    : [],
+            values      : new Map<Option, unknown>([
+                [ boolean, true ]
+            ])
+        },
+        'Should detect invalid input'
+    )
+})
+
+

@@ -6,7 +6,7 @@ import { XmlElement } from "../jsx/XmlElement.js"
 //---------------------------------------------------------------------------------------------------------------------
 export type OptionAtomType         = 'boolean' | 'string' | 'number'
 
-export type OptionStructureType    = 'map' | 'array' | 'set' | 'atom'
+export type OptionStructureType    = 'map' | 'array' | 'set' | 'atom' | 'enum'
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -28,6 +28,8 @@ export class Option extends Mixin(
 
         // maps are supposed to always have string keys
         structure   : OptionStructureType   = 'atom'
+
+        enumeration : string[]              = []
 
         group       : OptionGroup           = undefined
 
@@ -91,6 +93,21 @@ export class Option extends Mixin(
 
                     (valueEntry.value as Set<unknown>).add(parseRes.value)
                 }
+                else if (this.structure === 'enum') {
+                    if (this.type !== 'string') throw new Error("Only enum of strings are supported")
+
+                    if (!this.enumeration.some(enumMember => enumMember.toLowerCase() === optionValue.toLowerCase())) {
+                        errors.push({
+                            error       : OptionsParseErrorCodes.UnknownEnumMember,
+                            input       : optionValue,
+                            option      : this
+                        })
+
+                        return
+                    }
+
+                    valueEntry.value    = this.enumeration.find(enumMember => enumMember.toLowerCase() === optionValue.toLowerCase())
+                }
             }
         }
 
@@ -145,7 +162,8 @@ export enum OptionsParseErrorCodes {
     OptionDoesNotHaveValue      = 'OptionDoesNotHaveValue',
     InvalidNumericValue         = 'InvalidNumericValue',
     InvalidBooleanValue         = 'InvalidBooleanValue',
-    InvalidKeyValuePair         = 'InvalidKeyValuePair'
+    InvalidKeyValuePair         = 'InvalidKeyValuePair',
+    UnknownEnumMember           = 'UnknownEnumMember'
 }
 
 export type OptionParseError = {
