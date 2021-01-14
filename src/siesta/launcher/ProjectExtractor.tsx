@@ -49,7 +49,7 @@ export class ProjectExtractorChild extends Mixin(
                         annotation      : <div>
                             <span class="log_message_error"> ERROR </span> <span class="accented">Exception importing project file - wrong path/URL?</span>
                             <div>
-                                { e }
+                                { e.stack }
                             </div>
                         </div>,
                         exitCode        : ExitCodes.EXCEPTION_IN_PROJECT_FILE
