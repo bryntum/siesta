@@ -15,8 +15,8 @@ export class ProjectOptions extends Mixin(
 
     class ProjectOptions extends base {
         @include()
-        @option({ type : 'boolean' })
-        desc            : boolean           = false
+        @option({ type : 'object' })
+        desc            : Partial<TestDescriptor>           = undefined
     }
 
     return ProjectOptions

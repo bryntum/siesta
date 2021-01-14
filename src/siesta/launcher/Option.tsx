@@ -5,7 +5,7 @@ import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export type OptionAtomType         = 'boolean' | 'string' | 'number'
+export type OptionAtomType         = 'boolean' | 'string' | 'number' | 'object'
 
 export type OptionStructureType    = 'map' | 'array' | 'set' | 'atom' | 'enum'
 
@@ -134,9 +134,15 @@ export class Option extends Mixin(
 
         parseAtomValue (input : string) : { value? : unknown, error? : OptionParseError } {
             if (this.type === 'string') {
+                if (input === undefined)
+                    return { error : { error : OptionsParseErrorCodes.OptionDoesNotHaveValue, option : this } }
+
                 return { value : input }
             }
             else if (this.type === 'number') {
+                if (input === undefined)
+                    return { error : { error : OptionsParseErrorCodes.OptionDoesNotHaveValue, option : this } }
+
                 const value       = Number(input)
 
                 if (isNaN(value)) {
@@ -359,11 +365,12 @@ export class OptionsBag extends Base {
 }
 
 
-export const unknownOption = (warning : OptionParseWarning) : XmlElement => <div>
+//---------------------------------------------------------------------------------------------------------------------
+const unknownOption = (warning : OptionParseWarning) : XmlElement => <div>
     <span class="log_message_warn"> WARNING </span> Unknown option: <span class="accented">{ warning.option.name }</span>
 </div>
 
-export const existingValueOverwritten = (warning : OptionParseWarning) : XmlElement => <div>
+const existingValueOverwritten = (warning : OptionParseWarning) : XmlElement => <div>
     <span class="log_message_warn"> WARNING </span> The value of option <span class="accented">--{ warning.option.name }</span>,
     { ' ' }<span class="accented_value">{ warning.value }</span> is overwritten with <span class="accented_value">{ warning.overwrittenWith }</span>
 </div>
@@ -371,4 +378,35 @@ export const existingValueOverwritten = (warning : OptionParseWarning) : XmlElem
 export const optionWarningTemplateByCode = new Map<OptionsParseWarningCodes, (warning : OptionParseWarning) => XmlElement>([
     [ OptionsParseWarningCodes.UnknownOption, unknownOption ],
     [ OptionsParseWarningCodes.ExistingValueOverwritten, existingValueOverwritten ]
+])
+
+
+//---------------------------------------------------------------------------------------------------------------------
+const optionDoesNotHaveValue = (error : OptionParseError) : XmlElement => <div>
+    <span class="log_message_error"> ERROR </span> Missing value for option <span class="accented">{ error.option.name }</span>
+</div>
+
+const unknownEnumMember = (error : OptionParseError) : XmlElement => <div>
+    <p><span class="log_message_error"> ERROR </span> Unknown value <span class="accented_value">{ error.input }</span> for enumeration option <span class="accented">{ error.option.name }</span></p>
+    <ul>
+        Known values are:
+        { error.option.enumeration.map(enumEntry => <li><span class="accented_value">{ enumEntry }</span></li>) }
+    </ul>
+</div>
+
+const invalidNumericValue = (error : OptionParseError) : XmlElement => <div>
+    <p><span class="log_message_error"> ERROR </span> Invalid numeric value <span class="accented_value">{ error.input }</span> for option <span class="accented">{ error.option.name }</span></p>
+</div>
+
+const invalidBooleanValue = (error : OptionParseError) : XmlElement => <div>
+    <p><span class="log_message_error"> ERROR </span> Invalid boolean value <span class="accented_value">{ error.input }</span> for option <span class="accented">{ error.option.name }</span></p>
+</div>
+
+export const optionErrorTemplateByCode = new Map<OptionsParseErrorCodes, (warning : OptionParseError) => XmlElement>([
+    [ OptionsParseErrorCodes.OptionDoesNotHaveValue, optionDoesNotHaveValue ],
+    [ OptionsParseErrorCodes.UnknownEnumMember, unknownEnumMember ],
+    [ OptionsParseErrorCodes.InvalidNumericValue, invalidNumericValue ],
+    [ OptionsParseErrorCodes.InvalidBooleanValue, invalidBooleanValue ],
+    // TODO
+    [ OptionsParseErrorCodes.InvalidKeyValuePair, () => <div></div> ],
 ])

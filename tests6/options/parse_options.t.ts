@@ -29,7 +29,7 @@ it('Should be able to parse options', async t => {
 
 it('Should detect errors in invalid input', async t => {
     const bag2       = OptionsBag.new({
-        input   : [ '--number', 'foo', '--boolean', 'bar' ]
+        input   : [ '--number', 'foo', '--boolean', 'bar', '--string' ]
     })
 
     t.isDeeply(
@@ -37,7 +37,8 @@ it('Should detect errors in invalid input', async t => {
         {
             errors      : [
                 { error : OptionsParseErrorCodes.InvalidNumericValue, input : 'foo', option : number },
-                { error : OptionsParseErrorCodes.InvalidBooleanValue, input : 'bar', option : boolean }
+                { error : OptionsParseErrorCodes.InvalidBooleanValue, input : 'bar', option : boolean },
+                { error : OptionsParseErrorCodes.OptionDoesNotHaveValue, option : string }
             ],
             warnings    : [],
             values      : new Map<Option, unknown>()

@@ -19,6 +19,7 @@ import {
     HasOptions,
     Option,
     option,
+    optionErrorTemplateByCode,
     OptionGroup,
     OptionParseWarning,
     OptionsBag,
@@ -167,7 +168,7 @@ export class Launcher extends Mixin(
             )
 
             extractRes.errors.forEach(error => {
-                console.log(error)
+                this.write(optionErrorTemplateByCode.get(error.error)(error))
             })
 
             extractRes.warnings.forEach(warning => {
