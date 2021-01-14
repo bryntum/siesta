@@ -1,10 +1,19 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
+import { CI } from "../../collection/Iterator.js"
+import { XmlElement } from "../jsx/XmlElement.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 type OptionAtomType         = 'boolean' | 'string' | 'number'
 
 type OptionStructureType    = 'map' | 'array' | 'set' | 'atom'
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class OptionGroup extends Base {
+    name            : string        = ''
+    weight          : number        = 100
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -17,14 +26,17 @@ export class Option extends Mixin(
 
         type        : OptionAtomType        = 'string'
 
-        // maps are supposed to have string keys
+        // maps are supposed to always have string keys
         structure   : OptionStructureType   = 'atom'
 
+        group       : OptionGroup           = undefined
 
-        applyInputValue (
+        help        : XmlElement            = undefined
+
+
+        extractInputValue (
             optionValue         : string,
             valueEntry          : { value : unknown },
-            optionNameSegments  : string[],
             errors              : OptionParseError[],
             warnings            : OptionParseWarning[]
         ) {
@@ -61,10 +73,10 @@ export class Option extends Mixin(
 
                     if (valueEntry.value !== undefined)
                         if (valueEntry.value !== parseRes.value) {
-                            warnings.push({ warning : OptionsParseWarnings.ExistingValueOverwritten, option : this, value : valueEntry.value })
+                            warnings.push({ warning : OptionsParseWarningCodes.ExistingValueOverwritten, option : this, value : valueEntry.value })
                         }
                         else {
-                            warnings.push({ warning : OptionsParseWarnings.SameValueEncountered, option : this, value : valueEntry.value })
+                            warnings.push({ warning : OptionsParseWarningCodes.SameValueEncountered, option : this, value : valueEntry.value })
                         }
 
                     valueEntry.value = parseRes.value
@@ -86,7 +98,7 @@ export class Option extends Mixin(
         parseMapValue (input : string) : { key? : string, value? : string, error? : OptionParseError } {
             const match     = /\s*([\w_-]+)\s*(?:=|:|=>)\s*(.*)\s*/.exec(input)
 
-            if (!match) return { error : { error : OptionsParseErrors.InvalidKeyValuePair, option : this, input } }
+            if (!match) return { error : { error : OptionsParseErrorCodes.InvalidKeyValuePair, option : this, input } }
 
             return { key : match[ 1 ], value : match[ 2 ] }
         }
@@ -100,11 +112,13 @@ export class Option extends Mixin(
                 const value       = Number(input)
 
                 if (isNaN(value)) {
-                    return { error : { error : OptionsParseErrors.InvalidNumericValue, option : this, input } }
+                    return { error : { error : OptionsParseErrorCodes.InvalidNumericValue, option : this, input } }
                 } else {
                     return { value }
                 }
             } else {
+                if (input === undefined) return { value : true }
+
                 if (/^\s*true|enable|yes|1\s*$/i.test(input)) {
                     return { value : true }
                 }
@@ -112,7 +126,7 @@ export class Option extends Mixin(
                     return { value : false }
                 }
                 else {
-                    return { error : { error : OptionsParseErrors.InvalidBooleanValue, option : this, input } }
+                    return { error : { error : OptionsParseErrorCodes.InvalidBooleanValue, option : this, input } }
                 }
             }
         }
@@ -120,14 +134,14 @@ export class Option extends Mixin(
 ){}
 
 
-export enum OptionsParseWarnings {
+export enum OptionsParseWarningCodes {
     UnknownOption               = 'UnknownOption',
     ExistingValueOverwritten    = 'ExistingValueOverwritten',
     SameValueEncountered        = 'SameValueEncountered'
 }
 
 
-export enum OptionsParseErrors {
+export enum OptionsParseErrorCodes {
     OptionDoesNotHaveValue      = 'OptionDoesNotHaveValue',
     InvalidNumericValue         = 'InvalidNumericValue',
     InvalidBooleanValue         = 'InvalidBooleanValue',
@@ -135,13 +149,13 @@ export enum OptionsParseErrors {
 }
 
 export type OptionParseError = {
-    error       : OptionsParseErrors,
+    error       : OptionsParseErrorCodes,
     option      : Option,
     input?      : string
 }
 
 export type OptionParseWarning = {
-    warning     : OptionsParseWarnings,
+    warning     : OptionsParseWarningCodes,
     option      : Option,
     value?      : unknown
 }
@@ -178,101 +192,14 @@ export const option = (config? : Partial<Option>, optionCls : typeof Option = Op
 
 
 //---------------------------------------------------------------------------------------------------------------------
+type OptionValueEntry = { key : string, value : string }
+
 export type OptionsParseResult = {
     argv        : string[],
-    opts        : Map<string, { option : Option, value : unknown }>,
-    errors      : OptionParseError[],
-    warnings    : OptionParseWarning[]
+    opts        : OptionValueEntry[]
 }
 
-
-export function parseOptions (input : string[], knownOptions : { [ key : string ] : Option }) : OptionsParseResult {
-    let currentOption : Option
-
-    const argv : string[]   = []
-    const opts              = new Map<string, { option : Option, value : unknown }>()
-
-    const warnings : OptionParseWarning[]       = []
-    const errors : OptionParseError[]           = []
-
-    const forceFinishCurrentOption = () => {
-        if (currentOption)
-            if (currentOption.type === 'boolean' && currentOption.structure === 'atom') {
-                // boolean options does not need to have a value, just there presence
-                // assumes a `true` value, like:
-                //     --some_boolean_option --some_option_with_value=1
-                currentOption.applyInputValue('true', opts.get(currentOption.name), [], errors, warnings)
-
-                currentOption   = undefined
-            } else {
-                errors.push({ error : OptionsParseErrors.OptionDoesNotHaveValue, option : currentOption })
-
-                currentOption   = undefined
-            }
-    }
-
-    for (let i = 0; i < input.length; i++) {
-        const arg       = input[ i ]
-
-        if (arg === '--') break
-
-        const match     = /^\s*--([\w_\-.]+)(?:=(.*))?/.exec(arg)
-
-        if (match) {
-            forceFinishCurrentOption()
-
-            const optionFullName : string   = match[ 1 ]
-            const optionValue : string      = match[ 2 ]
-
-            const optionNameSegments        = optionFullName.split('.')
-
-            const optionName                = optionNameSegments[ 0 ]
-
-            if (!opts.has(optionName)) {
-                let option                  = knownOptions[ optionName ]
-
-                if (!option) {
-                    option                  = new Option({ name : optionName })
-
-                    warnings.push({ warning : OptionsParseWarnings.UnknownOption, option })
-                }
-
-                opts.set(optionName, { option, value : undefined })
-            }
-
-            const existingEntry             = opts.get(optionName)
-
-            currentOption                   = existingEntry.option
-
-            if (optionValue !== undefined) {
-                currentOption.applyInputValue(optionValue, existingEntry, optionNameSegments, errors, warnings)
-
-                currentOption               = undefined
-            }
-        }
-        else if (currentOption) {
-            currentOption.applyInputValue(arg, opts.get(currentOption.name), [], errors, warnings)
-
-            currentOption                   = undefined
-        }
-        else {
-            argv.push(arg)
-        }
-    }
-
-    forceFinishCurrentOption()
-
-    return { argv, opts, errors, warnings }
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export type OptionsParseResult2 = {
-    argv        : string[],
-    opts        : { key : string, value : string }[]
-}
-
-export function parseOptions2 (input : string[]) : OptionsParseResult2 {
+export function parseOptions (input : string[]) : OptionsParseResult {
     let currentOption : string
 
     const argv : string[]                               = []
@@ -319,4 +246,84 @@ export function parseOptions2 (input : string[]) : OptionsParseResult2 {
     forceFinishCurrentOption()
 
     return { argv, opts }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+type ExtractOptionsResult = { values : Map<Option, unknown>, errors : OptionParseError[], warnings : OptionParseWarning[] }
+
+export class OptionsBag extends Base {
+    input                   : string[]              = []
+
+    $argv                   : string[]              = undefined
+
+    $entries                : OptionValueEntry[]    = undefined
+
+    get argv () : string[] {
+        if (this.$argv !== undefined) return this.$argv
+
+        const parseRes          = parseOptions(this.input)
+
+        this.$entries           = parseRes.opts
+
+        return this.$argv       = parseRes.argv
+    }
+
+    get entries () : OptionValueEntry[] {
+        if (this.$entries !== undefined) return this.$entries
+
+        const parseRes          = parseOptions(this.input)
+
+        this.$argv              = parseRes.argv
+
+        return this.$entries    = parseRes.opts
+    }
+
+    set entries (value : OptionValueEntry[]) {
+        this.$entries           = value
+    }
+
+
+    extractOptions (knownOptions : Option[]) : ExtractOptionsResult {
+        const res : ExtractOptionsResult   = { values : new Map(), errors : [], warnings : [] }
+
+        const optionsByName     = CI(knownOptions)
+            .map(option => { return [ option.name.toLowerCase(), option ] as [ string, Option ] })
+            .toMap()
+
+        this.extract(entry => {
+            const option    = optionsByName.get(this.normalizeOptionName(entry.key))
+
+            if (option) {
+                option.extractInputValue(
+                    entry.value, {
+                        get value () {
+                            return res.values.get(option)
+                        },
+                        set value (v) {
+                            res.values.set(option, v)
+                        }
+                    },
+                    res.errors,
+                    res.warnings
+                )
+
+                return true
+            }
+
+            return false
+        })
+
+        return res
+    }
+
+
+    normalizeOptionName (name : string) : string {
+        return name.replace(/[-_]/, '').toLowerCase()
+    }
+
+
+    extract (predicate : (entry : { key : string, value : string }) => boolean) {
+        this.entries    = this.entries.filter(entry => !predicate(entry))
+    }
 }
