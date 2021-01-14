@@ -1,6 +1,6 @@
 import readline from "readline"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { saneSplit, SetIntervalHandler } from "../../util/Helpers.js"
+import { SetIntervalHandler } from "../../util/Helpers.js"
 import { hideCursor, showCursor } from "../../util_nodejs/Terminal.js"
 import { TestNodeResult } from "../test/Result.js"
 import { Reporter } from "./Reporter.js"
@@ -31,11 +31,11 @@ export class ReporterNodejs extends Mixin(
 
 
         onTestSuiteStart () {
-            // process.stdout.write(hideCursor)
+            process.stdout.write(hideCursor)
 
-            // process.on('SIGTERM', () => process.stdout.write('\n' + showCursor))
-            // process.on('SIGINT', () => { process.stdout.write('\n' + showCursor); process.exit(1) })
-            // process.on('exit', () => process.stdout.write(showCursor))
+            process.on('SIGTERM', () => process.stdout.write('\n' + showCursor))
+            process.on('SIGINT', () => { process.stdout.write('\n' + showCursor); process.exit(1) })
+            process.on('exit', () => process.stdout.write(showCursor))
 
             this.spinnerInterval    = setInterval(this.onSpinnerTick.bind(this), this.spinner.interval)
 
@@ -46,7 +46,7 @@ export class ReporterNodejs extends Mixin(
 
 
         onTestSuiteFinish () {
-            // process.stdout.write(showCursor)
+            process.stdout.write(showCursor)
 
             clearInterval(this.spinnerInterval)
 
