@@ -167,9 +167,6 @@ export class Reporter extends Mixin(
         get detail () : ReporterDetailing {
             return this.launch.launcher.detail
         }
-        get includePassed () : boolean {
-            return this.launch.launcher.includePassed
-        }
 
         filesPassed         : number                    = 0
         filesFailed         : number                    = 0
@@ -185,12 +182,16 @@ export class Reporter extends Mixin(
         startTime           : Date                      = undefined
 
 
+        // failed assertions are always included (along with all their parent sub-tests)
+        // otherwise, include everything at the specified `detail` level
         needToShowResult (result : TestResult) : boolean {
             if (result instanceof Assertion) {
-                return this.detail === 'assertion' ? this.includePassed || !result.passed : !result.passed
+                return this.detail === 'assertion' ? true : !result.passed
             }
             else if (result instanceof TestNodeResult) {
-                return this.detail === 'subtest' || this.detail === 'assertion' ? this.detail === 'assertion' ? true : this.includePassed || !result.passed : !result.passed
+                if (this.detail === 'assertion') return true
+
+                return this.detail === 'subtest' ? true : !result.passed
             } else {
                 return true
             }

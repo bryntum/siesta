@@ -136,15 +136,6 @@ export class Launcher extends Mixin(
         })
         detail          : ReporterDetailing = 'subtest'
 
-        @option({
-            type        : 'boolean',
-            group       : OptionsGroupOutput,
-            help        : <span>
-
-            </span>
-        })
-        includePassed   : boolean           = false
-
 
         get argv () : string [] {
             return this.optionsBag.argv
