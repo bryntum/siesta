@@ -1,21 +1,32 @@
 import path from 'path'
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { fileURLToPath } from "url"
 import { Channel } from "../../channel/Channel.js"
 import { ChannelNodeIpc } from "../../channel/ChannelNodeIpc.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { SiestaJSX } from "../jsx/Factory.js"
 import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNodejs } from "../reporter/ColorerNodejs.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
-import { Launcher } from "./Launcher.js"
+import { ExitCodes, Launcher, LauncherError, OptionsGroupPrimary } from "./Launcher.js"
+import { option } from "./Option.js"
 import { ChannelProjectExtractor } from "./ProjectExtractor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherNodejs extends Mixin(
     [ Launcher ],
-    (base : ClassUnion<typeof Launcher>) =>
+    (base : ClassUnion<typeof Launcher>) => {
 
     class LauncherNodejs extends base {
+
+        @option({
+            group       : OptionsGroupPrimary,
+            help        : <span>
+                Project file url
+            </span>
+        })
+        project             : string            = ''
 
         c               : Colorer               = ColorerNodejs.new()
 
@@ -51,7 +62,26 @@ export class LauncherNodejs extends Mixin(
 
 
         async setup () {
-            const parseResult       = await this.prepareOptions()
+            await super.setup()
+
+            const projectFileUrl    = this.project || this.argv[ 0 ]
+
+            if (!projectFileUrl) throw LauncherError.new({
+                exitCode : ExitCodes.INCORRECT_ARGUMENTS,
+                annotation      : <div>
+                    <p><span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url </span></p>
+                    <unl>
+                        You can specify the project file location with <span class="option_name">--project</span> option
+                        or by providing a positional argument:
+                        <li>
+                            npx siesta --project ./siesta.js
+                        </li>
+                        <li>
+                            npx siesta ./siesta.js --some_option=1
+                        </li>
+                    </unl>
+                </div>,
+            })
 
             // `projectDescriptor` might be already provided
             // if project file is launched directly as node executable
@@ -60,15 +90,17 @@ export class LauncherNodejs extends Mixin(
 
                 await channel.setup()
 
-                const parentPort        = channel.parentPort
+                const parentPort            = channel.parentPort
 
-                const projectUrl        = this.prepareProjectFileUrl(parseResult.argv[ 0 ])
+                try {
+                    const projectUrl        = this.prepareProjectFileUrl(projectFileUrl)
 
-                this.projectDescriptor  = await parentPort.extractProject(projectUrl)
+                    this.projectDescriptor  = await parentPort.extractProject(projectUrl)
 
-                this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
-
-                await parentPort.disconnect()
+                    this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
+                } finally {
+                    await parentPort.disconnect()
+                }
             }
         }
 
@@ -78,7 +110,7 @@ export class LauncherNodejs extends Mixin(
 
             }
             else if (/file:/.test(url)) {
-
+                return path.resolve(fileURLToPath(url))
             }
             else {
                 // assume plain fs path here
@@ -88,4 +120,6 @@ export class LauncherNodejs extends Mixin(
             return url
         }
     }
-) {}
+
+    return LauncherNodejs
+}) {}

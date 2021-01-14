@@ -1,9 +1,11 @@
+import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { CI } from "../../collection/Iterator.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
-import { Channel } from "../../channel/Channel.js"
+import { objectEntriesDeep } from "../../util/Helpers.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { ProjectPlanItem } from "../project/Plan.js"
@@ -13,8 +15,7 @@ import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Printer } from "../reporter/Printer.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { Launch } from "./Launch.js"
-import { parseOptions2 } from "./Option.js"
-import { ChannelProjectExtractor } from "./ProjectExtractor.js"
+import { HasOptions, Option, option, OptionGroup, OptionsBag, parseOptions } from "./Option.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +51,11 @@ export enum ExitCodes {
      * Incorrect command-line arguments, test suite did not start
      */
     'INCORRECT_ARGUMENTS'   = 6,
+
+    /**
+     * Internal exception, please report as a bug.
+     */
+    'UNHANLED_EXCEPTION'    = 7
 }
 
 
@@ -60,18 +66,27 @@ export class LauncherError extends Serializable.mix(Base) {
     exitCode            : ExitCodes     = undefined
 }
 
+export const OptionsGroupFiltering  = OptionGroup.new({
+    name        : 'Filtering',
+    weight      : 100
+})
+
+export const OptionsGroupPrimary  = OptionGroup.new({
+    name        : 'Primary',
+    weight      : 1000
+})
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
-    [ Printer, LoggerConsole, Base ],
-    (base : ClassUnion<typeof Printer, typeof LoggerConsole, typeof Base>) =>
+    [ HasOptions, Printer, LoggerConsole, Base ],
+    (base : ClassUnion<typeof HasOptions, typeof Printer, typeof LoggerConsole, typeof Base>) => {
 
     class Launcher extends base {
-        logger              : Logger            = LoggerConsole.new({ logLevel : LogLevel.warn })
+        logger              : Logger                = LoggerConsole.new({ logLevel : LogLevel.warn })
 
-        // projectFileUrl      : string            = ''
+        inputArguments      : string[]              = []
 
-        inputArguments      : string[]          = []
+        optionsBag          : OptionsBag            = undefined
 
         reporterClass       : typeof Reporter       = undefined
         colorerClass        : typeof Colorer        = ColorerNoop
@@ -83,6 +98,23 @@ export class Launcher extends Mixin(
         setupDone       : boolean           = false
         setupPromise    : Promise<any>      = undefined
 
+        @option({
+            group       : OptionsGroupFiltering,
+            structure   : "array",
+            help        : <span>
+                This option specifies a RegExp source, to which the test file URL needs to match, to be included in the suite launch.
+                It can be repeated multiple times, meaning the URL needs to match any of the provided RegExps.
+            </span>
+        })
+        include         : string[]          = []
+
+        @option({ group : OptionsGroupFiltering, structure : "array" })
+        exclude         : string[]          = []
+
+
+        get argv () : string [] {
+            return this.optionsBag.argv
+        }
 
 
         async start () : Promise<Launch> {
@@ -93,19 +125,22 @@ export class Launcher extends Mixin(
         }
 
 
-        async prepareOptions () {
-            const parseResult       = parseOptions2(this.inputArguments)
+        prepareOptions () {
+            this.optionsBag     = OptionsBag.new({ input : this.inputArguments })
 
-            if (parseResult.argv.length === 0) {
-                throw LauncherError.new({
-                    annotation      : <div>
-                        <span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url</span>
-                    </div>,
-                    exitCode        : ExitCodes.INCORRECT_ARGUMENTS
-                })
-            }
+            const extractRes    = this.optionsBag.extractOptions(
+                CI(objectEntriesDeep(this.$options)).map(entry => { return entry[ 1 ] as Option }).toArray()
+            )
 
-            return parseResult
+            extractRes.errors.forEach(error => {
+                console.log(error)
+            })
+
+            extractRes.warnings.forEach(warning => {
+                console.log(warning)
+            })
+
+            if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
         }
 
 
@@ -126,6 +161,7 @@ export class Launcher extends Mixin(
 
 
         async setup () {
+            this.prepareOptions()
         }
 
 
@@ -145,4 +181,6 @@ export class Launcher extends Mixin(
             return launch
         }
     }
-) {}
+
+    return Launcher
+}) {}
