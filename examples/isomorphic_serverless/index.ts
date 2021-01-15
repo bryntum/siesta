@@ -1,4 +1,4 @@
-import { ProjectIsomorphic } from "../../src/siesta/project/ProjectIsomorphic.js"
+import { ProjectIsomorphic } from "../../main.js"
 
 const project = ProjectIsomorphic.new({
     title                   : 'Isomorphic serverless test suite example',
