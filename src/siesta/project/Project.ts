@@ -1,42 +1,8 @@
-import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { include, serializable, Serializable } from "../../serializable/Serializable.js"
 import { Launcher } from "../launcher/Launcher.js"
-import { HasOptions, option } from "../launcher/Option.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { ProjectPlanGroup, ProjectPlanItemDescriptor, ProjectPlanItemFromDescriptor } from "./Plan.js"
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable({ mode : 'optIn' })
-export class ProjectOptions extends Mixin(
-    [ Serializable, HasOptions, Base ],
-    (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof Base>) => {
-
-    class ProjectOptions extends base {
-        @include()
-        @option({ type : 'object' })
-        desc            : Partial<TestDescriptor>           = undefined
-    }
-
-    return ProjectOptions
-}) {}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable()
-export class ProjectDescriptor extends Mixin(
-    [ Serializable, Base ],
-    (base : ClassUnion<typeof Serializable, typeof Base>) => {
-
-    class ProjectDescriptor extends base {
-        projectPlan     : ProjectPlanGroup          = undefined
-
-        options         : ProjectOptions            = undefined
-    }
-
-    return ProjectDescriptor
-}) {}
+import { ProjectDescriptor, ProjectOptions } from "./ProjectOptions.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -46,8 +12,6 @@ export class Project extends Mixin(
 
     class Project extends base {
         title           : string            = ''
-
-        testDescriptor  : Partial<TestDescriptor>           = undefined
 
         projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new()
 

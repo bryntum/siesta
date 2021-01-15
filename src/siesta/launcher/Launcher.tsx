@@ -9,7 +9,7 @@ import { objectEntriesDeep } from "../../util/Helpers.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { ProjectPlanItem } from "../project/Plan.js"
-import { ProjectDescriptor } from "../project/Project.js"
+import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Printer } from "../reporter/Printer.js"
@@ -182,7 +182,21 @@ export class Launcher extends Mixin(
 
 
         prepareProjectOptions () {
+            const extractRes    = this.optionsBag.extractOptions(
+                CI(objectEntriesDeep(this.projectDescriptor.options.$options)).map(entry => { return entry[ 1 ] as Option }).toArray()
+            )
 
+            extractRes.errors.forEach(error => {
+                this.write(optionErrorTemplateByCode.get(error.error)(error))
+            })
+
+            extractRes.warnings.forEach(warning => {
+                this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
+            })
+
+            if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
+
+            // extractRes.values.forEach((value, option) => this[ option.name ] = value)
         }
 
 
