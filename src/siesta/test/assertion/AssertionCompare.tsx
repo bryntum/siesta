@@ -19,11 +19,7 @@ export class AssertionCompare extends Mixin(
 
 
         ok<V> (value : V, description : string = '') {
-            this.addResult(Assertion.new({
-                name            : 'ok',
-                passed          : Boolean(value),
-                description
-            }))
+            return this.true(value, description)
         }
 
 
@@ -31,6 +27,19 @@ export class AssertionCompare extends Mixin(
             this.addResult(Assertion.new({
                 name            : 'true',
                 passed          : Boolean(value),
+                description
+            }))
+        }
+
+
+        notOk<V> (value : V, description : string = '') {
+            return this.false(value, description)
+        }
+
+        false<V> (value : V, description : string = '') {
+            this.addResult(Assertion.new({
+                name            : 'false',
+                passed          : !Boolean(value),
                 description
             }))
         }

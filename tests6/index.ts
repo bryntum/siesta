@@ -8,6 +8,14 @@ const project = ProjectIsomorphic.new({
 
 project.plan(
     {
+        filename       : 'class',
+
+        items       : [
+            'mixin.t.js',
+            'mixin_caching.t.js'
+        ]
+    },
+    {
         filename    : 'channel',
 
         items       : [

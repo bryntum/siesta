@@ -32,28 +32,6 @@ project.start(
         ]
     },
     {
-        group       : 'Serializable',
-
-        items       : [
-            'serializable/serializable.t.js'
-        ]
-    },
-    {
-        group       : 'Channel',
-
-        items       : [
-            'channel/channel.t.js'
-        ]
-    },
-    {
-        group       : 'Class',
-
-        items       : [
-            'class/020_mixin.t.js',
-            'class/030_mixin_caching.t.js'
-        ]
-    },
-    {
         group       : 'Iterator',
 
         items       : [
