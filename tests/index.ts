@@ -32,13 +32,6 @@ project.start(
         ]
     },
     {
-        group       : 'Iterator',
-
-        items       : [
-            'collection/010_chained_iterator.t.js',
-        ]
-    },
-    {
         group       : 'Util',
 
         items       : [

@@ -8,6 +8,13 @@ const project = ProjectIsomorphic.new({
 
 project.plan(
     {
+        filename       : 'chained_iterator',
+
+        items       : [
+            'chained_iterator.t.js',
+        ]
+    },
+    {
         filename       : 'class',
 
         items       : [
