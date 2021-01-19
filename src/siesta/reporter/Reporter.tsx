@@ -5,8 +5,8 @@ import { relative } from "../../util/Path.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement, XmlStream } from "../jsx/XmlElement.js"
 import { Launch } from "../launcher/Launch.js"
-import { ProjectDescriptor } from "../project/Project.js"
-import { Assertion, AssertionAsyncResolution, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
+import { ProjectDescriptor } from "../project/ProjectOptions.js"
+import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, TestNodeResult, TestResult } from "../test/Result.js"
 import { Colorer } from "./Colorer.js"
 import { Printer } from "./Printer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
@@ -73,7 +73,7 @@ export class ReporterTheme extends Base {
     }
 
 
-    assertionTemplate (assertion : Assertion) : XmlStream {
+    assertionTemplate (assertion : Assertion) : XmlElement {
         return <div class="assertion">
             <span class={`assertion_icon ${ assertion.passed ? 'assertion_icon_pass' : 'assertion_icon_fail' }`}>
                 { assertion.passed ? '✔' : '✘' }
@@ -88,13 +88,21 @@ export class ReporterTheme extends Base {
     }
 
 
-    logMessageTemplate (message : LogMessage) : XmlStream {
+    logMessageTemplate (message : LogMessage) : XmlElement {
         return <div class="log_message">
             <span class='log_message_icon'>ⓘ</span>
             { ' ' }
             <span class={ `log_message_${ LogLevel[ message.level ].toLowerCase() }` }> { LogLevel[ message.level ].toUpperCase() } </span>
             { ' ' }
             { message.message }
+        </div>
+    }
+
+
+    exceptionTemplate (exception : Exception) : XmlElement {
+        return <div class="exception">
+            <div class='exception_icon'> EXCEPTION </div>
+            <div class='indented'>{ exception.stack || exception }</div>
         </div>
     }
 
@@ -227,7 +235,11 @@ export class Reporter extends Mixin(
                                     ?
                                         this.t.logMessageTemplate(result)
                                     :
-                                        <span>Unknown element</span>
+                                        (result instanceof Exception)
+                                            ?
+                                                this.t.exceptionTemplate(result)
+                                            :
+                                                <span>Unknown element</span>
                 }</leaf>)
             })
 

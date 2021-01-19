@@ -147,6 +147,11 @@ export class DataVisitor extends Mixin(
         visitMapEntryValue<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
             return this.visit(value, depth)
         }
+
+
+        visitDate (date : Date, depth : number) : any {
+            return date
+        }
     }
 ){}
 
@@ -158,7 +163,7 @@ export class Mapper extends Mixin(
 
     class Mapper extends base {
 
-        visitObject (object : object, depth : number) : any {
+        visitObject (object : object, depth : number) : unknown {
             const entries   = Object.entries(object)
 
             const newObject = Object.create(Object.getPrototypeOf(object))
@@ -172,12 +177,12 @@ export class Mapper extends Mixin(
         }
 
 
-        visitArray (array : unknown[], depth : number) : any {
+        visitArray (array : unknown[], depth : number) : unknown {
             return array.map((value, index) => this.visitArrayEntry(value, array, index, depth))
         }
 
 
-        visitSet (set : Set<unknown>, depth : number) : any {
+        visitSet (set : Set<unknown>, depth : number) : unknown {
             let index : number      = 0
 
             const newSet            = new Set()
@@ -190,7 +195,7 @@ export class Mapper extends Mixin(
         }
 
 
-        visitMap (map : Map<unknown, unknown>, depth : number) : any {
+        visitMap (map : Map<unknown, unknown>, depth : number) : unknown {
             let index : number      = 0
 
             const newMap            = new Map()
@@ -203,6 +208,11 @@ export class Mapper extends Mixin(
             }
 
             return newMap
+        }
+
+
+        visitDate (date : Date, depth : number) : any {
+            return new Date(date)
         }
     }
 ) {}

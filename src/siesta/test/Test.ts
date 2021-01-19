@@ -6,7 +6,7 @@ import { Compare } from "./assertion/Compare.js"
 import { TestLauncherChild } from "./port/TestLauncher.js"
 import { TestReporterChild } from "./port/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { Assertion, AssertionAsyncResolution, LogMessage, TestNodeResult, TestResult } from "./Result.js"
+import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResult } from "./Result.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -101,6 +101,15 @@ export class Test extends Mixin(
         }
 
 
+        failOnExceptionDuringImport (exception : unknown) {
+            this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
+
+            this.addResult(Exception.new({ exception }))
+
+            this.reporter.onSubTestFinish(this.localId)
+        }
+
+
         async start () {
             this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
@@ -114,8 +123,17 @@ export class Test extends Mixin(
         }
 
 
+        // TODO
+        // need to figure out if we need to wait until all reports (`this.reporter.onXXX`)
+        // has been completed or not, before completing the method
         async launch () {
-            await this.code(this)
+            try {
+                await this.code(this)
+            } catch (exception) {
+                // console.log("TEST EXCEPTION", exception, "STACK", exception.stack)
+
+                this.addResult(Exception.new({ exception }))
+            }
 
             while (this.pendingSubTests.length) {
                 const subTest       = this.pendingSubTests.shift()

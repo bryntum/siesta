@@ -169,6 +169,51 @@ StartTest(t => {
         t.is(revived.another.another, revived)
     })
 
+
+    t.it('Serialization of native data structures should work - Date', async t => {
+        const date  = new Date(2020, 1, 1)
+
+        const revived : Map<Map<unknown, unknown>, Map<unknown, unknown>>   = parse(stringify(date))
+
+        t.isInstanceOf(revived, Date)
+
+        t.is(revived, date)
+
+        // TODO uncomment in Siesta6
+        // t.isDeeply(revived, crazyMap)
+    })
+
+
+    t.it('Serialization of crazy cyclic data structures should work - Map', async t => {
+        const crazyMap  = new Map()
+
+        crazyMap.set(crazyMap, crazyMap)
+
+        const revived : Map<Map<unknown, unknown>, Map<unknown, unknown>>   = parse(stringify(crazyMap))
+
+        t.isInstanceOf(revived, Map)
+
+        t.is(revived.get(revived), revived)
+
+        // TODO uncomment in Siesta6
+        // t.isDeeply(revived, crazyMap)
+    })
+
+
+    t.it('Serialization of crazy cyclic data structures should work - Set', async t => {
+        const crazySet  = new Set()
+
+        crazySet.add(crazySet)
+
+        const revived : Set<unknown>   = parse(stringify(crazySet))
+
+        t.isInstanceOf(revived, Set)
+
+        t.is(revived.has(revived), true)
+
+        // TODO uncomment in Siesta6
+        // t.isDeeply(revived, crazySet)
+    })
 })
 
 

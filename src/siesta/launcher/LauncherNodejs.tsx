@@ -24,7 +24,7 @@ export class LauncherNodejs extends Mixin(
             type        : 'string',
             group       : OptionsGroupPrimary,
             help        : <span>
-                Project file url
+                Project file url.
             </span>
         })
         project             : string            = ''
@@ -32,9 +32,9 @@ export class LauncherNodejs extends Mixin(
         @option({
             type        : 'boolean',
             group       : OptionsGroupOutput,
-            help        : <span>
-                Project file url
-            </span>
+            help        : <div>
+                Whether to suppress the output coloring. Automatically enforced if output stream is not a terminal.
+            </div>
         })
         noColor         : boolean           = false
 

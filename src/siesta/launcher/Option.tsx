@@ -37,6 +37,11 @@ export class Option extends Mixin(
         help        : XmlElement            = undefined
 
 
+        applyValue (target : HasOptions, value : unknown) {
+            target[ this.name ] = value
+        }
+
+
         extractInputValue (
             optionValue         : string,
             valueEntry          : { value : unknown },
@@ -168,6 +173,18 @@ export class Option extends Mixin(
 ){}
 
 
+// //---------------------------------------------------------------------------------------------------------------------
+// export class OptionArray extends Mixin(
+//     [ Option ],
+//     (base : ClassUnion<typeof Option>) =>
+//
+//     class Option extends base {
+//
+//     }
+// ) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export enum OptionsParseWarningCodes {
     UnknownOption               = 'UnknownOption',
     ExistingValueOverwritten    = 'ExistingValueOverwritten'
@@ -367,7 +384,7 @@ export class OptionsBag extends Base {
 
 //---------------------------------------------------------------------------------------------------------------------
 const unknownOption = (warning : OptionParseWarning) : XmlElement => <div>
-    <span class="log_message_warn"> WARNING </span> Unknown option: <span class="accented">{ warning.option.name }</span>
+    <span class="log_message_warn"> WARNING </span> Unknown option: <span class="accented">--{ warning.option.name }</span>
 </div>
 
 const existingValueOverwritten = (warning : OptionParseWarning) : XmlElement => <div>
@@ -383,11 +400,11 @@ export const optionWarningTemplateByCode = new Map<OptionsParseWarningCodes, (wa
 
 //---------------------------------------------------------------------------------------------------------------------
 const optionDoesNotHaveValue = (error : OptionParseError) : XmlElement => <div>
-    <span class="log_message_error"> ERROR </span> Missing value for option <span class="accented">{ error.option.name }</span>
+    <span class="log_message_error"> ERROR </span> Missing value for option <span class="accented">--{ error.option.name }</span>
 </div>
 
 const unknownEnumMember = (error : OptionParseError) : XmlElement => <div>
-    <p><span class="log_message_error"> ERROR </span> Unknown value <span class="accented_value">{ error.input }</span> for enumeration option <span class="accented">{ error.option.name }</span></p>
+    <p><span class="log_message_error"> ERROR </span> Unknown value <span class="accented_value">{ error.input }</span> for enumeration option <span class="accented">--{ error.option.name }</span></p>
     <ul>
         Known values are:
         { error.option.enumeration.map(enumEntry => <li><span class="accented_value">{ enumEntry }</span></li>) }
@@ -395,11 +412,11 @@ const unknownEnumMember = (error : OptionParseError) : XmlElement => <div>
 </div>
 
 const invalidNumericValue = (error : OptionParseError) : XmlElement => <div>
-    <p><span class="log_message_error"> ERROR </span> Invalid numeric value <span class="accented_value">{ error.input }</span> for option <span class="accented">{ error.option.name }</span></p>
+    <p><span class="log_message_error"> ERROR </span> Invalid numeric value <span class="accented_value">{ error.input }</span> for option <span class="accented">--{ error.option.name }</span></p>
 </div>
 
 const invalidBooleanValue = (error : OptionParseError) : XmlElement => <div>
-    <p><span class="log_message_error"> ERROR </span> Invalid boolean value <span class="accented_value">{ error.input }</span> for option <span class="accented">{ error.option.name }</span></p>
+    <p><span class="log_message_error"> ERROR </span> Invalid boolean value <span class="accented_value">{ error.input }</span> for option <span class="accented">--{ error.option.name }</span></p>
 </div>
 
 export const optionErrorTemplateByCode = new Map<OptionsParseErrorCodes, (warning : OptionParseError) => XmlElement>([

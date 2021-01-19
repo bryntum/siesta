@@ -45,10 +45,14 @@ export class Collapser extends Mixin(
         afterVisit (value : unknown, depth : number, visitResult : unknown) : unknown {
             super.afterVisit(value, depth, visitResult)
 
+            const nativeSerializationEntry  = nativeSerializableClassesByConstructor.get(visitResult.constructor)
+
+            const res = nativeSerializationEntry ? nativeSerializationEntry.toJSON(visitResult as object) : visitResult
+
             return this.collapser1.cyclicPoint.has(value) ?
-                { $refId : this.collapser1.visited.get(value), value : visitResult }
+                { $refId : this.collapser1.visited.get(value), value : res }
                     :
-                visitResult
+                res
         }
 
 
@@ -187,7 +191,9 @@ export class Serializable extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-const serializableClasses = new Map<string, typeof Serializable>()
+// TODO consider using 'moduleUrl/symbol' pair as class key
+// deserialization becomes async in this case
+const serializableClasses           = new Map<string, typeof Serializable>()
 
 const registerSerializableClass = (options : { id : string, mode : SerializationMode }, cls : typeof Serializable) => {
     const id                    = options.id
@@ -205,6 +211,19 @@ const registerSerializableClass = (options : { id : string, mode : Serialization
 export const lookupSerializableClass = (id : string) : typeof Serializable => {
     return serializableClasses.get(id)
 }
+
+
+//---------------------------------------------------------------------------------------------------------------------
+type NativeSerializationEntry = { toJSON : (native : object) => object, fromJSON : (json : object) => object }
+
+const nativeSerializableClassesByConstructor    = new Map<Function, NativeSerializationEntry>()
+const nativeSerializableClassesById             = new Map<string, NativeSerializationEntry>()
+
+const registerNativeSerializableClass = (cls : Function, entry : NativeSerializationEntry) => {
+    nativeSerializableClassesByConstructor.set(cls, entry)
+    nativeSerializableClassesById.set(cls.name, entry)
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export type SerializationMode = 'optIn' | 'optOut'
@@ -262,7 +281,86 @@ export const reviver = function (key : string | number, value : number | string 
 
             return cls.fromJSON(value)
         }
+
+        const $$class        = value.$$class as string
+
+        if ($$class !== undefined) {
+            const entry       = nativeSerializableClassesById.get($$class)
+
+            if (!entry) throw new Error(`Unknown native serializable class id: ${ $$class }`)
+
+            return entry.fromJSON(value)
+        }
     }
 
     return value
 }
+
+
+//---------------------------------------------------------------------------------------------------------------------
+registerNativeSerializableClass(Map, {
+    toJSON : (map : Map<unknown, unknown>) => {
+        return {
+            $$class     : 'Map',
+            entries     : Array.from(map.entries())
+        }
+    },
+    fromJSON : (data : any) => {
+        return new Map(data.entries)
+    }
+})
+
+registerNativeSerializableClass(Set, {
+    toJSON : (set : Set<unknown>) => {
+        return {
+            $$class     : 'Set',
+            entries     : Array.from(set)
+        }
+    },
+    fromJSON : (data : any) => {
+        return new Set(data.entries)
+    }
+})
+
+// possibly can be improved by storing Date in "magical" string format
+registerNativeSerializableClass(Date, {
+    toJSON : (date : Date) => {
+        return {
+            $$class     : 'Date',
+            time        : date.getTime()
+        }
+    },
+    fromJSON : (data : any) => {
+        return new Date(data.time)
+    }
+})
+
+
+const errorClasses = [ Error, TypeError, RangeError, EvalError, ReferenceError, SyntaxError, URIError ]
+
+errorClasses.forEach(cls =>
+
+    registerNativeSerializableClass(cls, {
+        toJSON : (error : Error) => {
+            return Object.assign({}, error, {
+                $$class     : cls.name,
+                stack       : error.stack,
+                message     : error.message,
+                name        : error.name
+            })
+        },
+        fromJSON : (data : any) => {
+            const error     = Object.create(cls.prototype)
+
+            Object.assign(error, data)
+
+            delete error.$$class
+
+            error.stack     = data.stack
+            error.message   = data.message
+            error.name      = data.name
+
+            return error
+        }
+    })
+)

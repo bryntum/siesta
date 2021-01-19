@@ -1,9 +1,10 @@
+import { Channel } from "../../../channel/Channel.js"
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { local, remote } from "../../../port/Port.js"
 import { PortEvaluateChild, PortEvaluateParent } from "../../../port/PortEvaluate.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../../port/PortHandshake.js"
-import { Channel } from "../../../channel/Channel.js"
+import { SiestaJSX } from "../../jsx/Factory.js"
 import { TestDescriptor } from "../Descriptor.js"
 import { globalTestEnv, Test } from "../Test.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
@@ -48,26 +49,35 @@ export class TestLauncherChild extends Mixin(
                 globalTestEnv.topTestDescriptor = testDescriptor
                 globalTestEnv.launcher          = this
 
+                let topTest : Test
+
                 try {
                     await import(testDescriptor.url)
-                    //debugger
-
+                } catch (e) {
                     // there might be no `topTest` if test file does not contain any calls
                     // to static `it` method of any test class
-                    const topTest = globalTestEnv.topTest || Test.new({
+                    topTest = globalTestEnv.topTest || Test.new({
                         descriptor      : testDescriptor,
-
                         reporter        : this
                     })
 
-                    await topTest.start()
+                    topTest.failOnExceptionDuringImport(e)
 
-                } catch (e) {
-                    //debugger
-                    console.log(e)
-                } finally {
                     globalTestEnv.clear()
+
+                    return
                 }
+
+                // there might be no `topTest` if test file does not contain any calls
+                // to static `it` method of any test class
+                topTest = globalTestEnv.topTest || Test.new({
+                    descriptor      : testDescriptor,
+                    reporter        : this
+                })
+
+                await topTest.start()
+
+                globalTestEnv.clear()
             }
         }
 

@@ -177,7 +177,7 @@ export class Launcher extends Mixin(
 
             if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
-            extractRes.values.forEach((value, option) => this[ option.name ] = value)
+            extractRes.values.forEach((value, option) => option.applyValue(this, value))
         }
 
 
@@ -196,7 +196,7 @@ export class Launcher extends Mixin(
 
             if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
-            // extractRes.values.forEach((value, option) => this[ option.name ] = value)
+            extractRes.values.forEach((value, option) => option.applyValue(this.projectDescriptor.options, value))
         }
 
 

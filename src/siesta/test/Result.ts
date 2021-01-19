@@ -40,6 +40,15 @@ export class Exception extends Mixin(
 
     class Exception extends base {
         exception       : unknown           = undefined
+
+        stack           : string            = ''
+
+        initialize (props? : Partial<Exception>) {
+            super.initialize(props)
+
+            // @ts-ignore
+            this.stack      = this.exception?.stack
+        }
     }
 ) {}
 

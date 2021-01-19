@@ -146,6 +146,8 @@ export class XmlRenderer extends Mixin(
                 })
 
                 res.colorizeMut(this.getRulesFor(el).reduce((colorer, rule) => rule(colorer), this.c))
+
+                if (el.hasClass('indented')) res.indentMut(this.treeIndentationLevel, false)
             }
 
             return res

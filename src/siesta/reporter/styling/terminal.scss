@@ -99,7 +99,6 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     color : $complementary_to_fail_color;
 }
 
-
 .log_message_error {
     background-color : $main_fail_color;
     color: black;
@@ -124,6 +123,12 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     background-color : $deccent_color;
     color: black;
 }
+
+.exception_icon {
+    background-color : $main_fail_color;
+    color: black;
+}
+
 
 
 .difference_key_path {

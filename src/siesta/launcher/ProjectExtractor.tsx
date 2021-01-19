@@ -4,7 +4,8 @@ import { local, remote } from "../../port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../port/PortHandshake.js"
 import { Channel } from "../../channel/Channel.js"
 import { SiestaJSX } from "../jsx/Factory.js"
-import { Project, ProjectDescriptor, projectExtraction } from "../project/Project.js"
+import { Project, projectExtraction } from "../project/Project.js"
+import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { ExitCodes, LauncherError } from "./Launcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------

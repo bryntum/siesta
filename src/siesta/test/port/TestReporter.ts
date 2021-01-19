@@ -21,13 +21,13 @@ XmlElement
 
 //---------------------------------------------------------------------------------------------------------------------
 interface TestReporter {
-    onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor)
+    onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) : Promise<any>
 
-    onSubTestFinish (testNodeId : LUID)
+    onSubTestFinish (testNodeId : LUID) : Promise<any>
 
-    onResult (testNodeId : LUID, result : TestResultLeaf)
+    onResult (testNodeId : LUID, result : TestResultLeaf) : Promise<any>
 
-    onAssertionFinish (testNodeId : LUID, assertion : AssertionAsyncResolution)
+    onAssertionFinish (testNodeId : LUID, assertion : AssertionAsyncResolution) : Promise<any>
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ export class TestReporterParent extends Mixin(
 
 
             @local()
-            onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) {
+            async onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) {
                 if (this.currentTestNodeResult) {
                     if (this.currentTestNodeResult.localId !== parentTestNodeId) {
                         throw new Error("Parent test node internal id mismatch")
@@ -76,7 +76,7 @@ export class TestReporterParent extends Mixin(
             }
 
             @local()
-            onSubTestFinish (testNodeId : LUID) {
+            async onSubTestFinish (testNodeId : LUID) {
                 if (!this.currentTestNodeResult || this.currentTestNodeResult.localId !== testNodeId) {
                     throw new Error("No current test node or test node id mismatch")
                 }
@@ -91,7 +91,7 @@ export class TestReporterParent extends Mixin(
 
 
             @local()
-            onResult (testNodeId : LUID, result : TestResultLeaf) {
+            async onResult (testNodeId : LUID, result : TestResultLeaf) {
                 if (!this.currentTestNodeResult || this.currentTestNodeResult.localId !== testNodeId) {
                     throw new Error("Parent node id mismatch for test result")
                 }
@@ -103,7 +103,7 @@ export class TestReporterParent extends Mixin(
 
 
             @local()
-            onAssertionFinish (testNodeId : LUID, assertion : AssertionAsyncResolution) {
+            async onAssertionFinish (testNodeId : LUID, assertion : AssertionAsyncResolution) {
                 if (!this.currentTestNodeResult || this.currentTestNodeResult.localId !== testNodeId) {
                     throw new Error("Parent node id mismatch for asynchronous test result finalization")
                 }
@@ -126,16 +126,16 @@ export class TestReporterChild extends Mixin(
 
         class TestReporterChild extends base implements TestReporter {
             @remote()
-            onSubTestStart : (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => any
+            onSubTestStart : (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => Promise<any>
 
             @remote()
-            onSubTestFinish : (testNodeId : LUID) => any
+            onSubTestFinish : (testNodeId : LUID) => Promise<any>
 
             @remote()
-            onResult : (testNodeId : LUID, result : TestResultLeaf) => any
+            onResult : (testNodeId : LUID, result : TestResultLeaf) => Promise<any>
 
             @remote()
-            onAssertionFinish : (testNodeId : LUID, assertion : AssertionAsyncResolution) => any
+            onAssertionFinish : (testNodeId : LUID, assertion : AssertionAsyncResolution) => Promise<any>
         }
 
         return TestReporterChild
