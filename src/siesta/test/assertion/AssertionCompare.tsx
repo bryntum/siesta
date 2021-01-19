@@ -9,11 +9,11 @@ import { Assertion, TestNodeResult } from "../Result.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class Compare extends Mixin(
+export class AssertionCompare extends Mixin(
     [ TestNodeResult ],
     (base : ClassUnion<typeof TestNodeResult>) =>
 
-    class Compare extends base {
+    class AssertionCompare extends base {
 
         maxIsDeeplyDifferences      : number        = 5
 
@@ -21,6 +21,15 @@ export class Compare extends Mixin(
         ok<V> (value : V, description : string = '') {
             this.addResult(Assertion.new({
                 name            : 'ok',
+                passed          : Boolean(value),
+                description
+            }))
+        }
+
+
+        true<V> (value : V, description : string = '') {
+            this.addResult(Assertion.new({
+                name            : 'true',
                 passed          : Boolean(value),
                 description
             }))
@@ -47,6 +56,26 @@ export class Compare extends Mixin(
                             <span class="difference_value">{ Serializer.serialize(value2, { maxDepth : 4, maxWide : 4 }) }</span>
                         </li>
                     </unl>
+                </div>
+            }))
+        }
+
+
+        isNot<V> (value1 : V, value2 : V, description : string = '') {
+            const passed        = value1 !== value2
+
+            this.addResult(Assertion.new({
+                name            : 'isNot',
+                passed,
+                sourceLine      : this.getSourceLine(),
+                description,
+
+                annotation      : passed ? null : <div>
+                    The value we got is equal to the value we expect
+                    <p>
+                        <span class="difference_title">Value : </span>
+                        <span class="difference_value">{ Serializer.serialize(value1, { maxDepth : 4, maxWide : 4 }) }</span>
+                    </p>
                 </div>
             }))
         }

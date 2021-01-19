@@ -1,8 +1,10 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
-import { Async } from "./assertion/Async.js"
-import { Compare } from "./assertion/Compare.js"
+import { AssertionAsync } from "./assertion/AssertionAsync.js"
+import { AssertionCompare } from "./assertion/AssertionCompare.js"
+import { AssertionException } from "./assertion/AssertionException.js"
+import { AssertionGeneral } from "./assertion/AssertionGeneral.js"
 import { TestLauncherChild } from "./port/TestLauncher.js"
 import { TestReporterChild } from "./port/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
@@ -14,14 +16,18 @@ export class Test extends Mixin(
     [
         TestNodeResult,
         Logger,
-        Async,
-        Compare
+        AssertionAsync,
+        AssertionCompare,
+        AssertionException,
+        AssertionGeneral
     ],
     (base : ClassUnion<
         typeof TestNodeResult,
         typeof Logger,
-        typeof Async,
-        typeof Compare
+        typeof AssertionAsync,
+        typeof AssertionCompare,
+        typeof AssertionException,
+        typeof AssertionGeneral
     >) =>
 
     class Test extends base {

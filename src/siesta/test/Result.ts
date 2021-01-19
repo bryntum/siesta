@@ -212,6 +212,7 @@ export class TestNodeResult extends Mixin(
         addResult (result : TestResult) : TestResult {
             if (this.frozen) throw new Error("Adding result after test finalization")
 
+            // clear the `$childNodes` cache
             if (result instanceof TestNodeResult) this.$childNodes = undefined
 
             this.resultLog.push(result)

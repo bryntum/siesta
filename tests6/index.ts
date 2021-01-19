@@ -15,6 +15,13 @@ project.plan(
         ]
     },
     {
+        filename    : 'serializable',
+
+        items       : [
+            'serializable.t.js'
+        ]
+    },
+    {
         filename    : 'options',
 
         items       : [

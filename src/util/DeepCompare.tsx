@@ -155,7 +155,6 @@ export class DifferenceReachability extends Difference {
 }
 
 
-
 export class DifferenceSet<V = unknown> extends Difference {
     set1            : Set<V>    = undefined
     set2            : Set<V>    = undefined
@@ -415,7 +414,7 @@ export type DeepCompareOptions = {
 }
 
 
-export class DeepCompareState extends Base {
+class DeepCompareState extends Base {
     idSource        : number                    = 0
 
     keyPath         : PathSegment[]             = []
@@ -468,6 +467,7 @@ export class DeepCompareState extends Base {
 
 //---------------------------------------------------------------------------------------------------------------------
 // using generator will potentially allow to easily implement "show more differences" button somewhere in the UI
+// UPDATE actually not, since data can mutate since the generator call
 export const compareDeepGen = function * (
     v1          : unknown,
     v2          : unknown,

@@ -15,11 +15,11 @@ type WaitForArg<R> = (() => OrPromise<R>) | {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class Async extends Mixin(
+export class AssertionAsync extends Mixin(
     [ TestNodeResult ],
     (base : ClassUnion<typeof TestNodeResult>) =>
 
-    class Async extends base {
+    class AssertionAsync extends base {
 
         defaultTimeout      : number        = 15000
 
