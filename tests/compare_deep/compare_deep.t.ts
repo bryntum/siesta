@@ -6,7 +6,7 @@ import {
     DifferenceTypesAreDifferent,
     DifferenceValuesAreDifferent,
     PathSegment
-} from "../../src/util/DeepCompare.js"
+} from "../../src/util/CompareDeep.js"
 
 it('Deep compare should work for primitives and non-cyclic data structures', async t => {
     t.isDeeply(CI(compareDeepGen(1, 1)).toArray(), [])

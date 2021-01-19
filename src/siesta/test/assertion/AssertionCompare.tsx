@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { CI } from "../../../collection/Iterator.js"
-import { compareDeepGen } from "../../../util/DeepCompare.js"
+import { compareDeepGen } from "../../../util/CompareDeep.js"
 import { typeOf } from "../../../util/Helpers.js"
 import { Serializer } from "../../../util/Serializer.js"
 import { isRegExp } from "../../../util/Typeguards.js"
