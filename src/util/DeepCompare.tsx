@@ -90,11 +90,11 @@ export class DifferenceTypesAreDifferent extends Difference {
             The values at { this.keyPathXmlNode() } have different types:
             <unl class='difference_got_expected'>
                 <li class='difference_got'>
-                    <span class="difference_title">Got value of <span class="typename">`{ this.type1 }`</span>     : </span>
+                    <span class="difference_title">Got value of <span class="typename">`{ this.type1 }`</span> : </span>
                     <span class="difference_value">{ Serializer.serialize(this.v1, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
                 <li class='difference_expected'>
-                    <span class="difference_title">Expected value of <span class="typename">`{ this.type2 }`</span>: </span>
+                    <span class="difference_title">Expected value of <span class="typename">`{ this.type2 }`</span> : </span>
                     <span class="difference_value">{ Serializer.serialize(this.v2, { maxDepth : 4, maxWide : 4 }) }</span>
                 </li>
             </unl>
@@ -141,7 +141,7 @@ export class DifferenceReachability extends Difference {
                             </p>
                         :
                             <p>
-                                <span class="difference_title">The value on left has been encountered first time: </span>
+                                <span class="difference_title">The value on right has been encountered first time: </span>
                             </p>
                     }
                     <p>

@@ -8,6 +8,13 @@ const project = ProjectIsomorphic.new({
 
 project.plan(
     {
+        filename       : 'uniqable',
+
+        items       : [
+            'uniqable.t.js',
+        ]
+    },
+    {
         filename       : 'hook',
 
         items       : [
@@ -41,6 +48,20 @@ project.plan(
 
         items       : [
             'serializable.t.js'
+        ]
+    },
+    {
+        filename    : 'serializer',
+
+        items       : [
+            'serializer.t.js'
+        ]
+    },
+    {
+        filename    : 'compare_deep',
+
+        items       : [
+            'compare_deep.t.js'
         ]
     },
     {
