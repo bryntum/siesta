@@ -45,6 +45,31 @@ export class AssertionCompare extends Mixin(
         }
 
 
+        isStrict<V> (value1 : V, value2 : V, description : string = '') {
+            const passed        = value1 === value2
+
+            this.addResult(Assertion.new({
+                name            : 'is',
+                passed,
+                sourceLine      : this.getSourceLine(),
+                description,
+
+                annotation      : passed ? null : <div>
+                    <unl class='difference_got_expected'>
+                        <li class='difference_got'>
+                            <span class="difference_title">Got    : </span>
+                            <span class="difference_value">{ Serializer.serialize(value1, { maxDepth : 4, maxWide : 4 }) }</span>
+                        </li>
+                        <li class='difference_expected'>
+                            <span class="difference_title">Expect : </span>
+                            <span class="difference_value">{ Serializer.serialize(value2, { maxDepth : 4, maxWide : 4 }) }</span>
+                        </li>
+                    </unl>
+                </div>
+            }))
+        }
+
+
         is<V> (value1 : V, value2 : V, description : string = '') {
             const passed        = value1 === value2
 
