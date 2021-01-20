@@ -3,6 +3,7 @@ import { Serializer } from "../../../util/Serializer.js"
 import { isRegExp } from "../../../util/Typeguards.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
 import { Assertion, TestNodeResult } from "../Result.js"
+import { GotExpectTemplate } from "./AssertionCompare.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -57,19 +58,12 @@ export class AssertionException extends Mixin(
                             passed          : false,
                             description,
 
-                            annotation      : <div>
-                                Provided function threw exception
-                                <unl class='difference_got_expected'>
-                                    <li class='difference_got'>
-                                        <span class="difference_title">Got exception             : </span>
-                                        <span class="difference_value">{Serializer.serialize(message, {maxDepth: 4, maxWide: 4})}</span>
-                                    </li>
-                                    <li class='difference_expected'>
-                                        <span class="difference_title">Expect exception matching : </span>
-                                        <span class="difference_value">{Serializer.serialize(pattern, {maxDepth: 4, maxWide: 4})}</span>
-                                    </li>
-                                </unl>
-                            </div>
+                            annotation      : GotExpectTemplate.el({
+                                got         : message,
+                                gotTitle    : 'Got exception',
+                                expect      : pattern,
+                                expectTitle : 'Expect exception matching'
+                            }),
                         }))
                 } else {
                     if (message.indexOf(pattern) !== -1)
@@ -84,18 +78,12 @@ export class AssertionException extends Mixin(
                             passed          : false,
                             description,
 
-                            annotation      : <div>
-                                <unl class='difference_got_expected'>
-                                    <li class='difference_got'>
-                                        <span class="difference_title">Got exception               : </span>
-                                        <span class="difference_value">{Serializer.serialize(message, {maxDepth: 4, maxWide: 4})}</span>
-                                    </li>
-                                    <li class='difference_expected'>
-                                        <span class="difference_title">Expect exception containing : </span>
-                                        <span class="difference_value">{Serializer.serialize(pattern, {maxDepth: 4, maxWide: 4})}</span>
-                                    </li>
-                                </unl>
-                            </div>
+                            annotation      : GotExpectTemplate.el({
+                                got         : message,
+                                gotTitle    : 'Got exception',
+                                expect      : pattern,
+                                expectTitle : 'Expect exception containing'
+                            })
                         }))
                 }
             }
@@ -129,7 +117,7 @@ export class AssertionException extends Mixin(
                     passed          : false,
                     description,
 
-                    annotation      : <div>
+                    annotation      : <div class='indented'>
                         Provided function threw an exception:
                         <p class='indented'>
                             <span class="difference_value">{Serializer.serialize(message, {maxDepth: 4, maxWide: 4})}</span>

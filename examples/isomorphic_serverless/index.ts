@@ -25,7 +25,9 @@ project.plan(
 
         items       : [
             // 'is_deeply.t.js',
-            'like.t.js'
+            'like.t.js',
+            'exception.t.js',
+            'general.t.js'
         ]
     },
     {
