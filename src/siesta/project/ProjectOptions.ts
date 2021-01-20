@@ -9,6 +9,10 @@ import { ProjectPlanGroup } from "./Plan.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// need to use `optIn` mode for serialization of ProjectOptions, because
+// we have a creation of `ProjectOptions` instance from the `Project` instance
+// (which contains extra properties which all will be applied to the `ProjectOptions` instance,
+// because of the way `Base` `initialize` method works)
 @serializable({ mode : 'optIn' })
 export class ProjectOptions extends Mixin(
     [ Serializable, HasOptions, Base ],
@@ -31,7 +35,7 @@ export class ProjectOptionsBrowser extends Mixin(
     (base : ClassUnion<typeof ProjectOptions>) => {
 
     class ProjectOptionsBrowser extends base {
-        testDescriptor      : Partial<TestDescriptorBrowser>    = undefined
+        testDescriptor      : Partial<TestDescriptorBrowser>
     }
 
     return ProjectOptionsBrowser
@@ -45,7 +49,7 @@ export class ProjectOptionsNodejs extends Mixin(
     (base : ClassUnion<typeof ProjectOptions>) => {
 
     class ProjectOptionsNodejs extends base {
-        testDescriptor      : Partial<TestDescriptorNodejs>    = undefined
+        testDescriptor      : Partial<TestDescriptorNodejs>
     }
 
     return ProjectOptionsNodejs
