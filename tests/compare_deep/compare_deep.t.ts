@@ -116,9 +116,9 @@ it('Deep compare should work with circular data structures', async t => {
             PathSegment.new({ type : 'object_key', key : 'a' })
         ],
         v1      : a1,
-        v2      : a3,
+        v2      : a3.a,
         v1Path  : [],
-        v2Path  : []
+        v2Path  : undefined
     }) ])
 
 
