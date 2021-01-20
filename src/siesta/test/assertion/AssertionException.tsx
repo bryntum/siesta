@@ -35,7 +35,6 @@ export class AssertionException extends Mixin(
                 this.addResult(Assertion.new({
                     name            : 'throws',
                     passed          : false,
-                    sourceLine      : this.getSourceLine(),
                     description,
 
                     annotation      : <div>
@@ -50,14 +49,12 @@ export class AssertionException extends Mixin(
                         this.addResult(Assertion.new({
                             name            : 'throws',
                             passed          : true,
-                            sourceLine      : this.getSourceLine(),
                             description
                         }))
                     else
                         this.addResult(Assertion.new({
                             name            : 'throws',
                             passed          : false,
-                            sourceLine      : this.getSourceLine(),
                             description,
 
                             annotation      : <div>
@@ -79,14 +76,12 @@ export class AssertionException extends Mixin(
                         this.addResult(Assertion.new({
                             name            : 'throws',
                             passed          : true,
-                            sourceLine      : this.getSourceLine(),
                             description
                         }))
                     else
                         this.addResult(Assertion.new({
                             name            : 'throws',
                             passed          : false,
-                            sourceLine      : this.getSourceLine(),
                             description,
 
                             annotation      : <div>
@@ -132,7 +127,6 @@ export class AssertionException extends Mixin(
                 this.addResult(Assertion.new({
                     name            : 'throws',
                     passed          : false,
-                    sourceLine      : this.getSourceLine(),
                     description,
 
                     annotation      : <div>
@@ -146,7 +140,6 @@ export class AssertionException extends Mixin(
                 this.addResult(Assertion.new({
                     name            : 'throws',
                     passed          : true,
-                    sourceLine      : this.getSourceLine(),
                     description
                 }))
             }

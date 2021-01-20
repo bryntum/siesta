@@ -1,3 +1,4 @@
+import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { CI } from "../../../collection/Iterator.js"
 import { compareDeepGen } from "../../../util/CompareDeep.js"
@@ -5,6 +6,7 @@ import { typeOf } from "../../../util/Helpers.js"
 import { Serializer } from "../../../util/Serializer.js"
 import { isRegExp } from "../../../util/Typeguards.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
+import { XmlElement } from "../../jsx/XmlElement.js"
 import { Assertion, TestNodeResult } from "../Result.js"
 
 
@@ -51,7 +53,6 @@ export class AssertionCompare extends Mixin(
             this.addResult(Assertion.new({
                 name            : 'is',
                 passed,
-                sourceLine      : this.getSourceLine(),
                 description,
 
                 annotation      : passed ? null : <div>
@@ -76,21 +77,12 @@ export class AssertionCompare extends Mixin(
             this.addResult(Assertion.new({
                 name            : 'is',
                 passed,
-                sourceLine      : this.getSourceLine(),
                 description,
 
-                annotation      : passed ? null : <div>
-                    <unl class='difference_got_expected'>
-                        <li class='difference_got'>
-                            <span class="difference_title">Got    : </span>
-                            <span class="difference_value">{ Serializer.serialize(value1, { maxDepth : 4, maxWide : 4 }) }</span>
-                        </li>
-                        <li class='difference_expected'>
-                            <span class="difference_title">Expect : </span>
-                            <span class="difference_value">{ Serializer.serialize(value2, { maxDepth : 4, maxWide : 4 }) }</span>
-                        </li>
-                    </unl>
-                </div>
+                annotation      : passed ? null : GotExpectTemplate.el({
+                    got     : value1,
+                    expect  : value2
+                })
             }))
         }
 
@@ -101,7 +93,6 @@ export class AssertionCompare extends Mixin(
             this.addResult(Assertion.new({
                 name            : 'isNot',
                 passed,
-                sourceLine      : this.getSourceLine(),
                 description,
 
                 annotation      : passed ? null : <div>
@@ -122,9 +113,7 @@ export class AssertionCompare extends Mixin(
                 this.addResult(Assertion.new({
                     name            : 'isDeeply',
                     passed          : false,
-                    sourceLine      : this.getSourceLine(),
                     description,
-
 
                     annotation      : <div>
                         {/*Provided values are different. Here {*/}
@@ -150,7 +139,6 @@ export class AssertionCompare extends Mixin(
                 this.addResult(Assertion.new({
                     name            : 'isDeeply',
                     passed          : true,
-                    sourceLine      : this.getSourceLine(),
                     description
                 }))
             }
@@ -164,14 +152,12 @@ export class AssertionCompare extends Mixin(
                     this.addResult(Assertion.new({
                         name            : 'like',
                         passed          : true,
-                        sourceLine      : this.getSourceLine(),
                         description     : desc
                     }))
                 } else {
                     this.addResult(Assertion.new({
                         name            : 'like',
                         passed          : false,
-                        sourceLine      : this.getSourceLine(),
                         description     : desc,
                         annotation      : <div>
                             <unl class='difference_got_expected'>
@@ -192,14 +178,12 @@ export class AssertionCompare extends Mixin(
                     this.addResult(Assertion.new({
                         name            : 'like',
                         passed          : true,
-                        sourceLine      : this.getSourceLine(),
                         description     : desc
                     }))
                 } else {
                     this.addResult(Assertion.new({
                         name            : 'like',
                         passed          : false,
-                        sourceLine      : this.getSourceLine(),
                         description     : desc,
                         annotation      : <div>
                             <unl class='difference_got_expected'>
@@ -219,3 +203,42 @@ export class AssertionCompare extends Mixin(
         }
     }
 ) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class GotExpectTemplate extends Base {
+    got         : unknown       = undefined
+
+    gotTitle    : string        = 'Got'
+
+    expect      : unknown       = undefined
+
+    expectTitle : string        = 'Expect'
+
+
+    getTitleLengthEquality (label : 'got' | 'expect') : string {
+        if (this.expect === undefined) return ''
+
+        const max       = Math.max(this.gotTitle.length, this.expectTitle.length)
+
+        return ' '.repeat(max - (label === 'got' ? this.gotTitle.length : this.expectTitle.length))
+    }
+
+
+    static el<T extends typeof GotExpectTemplate> (this : T, props? : Partial<InstanceType<T>>) : XmlElement {
+        const instance      = this.new(props) as InstanceType<T>
+
+        return <div class="indented got_expected">
+            <div class='got'>
+                <span class="got_title">{ instance.gotTitle } { instance.getTitleLengthEquality('got') }: </span>
+                <span class="got_value">{ Serializer.serialize(instance.got, { maxDepth : 4, maxWide : 4 }) }</span>
+            </div>
+            {
+                instance.expect !== undefined && <div class='expect'>
+                    <span class="expect_title">{ instance.expectTitle } { instance.getTitleLengthEquality('expect') }: </span>
+                    <span class="expect_value">{ Serializer.serialize(instance.expect, { maxDepth : 4, maxWide : 4 }) }</span>
+                </div>
+            }
+        </div>
+    }
+}

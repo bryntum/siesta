@@ -164,6 +164,7 @@ export class TestNodeResult extends Mixin(
         }
 
 
+        // this is here to be available for the assertion mixins
         getSourceLine () : number | undefined {
             const stack         = new Error().stack
 

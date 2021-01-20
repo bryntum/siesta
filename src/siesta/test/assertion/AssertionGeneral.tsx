@@ -16,14 +16,12 @@ export class AssertionGeneral extends Mixin(
                 this.addResult(Assertion.new({
                     name            : 'throws',
                     passed          : true,
-                    sourceLine      : this.getSourceLine(),
                     description,
                 }))
             } else {
                 this.addResult(Assertion.new({
                     name            : 'isInstanceOf',
                     passed          : false,
-                    sourceLine      : this.getSourceLine(),
                     description,
 
                     annotation      : <div>

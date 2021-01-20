@@ -44,6 +44,8 @@ export class Test extends Mixin(
 
 
         addResult (result : TestResult) : TestResult {
+            if ((result instanceof Assertion) && result.sourceLine === undefined) result.sourceLine = this.getSourceLine()
+
             super.addResult(result)
 
             if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.localId, result)
@@ -73,7 +75,6 @@ export class Test extends Mixin(
             this.addResult(Assertion.new({
                 name            : 'pass',
                 passed          : true,
-                sourceLine      : this.getSourceLine(),
                 description
             }))
         }
@@ -83,7 +84,6 @@ export class Test extends Mixin(
             this.addResult(Assertion.new({
                 name            : 'fail',
                 passed          : false,
-                sourceLine      : this.getSourceLine(),
                 description
             }))
         }
