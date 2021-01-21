@@ -149,6 +149,14 @@ export function* map<Element, Result> (iterator : Iterable<Element>, func : (el 
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export function forEach<Element> (iterator : Iterable<Element>, func : (el : Element, index : number) => false | undefined) : false | undefined {
+    let i   = 0
+
+    for (const el of iterator) if (func(el, i++) === false) return false
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export function reduce<Element, Result> (iterator : Iterable<Element>, func : (acc : Result, el : Element, index : number) => Result, initialAcc : Result) : Result {
     let i   = 0
 
@@ -292,6 +300,11 @@ export class ChainedIteratorClass<T> {
 
     drop (howMany : number) : ChainedIteratorClass<T> {
         return this.derive(drop(this.iterable, howMany))
+    }
+
+
+    forEach (func : (el : T, index : number) => false | undefined) : false | undefined {
+        return forEach(this.iterable, func)
     }
 
 
