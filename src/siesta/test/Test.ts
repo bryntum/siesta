@@ -38,7 +38,7 @@ export class Test extends Mixin(
 
         // ongoing             : Promise<any>      = undefined
 
-        pendingSubTests     : Test[]            = []
+        pendingSubTests     : Test[]                = []
 
         reporter            : TestReporterChild     = undefined
 
