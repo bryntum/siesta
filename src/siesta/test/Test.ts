@@ -7,8 +7,8 @@ import { AssertionException } from "./assertion/AssertionException.js"
 import { AssertionGeneral } from "./assertion/AssertionGeneral.js"
 import { TestLauncherChild } from "./port/TestLauncher.js"
 import { TestReporterChild } from "./port/TestReporter.js"
-import { TestDescriptor, TestDescriptorArgument } from "./Descriptor.js"
-import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResult } from "./Result.js"
+import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
+import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResult } from "./TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------

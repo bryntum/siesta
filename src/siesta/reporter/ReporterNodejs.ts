@@ -2,7 +2,7 @@ import readline from "readline"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { SetIntervalHandler } from "../../util/Helpers.js"
 import { hideCursor, showCursor } from "../../util_nodejs/Terminal.js"
-import { TestNodeResult } from "../test/Result.js"
+import { TestNodeResult } from "../test/TestResult.js"
 import { Reporter } from "./Reporter.js"
 
 //---------------------------------------------------------------------------------------------------------------------

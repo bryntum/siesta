@@ -2,7 +2,7 @@ import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { serializable } from "../../../serializable/Serializable.js"
 import { delay, OrPromise } from "../../../util/Helpers.js"
 import { isFunction } from "../../../util/Typeguards.js"
-import { AssertionAsyncCreation, AssertionAsyncResolution, Exception, TestNodeResult } from "../Result.js"
+import { AssertionAsyncCreation, AssertionAsyncResolution, Exception, TestNodeResult } from "../TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------

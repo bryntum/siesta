@@ -13,7 +13,7 @@ import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Printer } from "../reporter/Printer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
-import { TestDescriptor } from "../test/Descriptor.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Launch } from "./Launch.js"
 import {
     HasOptions,

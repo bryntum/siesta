@@ -1,8 +1,8 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
-import { TestDescriptor } from "../test/Descriptor.js"
-import { TestDescriptorBrowser } from "../test/DescriptorBrowser.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
+import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Project } from "./Project.js"
 import { ProjectOptionsBrowser } from "./ProjectOptions.js"
 

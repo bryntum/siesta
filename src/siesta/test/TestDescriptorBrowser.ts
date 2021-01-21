@@ -1,6 +1,6 @@
 import { serializable } from "../../serializable/Serializable.js"
 import { option } from "../launcher/Option.js"
-import { TestDescriptor } from "./Descriptor.js"
+import { TestDescriptor } from "./TestDescriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type PreloadDescriptor = string

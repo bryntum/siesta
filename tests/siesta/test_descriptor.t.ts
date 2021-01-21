@@ -1,5 +1,5 @@
 import { it } from "../../main.js"
-import { TestDescriptor } from "../../src/siesta/test/Descriptor.js"
+import { TestDescriptor } from "../../src/siesta/test/TestDescriptor.js"
 
 
 it('Should be able to flatten the descriptor options', t => {

@@ -2,7 +2,7 @@ import { AnyFunction, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { Serializer } from "../../../util/Serializer.js"
 import { isRegExp } from "../../../util/Typeguards.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
-import { Assertion, TestNodeResult } from "../Result.js"
+import { Assertion, TestNodeResult } from "../TestResult.js"
 import { GotExpectTemplate } from "./AssertionCompare.js"
 
 

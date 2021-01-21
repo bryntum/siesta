@@ -1,6 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { TestNodeResult } from "../test/Result.js"
+import { TestNodeResult } from "../test/TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------

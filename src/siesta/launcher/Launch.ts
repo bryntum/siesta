@@ -4,7 +4,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { Reporter } from "../reporter/Reporter.js"
-import { TestDescriptor } from "../test/Descriptor.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
 import { ChannelTestLauncher } from "../test/port/TestLauncher.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 

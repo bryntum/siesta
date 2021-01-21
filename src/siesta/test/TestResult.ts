@@ -4,8 +4,8 @@ import { LogLevel } from "../../logger/Logger.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { escapeRegExp } from "../../util/Helpers.js"
 import { XmlElement } from "../jsx/XmlElement.js"
-import { TestDescriptor } from "./Descriptor.js"
-import { LUID, luid } from "./LUID.js"
+import { TestDescriptor } from "./TestDescriptor.js"
+import { LUID, luid } from "../common/LUID.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Result extends Mixin(

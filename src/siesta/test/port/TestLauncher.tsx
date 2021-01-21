@@ -5,7 +5,7 @@ import { local, remote } from "../../../port/Port.js"
 import { PortEvaluateChild, PortEvaluateParent } from "../../../port/PortEvaluate.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../../port/PortHandshake.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
-import { TestDescriptor } from "../Descriptor.js"
+import { TestDescriptor } from "../TestDescriptor.js"
 import { globalTestEnv, Test } from "../Test.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 

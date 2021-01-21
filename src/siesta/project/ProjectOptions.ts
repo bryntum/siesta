@@ -2,9 +2,9 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { include, serializable, Serializable } from "../../serializable/Serializable.js"
 import { HasOptions, option } from "../launcher/Option.js"
-import { TestDescriptor } from "../test/Descriptor.js"
-import { TestDescriptorBrowser } from "../test/DescriptorBrowser.js"
-import { TestDescriptorNodejs } from "../test/DescriptorNodejs.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
+import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
+import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------

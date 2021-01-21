@@ -1,5 +1,5 @@
 import { serializable } from "../../serializable/Serializable.js"
-import { TestDescriptor } from "./Descriptor.js"
+import { TestDescriptor } from "./TestDescriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()

@@ -3,9 +3,9 @@ import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { Reporter } from "../../reporter/Reporter.js"
 import { AssertionWaitFor } from "../assertion/AssertionAsync.js"
-import { TestDescriptor } from "../Descriptor.js"
-import { LUID } from "../LUID.js"
-import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResultLeaf } from "../Result.js"
+import { TestDescriptor } from "../TestDescriptor.js"
+import { LUID } from "../../common/LUID.js"
+import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResultLeaf } from "../TestResult.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 // make sure we actually import these class symbols (and not just types),

@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Launcher } from "../launcher/Launcher.js"
-import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/Descriptor.js"
+import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/TestDescriptor.js"
 import { ProjectDescriptor, ProjectOptions } from "./ProjectOptions.js"
 
 
