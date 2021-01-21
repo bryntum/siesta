@@ -120,7 +120,7 @@ export class LauncherNodejs extends Mixin(
 
                     this.projectDescriptor  = await parentPort.extractProject(projectUrl)
 
-                    this.projectDescriptor.projectPlan.descriptor.url   = projectUrl.replace(/\/[^/]*?$/, '')
+                    this.projectDescriptor.projectPlan.url   = projectUrl.replace(/\/[^/]*?$/, '')
                 } finally {
                     await parentPort.disconnect()
                 }

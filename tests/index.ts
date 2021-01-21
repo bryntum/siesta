@@ -71,6 +71,13 @@ project.plan(
             'parse_options.t.js'
         ]
     },
+    {
+        filename    : 'siesta',
+
+        items       : [
+            'test_descriptor.t.js'
+        ]
+    },
 )
 
 project.start()

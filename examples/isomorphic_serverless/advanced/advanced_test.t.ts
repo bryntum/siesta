@@ -1,7 +1,6 @@
 import { describe } from "../../../main.js"
 
 describe({
-    env         : 'generic', // 'generic' | 'browser' | 'nodejs'
     tags        : [ 'basic', 'generic', 'data', 'model' ],
     title       : 'Basic assertions should work',
 }, async t => {

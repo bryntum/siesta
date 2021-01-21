@@ -2,37 +2,33 @@ import { AnyConstructor, Mixin } from "../class/Mixin.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class LeafNode extends Mixin(
+export class TreeNode extends Mixin(
     [],
     (base : AnyConstructor) =>
 
-    class LeafNode extends base {
-        parentNode      : ParentNode          = undefined
-    }
-) {}
+    class TreeNode extends base {
+        parentNode      : TreeNode          = undefined
+
+        childNodeT      : TreeNode
+
+        childNodes      : this[ 'childNodeT' ][] = undefined
 
 
-//---------------------------------------------------------------------------------------------------------------------
-export class ParentNode extends Mixin(
-    [],
-    (base : AnyConstructor) =>
-
-    class ParentNode extends base {
-        parentNode      : ParentNode        = undefined
-
-        // can not use `this[ 'Child' ]` here - TS can't figure out the type discrimination in `traverse`
-        childNodes      : (this[ 'Leaf' ] | this[ 'parentNode' ])[]        = []
-
-        Leaf            : LeafNode
-        Child           : this[ 'Leaf' ] | this[ 'parentNode' ]
-
-
-        getRootNode () : ParentNode {
-            let root : ParentNode           = this
+        getRootNode () : TreeNode {
+            let root : TreeNode             = this
 
             while (root.parentNode) root    = root.parentNode
 
             return root
+        }
+
+
+        appendChild (child : TreeNode) : TreeNode {
+            child.parentNode    = this;
+
+            (this.childNodes || (this.childNodes = [])).push(child)
+
+            return child
         }
 
 
@@ -41,7 +37,12 @@ export class ParentNode extends Mixin(
         }
 
 
-        forEachChildNode (func : (node : this[ 'Child' ]) => any) : false | undefined {
+        isLeaf () : boolean {
+            return this.childNodes === undefined
+        }
+
+
+        forEachChildNode (func : (node : TreeNode) => any) : false | undefined {
             const childNodes      = this.childNodes
 
             for (let i = 0; i < childNodes.length; i++)
@@ -49,21 +50,15 @@ export class ParentNode extends Mixin(
         }
 
 
-        traverse (func : (node : this[ 'Child' ]) => any, includeThis : boolean = true) : false | undefined {
+        traverse (func : (node : TreeNode) => any, includeThis : boolean = true) : false | undefined {
             if (includeThis && func(this) === false) return false
 
             const childNodes      = this.childNodes
 
-            for (let i = 0; i < childNodes.length; i++) {
-                const childNode     = childNodes[ i ]
-
-                if (childNode instanceof LeafNode) {
-                    if (func(childNode) === false) return false
+            if (childNodes)
+                for (let i = 0; i < childNodes.length; i++) {
+                    if (childNodes[ i ].traverse(func, true) === false) return false
                 }
-                else {
-                    if (childNode.traverse(func, true) === false) return false
-                }
-            }
         }
 
 
@@ -84,8 +79,8 @@ export class ParentNode extends Mixin(
         }
 
 
-        leafsAxis () : this[ 'Leaf' ][] {
-            return this.childNodes.flatMap(node => (node instanceof LeafNode) ? [ node ] : node.leafsAxis())
+        leavesAxis () : this[ 'childNodeT' ][] {
+            return this.childNodes ? this.childNodes.flatMap(node => node.leavesAxis()) : [ this ]
         }
     }
 ) {}

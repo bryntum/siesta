@@ -36,6 +36,8 @@ export class Option extends Mixin(
 
         help        : XmlElement            = undefined
 
+        defaultValue    : unknown           = undefined
+
 
         applyValue (target : HasOptions, value : unknown) {
             target[ this.name ] = value
@@ -236,10 +238,13 @@ const initOptionsStorage = (proto : HasOptions) => {
 //---------------------------------------------------------------------------------------------------------------------
 export const option = (config? : Partial<Option>, optionCls : typeof Option = Option) : PropertyDecorator => {
 
-    return (target : HasOptions, propertyKey : string) : void => {
-        initOptionsStorage(target)
+    return (proto : HasOptions, propertyKey : string) : void => {
+        initOptionsStorage(proto)
 
-        target.$options[ propertyKey ]  = optionCls.new(Object.assign({}, config, { name : propertyKey }))
+        const option                    = optionCls.new(Object.assign({}, config, { name : propertyKey }))
+
+        proto.$options[ propertyKey ]   = option
+        proto[ propertyKey ]            = option.defaultValue
     }
 }
 

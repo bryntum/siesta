@@ -64,7 +64,7 @@ export class ReporterTheme extends Base {
 
 
     testNodeUrl (testNode : TestNodeResult) : XmlElement {
-        const rel       = relative(this.projectDescriptor.projectPlan.descriptor.url, testNode.descriptor.url)
+        const rel       = relative(this.projectDescriptor.projectPlan.url, testNode.descriptor.url)
         const match     = /(.*?\/)?([^/]+)/.exec(rel)
 
         return <span>
@@ -109,7 +109,7 @@ export class ReporterTheme extends Base {
 
     testSuiteHeader () : XmlElement {
         return <div>
-            Launching test suite: <span class="project_title">{ this.projectDescriptor.projectPlan.descriptor.title }</span>
+            Launching test suite: <span class="project_title">{ this.projectDescriptor.projectPlan.title }</span>
             <div></div>
         </div>
     }

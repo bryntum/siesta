@@ -5,7 +5,6 @@ import { HasOptions, option } from "../launcher/Option.js"
 import { TestDescriptor } from "../test/Descriptor.js"
 import { TestDescriptorBrowser } from "../test/DescriptorBrowser.js"
 import { TestDescriptorNodejs } from "../test/DescriptorNodejs.js"
-import { ProjectPlanGroup } from "./Plan.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -63,7 +62,7 @@ export class ProjectDescriptor extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Base>) => {
 
     class ProjectDescriptor extends base {
-        projectPlan     : ProjectPlanGroup          = undefined
+        projectPlan     : TestDescriptor            = undefined
 
         options         : ProjectOptions            = undefined
     }

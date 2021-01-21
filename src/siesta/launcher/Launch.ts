@@ -2,9 +2,9 @@ import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
-import { ProjectPlanItem } from "../project/Plan.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { Reporter } from "../reporter/Reporter.js"
+import { TestDescriptor } from "../test/Descriptor.js"
 import { ChannelTestLauncher } from "../test/port/TestLauncher.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 
@@ -18,7 +18,7 @@ export class Launch extends Mixin(
         launcher                    : Launcher              = undefined
         projectDescriptor           : ProjectDescriptor     = undefined
 
-        projectPlanItemsToLaunch    : ProjectPlanItem[]     = []
+        projectPlanItemsToLaunch    : TestDescriptor[]      = []
 
         reporter                    : Reporter              = undefined
 
@@ -72,10 +72,10 @@ export class Launch extends Mixin(
         }
 
 
-        async launchProjectPlanItem (item : ProjectPlanItem) {
-            item.normalizeDescriptor()
+        async launchProjectPlanItem (item : TestDescriptor) {
+            const normalized = item.flatten()
 
-            this.logger.log("Launching project item: ", item.descriptor.url)
+            this.logger.log("Launching project item: ", normalized.url)
 
             const channel       = await this.testLauncherChannelClass.new()
 
@@ -85,7 +85,7 @@ export class Launch extends Mixin(
 
             testLauncher.reporter   = this.reporter
 
-            await testLauncher.launchTest(item.descriptor)
+            await testLauncher.launchTest(normalized)
 
             testLauncher.disconnect()
         }

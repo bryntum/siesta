@@ -1,67 +1,133 @@
 import { Base } from "../../class/Base.js"
+import { CI } from "../../collection/Iterator.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
-import { typeOf } from "../../util/Helpers.js"
+import { TreeNode } from "../../tree/TreeNode.js"
+import { ArbitraryObject, cloneObject, objectEntriesDeep, typeOf } from "../../util/Helpers.js"
+import { isString } from "../../util/Typeguards.js"
 import { IsolationLevel } from "../common/IsolationLevel.js"
 import { HasOptions, option } from "../launcher/Option.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class TestDescriptor extends Serializable.mix(HasOptions.mix(Base)) {
+export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix(Base))) {
+    childNodeT      : TestDescriptor
+    parentNode      : TestDescriptor
+
     title           : string                = ''
 
     filename        : string                = ''
 
-    url             : string                = ''
+    @option()
+    url             : string
 
-    env             : 'generic' | 'browser' | 'nodejs'  = 'generic'
+    @option({ defaultValue : [] })
+    tags            : string[]
 
-    tags            : string[]              = []
-
-    isTodo          : boolean               = false
-
-    isolation       : IsolationLevel        = undefined
-
-    // will be applied directly to test instance
-    config          : object                = undefined
+    @option({ defaultValue : false })
+    isTodo          : boolean
 
     @option()
-    autoCheckGlobals    : boolean           = false
+    isolation       : IsolationLevel
+
+    // will be applied directly to test instance
+    @option()
+    config          : ArbitraryObject
+
+    @option({ defaultValue : false })
+    autoCheckGlobals    : boolean
 
 
-    // merge (anotherObj : Partial<TestDescriptor>) {
-    //     const another   = (this.constructor as typeof TestDescriptor).maybeNew(anotherObj)
-    //
-    //     if (this.filename) {
-    //         if (another.filename !== this.filename) throw new Error('Can not merge test descriptor - `name` does not match')
-    //     } else {
-    //         this.filename       = another.filename
-    //     }
-    //
-    //     // TODO can promote `env` from `generic` to either `browser` or `nodejs`, anything else should throw
-    //
-    //     if (isSuperclassOf(another.testClass, this.testClass)) {
-    //         this.testClass      = another.testClass
-    //     }
-    //     else if (another.testClass === this.testClass || isSubclassOf(another.testClass, this.testClass)) {
-    //         // do nothing
-    //     }
-    //     else
-    //         throw new Error("Can not merge descriptor - different `testClass` hierarchies")
-    //
-    //     // strip duplicates
-    //     this.tags           = Array.from(new Set(this.tags.concat(another.tags)))
-    // }
+    planItem (item : TestDescriptor) : TestDescriptor {
+        this.appendChild(item)
+
+        return item
+    }
 
 
-    static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, props? : string | Partial<InstanceType<T>>) : InstanceType<T> {
-        if (typeOf(props) === 'String') {
-            // @ts-ignore
-            return this.new({ title : props })
+    getOptionValueReducers () : { [ key in keyof this ]? : (name : keyof this, parentsAxis : this[]) => this[ typeof name ] } {
+        return {
+            url     : (name : 'url', parentsAxis : this[]) : this[ typeof name ] => {
+                const urlParts      = []
+
+                CI(parentsAxis).forEach(desc => {
+                    if (desc.url) {
+                        urlParts.push(desc.url.replace(/\/$/, '')); return false
+                    }
+                    else {
+                        urlParts.push(desc.filename)
+                    }
+                })
+
+                urlParts.reverse()
+
+                return urlParts.join('/')
+            }
+        }
+    }
+
+
+    flatten () : this {
+        if (this.childNodes) throw new Error("Can only flatten leaf descriptors, not groups")
+
+        const descriptor        = cloneObject(this)
+        descriptor.parentNode   = undefined
+
+        if (!descriptor.url && !descriptor.filename) throw new Error("Descriptor needs to have either `filename` or `url` property defined")
+
+        const parentsAxis       = [ this, ...this.parentsAxis() ]
+
+        const reducers          = this.getOptionValueReducers()
+
+        const defaultReducer    = (name : keyof this, parentsAxis : this[]) : this[ typeof name ] => {
+            let res : this[ typeof name ]
+
+            CI(parentsAxis).forEach((desc, index) => {
+                if (desc.hasOwnProperty(name) || index === parentsAxis.length - 1) { res = desc[ name ]; return false }
+            })
+
+            return res
+        }
+
+        objectEntriesDeep(this.$options).forEach(([ key, value ]) => {
+            const reducer       = reducers[ key ] || defaultReducer
+
+            descriptor[ key ]   = reducer(key, parentsAxis)
+        })
+
+        return descriptor
+    }
+
+
+    static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, desc : string | Partial<InstanceType<T>>) : InstanceType<T> {
+        if (isString(desc)) {
+            return this.new({ title : desc } as Partial<InstanceType<T>>)
         } else {
-            // @ts-ignore
-            return this.new(props)
+            return this.new(desc)
+        }
+    }
+
+
+    static fromProjectPlanItemDescriptor<T extends typeof TestDescriptor> (this : T, desc : ProjectPlanItemDescriptor<InstanceType<T>>) : InstanceType<T> {
+        if (isString(desc)) {
+            return this.new({ filename : desc } as Partial<InstanceType<T>>)
+        }
+        else if (desc.items !== undefined) {
+            const groupDesc     = Object.assign({}, desc)
+
+            delete groupDesc.items
+
+            const group         = this.new(groupDesc)
+
+            desc.items.forEach(item => group.planItem(this.fromProjectPlanItemDescriptor(item)))
+
+            return group
+        } else {
+            return this.new(desc)
         }
     }
 }
 
 export type TestDescriptorArgument = string | Partial<TestDescriptor>
+
+export type ProjectPlanItemDescriptor<DescClass extends TestDescriptor> = string | (Partial<DescClass> & { items? : ProjectPlanItemDescriptor<DescClass>[] })
+

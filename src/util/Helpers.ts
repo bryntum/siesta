@@ -163,10 +163,18 @@ export const escapeRegExp = (source : string) : string => source.replace(/[.*+?^
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const objectEntriesDeep = (source : object) : [ string, unknown ][] => {
-    const res : [ string, unknown ][]   = []
+export const objectEntriesDeep = (source : object) : [ ArbitraryObjectKey, unknown ][] => {
+    const res : [ ArbitraryObjectKey, unknown ][]   = []
 
     for (const key in source) res.push([ key, source[ key ] ])
 
     return res
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const cloneObject = <O extends object>(object : O) : O => {
+    const newObject = Object.create(Object.getPrototypeOf(object))
+
+    return Object.assign(newObject, object)
 }

@@ -8,12 +8,12 @@ import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement } from "../jsx/XmlElement.js"
-import { ProjectPlanItem } from "../project/Plan.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { Colorer } from "../reporter/Colorer.js"
 import { ColorerNoop } from "../reporter/ColorerNoop.js"
 import { Printer } from "../reporter/Printer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
+import { TestDescriptor } from "../test/Descriptor.js"
 import { Launch } from "./Launch.js"
 import {
     HasOptions,
@@ -156,7 +156,7 @@ export class Launcher extends Mixin(
             // need to await for setup, because `projectDescriptor` might not be available yet
             await this.performSetup()
 
-            return await this.launch(this.projectDescriptor.projectPlan.leafsAxis())
+            return await this.launch(this.projectDescriptor.projectPlan.leavesAxis())
         }
 
 
@@ -242,7 +242,7 @@ export class Launcher extends Mixin(
         }
 
 
-        async launch (projectPlanItemsToLaunch : ProjectPlanItem[]) : Promise<Launch> {
+        async launch (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<Launch> {
             await this.performSetup()
 
             const launch    = Launch.new({

@@ -1,7 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Launcher } from "../launcher/Launcher.js"
-import { TestDescriptor } from "../test/Descriptor.js"
-import { ProjectPlanGroup, ProjectPlanItemDescriptor, ProjectPlanItemFromDescriptor } from "./Plan.js"
+import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/Descriptor.js"
 import { ProjectDescriptor, ProjectOptions } from "./ProjectOptions.js"
 
 
@@ -11,29 +10,31 @@ export class Project extends Mixin(
     (base : ClassUnion<typeof ProjectOptions>) => {
 
     class Project extends base {
-        title           : string            = ''
-
-        projectPlan     : ProjectPlanGroup                  = ProjectPlanGroup.new()
-
-        launcherClass   : typeof Launcher   = undefined
+        launcherClass           : typeof Launcher           = undefined
+        testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
 
-        plan (...args : (ProjectPlanItemDescriptor | ProjectPlanItemDescriptor[])[]) {
-            const descriptors : ProjectPlanItemDescriptor[]  = args.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el)) as any
+        title                   : string                    = ''
 
-            descriptors.forEach(item => this.projectPlan.planItem(ProjectPlanItemFromDescriptor(item)))
+        projectPlan             : TestDescriptor            = this.testDescriptorClass.new()
+
+        planItemT               : ProjectPlanItemDescriptor<InstanceType<this[ 'testDescriptorClass' ]>>
+
+
+        plan (...args : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
+            const descriptors : this[ 'planItemT' ][]  = args.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el)) as any
+
+            descriptors.forEach(item => this.projectPlan.planItem(this.testDescriptorClass.fromProjectPlanItemDescriptor(item)))
         }
 
 
         async setup () {
             // if (!this.baseUrl) this.baseUrl = this.buildBaseUrl()
 
-            const desc                  = TestDescriptor.maybeNew(this.testDescriptor)
-
-            desc.url                    = '.'
-            desc.title                  = this.title
-
-            this.projectPlan.descriptor = desc
+            Object.assign(this.projectPlan, this.testDescriptor, {
+                url     : '.',
+                title   : this.title
+            })
         }
 
 
