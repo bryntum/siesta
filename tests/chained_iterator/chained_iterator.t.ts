@@ -1,5 +1,5 @@
 import { it } from "../../main.js"
-import { CI, map, MemoizedIterator, MI } from "../../src/collection/Iterator.js"
+import { CI, map, MemoizedIterator, MI } from "../../src/iterator/Iterator.js"
 
 
 it('Should be able to use chained iterators', t => {

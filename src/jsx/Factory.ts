@@ -1,4 +1,4 @@
-import { isArray, isString } from "../../util/Typeguards.js"
+import { isArray, isString } from "../util/Typeguards.js"
 import { XmlElement, XmlNode, XmlStream } from "./XmlElement.js"
 
 

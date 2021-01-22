@@ -1,5 +1,5 @@
 import { it } from "../../main.js"
-import { Serializer } from "../../src/util/Serializer.js"
+import { Serializer } from "../../src/serializer/Serializer.js"
 
 it('Serialization should work', async t => {
     t.is(Serializer.serialize("2"), '"2"')

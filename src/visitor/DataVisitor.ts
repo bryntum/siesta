@@ -1,5 +1,5 @@
 import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
-import { ArbitraryObjectKey, isAtomicValue, typeOf, uppercaseFirst } from "./Helpers.js"
+import { ArbitraryObjectKey, isAtomicValue, typeOf, uppercaseFirst } from "../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DataVisitor extends Mixin(

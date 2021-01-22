@@ -1,5 +1,5 @@
 import { it } from "../../main.js"
-import { CI } from "../../src/collection/Iterator.js"
+import { CI } from "../../src/iterator/Iterator.js"
 import {
     compareDeepGen,
     DifferenceObject, DifferenceSet, DifferenceReachability,

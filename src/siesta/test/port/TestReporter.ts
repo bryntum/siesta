@@ -1,6 +1,6 @@
 import { Port, local, remote } from "../../../port/Port.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { XmlElement } from "../../jsx/XmlElement.js"
+import { XmlElement } from "../../../jsx/XmlElement.js"
 import { Reporter } from "../../reporter/Reporter.js"
 import { AssertionWaitFor } from "../assertion/AssertionAsync.js"
 import { TestDescriptor } from "../TestDescriptor.js"

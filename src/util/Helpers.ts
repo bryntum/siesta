@@ -1,5 +1,5 @@
 import { AnyConstructor } from "../class/Mixin.js"
-import { CI } from "../collection/Iterator.js"
+import { CI } from "../iterator/Iterator.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 // assume 32-bit platform (https://v8.dev/blog/react-cliff)

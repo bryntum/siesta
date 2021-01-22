@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { escapeRegExp } from "../../util/Helpers.js"
-import { XmlElement } from "../jsx/XmlElement.js"
+import { XmlElement } from "../../jsx/XmlElement.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 import { LUID, luid } from "../common/LUID.js"
 

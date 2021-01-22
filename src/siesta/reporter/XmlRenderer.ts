@@ -2,7 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
-import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
+import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { Colorer, ColorerRule } from "./Colorer.js"
 import { ColorerNoop } from "./ColorerNoop.js"
 import { styles } from "./styling/terminal.js"
@@ -10,6 +10,8 @@ import { styles } from "./styling/terminal.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TextBlock extends Base {
+    maxLen          : number            = Number.MAX_SAFE_INTEGER
+
     text            : string[][]        = [ [] ]
 
 
@@ -102,7 +104,7 @@ export class XmlRenderer extends Mixin(
         ])
 
 
-        render (el : XmlNode) : TextBlock {
+        render (el : XmlNode, maxLength : number = Number.MAX_SAFE_INTEGER) : TextBlock {
             const res   = TextBlock.new()
 
             if (isString(el)) {

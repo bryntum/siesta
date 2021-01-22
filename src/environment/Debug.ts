@@ -1,5 +1,5 @@
 import { Base } from "../class/Base.js"
-import { CI } from "../collection/Iterator.js"
+import { CI } from "../iterator/Iterator.js"
 import { matchAll } from "../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------

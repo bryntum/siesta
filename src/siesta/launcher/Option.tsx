@@ -1,8 +1,8 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { CI } from "../../collection/Iterator.js"
-import { SiestaJSX } from "../jsx/Factory.js"
-import { XmlElement } from "../jsx/XmlElement.js"
+import { CI } from "../../iterator/Iterator.js"
+import { SiestaJSX } from "../../jsx/Factory.js"
+import { XmlElement } from "../../jsx/XmlElement.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type OptionAtomType         = 'boolean' | 'string' | 'number' | 'object'

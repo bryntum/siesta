@@ -1,4 +1,4 @@
-import { CI, MemoizedIterator, MI } from "../collection/Iterator.js"
+import { CI, MemoizedIterator, MI } from "../iterator/Iterator.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 const MixinInstanceOfProperty   = Symbol('MixinIdentity')

@@ -1,6 +1,6 @@
 import { Base } from "../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
-import { DataVisitor, Mapper, Mutator } from "../util/DataVisitor.js"
+import { DataVisitor, Mapper, Mutator } from "../visitor/DataVisitor.js"
 import { ArbitraryObject } from "../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------

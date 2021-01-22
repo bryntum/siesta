@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { DataVisitor } from "./DataVisitor.js"
-import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf, uppercaseFirst } from "./Helpers.js"
+import { DataVisitor } from "../visitor/DataVisitor.js"
+import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf, uppercaseFirst } from "../util/Helpers.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------

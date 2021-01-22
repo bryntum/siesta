@@ -1,8 +1,8 @@
-import { Base } from "../../class/Base.js"
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Serializable, serializable } from "../../serializable/Serializable.js"
-import { saneSplit } from "../../util/Helpers.js"
-import { isString } from "../../util/Typeguards.js"
+import { Base } from "../class/Base.js"
+import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { Serializable, serializable } from "../serializable/Serializable.js"
+import { saneSplit } from "../util/Helpers.js"
+import { isString } from "../util/Typeguards.js"
 import { SiestaJSX } from "./Factory.js"
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { SiestaJSX } from "../../jsx/Factory.js"
+import { SiestaJSX } from "../../../jsx/Factory.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
 import { GotExpectTemplate } from "./AssertionCompare.js"
 

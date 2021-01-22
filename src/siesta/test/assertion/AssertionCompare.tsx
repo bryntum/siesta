@@ -1,12 +1,12 @@
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { CI } from "../../../collection/Iterator.js"
+import { CI } from "../../../iterator/Iterator.js"
 import { compareDeepGen } from "../../../util/CompareDeep.js"
 import { typeOf } from "../../../util/Helpers.js"
-import { Serializer } from "../../../util/Serializer.js"
+import { Serializer } from "../../../serializer/Serializer.js"
 import { isDate, isRegExp } from "../../../util/Typeguards.js"
-import { SiestaJSX } from "../../jsx/Factory.js"
-import { XmlElement } from "../../jsx/XmlElement.js"
+import { SiestaJSX } from "../../../jsx/Factory.js"
+import { XmlElement } from "../../../jsx/XmlElement.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
 
 

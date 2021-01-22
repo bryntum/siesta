@@ -1,5 +1,5 @@
 import { Base } from "../../class/Base.js"
-import { CI } from "../../collection/Iterator.js"
+import { CI } from "../../iterator/Iterator.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { ArbitraryObject, cloneObject, objectEntriesDeep, typeOf } from "../../util/Helpers.js"
