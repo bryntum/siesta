@@ -1,13 +1,13 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { DataVisitor } from "../visitor/DataVisitor.js"
+import { Visitor } from "../visitor/Visitor.js"
 import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf, uppercaseFirst } from "../util/Helpers.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Serializer extends Mixin(
-    [ DataVisitor, Base ],
-    (base : ClassUnion<typeof DataVisitor, typeof Base>) =>
+    [ Visitor, Base ],
+    (base : ClassUnion<typeof Visitor, typeof Base>) =>
 
     class Serializer extends base {
 

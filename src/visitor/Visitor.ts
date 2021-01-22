@@ -2,11 +2,11 @@ import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
 import { ArbitraryObjectKey, isAtomicValue, typeOf, uppercaseFirst } from "../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class DataVisitor extends Mixin(
+export class Visitor extends Mixin(
     [],
     (base : AnyConstructor) =>
 
-    class DataVisitor extends base {
+    class Visitor extends base {
 
         maxDepth        : number                    = Number.MAX_SAFE_INTEGER
 
@@ -158,8 +158,8 @@ export class DataVisitor extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Mapper extends Mixin(
-    [ DataVisitor ],
-    (base : ClassUnion<typeof DataVisitor>) =>
+    [ Visitor ],
+    (base : ClassUnion<typeof Visitor>) =>
 
     class Mapper extends base {
 
@@ -220,8 +220,8 @@ export class Mapper extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Mutator extends Mixin(
-    [ DataVisitor ],
-    (base : ClassUnion<typeof DataVisitor>) =>
+    [ Visitor ],
+    (base : ClassUnion<typeof Visitor>) =>
 
     class Mutator extends base {
 

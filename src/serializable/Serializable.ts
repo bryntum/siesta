@@ -1,6 +1,6 @@
 import { Base } from "../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
-import { DataVisitor, Mapper, Mutator } from "../visitor/DataVisitor.js"
+import { Visitor, Mapper, Mutator } from "../visitor/Visitor.js"
 import { ArbitraryObject } from "../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -12,8 +12,8 @@ export const setReferenceIdSource = (value : JsonReferenceId) => referenceIdSour
 
 //---------------------------------------------------------------------------------------------------------------------
 class CollapserPhase1 extends Mixin(
-    [ DataVisitor, Base ],
-    (base : ClassUnion<typeof DataVisitor, typeof Base>) =>
+    [ Visitor, Base ],
+    (base : ClassUnion<typeof Visitor, typeof Base>) =>
 
     class CollapserPhase1 extends base {
         cyclicPoint             : Set<unknown>              = new Set()
