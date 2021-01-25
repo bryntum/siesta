@@ -21,6 +21,13 @@ project.plan(
     //         'hook.t.js',
     //     ]
     // },
+    {
+        filename    : 'jsx',
+
+        items       : [
+            'text_block.t.js'
+        ]
+    },
     // {
     //     filename       : 'chained_iterator',
     //
