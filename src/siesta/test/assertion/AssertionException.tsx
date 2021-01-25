@@ -62,7 +62,8 @@ export class AssertionException extends Mixin(
                                 got         : message,
                                 gotTitle    : 'Got exception',
                                 expect      : pattern,
-                                expectTitle : 'Expect exception matching'
+                                expectTitle : 'Expect exception matching',
+                                serializerConfig : this.descriptor.serializerConfig
                             }),
                         }))
                 } else {
@@ -82,7 +83,8 @@ export class AssertionException extends Mixin(
                                 got         : message,
                                 gotTitle    : 'Got exception',
                                 expect      : pattern,
-                                expectTitle : 'Expect exception containing'
+                                expectTitle : 'Expect exception containing',
+                                serializerConfig : this.descriptor.serializerConfig
                             })
                         }))
                 }

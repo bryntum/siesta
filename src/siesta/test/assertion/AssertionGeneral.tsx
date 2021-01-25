@@ -28,7 +28,8 @@ export class AssertionGeneral extends Mixin(
                         got         : instance,
                         gotTitle    : 'Got value',
                         expect      : cls,
-                        expectTitle : 'Expect instance of'
+                        expectTitle : 'Expect instance of',
+                        serializerConfig : this.descriptor.serializerConfig
                     })
                 }))
             }

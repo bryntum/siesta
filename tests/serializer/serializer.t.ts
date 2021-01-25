@@ -8,6 +8,27 @@ it('Serialization should work', async t => {
 })
 
 
+it('Pretty printed serialization should work', async t => {
+    t.is(
+        Serializer.serialize({ prop1 : [ Symbol('a'), /a/m ] }, { prettyPrint : true, indentationString : '    ' }),
+`{
+    "prop1": [Symbol(a), /a/m]
+}`
+    )
+
+    t.is(
+        Serializer.serialize({ prop1 : { prop2 : { prop3 : 3 }} }, { prettyPrint : true, indentationString : '    ' }),
+`{
+    "prop1": {
+        "prop2": {
+            "prop3": 3
+        }
+    }
+}`
+    )
+})
+
+
 it('Should not show "out of wide" properties', async t => {
     t.is(Serializer.serialize({ prop1 : 1, prop2 : 2, prop3 : 3 }, { maxDepth : 1, maxWide : 2 }), '{ "prop1": 1, "prop2": 2, ... }')
 

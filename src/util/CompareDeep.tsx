@@ -27,7 +27,7 @@ export class PathSegment extends Base {
 
     key             : unknown                       = undefined
 
-    asXmlNode () : XmlNode[] {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlNode[] {
         let str : string    = undefined
 
         switch (this.type) {
@@ -40,11 +40,11 @@ export class PathSegment extends Base {
                 break
 
             case "map_key" :
-                str = `.get(${ Serializer.serialize(this.key, { maxDepth : 4, maxWide : 4 }) })`
+                str = `.get(${ Serializer.serialize(this.key, serializerConfig) })`
                 break
 
             case "set_element" :
-                str = `.set_element(${ Serializer.serialize(this.key, { maxDepth : 4, maxWide : 4 }) })`
+                str = `.set_element(${ Serializer.serialize(this.key, serializerConfig) })`
                 break
         }
 
@@ -59,19 +59,19 @@ export class Difference extends Base {
     keyPath     : PathSegment[] = []
 
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         throw new Error("Abstract method")
     }
 
 
-    keyPathXmlNode () : XmlElement {
-        return this.keyPathTemplate(this.keyPath)
+    keyPathXmlNode (serializerConfig : Partial<Serializer>) : XmlElement {
+        return this.keyPathTemplate(this.keyPath, Object.assign({}, serializerConfig, { prettyPrint : false }))
     }
 
 
-    keyPathTemplate (keyPath : PathSegment[]) : XmlElement {
+    keyPathTemplate (keyPath : PathSegment[], serializerConfig : Partial<Serializer>) : XmlElement {
         return <span class="difference_key_path">{
-            keyPath.length === 0 ? 'root' : keyPath.flatMap(pathSegment => pathSegment.asXmlNode())
+            keyPath.length === 0 ? 'root' : keyPath.flatMap(pathSegment => pathSegment.asXmlNode(serializerConfig))
         }</span>
     }
 }
@@ -85,17 +85,17 @@ export class DifferenceTypesAreDifferent extends Difference {
     type2       : string        = ''
 
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         return <div>
-            The values at { this.keyPathXmlNode() } have different types:
+            The values at { this.keyPathXmlNode(serializerConfig) } have different types:
             <unl class='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got value of <span class="typename">`{ this.type1 }`</span> : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.v1, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.v1, serializerConfig) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected value of <span class="typename">`{ this.type2 }`</span> : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.v2, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.v2, serializerConfig) }</span>
                 </li>
             </unl>
         </div>
@@ -111,16 +111,16 @@ export class DifferenceReachability extends Difference {
     v2Path      : PathSegment[] = undefined
 
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         return <div>
-            The values at { this.keyPathXmlNode() } have different reachability:
+            The values at { this.keyPathXmlNode(serializerConfig) } have different reachability:
             <ul className='difference_got_expected'>
                 <li class='difference_got'>
                     {
                         this.v1Path !== undefined ?
                             <p>
                                 <span class="difference_title">The value on left has been already reached from (cyclic visit): </span>
-                                <span class="difference_value">{ this.keyPathTemplate(this.v1Path) }</span>
+                                <span class="difference_value">{ this.keyPathTemplate(this.v1Path, serializerConfig) }</span>
                             </p>
                         :
                             <p>
@@ -129,7 +129,7 @@ export class DifferenceReachability extends Difference {
                     }
                     <p>
                         <span class="difference_title">Value on left  : </span>
-                        <span class="difference_value">{ Serializer.serialize(this.v1, { maxDepth : 4, maxWide : 4 }) }</span>
+                        <span class="difference_value">{ Serializer.serialize(this.v1, serializerConfig) }</span>
                     </p>
                 </li>
                 <li class='difference_expected'>
@@ -137,7 +137,7 @@ export class DifferenceReachability extends Difference {
                         this.v2Path !== undefined ?
                             <p>
                                 <span class="difference_title">The value on right has been already reached from (cyclic visit): </span>
-                                <span class="difference_value">{ this.keyPathTemplate(this.v2Path) }</span>
+                                <span class="difference_value">{ this.keyPathTemplate(this.v2Path, serializerConfig) }</span>
                             </p>
                         :
                             <p>
@@ -146,7 +146,7 @@ export class DifferenceReachability extends Difference {
                     }
                     <p>
                         <span class="difference_title">Value on right : </span>
-                        <span class="difference_value">{ Serializer.serialize(this.v2, { maxDepth : 4, maxWide : 4 }) }</span>
+                        <span class="difference_value">{ Serializer.serialize(this.v2, serializerConfig) }</span>
                     </p>
                 </li>
             </ul>
@@ -166,15 +166,15 @@ export class DifferenceSet<V = unknown> extends Difference {
     onlyIn2         : Set<V>    = undefined
 
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         return <div>
-            The <span class="typename">`Set`</span>s at { this.keyPathXmlNode() } are different:
+            The <span class="typename">`Set`</span>s at { this.keyPathXmlNode(serializerConfig) } are different:
             <ul>
                 {
                     this.onlyIn1.size > 0 && <li>
                         Elements present only in the set we got (missing in the expected set)
                         <ul>{
-                            Array.from(this.onlyIn1).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) }</li>)
+                            Array.from(this.onlyIn1).map(el => <li>{ Serializer.serialize(el, serializerConfig) }</li>)
                         }</ul>
                     </li>
                 }
@@ -182,7 +182,7 @@ export class DifferenceSet<V = unknown> extends Difference {
                     this.onlyIn2.size > 0 && <li>
                         Elements present only in the set we expect (missing in the set we got)
                         <ul>{
-                            Array.from(this.onlyIn2).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) }</li>)
+                            Array.from(this.onlyIn2).map(el => <li>{ Serializer.serialize(el, serializerConfig) }</li>)
                         }</ul>
                     </li>
                 }
@@ -203,15 +203,15 @@ export class DifferenceMap<K = unknown, V = unknown> extends Difference {
     onlyIn2         : Set<K>        = undefined
 
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         return <div>
-            The <span class="typename">`Map`</span>s at { this.keyPathXmlNode() } are different:
+            The <span class="typename">`Map`</span>s at { this.keyPathXmlNode(serializerConfig) } are different:
             <ul>
                 {
                     this.onlyIn1.size > 0 && <li>
                         Keys present only in the map we got (missing in the expected map)
                         <ul>
-                            { CI(this.onlyIn1).take(5).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) } : { Serializer.serialize(this.map1.get(el), { maxDepth : 4, maxWide : 4 }) }</li>) }
+                            { CI(this.onlyIn1).take(5).map(el => <li>{ Serializer.serialize(el, serializerConfig) } : { Serializer.serialize(this.map1.get(el), serializerConfig) }</li>) }
                             { this.onlyIn1.size > 5 && <li>... 5 from { this.onlyIn1.size } are shown</li> }
                         </ul>
                     </li>
@@ -220,7 +220,7 @@ export class DifferenceMap<K = unknown, V = unknown> extends Difference {
                     this.onlyIn2.size > 0 && <li>
                         Keys present only in the map we expect (missing in the map we got)
                         <ul>
-                            { CI(this.onlyIn2).take(5).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) } : { Serializer.serialize(this.map2.get(el), { maxDepth : 4, maxWide : 4 }) }</li>) }
+                            { CI(this.onlyIn2).take(5).map(el => <li>{ Serializer.serialize(el, serializerConfig) } : { Serializer.serialize(this.map2.get(el), serializerConfig) }</li>) }
                             { this.onlyIn2.size > 5 && <li>... 5 from { this.onlyIn2.size } are shown</li> }
                         </ul>
                     </li>
@@ -242,15 +242,15 @@ export class DifferenceObject extends Difference {
     onlyIn2         : Set<ArbitraryObjectKey>   = undefined
 
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         return <div>
-            The <span class="typename">`Object`</span>s at { this.keyPathXmlNode() } are different:
+            The <span class="typename">`Object`</span>s at { this.keyPathXmlNode(serializerConfig) } are different:
             <ul>
                 {
                     this.onlyIn1.size > 0 && <li>
                         Keys present only in the object we got (missing in the expected object)
                         <ul>
-                            { CI(this.onlyIn1).take(5).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) } : { Serializer.serialize(this.object1[ el as any ], { maxDepth : 4, maxWide : 4 }) }</li>) }
+                            { CI(this.onlyIn1).take(5).map(el => <li>{ Serializer.serialize(el, serializerConfig) } : { Serializer.serialize(this.object1[ el as any ], serializerConfig) }</li>) }
                             { this.onlyIn1.size > 5 && <li>... 5 from { this.onlyIn1.size } are shown</li> }
                         </ul>
                     </li>
@@ -259,7 +259,7 @@ export class DifferenceObject extends Difference {
                     this.onlyIn2.size > 0 && <li>
                         Elements present only in the set we expect (missing in the set we got)
                         <ul>
-                            { CI(this.onlyIn2).take(5).map(el => <li>{ Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) } : { Serializer.serialize(this.object2[ el as any ], { maxDepth : 4, maxWide : 4 }) }</li>) }
+                            { CI(this.onlyIn2).take(5).map(el => <li>{ Serializer.serialize(el, serializerConfig) } : { Serializer.serialize(this.object2[ el as any ], serializerConfig) }</li>) }
                             { this.onlyIn2.size > 5 && <li>... 5 from { this.onlyIn2.size } are shown</li> }
                         </ul>
                     </li>
@@ -279,11 +279,11 @@ export class DifferenceArray extends Difference {
     type            : 'extra' | 'missing'   = undefined
 
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         const minLength     = Math.min(this.array1.length, this.array2.length)
 
         return <div>
-            <p>The arrays at { this.keyPathXmlNode() } have different length.</p>
+            <p>The arrays at { this.keyPathXmlNode(serializerConfig) } have different length.</p>
             <p>We have an array of length <span class="ligther_smooth_accent_color">{ this.array1.length }</span>
                 &nbsp;and expect an array of length <span class="ligther_smooth_accent_color">{ this.array2.length }</span>
             </p>
@@ -303,7 +303,7 @@ export class DifferenceArray extends Difference {
             }:</p>
             <unl>{
                 (this.type === 'extra' ? this.array1 : this.array2).slice(this.startingFrom).map((el, index) =>
-                    <li><span>[ { index + this.startingFrom } ]</span> : { Serializer.serialize(el, { maxDepth : 4, maxWide : 4 }) }</li>
+                    <li><span>[ { index + this.startingFrom } ]</span> : { Serializer.serialize(el, serializerConfig) }</li>
                 )
             }</unl>
         </div>
@@ -315,17 +315,17 @@ export class DifferenceFunction extends Difference {
     func1           : Function      = undefined
     func2           : Function      = undefined
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         return <div>
-            <p>The <span class="typename">`Functions`</span>s at { this.keyPathXmlNode() } are different:</p>
+            <p>The <span class="typename">`Functions`</span>s at { this.keyPathXmlNode(serializerConfig) } are different:</p>
             <unl className='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got      : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.func1, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.func1, serializerConfig) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.func2, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.func2, serializerConfig) }</span>
                 </li>
             </unl>
         </div>
@@ -346,17 +346,17 @@ export class DifferenceRegExp extends Difference {
     unicode         : boolean       = undefined
 
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         return <div>
-            <p>The <span class="typename">`RegExp`</span>s at { this.keyPathXmlNode() } are different:</p>
+            <p>The <span class="typename">`RegExp`</span>s at { this.keyPathXmlNode(serializerConfig) } are different:</p>
             <unl className='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got      : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.regexp1, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.regexp1, serializerConfig) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.regexp2, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.regexp2, serializerConfig) }</span>
                 </li>
             </unl>
         </div>
@@ -369,17 +369,17 @@ export class DifferenceDate extends Difference {
     date2           : Date          = undefined
 
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         return <div>
-            <p>The <span class="typename">`Date`</span>s at { this.keyPathXmlNode() } are different:</p>
+            <p>The <span class="typename">`Date`</span>s at { this.keyPathXmlNode(serializerConfig) } are different:</p>
             <unl className='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got      : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.date1, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.date1, serializerConfig) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.date2, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.date2, serializerConfig) }</span>
                 </li>
             </unl>
         </div>
@@ -391,17 +391,17 @@ export class DifferenceValuesAreDifferent extends Difference {
     v1          : unknown       = undefined
     v2          : unknown       = undefined
 
-    asXmlNode () : XmlElement {
+    asXmlNode (serializerConfig : Partial<Serializer> = {}) : XmlElement {
         return <div>
-            The values at { this.keyPathXmlNode() } are different:
+            The values at { this.keyPathXmlNode(serializerConfig) } are different:
             <unl class='difference_got_expected'>
                 <li class='difference_got'>
                     <span class="difference_title">Got      : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.v1, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.v1, serializerConfig) }</span>
                 </li>
                 <li class='difference_expected'>
                     <span class="difference_title">Expected : </span>
-                    <span class="difference_value">{ Serializer.serialize(this.v2, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <span class="difference_value">{ Serializer.serialize(this.v2, serializerConfig) }</span>
                 </li>
             </unl>
         </div>

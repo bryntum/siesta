@@ -1,7 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
-import { XmlRenderer } from "./XmlRenderer.js"
+import { XmlRenderer } from "../../jsx/XmlRenderer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -30,7 +30,7 @@
         "src/**/*.tsx",
         "scripts/**/*.ts",
         "tests/**/*.ts",
-        "tests/**/*.ts",
+        "tests/**/*.tsx",
         "benchmarks/**/*.ts",
         "examples/**/*.ts"
     ],

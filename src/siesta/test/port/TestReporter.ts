@@ -39,7 +39,7 @@ export class TestReporterParent extends Mixin(
 
             reporter                    : Reporter              = undefined
 
-            topTestNodeResult           : TestNodeResult        = undefined
+            // topTestNodeResult           : TestNodeResult        = undefined
 
             currentTestNodeResult       : TestNodeResult        = undefined
 
@@ -69,7 +69,7 @@ export class TestReporterParent extends Mixin(
                         state           : 'running',
                     })
 
-                    this.currentTestNodeResult  = this.topTestNodeResult = newNode
+                    this.currentTestNodeResult  = /*this.topTestNodeResult =*/ newNode
                 }
 
                 this.reporter.onSubTestStart(this.currentTestNodeResult)

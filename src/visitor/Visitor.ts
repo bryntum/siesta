@@ -94,7 +94,7 @@ export class Visitor extends Mixin(
             key     : ArbitraryObjectKey, value : unknown, object : object, index : number,
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
         ) : any {
-            return this.visitAtomicValue(key, depth)
+            return this.visitAtomicValueEntry(key, depth)
         }
 
         visitObjectEntryValue (

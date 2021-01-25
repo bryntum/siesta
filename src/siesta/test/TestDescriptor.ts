@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { CI } from "../../iterator/Iterator.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
+import { Serializer } from "../../serializer/Serializer.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { ArbitraryObject, cloneObject, objectEntriesDeep, typeOf } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
@@ -35,6 +36,8 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
 
     @option({ defaultValue : false })
     autoCheckGlobals    : boolean
+
+    serializerConfig    : Partial<Serializer>   = { maxWide : 4, maxDepth : 4, prettyPrint : true }
 
 
     planItem (item : TestDescriptor) : TestDescriptor {
@@ -117,6 +120,10 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
             delete groupDesc.items
 
             const group         = this.new(groupDesc)
+
+            // need to force-create the `childNodes` array for the case when the `items` array is empty
+            // so that this descriptor will be counted as a group, not leaf
+            group.childNodes    = []
 
             desc.items.forEach(item => group.planItem(this.fromProjectPlanItemDescriptor(item)))
 

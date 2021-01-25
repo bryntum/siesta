@@ -57,7 +57,8 @@ export class AssertionCompare extends Mixin(
 
                 annotation      : passed ? null : GotExpectTemplate.el({
                     got     : value1,
-                    expect  : value2
+                    expect  : value2,
+                    serializerConfig : this.descriptor.serializerConfig
                 })
             }))
         }
@@ -73,7 +74,8 @@ export class AssertionCompare extends Mixin(
 
                 annotation      : passed ? null : GotExpectTemplate.el({
                     got     : value1,
-                    expect  : value2
+                    expect  : value2,
+                    serializerConfig : this.descriptor.serializerConfig
                 })
             }))
         }
@@ -91,7 +93,7 @@ export class AssertionCompare extends Mixin(
                     The value we got is equal to the value we expect
                     <p>
                         <span class="difference_title">Value : </span>
-                        <span class="difference_value">{ Serializer.serialize(value1, { maxDepth : 4, maxWide : 4 }) }</span>
+                        <span class="difference_value">{ Serializer.serialize(value1, this.descriptor.serializerConfig) }</span>
                     </p>
                 </div>
             }))
@@ -99,6 +101,11 @@ export class AssertionCompare extends Mixin(
 
 
         isDeeply<V> (value1 : V, value2 : V, description : string = '') {
+            this.isDeeply(value1, value2, description)
+        }
+
+
+        equal<V> (value1 : V, value2 : V, description : string = '') {
             const differences   = CI(compareDeepGen(value1, value2)).take(5)
 
             if (differences.length > 0) {
@@ -121,7 +128,7 @@ export class AssertionCompare extends Mixin(
                         {/*}:*/}
                         <ul>{
                             differences.map(difference =>
-                                <li class="difference">{ difference.asXmlNode() }</li>
+                                <li class="difference">{ difference.asXmlNode(this.descriptor.serializerConfig) }</li>
                             )
                         }</ul>
                     </div>
@@ -155,7 +162,8 @@ export class AssertionCompare extends Mixin(
                             got         : string,
                             gotTitle    : 'Got string',
                             expect      : pattern,
-                            expectTitle : 'Expect string matching'
+                            expectTitle : 'Expect string matching',
+                            serializerConfig : this.descriptor.serializerConfig
                         })
                     }))
                 }
@@ -175,7 +183,8 @@ export class AssertionCompare extends Mixin(
                             got         : string,
                             gotTitle    : 'Got string',
                             expect      : pattern,
-                            expectTitle : 'Expect string containing'
+                            expectTitle : 'Expect string containing',
+                            serializerConfig : this.descriptor.serializerConfig
                         })
                     }))
                 }
@@ -195,6 +204,8 @@ export class GotExpectTemplate extends Base {
 
     expectTitle : string        = 'Expect'
 
+    serializerConfig    : Partial<Serializer>   = { maxDepth : 4, maxWide : 4, prettyPrint : true }
+
 
     getTitleLengthEquality (label : 'got' | 'expect') : string {
         if (this.expect === undefined) return ''
@@ -210,13 +221,13 @@ export class GotExpectTemplate extends Base {
 
         return <div class="indented got_expected">
             <div class='got'>
-                <span class="got_title">{ instance.gotTitle } { instance.getTitleLengthEquality('got') }: </span>
-                <span class="got_value">{ Serializer.serialize(instance.got, { maxDepth : 4, maxWide : 4 }) }</span>
+                <div class="underlined got_title">{ instance.gotTitle }:</div>
+                <div class="indented got_value">{ Serializer.serialize(instance.got, instance.serializerConfig) }</div>
             </div>
             {
                 instance.expect !== undefined && <div class='expect'>
-                    <span class="expect_title">{ instance.expectTitle } { instance.getTitleLengthEquality('expect') }: </span>
-                    <span class="expect_value">{ Serializer.serialize(instance.expect, { maxDepth : 4, maxWide : 4 }) }</span>
+                    <div class="underlined expect_title">{ instance.expectTitle }:</div>
+                    <div class="indented expect_value">{ Serializer.serialize(instance.expect, instance.serializerConfig) }</div>
                 </div>
             }
         </div>

@@ -1,21 +1,21 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { SiestaJSX } from "../jsx/Factory.js"
+import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { Visitor } from "../visitor/Visitor.js"
 import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf, uppercaseFirst } from "../util/Helpers.js"
 
-
 //---------------------------------------------------------------------------------------------------------------------
-export class Serializer extends Mixin(
+export class SerializerXml extends Mixin(
     [ Visitor, Base ],
     (base : ClassUnion<typeof Visitor, typeof Base>) =>
 
-    class Serializer extends base {
+    class SerializerXml extends base {
 
         maxWide                 : number    = Number.MAX_SAFE_INTEGER
 
         indentationString       : string    = ' '.repeat(2)
 
-        // TODO implemented only for objects
         prettyPrint             : boolean   = false
 
         // TODO
@@ -24,73 +24,88 @@ export class Serializer extends Mixin(
         // eof TODO
 
         outOfDepthSymbol    : string        = '🠗'
-        outOfWideSymbol     : string        = '...'
+        outOfWideSymbol     : XmlElement    = <out_of_wide></out_of_wide>
 
-        result              : string[]      = []
+        result              : XmlElement[]  = [ <serialization></serialization> ]
+
+        currentElement      : XmlElement    = this.result[ 0 ]
 
         refCounter          : number        = 1
 
         references          : Map<unknown, number>  = new Map()
 
-        currentIndentation  : string        = ''
+        valueToEl           : Map<unknown, XmlElement>  = new Map()
 
-        atNewLine           : boolean       = true
-
-
-        increaseIndent () {
-            this.currentIndentation         += this.indentationString
-        }
+        beforeVisitEl       : unknown       = undefined
 
 
-        decreaseIndent () {
-            this.currentIndentation         = this.currentIndentation.slice(0, this.currentIndentation.length - this.indentationString.length)
-        }
+
+        // increaseIndent () {
+        //     this.currentIndentation         += this.indentationString
+        // }
+        //
+        //
+        // decreaseIndent () {
+        //     this.currentIndentation         = this.currentIndentation.slice(0, this.currentIndentation.length - this.indentationString.length)
+        // }
 
 
         beforeVisit (value : unknown, depth : number) {
-            this.visited.set(value, [ this.result.length, undefined ])
+            this.beforeVisitEl  = value
+
+            this.visited.set(value, value)
 
             return value
         }
 
 
-        afterVisit (value : unknown, depth : number, visitResult : unknown) : unknown {
-            const currentMarker     = this.visited.get(value)
+        // afterVisit (value : unknown, depth : number, visitResult : unknown) : unknown {
+        //     const visit = this.visited.get(value) as any
+        //
+        //     // visit.visitedAs = visit.curEl.childNodes.length === visit.currentElLength ? this.result[ visi]
+        //
+        //         // this.currentElement.childNodes[ this.currentElement.childNodes.length - 1 ]
+        //
+        //     return visitResult
+        // }
 
-            currentMarker[ 1 ]      = this.result.length - 1
 
-            return visitResult
+        write (el : XmlElement) {
+            this.currentElement.appendChild(el)
+
+            if (!this.valueToEl.has(this.beforeVisitEl)) this.valueToEl.set(this.beforeVisitEl, el)
         }
 
 
-        write (str : string) {
-            if (this.atNewLine) {
-                this.result.push(this.currentIndentation)
-                this.atNewLine      = false
-            }
+        push (el : XmlElement/*, forObject? : unknown*/) {
+            // if (forObject !== undefinthis.valueToEl.set(forObject, el)
 
-            this.result.push(str)
+            this.write(el)
+
+            this.result.push(el)
+
+            this.currentElement = el
         }
 
 
-        writeNewLine () {
-            this.result.push('\n')
+        pop () {
+            this.result.pop()
 
-            this.atNewLine      = true
+            this.currentElement = this.result[ this.result.length - 1 ]
         }
 
 
         visitOutOfDepthValue (value : unknown, depth : number) {
             if (isAtomicValue(value)) {
-                this.visitAtomicValueEntry(value, depth)
+                this.visitAtomicValue(value, depth)
             } else {
-                this.write(`${ this.outOfDepthSymbol } ${ constructorNameOf(value) || typeOf(value) } {...}`)
+                this.write(<outofdepth constructorName={ constructorNameOf(value) || typeOf(value) }></outofdepth>)
             }
         }
 
 
         visitAtomicValue (value : unknown, depth : number) {
-            this.write(String(value))
+            this.write(<atomic_value>{ value }</atomic_value>)
         }
 
 
@@ -98,25 +113,22 @@ export class Serializer extends Mixin(
             const valueReference    = this.references.get(value)
 
             if (valueReference !== undefined) {
-                this.write(`[Circular *${ valueReference }]`)
+                this.write(<reference>{ valueReference }</reference>)
             } else {
-                const currentMarker     = this.visited.get(value)
+                const alreadyVisitedAs  = this.valueToEl.get(value)
 
                 const refCount          = this.refCounter++
 
                 this.references.set(value, refCount)
+                alreadyVisitedAs.setAttribute('refId', String(refCount))
 
-                this.result[ currentMarker[ 0 ] ] = `<ref *${ refCount }> ${ this.result[ currentMarker[ 0 ] ] }`
-
-                this.write(`[Circular *${ refCount }]`)
+                this.write(<reference>{ refCount }</reference>)
             }
         }
 
 
         getVisitMethodFor (value : unknown) : Function {
             const type      = typeOf(value)
-
-            if (type === 'RegExp' || 'Symbol') return this.visitAtomicValue
 
             if (/Function$/.test(type)) return this.visitFunction
 
@@ -126,71 +138,66 @@ export class Serializer extends Mixin(
         }
 
 
+        visitSymbol (value : symbol, depth : number) {
+            this.write(<symbol>{ value }</symbol>)
+        }
+
+
+        visitNumber (value : number, depth : number) {
+            this.write(<number>{ value }</number>)
+        }
+
+
         visitString (value : string, depth : number) {
-            this.write(`"${ value.replace(/"/g, '\\"').replace(/\n/g, '\\n') }"`)
+            this.write(<string>{ value }</string>)
         }
 
 
         visitDate (value : Date, depth : number) {
-            this.write(dateToString(value))
+            this.write(<date>{ dateToString(value) }</date>)
         }
 
 
         visitRegExp (value : RegExp, depth : number) {
-            this.write(String(value))
-        }
-
-
-        visitAsyncGeneratorFunction (value : AsyncGeneratorFunction, depth : number) {
-            this.visitFunction(value, depth)
-        }
-
-
-        visitGeneratorFunction (value : GeneratorFunction, depth : number) {
-            this.visitFunction(value, depth)
-        }
-
-
-        visitAsyncFunction (value : Function, depth : number) {
-            this.visitFunction(value, depth)
+            this.write(<regexp>{ String(value) }</regexp>)
         }
 
 
         visitFunction (value : Function, depth : number) {
-            this.write(functionSources(value)/*.replace(/\{.*\}$/, '{ ... }')*/)
+            this.write(<function>{ functionSources(value) }</function>)
         }
 
 
         visitObject (object : object, depth : number) : any {
+            const objectEl          = <object></object>
+
             const constructorName   = constructorNameOf(object)
 
-            this.write(constructorName !== 'Object' ? constructorName + ' {' : '{')
+            if (constructorName !== 'Object') objectEl.setAttribute('constructorName', constructorName)
 
-            if (this.prettyPrint) {
-                this.increaseIndent()
-                this.writeNewLine()
-            }
+            this.push(objectEl)
 
             super.visitObject(object, depth)
 
-            this.decreaseIndent()
-
-            this.write('}')
+            this.pop()
         }
 
         visitObjectEntryKey (
             key : ArbitraryObjectKey, value : unknown, object : object, index : number,
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
         ) {
-            if (!this.prettyPrint)
-                if (index === 0) this.write(' ')
+            // this should be set inside of the `visitObject` of course, but that would imply
+            // an extra call to `Object.entries()`
+            if (index === 0) this.currentElement.setAttribute('size', entries.length)
 
             if (index < this.maxWide) {
-                this.write('"')
+                this.push(<object_entry></object_entry>)
+
+                this.push(<object_entry_key></object_entry_key>)
 
                 super.visitObjectEntryKey(key, value, object, index, entries, depth)
 
-                this.write('": ')
+                this.pop()
             }
         }
 
@@ -199,33 +206,29 @@ export class Serializer extends Mixin(
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
         ) {
             if (index < this.maxWide) {
+                this.push(<object_entry_value></object_entry_value>)
+
                 super.visitObjectEntryValue(key, value, object, index, entries, depth)
 
-                if (index < entries.length - 1) this.write(', ')
+                this.pop()
+                this.pop()
             }
             else if (index === this.maxWide)
                 this.write(this.outOfWideSymbol)
-
-            if (this.prettyPrint)
-                this.writeNewLine()
-            else
-                if (index === entries.length - 1) this.write(' ')
         }
 
 
         visitArray (array : unknown[], depth : number) : any {
-            this.write('[')
+            this.push(<array length={ array.length }></array>)
 
             super.visitArray(array, depth)
 
-            this.write(']')
+            this.pop()
         }
 
         visitArrayEntry<V> (value : V, array : V[], index : number, depth : number) {
             if (index < this.maxWide) {
                 super.visitArrayEntry(value, array, index, depth)
-
-                if (index < array.length - 1) this.write(', ')
             }
             else if (index === this.maxWide)
                 this.write(this.outOfWideSymbol)
@@ -233,20 +236,16 @@ export class Serializer extends Mixin(
 
 
         visitSet (set : Set<unknown>, depth : number) : any {
-            const space     = set.size > 0 ? ' ' : ''
-
-            this.write(`Set(${ set.size }) {${ space }`)
+            this.push(<set size={ set.size }></set>)
 
             super.visitSet(set, depth)
 
-            this.write(`${ space }}`)
+            this.pop()
         }
 
         visitSetElement<V> (value : V, set : Set<V>, index : number, depth : number) {
             if (index < this.maxWide) {
                 super.visitSetElement(value, set, index, depth)
-
-                if (index < set.size - 1) this.write(', ')
             }
             else if (index === this.maxWide)
                 this.write(this.outOfWideSymbol)
@@ -254,28 +253,33 @@ export class Serializer extends Mixin(
 
 
         visitMap (map : Map<unknown, unknown>, depth : number) : any {
-            const space     = map.size > 0 ? ' ' : ''
-
-            this.write(`Map(${ map.size }) {${ space }`)
+            this.push(<map size={ map.size }></map>)
 
             super.visitMap(map, depth)
 
-            this.write(`${ space }}`)
+            this.pop()
         }
 
         visitMapEntryKey<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
             if (index < this.maxWide) {
+                this.push(<map_entry></map_entry>)
+
+                this.push(<map_entry_key></map_entry_key>)
+
                 super.visitMapEntryKey(key, value, map, index, depth)
 
-                this.write(' => ')
+                this.pop()
             }
         }
 
         visitMapEntryValue<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
             if (index < this.maxWide) {
+                this.push(<map_entry_value></map_entry_value>)
+
                 super.visitMapEntryValue(key, value, map, index, depth)
 
-                if (index < map.size - 1) this.write(', ')
+                this.pop()
+                this.pop()
             }
             else if (index === this.maxWide)
                 this.write(this.outOfWideSymbol)
@@ -287,12 +291,12 @@ export class Serializer extends Mixin(
         }
 
 
-        static serialize <T extends typeof Serializer> (this : T, value : unknown, props? : Partial<InstanceType<T>>) : string {
+        static serialize <T extends typeof SerializerXml> (this : T, value : unknown, props? : Partial<InstanceType<T>>) : XmlElement {
             const serializer = this.new(props)
 
             serializer.visit(value)
 
-            return serializer.toString()
+            return serializer.currentElement
         }
     }
 ){}

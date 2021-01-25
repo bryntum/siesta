@@ -7,7 +7,7 @@ import { XmlElement, XmlStream } from "../../jsx/XmlElement.js"
 import { Launch } from "../launcher/Launch.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, TestNodeResult, TestResult } from "../test/TestResult.js"
-import { Colorer } from "./Colorer.js"
+import { Colorer } from "../../jsx/Colorer.js"
 import { Printer } from "./Printer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
 
