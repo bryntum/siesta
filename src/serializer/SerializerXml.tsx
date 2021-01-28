@@ -1,9 +1,10 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { SiestaJSX } from "../jsx/Factory.js"
-import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
-import { Visitor } from "../visitor/Visitor.js"
+import { XmlElement } from "../jsx/XmlElement.js"
 import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf, uppercaseFirst } from "../util/Helpers.js"
+import { Visitor } from "../visitor/Visitor.js"
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class SerializerXml extends Mixin(
@@ -11,19 +12,8 @@ export class SerializerXml extends Mixin(
     (base : ClassUnion<typeof Visitor, typeof Base>) =>
 
     class SerializerXml extends base {
+        maxWide             : number        = Number.MAX_SAFE_INTEGER
 
-        maxWide                 : number    = Number.MAX_SAFE_INTEGER
-
-        indentationString       : string    = ' '.repeat(2)
-
-        prettyPrint             : boolean   = false
-
-        // TODO
-        includeFunctionSources  : boolean   = true
-        maxStringLength         : number    = Number.MAX_SAFE_INTEGER
-        // eof TODO
-
-        outOfDepthSymbol    : string        = '🠗'
         outOfWideSymbol     : XmlElement    = <out_of_wide></out_of_wide>
 
         result              : XmlElement[]  = [ <serialization></serialization> ]
@@ -39,17 +29,6 @@ export class SerializerXml extends Mixin(
         beforeVisitEl       : unknown       = undefined
 
 
-
-        // increaseIndent () {
-        //     this.currentIndentation         += this.indentationString
-        // }
-        //
-        //
-        // decreaseIndent () {
-        //     this.currentIndentation         = this.currentIndentation.slice(0, this.currentIndentation.length - this.indentationString.length)
-        // }
-
-
         beforeVisit (value : unknown, depth : number) {
             this.beforeVisitEl  = value
 
@@ -59,17 +38,6 @@ export class SerializerXml extends Mixin(
         }
 
 
-        // afterVisit (value : unknown, depth : number, visitResult : unknown) : unknown {
-        //     const visit = this.visited.get(value) as any
-        //
-        //     // visit.visitedAs = visit.curEl.childNodes.length === visit.currentElLength ? this.result[ visi]
-        //
-        //         // this.currentElement.childNodes[ this.currentElement.childNodes.length - 1 ]
-        //
-        //     return visitResult
-        // }
-
-
         write (el : XmlElement) {
             this.currentElement.appendChild(el)
 
@@ -77,9 +45,7 @@ export class SerializerXml extends Mixin(
         }
 
 
-        push (el : XmlElement/*, forObject? : unknown*/) {
-            // if (forObject !== undefinthis.valueToEl.set(forObject, el)
-
+        push (el : XmlElement) {
             this.write(el)
 
             this.result.push(el)
@@ -97,9 +63,9 @@ export class SerializerXml extends Mixin(
 
         visitOutOfDepthValue (value : unknown, depth : number) {
             if (isAtomicValue(value)) {
-                this.visitAtomicValue(value, depth)
+                this.visitAtomicValueEntry(value, depth)
             } else {
-                this.write(<outofdepth constructorName={ constructorNameOf(value) || typeOf(value) }></outofdepth>)
+                this.write(<out_of_depth constructorName={ constructorNameOf(value) || typeOf(value) }></out_of_depth>)
             }
         }
 
@@ -110,19 +76,20 @@ export class SerializerXml extends Mixin(
 
 
         visitAlreadyVisited (value : unknown, depth : number) {
-            const valueReference    = this.references.get(value)
+            const valueReference        = this.references.get(value)
 
             if (valueReference !== undefined) {
-                this.write(<reference>{ valueReference }</reference>)
+                this.write(<reference refId={ valueReference }></reference>)
             } else {
                 const alreadyVisitedAs  = this.valueToEl.get(value)
 
                 const refCount          = this.refCounter++
 
                 this.references.set(value, refCount)
-                alreadyVisitedAs.setAttribute('refId', String(refCount))
 
-                this.write(<reference>{ refCount }</reference>)
+                alreadyVisitedAs.setAttribute('refId', refCount)
+
+                this.write(<reference refId={ refCount }></reference>)
             }
         }
 
@@ -149,7 +116,9 @@ export class SerializerXml extends Mixin(
 
 
         visitString (value : string, depth : number) {
-            this.write(<string>{ value }</string>)
+            // we use `'"' +` expressions inside the {} to create a single child node
+            // the form `<string>"{}"</string>` would create 3 child nodes
+            this.write(<string>{ '"' + value.replace(/"/g, '\\"').replace(/\n/g, '↵') + '"' }</string>)
         }
 
 
@@ -169,7 +138,7 @@ export class SerializerXml extends Mixin(
 
 
         visitObject (object : object, depth : number) : any {
-            const objectEl          = <object></object>
+            const objectEl          = <object size={ 0 }></object>
 
             const constructorName   = constructorNameOf(object)
 
@@ -334,6 +303,13 @@ const functionSources = (func : Function) : string => {
 }
 
 
-const dateToString = (date : Date) : string => {
-    return `new Date("${ date.getFullYear() }/${ date.getMonth() }/${ date.getDate() } ${ date.getHours() }:${ date.getMinutes() }:${ date.getSeconds() }.${ date.getMilliseconds() }")`
+const prependZeros = (num : number) : string => {
+    return num >= 10 ? String(num) : '0' + String(num)
 }
+
+
+const dateToString = (date : Date) : string => {
+    return `new Date("${ date.getFullYear() }/${ prependZeros(date.getMonth()) }/${ prependZeros(date.getDate()) } ${ prependZeros(date.getHours()) }:${ prependZeros(date.getMinutes()) }:${ prependZeros(date.getSeconds()) }.${ date.getMilliseconds() }")`
+}
+
+

@@ -257,7 +257,7 @@ export class DifferenceObject extends Difference {
                 }
                 {
                     this.onlyIn2.size > 0 && <li>
-                        Elements present only in the set we expect (missing in the set we got)
+                        Keys present only in the object we expect (missing in the object we got)
                         <ul>
                             { CI(this.onlyIn2).take(5).map(el => <li>{ Serializer.serialize(el, serializerConfig) } : { Serializer.serialize(this.object2[ el as any ], serializerConfig) }</li>) }
                             { this.onlyIn2.size > 5 && <li>... 5 from { this.onlyIn2.size } are shown</li> }

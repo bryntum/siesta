@@ -127,7 +127,7 @@ export class Serializer extends Mixin(
 
 
         visitString (value : string, depth : number) {
-            this.write(`"${ value.replace(/"/g, '\\"').replace(/\n/g, '\\n') }"`)
+            this.write(`"${ value.replace(/"/g, '\\"').replace(/\n/g, '↵') }"`)
         }
 
 

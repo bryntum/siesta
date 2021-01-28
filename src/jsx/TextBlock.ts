@@ -7,6 +7,8 @@ import { Colorer } from "./Colorer.js"
 export class TextBlock extends Base {
     maxLen                  : number            = Number.MAX_SAFE_INTEGER
 
+    minContentWidth         : number            = 2
+
     text                    : string[][]        = [ [ '' ] ]
 
     indentLevel             : number            = 0
@@ -21,6 +23,11 @@ export class TextBlock extends Base {
     initialize (props) {
         super.initialize(props)
 
+        this.initIndent()
+    }
+
+
+    initIndent () {
         this.indentationString          = ' '.repeat(this.indentLevel)
     }
 
@@ -61,6 +68,8 @@ export class TextBlock extends Base {
 
 
     addSameLineText (str : string) {
+        if (str === '') return
+
         this.joinLastLine()
 
         if (this.lastLine.length + str.length < this.maxLen) {
@@ -69,10 +78,15 @@ export class TextBlock extends Base {
             let insertPos       = this.lastLine.length
             let sourcePos       = 0
 
+            if (insertPos === this.maxLen) {
+                this.addNewLine()
+                insertPos       = 0
+            }
+
             while (sourcePos < str.length) {
                 let lenToInsert   = this.maxLen - insertPos
 
-                if (lenToInsert <= 0) lenToInsert = this.indentLevel
+                if (lenToInsert < this.minContentWidth) lenToInsert = this.minContentWidth
 
                 const toInsert  = str.substr(sourcePos, lenToInsert)
 

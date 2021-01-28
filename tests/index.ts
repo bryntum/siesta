@@ -62,7 +62,8 @@ project.plan(
 
         items       : [
             // 'serializer.t.js',
-            'serializer_xml.t.js'
+            'serializer_xml.t.js',
+            'stringifier_xml.t.js'
         ]
     },
     // {

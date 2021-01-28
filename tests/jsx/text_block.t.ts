@@ -22,7 +22,7 @@ it('Should split too long lines into chunks', async t => {
     block3.push('1'.repeat(10))
     block3.push('1'.repeat(10))
 
-    t.is(block3.toString(), '1'.repeat(10) + '\n' + '1'.repeat(10))
+    t.is(block3.toString(), '1'.repeat(10) + '\n' + '1'.repeat(10), 'block3')
 
     //-------------------
     const block4    = TextBlock.new({ maxLen : 10 })
@@ -62,6 +62,11 @@ it('Should support indent/oudent', async t => {
     block1.push('1'.repeat(7))
 
     t.is(block1.toString(), '1'.repeat(10) + '\n' + '  ' + '1'.repeat(5), 'Content of the next line has been indented')
+
+    //--------------
+    block1.outdent()
+
+    block1.push('1'.repeat(8))
+
+    t.is(block1.toString(), '1'.repeat(10) + '\n' + '  ' + '1'.repeat(8) + '\n' + '1'.repeat(5), 'Content of the next line has been indented')
 })
-
-

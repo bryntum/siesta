@@ -28,7 +28,7 @@ export class Visitor extends Mixin(
 
 
         visit (value : unknown, depth : number = 0) {
-            if (depth > this.maxDepth) {
+            if (depth >= this.maxDepth) {
                 return this.visitOutOfDepthValue(value, depth + 1)
             }
             else if (isAtomicValue(value)) {
