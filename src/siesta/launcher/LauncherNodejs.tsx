@@ -81,20 +81,36 @@ export class LauncherNodejs extends Mixin(
                 exitCode        : ExitCodes.INCORRECT_ARGUMENTS,
                 annotation      : <div>
                     <p><span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url </span></p>
-                    <unl>
+                    <div>
                         You can specify the project file location with <span class="option_name">--project</span> option
                         or by providing a positional argument:
-                        <li>
+                        <p class="indented">
                             npx siesta --project ./siesta.js
-                        </li>
-                        <li>
+                        </p>
+                        <p class="indented">
                             npx siesta ./siesta.js --some_option=1
-                        </li>
-                    </unl>
-                </div>,
+                        </p>
+                    </div>
+                </div>
             })
 
             if (!this.project) this.project = this.argv[ 0 ]
+        }
+
+
+        onLauncherError (e : LauncherError) {
+            super.onLauncherError(e)
+
+            process.exitCode = e.exitCode
+        }
+
+
+        onUnknownError (e : unknown) {
+            super.onUnknownError(e)
+
+            console.log('Unhandled exception:', e)
+
+            process.exit(ExitCodes.UNHANLED_EXCEPTION)
         }
 
 
@@ -106,6 +122,8 @@ export class LauncherNodejs extends Mixin(
         async setupInner () {
             await super.setupInner()
 
+            const projectUrl        = this.prepareProjectFileUrl(this.project)
+
             // `projectDescriptor` might be already provided
             // if project file is launched directly as node executable
             if (!this.projectDescriptor) {
@@ -116,15 +134,13 @@ export class LauncherNodejs extends Mixin(
                 const parentPort            = channel.parentPort
 
                 try {
-                    const projectUrl        = this.prepareProjectFileUrl(this.project)
-
                     this.projectDescriptor  = await parentPort.extractProject(projectUrl)
-
-                    this.projectDescriptor.projectPlan.url   = projectUrl.replace(/\/[^/]*?$/, '')
                 } finally {
                     await parentPort.disconnect()
                 }
             }
+
+            this.projectDescriptor.projectPlan.url   = projectUrl.replace(/\/[^/]*?$/, '')
         }
 
 

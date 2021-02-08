@@ -13,24 +13,8 @@ const launcher  = LauncherNodejs.new({
     inputArguments      : process.argv.slice(2)
 })
 
-try {
-    // we just set the `exitCode` property and not call `process.exit()` directly,
-    // because some output might not be processed yet
-    const launch        = await launcher.start()
+const launch        = await launcher.start()
 
-    process.exitCode    = launch.getExitCode()
-} catch (e) {
-    if (e instanceof LauncherError) {
-        e.annotation && launcher.write(e.annotation)
-
-        process.exitCode = e.exitCode
-
-        // process._getActiveHandles();
-        // process._getActiveRequests()
-
-    } else {
-        console.log('Unhandled exception:', e)
-
-        process.exit(ExitCodes.UNHANLED_EXCEPTION)
-    }
-}
+// we just set the `exitCode` property and not call `process.exit()` directly,
+// because some output might not be processed yet
+process.exitCode    = process.exitCode ?? launch.getExitCode()

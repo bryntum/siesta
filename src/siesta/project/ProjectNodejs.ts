@@ -14,7 +14,7 @@ export class ProjectNodejs extends Mixin(
 
     class ProjectNodejs extends base {
 
-        launcherClass           : typeof Launcher           = LauncherNodejs
+        launcherClass           : typeof LauncherNodejs     = LauncherNodejs
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptorNodejs
 
         // buildBaseUrl () : string {
@@ -24,6 +24,19 @@ export class ProjectNodejs extends Mixin(
 
         buildInputArguments () : string[] {
             return process.argv.slice(2)
+        }
+
+
+        getStandaloneLauncher () : LauncherNodejs {
+            const launcher = this.launcherClass.new({
+                projectDescriptor       : this.asProjectDescriptor(),
+
+                inputArguments          : this.buildInputArguments(),
+
+                project                 : process.argv[ 1 ]
+            })
+
+            return launcher
         }
 
 

@@ -153,10 +153,28 @@ export class Launcher extends Mixin(
 
 
         async start () : Promise<Launch> {
-            // need to await for setup, because `projectDescriptor` might not be available yet
-            await this.performSetup()
+            try {
+                // need to await for setup, because `projectDescriptor` might not be available yet
+                await this.performSetup()
 
-            return await this.launch(this.projectDescriptor.projectPlan.leavesAxis())
+                return await this.launch(this.projectDescriptor.projectPlan.leavesAxis())
+            } catch (e) {
+                if (e instanceof LauncherError) {
+                    this.onLauncherError(e)
+                } else {
+                    this.onUnknownError(e)
+                }
+
+            }
+        }
+
+
+        onLauncherError (e : LauncherError) {
+            e.annotation && this.write(e.annotation)
+        }
+
+
+        onUnknownError (e : unknown) {
         }
 
 

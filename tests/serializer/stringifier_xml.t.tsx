@@ -1,6 +1,5 @@
 import { it } from "../../main.js"
 import { SiestaJSX } from "../../src/jsx/Factory.js"
-import { Serializer } from "../../src/serializer/Serializer.js"
 import { SerializerXml } from "../../src/serializer/SerializerXml.js"
 import { StringifierXml } from "../../src/serializer/StringifierXml.js"
 
@@ -188,7 +187,7 @@ it('Should show "out of depth" symbol', async t => {
         StringifierXml.stringify(serializedObject, { prettyPrint : true, maxLen : 50, indentLevel : 2 }),
 `{
   "prop1": 1,
-  "prop2": 🠗 Object { ... }
+  "prop2": ▼ Object { ... }
 }`,
         'Stringification of object with "out of depth" entry value'
     )

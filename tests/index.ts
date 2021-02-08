@@ -7,20 +7,20 @@ const project = ProjectIsomorphic.new({
 })
 
 project.plan(
-    // {
-    //     filename       : 'uniqable',
-    //
-    //     items       : [
-    //         'uniqable.t.js',
-    //     ]
-    // },
-    // {
-    //     filename       : 'hook',
-    //
-    //     items       : [
-    //         'hook.t.js',
-    //     ]
-    // },
+    {
+        filename       : 'uniqable',
+
+        items       : [
+            'uniqable.t.js',
+        ]
+    },
+    {
+        filename       : 'hook',
+
+        items       : [
+            'hook.t.js',
+        ]
+    },
     {
         filename    : 'jsx',
 
@@ -28,35 +28,35 @@ project.plan(
             'text_block.t.js'
         ]
     },
-    // {
-    //     filename       : 'chained_iterator',
-    //
-    //     items       : [
-    //         'chained_iterator.t.js',
-    //     ]
-    // },
-    // {
-    //     filename       : 'class',
-    //
-    //     items       : [
-    //         'mixin.t.js',
-    //         'mixin_caching.t.js'
-    //     ]
-    // },
-    // {
-    //     filename    : 'channel',
-    //
-    //     items       : [
-    //         'channel.t.js'
-    //     ]
-    // },
-    // {
-    //     filename    : 'serializable',
-    //
-    //     items       : [
-    //         'serializable.t.js'
-    //     ]
-    // },
+    {
+        filename       : 'chained_iterator',
+
+        items       : [
+            'chained_iterator.t.js',
+        ]
+    },
+    {
+        filename       : 'class',
+
+        items       : [
+            'mixin.t.js',
+            'mixin_caching.t.js'
+        ]
+    },
+    {
+        filename    : 'channel',
+
+        items       : [
+            'channel.t.js'
+        ]
+    },
+    {
+        filename    : 'serializable',
+
+        items       : [
+            'serializable.t.js'
+        ]
+    },
     {
         filename    : 'serializer',
 
@@ -66,27 +66,27 @@ project.plan(
             'stringifier_xml.t.js'
         ]
     },
-    // {
-    //     filename    : 'compare_deep',
-    //
-    //     items       : [
-    //         'compare_deep.t.js'
-    //     ]
-    // },
-    // {
-    //     filename    : 'options',
-    //
-    //     items       : [
-    //         'parse_options.t.js'
-    //     ]
-    // },
-    // {
-    //     filename    : 'siesta',
-    //
-    //     items       : [
-    //         'test_descriptor.t.js'
-    //     ]
-    // },
+    {
+        filename    : 'compare_deep',
+
+        items       : [
+            'compare_deep.t.js'
+        ]
+    },
+    {
+        filename    : 'options',
+
+        items       : [
+            'parse_options.t.js'
+        ]
+    },
+    {
+        filename    : 'siesta',
+
+        items       : [
+            'test_descriptor.t.js'
+        ]
+    },
 )
 
 project.start()

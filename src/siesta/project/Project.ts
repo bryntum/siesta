@@ -59,12 +59,19 @@ export class Project extends Mixin(
         }
 
 
-        async launchStandalone () : Promise<Launcher> {
-            const launcher  = this.launcherClass.new({
+        getStandaloneLauncher () : Launcher {
+            const launcher = this.launcherClass.new({
                 projectDescriptor       : this.asProjectDescriptor(),
 
                 inputArguments          : this.buildInputArguments()
             })
+
+            return launcher
+        }
+
+
+        async launchStandalone () : Promise<Launcher> {
+            const launcher  = this.getStandaloneLauncher()
 
             await launcher.start()
 

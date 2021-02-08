@@ -22,7 +22,7 @@ export class TextBlock extends Base {
 
     currentIndentation      : string            = ''
 
-    atNewLine               : boolean           = false
+    atNewLine               : boolean           = true
 
 
     initialize (props) {
@@ -130,10 +130,7 @@ export class TextBlock extends Base {
     pullFrom (another : TextBlock) {
         another.text.forEach((line, index, array) => {
             if (index === 0) {
-                this.textLength[ this.textLength.length - 1 ] += another.textLength[ 0 ] - another.reserved
-
-                this.lastLineBuffer.push(line.join('').replace(this.reserveChar.repeat(another.reserved), ''))
-
+                this.push(line.join('').replace(this.reserveChar.repeat(another.reserved), ''))
             } else {
                 this.text.push(line)
                 this.textLength.push(another.textLength[ index ])
