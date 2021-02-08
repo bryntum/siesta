@@ -1,5 +1,6 @@
 import { Base } from "../class/Base.js"
 import { saneSplit } from "../util/Helpers.js"
+import { stripAnsiControlCharacters } from "../util_nodejs/Terminal.js"
 import { Colorer } from "./Colorer.js"
 
 
@@ -7,9 +8,13 @@ import { Colorer } from "./Colorer.js"
 export class TextBlock extends Base {
     maxLen                  : number            = Number.MAX_SAFE_INTEGER
 
-    minContentWidth         : number            = 2
+    reserveChar             : string            = String.fromCharCode(0)
+    reserved                : number            = 0
+
+    // minContentWidth         : number            = 2
 
     text                    : string[][]        = [ [ '' ] ]
+    textLength              : number[]          = [ 0 ]
 
     indentLevel             : number            = 0
 
@@ -24,11 +29,15 @@ export class TextBlock extends Base {
         super.initialize(props)
 
         this.initIndent()
+
+        this.push(this.reserveChar.repeat(this.reserved))
     }
 
 
     initIndent () {
         this.indentationString          = ' '.repeat(this.indentLevel)
+
+        // if (this.maxLen < this.minContentWidth) this.maxLen = this.minContentWidth
     }
 
 
@@ -58,51 +67,47 @@ export class TextBlock extends Base {
 
 
     pushToLastLineBuffer (str : string) {
+        if (str === '') return
+
         if (this.atNewLine) {
-            this.lastLineBuffer.push(this.currentIndentation)
             this.atNewLine = false
+
+            this.lastLineBuffer.push(this.currentIndentation)
+            this.textLength[ this.textLength.length - 1 ] += this.currentIndentation.length
         }
 
         this.lastLineBuffer.push(str)
+
+        this.textLength[ this.textLength.length - 1 ] += stripAnsiControlCharacters(str).length
     }
 
 
     addSameLineText (str : string) {
-        if (str === '') return
-
         this.joinLastLine()
 
-        if (this.lastLine.length + str.length < this.maxLen) {
-            this.pushToLastLineBuffer(str)
-        } else {
-            let insertPos       = this.lastLine.length
-            let sourcePos       = 0
+        let sourcePos       = 0
 
-            if (insertPos === this.maxLen) {
-                this.addNewLine()
-                insertPos       = 0
-            }
+        while (sourcePos < str.length) {
+            const insertPos     = this.atNewLine ? this.currentIndentation.length : this.textLength[ this.textLength.length - 1 ]
 
-            while (sourcePos < str.length) {
-                let lenToInsert   = this.maxLen - insertPos
+            const lenToInsert   = this.maxLen - insertPos
 
-                if (lenToInsert < this.minContentWidth) lenToInsert = this.minContentWidth
+            // if (lenToInsert < this.minContentWidth) lenToInsert = this.minContentWidth
 
-                const toInsert  = str.substr(sourcePos, lenToInsert)
+            const toInsert      = str.substr(sourcePos, lenToInsert)
 
-                this.pushToLastLineBuffer(toInsert)
-                if (sourcePos + lenToInsert < str.length) this.addNewLine()
+            this.pushToLastLineBuffer(toInsert)
 
-                insertPos       = this.currentIndentation.length
+            if (sourcePos + lenToInsert < str.length) this.addNewLine()
 
-                sourcePos       += lenToInsert
-            }
+            sourcePos           += lenToInsert
         }
     }
 
 
     addNewLine () {
         this.text.push([ '' ])
+        this.textLength.push(0)
 
         this.atNewLine      = true
     }
@@ -123,11 +128,17 @@ export class TextBlock extends Base {
 
 
     pullFrom (another : TextBlock) {
-        const [ firstLine, ...otherLines ]  = another.text
+        another.text.forEach((line, index, array) => {
+            if (index === 0) {
+                this.textLength[ this.textLength.length - 1 ] += another.textLength[ 0 ] - another.reserved
 
-        this.text[ this.text.length - 1 ].push(...firstLine)
+                this.lastLineBuffer.push(line.join('').replace(this.reserveChar.repeat(another.reserved), ''))
 
-        this.text.push(...otherLines)
+            } else {
+                this.text.push(line)
+                this.textLength.push(another.textLength[ index ])
+            }
+        })
     }
 
 
@@ -146,6 +157,8 @@ export class TextBlock extends Base {
         const indenterWithMarker    = ' '.repeat(howMany - 2) + '· '
 
         this.text.forEach((line, index) => {
+            this.textLength[ index ]    += howMany
+
             if (index === 0 && includeMarker) {
                 line.unshift(indenterWithMarker)
             } else {
@@ -160,6 +173,8 @@ export class TextBlock extends Base {
         const indenterTree      = '─'.repeat(howMany - 1)
 
         this.text.forEach((line, index) => {
+            this.textLength[ index ]    += howMany
+
             if (index === 0) {
                 line.unshift(c.text(isLast ? '└' + indenterTree : '├' + indenterTree))
             } else {

@@ -1,9 +1,10 @@
 import { Base } from "../../class/Base.js"
 import { CI } from "../../iterator/Iterator.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
-import { Serializer } from "../../serializer/Serializer.js"
+import { SerializerXml } from "../../serializer/SerializerXml.js"
+import { StringifierXml } from "../../serializer/StringifierXml.js"
 import { TreeNode } from "../../tree/TreeNode.js"
-import { ArbitraryObject, cloneObject, objectEntriesDeep, typeOf } from "../../util/Helpers.js"
+import { ArbitraryObject, cloneObject, objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { IsolationLevel } from "../common/IsolationLevel.js"
 import { HasOptions, option } from "../launcher/Option.js"
@@ -37,7 +38,8 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
     @option({ defaultValue : false })
     autoCheckGlobals    : boolean
 
-    serializerConfig    : Partial<Serializer>   = { maxWide : 4, maxDepth : 4, prettyPrint : true }
+    serializerConfig    : Partial<SerializerXml>   = { maxWide : 4, maxDepth : 4 }
+    stringifierConfig   : Partial<StringifierXml>  = { prettyPrint : true }
 
 
     planItem (item : TestDescriptor) : TestDescriptor {

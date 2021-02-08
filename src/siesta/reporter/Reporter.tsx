@@ -16,7 +16,9 @@ import { randomSpinner, Spinner } from "./Spinner.js"
 export class ReporterTheme extends Base {
     reporter    : Reporter              = undefined
 
-    progressBarTotalLength : number     = 50
+    get progressBarTotalLength () : number {
+        return Math.min(this.reporter.getMaxLen() - this.spinner().length - 2, 50)
+    }
 
 
     get c () : Colorer {

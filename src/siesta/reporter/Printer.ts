@@ -21,8 +21,13 @@ export class Printer extends Mixin(
         }
 
 
+        getMaxLen () : number {
+            return Number.MAX_SAFE_INTEGER
+        }
+
+
         write (el : XmlElement) {
-            this.printLn(this.render(el).toString())
+            this.printLn(this.render(el, this.getMaxLen()).toString())
         }
     }
 

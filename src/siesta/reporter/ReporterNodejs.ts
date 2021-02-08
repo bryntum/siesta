@@ -21,6 +21,11 @@ export class ReporterNodejs extends Mixin(
         spinnerChars    : number                        = 0
 
 
+        getMaxLen () : number {
+            return process.stdout.columns ?? Number.MAX_SAFE_INTEGER
+        }
+
+
         print (str : string) {
             process.stdout.write(str)
 

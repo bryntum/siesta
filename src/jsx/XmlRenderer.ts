@@ -1,5 +1,6 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { StringifierXml } from "../serializer/StringifierXml.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { TextBlock } from "./TextBlock.js"
@@ -15,44 +16,53 @@ export class XmlRenderer extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class XmlRenderer extends base {
-        styles      : Map<string, ColorerRule>  = styles
+        styles                  : Map<string, ColorerRule>  = styles
 
-        c           : Colorer       = ColorerNoop.new()
+        c                       : Colorer       = ColorerNoop.new()
 
-        treeIndentationLevel        : number    = 2
+        indentLevel             : number        = 2
 
-        blockLevelElements          : Set<string> = new Set([
+        blockLevelElements      : Set<string>   = new Set([
             'div', 'ul', 'unl', 'li', 'tree', 'leaf', 'p'
         ])
 
 
-        render (el : XmlNode, maxLength : number = Number.MAX_SAFE_INTEGER) : TextBlock {
-            const res   = TextBlock.new()
+        isSubBlockIndented (el : XmlElement, node : XmlNode) : boolean {
+            if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {
+                return true
+            }
 
+            if (el.tagName === 'unl' && !isString(node) && node.tagName === 'li') {
+                return true
+            }
+
+            if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
+                return true
+            }
+
+            return false
+        }
+
+
+        render (el : XmlNode, maxLen : number = Number.MAX_SAFE_INTEGER, reserved : number = 0) : TextBlock {
             if (isString(el)) {
+                const res   = TextBlock.new({ maxLen, reserved })
+
                 res.push(el)
+
+                return res
+            }
+            else if (el.tagName === 'serialization') {
+                return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
             } else {
+                const res   = TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved })
+
+                if (el.hasClass('indented')) res.indent()
+
                 let context : 'inline' | 'opened_block' | 'closed_block' = 'opened_block'
 
                 el.childNodes.forEach((node, index, array) => {
                     const isLast        = index === array.length - 1
-                    const block         = this.render(node)
-
-                    if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {
-                        block.indentMut(this.treeIndentationLevel, true)
-                    }
-
-                    if (el.tagName === 'unl' && !isString(node) && node.tagName === 'li') {
-                        block.indentMut(this.treeIndentationLevel, false)
-                    }
-
-                    if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
-                        const attr          = el.getAttribute('isLastNode')
-
-                        const isLastNode    = attr !== undefined ? attr && isLast : isLast
-
-                        block.indentAsTreeLeafMut(this.treeIndentationLevel, isLastNode, this.styles.get('tree_line')(this.c))
-                    }
 
                     if (this.getDisplayType(node) === 'inline') {
                         context             = 'inline'
@@ -66,16 +76,37 @@ export class XmlRenderer extends Mixin(
                         }
                     }
 
+                    const block         = this.render(
+                        node,
+                        maxLen - (this.isSubBlockIndented(el, node) ? this.indentLevel : 0),
+                        context === 'inline' ? res.textLength[ res.textLength.length - 1 ] : 0
+                    )
+
+                    if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {
+                        block.indentMut(this.indentLevel, true)
+                    }
+
+                    if (el.tagName === 'unl' && !isString(node) && node.tagName === 'li') {
+                        block.indentMut(this.indentLevel, false)
+                    }
+
+                    if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
+                        const attr          = el.getAttribute('isLastNode')
+
+                        const isLastNode    = attr !== undefined ? attr && isLast : isLast
+
+                        block.indentAsTreeLeafMut(this.indentLevel, isLastNode, this.styles.get('tree_line')(this.c))
+                    }
+
                     res.pullFrom(block)
                 })
 
                 res.colorizeMut(this.getRulesFor(el).reduce((colorer, rule) => rule(colorer), this.c))
 
-                if (el.hasClass('indented')) res.indentMut(this.treeIndentationLevel, false)
                 if (el.hasClass('underlined')) res.colorizeMut(this.c.underline)
-            }
 
-            return res
+                return res
+            }
         }
 
 

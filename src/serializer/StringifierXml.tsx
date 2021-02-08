@@ -11,7 +11,7 @@ export class StringifierXml extends Mixin(
     class StringifierXml extends base {
         maxLen                  : number        = Number.MAX_SAFE_INTEGER
 
-        outOfDepthSymbol        : string        = '🠗'
+        outOfDepthSymbol        : string        = '▼'
         outOfWideSymbol         : string        = '...'
 
         indentLevel             : number        = 0
@@ -24,17 +24,6 @@ export class StringifierXml extends Mixin(
             'number', 'string', 'date', 'regexp', 'symbol', 'function'
         ])
 
-        inObject                : boolean       = false
-        objectHasEntries        : boolean       = false
-
-
-        initialize (props) {
-            super.initialize(props)
-
-            this.output.indentLevel     = this.indentLevel
-            this.output.initIndent()
-        }
-
 
         write (str : string) {
             this.output.push(str)
@@ -42,8 +31,16 @@ export class StringifierXml extends Mixin(
 
 
         stringify (value : XmlElement) {
-            this.output.maxLen      = this.maxLen
+            this.output.maxLen          = this.maxLen
+            this.output.indentLevel     = this.indentLevel
 
+            this.output.initIndent()
+
+            this.walk(value.childNodes[ 0 ] as XmlElement, 0, value)
+        }
+
+
+        stringifyToProvidedOutput (value : XmlElement) {
             this.walk(value.childNodes[ 0 ] as XmlElement, 0, value)
         }
 
@@ -213,6 +210,15 @@ export class StringifierXml extends Mixin(
             stringifier.stringify(value)
 
             return stringifier.toString()
+        }
+
+
+        static stringifyToProvidedOutput <T extends typeof StringifierXml> (this : T, value : XmlElement, props? : Partial<InstanceType<T>>) {
+            if (!props.output) throw new Error("`output` config is required")
+
+            const stringifier = this.new(props)
+
+            stringifier.stringifyToProvidedOutput(value)
         }
 
 
