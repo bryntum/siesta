@@ -104,7 +104,6 @@ export class Launcher extends Mixin(
         optionsBag          : OptionsBag            = undefined
 
         reporterClass       : typeof Reporter       = undefined
-        colorerClass        : typeof Colorer        = ColorerNoop
 
         projectDescriptor   : ProjectDescriptor     = undefined
 
@@ -187,12 +186,21 @@ export class Launcher extends Mixin(
         }
 
 
+        onLauncherOptionsAvailable () {
+
+        }
+
+
         prepareLauncherOptions () {
             this.optionsBag     = OptionsBag.new({ input : this.inputArguments })
 
             const extractRes    = this.optionsBag.extractOptions(
                 CI(objectEntriesDeep(this.$options)).map(entry => { return entry[ 1 ] as Option }).toArray()
             )
+
+            extractRes.values.forEach((value, option) => option.applyValue(this, value))
+
+            this.onLauncherOptionsAvailable()
 
             extractRes.errors.forEach(error => {
                 this.write(optionErrorTemplateByCode.get(error.error)(error))
@@ -203,8 +211,6 @@ export class Launcher extends Mixin(
             })
 
             if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
-
-            extractRes.values.forEach((value, option) => option.applyValue(this, value))
 
             this.include    = this.include.map(pattern => new RegExp(pattern))
             this.exclude    = this.exclude.map(pattern => new RegExp(pattern))

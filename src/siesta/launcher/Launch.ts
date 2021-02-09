@@ -55,7 +55,7 @@ export class Launch extends Mixin(
 
 
         async setup () {
-            this.reporter       = this.launcher.reporterClass.new({ c : this.launcher.colorerClass.new(), launch : this })
+            this.reporter       = this.launcher.reporterClass.new({ colorerClass : this.launcher.colorerClass, launch : this })
         }
 
 

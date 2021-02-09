@@ -3,6 +3,7 @@ import { fileURLToPath } from "url"
 import { Channel } from "../../channel/Channel.js"
 import { ChannelNodeIpc } from "../../channel/ChannelNodeIpc.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
 import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
@@ -36,10 +37,8 @@ export class LauncherNodejs extends Mixin(
                 Whether to suppress the output coloring. Automatically enforced if output stream is not a terminal.
             </div>
         })
-        noColor         : boolean           = false
+        noColor         : boolean               = false
 
-
-        c               : Colorer               = ColorerNodejs.new()
 
         reporterClass   : typeof Reporter       = ReporterNodejs
         colorerClass    : typeof Colorer        = ColorerNodejs
@@ -69,6 +68,13 @@ export class LauncherNodejs extends Mixin(
 
                 class ChannelProjectExtractorImplementation extends base {}
             ) {}
+        }
+
+
+        onLauncherOptionsAvailable () {
+            super.onLauncherOptionsAvailable()
+
+            if (this.noColor || !process.stdout.isTTY) this.colorerClass    = ColorerNoop
         }
 
 

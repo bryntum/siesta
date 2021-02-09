@@ -18,13 +18,22 @@ export class XmlRenderer extends Mixin(
     class XmlRenderer extends base {
         styles                  : Map<string, ColorerRule>  = styles
 
-        c                       : Colorer       = ColorerNoop.new()
-
         indentLevel             : number        = 2
 
         blockLevelElements      : Set<string>   = new Set([
             'div', 'ul', 'unl', 'li', 'tree', 'leaf', 'p'
         ])
+
+
+        colorerClass            : typeof Colorer    = ColorerNoop
+
+        $c              : Colorer   = undefined
+
+        get c () : Colorer {
+            if (this.$c !== undefined) return this.$c
+
+            return this.$c  = this.colorerClass.new()
+        }
 
 
         isSubBlockIndented (el : XmlElement, node : XmlNode) : boolean {

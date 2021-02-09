@@ -184,7 +184,6 @@ export class Reporter extends Mixin(
         resultsCompleted    : Set<TestNodeResult>       = new Set()
         resultsRunning      : Set<TestNodeResult>       = new Set()
 
-        c                   : Colorer                   = undefined
         t                   : ReporterTheme             = ReporterTheme.new({ reporter : this })
 
         spinner             : Spinner                   = randomSpinner()
