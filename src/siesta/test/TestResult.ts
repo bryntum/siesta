@@ -1,11 +1,11 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { XmlElement } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { escapeRegExp } from "../../util/Helpers.js"
-import { XmlElement } from "../../jsx/XmlElement.js"
-import { TestDescriptor } from "./TestDescriptor.js"
 import { LUID, luid } from "../common/LUID.js"
+import { TestDescriptor } from "./TestDescriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Result extends Mixin(
@@ -232,7 +232,7 @@ export class TestNodeResult extends Mixin(
             let passed : boolean    = true
 
             this.resultLog.forEach(result => {
-                if (result instanceof Exception) passed = false
+                if ((result instanceof Exception) && !this.isTodo) passed = false
 
                 if ((result instanceof Assertion) && !result.passed && !this.isTodo) passed = false
 
@@ -276,7 +276,10 @@ export class TestNodeResult extends Mixin(
         get isTodo () : boolean {
             if (this.$isTodo !== undefined) return this.$isTodo
 
-            return this.$isTodo = this.descriptor.isTodo || (this.descriptor.snooze && this.descriptor.snooze < new Date() || false)
+            const snoozeConfig      = new Date(this.descriptor.snooze)
+            const snoozeDate        = isNaN(snoozeConfig.getTime()) ? undefined : snoozeConfig
+
+            return this.$isTodo = this.descriptor.isTodo || (snoozeDate && (snoozeDate > new Date()) || false)
         }
 
         set isTodo (value : boolean) {

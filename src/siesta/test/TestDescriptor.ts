@@ -31,8 +31,8 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
     @option({ type : 'boolean', defaultValue : false })
     isTodo          : boolean
 
-    @option(/*{ type : 'date' }*/)
-    snooze          : Date
+    @option({ type : 'string' })
+    snooze          : string | Date
 
     @option()
     isolation       : IsolationLevel

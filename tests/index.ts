@@ -87,6 +87,7 @@ project.plan(
             'test_descriptor.t.js',
             'before_after_each.t.js',
             'todo_tests.t.js',
+            'snooze_tests.t.js'
         ]
     },
 )
