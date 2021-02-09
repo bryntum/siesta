@@ -106,7 +106,7 @@ export class Launcher extends Mixin(
         reporterClass       : typeof Reporter       = undefined
         colorerClass        : typeof Colorer        = ColorerNoop
 
-        projectDescriptor   : ProjectDescriptor = undefined
+        projectDescriptor   : ProjectDescriptor     = undefined
 
         // channelConstructors     : (typeof Channel)[]      = []
 
@@ -118,22 +118,24 @@ export class Launcher extends Mixin(
             group       : OptionsGroupFiltering,
             structure   : "array",
             help        : <span>
-                This option specifies a RegExp source, to which the test file URL needs to match, to be <span class="accented">included</span> in the suite launch.
+                This option specifies a RegExp source, to which the test file URL needs to match,
+                to be <span class="accented">included</span> in the suite launch.
                 It can be repeated multiple times, meaning the URL to be included can match any of the provided RegExps.
             </span>
         })
-        include         : string[]          = []
+        include         : RegExp[]          = []
 
         @option({
             group       : OptionsGroupFiltering,
             type        : 'string',
             structure   : "array",
             help        : <span>
-                This option specifies a RegExp source, to which the test file URL needs to match, to be <span class="accented">excluded</span> in the suite launch.
+                This option specifies a RegExp source, to which the test file URL needs to match,
+                to be <span class="accented">excluded</span> in the suite launch.
                 It can be repeated multiple times, meaning the URL to be excluded can match any of the provided RegExps.
             </span>
         })
-        exclude         : string[]          = []
+        exclude         : RegExp[]          = []
 
         @option({
             type        : 'string',
@@ -157,7 +159,7 @@ export class Launcher extends Mixin(
                 // need to await for setup, because `projectDescriptor` might not be available yet
                 await this.performSetup()
 
-                return await this.launch(this.projectDescriptor.projectPlan.leavesAxis())
+                return await this.launch(this.getDescriptorsToLaunch())
             } catch (e) {
                 if (e instanceof LauncherError) {
                     this.onLauncherError(e)
@@ -165,6 +167,14 @@ export class Launcher extends Mixin(
                     this.onUnknownError(e)
                 }
             }
+        }
+
+
+        getDescriptorsToLaunch () : TestDescriptor[] {
+            return this.projectDescriptor.projectPlan.leavesAxis().filter(descriptor => {
+                return (this.include.length === 0 || this.include.some(pattern => pattern.test(descriptor.flatten.url)))
+                    && (this.exclude.length === 0 || !this.exclude.some(pattern => pattern.test(descriptor.flatten.url)))
+            })
         }
 
 
@@ -195,6 +205,9 @@ export class Launcher extends Mixin(
             if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
             extractRes.values.forEach((value, option) => option.applyValue(this, value))
+
+            this.include    = this.include.map(pattern => new RegExp(pattern))
+            this.exclude    = this.exclude.map(pattern => new RegExp(pattern))
         }
 
 

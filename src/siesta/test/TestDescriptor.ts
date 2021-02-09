@@ -71,7 +71,11 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
     }
 
 
-    flatten () : this {
+    $flatten        : this      = undefined
+
+    get flatten () : this {
+        if (this.$flatten !== undefined) return this.$flatten
+
         if (this.childNodes) throw new Error("Can only flatten leaf descriptors, not groups")
 
         const descriptor        = cloneObject(this)
@@ -99,7 +103,7 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
             descriptor[ key ]   = reducer(key, parentsAxis)
         })
 
-        return descriptor
+        return this.$flatten    = descriptor
     }
 
 
