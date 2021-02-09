@@ -4,7 +4,7 @@
 // for example:
 // - common "event" feature is filtering the same listeners
 //   but how often did you actually experience a case when you had to subscribe to event
-//   with same listener? Its most probably code smell. If its still valid, then solve it
+//   with same listener? Its most probably code smell. If its still a valid concern, then solve it
 //   with a flag
 // - another common "event" feature is having "scope" argument for listener
 //   then you may have same listeners with different scope, which makes implementation
