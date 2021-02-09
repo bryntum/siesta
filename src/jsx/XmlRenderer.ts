@@ -100,9 +100,9 @@ export class XmlRenderer extends Mixin(
                     }
 
                     if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
-                        const attr          = el.getAttribute('isLastNode')
+                        const attr          = el.getAttribute('isTopLevelLastNode')
 
-                        const isLastNode    = attr !== undefined ? attr && isLast : isLast
+                        const isLastNode    = attr !== null ? attr && isLast : isLast
 
                         block.indentAsTreeLeafMut(this.indentLevel, isLastNode, this.styles.get('tree_line')(this.c))
                     }

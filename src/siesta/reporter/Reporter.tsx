@@ -207,10 +207,10 @@ export class Reporter extends Mixin(
         }
 
 
-        testNodeTemplateXml (testNode : TestNodeResult, isLastNode : boolean = false) : XmlElement {
+        testNodeTemplateXml (testNode : TestNodeResult, isTopLevelLastNode : boolean | null = null) : XmlElement {
             let node : XmlElement       = <tree></tree>
 
-            node.setAttribute('isLastNode', isLastNode)
+            node.setAttribute('isTopLevelLastNode', isTopLevelLastNode)
 
             if (testNode.isRoot) {
                 node.appendChild(this.t.testNodeState(testNode), ' ', this.t.testNodeUrl(testNode))
@@ -230,7 +230,7 @@ export class Reporter extends Mixin(
                         :
                             (result instanceof TestNodeResult)
                                 ?
-                                    this.testNodeTemplateXml(result, isLast)
+                                    this.testNodeTemplateXml(result)
                                 :
                                 (result instanceof LogMessage)
                                     ?
