@@ -15,8 +15,8 @@ export class ChannelSameContext extends Mixin(
 
             childPort               : Port                  = undefined
 
-            parentMedia             : Media                 = undefined
-            childMedia              : Media                 = undefined
+            parentMedia             : MediaSameContext      = undefined
+            childMedia              : MediaSameContext      = undefined
 
             mediaClass              : typeof MediaSameContext   = MediaSameContext
 

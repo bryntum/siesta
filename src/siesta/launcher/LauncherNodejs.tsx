@@ -2,6 +2,7 @@ import path from 'path'
 import { fileURLToPath } from "url"
 import { Channel } from "../../channel/Channel.js"
 import { ChannelNodeIpc } from "../../channel/ChannelNodeIpc.js"
+import { ChannelSameContext } from "../../channel/ChannelSameContext.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
@@ -63,9 +64,10 @@ export class LauncherNodejs extends Mixin(
         get projectExtractorChannelClass () : typeof ChannelProjectExtractor {
             if (this.$projectExtractorChannelClass !== undefined) return this.$projectExtractorChannelClass
 
+            // TODO this should use other channel, when launching browser project
             return this.$projectExtractorChannelClass = class ChannelProjectExtractorImplementation extends Mixin(
-                [ ChannelProjectExtractor, this.targetContextChannelClass ],
-                (base : ClassUnion<typeof ChannelProjectExtractor, typeof Channel>) =>
+                [ ChannelProjectExtractor, ChannelSameContext ],
+                (base : ClassUnion<typeof ChannelProjectExtractor, typeof ChannelSameContext>) =>
 
                 class ChannelProjectExtractorImplementation extends base {}
             ) {}
