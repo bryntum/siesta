@@ -1,6 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { CI } from "../../iterator/Iterator.js"
-import { serializable, Serializable } from "../../serializable/Serializable.js"
+import { include, serializable, Serializable } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { StringifierXml } from "../../serializer/StringifierXml.js"
 import { TreeNode } from "../../tree/TreeNode.js"
@@ -15,8 +15,11 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
     childNodeT      : TestDescriptor
     parentNode      : TestDescriptor
 
+    // TODO should support `name` alias (primary and recommended should be `title` to avoid
+    // confusion with `filename`
     title           : string                = ''
 
+    // TODO support `fileName` alias?
     filename        : string                = ''
 
     @option()
@@ -25,11 +28,17 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
     @option({ defaultValue : [] })
     tags            : string[]
 
-    @option({ defaultValue : false })
+    @option({ type : 'boolean', defaultValue : false })
     isTodo          : boolean
+
+    @option(/*{ type : 'date' }*/)
+    snooze          : Date
 
     @option()
     isolation       : IsolationLevel
+
+    @option({ type : 'boolean', defaultValue : false })
+    failOnIit           : boolean
 
     // will be applied directly to test instance
     @option()

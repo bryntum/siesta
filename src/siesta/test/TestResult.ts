@@ -202,6 +202,8 @@ export class TestNodeResult extends Mixin(
             // clear the `$childNodes` cache
             if (result instanceof TestNodeResult) this.$childNodes = undefined
 
+            this.$passed    = undefined
+
             this.resultLog.push(result)
             this.resultMap.set(result.localId, result)
 
@@ -232,9 +234,9 @@ export class TestNodeResult extends Mixin(
             this.resultLog.forEach(result => {
                 if (result instanceof Exception) passed = false
 
-                if ((result instanceof Assertion) && !result.passed) passed = false
+                if ((result instanceof Assertion) && !result.passed && !this.isTodo) passed = false
 
-                if ((result instanceof TestNodeResult) && !result.passed) passed = false
+                if ((result instanceof TestNodeResult) && !result.passed && !this.isTodo) passed = false
             })
 
             return this.$passed     = passed
@@ -266,6 +268,20 @@ export class TestNodeResult extends Mixin(
             if (rootFirst) parents.reverse()
 
             return parents
+        }
+
+
+        $isTodo           : boolean    = undefined
+
+        get isTodo () : boolean {
+            if (this.$isTodo !== undefined) return this.$isTodo
+
+            return this.$isTodo = this.descriptor.isTodo || (this.descriptor.snooze && this.descriptor.snooze < new Date() || false)
+        }
+
+        set isTodo (value : boolean) {
+            this.descriptor.isTodo      = value
+            this.$isTodo                = undefined
         }
     }
 

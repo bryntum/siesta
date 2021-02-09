@@ -85,7 +85,8 @@ project.plan(
 
         items       : [
             'test_descriptor.t.js',
-            'before_after_each.t.js'
+            'before_after_each.t.js',
+            'todo_tests.t.js',
         ]
     },
 )

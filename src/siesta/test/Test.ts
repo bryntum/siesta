@@ -109,11 +109,21 @@ export class Test extends Mixin(
         }
 
 
+        todo (name : TestDescriptorArgument, code : (t : this) => any) : this {
+            const test              = this.it(name, code)
+
+            test.descriptor.isTodo  = true
+
+            return test
+        }
+
+
         xit (name : TestDescriptorArgument, code : (t : this) => any) : this {
             const cls       = this.constructor as typeof Test
 
             const test      = cls.new()
 
+            // return a dummy test instance to keep the possibly dependent code happy
             return test as this
         }
 
@@ -129,6 +139,8 @@ export class Test extends Mixin(
 
         it (name : TestDescriptorArgument, code : (t : this) => any) : this {
             const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
+
+            if (this.isTodo) descriptor.isTodo  = true
 
             const cls       = this.constructor as typeof Test
 

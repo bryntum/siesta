@@ -193,14 +193,14 @@ export class Reporter extends Mixin(
 
         // failed assertions are always included (along with all their parent sub-tests)
         // otherwise, include everything at the specified `detail` level
-        needToShowResult (result : TestResult) : boolean {
+        needToShowResult (result : TestResult, isTodo : boolean) : boolean {
             if (result instanceof Assertion) {
-                return this.detail === 'assertion' ? true : !result.passed
+                return this.detail === 'assertion' ? true : isTodo ? false : !result.passed
             }
             else if (result instanceof TestNodeResult) {
                 if (this.detail === 'assertion') return true
 
-                return this.detail === 'subtest' ? true : !result.passed
+                return this.detail === 'subtest' ? true : isTodo ? false : !result.passed
             } else {
                 return true
             }
@@ -218,7 +218,7 @@ export class Reporter extends Mixin(
                 node.appendChild(this.t.testNodeState(testNode), ' ', this.c[ this.detail === 'assertion' ? 'underline' : 'noop' ].text(testNode.descriptor.title))
             }
 
-            const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result))
+            const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result, testNode.isTodo))
 
             nodesToShow.forEach((result, index) => {
                 const isLast            = index === nodesToShow.length - 1
