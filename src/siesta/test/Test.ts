@@ -46,6 +46,9 @@ export class Test extends Mixin(
         beforeEachHooks     : ((t : this) => any)[] = []
         afterEachHooks      : ((t : this) => any)[] = []
 
+        isExclusive         : boolean               = false
+
+        // not related to `before/afterEach` hooks, completely different thing
         startHook           : Hook<[ this ]>        = new Hook()
         finishHook          : Hook<[ this ]>        = new Hook()
 
@@ -103,6 +106,24 @@ export class Test extends Mixin(
                 passed          : false,
                 description
             }))
+        }
+
+
+        xit (name : TestDescriptorArgument, code : (t : this) => any) : this {
+            const cls       = this.constructor as typeof Test
+
+            const test      = cls.new()
+
+            return test as this
+        }
+
+
+        iit (name : TestDescriptorArgument, code : (t : this) => any) : this {
+            const test          = this.it(name, code)
+
+            test.isExclusive    = true
+
+            return test
         }
 
 
@@ -167,8 +188,11 @@ export class Test extends Mixin(
                 this.addResult(Exception.new({ exception }))
             }
 
-            while (this.pendingSubTests.length) {
-                const subTest       = this.pendingSubTests.shift()
+            const exclusiveSubTests = this.pendingSubTests.filter(subTest => subTest.isExclusive)
+            const subTestsToLaunch  = exclusiveSubTests.length > 0 ? exclusiveSubTests : this.pendingSubTests
+
+            while (subTestsToLaunch.length) {
+                const subTest       = subTestsToLaunch.shift()
 
                 this.addResult(subTest)
 
@@ -185,6 +209,15 @@ export class Test extends Mixin(
 
 
         async tearDown () {
+        }
+
+
+        static iit<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
+            const test          = this.it(name, code)
+
+            test.isExclusive    = true
+
+            return test
         }
 
 
@@ -206,6 +239,11 @@ export class Test extends Mixin(
 
         static describe<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
             return this.it(name, code)
+        }
+
+
+        static ddescribe<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
+            return this.iit(name, code)
         }
     }
 ) {}
@@ -236,3 +274,17 @@ export const it = (name : TestDescriptorArgument, code : (t : Test) => any) : Te
 }
 
 export const describe = it
+
+
+export const iit = (name : TestDescriptorArgument, code : (t : Test) => any) : Test => {
+    return Test.iit(name, code)
+}
+
+export const ddescribe = iit
+
+
+export const xit = (name : TestDescriptorArgument, code : (t : Test) => any) : Test => {
+    return Test.new()
+}
+
+export const xdescribe = iit
