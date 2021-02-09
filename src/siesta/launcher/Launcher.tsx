@@ -164,7 +164,6 @@ export class Launcher extends Mixin(
                 } else {
                     this.onUnknownError(e)
                 }
-
             }
         }
 

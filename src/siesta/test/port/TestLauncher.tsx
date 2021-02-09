@@ -54,6 +54,8 @@ export class TestLauncherChild extends Mixin(
                 try {
                     await import(testDescriptor.url)
                 } catch (e) {
+                    debugger
+
                     // there might be no `topTest` if test file does not contain any calls
                     // to static `it` method of any test class
                     topTest = globalTestEnv.topTest || Test.new({

@@ -32,6 +32,24 @@ export class ProjectBrowser extends Mixin(
             // TODO should extract search params from location.href here
             return []
         }
+
+
+        getStandaloneLauncher () : LauncherBrowser {
+            const launcher = this.launcherClass.new({
+                projectDescriptor       : this.asProjectDescriptor(),
+
+                inputArguments          : this.buildInputArguments()
+            })
+
+            const url           = new URL(window.location.href)
+
+            url.hash            = ''
+            url.search          = ''
+
+            launcher.projectDescriptor.projectPlan.url  = url.toString().replace(/\/[^/]*?$/, '')
+
+            return launcher
+        }
     }
 
     return ProjectBrowser
