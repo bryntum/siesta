@@ -3,10 +3,7 @@ import { Assertion } from "../../src/siesta/test/TestResult.js"
 
 //-------------------------------------------------------
 describe('Todo tests should not fail', t => {
-    t.it({
-        title   : 'Todo test',
-        isTodo  : true,
-    }, t => {
+    t.todo('Todo test', t => {
         t.is(1, 2, 'todo1')
 
         t.it('Nested test should become todo as well', t => {
