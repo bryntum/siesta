@@ -9,6 +9,7 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
+import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary } from "./Launcher.js"
 import { option } from "./Option.js"
 import { ChannelProjectExtractor } from "./ProjectExtractor.js"
@@ -40,7 +41,7 @@ export class LauncherNodejs extends Mixin(
         noColor         : boolean               = false
 
 
-        reporterClass   : typeof Reporter       = ReporterNodejs
+        reporterClass   : typeof Reporter       = ReporterNodejsTerminal
         colorerClass    : typeof Colorer        = ColorerNodejs
 
 
@@ -74,7 +75,10 @@ export class LauncherNodejs extends Mixin(
         onLauncherOptionsAvailable () {
             super.onLauncherOptionsAvailable()
 
-            if (this.noColor || !process.stdout.isTTY) this.colorerClass    = ColorerNoop
+            if (this.noColor || !process.stdout.isTTY) {
+                this.colorerClass       = ColorerNoop
+                this.reporterClass      = ReporterNodejs
+            }
         }
 
 
