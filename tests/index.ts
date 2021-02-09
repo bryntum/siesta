@@ -84,7 +84,8 @@ project.plan(
         filename    : 'siesta',
 
         items       : [
-            'test_descriptor.t.js'
+            'test_descriptor.t.js',
+            'before_after_each.t.js'
         ]
     },
 )

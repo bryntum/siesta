@@ -1,5 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { Hook } from "../../hook/Hook.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
@@ -41,6 +42,22 @@ export class Test extends Mixin(
         pendingSubTests     : Test[]                = []
 
         reporter            : TestReporterChild     = undefined
+
+        beforeEachHooks     : ((t : this) => any)[] = []
+        afterEachHooks      : ((t : this) => any)[] = []
+
+        startHook           : Hook<[ this ]>        = new Hook()
+        finishHook          : Hook<[ this ]>        = new Hook()
+
+
+        beforeEach (code : (t : this) => any) {
+            this.beforeEachHooks.push(code)
+        }
+
+
+        afterEach (code : (t : this) => any) {
+            this.afterEachHooks.push(code)
+        }
 
 
         addResult (result : TestResult) : TestResult {
@@ -119,11 +136,15 @@ export class Test extends Mixin(
         async start () {
             this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
+            this.startHook.trigger(this)
+
             if (this.isRoot) await this.setup()
 
             await this.launch()
 
             if (this.isRoot) await this.tearDown()
+
+            this.finishHook.trigger(this)
 
             this.reporter.onSubTestFinish(this.localId)
         }
@@ -133,6 +154,11 @@ export class Test extends Mixin(
         // need to figure out if we need to wait until all reports (`this.reporter.onXXX`)
         // has been completed or not, before completing the method
         async launch () {
+            const beforeHooks   = this.collectParents(true).flatMap(parent => parent.beforeEachHooks)
+            const afterHooks    = this.collectParents().flatMap(parent => parent.afterEachHooks)
+
+            for (const hook of beforeHooks) await hook(this)
+
             try {
                 await this.code(this)
             } catch (exception) {
@@ -148,6 +174,8 @@ export class Test extends Mixin(
 
                 await subTest.start()
             }
+
+            for (const hook of afterHooks) await hook(this)
         }
 
 

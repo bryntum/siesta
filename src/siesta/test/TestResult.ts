@@ -250,6 +250,23 @@ export class TestNodeResult extends Mixin(
                 return result instanceof TestNodeResult
             })
         }
+
+
+        collectParents (rootFirst : boolean = false) : this[ 'parentNode' ][] {
+            const parents   : this[ 'parentNode' ][]    = []
+
+            let node : TestNodeResult       = this.parentNode
+
+            while (node) {
+                parents.push(node)
+
+                node    = node.parentNode
+            }
+
+            if (rootFirst) parents.reverse()
+
+            return parents
+        }
     }
 
     return TestNodeResult
