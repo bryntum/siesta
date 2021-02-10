@@ -181,3 +181,7 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
 .option_name {
     color : $accent_color;
 }
+
+.option_group_name {
+    color               : $main_pass_color;
+}

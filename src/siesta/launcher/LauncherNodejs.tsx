@@ -4,14 +4,17 @@ import { Channel } from "../../channel/Channel.js"
 import { ChannelNodeIpc } from "../../channel/ChannelNodeIpc.js"
 import { ChannelSameContext } from "../../channel/ChannelSameContext.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { ColorerNoop } from "../../jsx/ColorerNoop.js"
-import { SiestaJSX } from "../../jsx/Factory.js"
 import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
+import { ColorerNoop } from "../../jsx/ColorerNoop.js"
+import { SiestaJSX } from "../../jsx/Factory.js"
+import { ProjectOptions, ProjectOptionsNodejs } from "../project/ProjectOptions.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
-import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary } from "./Launcher.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
+import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
+import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary, PrepareOptionsResult } from "./Launcher.js"
 import { option } from "./Option.js"
 import { ChannelProjectExtractor } from "./ProjectExtractor.js"
 
@@ -36,7 +39,8 @@ export class LauncherNodejs extends Mixin(
             type        : 'boolean',
             group       : OptionsGroupOutput,
             help        : <div>
-                Whether to suppress the output coloring. Automatically enforced if output stream is not a terminal.
+                Whether to suppress the output coloring. Also suppresses the progress bar and spinner.
+                Automatically enforced if output stream is not a terminal.
             </div>
         })
         noColor         : boolean               = false
@@ -45,12 +49,20 @@ export class LauncherNodejs extends Mixin(
         reporterClass   : typeof Reporter       = ReporterNodejsTerminal
         colorerClass    : typeof Colorer        = ColorerNodejs
 
+        projectOptionsClass : typeof ProjectOptions = ProjectOptionsNodejs
+        testDescriptorClass : typeof TestDescriptor = TestDescriptorNodejs
+
 
         // channelConstructors     : (typeof Channel)[]      = [ ChannelNodeIpc ]
 
 
         get targetContextChannelClass () : typeof Channel {
             return ChannelNodeIpc
+        }
+
+
+        getMaxLen () : number {
+            return process.stdout.columns ?? Number.MAX_SAFE_INTEGER
         }
 
 
@@ -84,8 +96,8 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        prepareLauncherOptions () {
-            super.prepareLauncherOptions()
+        prepareLauncherOptions () : PrepareOptionsResult {
+            const res    = super.prepareLauncherOptions()
 
             const projectFileUrl    = this.project || this.argv[ 0 ]
 
@@ -107,6 +119,8 @@ export class LauncherNodejs extends Mixin(
             })
 
             if (!this.project) this.project = this.argv[ 0 ]
+
+            return res
         }
 
 
@@ -126,9 +140,9 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        prepareProjectOptions () {
-            super.prepareProjectOptions()
-        }
+        // prepareProjectOptions () {
+        //     return super.prepareProjectOptions()
+        // }
 
 
         async setupInner () {
@@ -138,7 +152,7 @@ export class LauncherNodejs extends Mixin(
 
             // `projectDescriptor` might be already provided
             // if project file is launched directly as node executable
-            if (!this.projectDescriptor) {
+            if (!this.projectDescriptor && projectUrl) {
                 const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
 
                 await channel.setup()

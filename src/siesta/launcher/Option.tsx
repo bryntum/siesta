@@ -308,7 +308,7 @@ function parseOptions (input : string[]) : OptionsParseResult {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-type ExtractOptionsResult = { values : Map<Option, unknown>, errors : OptionParseError[], warnings : OptionParseWarning[] }
+export type ExtractOptionsResult = { values : Map<Option, unknown>, errors : OptionParseError[], warnings : OptionParseWarning[] }
 
 export class OptionsBag extends Base {
     input                   : string[]              = []

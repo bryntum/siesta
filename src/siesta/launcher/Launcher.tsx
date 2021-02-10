@@ -8,18 +8,18 @@ import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
-import { ProjectDescriptor } from "../project/ProjectOptions.js"
+import { ProjectDescriptor, ProjectOptions } from "../project/ProjectOptions.js"
 import { Printer } from "../reporter/Printer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Launch } from "./Launch.js"
 import {
+    ExtractOptionsResult,
     HasOptions,
     Option,
     option,
     optionErrorTemplateByCode,
     OptionGroup,
-    OptionParseWarning,
     OptionsBag,
     OptionsParseWarningCodes,
     optionWarningTemplateByCode
@@ -95,6 +95,12 @@ const optionsToArray    = (obj : { [ key : string ] : Option }) : Option[] =>
     objectEntriesDeep(obj).map(entry => entry[ 1 ])
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export type PrepareOptionsResult = {
+    extractResult       : ExtractOptionsResult,
+    errors              : XmlElement[]
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
@@ -107,6 +113,9 @@ export class Launcher extends Mixin(
         inputArguments      : string[]              = []
 
         optionsBag          : OptionsBag            = undefined
+
+        projectOptionsClass : typeof ProjectOptions = ProjectOptions
+        testDescriptorClass : typeof TestDescriptor = TestDescriptor
 
         reporterClass       : typeof Reporter       = undefined
 
@@ -159,6 +168,14 @@ export class Launcher extends Mixin(
         })
         help            : boolean           = false
 
+        @option({
+            type        : 'boolean',
+            group       : OptionsGroupPrimary,
+            help        : <span>
+                Prints the Siesta version
+            </span>
+        })
+        version         : boolean           = false
 
 
         get argv () : string [] {
@@ -201,10 +218,25 @@ export class Launcher extends Mixin(
 
         // earliest point at which launcher options has been applied already
         onLauncherOptionsAvailable () {
+            if (this.help) {
+                this.write(this.helpScreenTemplate(
+                    [
+                        ...optionsToArray(this.$options),
+                        ...optionsToArray(this.projectDescriptor ? this.projectDescriptor.options.$options : this.projectOptionsClass.prototype.$options),
+                        ...optionsToArray(this.projectDescriptor ? this.projectDescriptor.projectPlan.$options : this.testDescriptorClass.prototype.$options)
+                    ]
+                ))
+            }
+
+            if (this.version) {
+                this.write(this.versionTemplate())
+            }
+
+            if (this.help || this.version) throw LauncherError.new({ exitCode : ExitCodes.DRY_RUN })
         }
 
 
-        prepareLauncherOptions () {
+        prepareLauncherOptions () : PrepareOptionsResult {
             this.optionsBag     = OptionsBag.new({ input : this.inputArguments })
 
             const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.$options))
@@ -213,52 +245,58 @@ export class Launcher extends Mixin(
 
             this.onLauncherOptionsAvailable()
 
-            extractRes.errors.forEach(error => {
-                this.write(optionErrorTemplateByCode.get(error.error)(error))
-            })
-
-            extractRes.warnings.forEach(warning => {
-                this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
-            })
-
-            if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
+            // extractRes.errors.forEach(error => {
+            //     this.write(optionErrorTemplateByCode.get(error.error)(error))
+            // })
+            //
+            // extractRes.warnings.forEach(warning => {
+            //     this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
+            // })
+            //
+            // if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
             this.include    = this.include.map(pattern => new RegExp(pattern))
             this.exclude    = this.exclude.map(pattern => new RegExp(pattern))
+
+            return { extractResult : extractRes, errors : [] }
         }
 
 
-        prepareProjectOptions () {
+        prepareProjectOptions () : PrepareOptionsResult {
             const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectDescriptor.options.$options))
 
-            extractRes.errors.forEach(error => {
-                this.write(optionErrorTemplateByCode.get(error.error)(error))
-            })
-
-            extractRes.warnings.forEach(warning => {
-                this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
-            })
-
-            if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
+            // extractRes.errors.forEach(error => {
+            //     this.write(optionErrorTemplateByCode.get(error.error)(error))
+            // })
+            //
+            // extractRes.warnings.forEach(warning => {
+            //     this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
+            // })
+            //
+            // if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
             extractRes.values.forEach((value, option) => option.applyValue(this.projectDescriptor.options, value))
+
+            return { extractResult : extractRes, errors : [] }
         }
 
 
-        prepareTestDescriptorOptions () {
+        prepareTestDescriptorOptions () : PrepareOptionsResult {
             const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectDescriptor.projectPlan.$options))
 
-            extractRes.errors.forEach(error => {
-                this.write(optionErrorTemplateByCode.get(error.error)(error))
-            })
-
-            extractRes.warnings.forEach(warning => {
-                this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
-            })
-
-            if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
+            // extractRes.errors.forEach(error => {
+            //     this.write(optionErrorTemplateByCode.get(error.error)(error))
+            // })
+            //
+            // extractRes.warnings.forEach(warning => {
+            //     this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
+            // })
+            //
+            // if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
             extractRes.values.forEach((value, option) => option.applyValue(this.projectDescriptor.projectPlan, value))
+
+            return { extractResult : extractRes, errors : [] }
         }
 
 
@@ -279,38 +317,58 @@ export class Launcher extends Mixin(
 
 
         async setup () {
-            this.prepareLauncherOptions()
+            const prepareLauncherOptions    = this.prepareLauncherOptions()
 
             await this.setupInner()
 
-            this.prepareProjectOptions()
+            const prepareProjectOptions     = this.prepareProjectOptions()
 
-            this.prepareTestDescriptorOptions()
+            const prepareTestDescriptorOptions    = this.prepareTestDescriptorOptions()
 
-            if (this.optionsBag.entries.length) {
-                const warnings = CI(this.optionsBag.entries).map(entry => entry.key).uniqueOnly().map(optionName => {
-                    const warning : OptionParseWarning = {
+            //-----------------------
+            const errors : XmlElement[]     = [
+                ...prepareLauncherOptions.extractResult.errors,
+                ...prepareProjectOptions.extractResult.errors,
+                ...prepareTestDescriptorOptions.extractResult.errors
+            ].map(error => optionErrorTemplateByCode.get(error.error)(error)).concat(
+                prepareLauncherOptions.errors,
+                prepareProjectOptions.errors,
+                prepareTestDescriptorOptions.errors
+            )
+
+            errors.forEach(error => this.write(error))
+
+            //-----------------------
+            const warnings                  = [
+                ...prepareLauncherOptions.extractResult.warnings,
+                ...prepareProjectOptions.extractResult.warnings,
+                ...prepareTestDescriptorOptions.extractResult.warnings,
+                ...CI(this.optionsBag.entries).map(entry => entry.key).uniqueOnly().map(optionName => {
+                    return {
                         warning     : OptionsParseWarningCodes.UnknownOption,
                         option      : Option.new({ name : optionName })
                     }
+                })
+            ]
 
-                    return warning
-                }).toArray().forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
+            warnings.forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
 
-                this.print('\n')
-            }
 
-            if (this.help) {
-                this.write(this.helpScreenTemplate(
-                    [
-                        ...optionsToArray(this.$options),
-                        ...optionsToArray(this.projectDescriptor.options.$options),
-                        ...optionsToArray(this.projectDescriptor.projectPlan.$options)
-                    ]
-                ))
+            // if (this.optionsBag.entries.length) {
+            //     const warnings = CI(this.optionsBag.entries).map(entry => entry.key).uniqueOnly().map(optionName => {
+            //         const warning : OptionParseWarning = {
+            //             warning     : OptionsParseWarningCodes.UnknownOption,
+            //             option      : Option.new({ name : optionName })
+            //         }
+            //
+            //         return warning
+            //     }).toArray().forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
+            //
+            //     this.print('\n')
+            // }
 
-                throw LauncherError.new({ exitCode : ExitCodes.DRY_RUN })
-            }
+
+            if (errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
         }
 
 
@@ -335,18 +393,42 @@ export class Launcher extends Mixin(
         }
 
 
+        versionTemplate () : XmlElement {
+            return <div>Siesta 6.0.0</div>
+        }
+
+
         helpScreenTemplate (options : Option[]) : XmlElement {
-            const optionsByGroup    = CI(options)
-                .map(option => [ option.group, option ] as [ OptionGroup, Option ])
-                .toMap()
+            const optionsByGroup : Map<OptionGroup, Option[]>   = CI(options)
+                .reduce((acc, option) => {
+                    const group     = option.group
+
+                    if (!acc.has(group)) acc.set(group, [])
+
+                    acc.get(group).push(option)
+
+                    return acc
+                }, new Map())
 
             const groups            = Array.from(optionsByGroup.keys())
 
             groups.sort((group1, group2) => group1.weight - group2.weight)
 
             return <div class="help_screen">
+                <p><span class="accented">npx siesta URL [--option=value]</span></p>
+                <p>URL should point to your project file. All options are optional.</p>
+
                 { groups.map(group => <div class="group">
-                    { group.name }
+                    <span class="option_group_name">{ '\n' + group.name + ':\n' + '='.repeat(group.name.length + 1) }</span>
+
+                    { optionsByGroup.get(group).map(option =>
+                        <div class="option">
+                            <div class="option_name">{ '--' + option.name }</div>
+                            <div class="zindented">{ option.help }</div>
+                            <p></p>
+                        </div>
+                    ) }
+
                 </div>) }
             </div>
         }
