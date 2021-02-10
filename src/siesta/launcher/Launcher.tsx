@@ -423,7 +423,7 @@ export class Launcher extends Mixin(
                     { optionsByGroup.get(group).map(option =>
                         <div class="option">
                             <div class="option_name">{ '--' + option.name }</div>
-                            <div class="zindented">{ option.help }</div>
+                            <div class="indented">{ option.help }</div>
                             <p></p>
                         </div>
                     ) }

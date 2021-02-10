@@ -20,7 +20,7 @@ export class ManagedString extends Base {
         return ManagedStringWrapped.new({
             string      : this,
 
-            ...c.wrappings()
+            wrappings   : c.wrappings()
         })
     }
 
@@ -33,10 +33,9 @@ export class ManagedString extends Base {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ManagedStringPlain extends ManagedString {
-    string          : string        = ''
+    string          : string                = ''
 
-    open            : string        = ''
-    close           : string        = ''
+    wrappings       : [ string, string ]    = undefined
 
 
     get length () : number {
@@ -44,14 +43,15 @@ export class ManagedStringPlain extends ManagedString {
     }
 
     toString () : string {
-        return this.open + this.string + this.close
+        const wrappings     = this.wrappings
+
+        return wrappings ? wrappings[ 0 ] + this.string + wrappings[ 1 ] : this.string
     }
 
 
     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ManagedString {
         return ManagedStringPlain.new({
-            open        : this.open,
-            close       : this.close,
+            wrappings   : this.wrappings,
 
             string      : this.string.substr(pos, howMany)
         })
@@ -66,10 +66,9 @@ export class ManagedStringPlain extends ManagedString {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ManagedStringWrapped extends ManagedString {
-    string          : ManagedString = ManagedStringPlain.new()
+    string          : ManagedString         = ManagedStringPlain.new()
 
-    open            : string        = ''
-    close           : string        = ''
+    wrappings       : [ string, string ]    = undefined
 
 
     get length () : number {
@@ -78,14 +77,15 @@ export class ManagedStringWrapped extends ManagedString {
 
 
     toString () : string {
-        return this.open + this.string + this.close
+        const wrappings     = this.wrappings
+
+        return wrappings ? wrappings[ 0 ] + this.string + wrappings[ 1 ] : this.string.toString()
     }
 
 
     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ManagedString {
         return ManagedStringWrapped.new({
-            open        : this.open,
-            close       : this.close,
+            wrappings   : this.wrappings,
 
             string      : this.string.substr(pos, howMany)
         })
@@ -96,7 +96,7 @@ export class ManagedStringWrapped extends ManagedString {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ManagedStringSum extends ManagedString {
-    strings         : ManagedString[]       = []
+    strings         : (string | ManagedString)[]       = []
 
 
     get length () : number {
@@ -109,24 +109,18 @@ export class ManagedStringSum extends ManagedString {
 
 
     push (string : string | ManagedString) {
-        if (isString(string))
-            this.strings.push(ManagedStringPlain.fromString(string))
-        else
-            this.strings.push(string)
+        this.strings.push(string)
     }
 
 
     unshift (string : string | ManagedString) {
-        if (isString(string))
-            this.strings.unshift(ManagedStringPlain.fromString(string))
-        else
-            this.strings.unshift(string)
+        this.strings.unshift(string)
     }
 
 
     colorize (c : Colorer) : ManagedStringSum {
         return ManagedStringSum.new({
-            strings     : this.strings.map(string => string.colorize(c))
+            strings     : this.strings.map(string => isString(string) ? ManagedStringPlain.fromString(string).colorize(c) : string.colorize(c))
         })
     }
 
@@ -134,35 +128,40 @@ export class ManagedStringSum extends ManagedString {
     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ManagedString {
         let currentPos          = 0
 
-        return this.strings.reduce((acc : ManagedStringSum, str : ManagedString) => {
-            const charsLeftToStartCapturing     = pos - currentPos
+        // for some reason TS can't figure out the right override for this `reduce` call
+        // need to specify the generic argument explicitly
+        return this.strings.reduce<ManagedStringSum>(
+            (acc : ManagedStringSum, str : string | ManagedString) : ManagedStringSum => {
+                const charsLeftToStartCapturing     = pos - currentPos
 
-            let offset : number = 0
+                let offset : number = 0
 
-            if (charsLeftToStartCapturing > 0) {
-                currentPos  += str.length
+                if (charsLeftToStartCapturing > 0) {
+                    currentPos  += str.length
 
-                if (str.length <= charsLeftToStartCapturing) {
-                    return acc
+                    if (str.length <= charsLeftToStartCapturing) {
+                        return acc
+                    }
+                    else {
+                        offset      = str.length - charsLeftToStartCapturing
+                    }
                 }
-                else {
-                    offset      = str.length - charsLeftToStartCapturing
+
+                const remaining     = howMany - acc.length
+
+                if (str.length - offset >= remaining) {
+                    acc.push(str.substr(offset, remaining))
+                } else {
+                    if (offset > 0)
+                        acc.push(str.substr(offset))
+                    else
+                        acc.push(str)
                 }
-            }
 
-            const remaining     = howMany - acc.length
-
-            if (str.length - offset >= remaining) {
-                acc.push(str.substr(offset, remaining))
-            } else {
-                if (offset > 0)
-                    acc.push(str.substr(offset))
-                else
-                    acc.push(str)
-            }
-
-            return acc
-        }, ManagedStringSum.new())
+                return acc
+            },
+            ManagedStringSum.new()
+        )
     }
 }
 

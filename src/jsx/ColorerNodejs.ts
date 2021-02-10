@@ -25,9 +25,7 @@ export class ColorerNodejs extends Colorer {
     }
 
 
-    wrappings () : { open : string, close : string } {
-        const wrappings  = this.currentChalk(zero).split(zero)
-
-        return { open : wrappings[ 0 ], close : wrappings[ 1 ] }
+    wrappings () : [ string, string ] {
+        return this.currentChalk(zero).split(zero)
     }
 }
