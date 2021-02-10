@@ -411,24 +411,25 @@ export class Launcher extends Mixin(
 
             const groups            = Array.from(optionsByGroup.keys())
 
-            groups.sort((group1, group2) => group1.weight - group2.weight)
+            groups.sort((group1, group2) => group2.weight - group1.weight)
 
             return <div class="help_screen">
                 <p><span class="accented">npx siesta URL [--option=value]</span></p>
                 <p>URL should point to your project file. All options are optional.</p>
 
-                { groups.map(group => <div class="group">
-                    <span class="option_group_name">{ '\n' + group.name + ':\n' + '='.repeat(group.name.length + 1) }</span>
+                {
+                    groups.map(group => <div class="group">
+                        <span class="option_group_name">{ '\n' + group.name + ':\n' + '='.repeat(group.name.length + 1) }</span>
 
-                    { optionsByGroup.get(group).map(option =>
-                        <div class="option">
-                            <div class="option_name">{ '--' + option.name }</div>
-                            <div class="indented">{ option.help }</div>
-                            <p></p>
-                        </div>
-                    ) }
-
-                </div>) }
+                        {
+                            optionsByGroup.get(group).map(option => <div class="option">
+                                <div class="option_name">{ '--' + option.name }</div>
+                                <div class="indented">{ option.help }</div>
+                                <p></p>
+                            </div>)
+                        }
+                    </div>)
+                }
             </div>
         }
     }
