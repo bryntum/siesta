@@ -1,13 +1,20 @@
 import { Base } from "../../class/Base.js"
 import { CI } from "../../iterator/Iterator.js"
-import { include, serializable, Serializable } from "../../serializable/Serializable.js"
+import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { StringifierXml } from "../../serializer/StringifierXml.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { ArbitraryObject, cloneObject, objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
-import { IsolationLevel } from "../common/IsolationLevel.js"
-import { HasOptions, option } from "../launcher/Option.js"
+import { HasOptions, option, OptionGroup } from "../launcher/Option.js"
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const OptionsGroupTestDescriptor  = OptionGroup.new({
+    name        : 'Test descriptor',
+    weight      : 800
+})
+
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
@@ -22,29 +29,27 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
     // TODO support `fileName` alias?
     filename        : string                = ''
 
-    @option()
     url             : string
 
-    @option({ defaultValue : [] })
+    @option({ defaultValue : [], group : OptionsGroupTestDescriptor })
     tags            : string[]
 
-    @option({ type : 'boolean', defaultValue : false })
+    @option({ type : 'boolean', defaultValue : false, group : OptionsGroupTestDescriptor })
     isTodo          : boolean
 
-    @option({ type : 'string' })
+    @option({ type : 'string', group : OptionsGroupTestDescriptor })
     snooze          : string | Date
 
-    @option()
-    isolation       : IsolationLevel
+    // @option()
+    // isolation       : IsolationLevel
 
-    @option({ type : 'boolean', defaultValue : false })
+    @option({ type : 'boolean', defaultValue : false, group : OptionsGroupTestDescriptor })
     failOnIit           : boolean
 
     // will be applied directly to test instance
-    @option()
     config          : ArbitraryObject
 
-    @option({ defaultValue : false })
+    @option({ defaultValue : false, group : OptionsGroupTestDescriptor })
     autoCheckGlobals    : boolean
 
     serializerConfig    : Partial<SerializerXml>   = { maxWide : 4, maxDepth : 4 }
@@ -75,6 +80,9 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
                 urlParts.reverse()
 
                 return urlParts.join('/')
+            },
+            tags    : (name : 'tags', parentsAxis : this[]) : this[ typeof name ] => {
+                return CI(parentsAxis.flatMap(desc => desc.tags)).uniqueOnly().toArray()
             }
         }
     }
@@ -106,7 +114,7 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
             return res
         }
 
-        objectEntriesDeep(this.$options).forEach(([ key, value ]) => {
+        objectEntriesDeep(this.$options).map(([ key, _ ]) => key).concat('url', 'config').forEach(key => {
             const reducer       = reducers[ key ] || defaultReducer
 
             descriptor[ key ]   = reducer(key, parentsAxis)

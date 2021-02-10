@@ -2,15 +2,13 @@ import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { CI } from "../../iterator/Iterator.js"
+import { SiestaJSX } from "../../jsx/Factory.js"
+import { XmlElement } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
-import { SiestaJSX } from "../../jsx/Factory.js"
-import { XmlElement } from "../../jsx/XmlElement.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
-import { Colorer } from "../../jsx/Colorer.js"
-import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { Printer } from "../reporter/Printer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
@@ -30,15 +28,10 @@ import {
 //---------------------------------------------------------------------------------------------------------------------
 
 // Exit codes:
-// 0 - all tests passed
-// 1 - there were test failures
 // 2 - inactivity timeout while running the test suite
 // 3 - no supported browsers available on this machine
 // 4 - no tests to run (probably `include/filter` doesn't match any test url or `exclude` match everything)
 // 5 - can't open project page
-// 6 - wrong arguments
-// 7 - exception thrown
-// 8 - exit after printing version
 // 9 - java is not installed or not available in PATH
 
 export enum ExitCodes {
@@ -65,7 +58,12 @@ export enum ExitCodes {
     /**
      * Internal exception, please report as a bug.
      */
-    'UNHANLED_EXCEPTION'    = 7
+    'UNHANLED_EXCEPTION'    = 7,
+
+    /**
+     * Dry run exit, for example after printing the helps screen or package version.
+     */
+    'DRY_RUN'               = 8
 }
 
 
@@ -91,6 +89,13 @@ export const OptionsGroupOutput  = OptionGroup.new({
     weight      : 900
 })
 
+
+//---------------------------------------------------------------------------------------------------------------------
+const optionsToArray    = (obj : { [ key : string ] : Option }) : Option[] =>
+    objectEntriesDeep(obj).map(entry => entry[ 1 ])
+
+
+
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
     [ HasOptions, Printer, LoggerConsole, Base ],
@@ -106,8 +111,6 @@ export class Launcher extends Mixin(
         reporterClass       : typeof Reporter       = undefined
 
         projectDescriptor   : ProjectDescriptor     = undefined
-
-        // channelConstructors     : (typeof Channel)[]      = []
 
         setupDone       : boolean           = false
         setupPromise    : Promise<any>      = undefined
@@ -146,6 +149,16 @@ export class Launcher extends Mixin(
             </span>
         })
         detail          : ReporterDetailing = 'file'
+
+        @option({
+            type        : 'boolean',
+            group       : OptionsGroupPrimary,
+            help        : <span>
+                Prints the help screen with the list of available options.
+            </span>
+        })
+        help            : boolean           = false
+
 
 
         get argv () : string [] {
@@ -186,17 +199,15 @@ export class Launcher extends Mixin(
         }
 
 
+        // earliest point at which launcher options has been applied already
         onLauncherOptionsAvailable () {
-
         }
 
 
         prepareLauncherOptions () {
             this.optionsBag     = OptionsBag.new({ input : this.inputArguments })
 
-            const extractRes    = this.optionsBag.extractOptions(
-                CI(objectEntriesDeep(this.$options)).map(entry => { return entry[ 1 ] as Option }).toArray()
-            )
+            const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.$options))
 
             extractRes.values.forEach((value, option) => option.applyValue(this, value))
 
@@ -218,9 +229,7 @@ export class Launcher extends Mixin(
 
 
         prepareProjectOptions () {
-            const extractRes    = this.optionsBag.extractOptions(
-                CI(objectEntriesDeep(this.projectDescriptor.options.$options)).map(entry => { return entry[ 1 ] as Option }).toArray()
-            )
+            const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectDescriptor.options.$options))
 
             extractRes.errors.forEach(error => {
                 this.write(optionErrorTemplateByCode.get(error.error)(error))
@@ -233,6 +242,23 @@ export class Launcher extends Mixin(
             if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
             extractRes.values.forEach((value, option) => option.applyValue(this.projectDescriptor.options, value))
+        }
+
+
+        prepareTestDescriptorOptions () {
+            const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectDescriptor.projectPlan.$options))
+
+            extractRes.errors.forEach(error => {
+                this.write(optionErrorTemplateByCode.get(error.error)(error))
+            })
+
+            extractRes.warnings.forEach(warning => {
+                this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
+            })
+
+            if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
+
+            extractRes.values.forEach((value, option) => option.applyValue(this.projectDescriptor.projectPlan, value))
         }
 
 
@@ -259,6 +285,8 @@ export class Launcher extends Mixin(
 
             this.prepareProjectOptions()
 
+            this.prepareTestDescriptorOptions()
+
             if (this.optionsBag.entries.length) {
                 const warnings = CI(this.optionsBag.entries).map(entry => entry.key).uniqueOnly().map(optionName => {
                     const warning : OptionParseWarning = {
@@ -270,6 +298,18 @@ export class Launcher extends Mixin(
                 }).toArray().forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
 
                 this.print('\n')
+            }
+
+            if (this.help) {
+                this.write(this.helpScreenTemplate(
+                    [
+                        ...optionsToArray(this.$options),
+                        ...optionsToArray(this.projectDescriptor.options.$options),
+                        ...optionsToArray(this.projectDescriptor.projectPlan.$options)
+                    ]
+                ))
+
+                throw LauncherError.new({ exitCode : ExitCodes.DRY_RUN })
             }
         }
 
@@ -292,6 +332,23 @@ export class Launcher extends Mixin(
             await launch.start()
 
             return launch
+        }
+
+
+        helpScreenTemplate (options : Option[]) : XmlElement {
+            const optionsByGroup    = CI(options)
+                .map(option => [ option.group, option ] as [ OptionGroup, Option ])
+                .toMap()
+
+            const groups            = Array.from(optionsByGroup.keys())
+
+            groups.sort((group1, group2) => group1.weight - group2.weight)
+
+            return <div class="help_screen">
+                { groups.map(group => <div class="group">
+                    { group.name }
+                </div>) }
+            </div>
         }
     }
 

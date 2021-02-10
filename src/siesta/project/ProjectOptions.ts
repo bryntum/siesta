@@ -19,7 +19,6 @@ export class ProjectOptions extends Mixin(
 
     class ProjectOptions extends base {
         @include()
-        @option({ type : 'object' })
         testDescriptor      : Partial<TestDescriptor>           = undefined
     }
 

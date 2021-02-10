@@ -100,7 +100,7 @@ export class LauncherNodejs extends Mixin(
                             npx siesta --project ./siesta.js
                         </p>
                         <p class="indented">
-                            npx siesta ./siesta.js --some_option=1
+                            npx siesta ./siesta.js
                         </p>
                     </div>
                 </div>
