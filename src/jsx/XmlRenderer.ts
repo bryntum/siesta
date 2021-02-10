@@ -88,7 +88,7 @@ export class XmlRenderer extends Mixin(
                     const block         = this.render(
                         node,
                         maxLen - (this.isSubBlockIndented(el, node) ? this.indentLevel : 0),
-                        context === 'inline' ? res.textLength[ res.textLength.length - 1 ] : 0
+                        context === 'inline' ? res.lastLine.length : 0
                     )
 
                     if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {

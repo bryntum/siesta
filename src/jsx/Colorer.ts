@@ -6,6 +6,9 @@ export type ColorerRule = (c : Colorer) => Colorer
 
 
 //---------------------------------------------------------------------------------------------------------------------
+const zeroWrapping  = { open : '', close : '' }
+
+//---------------------------------------------------------------------------------------------------------------------
 export class Colorer extends Base {
     get noop () : Colorer { return this }
 
@@ -77,5 +80,10 @@ export class Colorer extends Base {
 
     text (text : string) : string {
         throw new Error("implement me")
+    }
+
+
+    wrappings () : { open : string, close : string } {
+        return zeroWrapping
     }
 }

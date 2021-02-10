@@ -399,16 +399,15 @@ export class Launcher extends Mixin(
 
 
         helpScreenTemplate (options : Option[]) : XmlElement {
-            const optionsByGroup : Map<OptionGroup, Option[]>   = CI(options)
-                .reduce((acc, option) => {
-                    const group     = option.group
+            const optionsByGroup : Map<OptionGroup, Option[]>   = options.reduce((acc, option) => {
+                const group     = option.group
 
-                    if (!acc.has(group)) acc.set(group, [])
+                if (!acc.has(group)) acc.set(group, [])
 
-                    acc.get(group).push(option)
+                acc.get(group).push(option)
 
-                    return acc
-                }, new Map())
+                return acc
+            }, new Map())
 
             const groups            = Array.from(optionsByGroup.keys())
 
