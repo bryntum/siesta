@@ -3,12 +3,12 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { SetIntervalHandler } from "../../util/Helpers.js"
 import { hideCursor, showCursor } from "../../util_nodejs/Terminal.js"
 import { TestNodeResult } from "../test/TestResult.js"
-import { Reporter } from "./Reporter.js"
+import { ReporterNodejs } from "./ReporterNodejs.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterNodejsTerminal extends Mixin(
-    [ Reporter ],
-    (base : ClassUnion<typeof Reporter>) => {
+    [ ReporterNodejs ],
+    (base : ClassUnion<typeof ReporterNodejs>) => {
 
     class ReporterNodejsTerminal extends base {
 
@@ -21,13 +21,8 @@ export class ReporterNodejsTerminal extends Mixin(
         spinnerChars    : number                        = 0
 
 
-        getMaxLen () : number {
-            return process.stdout.columns ?? Number.MAX_SAFE_INTEGER
-        }
-
-
         print (str : string) {
-            process.stdout.write(str)
+            super.print(str)
 
             if (this.isPrintingFooter) {
                 this.footerLines += Array.from(str.matchAll(/\n/g)).length
