@@ -64,9 +64,11 @@ export class XmlRenderer extends Mixin(
             else if (el.tagName === 'serialization') {
                 return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
             } else {
-                const res   = TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved })
+                const res           = TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved })
 
-                if (el.hasClass('indented')) res.indent()
+                const isIndented    = el.hasClass('indented')
+
+                if (isIndented) res.indent()
 
                 let context : 'inline' | 'opened_block' | 'closed_block' = 'opened_block'
 
@@ -87,7 +89,9 @@ export class XmlRenderer extends Mixin(
 
                     const block         = this.render(
                         node,
-                        maxLen - (this.isSubBlockIndented(el, node) ? this.indentLevel : 0),
+                        maxLen
+                            - (this.isSubBlockIndented(el, node) ? this.indentLevel : 0)
+                            - (isIndented ? this.indentLevel : 0),
                         context === 'inline' ? res.lastLine.length : 0
                     )
 
