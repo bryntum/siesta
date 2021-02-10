@@ -2,10 +2,9 @@ import { Base } from "../class/Base.js"
 import { AnyConstructor, Mixin } from "../class/Mixin.js"
 import { CI } from "../iterator/Iterator.js"
 import { SiestaJSX } from "../jsx/Factory.js"
-import { XmlElement, XmlNode, XmlStream } from "../jsx/XmlElement.js"
+import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { SerializerXml } from "../serializer/SerializerXml.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "./Helpers.js"
-import { Serializer } from "../serializer/Serializer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 import { AnyFunction, ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { Serializer } from "../../../serializer/Serializer.js"
-import { isRegExp } from "../../../util/Typeguards.js"
 import { SiestaJSX } from "../../../jsx/Factory.js"
+import { SerializerXml } from "../../../serializer/SerializerXml.js"
+import { isRegExp } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
 import { GotExpectTemplate } from "./AssertionCompare.js"
 
@@ -122,7 +122,7 @@ export class AssertionException extends Mixin(
                     annotation      : <div class='indented'>
                         Provided function threw an exception:
                         <p class='indented'>
-                            <span class="difference_value">{Serializer.serialize(message, {maxDepth: 4, maxWide: 4})}</span>
+                            <span class="difference_value">{ SerializerXml.serialize(message, { maxDepth: 4, maxWide: 4 }) }</span>
                         </p>
                     </div>
                 }))
