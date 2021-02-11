@@ -2,6 +2,7 @@ import { it } from "../../main.js"
 import { SiestaJSX } from "../../src/jsx/Factory.js"
 import { SerializerXml } from "../../src/serializer/SerializerXml.js"
 import { StringifierXml } from "../../src/serializer/StringifierXml.js"
+import { iit } from "../../src/siesta/test/Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 const stringifierConfig : Partial<StringifierXml>  = { prettyPrint : true, maxLen : 20, indentLevel : 2 }
@@ -213,4 +214,14 @@ it('Should include reference number into serialization', async t => {
     map.set(map, map)
 
     t.is(StringifierXml.stringify(SerializerXml.serialize(map)), '<ref *1> Map (1) { [Circular *1] => [Circular *1] }')
+})
+
+
+it('Should include class name into serialization', async t => {
+
+    class SomeClass {
+        a : number          = 1
+    }
+
+    t.is(StringifierXml.stringify(SerializerXml.serialize(new SomeClass())), 'SomeClass { "a": 1 }')
 })

@@ -1,9 +1,13 @@
 import { it } from "../../main.js"
 import { SiestaJSX } from "../../src/jsx/Factory.js"
 import { SerializerXml } from "../../src/serializer/SerializerXml.js"
+import { anyNumberApprox } from "../../src/util/CompareDeep.js"
 
 
 it('Serialization should work for atoms', async t => {
+    t.equal(SerializerXml.serialize(undefined), <serialization><undefined></undefined></serialization>, '`undefined` serialization')
+    t.equal(SerializerXml.serialize(null), <serialization><null></null></serialization>, '`null` serialization')
+
     t.equal(SerializerXml.serialize(1), <serialization><number>1</number></serialization>, 'Number serialization')
 
     t.equal(SerializerXml.serialize("2"), <serialization><string>"2"</string></serialization>, 'String serialization')
@@ -197,5 +201,15 @@ it('Serialization of cyclic structures should include references information', a
                 </object_entry>
             </object>
         </serialization>
+    )
+})
+
+
+it('Should serialize placeholders as numbers', async t => {
+
+    t.equal(
+        SerializerXml.serialize(anyNumberApprox(10)),
+        <serialization><number>10±0.5</number></serialization>,
+        'Number serialization'
     )
 })

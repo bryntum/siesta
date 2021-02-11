@@ -21,7 +21,7 @@ export class StringifierXml extends Mixin(
         output                  : TextBlock     = TextBlock.new()
 
         leafNodes               : Set<string>   = new Set([
-            'number', 'string', 'date', 'regexp', 'symbol', 'function'
+            'number', 'string', 'date', 'regexp', 'symbol', 'function', 'special'
         ])
 
 
@@ -55,6 +55,12 @@ export class StringifierXml extends Mixin(
         walk (value : XmlElement, index : number, parentEl : XmlElement) {
             if (this.leafNodes.has(value.tagName)) {
                 this.write(value.childNodes[ 0 ] as string)
+            }
+            else if (value.tagName === 'undefined') {
+                this.write(`undefined`)
+            }
+            else if (value.tagName === 'null') {
+                this.write(`null`)
             }
             else if (value.tagName === 'reference') {
                 this.write(`[Circular *${ value.getAttribute('refId') }]`)
@@ -150,7 +156,12 @@ export class StringifierXml extends Mixin(
                 this.write(']')
             }
             else if (value.tagName === 'object') {
+                const className     = value.getAttribute('constructorName')
+
+                if (className !== 'Object') this.write(className + ' ')
+
                 this.checkForReferenceId(value)
+
                 this.write(`{`)
 
                 this.output.indent()

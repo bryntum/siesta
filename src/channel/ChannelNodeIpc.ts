@@ -24,6 +24,7 @@ export class ChannelNodeIpc extends Mixin(
                     {
                         execArgv : [
                             // '--inspect-brk=127.0.0.1:9339',
+                            '--unhandled-rejections=strict',
                             '--trace-warnings',
                             '--input-type', 'module',
                             '--eval', [

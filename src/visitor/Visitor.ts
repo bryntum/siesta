@@ -2,6 +2,10 @@ import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
 import { ArbitraryObjectKey, isAtomicValue, typeOf, uppercaseFirst } from "../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
+export const visitorVisitSymbol = Symbol('internalVisitSymbol')
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export class Visitor extends Mixin(
     [],
     (base : AnyConstructor) =>
@@ -11,6 +15,8 @@ export class Visitor extends Mixin(
         maxDepth        : number                    = Number.MAX_SAFE_INTEGER
 
         visited         : Map<unknown, unknown>     = new Map()
+
+        internalVisitSymbol     : symbol            = visitorVisitSymbol
 
 
         beforeVisit (value : unknown, depth : number) : unknown {
@@ -69,13 +75,19 @@ export class Visitor extends Mixin(
         visitNotVisited (value : unknown, depth : number) {
             const newValue                  = this.beforeVisit(value, depth)
 
-            const specificVisitorMethod     = `visit${ uppercaseFirst(typeOf(newValue)) }`
+            if (newValue[ this.internalVisitSymbol ]) {
+                const visitResult               = newValue[ this.internalVisitSymbol ](this, depth)
 
-            const visitMethod               = this[ specificVisitorMethod ] || this.visitObject
+                return this.afterVisit(newValue, depth, visitResult)
+            } else {
+                const specificVisitorMethod     = `visit${ uppercaseFirst(typeOf(newValue)) }`
 
-            const visitResult               = visitMethod.call(this, newValue, depth)
+                const visitMethod               = this[ specificVisitorMethod ] || this.visitObject
 
-            return this.afterVisit(newValue, depth, visitResult)
+                const visitResult               = visitMethod.call(this, newValue, depth)
+
+                return this.afterVisit(newValue, depth, visitResult)
+            }
         }
 
 

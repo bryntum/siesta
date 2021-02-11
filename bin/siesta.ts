@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { ExitCodes, LauncherError } from "../src/siesta/launcher/Launcher.js"
+import { ExitCodes } from "../src/siesta/launcher/Launcher.js"
 import { LauncherNodejs } from "../src/siesta/launcher/LauncherNodejs.js"
 
 process.on('unhandledRejection', (reason, promise) => {

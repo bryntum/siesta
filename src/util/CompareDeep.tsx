@@ -1,24 +1,163 @@
 import { Base } from "../class/Base.js"
-import { AnyConstructor, Mixin } from "../class/Mixin.js"
+import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
 import { CI } from "../iterator/Iterator.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
-import { SerializerXml } from "../serializer/SerializerXml.js"
+import { serializationVisitSymbol, SerializerXml } from "../serializer/SerializerXml.js"
+import { Visitor } from "../visitor/Visitor.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "./Helpers.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class PlaceHolder extends Mixin(
-    [],
-    (base : AnyConstructor) =>
+    [ Base ],
+    (base : ClassUnion<typeof Base>) =>
 
     class PlaceHolder extends base {
 
-        * equalsToGen (v : unknown) : Generator<Difference> {
+        toString () : string {
+            throw new Error("Abstract method")
+        }
+
+
+        [ serializationVisitSymbol ] (visitor : Visitor, depth : number) : this {
+            throw new Error("Abstract method")
+        }
+
+
+        * equalsToGen (v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Generator<Difference> {
             throw new Error("Abstract method")
         }
     }
 ){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class PlaceHolderNumber extends Mixin(
+    [ PlaceHolder ],
+    (base : ClassUnion<typeof PlaceHolder>) =>
+
+    class PlaceHolderNumber extends base {
+        value       : number        = undefined
+
+        threshold   : number        = undefined
+
+        min         : number        = undefined
+        max         : number        = undefined
+
+
+        initialize (props? : Partial<PlaceHolderNumber>) {
+            super.initialize(props)
+
+            if (this.threshold === undefined) this.threshold = 0.05 * this.value
+        }
+
+
+        toString () : string {
+            if (this.value !== undefined) return `${ this.value }±${ this.threshold }`
+
+            return `${ this.min } ≤ x ≤ ${ this.max }`
+        }
+
+
+        [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
+            visitor.write(<number>{ this }</number>)
+
+            return this
+        }
+
+
+        * equalsToGen (v : number, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Generator<Difference> {
+            const v1        = flipped ? v : this
+            const v2        = flipped ? this : v
+
+            const type1     = flipped ? typeOf(v) : 'Number'
+            const type2     = flipped ? 'Number' : typeOf(v)
+
+            if (type1 !== type2)
+                yield DifferenceTypesAreDifferent.new({ v1, v2, type1, type2, keyPath : state.keyPathSnapshot() })
+            else {
+                const threshold     = Math.abs(v - this.value)
+
+                if (threshold > this.threshold)
+                    yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
+            }
+        }
+    }
+){}
+
+
+export const anyNumberApprox = (value : number, threshold? : number) : PlaceHolderNumber => PlaceHolderNumber.new({ value, threshold })
+
+export const anyNumberBetween = (min : number, max : number) : PlaceHolderNumber => PlaceHolderNumber.new({ min, max })
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class PlaceHolderInstance extends Mixin(
+    [ PlaceHolder ],
+    (base : ClassUnion<typeof PlaceHolder>) =>
+
+    class PlaceHolderInstance extends base {
+        cls         : AnyConstructor    = Object
+
+
+        toString () : string {
+            return `any instance of [${ this.cls.name }]`
+        }
+
+
+        [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
+            visitor.write(<object constructorName={ this.cls.name }></object>)
+
+            return this
+        }
+
+
+        * equalsToGen (v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Generator<Difference> {
+            const v1        = flipped ? v : this
+            const v2        = flipped ? this : v
+
+            // this handles the primitives, like `1 instanceof Number` and other simple cases
+            if (Object.getPrototypeOf(v) === this.cls.prototype) return
+
+            // generic `instanceof` check, possibly using [Symbol.hasInstance]
+            if (!(v instanceof this.cls))
+                yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
+        }
+    }
+){}
+
+export const anyInstanceOf = (cls : AnyConstructor) : PlaceHolderInstance => PlaceHolderInstance.new({ cls })
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class PlaceHolderAny extends Mixin(
+    [ PlaceHolder ],
+    (base : ClassUnion<typeof PlaceHolder>) =>
+
+    class PlaceHolderAny extends base {
+        cls         : AnyConstructor    = Object
+
+
+        toString () : string {
+            return `any`
+        }
+
+
+        [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
+            visitor.write(<special>any</special>)
+
+            return this
+        }
+
+
+        * equalsToGen (v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Generator<Difference> {
+        }
+    }
+){}
+
+export const any = () : PlaceHolderAny => PlaceHolderAny.new()
+
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -476,15 +615,22 @@ export const compareDeepGen = function * (
 )
     : Generator<Difference>
 {
-    // // some (or both) of the inputs is a PlaceHolder instance
-    // if (v1 instanceof PlaceHolder && v2 instanceof PlaceHolder)
-    //     yield v1.equalsTo(v2)
-    // else if (v1 instanceof PlaceHolder)
-    //     return v1.equalsTo(v2)
-    // else if (v2 instanceof PlaceHolder)
-    //     return v2.equalsTo(v1)
-    //
-    // //
+    // shortcut exit to save time, this also allows to compare the placeholder with itself
+    if (v1 === v2) return
+
+    // some (or both) of the inputs is a PlaceHolder instance
+    if (v1 instanceof PlaceHolder && v2 instanceof PlaceHolder) {
+        yield* v1.equalsToGen(v2, false, options, state)
+        return
+    }
+    else if (v1 instanceof PlaceHolder) {
+        yield* v1.equalsToGen(v2, false, options, state)
+        return
+    }
+    else if (v2 instanceof PlaceHolder) {
+        yield* v2.equalsToGen(v1, true, options, state)
+        return
+    }
 
     const v1Visit   = state.visited1.get(v1)
     const v2Visit   = state.visited2.get(v2)

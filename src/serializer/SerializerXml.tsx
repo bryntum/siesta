@@ -5,6 +5,9 @@ import { XmlElement } from "../jsx/XmlElement.js"
 import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf, uppercaseFirst } from "../util/Helpers.js"
 import { Visitor } from "../visitor/Visitor.js"
 
+//---------------------------------------------------------------------------------------------------------------------
+export const serializationVisitSymbol = Symbol('serializationVisitSymbol')
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class SerializerXml extends Mixin(
@@ -27,6 +30,8 @@ export class SerializerXml extends Mixin(
         valueToEl           : Map<unknown, XmlElement>  = new Map()
 
         beforeVisitEl       : unknown       = undefined
+
+        internalVisitSymbol     : symbol            = serializationVisitSymbol
 
 
         beforeVisit (value : unknown, depth : number) {
@@ -94,14 +99,13 @@ export class SerializerXml extends Mixin(
         }
 
 
-        getVisitMethodFor (value : unknown) : Function {
-            const type      = typeOf(value)
+        visitUndefined (value : symbol, depth : number) {
+            this.write(<undefined></undefined>)
+        }
 
-            if (/Function$/.test(type)) return this.visitFunction
 
-            const specificVisitorMethod     = `visit${ uppercaseFirst(typeOf(value)) }`
-
-            return this[ specificVisitorMethod ] || this.visitObject
+        visitNull (value : symbol, depth : number) {
+            this.write(<null></null>)
         }
 
 

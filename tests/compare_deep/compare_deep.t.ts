@@ -1,12 +1,18 @@
 import { it } from "../../main.js"
 import { CI } from "../../src/iterator/Iterator.js"
 import {
+    any,
+    anyInstanceOf,
+    anyNumberApprox,
     compareDeepGen,
-    DifferenceObject, DifferenceSet, DifferenceReachability,
+    DifferenceObject,
+    DifferenceReachability,
+    DifferenceSet,
     DifferenceTypesAreDifferent,
     DifferenceValuesAreDifferent,
     PathSegment
 } from "../../src/util/CompareDeep.js"
+
 
 it('Deep compare should work for primitives and non-cyclic data structures', async t => {
     t.isDeeply(CI(compareDeepGen(1, 1)).toArray(), [])
@@ -42,6 +48,48 @@ it('Deep compare should work for primitives and non-cyclic data structures', asy
             })
         ]
     )
+})
+
+
+it('Deep compare should work for number placeholders', async t => {
+    t.isDeeply(CI(compareDeepGen(10, anyNumberApprox(10))).toArray(), [])
+
+    //------------------------
+    const placeholder   = anyNumberApprox(10)
+
+    t.isDeeply(
+        CI(compareDeepGen('10', placeholder)).toArray(),
+        [ DifferenceTypesAreDifferent.new({ v1 : '10', v2 : placeholder, type1 : 'String', type2 : 'Number' }) ]
+    )
+})
+
+
+it('Deep compare should work for instance placeholders', async t => {
+    t.isDeeply(CI(compareDeepGen(10, anyInstanceOf(Number))).toArray(), [])
+
+    t.isDeeply(CI(compareDeepGen(new Date, anyInstanceOf(Date))).toArray(), [])
+
+    t.isDeeply(CI(compareDeepGen(new Date, anyInstanceOf(Object))).toArray(), [])
+
+    t.isDeeply(CI(compareDeepGen([ 1, 2, 3 ], anyInstanceOf(Array))).toArray(), [])
+
+    //------------------------
+    const placeholder   = anyInstanceOf(Date)
+
+    t.isDeeply(
+        CI(compareDeepGen('10', placeholder)).toArray(),
+        [ DifferenceValuesAreDifferent.new({ v1 : '10', v2 : placeholder }) ]
+    )
+
+})
+
+
+it('Deep compare should work for any placeholders', async t => {
+    t.isDeeply(CI(compareDeepGen(10, any())).toArray(), [])
+
+    t.isDeeply(CI(compareDeepGen(new Date, any())).toArray(), [])
+
+    t.isDeeply(CI(compareDeepGen([ 1, 2, 3 ], any())).toArray(), [])
 })
 
 
