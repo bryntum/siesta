@@ -23,6 +23,13 @@ it('Serialization should work for atoms', async t => {
 
 it('Serialization should work for objects', async t => {
     t.equal(
+        SerializerXml.serialize({}),
+        <serialization>
+            <object size={ 0 }></object>
+        </serialization>
+    )
+
+    t.equal(
         SerializerXml.serialize({ prop1 : 1, prop2 : 2 }),
         <serialization>
             <object size={ 2 }>

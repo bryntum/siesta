@@ -158,7 +158,7 @@ export class StringifierXml extends Mixin(
             else if (value.tagName === 'object') {
                 const className     = value.getAttribute('constructorName')
 
-                if (className !== 'Object') this.write(className + ' ')
+                if (className && className !== 'Object') this.write(className + ' ')
 
                 this.checkForReferenceId(value)
 

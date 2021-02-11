@@ -125,6 +125,7 @@ it('Should be able to stringify previously serialized value', async t => {
 })
 
 
+//---------------------------------------------------------------------------------------------------------------------
 it('Should show "out of wide" symbol', async t => {
     //-----------------
     const serializedObject  = SerializerXml.serialize({ prop1 : 1, prop2 : 2, prop3 : 3 }, { maxWide : 2 })
@@ -180,6 +181,7 @@ it('Should show "out of wide" symbol', async t => {
 })
 
 
+//---------------------------------------------------------------------------------------------------------------------
 it('Should show "out of depth" symbol', async t => {
     //-----------------
     const serializedObject  = SerializerXml.serialize({ prop1 : 1, prop2 : { prop3 : 3 } }, { maxDepth : 1 })
@@ -195,6 +197,7 @@ it('Should show "out of depth" symbol', async t => {
 })
 
 
+//---------------------------------------------------------------------------------------------------------------------
 it('Should include reference number into serialization', async t => {
     //-----------------
     const a     = { a : undefined }
@@ -217,6 +220,7 @@ it('Should include reference number into serialization', async t => {
 })
 
 
+//---------------------------------------------------------------------------------------------------------------------
 it('Should include class name into serialization', async t => {
 
     class SomeClass {
