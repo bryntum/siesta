@@ -167,6 +167,8 @@ export class Test extends Mixin(
 
 
         async start () {
+            globalTestEnv.currentTest       = this
+
             this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
             this.startHook.trigger(this)
@@ -180,6 +182,8 @@ export class Test extends Mixin(
             this.finishHook.trigger(this)
 
             this.reporter.onSubTestFinish(this.localId)
+
+            globalTestEnv.currentTest       = this.parentNode
         }
 
 
@@ -245,7 +249,9 @@ export class Test extends Mixin(
                 } as Partial<InstanceType<T>>)
             }
 
-            return globalTestEnv.topTest.it(name, code) as InstanceType<T>
+            const currentTest       = globalTestEnv.currentTest || globalTestEnv.topTest
+
+            return currentTest.it(name, code) as InstanceType<T>
         }
 
 
@@ -265,15 +271,21 @@ export class Test extends Mixin(
 export class GlobalTestEnvironment extends Base {
     launcher            : TestLauncherChild = undefined
 
+    // the test instance, representing the whole current test file
+    // not directly accessible by user, but every global `it/describe` section
+    // is created as child node of it
     topTest             : Test              = undefined
 
     topTestDescriptor   : TestDescriptor    = undefined
+
+    currentTest         : Test              = undefined
 
 
     clear () {
         this.launcher           = undefined
         this.topTest            = undefined
         this.topTestDescriptor  = undefined
+        this.currentTest        = undefined
     }
 }
 
@@ -300,3 +312,18 @@ export const xit = (name : TestDescriptorArgument, code : (t : Test) => any) : T
 }
 
 export const xdescribe = iit
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const beforeEach = (code : (t : Test) => any) => {
+    if (!globalTestEnv.currentTest) throw new Error("Global `beforeEach` used outside of the scope of any test")
+
+    globalTestEnv.currentTest.beforeEach(code)
+}
+
+export const afterEach = (code : (t : Test) => any) => {
+    if (!globalTestEnv.currentTest) throw new Error("Global `afterEach` used outside of the scope of any test")
+
+    globalTestEnv.currentTest.afterEach(code)
+}
+
