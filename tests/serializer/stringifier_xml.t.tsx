@@ -1,44 +1,35 @@
 import { it } from "../../main.js"
 import { SiestaJSX } from "../../src/jsx/Factory.js"
-import { SerializerXml } from "../../src/serializer/SerializerXml.js"
 import { StringifierXml } from "../../src/serializer/StringifierXml.js"
-import { iit } from "../../src/siesta/test/Test.js"
+import { anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src/util/CompareDeep.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 const stringifierConfig : Partial<StringifierXml>  = { prettyPrint : true, maxLen : 20, indentLevel : 2 }
 
 it('Should be able to stringify previously serialized value', async t => {
-    const serializedNumber      = SerializerXml.serialize(1)
-
     t.is(
-        StringifierXml.stringify(serializedNumber, stringifierConfig),
+        StringifierXml.print(1, stringifierConfig),
         "1"
     )
 
     //-----------------
-    const serializedString      = SerializerXml.serialize("1")
-
     t.is(
-        StringifierXml.stringify(serializedString, stringifierConfig),
+        StringifierXml.print("1", stringifierConfig),
         '"1"'
     )
 
 
     //-----------------
-    const serializedObject1      = SerializerXml.serialize({})
-
     t.is(
-        StringifierXml.stringify(serializedObject1, stringifierConfig),
+        StringifierXml.print({}, stringifierConfig),
         `{}`,
         'Empty object stringification'
     )
 
 
     //-----------------
-    const serializedObject2      = SerializerXml.serialize({ prop1 : { prop2 : 2 }, prop3 : 3 })
-
     t.is(
-        StringifierXml.stringify(serializedObject2, stringifierConfig),
+        StringifierXml.print({ prop1 : { prop2 : 2 }, prop3 : 3 }, stringifierConfig),
 `{
   "prop1": {
     "prop2": 2
@@ -49,10 +40,8 @@ it('Should be able to stringify previously serialized value', async t => {
     )
 
     //-----------------
-    const serializedObject3      = SerializerXml.serialize({ prop1 : { prop2 : '1'.repeat(10) } })
-
     t.is(
-        StringifierXml.stringify(serializedObject3, stringifierConfig),
+        StringifierXml.print({ prop1 : { prop2 : '1'.repeat(10) } }, stringifierConfig),
 `{
   "prop1": {
     "prop2": "111111
@@ -63,10 +52,8 @@ it('Should be able to stringify previously serialized value', async t => {
     )
 
     //-----------------
-    const serializedArray1      = SerializerXml.serialize([ 1, 2, 3 ])
-
     t.is(
-        StringifierXml.stringify(serializedArray1, stringifierConfig),
+        StringifierXml.print([ 1, 2, 3 ], stringifierConfig),
 `[
   1,
   2,
@@ -77,10 +64,8 @@ it('Should be able to stringify previously serialized value', async t => {
 
 
     //-----------------
-    const serializedArray2      = SerializerXml.serialize([ { prop : 1 }, { prop : 2 }, { prop : 3 } ])
-
     t.is(
-        StringifierXml.stringify(serializedArray2, stringifierConfig),
+        StringifierXml.print([ { prop : 1 }, { prop : 2 }, { prop : 3 } ], stringifierConfig),
 `[
   {
     "prop": 1
@@ -97,10 +82,8 @@ it('Should be able to stringify previously serialized value', async t => {
 
 
     //-----------------
-    const serializedSet1      = SerializerXml.serialize(new Set([ 1, 2, 3 ]))
-
     t.is(
-        StringifierXml.stringify(serializedSet1, stringifierConfig),
+        StringifierXml.print(new Set([ 1, 2, 3 ]), stringifierConfig),
 `Set (3) {
   1,
   2,
@@ -111,10 +94,8 @@ it('Should be able to stringify previously serialized value', async t => {
 
 
     //-----------------
-    const serializedMap1      = SerializerXml.serialize(new Map([ [ 1, '1' ], [ 2, '2' ], [ 3, '3' ] ]))
-
     t.is(
-        StringifierXml.stringify(serializedMap1, stringifierConfig),
+        StringifierXml.print(new Map([ [ 1, '1' ], [ 2, '2' ], [ 3, '3' ] ]), stringifierConfig),
 `Map (3) {
   1 => "1",
   2 => "2",
@@ -128,10 +109,8 @@ it('Should be able to stringify previously serialized value', async t => {
 //---------------------------------------------------------------------------------------------------------------------
 it('Should show "out of wide" symbol', async t => {
     //-----------------
-    const serializedObject  = SerializerXml.serialize({ prop1 : 1, prop2 : 2, prop3 : 3 }, { maxWide : 2 })
-
     t.is(
-        StringifierXml.stringify(serializedObject, stringifierConfig),
+        StringifierXml.print({ prop1 : 1, prop2 : 2, prop3 : 3 }, stringifierConfig, { maxWide : 2 }),
 `{
   "prop1": 1,
   "prop2": 2,
@@ -141,10 +120,8 @@ it('Should show "out of wide" symbol', async t => {
     )
 
     //-----------------
-    const serializedArray   = SerializerXml.serialize([ 1, 2, 3 ], { maxWide : 2 })
-
     t.is(
-        StringifierXml.stringify(serializedArray, stringifierConfig),
+        StringifierXml.print([ 1, 2, 3 ], stringifierConfig, { maxWide : 2 }),
 `[
   1,
   2,
@@ -154,10 +131,8 @@ it('Should show "out of wide" symbol', async t => {
     )
 
     //-----------------
-    const serializedSet     = SerializerXml.serialize(new Set([ 1, 2, 3 ]), { maxWide : 2 })
-
     t.is(
-        StringifierXml.stringify(serializedSet, stringifierConfig),
+        StringifierXml.print(new Set([ 1, 2, 3 ]), stringifierConfig, { maxWide : 2 }),
 `Set (3) {
   1,
   2,
@@ -167,10 +142,8 @@ it('Should show "out of wide" symbol', async t => {
     )
 
     //-----------------
-    const serializedMap     = SerializerXml.serialize(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]), { maxWide : 2 })
-
     t.is(
-        StringifierXml.stringify(serializedMap, stringifierConfig),
+        StringifierXml.print(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]), stringifierConfig, { maxWide : 2 }),
 `Map (3) {
   1 => 1,
   2 => 2,
@@ -184,10 +157,8 @@ it('Should show "out of wide" symbol', async t => {
 //---------------------------------------------------------------------------------------------------------------------
 it('Should show "out of depth" symbol', async t => {
     //-----------------
-    const serializedObject  = SerializerXml.serialize({ prop1 : 1, prop2 : { prop3 : 3 } }, { maxDepth : 1 })
-
     t.is(
-        StringifierXml.stringify(serializedObject, { prettyPrint : true, maxLen : 50, indentLevel : 2 }),
+        StringifierXml.print({ prop1 : 1, prop2 : { prop3 : 3 } }, { prettyPrint : true, maxLen : 50, indentLevel : 2 }, { maxDepth : 1 }),
 `{
   "prop1": 1,
   "prop2": ▼ Object { ... }
@@ -203,20 +174,20 @@ it('Should include reference number into serialization', async t => {
     const a     = { a : undefined }
     a.a         = a
 
-    t.is(StringifierXml.stringify(SerializerXml.serialize(a)), '<ref *1> { "a": [Circular *1] }')
+    t.is(StringifierXml.print(a), '<ref *1> { "a": [Circular *1] }')
 
     //-----------------
     const b     = { b : undefined, c : undefined }
     b.b         = b
     b.c         = b
 
-    t.is(StringifierXml.stringify(SerializerXml.serialize(b)), '<ref *1> { "b": [Circular *1], "c": [Circular *1] }')
+    t.is(StringifierXml.print(b), '<ref *1> { "b": [Circular *1], "c": [Circular *1] }')
 
     //-----------------
     const map   = new Map()
     map.set(map, map)
 
-    t.is(StringifierXml.stringify(SerializerXml.serialize(map)), '<ref *1> Map (1) { [Circular *1] => [Circular *1] }')
+    t.is(StringifierXml.print(map), '<ref *1> Map (1) { [Circular *1] => [Circular *1] }')
 })
 
 
@@ -227,5 +198,19 @@ it('Should include class name into serialization', async t => {
         a : number          = 1
     }
 
-    t.is(StringifierXml.stringify(SerializerXml.serialize(new SomeClass())), 'SomeClass { "a": 1 }')
+    t.is(StringifierXml.print(new SomeClass()), 'SomeClass { "a": 1 }')
+})
+
+
+//---------------------------------------------------------------------------------------------------------------------
+it('Should serialize number placeholder', async t => {
+    t.is(StringifierXml.print(anyNumberApprox(10)), '10±0.5')
+    t.is(StringifierXml.print(anyNumberBetween(1, 2)), '1 ≤ x ≤ 2')
+})
+
+
+//---------------------------------------------------------------------------------------------------------------------
+it('Should serialize instance placeholder', async t => {
+    t.is(StringifierXml.print(anyInstanceOf(Date)), 'any [Date]')
+    t.is(StringifierXml.print(anyInstanceOf(Number)), 'any [Number]')
 })

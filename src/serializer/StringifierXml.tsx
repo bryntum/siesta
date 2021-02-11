@@ -2,6 +2,7 @@ import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { TextBlock } from "../jsx/TextBlock.js"
 import { XmlElement } from "../jsx/XmlElement.js"
+import { SerializerXml } from "./SerializerXml.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class StringifierXml extends Mixin(
@@ -240,5 +241,16 @@ export class StringifierXml extends Mixin(
 
             return stringifier.toTextBlock()
         }
+
+
+        static print <T extends typeof StringifierXml> (
+            this : T,
+            value : unknown,
+            stringificationProps? : Partial<InstanceType<T>>,
+            serilizationProps? : Partial<SerializerXml>
+        ) : string {
+            return this.stringify(SerializerXml.serialize(value, serilizationProps), stringificationProps)
+        }
+
     }
 ) {}

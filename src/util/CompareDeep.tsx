@@ -49,7 +49,7 @@ export class PlaceHolderNumber extends Mixin(
         initialize (props? : Partial<PlaceHolderNumber>) {
             super.initialize(props)
 
-            if (this.threshold === undefined) this.threshold = 0.05 * this.value
+            if (this.value !== undefined && this.threshold === undefined) this.threshold = 0.05 * this.value
         }
 
 
@@ -76,11 +76,14 @@ export class PlaceHolderNumber extends Mixin(
 
             if (type1 !== type2)
                 yield DifferenceTypesAreDifferent.new({ v1, v2, type1, type2, keyPath : state.keyPathSnapshot() })
-            else {
-                const threshold     = Math.abs(v - this.value)
-
-                if (threshold > this.threshold)
+            else if (this.value !== undefined) {
+                if (Math.abs(v - this.value) > this.threshold)
                     yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
+            }
+            else {
+                if (v < this.min || v > this.max)
+                    yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
+
             }
         }
     }
@@ -102,12 +105,12 @@ export class PlaceHolderInstance extends Mixin(
 
 
         toString () : string {
-            return `any instance of [${ this.cls.name }]`
+            return `any [${ this.cls.name }]`
         }
 
 
         [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-            visitor.write(<object constructorName={ this.cls.name }></object>)
+            visitor.write(<special>{ this }</special>)
 
             return this
         }
@@ -145,7 +148,7 @@ export class PlaceHolderAny extends Mixin(
 
 
         [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-            visitor.write(<special>any</special>)
+            visitor.write(<special>{ this }</special>)
 
             return this
         }
