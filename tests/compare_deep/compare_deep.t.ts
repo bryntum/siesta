@@ -84,11 +84,17 @@ it('Deep compare should work for string placeholders', async t => {
 
 
 it('Deep compare should work for instance placeholders', async t => {
+    t.isDeeply(CI(compareDeepGen(false, anyInstanceOf(Boolean))).toArray(), [])
+
+    t.isDeeply(CI(compareDeepGen('foo', anyInstanceOf(String))).toArray(), [])
+
     t.isDeeply(CI(compareDeepGen(10, anyInstanceOf(Number))).toArray(), [])
 
     t.isDeeply(CI(compareDeepGen(new Date, anyInstanceOf(Date))).toArray(), [])
 
     t.isDeeply(CI(compareDeepGen(new Date, anyInstanceOf(Object))).toArray(), [])
+
+    t.isDeeply(CI(compareDeepGen({}, anyInstanceOf(Object))).toArray(), [])
 
     t.isDeeply(CI(compareDeepGen([ 1, 2, 3 ], anyInstanceOf(Array))).toArray(), [])
 
