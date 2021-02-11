@@ -6,6 +6,7 @@ import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { serializationVisitSymbol, SerializerXml } from "../serializer/SerializerXml.js"
 import { Visitor } from "../visitor/Visitor.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "./Helpers.js"
+import { isRegExp } from "./Typeguards.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -83,16 +84,57 @@ export class PlaceHolderNumber extends Mixin(
             else {
                 if (v < this.min || v > this.max)
                     yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
-
             }
         }
     }
 ){}
 
-
 export const anyNumberApprox = (value : number, threshold? : number) : PlaceHolderNumber => PlaceHolderNumber.new({ value, threshold })
 
 export const anyNumberBetween = (min : number, max : number) : PlaceHolderNumber => PlaceHolderNumber.new({ min, max })
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class PlaceHolderString extends Mixin(
+    [ PlaceHolder ],
+    (base : ClassUnion<typeof PlaceHolder>) =>
+
+    class PlaceHolderString extends base {
+        pattern     : string | RegExp       = ''
+
+        toString () : string {
+            if (isRegExp(this.pattern))
+                return `any string matching ${ this.pattern }`
+            else
+                return `any string containing ${ this.pattern }`
+        }
+
+
+        [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
+            visitor.write(<special>{ this }</special>)
+
+            return this
+        }
+
+
+        * equalsToGen (v : string, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Generator<Difference> {
+            const v1        = flipped ? v : this
+            const v2        = flipped ? this : v
+
+            const type1     = flipped ? typeOf(v) : 'String'
+            const type2     = flipped ? 'String' : typeOf(v)
+
+            if (type1 !== type2)
+                yield DifferenceTypesAreDifferent.new({ v1, v2, type1, type2, keyPath : state.keyPathSnapshot() })
+            else {
+                if (isRegExp(this.pattern) ? !this.pattern.test(v) : String(v).indexOf(this.pattern) === -1)
+                    yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
+            }
+        }
+    }
+){}
+
+export const anyStringLike = (pattern : string | RegExp) : PlaceHolderString => PlaceHolderString.new({ pattern })
 
 
 //---------------------------------------------------------------------------------------------------------------------

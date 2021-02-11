@@ -3,7 +3,7 @@ import { CI } from "../../src/iterator/Iterator.js"
 import {
     any,
     anyInstanceOf,
-    anyNumberApprox,
+    anyNumberApprox, anyStringLike,
     compareDeepGen,
     DifferenceObject,
     DifferenceReachability,
@@ -60,6 +60,25 @@ it('Deep compare should work for number placeholders', async t => {
     t.isDeeply(
         CI(compareDeepGen('10', placeholder)).toArray(),
         [ DifferenceTypesAreDifferent.new({ v1 : '10', v2 : placeholder, type1 : 'String', type2 : 'Number' }) ]
+    )
+})
+
+
+it('Deep compare should work for string placeholders', async t => {
+    t.isDeeply(CI(compareDeepGen('10', anyStringLike('1'))).toArray(), [])
+    t.isDeeply(CI(compareDeepGen('FOO', anyStringLike(/foo/i))).toArray(), [])
+
+    //------------------------
+    const placeholder   = anyStringLike(/foo/i)
+
+    t.isDeeply(
+        CI(compareDeepGen(1, placeholder)).toArray(),
+        [ DifferenceTypesAreDifferent.new({ v1 : 1, v2 : placeholder, type1 : 'Number', type2 : 'String' }) ]
+    )
+
+    t.isDeeply(
+        CI(compareDeepGen('bar', placeholder)).toArray(),
+        [ DifferenceValuesAreDifferent.new({ v1 : 'bar', v2 : placeholder }) ]
     )
 })
 
