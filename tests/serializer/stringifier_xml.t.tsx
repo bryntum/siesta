@@ -1,7 +1,7 @@
 import { it } from "../../main.js"
 import { SiestaJSX } from "../../src/jsx/Factory.js"
 import { StringifierXml } from "../../src/serializer/StringifierXml.js"
-import { anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src/util/CompareDeep.js"
+import { any, anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src/util/CompareDeep.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 const stringifierConfig : Partial<StringifierXml>  = { prettyPrint : true, maxLen : 20, indentLevel : 2 }
@@ -213,4 +213,10 @@ it('Should serialize number placeholder', async t => {
 it('Should serialize instance placeholder', async t => {
     t.is(StringifierXml.print(anyInstanceOf(Date)), 'any [Date]')
     t.is(StringifierXml.print(anyInstanceOf(Number)), 'any [Number]')
+})
+
+
+//---------------------------------------------------------------------------------------------------------------------
+it('Should serialize any placeholder', async t => {
+    t.is(StringifierXml.print(any()), 'any')
 })

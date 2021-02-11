@@ -73,6 +73,8 @@ it('Deep compare should work for instance placeholders', async t => {
 
     t.isDeeply(CI(compareDeepGen([ 1, 2, 3 ], anyInstanceOf(Array))).toArray(), [])
 
+    t.isDeeply(CI(compareDeepGen(() => {}, anyInstanceOf(Function))).toArray(), [])
+
     //------------------------
     const placeholder   = anyInstanceOf(Date)
 
