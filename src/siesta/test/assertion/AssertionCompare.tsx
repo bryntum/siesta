@@ -28,7 +28,7 @@ export class AssertionCompare extends Mixin(
             const passed        = !Boolean(value)
 
             this.addResult(Assertion.new({
-                name            : 'true',
+                name            : 't.true(received)',
                 passed,
                 description,
                 annotation      : passed ? undefined : GotExpectTemplate.el({
@@ -181,9 +181,20 @@ export class AssertionCompare extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class AnnotationTemplate extends Base {
+    t                   : TestNodeResult            = undefined
 
-    serializerConfig    : Partial<SerializerXml>   = { maxDepth : 4, maxWide : 4 }
+    $serializerConfig   : Partial<SerializerXml>    = undefined
 
+
+    get serializerConfig () : Partial<SerializerXml> {
+        if (this.$serializerConfig !== undefined) return this.$serializerConfig
+
+        return this.$serializerConfig = this.t ? this.t.descriptor.serializerConfig : { maxDepth : 4, maxWide : 4 }
+    }
+
+    set serializerConfig (value : Partial<SerializerXml>) {
+        this.$serializerConfig = value
+    }
 
     toXmlElement () : XmlElement {
         throw new Error("Abstract method")
@@ -221,10 +232,12 @@ export class GotExpectTemplate extends AnnotationTemplate {
     toXmlElement () : XmlElement {
         return <div class="indented got_expected">
             { this.description || false }
-            <div class='got'>
-                <div class="underlined got_title">{ this.gotTitle }:</div>
-                <div class="indented got_value">{ SerializerXml.serialize(this.got, this.serializerConfig) }</div>
-            </div>
+            {
+                this.got !== undefined && <div class='got'>
+                    <div class="underlined got_title">{ this.gotTitle }:</div>
+                    <div class="indented got_value">{ SerializerXml.serialize(this.got, this.serializerConfig) }</div>
+                </div>
+            }
             {
                 this.expect !== undefined && <div class='expect'>
                     <div class="underlined expect_title">{ this.expectTitle }:</div>
