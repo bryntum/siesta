@@ -929,8 +929,7 @@ export const compareDateDeepGen = function * (date1 : Date, date2 : Date, option
 
 //---------------------------------------------------------------------------------------------------------------------
 export const comparePrimitivesGen = function * (v1 : unknown, v2 : unknown, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Generator<Difference> {
-    // shortcut exit to save time, this also allows to compare the placeholder with itself
-    if (v1 === v2 || isNaN(v1 as number) && isNaN(v2 as number)) return
+    if (v1 === v2 || (Number.isNaN(v1) && Number.isNaN(v2))) return
 
     // some (or both) of the inputs is a PlaceHolder instance
     if (v1 instanceof PlaceHolder && v2 instanceof PlaceHolder) {
