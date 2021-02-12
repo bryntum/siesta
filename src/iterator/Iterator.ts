@@ -1,4 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
+export type FalseAsEarlyExit = false | void
+
+//---------------------------------------------------------------------------------------------------------------------
 /**
  * Given a single `Iterable`, returns an array of 2 iterables, mirroring the original one (which should not be used anymore).
  *
@@ -149,7 +152,7 @@ export function* map<Element, Result> (iterator : Iterable<Element>, func : (el 
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export function forEach<Element> (iterator : Iterable<Element>, func : (el : Element, index : number) => false | undefined) : false | undefined {
+export function forEach<Element> (iterator : Iterable<Element>, func : (el : Element, index : number) => FalseAsEarlyExit) : FalseAsEarlyExit {
     let i   = 0
 
     for (const el of iterator) if (func(el, i++) === false) return false
@@ -313,7 +316,7 @@ export class ChainedIteratorClass<T> {
     }
 
 
-    forEach (func : (el : T, index : number) => false | undefined) : false | undefined {
+    forEach (func : (el : T, index? : number) => FalseAsEarlyExit) : FalseAsEarlyExit {
         return forEach(this.iterable, func)
     }
 
