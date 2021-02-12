@@ -67,7 +67,7 @@ export class ReporterTheme extends Base {
 
     testNodeUrl (testNode : TestNodeResult) : XmlElement {
         const rel       = relative(this.projectDescriptor.projectPlan.url, testNode.descriptor.url)
-        const match     = /(.*?\/)?([^/]+)/.exec(rel)
+        const match     = /(.*\/)?([^\/]+)/.exec(rel)
 
         return <span>
             <span class="test_file_url_dirname">{ match[ 1 ] || '' }</span><span class="test_file_url_filename">{ match[ 2 ] }</span>
@@ -208,9 +208,7 @@ export class Reporter extends Mixin(
 
 
         testNodeTemplateXml (testNode : TestNodeResult, isTopLevelLastNode : boolean | null = null) : XmlElement {
-            let node : XmlElement       = <tree></tree>
-
-            node.setAttribute('isTopLevelLastNode', isTopLevelLastNode)
+            let node : XmlElement       = <tree isTopLevelLastNode={ isTopLevelLastNode }></tree>
 
             if (testNode.isRoot) {
                 node.appendChild(this.t.testNodeState(testNode), ' ', this.t.testNodeUrl(testNode))
