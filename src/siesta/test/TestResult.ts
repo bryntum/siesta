@@ -164,6 +164,11 @@ export class TestNodeResult extends Mixin(
         }
 
 
+        negateExpectationName (name : string) : string {
+            return name.replace(/^(expect\(.+?\)\.)/, '$1not.')
+        }
+
+
         // this is here to be available for the assertion mixins
         getSourceLine () : number | undefined {
             const stack         = new Error().stack
@@ -285,6 +290,15 @@ export class TestNodeResult extends Mixin(
         set isTodo (value : boolean) {
             this.descriptor.isTodo      = value
             this.$isTodo                = undefined
+        }
+
+
+        * eachAssertion () : Generator<Assertion> {
+            for (const result of this.resultLog) {
+                if (result instanceof Assertion) yield result
+
+                if (result instanceof TestNodeResult) yield* result.eachAssertion()
+            }
         }
     }
 

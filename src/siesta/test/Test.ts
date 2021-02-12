@@ -50,8 +50,11 @@ export class Test extends Mixin(
         isExclusive         : boolean               = false
 
         // not related to `before/afterEach` hooks, completely different thing
+        preStartHook           : Hook<[ this ]>     = new Hook()
         startHook           : Hook<[ this ]>        = new Hook()
+
         finishHook          : Hook<[ this ]>        = new Hook()
+        postFinishHook      : Hook<[ this ]>        = new Hook()
 
 
         expect (value : unknown) : Expectation {
@@ -173,10 +176,14 @@ export class Test extends Mixin(
 
 
         async start () {
+            // extra-early start hook, test is not yet marked as active in the reporter
+            this.preStartHook.trigger(this)
+
             globalTestEnv.currentTest       = this
 
             this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
+            // start hook, test is marked as active in the reporter
             this.startHook.trigger(this)
 
             if (this.isRoot) await this.setup()
@@ -185,11 +192,15 @@ export class Test extends Mixin(
 
             if (this.isRoot) await this.tearDown()
 
+            // finish hook, test is still marked as active in the reporter
             this.finishHook.trigger(this)
 
             this.reporter.onSubTestFinish(this.localId)
 
             globalTestEnv.currentTest       = this.parentNode
+
+            // extra-late finish hook, test is already not marked as active in the reporter
+            this.postFinishHook.trigger(this)
         }
 
 
@@ -317,21 +328,25 @@ export const xit = (name : TestDescriptorArgument, code : (t : Test) => any) : T
     return Test.new()
 }
 
-export const xdescribe = iit
+export const xdescribe = xit
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export const beforeEach = (code : (t : Test) => any) => {
-    if (!globalTestEnv.currentTest) throw new Error("Global `beforeEach` used outside of the scope of any test")
+    if (!globalTestEnv.currentTest) throw new Error("Global `beforeEach` call used outside of the scope of any test")
 
     globalTestEnv.currentTest.beforeEach(code)
 }
 
 export const afterEach = (code : (t : Test) => any) => {
-    if (!globalTestEnv.currentTest) throw new Error("Global `afterEach` used outside of the scope of any test")
+    if (!globalTestEnv.currentTest) throw new Error("Global `afterEach` call used outside of the scope of any test")
 
     globalTestEnv.currentTest.afterEach(code)
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-export const expect = (value : unknown) : Expectation => Expectation.new({ value, t : globalTestEnv.currentTest })
+export const expect = (value : unknown) : Expectation => {
+    if (!globalTestEnv.currentTest) throw new Error("Global `expect` call used outside of the scope of any test")
+
+    return Expectation.new({ value, t : globalTestEnv.currentTest })
+}

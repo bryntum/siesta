@@ -22,7 +22,7 @@ export class StringifierXml extends Mixin(
         output                  : TextBlock     = TextBlock.new()
 
         leafNodes               : Set<string>   = new Set([
-            'number', 'string', 'date', 'regexp', 'symbol', 'function', 'special'
+            'boolean', 'number', 'string', 'date', 'regexp', 'symbol', 'function', 'special'
         ])
 
 

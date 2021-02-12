@@ -114,6 +114,12 @@ export class SerializerXml extends Mixin(
         }
 
 
+        visitBoolean (value : boolean, depth : number) {
+            // note, that just `<boolean>{ value }</boolean>` will create empty tag (`false` is ignored)
+            this.write(<boolean>{ String(value) }</boolean>)
+        }
+
+
         visitNumber (value : number, depth : number) {
             this.write(<number>{ value }</number>)
         }

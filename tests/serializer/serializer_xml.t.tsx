@@ -6,7 +6,10 @@ import { anyNumberApprox } from "../../src/util/CompareDeep.js"
 
 it('Serialization should work for atoms', async t => {
     t.equal(SerializerXml.serialize(undefined), <serialization><undefined></undefined></serialization>, '`undefined` serialization')
+
     t.equal(SerializerXml.serialize(null), <serialization><null></null></serialization>, '`null` serialization')
+
+    t.equal(SerializerXml.serialize(false), <serialization><boolean>false</boolean></serialization>, 'Boolean serialization')
 
     t.equal(SerializerXml.serialize(1), <serialization><number>1</number></serialization>, 'Number serialization')
 
@@ -15,6 +18,7 @@ it('Serialization should work for atoms', async t => {
     t.equal(SerializerXml.serialize(new Date(2020, 1, 1)), <serialization><date>new Date("2020/01/01 00:00:00.0")</date></serialization>, 'Date serialization')
 
     t.equal(SerializerXml.serialize(() => {}), <serialization><function>{ '() => { }' }</function></serialization>, 'Function serialization')
+
     t.equal(SerializerXml.serialize(function name () {}), <serialization><function>{ 'function name() { }' }</function></serialization>, 'Function serialization')
 
     t.equal(SerializerXml.serialize(Symbol(1)), <serialization><symbol>Symbol(1)</symbol></serialization>, 'Symbol serialization')

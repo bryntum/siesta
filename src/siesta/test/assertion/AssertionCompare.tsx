@@ -25,7 +25,7 @@ export class AssertionCompare extends Mixin(
 
 
         true<V> (value : V, description : string = '') {
-            const passed        = !Boolean(value)
+            const passed        = Boolean(value)
 
             this.addResult(Assertion.new({
                 name            : 't.true(received)',

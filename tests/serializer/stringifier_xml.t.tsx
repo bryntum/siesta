@@ -7,6 +7,21 @@ import { any, anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src
 const stringifierConfig : Partial<StringifierXml>  = { prettyPrint : true, maxLen : 20, indentLevel : 2 }
 
 it('Should be able to stringify previously serialized value', async t => {
+    //-----------------
+    t.is(
+        StringifierXml.print(false, stringifierConfig),
+        "false"
+    )
+
+
+    //-----------------
+    t.is(
+        StringifierXml.print(Symbol(1), stringifierConfig),
+        "Symbol(1)"
+    )
+
+
+    //-----------------
     t.is(
         StringifierXml.print(1, stringifierConfig),
         "1"
