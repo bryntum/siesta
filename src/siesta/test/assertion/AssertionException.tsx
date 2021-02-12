@@ -13,126 +13,149 @@ export class AssertionException extends Mixin(
 
     class AssertionException extends base {
 
-        async throwsOk (func : AnyFunction, pattern : string | RegExp, description : string = '') {
-            return this.throws(func, pattern, description)
-        }
-
-        async throws (func : AnyFunction, pattern : string | RegExp, description : string = '') {
+        async checkForException (func : AnyFunction) : Promise<{ thrown : boolean, exception : any }> {
             let thrown : boolean    = false
             let exception
 
             try {
-                const result    = func()
-
-                if (result instanceof Promise) await result
+                await func()
             } catch (e) {
                 // as an edge case an `undefined` can be thrown, so need extra boolean flag
                 // to check that exception has been actually thrown
-                thrown      = true
-                exception   = e
+                thrown              = true
+                exception           = e
             }
 
+            return { thrown, exception }
+        }
+
+
+        async assertThrowInternal (
+            assertionName   : string,
+            negated         : boolean,
+            func            : AnyFunction,
+            sourceLine      : number,
+            pattern         : string | RegExp = '',
+            description     : string = ''
+        ) {
+            const { thrown, exception } = await this.checkForException(func)
+
             if (!thrown) {
-                this.addResult(Assertion.new({
-                    name            : 'throws',
-                    passed          : false,
-                    description,
+                if (negated)
+                    this.addResult(Assertion.new({
+                        sourceLine,
+                        name            : this.negateExpectationName(assertionName),
+                        passed          : true,
+                        description
+                    }))
+                else
+                    this.addResult(Assertion.new({
+                        sourceLine,
+                        name            : assertionName,
+                        passed          : false,
+                        description,
 
-                    annotation      : <div>
-                        Provided function did not throw exception
-                    </div>
-                }))
+                        annotation      : GotExpectTemplate.el({
+                            description : 'Provided function did not throw exception',
+                            gotTitle    : `Expect exception with message ${ isRegExp(pattern) ? 'matching' : 'containing' }`,
+                            got         : pattern,
+                            t           : this
+                        })
+                    }))
             } else {
-                const message   = String(exception?.message) ?? String(exception)
+                const message   = String(exception?.message ?? exception)
 
-                if (isRegExp(pattern)) {
-                    if (pattern.test(message))
-                        this.addResult(Assertion.new({
-                            name            : 'throws',
-                            passed          : true,
-                            description
-                        }))
-                    else
-                        this.addResult(Assertion.new({
-                            name            : 'throws',
-                            passed          : false,
-                            description,
+                if (negated)
+                    this.addResult(Assertion.new({
+                        sourceLine,
+                        name            : this.negateExpectationName(assertionName),
+                        passed          : false,
+                        description,
 
-                            annotation      : GotExpectTemplate.el({
-                                got         : message,
-                                gotTitle    : 'Got exception',
-                                expect      : pattern,
-                                expectTitle : 'Expect exception matching',
-                                serializerConfig : this.descriptor.serializerConfig
-                            }),
-                        }))
-                } else {
-                    if (message.indexOf(pattern) !== -1)
-                        this.addResult(Assertion.new({
-                            name            : 'throws',
-                            passed          : true,
-                            description
-                        }))
-                    else
-                        this.addResult(Assertion.new({
-                            name            : 'throws',
-                            passed          : false,
-                            description,
+                        annotation      : GotExpectTemplate.el({
+                            gotTitle    : 'Provided function threw an exception',
+                            got         : message,
+                            t           : this
+                        }),
+                    }))
+                else {
+                    if (isRegExp(pattern)) {
+                        if (pattern.test(message))
+                            this.addResult(Assertion.new({
+                                sourceLine,
+                                name            : assertionName,
+                                passed          : true,
+                                description
+                            }))
+                        else
+                            this.addResult(Assertion.new({
+                                sourceLine,
+                                name            : assertionName,
+                                passed          : false,
+                                description,
 
-                            annotation      : GotExpectTemplate.el({
-                                got         : message,
-                                gotTitle    : 'Got exception',
-                                expect      : pattern,
-                                expectTitle : 'Expect exception containing',
-                                serializerConfig : this.descriptor.serializerConfig
-                            })
-                        }))
+                                annotation      : GotExpectTemplate.el({
+                                    gotTitle    : 'Got exception',
+                                    got         : message,
+                                    expectTitle : 'Expect exception matching',
+                                    expect      : pattern,
+                                    t           : this
+                                }),
+                            }))
+                    } else {
+                        if (message.indexOf(pattern) !== -1)
+                            this.addResult(Assertion.new({
+                                sourceLine,
+                                name            : assertionName,
+                                passed          : true,
+                                description
+                            }))
+                        else
+                            this.addResult(Assertion.new({
+                                sourceLine,
+                                name            : assertionName,
+                                passed          : false,
+                                description,
+
+                                annotation      : GotExpectTemplate.el({
+                                    gotTitle    : 'Got exception',
+                                    got         : message,
+                                    expectTitle : 'Expect exception containing',
+                                    expect      : pattern,
+                                    t           : this
+                                })
+                            }))
+                    }
                 }
             }
         }
 
 
-        async livesOk (func : AnyFunction, description : string = '') {
-            return this.doesNotThrow(func, description)
+        async throws (func : AnyFunction, pattern : string | RegExp = '', description : string = '') {
+            return this.assertThrowInternal('throws(func, pattern)', false, func, this.getSourceLine(), pattern, description)
         }
 
         async doesNotThrow (func : AnyFunction, description : string = '') {
-            let thrown : boolean    = false
-            let exception
-
-            try {
-                const result    = func()
-
-                if (result instanceof Promise) await result
-            } catch (e) {
-                // as an edge case an `undefined` can be thrown, so need extra boolean flag
-                // to check that exception has been actually thrown
-                thrown      = true
-                exception   = e
-            }
-
-            if (thrown) {
-                const message   = String(exception?.message) ?? String(exception)
-
-                this.addResult(Assertion.new({
-                    name            : 'throws',
-                    passed          : false,
-                    description,
-
-                    annotation      : <div class='indented'>
-                        Provided function threw an exception:
-                        <p class='indented'>
-                            <span class="difference_value">{ SerializerXml.serialize(message, { maxDepth: 4, maxWide: 4 }) }</span>
-                        </p>
-                    </div>
-                }))
-            } else {
-                this.addResult(Assertion.new({
-                    name            : 'throws',
-                    passed          : true,
-                    description
-                }))
-            }
+            return this.assertThrowInternal('doesNotThrow(func)', true, func, this.getSourceLine(), '', description)
         }
+
+
+        // backward compat
+        async throwsOk (func : AnyFunction, pattern : string | RegExp, description : string = '') {
+            return this.assertThrowInternal('throwsOk(func, pattern)', false, func, this.getSourceLine(), pattern, description)
+        }
+
+        async livesOk (func : AnyFunction, description : string = '') {
+            return this.assertThrowInternal('livesOk(func)', true, func, this.getSourceLine(), '', description)
+        }
+
+        async lives_ok (func : AnyFunction, description : string = '') {
+            return this.assertThrowInternal('livesOk(func)', true, func, this.getSourceLine(), '', description)
+        }
+
+        async lives (func : AnyFunction, description : string = '') {
+            return this.assertThrowInternal('livesOk(func)', true, func, this.getSourceLine(), '', description)
+        }
+        // eof backward compat
     }
 ) {}
