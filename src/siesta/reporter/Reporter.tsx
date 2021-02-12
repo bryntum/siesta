@@ -81,7 +81,7 @@ export class ReporterTheme extends Base {
                 { assertion.passed ? '✔' : '✘' }
             </span>
             { ' ' }
-            [<span class="assertion_name">{ assertion.name }</span>]
+            <span class="assertion_name">{ assertion.name }</span>
             <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
             { ' ' }
             at line <span class="assertion_source_line">{ assertion.sourceLine }</span>

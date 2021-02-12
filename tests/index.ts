@@ -87,7 +87,8 @@ project.plan(
             'before_after_each.t.js',
             'todo_tests.t.js',
             'snooze_tests.t.js',
-            'global_test.t.js'
+            'global_test.t.js',
+            'expectation.t.js'
         ]
     },
 )

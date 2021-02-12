@@ -201,7 +201,7 @@ export class PlaceHolderAny extends Mixin(
     }
 ){}
 
-export const any = () : PlaceHolderAny => PlaceHolderAny.new()
+export const any = (cls? : AnyConstructor) : PlaceHolderAny | PlaceHolderInstance => cls ? PlaceHolderInstance.new({ cls }) : PlaceHolderAny.new()
 
 
 
@@ -593,8 +593,15 @@ export class DifferenceValuesAreDifferent extends Difference {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
+// in the future, we might support several options for comparison,
+// for example:
+// - whether to compare objects deep by prototypes
+// - whether to compare built-in primitives, like Date, RegExp etc as objects as well,
+// so that `const a = new Date(); a.extraProp = 1; b = new Date();`
+// - whether to treated different reachability for cycles as difference
+// - etc
 export type DeepCompareOptions = {
-    includePropertiesFromPrototypeChain : boolean
+    // includePropertiesFromPrototypeChain : boolean
 }
 
 
@@ -922,14 +929,22 @@ export const compareDateDeepGen = function * (date1 : Date, date2 : Date, option
 
 //---------------------------------------------------------------------------------------------------------------------
 export const comparePrimitivesGen = function * (v1 : unknown, v2 : unknown, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Generator<Difference> {
-    if (v1 !== v2) yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
+    // shortcut exit to save time, this also allows to compare the placeholder with itself
+    if (v1 === v2 || isNaN(v1 as number) && isNaN(v2 as number)) return
 
-    // if (v1 instanceof PlaceHolder && v2 instanceof PlaceHolder)
-    //     return v1.equalsTo(v2)
-    // else if (v1 instanceof PlaceHolder)
-    //     return v1.equalsTo(v2)
-    // else if (v2 instanceof PlaceHolder)
-    //     return v2.equalsTo(v1)
+    // some (or both) of the inputs is a PlaceHolder instance
+    if (v1 instanceof PlaceHolder && v2 instanceof PlaceHolder) {
+        yield* v1.equalsToGen(v2, false, options, state)
+    }
+    else if (v1 instanceof PlaceHolder) {
+        yield* v1.equalsToGen(v2, false, options, state)
+    }
+    else if (v2 instanceof PlaceHolder) {
+        yield* v2.equalsToGen(v1, true, options, state)
+    }
+    else {
+        yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
+    }
 }
 
 /*

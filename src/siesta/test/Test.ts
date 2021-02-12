@@ -6,6 +6,7 @@ import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
 import { AssertionException } from "./assertion/AssertionException.js"
 import { AssertionGeneral } from "./assertion/AssertionGeneral.js"
+import { Expectation } from "./Expectation.js"
 import { TestLauncherChild } from "./port/TestLauncher.js"
 import { TestReporterChild } from "./port/TestReporter.js"
 import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
@@ -51,6 +52,11 @@ export class Test extends Mixin(
         // not related to `before/afterEach` hooks, completely different thing
         startHook           : Hook<[ this ]>        = new Hook()
         finishHook          : Hook<[ this ]>        = new Hook()
+
+
+        expect (value : unknown) : Expectation {
+            return Expectation.new({ value, t : this })
+        }
 
 
         beforeEach (code : (t : this) => any) {
@@ -327,3 +333,5 @@ export const afterEach = (code : (t : Test) => any) => {
     globalTestEnv.currentTest.afterEach(code)
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+export const expect = (value : unknown) : Expectation => Expectation.new({ value, t : globalTestEnv.currentTest })

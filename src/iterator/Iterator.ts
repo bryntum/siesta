@@ -171,6 +171,16 @@ export function reduce<Element, Result> (iterator : Iterable<Element>, func : (a
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export function size<Element> (iterator : Iterable<Element>) : number {
+    let i   = 0
+
+    for (const el of iterator) i++
+
+    return i
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export function* uniqueOnly<Element> (iterator : Iterable<Element>) : Iterable<Element> {
     yield* uniqueOnlyBy(iterator, i => i)
 }
@@ -315,6 +325,11 @@ export class ChainedIteratorClass<T> {
 
     reduce<Result> (func : (acc : Result, el : T, index : number) => Result, initialAcc : Result) : Result {
         return reduce(this, func, initialAcc)
+    }
+
+
+    get size () : number {
+        return size(this)
     }
 
 
