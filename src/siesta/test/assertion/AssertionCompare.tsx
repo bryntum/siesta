@@ -19,6 +19,9 @@ export class AssertionCompare extends Mixin(
         maxEqualityDifferences          : number        = 5
 
 
+        //----------------------------------------------------
+        // region truthy assertions
+
         assertTrueInternal (
             assertionName   : string,
             negated         : boolean,
@@ -65,10 +68,69 @@ export class AssertionCompare extends Mixin(
             this.assertTrueInternal('not_ok(received)', false, true, value, description)
         }
         // eof backward compat
+        // endregion
 
 
         //----------------------------------------------------
-        assertEqualInternal (
+        // region equality assertions
+
+        assertEqualToConstant (
+            assertionName   : string,
+            same            : boolean,
+            negated         : boolean,
+            value1          : unknown,
+            value2          : unknown,
+            description     : string = ''
+        ) {
+            const passed        = negated ? !same : same
+
+            this.addResult(Assertion.new({
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                passed,
+                description,
+
+                annotation  : passed ? undefined : negated ? GotExpectTemplate.el({
+                    got                 : value1,
+                    expectTitle         : 'Expect value, not equal to',
+                    expect              : value2,
+                    t                   : this
+                }) : GotExpectTemplate.el({
+                    got                 : value1,
+                    expect              : value2,
+                    t                   : this
+                })
+            }))
+        }
+
+
+        assertEqualityInternal (
+            assertionName   : string,
+            same            : boolean,
+            negated         : boolean,
+            value1          : unknown,
+            value2          : unknown,
+            description     : string = ''
+        ) {
+            const passed        = negated ? !same : same
+
+            this.addResult(Assertion.new({
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                passed,
+                description,
+
+                annotation  : passed ? undefined : negated ? NotEqualAnnotationTemplate.el({
+                    value               : value2,
+                    t                   : this
+                }) : GotExpectTemplate.el({
+                    got                 : value1,
+                    expect              : value2,
+                    t                   : this
+                })
+            }))
+        }
+
+
+        assertStructuralEqualityInternal (
             assertionName   : string,
             negated         : boolean,
             value1          : unknown,
@@ -91,36 +153,116 @@ export class AssertionCompare extends Mixin(
                     t                   : this
                 })
             }))
-
         }
 
 
         eq<V> (value1 : V, value2 : V, description : string = '') {
-            this.assertEqualInternal('eq(received, expected)', false, value1, value2, description)
+            this.assertStructuralEqualityInternal('eq(received, expected)', false, value1, value2, description)
         }
 
 
         ne<V> (value1 : V, value2 : V, description : string = '') {
-            this.assertEqualInternal('ne(received, expected)', false, value1, value2, description)
+            this.assertStructuralEqualityInternal('ne(received, expected)', false, value1, value2, description)
         }
 
 
         equal<V> (value1 : V, value2 : V, description : string = '') {
-            this.assertEqualInternal('equal(received, expected)', false, value1, value2, description)
+            this.assertStructuralEqualityInternal('equal(received, expected)', false, value1, value2, description)
         }
 
 
         notEqual<V> (value1 : V, value2 : V, description : string = '') {
-            this.assertEqualInternal('notEqual(received, expected)', true, value1, value2, description)
+            this.assertStructuralEqualityInternal('notEqual(received, expected)', true, value1, value2, description)
         }
 
 
         // backward compat
         isDeeply<V> (value1 : V, value2 : V, description : string = '') {
-            this.assertEqualInternal('isDeeply(received, expected)', false, value1, value2, description)
+            this.assertStructuralEqualityInternal('isDeeply(received, expected)', false, value1, value2, description)
         }
         // eof backward compat
+        // endregion
 
+
+        //----------------------------------------------------
+        assertDefinedInternal (
+            assertionName   : string,
+            negated         : boolean,
+            inverted        : boolean,
+            value           : unknown,
+            description     : string = ''
+        ) {
+            const condition1    = value !== undefined
+            const condition2    = inverted ? !condition1 : condition1
+
+            const passed        = negated ? !condition2 : condition2
+
+            const title         = (negated && inverted) ? 'defined' : negated || inverted ? 'undefined' : 'defined'
+
+            this.addResult(Assertion.new({
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                passed,
+                description,
+                annotation      : passed ? undefined : GotExpectTemplate.el({
+                    description         : `Expected is ${ title } value`,
+                    got                 : value,
+                    t                   : this
+                })
+            }))
+        }
+
+
+        //----------------------------------------------------
+        // region pattern matching
+
+        assertMatchInternal (
+            assertName      : string,
+            negated         : boolean,
+            string          : string,
+            pattern         : string | RegExp,
+            description     : string = ''
+        ) {
+            const assertionName     = negated ? this.negateExpectationName(assertName) : assertName
+            const condition         = isRegExp(pattern) ? pattern.test(string) : String(string).indexOf(pattern) !== -1
+            const passed            = negated ? !condition : condition
+
+            const expectTitle       = `Expect string ${ negated ? 'not ' : '' }${ isRegExp(pattern) ? 'matching' : 'containing' }`
+
+            this.addResult(Assertion.new({
+                name            : assertionName,
+                passed          : passed,
+                description     : description,
+                annotation      : passed ? undefined : GotExpectTemplate.el({
+                    gotTitle    : 'Received string',
+                    got         : string,
+                    expectTitle,
+                    expect      : pattern,
+                    t           : this
+                })
+            }))
+        }
+
+
+        match (string : string, pattern : RegExp | string, desc : string = '') {
+            this.assertMatchInternal('match(received, expected)', false, string, pattern, desc)
+        }
+
+
+        notMatch (string : string, pattern : RegExp | string, desc : string = '') {
+            this.assertMatchInternal('notMatch(received, expected)', true, string, pattern, desc)
+        }
+
+
+        // backward compat
+        like (string : string, pattern : RegExp | string, desc : string = '') {
+            this.assertMatchInternal('like(received, expected)', false, string, pattern, desc)
+        }
+
+        unlike (string : string, pattern : RegExp | string, desc : string = '') {
+            this.assertMatchInternal('unlike(received, expected)', false, string, pattern, desc)
+        }
+        // eof backward compat
+        // endregion
 
 
         isStrict<V> (value1 : V, value2 : V, description : string = '') {
@@ -167,54 +309,6 @@ export class AssertionCompare extends Mixin(
 
                 annotation      : passed ? undefined : NotEqualAnnotationTemplate.el({ value : value2, serializerConfig : this.descriptor.serializerConfig })
             }))
-        }
-
-
-        like (string : string, pattern : RegExp | string, desc : string = '') {
-
-            if (isRegExp(pattern)) {
-                if (pattern.test(string)) {
-                    this.addResult(Assertion.new({
-                        name            : 'like',
-                        passed          : true,
-                        description     : desc
-                    }))
-                } else {
-                    this.addResult(Assertion.new({
-                        name            : 'like',
-                        passed          : false,
-                        description     : desc,
-                        annotation      : GotExpectTemplate.el({
-                            got         : string,
-                            gotTitle    : 'Got string',
-                            expect      : pattern,
-                            expectTitle : 'Expect string matching',
-                            serializerConfig : this.descriptor.serializerConfig
-                        })
-                    }))
-                }
-            } else {
-                if (String(string).indexOf(pattern) !== -1) {
-                    this.addResult(Assertion.new({
-                        name            : 'like',
-                        passed          : true,
-                        description     : desc
-                    }))
-                } else {
-                    this.addResult(Assertion.new({
-                        name            : 'like',
-                        passed          : false,
-                        description     : desc,
-                        annotation      : GotExpectTemplate.el({
-                            got         : string,
-                            gotTitle    : 'Got string',
-                            expect      : pattern,
-                            expectTitle : 'Expect string containing',
-                            serializerConfig : this.descriptor.serializerConfig
-                        })
-                    }))
-                }
-            }
         }
     }
 ) {}

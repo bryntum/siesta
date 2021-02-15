@@ -11,40 +11,104 @@ in other tests. For such methods, the coverage is less detailed.
 */
 
 //-------------------------------------------------------
-describe('Before/after should work #1', t => {
+it('`expect().toBe() should work`', async t => {
+
+    //------------------
     t.expect(1).toBe(1)
+
     t.expect(1).not.toBe(2)
 
-    t.expect(1).toBe(any(Number))
+    //------------------
+    t.todo('Should all fail', async t => {
 
-    t.expect(() => {}).toBe(any(Function))
-    t.expect(() => {}).toBe(any(Object))
+        t.expect(1).not.toBe(1)
 
-    t.expect([]).not.toBeNull()
-    t.expect(null).toBeNull()
+        t.expect(1).toBe(2)
 
-    t.expect(NaN).toBeNaN()
-
-    t.expect(function () {}).toBeDefined()
-    t.expect(1).toBeDefined()
-    t.expect(undefined).toBeUndefined()
-
-    t.expect("asd").toMatch(/asd/)
-
-    t.expect([ 1 ]).toContain(1)
-
-    t.expect([ 2 ]).not.toContain(1)
-
-    t.expect("asd").toContain("a")
-    t.expect("asd").not.toContain("z")
-
-    t.expect(1).toBeCloseTo(1.01, 1)
-    t.expect(1).not.toBeCloseTo(1.01, 2)
+    }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
 })
 
 
 //-------------------------------------------------------
-it('`expect(func).toEqual should work`', async t => {
+describe('Before/after should work #1', t => {
+    // t.expect(function () {}).toBeDefined()
+    // t.expect(1).toBeDefined()
+    //
+    // t.expect([ 1 ]).toContain(1)
+    //
+    // t.expect([ 2 ]).not.toContain(1)
+    //
+    // t.expect(1).toBeCloseTo(1.01, 1)
+    // t.expect(1).not.toBeCloseTo(1.01, 2)
+})
+
+
+//-------------------------------------------------------
+it('`expect().toBeNull()/toBeNaN()/toBeDefined/toBeUndefined() should work`', async t => {
+
+    //------------------
+    t.expect(null).toBeNull()
+    t.expect(NaN).toBeNaN()
+    t.expect(null).toBeDefined()
+    t.expect(undefined).toBeUndefined()
+
+    //------------------
+    t.expect(undefined).not.toBeNull()
+    t.expect(null).not.toBeNaN()
+    t.expect(undefined).not.toBeDefined()
+    t.expect(null).not.toBeUndefined()
+
+
+    //------------------
+    t.todo('Should all fail', async t => {
+
+        //------------------
+        t.expect(null).not.toBeNull()
+        t.expect(NaN).not.toBeNaN()
+        t.expect(null).not.toBeDefined()
+        t.expect(undefined).not.toBeUndefined()
+
+        //------------------
+        t.expect(undefined).toBeNull()
+        t.expect(null).toBeNaN()
+        t.expect(undefined).toBeDefined()
+        t.expect(null).toBeUndefined()
+
+    }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
+})
+
+
+
+//-------------------------------------------------------
+it('`expect().toMatch()/toContain(string) should work`', async t => {
+
+    //------------------
+    t.expect('ZOOKA').toMatch(/zooka/i)
+
+    t.expect('ZOOKA').toContain('OO')
+
+    t.expect('ZOOKA').not.toMatch(/kuki/i)
+
+    t.expect('ZOOKA').not.toContain('zops')
+
+
+    //------------------
+    t.todo('Should all fail', async t => {
+
+        t.expect('ZOOKA').not.toMatch(/zooka/i)
+
+        t.expect('ZOOKA').not.toContain('OO')
+
+        t.expect('ZOOKA').toMatch(/kuki/i)
+
+        t.expect('ZOOKA').toContain('zops')
+
+    }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
+})
+
+
+//-------------------------------------------------------
+it('`expect().toEqual() should work`', async t => {
 
     //------------------
     t.expect([]).toEqual([])
@@ -63,7 +127,7 @@ it('`expect(func).toEqual should work`', async t => {
 
 
 //-------------------------------------------------------
-it('`expect(func).toBeTruthy/Falsy() should work`', async t => {
+it('`expect().toBeTruthy/Falsy() should work`', async t => {
 
     //------------------
     t.expect(true).toBeTruthy()
@@ -78,7 +142,7 @@ it('`expect(func).toBeTruthy/Falsy() should work`', async t => {
 
 
 //-------------------------------------------------------
-it('`expect(func).toThrow() should work`', async t => {
+it('`expect().toThrow() should work`', async t => {
 
     //------------------
     t.expect(() => { throw new Error('oopsie') }).toThrow()

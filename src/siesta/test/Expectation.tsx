@@ -27,19 +27,6 @@ export class Expectation extends Base {
     }
 
 
-    possiblyNegateAssertionName (name : string) : string {
-        return this.isNot ? name.replace(/^(expect\(.+?\)\.)/, '$1not.') : name
-    }
-
-
-    process (passed : boolean, name : string, annotation : XmlElement) {
-        this.t.addResult(Assertion.new({
-            name        : this.possiblyNegateAssertionName(name),
-            passed      : this.isNot ? !passed : passed,
-            annotation
-        }))
-    }
-
 
     /**
      * This assertion compares the value provided to the {@link Siesta.Test#expect expect} method with the `expectedValue` argument.
@@ -53,26 +40,18 @@ export class Expectation extends Base {
      * @param {Primitive} expectedValue An expected value
      */
     toBe (expectedValue : unknown) {
-        const same      = CI(comparePrimitivesGen(this.value, expectedValue, this.t.descriptor.deepCompareConfig)).size === 0
-        const passed    = this.isNot ? !same : same
-
-        this.t.addResult(Assertion.new({
-            name        : this.possiblyNegateAssertionName('expect(received).toBe(expected)'),
-            passed,
-            annotation  : passed ? undefined : this.isNot ? NotEqualAnnotationTemplate.el({
-                value               : this.value,
-                serializerConfig    : this.t.descriptor.serializerConfig
-            }) : GotExpectTemplate.el({
-                got                 : this.value,
-                expect              : expectedValue,
-                serializerConfig    : this.t.descriptor.serializerConfig
-            })
-        }))
+        this.t.assertEqualityInternal(
+            'expect(received).toBe(expected)',
+            CI(comparePrimitivesGen(this.value, expectedValue, this.t.descriptor.deepCompareConfig)).take(1).length === 0,
+            this.isNot,
+            this.value,
+            expectedValue
+        )
     }
 
 
     toBeEqual (expectedValue : unknown) {
-        return this.toEqual(expectedValue)
+        this.t.assertStructuralEqualityInternal('expect(received).toBeEqual(expected)', this.isNot, this.value, expectedValue)
     }
 
 
@@ -86,7 +65,7 @@ export class Expectation extends Base {
      * @param {Mixed} expectedValue An expected value
      */
     toEqual (expectedValue : unknown) {
-        this.t.assertEqualInternal('expect(received).toEqual(expected)', this.isNot, this.value, expectedValue)
+        this.t.assertStructuralEqualityInternal('expect(received).toEqual(expected)', this.isNot, this.value, expectedValue)
     }
 
 
@@ -94,20 +73,7 @@ export class Expectation extends Base {
      * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is `null`.
      */
     toBeNull () {
-        const same          = this.value === null
-        const passed        = this.isNot ? !same : same
-
-        this.t.addResult(Assertion.new({
-            name        : this.possiblyNegateAssertionName('expect(received).toBeNull(expected)'),
-            passed,
-            annotation  : passed ? undefined : this.isNot ? NotEqualAnnotationTemplate.el({
-                value               : null,
-                serializerConfig    : this.t.descriptor.serializerConfig
-            }) : GotExpectTemplate.el({
-                got                 : this.value,
-                serializerConfig    : this.t.descriptor.serializerConfig
-            })
-        }))
+        this.t.assertEqualToConstant('expect(received).toBeNull()', this.value === null, this.isNot, this.value, null)
     }
 
 
@@ -115,20 +81,7 @@ export class Expectation extends Base {
      * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is `NaN`.
      */
     toBeNaN () {
-        const same          = isNaN(this.value as number)
-        const passed        = this.isNot ? !same : same
-
-        this.t.addResult(Assertion.new({
-            name        : this.possiblyNegateAssertionName('expect(received).toBeNull(expected)'),
-            passed,
-            annotation  : passed ? undefined : this.isNot ? NotEqualAnnotationTemplate.el({
-                value               : null,
-                serializerConfig    : this.t.descriptor.serializerConfig
-            }) : GotExpectTemplate.el({
-                got                 : this.value,
-                serializerConfig    : this.t.descriptor.serializerConfig
-            })
-        }))
+        this.t.assertEqualToConstant('expect(received).toBeNaN()', Number.isNaN(this.value), this.isNot, this.value, NaN)
     }
 
 
@@ -136,10 +89,7 @@ export class Expectation extends Base {
      * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is not the `undefined` value.
      */
     toBeDefined () {
-        this.process(this.value !== undefined, 'expect(received).toBeDefined()', GotExpectTemplate.el({
-            got                 : this.value,
-            serializerConfig    : this.t.descriptor.serializerConfig
-        }))
+        this.t.assertDefinedInternal('expect(received).toBeDefined()', this.isNot, false, this.value)
     }
 
 
@@ -147,10 +97,7 @@ export class Expectation extends Base {
      * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is the `undefined` value.
      */
     toBeUndefined () {
-        this.process(this.value === undefined, 'expect(received).toBeUndefined()', GotExpectTemplate.el({
-            got                 : this.value,
-            serializerConfig    : this.t.descriptor.serializerConfig
-        }))
+        this.t.assertDefinedInternal('expect(received).toBeUndefined()', this.isNot, true, this.value)
     }
 
 
@@ -178,12 +125,7 @@ export class Expectation extends Base {
      * @param {RegExp} regexp The regular expression to match the string against
      */
     toMatch (regexp : RegExp) {
-        this.process(new RegExp(regexp).test(this.value as string), 'expect(received).toMatch(regexp)', GotExpectTemplate.el({
-            got                 : this.value,
-            expect              : regexp,
-            expectTitle         : this.isNot ? 'Expect string not matching' : 'Expect string matching',
-            serializerConfig    : this.t.descriptor.serializerConfig
-        }))
+        this.t.assertMatchInternal('expect(received).toMatch(expected)', this.isNot, this.value as string, regexp)
     }
 
 
@@ -202,11 +144,7 @@ export class Expectation extends Base {
         const passed      = false
 
         if (isString(value)) {
-            this.process(value.indexOf(String(element)) >= 0, 'expect(received).toContain(expected)', GotExpectTemplate.el({
-                got                 : this.value,
-                expect              : element,
-                expectTitle         : this.isNot ? 'Expect string not containing' : 'Expect string containing'
-            }))
+            this.t.assertMatchInternal('expect(received).toContain(expected)', this.isNot, value, element as string | RegExp)
         } else {
             // normalize to array (can be NodeList, `arguments` etc)
             const ci        = CI(value as Iterable<unknown>)
