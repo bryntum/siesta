@@ -332,7 +332,7 @@ type MixinClassConstructor<T> =
 
 
 //---------------------------------------------------------------------------------------------------------------------
-//region type helpers
+// region type helpers
 type MixinHelperFuncAny = <T>(required : AnyConstructor[], arg : T) =>
     T extends AnyFunction ?
         MixinClassConstructor<T>
@@ -459,7 +459,7 @@ type MixinHelperFunc10 = <A1 extends AnyConstructor, A2 extends AnyConstructor, 
             : never
         : never
     : never
-//endregion type helpers
+// endregion
 
 //---------------------------------------------------------------------------------------------------------------------
 const isMixinClass = (func : AnyConstructor) : boolean => {
