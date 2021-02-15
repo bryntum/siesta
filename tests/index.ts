@@ -87,7 +87,9 @@ project.plan(
                 filename    : 'assertions',
 
                 items       : [
-                    'assertion_exception.t.js'
+                    'assertion_compare.t.js',
+                    'assertion_exception.t.js',
+                    'expectation.t.js'
                 ]
             },
             'test_descriptor.t.js',
@@ -95,7 +97,6 @@ project.plan(
             'todo_tests.t.js',
             'snooze_tests.t.js',
             'global_test.t.js',
-            'expectation.t.js'
         ]
     },
 )

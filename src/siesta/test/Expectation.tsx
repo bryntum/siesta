@@ -1,10 +1,11 @@
 import { Base } from "../../class/Base.js"
+import { AnyFunction } from "../../class/Mixin.js"
 import { CI } from "../../iterator/Iterator.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { compareDeepGen, comparePrimitivesGen } from "../../util/CompareDeep.js"
-import { isFunction, isString } from "../../util/Typeguards.js"
-import { DeepEqualAnnotationTemplate, GotExpectTemplate, NotEqualAnnotationTemplate } from "./assertion/AssertionCompare.js"
+import { isString } from "../../util/Typeguards.js"
+import { GotExpectTemplate, NotEqualAnnotationTemplate } from "./assertion/AssertionCompare.js"
 import { Test } from "./Test.js"
 import { Assertion } from "./TestResult.js"
 
@@ -85,21 +86,7 @@ export class Expectation extends Base {
      * @param {Mixed} expectedValue An expected value
      */
     toEqual (expectedValue : unknown) {
-        const differences   = CI(compareDeepGen(this.value, expectedValue, this.t.descriptor.deepCompareConfig)).take(5)
-        const same          = differences.length === 0
-        const passed        = this.isNot ? !same : same
-
-        this.t.addResult(Assertion.new({
-            name        : this.possiblyNegateAssertionName('expect(received).toEqual(expected)'),
-            passed,
-            annotation  : passed ? undefined : this.isNot ? NotEqualAnnotationTemplate.el({
-                value               : expectedValue,
-                serializerConfig    : this.t.descriptor.serializerConfig
-            }) : DeepEqualAnnotationTemplate.el({
-                differences,
-                serializerConfig    : this.t.descriptor.serializerConfig
-            })
-        }))
+        this.t.assertEqualInternal('expect(received).toEqual(expected)', this.isNot, this.value, expectedValue)
     }
 
 
@@ -172,10 +159,7 @@ export class Expectation extends Base {
      * For example - non empty strings, numbers except the 0, objects, arrays etc.
      */
     toBeTruthy () {
-        this.process(Boolean(this.value), 'expect(received).toBeTruthy()', GotExpectTemplate.el({
-            got                 : this.value,
-            serializerConfig    : this.t.descriptor.serializerConfig
-        }))
+        this.t.assertTrueInternal('expect(received).toBeTruthy()', this.isNot, false, this.value)
     }
 
 
@@ -184,10 +168,7 @@ export class Expectation extends Base {
      * For example - empty strings, number 0, `null`, `undefined`, etc.
      */
     toBeFalsy () {
-        this.process(Boolean(this.value), 'expect(received).toBeFalsy()', GotExpectTemplate.el({
-            got                 : this.value,
-            serializerConfig    : this.t.descriptor.serializerConfig
-        }))
+        this.t.assertTrueInternal('expect(received).toBeFalsy()', this.isNot, true, this.value)
     }
 
 
@@ -301,21 +282,9 @@ export class Expectation extends Base {
      * }).toThrow());
      *
      */
-    // async toThrow () {
-    //     const func    = this.value as Function
-    //
-    //     if (!isFunction(func)) throw new Error("`expect().toThrow()` matcher expects a function")
-    //
-    //     let exception   = undefined
-    //
-    //     try {
-    //         await func()
-    //     } catch (e) {
-    //         exception   = e
-    //     }
-    //
-    //     this.process(exception !== undefined, 'expect(func).toThrow()', <div></div>)
-    // }
+    async toThrow (pattern? : string | RegExp) {
+        return this.t.assertThrowInternal('expect(func).toThrow()', this.isNot, this.value as AnyFunction, this.t.getSourceLine(), pattern)
+    }
 
 
 //     /**

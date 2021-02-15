@@ -16,48 +16,111 @@ export class AssertionCompare extends Mixin(
 
     class AssertionCompare extends base {
 
-        maxIsDeeplyDifferences      : number        = 5
+        maxEqualityDifferences          : number        = 5
 
 
-        ok<V> (value : V, description : string = '') {
-            return this.true(value, description)
+        assertTrueInternal (
+            assertionName   : string,
+            negated         : boolean,
+            inverted        : boolean,
+            value           : unknown,
+            description     : string = ''
+        ) {
+            const passed        = negated || inverted ? !Boolean(value) : Boolean(value)
+
+            this.addResult(Assertion.new({
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                passed,
+                description,
+                annotation      : passed ? undefined : GotExpectTemplate.el({
+                    description         : `Expected is${ negated ? ' not ' : '' } ${ inverted ? '"falsy"' : '"truthy"' } value`,
+                    got                 : value,
+                    t                   : this
+                })
+            }))
+        }
+
+
+        false<V> (value : V, description : string = '') {
+            this.assertTrueInternal('false(received)', false, true, value, description)
         }
 
 
         true<V> (value : V, description : string = '') {
-            const passed        = Boolean(value)
+            this.assertTrueInternal('true(received)', false, false, value, description)
+        }
 
-            this.addResult(Assertion.new({
-                name            : 't.true(received)',
-                passed,
-                description,
-                annotation      : passed ? undefined : GotExpectTemplate.el({
-                    description         : 'Expected is "truthy" value',
-                    got                 : value,
-                    serializerConfig    : this.descriptor.serializerConfig
-                })
-            }))
+
+        // backward compat
+        ok<V> (value : V, description : string = '') {
+            this.assertTrueInternal('ok(received)', false, false, value, description)
         }
 
 
         notOk<V> (value : V, description : string = '') {
-            return this.false(value, description)
+            this.assertTrueInternal('notOk(received)', false, true, value, description)
         }
 
-        false<V> (value : V, description : string = '') {
-            const passed        = !Boolean(value)
+        not_ok<V> (value : V, description : string = '') {
+            this.assertTrueInternal('not_ok(received)', false, true, value, description)
+        }
+        // eof backward compat
+
+
+        //----------------------------------------------------
+        assertEqualInternal (
+            assertionName   : string,
+            negated         : boolean,
+            value1          : unknown,
+            value2          : unknown,
+            description     : string = ''
+        ) {
+            const differences   = CI(compareDeepGen(value1, value2, this.descriptor.deepCompareConfig)).take(this.maxEqualityDifferences)
+            const passed        = negated ? differences.length > 0 : differences.length === 0
 
             this.addResult(Assertion.new({
-                name            : 'false',
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
                 passed,
                 description,
-                annotation      : passed ? undefined : GotExpectTemplate.el({
-                    description         : 'Expected is "falsy" value',
-                    got                 : value,
-                    serializerConfig    : this.descriptor.serializerConfig
+
+                annotation  : passed ? undefined : negated ? NotEqualAnnotationTemplate.el({
+                    value               : value2,
+                    t                   : this
+                }) : DeepEqualAnnotationTemplate.el({
+                    differences,
+                    t                   : this
                 })
             }))
+
         }
+
+
+        eq<V> (value1 : V, value2 : V, description : string = '') {
+            this.assertEqualInternal('eq(received, expected)', false, value1, value2, description)
+        }
+
+
+        ne<V> (value1 : V, value2 : V, description : string = '') {
+            this.assertEqualInternal('ne(received, expected)', false, value1, value2, description)
+        }
+
+
+        equal<V> (value1 : V, value2 : V, description : string = '') {
+            this.assertEqualInternal('equal(received, expected)', false, value1, value2, description)
+        }
+
+
+        notEqual<V> (value1 : V, value2 : V, description : string = '') {
+            this.assertEqualInternal('notEqual(received, expected)', true, value1, value2, description)
+        }
+
+
+        // backward compat
+        isDeeply<V> (value1 : V, value2 : V, description : string = '') {
+            this.assertEqualInternal('isDeeply(received, expected)', false, value1, value2, description)
+        }
+        // eof backward compat
+
 
 
         isStrict<V> (value1 : V, value2 : V, description : string = '') {
@@ -103,28 +166,6 @@ export class AssertionCompare extends Mixin(
                 description,
 
                 annotation      : passed ? undefined : NotEqualAnnotationTemplate.el({ value : value2, serializerConfig : this.descriptor.serializerConfig })
-            }))
-        }
-
-
-        isDeeply<V> (value1 : V, value2 : V, description : string = '') {
-            this.equal(value1, value2, description)
-        }
-
-
-        equal<V> (value1 : V, value2 : V, description : string = '') {
-            const differences   = CI(compareDeepGen(value1, value2, this.descriptor.deepCompareConfig)).take(5)
-            const passed        = differences.length === 0
-
-            this.addResult(Assertion.new({
-                name            : 'isDeeply',
-                passed,
-                description,
-
-                annotation      : passed ? undefined : DeepEqualAnnotationTemplate.el({
-                    differences,
-                    serializerConfig    : this.descriptor.serializerConfig
-                })
             }))
         }
 
@@ -211,11 +252,11 @@ export class AnnotationTemplate extends Base {
 export class GotExpectTemplate extends AnnotationTemplate {
     description : string        = ''
 
-    got         : unknown       = undefined
+    got         : unknown
 
     gotTitle    : string        = 'Received'
 
-    expect      : unknown       = undefined
+    expect      : unknown
 
     expectTitle : string        = 'Expected'
 
@@ -233,13 +274,13 @@ export class GotExpectTemplate extends AnnotationTemplate {
         return <div class="indented got_expected">
             { this.description || false }
             {
-                this.got !== undefined && <div class='got'>
+                this.hasOwnProperty('got') && <div class='got'>
                     <div class="underlined got_title">{ this.gotTitle }:</div>
                     <div class="indented got_value">{ SerializerXml.serialize(this.got, this.serializerConfig) }</div>
                 </div>
             }
             {
-                this.expect !== undefined && <div class='expect'>
+                this.hasOwnProperty('expect') && <div class='expect'>
                     <div class="underlined expect_title">{ this.expectTitle }:</div>
                     <div class="indented expect_value">{ SerializerXml.serialize(this.expect, this.serializerConfig) }</div>
                 </div>

@@ -1,6 +1,5 @@
 import { AnyFunction, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { SiestaJSX } from "../../../jsx/Factory.js"
-import { SerializerXml } from "../../../serializer/SerializerXml.js"
 import { isRegExp } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
 import { GotExpectTemplate } from "./AssertionCompare.js"
@@ -35,7 +34,7 @@ export class AssertionException extends Mixin(
             negated         : boolean,
             func            : AnyFunction,
             sourceLine      : number,
-            pattern         : string | RegExp = '',
+            pattern         : string | RegExp,
             description     : string = ''
         ) {
             const { thrown, exception } = await this.checkForException(func)
@@ -55,15 +54,18 @@ export class AssertionException extends Mixin(
                         passed          : false,
                         description,
 
-                        annotation      : GotExpectTemplate.el({
+                        annotation      : pattern !== undefined ? GotExpectTemplate.el({
                             description : 'Provided function did not throw exception',
                             gotTitle    : `Expect exception with message ${ isRegExp(pattern) ? 'matching' : 'containing' }`,
                             got         : pattern,
                             t           : this
+                        }) : GotExpectTemplate.el({
+                            description : 'Provided function did not throw exception',
+                            t           : this
                         })
                     }))
             } else {
-                const message   = String(exception?.message ?? exception)
+                const message   = exception?.message ?? exception
 
                 if (negated)
                     this.addResult(Assertion.new({
@@ -103,7 +105,7 @@ export class AssertionException extends Mixin(
                                 }),
                             }))
                     } else {
-                        if (message.indexOf(pattern) !== -1)
+                        if (pattern === undefined || message.indexOf(pattern) !== -1)
                             this.addResult(Assertion.new({
                                 sourceLine,
                                 name            : assertionName,
@@ -150,11 +152,11 @@ export class AssertionException extends Mixin(
         }
 
         async lives_ok (func : AnyFunction, description : string = '') {
-            return this.assertThrowInternal('livesOk(func)', true, func, this.getSourceLine(), '', description)
+            return this.assertThrowInternal('lives_ok(func)', true, func, this.getSourceLine(), '', description)
         }
 
         async lives (func : AnyFunction, description : string = '') {
-            return this.assertThrowInternal('livesOk(func)', true, func, this.getSourceLine(), '', description)
+            return this.assertThrowInternal('lives(func)', true, func, this.getSourceLine(), '', description)
         }
         // eof backward compat
     }
