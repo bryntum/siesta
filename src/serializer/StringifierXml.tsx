@@ -251,6 +251,5 @@ export class StringifierXml extends Mixin(
         ) : string {
             return this.stringify(SerializerXml.serialize(value, serilizationProps), stringificationProps)
         }
-
     }
 ) {}

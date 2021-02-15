@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { AnyFunction } from "../../class/Mixin.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
+import { Approximation, NumberApproximation } from "../../util/CompareDeep.js"
 import { isString } from "../../util/Typeguards.js"
 import { ComparisonType, GotExpectTemplate } from "./assertion/AssertionCompare.js"
 import { Test } from "./Test.js"
@@ -173,15 +174,14 @@ export class Expectation extends Base {
      * @param {Number} expectedValue The number to compare with
      * @param {Number} [precision=2] The number of digits after dot (comma) that should be same in both numbers.
      */
-    toBeCloseTo (expectedValue : number, precision : number = 2) {
-        const threshold   = Math.pow(10, -precision)
-        const delta       = Math.abs(this.value as number - expectedValue)
-
-        this.process(delta < threshold, 'expect(received).toBeCloseTo(expected)', GotExpectTemplate.el({
-            got         : this.value,
-            expect      : expectedValue,
-            expectTitle : `Expect value ${ this.isNot ? 'not' : '' } close to (threshold: ${ threshold })`
-        }))
+    toBeCloseTo (expectedValue : number, digits : Approximation = { digits : 2 }) {
+        this.t.assertCompareApproxInternal(
+            'expect(received).toBeCloseTo(expected)',
+            this.isNot,
+            this.value as number,
+            expectedValue,
+            NumberApproximation.fromApproximation(digits)
+        )
     }
 
 

@@ -1,10 +1,10 @@
 import { it } from "../../main.js"
-import { CI } from "../../src/iterator/Iterator.js"
 import {
     any,
     anyInstanceOf,
-    anyNumberApprox, anyStringLike,
-    compareDeepGen,
+    anyNumberApprox,
+    anyStringLike,
+    compareDeep,
     DifferenceObject,
     DifferenceReachability,
     DifferenceSet,
@@ -15,24 +15,24 @@ import {
 
 
 it('Deep compare should work for primitives and non-cyclic data structures', async t => {
-    t.isDeeply(CI(compareDeepGen(1, 1)).toArray(), [])
+    t.equal(compareDeep(1, 1), [])
 
-    t.isDeeply(CI(compareDeepGen(1, '1')).toArray(), [ DifferenceTypesAreDifferent.new({ v1 : 1, v2 : '1', type1 : 'Number', type2 : 'String' }) ])
+    t.equal(compareDeep(1, '1'), [ DifferenceTypesAreDifferent.new({ v1 : 1, v2 : '1', type1 : 'Number', type2 : 'String' }) ])
 
-    t.isDeeply(CI(compareDeepGen(1, 2)).toArray(), [ DifferenceValuesAreDifferent.new({ v1 : 1, v2 : 2 }) ])
+    t.equal(compareDeep(1, 2), [ DifferenceValuesAreDifferent.new({ v1 : 1, v2 : 2 }) ])
 
-    t.isDeeply(
-        CI(compareDeepGen({ prop1 : 1, prop2 : 2 }, { prop2 : 2, prop1 : 1 })).toArray(),
+    t.equal(
+        compareDeep({ prop1 : 1, prop2 : 2 }, { prop2 : 2, prop1 : 1 }),
         []
     )
 
-    t.isDeeply(
-        CI(compareDeepGen({ prop1 : 1, prop2 : 2 }, { prop2 : 3, prop1 : 1 })).toArray(),
+    t.equal(
+        compareDeep({ prop1 : 1, prop2 : 2 }, { prop2 : 3, prop1 : 1 }),
         [ DifferenceValuesAreDifferent.new({ v1 : 2, v2 : 3, keyPath : [ PathSegment.new({ type : 'object_key', key : 'prop2' }) ] }) ]
     )
 
-    t.isDeeply(
-        CI(compareDeepGen({ prop1 : 1, prop2 : 2 }, { prop2 : 2, prop1 : 1, prop3 : 3 })).toArray(),
+    t.equal(
+        compareDeep({ prop1 : 1, prop2 : 2 }, { prop2 : 2, prop1 : 1, prop3 : 3 }),
         [
             DifferenceObject.new({
                 object1         : { prop1 : 1, prop2 : 2 },
@@ -52,59 +52,59 @@ it('Deep compare should work for primitives and non-cyclic data structures', asy
 
 
 it('Deep compare should work for number placeholders', async t => {
-    t.isDeeply(CI(compareDeepGen(10, anyNumberApprox(10))).toArray(), [])
+    t.equal(compareDeep(10, anyNumberApprox(10)), [])
 
     //------------------------
     const placeholder   = anyNumberApprox(10)
 
-    t.isDeeply(
-        CI(compareDeepGen('10', placeholder)).toArray(),
+    t.equal(
+        compareDeep('10', placeholder),
         [ DifferenceTypesAreDifferent.new({ v1 : '10', v2 : placeholder, type1 : 'String', type2 : 'Number' }) ]
     )
 })
 
 
 it('Deep compare should work for string placeholders', async t => {
-    t.isDeeply(CI(compareDeepGen('10', anyStringLike('1'))).toArray(), [])
-    t.isDeeply(CI(compareDeepGen('FOO', anyStringLike(/foo/i))).toArray(), [])
+    t.equal(compareDeep('10', anyStringLike('1')), [])
+    t.equal(compareDeep('FOO', anyStringLike(/foo/i)), [])
 
     //------------------------
     const placeholder   = anyStringLike(/foo/i)
 
-    t.isDeeply(
-        CI(compareDeepGen(1, placeholder)).toArray(),
+    t.equal(
+        compareDeep(1, placeholder),
         [ DifferenceTypesAreDifferent.new({ v1 : 1, v2 : placeholder, type1 : 'Number', type2 : 'String' }) ]
     )
 
-    t.isDeeply(
-        CI(compareDeepGen('bar', placeholder)).toArray(),
+    t.equal(
+        compareDeep('bar', placeholder),
         [ DifferenceValuesAreDifferent.new({ v1 : 'bar', v2 : placeholder }) ]
     )
 })
 
 
 it('Deep compare should work for instance placeholders', async t => {
-    t.isDeeply(CI(compareDeepGen(false, anyInstanceOf(Boolean))).toArray(), [])
+    t.equal(compareDeep(false, anyInstanceOf(Boolean)), [])
 
-    t.isDeeply(CI(compareDeepGen('foo', anyInstanceOf(String))).toArray(), [])
+    t.equal(compareDeep('foo', anyInstanceOf(String)), [])
 
-    t.isDeeply(CI(compareDeepGen(10, anyInstanceOf(Number))).toArray(), [])
+    t.equal(compareDeep(10, anyInstanceOf(Number)), [])
 
-    t.isDeeply(CI(compareDeepGen(new Date, anyInstanceOf(Date))).toArray(), [])
+    t.equal(compareDeep(new Date, anyInstanceOf(Date)), [])
 
-    t.isDeeply(CI(compareDeepGen(new Date, anyInstanceOf(Object))).toArray(), [])
+    t.equal(compareDeep(new Date, anyInstanceOf(Object)), [])
 
-    t.isDeeply(CI(compareDeepGen({}, anyInstanceOf(Object))).toArray(), [])
+    t.equal(compareDeep({}, anyInstanceOf(Object)), [])
 
-    t.isDeeply(CI(compareDeepGen([ 1, 2, 3 ], anyInstanceOf(Array))).toArray(), [])
+    t.equal(compareDeep([ 1, 2, 3 ], anyInstanceOf(Array)), [])
 
-    t.isDeeply(CI(compareDeepGen(() => {}, anyInstanceOf(Function))).toArray(), [])
+    t.equal(compareDeep(() => {}, anyInstanceOf(Function)), [])
 
     //------------------------
     const placeholder   = anyInstanceOf(Date)
 
-    t.isDeeply(
-        CI(compareDeepGen('10', placeholder)).toArray(),
+    t.equal(
+        compareDeep('10', placeholder),
         [ DifferenceValuesAreDifferent.new({ v1 : '10', v2 : placeholder }) ]
     )
 
@@ -112,11 +112,11 @@ it('Deep compare should work for instance placeholders', async t => {
 
 
 it('Deep compare should work for any placeholders', async t => {
-    t.isDeeply(CI(compareDeepGen(10, any())).toArray(), [])
+    t.equal(compareDeep(10, any()), [])
 
-    t.isDeeply(CI(compareDeepGen(new Date, any())).toArray(), [])
+    t.equal(compareDeep(new Date, any()), [])
 
-    t.isDeeply(CI(compareDeepGen([ 1, 2, 3 ], any())).toArray(), [])
+    t.equal(compareDeep([ 1, 2, 3 ], any()), [])
 })
 
 
@@ -124,13 +124,13 @@ it('Deep compare should work with sets of objects', async t => {
     const a1    = new Set([ { a : 1 } ])
     const a2    = new Set([ { a : 1 } ])
 
-    t.isDeeply(CI(compareDeepGen(a1, a2)).toArray(), [])
+    t.equal(compareDeep(a1, a2), [])
 
     //----------------
     const b1    = new Set([ { a : 1 } ])
     const b2    = new Set([ { b : 1 } ])
 
-    t.isDeeply(CI(compareDeepGen(b1, b2)).toArray(), [
+    t.equal(compareDeep(b1, b2), [
         DifferenceSet.new({
             set1            : b1,
             set2            : b2,
@@ -149,7 +149,7 @@ it('Deep compare should work with sets of objects', async t => {
     const c1    = new Set([ { a : 1 } ])
     const c2    = new Set([ { a : 1 }, { b : 1 } ])
 
-    t.isDeeply(CI(compareDeepGen(c1, c2)).toArray(), [
+    t.equal(compareDeep(c1, c2), [
         DifferenceSet.new({
             set1            : c1,
             set2            : c2,
@@ -171,7 +171,7 @@ it('Deep compare should work with maps with key objects', async t => {
     const a1    = new Map([ [ { a : 1 }, 1 ] ])
     const a2    = new Map([ [ { a : 1 }, 1 ] ])
 
-    t.isDeeply(CI(compareDeepGen(a1, a2)).toArray(), [])
+    t.equal(compareDeep(a1, a2), [])
 })
 
 
@@ -182,11 +182,11 @@ it('Deep compare should work with circular data structures', async t => {
     const a2    = { a : undefined }
     a2.a        = a2
 
-    t.isDeeply(CI(compareDeepGen(a1, a2)).toArray(), [])
+    t.equal(compareDeep(a1, a2), [])
 
     const a3    = { a : a2 }
 
-    t.isDeeply(CI(compareDeepGen(a1, a3)).toArray(), [ DifferenceReachability.new({
+    t.equal(compareDeep(a1, a3), [ DifferenceReachability.new({
         keyPath : [
             PathSegment.new({ type : 'object_key', key : 'a' })
         ],
@@ -210,11 +210,11 @@ it('Deep compare should work with circular data structures', async t => {
     c11.next    = c21
     c21.prev    = c11
 
-    t.isDeeply(CI(compareDeepGen(b11, c11)).toArray(), [])
+    t.equal(compareDeep(b11, c11), [])
 
     //----------------
     const d1    = new Set([ b11, b21 ])
     const d2    = new Set([ c11, c21 ])
 
-    t.isDeeply(CI(compareDeepGen(d1, d2)).toArray(), [])
+    t.equal(compareDeep(d1, d2), [])
 })

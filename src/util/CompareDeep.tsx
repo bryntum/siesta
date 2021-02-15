@@ -6,7 +6,7 @@ import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { serializationVisitSymbol, SerializerXml } from "../serializer/SerializerXml.js"
 import { Visitor } from "../visitor/Visitor.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "./Helpers.js"
-import { isRegExp } from "./Typeguards.js"
+import { isNumber, isRegExp } from "./Typeguards.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -31,6 +31,32 @@ export class PlaceHolder extends Mixin(
         }
     }
 ){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class NumberApproximation extends Base {
+    percent         : number        = undefined
+
+    threshold       : number        = undefined
+
+    digits          : number        = undefined
+
+
+    getThreshold (value : number) : number {
+        if (this.threshold !== undefined) return this.threshold
+
+        if (this.percent !== undefined) return value * this.percent / 100
+
+        if (this.digits !== undefined) return Math.pow(10, -this.digits)
+    }
+
+
+    static fromApproximation <T extends typeof NumberApproximation> (this : T, approx : Approximation) : InstanceType<T> {
+        return isNumber(approx) ? this.new({ threshold : approx } as Partial<InstanceType<T>>) : this.maybeNew(approx as Partial<InstanceType<T>>)
+    }
+}
+
+export type Approximation   = number | Partial<NumberApproximation> | NumberApproximation
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -228,7 +254,7 @@ export class PathSegment extends Base {
                 break
 
             case "set_element" :
-                str = `.set_element(${ SerializerXml.serialize(this.key, serializerConfig) })`
+                str = `.element(${ SerializerXml.serialize(this.key, serializerConfig) })`
                 break
         }
 
@@ -747,6 +773,14 @@ export const compareDeepGen = function * (
         yield* comparePrimitivesGen(v1, v2, options, state)
     }
 }
+
+export const compareDeep = (
+    v1          : unknown,
+    v2          : unknown,
+    options     : DeepCompareOptions    = { includePropertiesFromPrototypeChain : false }
+) : Difference[] =>
+    Array.from(compareDeepGen(v1, v2, options))
+
 
 
 //---------------------------------------------------------------------------------------------------------------------

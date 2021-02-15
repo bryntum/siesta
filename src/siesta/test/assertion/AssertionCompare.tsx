@@ -4,8 +4,8 @@ import { CI } from "../../../iterator/Iterator.js"
 import { SiestaJSX } from "../../../jsx/Factory.js"
 import { XmlElement } from "../../../jsx/XmlElement.js"
 import { SerializerXml } from "../../../serializer/SerializerXml.js"
-import { compareDeepGen, comparePrimitivesGen, Difference } from "../../../util/CompareDeep.js"
-import { isDate, isRegExp } from "../../../util/Typeguards.js"
+import { Approximation, compareDeepGen, comparePrimitivesGen, Difference, NumberApproximation } from "../../../util/CompareDeep.js"
+import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
 
 
@@ -369,12 +369,68 @@ export class AssertionCompare extends Mixin(
             this.assertCompareInternal('isGreaterOrEqual(received, expected)', false, ComparisonType.GreaterOrEqual, value1, value2)
         }
 
+        isGE (value1 : unknown, value2 : unknown, description : string = '') {
+            this.assertCompareInternal('isGE(received, expected)', false, ComparisonType.GreaterOrEqual, value1, value2)
+        }
+
         isLess (value1 : unknown, value2 : unknown, description : string = '') {
             this.assertCompareInternal('isLess(received, expected)', false, ComparisonType.Less, value1, value2)
         }
 
         isLessOrEqual (value1 : unknown, value2 : unknown, description : string = '') {
             this.assertCompareInternal('isLessOrEqual(received, expected)', false, ComparisonType.LessOrEqual, value1, value2)
+        }
+
+        isLE (value1 : unknown, value2 : unknown, description : string = '') {
+            this.assertCompareInternal('isLE(received, expected)', false, ComparisonType.LessOrEqual, value1, value2)
+        }
+        // endregion
+
+
+        //----------------------------------------------------
+        // region compare approx
+
+        assertCompareApproxInternal<V> (
+            assertionName   : string,
+            negated         : boolean,
+            value1          : number,
+            value2          : number,
+            approximation   : NumberApproximation,
+            description     : string = ''
+        ) {
+            const threshold     = approximation.getThreshold(value1)
+            const condition     = Math.abs(value1 - value2) <= threshold
+            const passed        = negated ? !condition : condition
+
+            this.addResult(Assertion.new({
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                passed          : passed,
+                description     : description,
+                annotation      : passed ? undefined : GotExpectTemplate.el({
+                    got         : value1,
+                    expectTitle : `Expect value ${ negated ? 'not ' : '' }approximately equal to (threshold: ${ threshold })`,
+                    expect      : value2,
+                    t           : this
+                })
+            }))
+        }
+
+
+        isApprox (value1 : number, value2 : number, approx? : Approximation, description? : string) {
+            if (arguments.length === 2) {
+                approx          = NumberApproximation.new({ threshold : value1 * 0.05 })
+            }
+            else if (arguments.length === 3) {
+                if (isString(approx)) description = approx
+
+                approx          = NumberApproximation.new({ threshold : value1 * 0.05 })
+            }
+
+            if (isNumber(approx)) approx = NumberApproximation.new({ threshold : approx })
+
+            const approximation = NumberApproximation.maybeNew(approx)
+
+            this.assertCompareApproxInternal('isApprox(received, expected)', false, value1, value2, approximation, description)
         }
         // endregion
     }
@@ -411,15 +467,17 @@ export class AnnotationTemplate extends Base {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class GotExpectTemplate extends AnnotationTemplate {
-    description : string        = ''
+    description         : string        = ''
 
-    got         : unknown
+    description2        : string | XmlElement = ''
 
-    gotTitle    : string        = 'Received'
+    got                 : unknown
 
-    expect      : unknown
+    gotTitle            : string        = 'Received'
 
-    expectTitle : string        = 'Expected'
+    expect              : unknown
+
+    expectTitle         : string        = 'Expected'
 
 
     // getTitleLengthEquality (label : 'got' | 'expect') : string {
@@ -440,6 +498,7 @@ export class GotExpectTemplate extends AnnotationTemplate {
                     <div class="indented got_value">{ SerializerXml.serialize(this.got, this.serializerConfig) }</div>
                 </div>
             }
+            { this.description2 || false }
             {
                 this.hasOwnProperty('expect') && <div class='expect'>
                     <div class="underlined expect_title">{ this.expectTitle }:</div>
