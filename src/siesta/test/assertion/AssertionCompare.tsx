@@ -4,9 +4,21 @@ import { CI } from "../../../iterator/Iterator.js"
 import { SiestaJSX } from "../../../jsx/Factory.js"
 import { XmlElement } from "../../../jsx/XmlElement.js"
 import { SerializerXml } from "../../../serializer/SerializerXml.js"
-import { compareDeepGen, Difference } from "../../../util/CompareDeep.js"
+import { compareDeepGen, comparePrimitivesGen, Difference } from "../../../util/CompareDeep.js"
 import { isDate, isRegExp } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
+
+
+//---------------------------------------------------------------------------------------------------------------------
+type ComparisonTypeName = 'Greater' | 'GreaterOrEqual' | 'Less' | 'LessOrEqual'
+
+export const ComparisonType : { [ key in ComparisonTypeName ] : [ (a, b) => boolean, string ] } = {
+    Greater             : [ (a, b) => a > b, 'greater' ],
+    GreaterOrEqual      : [ (a, b) => a >= b, 'greater or equal' ],
+
+    Less                : [ (a, b) => a < b, 'less' ],
+    LessOrEqual         : [ (a, b) => a <= b, 'less or equal' ]
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -91,7 +103,7 @@ export class AssertionCompare extends Mixin(
 
                 annotation  : passed ? undefined : negated ? GotExpectTemplate.el({
                     got                 : value1,
-                    expectTitle         : 'Expect value, not equal to',
+                    expectTitle         : 'Expect value not equal to',
                     expect              : value2,
                     t                   : this
                 }) : GotExpectTemplate.el({
@@ -185,34 +197,6 @@ export class AssertionCompare extends Mixin(
 
 
         //----------------------------------------------------
-        assertDefinedInternal (
-            assertionName   : string,
-            negated         : boolean,
-            inverted        : boolean,
-            value           : unknown,
-            description     : string = ''
-        ) {
-            const condition1    = value !== undefined
-            const condition2    = inverted ? !condition1 : condition1
-
-            const passed        = negated ? !condition2 : condition2
-
-            const title         = (negated && inverted) ? 'defined' : negated || inverted ? 'undefined' : 'defined'
-
-            this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
-                passed,
-                description,
-                annotation      : passed ? undefined : GotExpectTemplate.el({
-                    description         : `Expected is ${ title } value`,
-                    got                 : value,
-                    t                   : this
-                })
-            }))
-        }
-
-
-        //----------------------------------------------------
         // region pattern matching
 
         assertMatchInternal (
@@ -265,51 +249,134 @@ export class AssertionCompare extends Mixin(
         // endregion
 
 
+        //----------------------------------------------------
+        // region "is" comparison
+
+        comparePrimitives (value1 : unknown, value2 : unknown) : boolean {
+            return CI(comparePrimitivesGen(value1, value2, this.descriptor.deepCompareConfig)).take(1).length === 0
+        }
+
+
+        comparePrimitivesIs (value1 : unknown, value2 : unknown) : boolean {
+            return isDate(value1) && isDate(value2) ? value1.getTime() === value2.getTime() : this.comparePrimitives(value1, value2)
+        }
+
+
         isStrict<V> (value1 : V, value2 : V, description : string = '') {
-            const passed        = value1 === value2
-
-            this.addResult(Assertion.new({
-                name            : 'isStrict',
-                passed,
-                description,
-
-                annotation      : passed ? undefined : GotExpectTemplate.el({
-                    got     : value1,
-                    expect  : value2,
-                    serializerConfig : this.descriptor.serializerConfig
-                })
-            }))
+            this.assertEqualityInternal('isStrict(received, expected)', value1 === value2, false, value1, value2, description)
         }
 
 
         is<V> (value1 : V, value2 : V, description : string = '') {
-            const passed        = isDate(value1) && isDate(value2) ? value1.getTime() === value2.getTime() : value1 === value2
+            this.assertEqualityInternal(
+                'is(received, expected)',
+                this.comparePrimitivesIs(value1, value2),
+                false,
+                value1,
+                value2,
+                description
+            )
+        }
+
+
+        isNot<V> (value1 : V, value2 : V, description : string = '') {
+            this.assertEqualityInternal(
+                'isNot(received, expected)',
+                this.comparePrimitivesIs(value1, value2),
+                true,
+                value1,
+                value2,
+                description
+            )
+        }
+        // endregion
+
+
+        //----------------------------------------------------
+        // region iterable contains
+
+        assertIterableContainInternal<V> (
+            assertionName   : string,
+            negated         : boolean,
+            iterable        : Iterable<V>,
+            element         : V,
+            description     : string = ''
+        ) {
+            const contains  = CI(iterable).some(value =>
+                CI(compareDeepGen(value, element, this.descriptor.deepCompareConfig)).take(1).length === 0
+            )
+
+            const passed    = negated ? !contains : contains
 
             this.addResult(Assertion.new({
-                name            : 'is',
-                passed,
-                description,
-
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                passed          : passed,
+                description     : description,
                 annotation      : passed ? undefined : GotExpectTemplate.el({
-                    got     : value1,
-                    expect  : value2,
-                    serializerConfig : this.descriptor.serializerConfig
+                    got         : iterable,
+                    expectTitle : `Expect iterable ${ negated ? 'not ' : '' }containing`,
+                    expect      : element,
+                    t           : this
                 })
             }))
         }
 
 
-        isNot<V> (value1 : V, value2 : V, description : string = '') {
-            const passed        = isDate(value1) && isDate(value2) ? value1.getTime() !== value2.getTime() : value1 !== value2
+        contain<V> (iterable : Iterable<V>, element : V, description : string = '') {
+            this.assertIterableContainInternal('contain(received, element)', false, iterable, element)
+        }
+
+
+        notContain<V> (iterable : Iterable<V>, element : V, description : string = '') {
+            this.assertIterableContainInternal('notContain(received, element)', true, iterable, element)
+        }
+        // endregion
+
+
+        //----------------------------------------------------
+        // region compare
+
+        assertCompareInternal<V> (
+            assertionName   : string,
+            negated         : boolean,
+            op              : [ (a, b) => boolean, string ],
+            value1          : unknown,
+            value2          : unknown,
+            description     : string = ''
+        ) {
+            const condition = op[ 0 ](value1, value2)
+            const passed    = negated ? !condition : condition
 
             this.addResult(Assertion.new({
-                name            : 'isNot',
-                passed,
-                description,
-
-                annotation      : passed ? undefined : NotEqualAnnotationTemplate.el({ value : value2, serializerConfig : this.descriptor.serializerConfig })
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                passed          : passed,
+                description     : description,
+                annotation      : passed ? undefined : GotExpectTemplate.el({
+                    got         : value1,
+                    expectTitle : `Expect value ${ negated ? 'not ' : '' }${ op[ 1 ] } than`,
+                    expect      : value2,
+                    t           : this
+                })
             }))
         }
+
+
+        isGreater (value1 : unknown, value2 : unknown, description : string = '') {
+            this.assertCompareInternal('isGreater(received, expected)', false, ComparisonType.Greater, value1, value2)
+        }
+
+        isGreaterOrEqual (value1 : unknown, value2 : unknown, description : string = '') {
+            this.assertCompareInternal('isGreaterOrEqual(received, expected)', false, ComparisonType.GreaterOrEqual, value1, value2)
+        }
+
+        isLess (value1 : unknown, value2 : unknown, description : string = '') {
+            this.assertCompareInternal('isLess(received, expected)', false, ComparisonType.Less, value1, value2)
+        }
+
+        isLessOrEqual (value1 : unknown, value2 : unknown, description : string = '') {
+            this.assertCompareInternal('isLessOrEqual(received, expected)', false, ComparisonType.LessOrEqual, value1, value2)
+        }
+        // endregion
     }
 ) {}
 

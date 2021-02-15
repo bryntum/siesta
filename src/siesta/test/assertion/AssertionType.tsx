@@ -1,6 +1,7 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { SiestaJSX } from "../../../jsx/Factory.js"
-import { TestNodeResult } from "../TestResult.js"
+import { Assertion, TestNodeResult } from "../TestResult.js"
+import { GotExpectTemplate } from "./AssertionCompare.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -9,6 +10,34 @@ export class AssertionType extends Mixin(
     (base : ClassUnion<typeof TestNodeResult>) =>
 
     class AssertionType extends base {
+
+        //----------------------------------------------------
+        assertDefinedInternal (
+            assertionName   : string,
+            negated         : boolean,
+            inverted        : boolean,
+            value           : unknown,
+            description     : string = ''
+        ) {
+            const condition1    = value !== undefined
+            const condition2    = inverted ? !condition1 : condition1
+
+            const passed        = negated ? !condition2 : condition2
+
+            const title         = (negated && inverted) ? 'defined' : negated || inverted ? 'undefined' : 'defined'
+
+            this.addResult(Assertion.new({
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                passed,
+                description,
+                annotation      : passed ? undefined : GotExpectTemplate.el({
+                    description         : `Expected is ${ title } value`,
+                    got                 : value,
+                    t                   : this
+                })
+            }))
+        }
+
 
         //----------------------------------------------------
         // region truthy assertions

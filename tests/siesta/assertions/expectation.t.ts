@@ -31,13 +31,6 @@ it('`expect().toBe() should work`', async t => {
 
 //-------------------------------------------------------
 describe('Before/after should work #1', t => {
-    // t.expect(function () {}).toBeDefined()
-    // t.expect(1).toBeDefined()
-    //
-    // t.expect([ 1 ]).toContain(1)
-    //
-    // t.expect([ 2 ]).not.toContain(1)
-    //
     // t.expect(1).toBeCloseTo(1.01, 1)
     // t.expect(1).not.toBeCloseTo(1.01, 2)
 })
@@ -77,6 +70,36 @@ it('`expect().toBeNull()/toBeNaN()/toBeDefined/toBeUndefined() should work`', as
     }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
 })
 
+
+//-------------------------------------------------------
+it('`expect().toContain() should work`', async t => {
+
+    //------------------
+    t.expect([ 1 ]).toContain(1)
+
+    t.expect(new Set([ 1 ])).toContain(1)
+
+    //------------------
+    t.expect([ 2 ]).not.toContain(1)
+
+    t.expect(new Set([ 2 ])).not.toContain(1)
+
+
+    //------------------
+    t.todo('Should all fail', async t => {
+
+        //------------------
+        t.expect([ 1 ]).not.toContain(1)
+
+        t.expect(new Set([ 1 ])).not.toContain(1)
+
+        //------------------
+        t.expect([ 2 ]).toContain(1)
+
+        t.expect(new Set([ 2 ])).toContain(1)
+
+    }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
+})
 
 
 //-------------------------------------------------------

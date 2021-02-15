@@ -6,6 +6,7 @@ import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
 import { AssertionException } from "./assertion/AssertionException.js"
 import { AssertionGeneral } from "./assertion/AssertionGeneral.js"
+import { AssertionType } from "./assertion/AssertionType.js"
 import { Expectation } from "./Expectation.js"
 import { TestLauncherChild } from "./port/TestLauncher.js"
 import { TestReporterChild } from "./port/TestReporter.js"
@@ -21,7 +22,8 @@ export class Test extends Mixin(
         AssertionAsync,
         AssertionCompare,
         AssertionException,
-        AssertionGeneral
+        AssertionGeneral,
+        AssertionType
     ],
     (base : ClassUnion<
         typeof TestNodeResult,
@@ -29,7 +31,8 @@ export class Test extends Mixin(
         typeof AssertionAsync,
         typeof AssertionCompare,
         typeof AssertionException,
-        typeof AssertionGeneral
+        typeof AssertionGeneral,
+        typeof AssertionType
     >) =>
 
     class Test extends base {

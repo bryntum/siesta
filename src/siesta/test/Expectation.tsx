@@ -1,13 +1,9 @@
 import { Base } from "../../class/Base.js"
 import { AnyFunction } from "../../class/Mixin.js"
-import { CI } from "../../iterator/Iterator.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
-import { XmlElement } from "../../jsx/XmlElement.js"
-import { compareDeepGen, comparePrimitivesGen } from "../../util/CompareDeep.js"
 import { isString } from "../../util/Typeguards.js"
-import { GotExpectTemplate, NotEqualAnnotationTemplate } from "./assertion/AssertionCompare.js"
+import { ComparisonType, GotExpectTemplate } from "./assertion/AssertionCompare.js"
 import { Test } from "./Test.js"
-import { Assertion } from "./TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -42,7 +38,7 @@ export class Expectation extends Base {
     toBe (expectedValue : unknown) {
         this.t.assertEqualityInternal(
             'expect(received).toBe(expected)',
-            CI(comparePrimitivesGen(this.value, expectedValue, this.t.descriptor.deepCompareConfig)).take(1).length === 0,
+            this.t.comparePrimitives(this.value, expectedValue),
             this.isNot,
             this.value,
             expectedValue
@@ -139,25 +135,11 @@ export class Expectation extends Base {
      */
     toContain (element : unknown) {
         const value       = this.value
-        const t           = this.t
-
-        const passed      = false
 
         if (isString(value)) {
             this.t.assertMatchInternal('expect(received).toContain(expected)', this.isNot, value, element as string | RegExp)
         } else {
-            // normalize to array (can be NodeList, `arguments` etc)
-            const ci        = CI(value as Iterable<unknown>)
-
-            this.process(
-                ci.some(value => CI(compareDeepGen(value, element, this.t.descriptor.deepCompareConfig)).take(1).length === 0),
-                'expect(received).toContain(expected)',
-                GotExpectTemplate.el({
-                    got                 : this.value,
-                    expect              : element,
-                    expectTitle         : this.isNot ? 'Expect array-like not containing' : 'Expect array-like containing'
-                })
-            )
+            this.t.assertIterableContainInternal('expect(received).toContain(expected)', this.isNot, value as Iterable<unknown>, element)
         }
     }
 
@@ -169,11 +151,7 @@ export class Expectation extends Base {
      * @param {Number} expectedValue The number to compare with
      */
     toBeLessThan (expectedValue : number) {
-        this.process(this.value < expectedValue, 'expect(received).toBeLessThan(expected)', GotExpectTemplate.el({
-            got                 : this.value,
-            expect              : expectedValue,
-            expectTitle         : this.isNot ? 'Expect value not less than' : 'Expect value less than'
-        }))
+        this.t.assertCompareInternal('expect(received).toBeLessThan(expected)', false, ComparisonType.Greater, this.value, expectedValue)
     }
 
 
@@ -184,11 +162,7 @@ export class Expectation extends Base {
      * @param {Number} expectedValue The number to compare with
      */
     toBeGreaterThan (expectedValue) {
-        this.process(this.value > expectedValue, 'expect(received).toBeGreaterThan(expected)', GotExpectTemplate.el({
-            got                 : this.value,
-            expect              : expectedValue,
-            expectTitle         : this.isNot ? 'Expect value not greater than' : 'Expect value greater than'
-        }))
+        this.t.assertCompareInternal('expect(received).toBeGreaterThan(expected)', false, ComparisonType.Greater, this.value, expectedValue)
     }
 
 
