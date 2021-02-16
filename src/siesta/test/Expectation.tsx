@@ -1,10 +1,12 @@
 import { Base } from "../../class/Base.js"
 import { AnyFunction } from "../../class/Mixin.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
-import { Approximation, NumberApproximation } from "../../util/CompareDeep.js"
+import { Approximation, equalDeep, NumberApproximation } from "../../util/CompareDeep.js"
 import { isString } from "../../util/Typeguards.js"
-import { ComparisonType, GotExpectTemplate } from "./assertion/AssertionCompare.js"
+import { ComparisonType, GotExpectTemplate, verifyExpectedNumber } from "./assertion/AssertionCompare.js"
+import { Spy } from "./Spy.js"
 import { Test } from "./Test.js"
+import { Assertion } from "./TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -199,119 +201,112 @@ export class Expectation extends Base {
     }
 
 
-//     /**
-//      * This assertion passes, if a spy, provided to the {@link Siesta.Test#expect expect} method have been
-//      * called expected number of times. The expected number of times can be provided as the 1st argument and by default
-//      * is 1.
-//      *
-//      * One can also provide the function, spied on, to the {@link Siesta.Test#expect expect} method.
-//      *
-//      * Examples:
-//      *
-// const spy = t.spyOn(obj, 'process')
-//
-// // call the method 2 times
-// obj.process()
-// obj.process()
-//
-// // following 2 calls are equivalent
-// t.expect(spy).toHaveBeenCalled();
-// t.expect(obj.process).toHaveBeenCalled();
-//
-// // one can also use exact number of calls or comparison operators
-// t.expect(obj.process).toHaveBeenCalled(2);
-// t.expect(obj.process).toHaveBeenCalled('>1');
-// t.expect(obj.process).toHaveBeenCalled('<=3');
-//
-//      *
-//      * See also {@link #toHaveBeenCalledWith}
-//      *
-//      * @param {Number/String} expectedNumber Expected number of calls. Can be either a number, specifying the exact
-//      * number of calls, or a string. In the latter case one can include a comparison operator in front of the number.
-//      *
-//      */
-//     toHaveBeenCalled (expectedNumber) {
-//         expectedNumber  = expectedNumber != null ? expectedNumber : '>=1'
-//
-//         const spy         = this.value
-//         const t           = this.t
-//         const R           = Siesta.Resource('Siesta.Test.BDD.Expectation');
-//
-//         if (this.typeOf(spy) == 'Function') {
-//             if (!spy.__SIESTA_SPY__) throw new Error(R.get('wrongSpy'))
-//
-//             spy         = spy.__SIESTA_SPY__
-//         }
-//
-//         if (!(spy instanceof Siesta.Test.BDD.Spy)) throw new Error(R.get('wrongSpy'))
-//
-//         this.process(t.verifyExpectedNumber(spy.callsLog.length, expectedNumber), {
-//             descTpl             : R.get('toHaveBeenCalledDescTpl'),
-//             assertionName       : 'expect(func).toHaveBeenCalled()',
-//             methodName          : spy.propertyName || '[function]',
-//             got                 : spy.callsLog.length,
-//             gotDesc             : R.get('actualNbrOfCalls'),
-//             need                : (this.isNot ? 'not ' : '') + expectedNumber,
-//             needDesc            : R.get('expectedNbrOfCalls')
-//         })
-//     }
-//
-//
-//     /**
-//      * This assertion passes, if a spy, provided to the {@link Siesta.Test#expect expect} method have been
-//      * called at least once with the specified arguments.
-//      *
-//      * One can also provide the function, spied on, to the {@link Siesta.Test#expect expect} method.
-//      *
-//      * One can use placeholders, generated with the {@link Siesta.Test.BDD#any any} method to verify the arguments.
-//      *
-//      * Example:
-//      *
-//
-// const spy = t.spyOn(obj, 'process')
-//
-// // call the method 2 times with different arguments
-// obj.build('development', '1.0.0')
-// obj.build('release', '1.0.1')
-//
-// t.expect(spy).toHaveBeenCalledWith('development', '1.0.0');
-// // or
-// t.expect(obj.process).toHaveBeenCalledWith('development', t.any(String));
-//
-//      *
-//      * See also {@link #toHaveBeenCalled}
-//      *
-//      * @param {Object} arg1 Argument to a call
-//      * @param {Object} arg2 Argument to a call
-//      * @param {Object} argN Argument to a call
-//      */
-//     toHaveBeenCalledWith () {
-//         const spy         = this.value
-//         const t           = this.t
-//         const R           = Siesta.Resource('Siesta.Test.BDD.Expectation');
-//
-//         if (this.typeOf(spy) == 'Function') {
-//             if (!spy.__SIESTA_SPY__) throw new Error(R.get('wrongSpy'))
-//
-//             spy         = spy.__SIESTA_SPY__
-//         }
-//
-//         if (!(spy instanceof Siesta.Test.BDD.Spy)) throw new Error(R.get('wrongSpy'))
-//
-//         const args                        = Array.prototype.slice.call(arguments)
-//         const foundCallWithMatchingArgs   = false
-//
-//         Joose.A.each(spy.callsLog, function (call) {
-//             if (t.compareObjects(call.args, args)) { foundCallWithMatchingArgs = true; return false }
-//         })
-//
-//         this.process(foundCallWithMatchingArgs, {
-//             descTpl             : R.get('toHaveBeenCalledWithDescTpl'),
-//             assertionName       : 'expect(func).toHaveBeenCalledWith()',
-//             methodName          : spy.propertyName,
-//             noGot               : true
-//         })
-//     }
+    /**
+     * This assertion passes, if a spy, provided to the {@link Siesta.Test#expect expect} method have been
+     * called expected number of times. The expected number of times can be provided as the 1st argument and by default
+     * is 1.
+     *
+     * One can also provide the function, spied on, to the {@link Siesta.Test#expect expect} method.
+     *
+     * Examples:
+     *
+const spy = t.spyOn(obj, 'process')
+
+// call the method 2 times
+obj.process()
+obj.process()
+
+// following 2 calls are equivalent
+t.expect(spy).toHaveBeenCalled();
+t.expect(obj.process).toHaveBeenCalled();
+
+// one can also use exact number of calls or comparison operators
+t.expect(spy).toHaveBeenCalled(2);
+t.expect(spy).toHaveBeenCalled('>1');
+t.expect(spy).toHaveBeenCalled('<=3');
+
+     *
+     * See also {@link #toHaveBeenCalledWith}
+     *
+     * @param expectedNumber Expected number of calls. Can be either a number, specifying the exact
+     * number of calls, or a string. In the latter case one should include a comparison operator in front of the number.
+     *
+     */
+    toHaveBeenCalled (expectedNumber : number | string = '>=1') {
+        // @ts-ignore
+        const spy           = this.value?.__SIESTA_SPY__ ?? this.value
+
+        if (!(spy instanceof Spy)) throw new Error("This method can be called on spy instance or spy wrapper function")
+
+        const condition     = verifyExpectedNumber(spy.callsLog.length, expectedNumber)
+        const passed        = this.isNot ? !condition : condition
+
+        const name          = 'expect(spy).toHaveBeenCalled(expected)'
+
+        this.t.addResult(Assertion.new({
+            name            : this.isNot ? this.t.negateExpectationName(name) : name,
+            passed,
+
+            annotation      : passed ? undefined : GotExpectTemplate.el({
+                gotTitle    : 'Actual number of calls',
+                got         : spy.callsLog.length,
+
+                expectTitle : 'Expected number of calls',
+                expect      : expectedNumber
+            })
+        }))
+    }
+
+
+    /**
+     * This assertion passes, if a spy, provided to the {@link Siesta.Test#expect expect} method have been
+     * called at least once with the specified arguments.
+     *
+     * One can also provide the function, spied on, to the {@link Siesta.Test#expect expect} method.
+     *
+     * One can use placeholders, generated with the {@link Siesta.Test.BDD#any any} method to verify the arguments.
+     *
+     * Example:
+     *
+
+const spy = t.spyOn(obj, 'process')
+
+// call the method 2 times with different arguments
+obj.build('development', '1.0.0')
+obj.build('release', '1.0.1')
+
+t.expect(spy).toHaveBeenCalledWith('development', '1.0.0');
+// or
+t.expect(obj.process).toHaveBeenCalledWith('development', t.any(String));
+
+     *
+     * See also {@link #toHaveBeenCalled}
+     *
+     * @param {Object} arg1 Argument to a call
+     * @param {Object} arg2 Argument to a call
+     * @param {Object} argN Argument to a call
+     */
+    toHaveBeenCalledWith (...args : unknown[]) {
+        // @ts-ignore
+        const spy           = this.value?.__SIESTA_SPY__ ?? this.value
+
+        if (!(spy instanceof Spy)) throw new Error("This method can be called on spy instance or spy wrapper function")
+
+        const condition     = spy.callsLog.some(callInfo => equalDeep(callInfo.args, args))
+        const passed        = this.isNot ? !condition : condition
+
+        const name          = 'expect(spy).toHaveBeenCalledWith(...arguments)'
+
+        this.t.addResult(Assertion.new({
+            name            : this.isNot ? this.t.negateExpectationName(name) : name,
+            passed,
+
+            annotation      : passed ? undefined : GotExpectTemplate.el({
+                gotTitle    : 'The function being spied, has never been called with the expected arguments',
+                got         : args
+            })
+        }))
+    }
 }
 
 

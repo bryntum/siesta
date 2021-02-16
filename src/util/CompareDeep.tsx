@@ -792,6 +792,13 @@ export const compareDeep = (
     Array.from(compareDeepGen(v1, v2, options))
 
 
+export const equalDeep = (
+    v1          : unknown,
+    v2          : unknown,
+    options     : DeepCompareOptions    = { includePropertiesFromPrototypeChain : false }
+) : boolean =>
+    CI(compareDeepGen(v1, v2, options)).take(1).length === 0
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export const compareArrayDeepGen = function * (

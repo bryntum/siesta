@@ -2,6 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
+import { ArbitraryObject, ArbitraryObjectKey } from "../../util/Helpers.js"
 import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
 import { AssertionException } from "./assertion/AssertionException.js"
@@ -10,6 +11,7 @@ import { AssertionType } from "./assertion/AssertionType.js"
 import { Expectation } from "./Expectation.js"
 import { TestLauncherChild } from "./port/TestLauncher.js"
 import { TestReporterChild } from "./port/TestReporter.js"
+import { Spy, SpyFunction } from "./Spy.js"
 import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
 import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResult } from "./TestResult.js"
 
@@ -58,6 +60,8 @@ export class Test extends Mixin(
 
         finishHook          : Hook<[ this ]>        = new Hook()
         postFinishHook      : Hook<[ this ]>        = new Hook()
+
+        spies               : Spy[]                 = []
 
 
         expect (value : unknown) : Expectation {
@@ -204,6 +208,8 @@ export class Test extends Mixin(
 
             // extra-late finish hook, test is already not marked as active in the reporter
             this.postFinishHook.trigger(this)
+
+            this.spies.forEach(spy => spy.remove())
         }
 
 
@@ -245,6 +251,123 @@ export class Test extends Mixin(
 
 
         async tearDown () {
+        }
+
+
+        /**
+         * This method installs a "spy" instead of normal function in some object. The "spy" is basically another function,
+         * which tracks the calls to itself. With spies, one can verify that some function was called and that
+         * it was called with certain arguments.
+         *
+         * By default, spy will call the original method and return a value from it. To enable different behavior, you can use one of these methods:
+         *
+         * - {@link Siesta.Test.BDD.Spy#returnValue returnValue} - return a specific value
+         * - {@link Siesta.Test.BDD.Spy#callThrough callThrough} - call the original method and return a value from it
+         * - {@link Siesta.Test.BDD.Spy#stub stub} - call the original method and return a value from it
+         * - {@link Siesta.Test.BDD.Spy#callFake callFake} - call the provided function and return a value from it
+         * - {@link Siesta.Test.BDD.Spy#throwError throwError} - throw a specific exception object
+         *
+
+        const spy = t.spyOn(obj, 'process')
+        // or, if you need to call some method instead
+        const spy = t.spyOn(obj, 'process').and.callFake(() => {
+            // is called instead of `process` method
+        })
+
+        // call the method
+        obj.process('fast', 1)
+
+        t.expect(spy).toHaveBeenCalled();
+        t.expect(spy).toHaveBeenCalledWith('fast', 1);
+
+         *
+         * See also {@link #createSpy}, {@link #createSpyObj}, {@link Siesta.Test.BDD.Expectation#toHaveBeenCalled toHaveBeenCalled},
+         * {@link Siesta.Test.BDD.Expectation#toHaveBeenCalledWith toHaveBeenCalledWith}
+         *
+         * See also the {@link Siesta.Test.BDD.Spy} class for additional details.
+         *
+         * @param {Object} object An object which property is being spied
+         * @param {String} propertyName A name of the property over which to install the spy.
+         *
+         * @return {Siesta.Test.BDD.Spy} spy Created spy instance
+         */
+        spyOn (object : unknown, propertyName : ArbitraryObjectKey) : Spy {
+            if (!object) { throw new Error("Missing host object in `spyOn` call") }
+
+            return Spy.new({
+                name            : String(propertyName),
+
+                t               : this,
+                hostObject      : object,
+                propertyName    : propertyName
+            })
+        }
+
+        /**
+         * This method create a standalone spy function, which tracks all calls to it. Tracking is done using the associated
+         * spy instance, which is available as `and` property. One can use the {@link Siesta.Test.BDD.Spy} class API to
+         * verify the calls to the spy function.
+         *
+         * Example:
+
+    var spyFunc     = t.createSpy('onadd listener')
+
+    myObservable.addEventListener('add', spyFunc)
+
+    // do something that triggers the `add` event on the `myObservable`
+
+    t.expect(spyFunc).toHaveBeenCalled()
+
+    t.expect(spyFunc.calls.argsFor(1)).toEqual([ 'Arg1', 'Arg2' ])
+
+         *
+         * See also: {@link #spyOn}
+         *
+         * @param {String} [spyName='James Bond'] A name of the spy for debugging purposes
+         *
+         * @return {Function} Created function. The associated spy instance is assigned to it as the `and` property
+         */
+        createSpy (spyName : string) : Function & { spy : Spy } {
+            return Spy.new({
+                name            : spyName || 'James Bond',
+                t               : this
+            }).stub().processor
+        }
+
+
+        /**
+         * This method creates an object, which properties are spy functions. Such object can later be used as a mockup.
+         *
+         * This method can be called with one argument only, which should be an array of properties.
+         *
+         * Example:
+
+    var mockup      = t.createSpyObj('encoder-mockup', [ 'encode', 'decode' ])
+    // or just
+    var mockup      = t.createSpyObj([ 'encode', 'decode' ])
+
+    mockup.encode('string')
+    mockup.decode('string')
+
+    t.expect(mockup.encode).toHaveBeenCalled()
+
+
+         *
+         * See also: {@link #createSpy}
+         *
+         * @param {String} spyName A name of the spy object. Can be omitted.
+         * @param {Array[String]} properties An array of the property names. For each property name a spy function will be created.
+         *
+         * @return {Object} A mockup object
+         */
+        createSpyObj (properties : ArbitraryObjectKey[]) : ArbitraryObject<SpyFunction> {
+            const obj           = {}
+
+            properties.forEach(propertyName =>
+                obj[ propertyName ] = this.createSpy(String(propertyName))
+            )
+
+            return obj
         }
 
 

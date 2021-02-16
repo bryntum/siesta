@@ -45,7 +45,7 @@ export type OrPromise<T>        = T | Promise<T>
 //---------------------------------------------------------------------------------------------------------------------
 export type ArbitraryObjectKey  = string | number | symbol
 
-export type ArbitraryObject     =  { [ key in ArbitraryObjectKey ] : unknown }
+export type ArbitraryObject<T = unknown>     =  { [ key in ArbitraryObjectKey ] : T }
 
 
 //---------------------------------------------------------------------------------------------------------------------

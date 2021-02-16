@@ -93,6 +93,13 @@ project.plan(
                     'expectation.t.js'
                 ]
             },
+            {
+                filename    : 'test',
+
+                items       : [
+                    'spies.t.js',
+                ]
+            },
             'test_descriptor.t.js',
             'before_after_each.t.js',
             'todo_tests.t.js',

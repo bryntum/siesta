@@ -1,23 +1,63 @@
 import { Base } from "../../../class/Base.js"
-import { ClassUnion, Mixin } from "../../../class/Mixin.js"
+import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { CI } from "../../../iterator/Iterator.js"
 import { SiestaJSX } from "../../../jsx/Factory.js"
 import { XmlElement } from "../../../jsx/XmlElement.js"
 import { SerializerXml } from "../../../serializer/SerializerXml.js"
-import { Approximation, compareDeepGen, comparePrimitivesGen, Difference, NumberApproximation } from "../../../util/CompareDeep.js"
+import {
+    any,
+    anyNumberApprox,
+    anyStringLike,
+    Approximation,
+    compareDeepGen,
+    comparePrimitivesGen,
+    Difference,
+    NumberApproximation,
+    PlaceHolderAny,
+    PlaceHolderInstance,
+    PlaceHolderNumber,
+    PlaceHolderString
+} from "../../../util/CompareDeep.js"
 import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-type ComparisonTypeName = 'Greater' | 'GreaterOrEqual' | 'Less' | 'LessOrEqual'
+type ComparisonTypeName = 'Equal' | 'Greater' | 'GreaterOrEqual' | 'Less' | 'LessOrEqual'
 
 export const ComparisonType : { [ key in ComparisonTypeName ] : [ (a, b) => boolean, string ] } = {
+    Equal               : [ (a, b) => a === b, 'equal' ],
+
     Greater             : [ (a, b) => a > b, 'greater' ],
     GreaterOrEqual      : [ (a, b) => a >= b, 'greater or equal' ],
 
     Less                : [ (a, b) => a < b, 'less' ],
     LessOrEqual         : [ (a, b) => a <= b, 'less or equal' ]
+}
+
+
+export const verifyExpectedNumber = (actual : number, expected : number | string) : boolean => {
+    let operator        = '=='
+
+    if (isString(expected)) {
+        const match     = /(<|>|<=|>=|=|==|===)\s*(\d+)/.exec(expected)
+
+        if (!match) throw new Error(`Unrecognized comparison format: ${ expected }`)
+
+        operator        = match[ 1 ]
+        expected        = Number(match[ 2 ])
+    }
+
+    switch (operator) {
+        case '=' :
+        case '==' :
+        case '===' : return actual === expected
+
+        case '<=' : return actual <= expected
+        case '>=' : return actual >= expected
+        case '<' : return actual < expected
+        case '>' : return actual > expected
+    }
 }
 
 
@@ -433,6 +473,22 @@ export class AssertionCompare extends Mixin(
 
             this.assertCompareApproxInternal('isApprox(received, expected)', false, value1, value2, approximation, description)
         }
+
+
+        // backward compat
+        any (cls? : AnyConstructor) : PlaceHolderAny | PlaceHolderInstance {
+            return any(cls)
+        }
+
+        anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : PlaceHolderNumber {
+            return anyNumberApprox(value, approx)
+        }
+
+        anyStringLike (pattern : string | RegExp) : PlaceHolderString {
+            return anyStringLike(pattern)
+        }
+        // eof backward compat
+
         // endregion
     }
 ) {}
