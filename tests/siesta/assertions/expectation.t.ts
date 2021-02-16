@@ -30,9 +30,19 @@ it('`expect().toBe() should work`', async t => {
 
 
 //-------------------------------------------------------
-describe('Before/after should work #1', t => {
-    // t.expect(1).toBeCloseTo(1.01, 1)
-    // t.expect(1).not.toBeCloseTo(1.01, 2)
+it('`expect().toBeCloseTo() should work`', async t => {
+    t.expect(1).toBeCloseTo(1.01, 0.1)
+
+    t.expect(1).not.toBeCloseTo(1.2, 0.1)
+
+    //------------------
+    t.todo('Should all fail', async t => {
+
+        t.expect(1).not.toBeCloseTo(1.01, 0.1)
+
+        t.expect(1).toBeCloseTo(1.2, 0.1)
+
+    }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
 })
 
 
