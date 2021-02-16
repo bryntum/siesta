@@ -54,12 +54,36 @@ it('Deep compare should work for primitives and non-cyclic data structures', asy
 it('Deep compare should work for number placeholders', async t => {
     t.equal(compareDeep(10, anyNumberApprox(10)), [])
 
+    t.equal(compareDeep(10.5, anyNumberApprox(10)), [])
+
+    t.equal(compareDeep(10.1, anyNumberApprox(10, { percent : 1 })), [])
+
+    t.equal(compareDeep(1.0512, anyNumberApprox(1.051, { digits : 3 })), [])
+
+    t.equal(compareDeep(1.1599999, anyNumberApprox(1.15, { digits : 2 })), [])
+
     //------------------------
     const placeholder   = anyNumberApprox(10)
 
     t.equal(
         compareDeep('10', placeholder),
         [ DifferenceTypesAreDifferent.new({ v1 : '10', v2 : placeholder, type1 : 'String', type2 : 'Number' }) ]
+    )
+
+    //------------------------
+    const placeholder2   = anyNumberApprox(1.05, { digits : 2 })
+
+    t.equal(
+        compareDeep(1.061, placeholder2),
+        [ DifferenceValuesAreDifferent.new({ v1 : 1.061, v2 : placeholder2 }) ]
+    )
+
+    //------------------------
+    const placeholder3   = anyNumberApprox(1.03, { percent : 2 })
+
+    t.equal(
+        compareDeep(1, placeholder3),
+        [ DifferenceValuesAreDifferent.new({ v1 : 1, v2 : placeholder3 }) ]
     )
 })
 

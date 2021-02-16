@@ -336,3 +336,33 @@ it('`isGreater/isLess` assertion should work', async t => {
 
     }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
 })
+
+
+//-------------------------------------------------------
+it('`isApprox` assertion should work', async t => {
+
+    //------------------
+    t.isApprox(1, 1)
+
+    t.isApprox(1.05, 1)
+
+    t.isApprox(1.05, 1, 0.7)
+
+    t.isApprox(1.051, 1.05, { digits : 2 })
+
+    t.isApprox(1, 1.02, { percent : 2 })
+
+    //------------------
+    t.todo('Should all fail', async t => {
+
+        //------------------
+        t.isApprox(1, 1.06)
+
+        t.isApprox(1.71, 1, 0.7)
+
+        t.isApprox(1.061, 1.05, { digits : 2 })
+
+        t.isApprox(1, 1.03, { percent : 2 })
+
+    }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
+})

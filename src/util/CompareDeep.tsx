@@ -47,7 +47,15 @@ export class NumberApproximation extends Base {
 
         if (this.percent !== undefined) return value * this.percent / 100
 
-        if (this.digits !== undefined) return Math.pow(10, -this.digits)
+        if (this.digits !== undefined) return 9.999999999999999 * Math.pow(10, -this.digits - 1)
+    }
+
+
+    equalApprox (v1 : number, v2 : number) : boolean {
+        const delta     = Math.abs(v1 - v2) - this.getThreshold(v1)
+
+        // strip the floating number artifacts (1.05 - 1 = 0.050000000000000044)
+        return Number(delta.toPrecision(10)) <= 1e-10
     }
 
 
@@ -67,7 +75,7 @@ export class PlaceHolderNumber extends Mixin(
     class PlaceHolderNumber extends base {
         value       : number        = undefined
 
-        threshold   : number        = undefined
+        approx      : NumberApproximation = undefined
 
         min         : number        = undefined
         max         : number        = undefined
@@ -76,12 +84,12 @@ export class PlaceHolderNumber extends Mixin(
         initialize (props? : Partial<PlaceHolderNumber>) {
             super.initialize(props)
 
-            if (this.value !== undefined && this.threshold === undefined) this.threshold = 0.05 * this.value
+            if (this.value !== undefined && this.approx === undefined) this.approx = NumberApproximation.new({ percent : 5 })
         }
 
 
         toString () : string {
-            if (this.value !== undefined) return `${ this.value }±${ this.threshold }`
+            if (this.value !== undefined) return `${ this.value }±${ this.approx.getThreshold(this.value) }`
 
             return `${ this.min } ≤ x ≤ ${ this.max }`
         }
@@ -104,7 +112,7 @@ export class PlaceHolderNumber extends Mixin(
             if (type1 !== type2)
                 yield DifferenceTypesAreDifferent.new({ v1, v2, type1, type2, keyPath : state.keyPathSnapshot() })
             else if (this.value !== undefined) {
-                if (Math.abs(v - this.value) > this.threshold)
+                if (!this.approx.equalApprox(v, this.value))
                     yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
             }
             else {
@@ -115,9 +123,11 @@ export class PlaceHolderNumber extends Mixin(
     }
 ){}
 
-export const anyNumberApprox = (value : number, threshold? : number) : PlaceHolderNumber => PlaceHolderNumber.new({ value, threshold })
+export const anyNumberApprox = (value : number, approx : Approximation = { percent : 5 }) : PlaceHolderNumber =>
+    PlaceHolderNumber.new({ value, approx : NumberApproximation.fromApproximation(approx) })
 
-export const anyNumberBetween = (min : number, max : number) : PlaceHolderNumber => PlaceHolderNumber.new({ min, max })
+export const anyNumberBetween = (min : number, max : number) : PlaceHolderNumber =>
+    PlaceHolderNumber.new({ min, max })
 
 
 //---------------------------------------------------------------------------------------------------------------------

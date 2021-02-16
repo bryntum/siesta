@@ -399,7 +399,7 @@ export class AssertionCompare extends Mixin(
             description     : string = ''
         ) {
             const threshold     = approximation.getThreshold(value1)
-            const condition     = Math.abs(value1 - value2) <= threshold
+            const condition     = approximation.equalApprox(value1, value2)
             const passed        = negated ? !condition : condition
 
             this.addResult(Assertion.new({
@@ -418,12 +418,13 @@ export class AssertionCompare extends Mixin(
 
         isApprox (value1 : number, value2 : number, approx? : Approximation, description? : string) {
             if (arguments.length === 2) {
-                approx          = NumberApproximation.new({ threshold : value1 * 0.05 })
+                approx              = NumberApproximation.new({ threshold : value1 * 0.05 })
             }
             else if (arguments.length === 3) {
-                if (isString(approx)) description = approx
-
-                approx          = NumberApproximation.new({ threshold : value1 * 0.05 })
+                if (isString(approx)) {
+                    description     = approx
+                    approx          = NumberApproximation.new({ threshold : value1 * 0.05 })
+                }
             }
 
             if (isNumber(approx)) approx = NumberApproximation.new({ threshold : approx })
