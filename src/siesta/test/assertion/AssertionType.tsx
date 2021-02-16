@@ -69,6 +69,17 @@ export class AssertionType extends Mixin(
             this.assertInstanceOfInternal('isInstanceOf(received, cls)', false, value, cls, description)
         }
 
+        // backward compat
+        isaOk (value : unknown, cls : AnyConstructor, description : string = '') {
+            this.assertInstanceOfInternal('isaOk(received, cls)', false, value, cls, description)
+        }
+
+        isa_ok (value : unknown, cls : AnyConstructor, description : string = '') {
+            this.assertInstanceOfInternal('isa_ok(received, cls)', false, value, cls, description)
+        }
+        // eof backward compat
+
+
 
         isBoolean (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isBoolean(received)', false, value, Boolean, description)
