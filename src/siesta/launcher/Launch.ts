@@ -1,12 +1,83 @@
 import { Channel } from "../../channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { Hook } from "../../hook/Hook.js"
 import { Logger } from "../../logger/Logger.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { ChannelTestLauncher } from "../test/port/TestLauncher.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
+
+//---------------------------------------------------------------------------------------------------------------------
+export class Queue extends Base {
+    maxWorkers                  : number                = 5
+
+    slots                       : Promise<unknown>[]    = []
+
+    freeSlots                   : number[]              = []
+
+    onFreeSlotAvailableHook     : Hook<[ this ]>        = new Hook()
+
+    onSlotSettledHook           : Hook<[ any, PromiseSettledResult<unknown> ]>        = new Hook()
+
+    onCompletedHook             : Hook                  = new Hook()
+
+
+    initialize (props? : Partial<Queue>) {
+        super.initialize(props)
+
+        for (let i = 0; i < this.maxWorkers; i++) {
+            this.slots.push(null)
+            this.freeSlots.push(i)
+        }
+    }
+
+
+    pullSingle () {
+        if (this.freeSlots.length > 0) this.onFreeSlotAvailableHook.trigger(this)
+
+        if (this.freeSlots.length === this.maxWorkers) this.onCompletedHook.trigger()
+    }
+
+
+    pull () {
+        while (this.freeSlots.length) {
+            this.onFreeSlotAvailableHook.trigger(this)
+
+            if (this.freeSlots.length === this.maxWorkers) {
+                this.onCompletedHook.trigger()
+                break
+            }
+        }
+    }
+
+
+    async push (id : any, promise : Promise<unknown>) {
+        if (this.freeSlots.length === 0) throw new Error("All slots are busy")
+
+        const freeSlot          = this.freeSlots.pop()
+
+        let value, reason
+
+        let thrown : boolean    = false
+
+        try {
+            value   = await promise
+        } catch (e) {
+            reason  = e
+            thrown  = true
+        }
+
+        this.freeSlots.push(freeSlot)
+
+        if (thrown)
+            this.onSlotSettledHook.trigger(id, { status : 'rejected', reason })
+        else
+            this.onSlotSettledHook.trigger(id, { status : 'fulfilled', value })
+    }
+}
+
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -25,6 +96,9 @@ export class Launch extends Mixin(
         targetContextChannelClass   : typeof Channel        = undefined
 
         type                        : 'project' | 'test'    = 'project'
+
+        mode                        : 'sequential' | 'parallel' = 'sequential'
+        maxWorkers                  : number                    = 5
 
 
         $testLauncherChannelClass : typeof ChannelTestLauncher  = undefined
@@ -66,9 +140,24 @@ export class Launch extends Mixin(
 
             const projectPlanItems      = this.projectPlanItemsToLaunch
 
-            for (const item of projectPlanItems) {
-                await this.launchProjectPlanItem(item)
+            const queue                 = Queue.new({ maxWorkers : this.maxWorkers})
+
+            queue.onFreeSlotAvailableHook.on(() => {
+                queue.push(null, this.launchProjectPlanItem(projectPlanItems.shift()))
+            })
+
+            if (this.mode === 'parallel') {
+                queue.onSlotSettledHook.on(() => queue.pull())
+
+                queue.pull()
             }
+            else {
+                queue.onSlotSettledHook.on(() => queue.pullSingle())
+
+                queue.pullSingle()
+            }
+
+            await new Promise<void>(resolve => queue.onCompletedHook.on(resolve))
 
             this.reporter.onTestSuiteFinish()
         }
