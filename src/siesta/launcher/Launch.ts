@@ -24,6 +24,8 @@ export class Launch extends Mixin(
 
         targetContextChannelClass   : typeof Channel        = undefined
 
+        type                        : 'project' | 'test'    = 'project'
+
 
         $testLauncherChannelClass : typeof ChannelTestLauncher  = undefined
 

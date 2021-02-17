@@ -1,3 +1,4 @@
+import path from "path"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
@@ -23,7 +24,9 @@ export class TestNodejs extends Mixin(
 
 
         static getSelfUrl () : string {
-            return process.argv[ 1 ]
+            const testUrl       = process.argv[ 1 ]
+
+            return path.relative(path.resolve(), testUrl)
         }
 
         static getInputArguments () : string[] {

@@ -5,7 +5,7 @@ import { Hook } from "../../hook/Hook.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { ArbitraryObject, ArbitraryObjectKey, isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { Launch } from "../launcher/Launch.js"
-import { Launcher } from "../launcher/Launcher.js"
+import { Launcher, LauncherError } from "../launcher/Launcher.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
@@ -469,11 +469,19 @@ export class Test extends Mixin(
                 inputArguments          : isomorphicTestClass.getInputArguments()
             })
 
-            descriptor.url      = isomorphicTestClass.getSelfUrl()
+            descriptor.url      = projectPlan.title = isomorphicTestClass.getSelfUrl()
 
-            await launcher.setup()
+            try {
+                await launcher.setup()
+            } catch (e) {
+                if (e instanceof LauncherError)
+                    return
+                else
+                    throw e
+            }
 
             const launch    = Launch.new({
+                type                        : 'test',
                 launcher,
                 projectDescriptor,
                 projectPlanItemsToLaunch    : projectPlan.leavesAxis(),

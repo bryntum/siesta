@@ -111,7 +111,7 @@ export class ReporterTheme extends Base {
 
     testSuiteHeader () : XmlElement {
         return <div>
-            Launching test suite: <span class="project_title">{ this.projectDescriptor.projectPlan.title }</span>
+            Launching { this.launch.type === 'project' ? 'test suite project' : 'test file'}: <span class="project_title">{ this.projectDescriptor.projectPlan.title }</span>
             <div></div>
         </div>
     }
