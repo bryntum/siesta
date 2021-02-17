@@ -43,12 +43,24 @@ export class ProjectExtractorChild extends Mixin(
 
                 try {
                     await import(projectUrl)
-
-                    res                         = await promise
                 } catch (e) {
                     throw LauncherError.new({
                         annotation      : <div>
                             <span class="log_message_error"> ERROR </span> <span class="accented">Exception importing project file - wrong path/URL?</span>
+                            <div>
+                                { e.stack }
+                            </div>
+                        </div>,
+                        exitCode        : ExitCodes.EXCEPTION_IN_PROJECT_FILE
+                    })
+                }
+
+                try {
+                    res                         = await promise
+                } catch (e) {
+                    throw LauncherError.new({
+                        annotation      : <div>
+                            <span class="log_message_error"> ERROR </span> <span class="accented">Exception while running the project file</span>
                             <div>
                                 { e.stack }
                             </div>
