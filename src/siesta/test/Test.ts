@@ -1,15 +1,19 @@
+import { ChannelSameContext } from "../../channel/ChannelSameContext.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { ArbitraryObject, ArbitraryObjectKey } from "../../util/Helpers.js"
+import { Launch } from "../launcher/Launch.js"
+import { Launcher } from "../launcher/Launcher.js"
+import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
 import { AssertionException } from "./assertion/AssertionException.js"
 import { AssertionGeneral } from "./assertion/AssertionGeneral.js"
 import { AssertionType } from "./assertion/AssertionType.js"
 import { Expectation } from "./Expectation.js"
-import { TestLauncherChild } from "./port/TestLauncher.js"
+import { ChannelTestLauncher, TestLauncherChild } from "./port/TestLauncher.js"
 import { TestReporterChild } from "./port/TestReporter.js"
 import { Spy, SpyFunction } from "./Spy.js"
 import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
@@ -38,6 +42,12 @@ export class Test extends Mixin(
     >) =>
 
     class Test extends base {
+        // value in prototype
+        launcherClass       : typeof Launcher
+
+        // value in prototype
+        testDescriptorClass : typeof TestDescriptor
+
         // "upgrade" types from TreeNode
         parentNode          : Test
 
@@ -238,6 +248,12 @@ export class Test extends Mixin(
 
                 this.addResult(subTest)
 
+                // TODO
+                // supports the launching individual test file case
+                // in that case the `reporter` appears already after
+                // the test structure is defined
+                subTest.reporter    = this.reporter
+
                 await subTest.start()
             }
 
@@ -382,14 +398,64 @@ export class Test extends Mixin(
 
         static it<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
             if (!globalTestEnv.topTest) {
-                if (!globalTestEnv.topTestDescriptor) throw new Error("No top test descriptor")
-                if (!globalTestEnv.launcher) throw new Error("No test launcher")
 
-                globalTestEnv.topTest   = this.new({
-                    descriptor      : globalTestEnv.topTestDescriptor,
-                    // TS can't figure out types compatibility
-                    reporter        : globalTestEnv.launcher as TestReporterChild
-                } as Partial<InstanceType<T>>)
+                if (globalTestEnv.topTestDescriptor) {
+                    // launched from the outside, by the Launcher
+                    globalTestEnv.topTest   = this.new({
+                        descriptor      : globalTestEnv.topTestDescriptor,
+                        // TS can't figure out types compatibility
+                        reporter        : globalTestEnv.launcher as TestReporterChild
+                    } as Partial<InstanceType<T>>)
+                } else {
+                    // launched standalone, by user executing the test file
+                    const projectPlan   = this.prototype.testDescriptorClass.new({ url : '.' })
+                    const descriptor    = this.prototype.testDescriptorClass.new({ url : this.getSelfUrl() })
+
+                    const topTest       = globalTestEnv.topTest   = this.new({
+                        descriptor      : descriptor,
+                    } as Partial<InstanceType<T>>)
+
+                    projectPlan.planItem(descriptor)
+
+                    const projectDescriptor = ProjectDescriptor.new({ projectPlan })
+
+                    const launcher      = this.prototype.launcherClass.new({
+                        projectDescriptor,
+                        inputArguments          : this.getInputArguments()
+                    });
+
+                    // TODO refactor the whole launching infrastructure
+                    (async () => {
+                        await launcher.setup()
+
+                        const launch    = Launch.new({
+                            launcher,
+                            projectDescriptor,
+                            projectPlanItemsToLaunch : projectPlan.leavesAxis(),
+                            targetContextChannelClass : ChannelSameContext
+                        })
+
+                        await launch.setup()
+
+                        const channel = launch.testLauncherChannelClass.new() as ChannelTestLauncher & ChannelSameContext
+
+                        const setupPromise      = channel.setup()
+
+                        const testLauncher      = channel.parentPort
+
+                        const reporter          = testLauncher.reporter   = launch.reporter
+
+                        await setupPromise
+
+                        topTest.reporter        = channel.childPort as TestLauncherChild
+
+                        reporter.onTestSuiteStart()
+
+                        await topTest.start()
+
+                        reporter.onTestSuiteFinish()
+                    })()
+                }
             }
 
             const currentTest       = globalTestEnv.currentTest || globalTestEnv.topTest
@@ -406,6 +472,20 @@ export class Test extends Mixin(
         static ddescribe<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
             return this.iit(name, code)
         }
+
+
+        static getSelfUrl () : string {
+            throw new Error("Abstract method")
+        }
+
+        static getInputArguments () : string[] {
+            throw new Error("Abstract method")
+        }
+
+
+        // static async launchStandalone () {
+        //
+        // }
     }
 ) {}
 

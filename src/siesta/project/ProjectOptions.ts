@@ -63,7 +63,7 @@ export class ProjectDescriptor extends Mixin(
     class ProjectDescriptor extends base {
         projectPlan     : TestDescriptor            = undefined
 
-        options         : ProjectOptions            = undefined
+        options         : ProjectOptions            = ProjectOptions.new()
     }
 
     return ProjectDescriptor

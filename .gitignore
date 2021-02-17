@@ -29,6 +29,7 @@
 #/benchmarks/**/*.js
 #/benchmarks/**/*.js.map
 /main.js
+/nodejs.js
 
 # docs
 /docs

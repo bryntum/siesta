@@ -6,6 +6,7 @@ import { TestDescriptor } from "./TestDescriptor.js"
 export type PreloadDescriptor = string
     | { type? : 'js' | 'css', url : string }
     | { code : string | Function }
+    | { style : string }
     | PreloadDescriptor[]
 
 

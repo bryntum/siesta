@@ -25,6 +25,7 @@
 
     "include" : [
         "main.ts",
+        "nodejs.ts",
         "bin/**/*.ts",
         "src/**/*.ts",
         "src/**/*.tsx",
