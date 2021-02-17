@@ -73,11 +73,11 @@ export class Launch extends Mixin(
 
 
         async launchProjectPlanItem (item : TestDescriptor) {
-            const normalized = item.flatten
+            const normalized        = item.flatten
 
             this.logger.log("Launching project item: ", normalized.url)
 
-            const channel       = await this.testLauncherChannelClass.new()
+            const channel           = this.testLauncherChannelClass.new()
 
             await channel.setup()
 
