@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { SiestaJSX } from "../../src/jsx/Factory.js"
 import { StringifierXml } from "../../src/serializer/StringifierXml.js"
 import { any, anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src/util/CompareDeep.js"

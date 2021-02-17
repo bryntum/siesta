@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { MIN_SMI } from "../../src/util/Helpers.js"
 import { compact, Uniqable } from "../../src/util/Uniqable.js"
 

@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { Option, OptionsBag, OptionsParseErrorCodes, OptionsParseWarningCodes } from "../../src/siesta/launcher/Option.js"
 
 const string    = Option.new({ name : 'string', type : 'string' })

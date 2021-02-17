@@ -1,4 +1,4 @@
-import { describe } from "../../../main.js"
+import { describe } from "../../../index.js"
 
 describe('`like`assertion should work', async t => {
 

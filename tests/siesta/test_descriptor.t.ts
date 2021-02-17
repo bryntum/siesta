@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { TestDescriptor } from "../../src/siesta/test/TestDescriptor.js"
 
 

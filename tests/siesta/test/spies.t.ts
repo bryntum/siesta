@@ -1,4 +1,4 @@
-import { describe } from "../../../main.js"
+import { describe } from "../../../index.js"
 import { Spy } from "../../../src/siesta/test/Spy.js"
 
 describe('Spy executing strategies', t => {

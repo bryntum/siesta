@@ -28,7 +28,7 @@
 /examples/**/*.js.map
 #/benchmarks/**/*.js
 #/benchmarks/**/*.js.map
-/main.js
+/index.js
 /nodejs.js
 /browser.js
 

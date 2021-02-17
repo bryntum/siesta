@@ -1,4 +1,4 @@
-import { Project } from "../../main.js"
+import { Project } from "../../index.js"
 
 const project = Project.new({
     title                   : 'Isomorphic serverless test suite example',

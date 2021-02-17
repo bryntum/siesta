@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { SiestaJSX } from "../../src/jsx/Factory.js"
 import { SerializerXml } from "../../src/serializer/SerializerXml.js"
 import { anyNumberApprox } from "../../src/util/CompareDeep.js"

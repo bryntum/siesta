@@ -1,4 +1,4 @@
-import { describe } from "../../../main.js"
+import { describe } from "../../../index.js"
 
 describe({
     tags        : [ 'basic', 'generic', 'data', 'model' ],

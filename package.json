@@ -3,7 +3,7 @@
   "version": "6.0.0",
   "description": "Next generation JavaScript/TypeScript testing and benchmarking tool",
   "main": "index.js",
-  "module": "main.js",
+  "module": "index.js",
   "type": "module",
   "bin": {
     "siesta": "bin/siesta.js"

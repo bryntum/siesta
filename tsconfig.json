@@ -24,7 +24,7 @@
     },
 
     "include" : [
-        "main.ts",
+        "index.ts",
         "nodejs.ts",
         "browser.ts",
         "bin/**/*.ts",

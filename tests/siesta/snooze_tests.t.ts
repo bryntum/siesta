@@ -1,4 +1,4 @@
-import { describe } from "../../main.js"
+import { describe } from "../../index.js"
 import { Assertion } from "../../src/siesta/test/TestResult.js"
 
 //-------------------------------------------------------

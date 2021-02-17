@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { Base } from "../../src/class/Base.js"
 import { ClassUnion, Mixin } from "../../src/class/Mixin.js"
 import { Collapser, Expander, parse, serializable, Serializable, setReferenceIdSource, stringify } from "../../src/serializable/Serializable.js"

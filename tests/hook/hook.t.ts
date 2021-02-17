@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { AnyConstructor, Mixin } from "../../src/class/Mixin.js"
 import { Hook } from "../../src/hook/Hook.js"
 

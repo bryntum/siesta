@@ -1,4 +1,4 @@
-import { describe, it } from "../../../main.js"
+import { describe, it } from "../../../index.js"
 import { any } from "../../../src/util/CompareDeep.js"
 import { delay } from "../../../src/util/Helpers.js"
 import { verifyAllFailed } from "../helpers.js"

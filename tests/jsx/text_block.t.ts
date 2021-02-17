@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { TextBlock } from "../../src/jsx/TextBlock.js"
 
 

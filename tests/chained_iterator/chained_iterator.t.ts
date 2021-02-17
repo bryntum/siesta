@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { CI, map, MemoizedIterator, MI } from "../../src/iterator/Iterator.js"
 
 

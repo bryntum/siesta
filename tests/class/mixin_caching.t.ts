@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { Base } from "../../src/class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin, ZeroBaseClass } from "../../src/class/Mixin.js"
 

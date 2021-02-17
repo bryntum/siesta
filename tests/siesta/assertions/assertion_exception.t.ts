@@ -1,4 +1,4 @@
-import { it } from "../../../main.js"
+import { it } from "../../../index.js"
 import { delay } from "../../../src/util/Helpers.js"
 import { verifyAllFailed } from "../helpers.js"
 

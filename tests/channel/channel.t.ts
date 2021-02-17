@@ -1,4 +1,4 @@
-import { it } from "../../main.js"
+import { it } from "../../index.js"
 import { MediaSameContext } from "../../src/port/MediaSameContext.js"
 import { local, Port, remote } from "../../src/port/Port.js"
 
