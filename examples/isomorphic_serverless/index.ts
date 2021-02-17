@@ -1,6 +1,6 @@
-import { ProjectIsomorphic } from "../../main.js"
+import { Project } from "../../main.js"
 
-const project = ProjectIsomorphic.new({
+const project = Project.new({
     title                   : 'Isomorphic serverless test suite example',
 
     // global test-specific options

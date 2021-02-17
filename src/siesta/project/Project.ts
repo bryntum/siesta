@@ -1,4 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { isNodejs } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/TestDescriptor.js"
 import { ProjectDescriptor, ProjectOptions } from "./ProjectOptions.js"
@@ -54,8 +55,27 @@ export class Project extends Mixin(
             if (projectExtraction.resolve) {
                 projectExtraction.resolve(this)
             } else {
-                await this.launchStandalone()
+                (await this.getIsomorphicSelfInstance()).launchStandalone()
             }
+        }
+
+
+        async getIsomorphicSelfInstance () {
+            const cls           = await this.getIsomorphicProjectClass()
+
+            const config        = Object.assign({}, this)
+
+            delete config.launcherClass
+
+            return cls.new(config)
+        }
+
+
+        async getIsomorphicProjectClass () : Promise<typeof Project> {
+            if (isNodejs())
+                return (await import('./ProjectNodejs.js')).ProjectNodejs
+            else
+                return (await import('./ProjectBrowser.js')).ProjectBrowser
         }
 
 

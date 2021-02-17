@@ -8,6 +8,7 @@ import { DeepCompareOptions } from "../../util/CompareDeep.js"
 import { ArbitraryObject, cloneObject, objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { HasOptions, option, OptionGroup } from "../launcher/Option.js"
+import { Test } from "./Test.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -159,7 +160,7 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
     }
 }
 
-export type TestDescriptorArgument = string | Partial<TestDescriptor>
+export type TestDescriptorArgument<T extends Test> = string | Partial<InstanceType<T[ 'testDescriptorClass' ]>>
 
-export type ProjectPlanItemDescriptor<DescClass extends TestDescriptor> = string | (Partial<DescClass> & { items? : ProjectPlanItemDescriptor<DescClass>[] })
+export type ProjectPlanItemDescriptor<T extends TestDescriptor> = string | (Partial<T> & { items? : ProjectPlanItemDescriptor<T>[] })
 

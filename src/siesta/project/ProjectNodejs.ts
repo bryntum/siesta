@@ -1,7 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Launcher } from "../launcher/Launcher.js"
 import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
-import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { Project } from "./Project.js"
 import { ProjectOptionsNodejs } from "./ProjectOptions.js"
@@ -14,8 +12,8 @@ export class ProjectNodejs extends Mixin(
 
     class ProjectNodejs extends base {
 
-        launcherClass           : typeof LauncherNodejs     = LauncherNodejs
-        testDescriptorClass     : typeof TestDescriptor     = TestDescriptorNodejs
+        launcherClass           : typeof LauncherNodejs         = LauncherNodejs
+        testDescriptorClass     : typeof TestDescriptorNodejs   = TestDescriptorNodejs
 
         // buildBaseUrl () : string {
         //     return '.'

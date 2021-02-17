@@ -8,11 +8,9 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { SiestaJSX } from "../../jsx/Factory.js"
-import { ProjectOptions, ProjectOptionsNodejs } from "../project/ProjectOptions.js"
-import { Reporter } from "../reporter/Reporter.js"
+import { ProjectOptionsNodejs } from "../project/ProjectOptions.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
-import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary, PrepareOptionsResult } from "./Launcher.js"
 import { option } from "./Option.js"
@@ -46,14 +44,12 @@ export class LauncherNodejs extends Mixin(
         noColor         : boolean               = false
 
 
-        reporterClass   : typeof Reporter       = ReporterNodejsTerminal
-        colorerClass    : typeof Colorer        = ColorerNodejs
+        reporterClass   : typeof ReporterNodejs             = ReporterNodejsTerminal
+        colorerClass    : typeof Colorer                    = ColorerNodejs
 
-        projectOptionsClass : typeof ProjectOptions = ProjectOptionsNodejs
-        testDescriptorClass : typeof TestDescriptor = TestDescriptorNodejs
+        projectOptionsClass : typeof ProjectOptionsNodejs   = ProjectOptionsNodejs
+        testDescriptorClass : typeof TestDescriptorNodejs   = TestDescriptorNodejs
 
-
-        // channelConstructors     : (typeof Channel)[]      = [ ChannelNodeIpc ]
 
 
         get targetContextChannelClass () : typeof Channel {

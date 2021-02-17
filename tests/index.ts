@@ -1,6 +1,6 @@
-import { ProjectIsomorphic } from "../src/siesta/project/ProjectIsomorphic.js"
+import { Project } from "../src/siesta/project/Project.js"
 
-const project = ProjectIsomorphic.new({
+const project = Project.new({
     title                   : 'Siesta 6 isomorphic test suite',
 
     testDescriptor          : {}

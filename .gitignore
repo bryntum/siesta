@@ -30,6 +30,7 @@
 #/benchmarks/**/*.js.map
 /main.js
 /nodejs.js
+/browser.js
 
 # docs
 /docs

@@ -3,7 +3,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
-import { ArbitraryObject, ArbitraryObjectKey } from "../../util/Helpers.js"
+import { ArbitraryObject, ArbitraryObjectKey, isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
@@ -39,13 +39,13 @@ export class Test extends Mixin(
         typeof AssertionException,
         typeof AssertionGeneral,
         typeof AssertionType
-    >) =>
+    >) => {
 
     class Test extends base {
         // value in prototype
         launcherClass       : typeof Launcher
 
-        // value in prototype
+        @prototypeValue(TestDescriptor)
         testDescriptorClass : typeof TestDescriptor
 
         // "upgrade" types from TreeNode
@@ -135,7 +135,7 @@ export class Test extends Mixin(
         }
 
 
-        todo (name : TestDescriptorArgument, code : (t : this) => any) : this {
+        todo (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const test              = this.it(name, code)
 
             test.descriptor.isTodo  = true
@@ -144,7 +144,7 @@ export class Test extends Mixin(
         }
 
 
-        xit (name : TestDescriptorArgument, code : (t : this) => any) : this {
+        xit (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const cls       = this.constructor as typeof Test
 
             const test      = cls.new()
@@ -154,7 +154,7 @@ export class Test extends Mixin(
         }
 
 
-        iit (name : TestDescriptorArgument, code : (t : this) => any) : this {
+        iit (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const test          = this.it(name, code)
 
             test.isExclusive    = true
@@ -163,7 +163,7 @@ export class Test extends Mixin(
         }
 
 
-        it (name : TestDescriptorArgument, code : (t : this) => any) : this {
+        it (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
 
             if (this.isTodo) descriptor.isTodo  = true
@@ -178,7 +178,7 @@ export class Test extends Mixin(
         }
 
 
-        describe (name : TestDescriptorArgument, code : (t : this) => any) : this {
+        describe (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             return this.it(name, code)
         }
 
@@ -387,7 +387,7 @@ export class Test extends Mixin(
         }
 
 
-        static iit<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
+        static iit<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             const test          = this.it(name, code)
 
             test.isExclusive    = true
@@ -396,7 +396,12 @@ export class Test extends Mixin(
         }
 
 
-        static it<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
+        static xit<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
+            return this.new()
+        }
+
+
+        static it<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             if (!globalTestEnv.topTest) {
 
                 if (globalTestEnv.topTestDescriptor) {
@@ -408,53 +413,11 @@ export class Test extends Mixin(
                     } as Partial<InstanceType<T>>)
                 } else {
                     // launched standalone, by user executing the test file
-                    const projectPlan   = this.prototype.testDescriptorClass.new({ url : '.' })
-                    const descriptor    = this.prototype.testDescriptorClass.new({ url : this.getSelfUrl() })
-
-                    const topTest       = globalTestEnv.topTest   = this.new({
-                        descriptor      : descriptor,
+                    globalTestEnv.topTest   = this.new({
+                        descriptor      : this.prototype.testDescriptorClass.new()
                     } as Partial<InstanceType<T>>)
 
-                    projectPlan.planItem(descriptor)
-
-                    const projectDescriptor = ProjectDescriptor.new({ projectPlan })
-
-                    const launcher      = this.prototype.launcherClass.new({
-                        projectDescriptor,
-                        inputArguments          : this.getInputArguments()
-                    });
-
-                    // TODO refactor the whole launching infrastructure
-                    (async () => {
-                        await launcher.setup()
-
-                        const launch    = Launch.new({
-                            launcher,
-                            projectDescriptor,
-                            projectPlanItemsToLaunch : projectPlan.leavesAxis(),
-                            targetContextChannelClass : ChannelSameContext
-                        })
-
-                        await launch.setup()
-
-                        const channel = launch.testLauncherChannelClass.new() as ChannelTestLauncher & ChannelSameContext
-
-                        const setupPromise      = channel.setup()
-
-                        const testLauncher      = channel.parentPort
-
-                        const reporter          = testLauncher.reporter   = launch.reporter
-
-                        await setupPromise
-
-                        topTest.reporter        = channel.childPort as TestLauncherChild
-
-                        reporter.onTestSuiteStart()
-
-                        await topTest.start()
-
-                        reporter.onTestSuiteFinish()
-                    })()
+                    this.launchStandalone()
                 }
             }
 
@@ -464,13 +427,18 @@ export class Test extends Mixin(
         }
 
 
-        static describe<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
+        static describe<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             return this.it(name, code)
         }
 
 
-        static ddescribe<T extends typeof Test> (this : T, name : TestDescriptorArgument, code : (t : Test) => any) : InstanceType<T> {
+        static ddescribe<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             return this.iit(name, code)
+        }
+
+
+        static xdescribe<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
+            return this.xit(name, code)
         }
 
 
@@ -483,11 +451,67 @@ export class Test extends Mixin(
         }
 
 
-        // static async launchStandalone () {
-        //
-        // }
+        // TODO refactor the whole launching infrastructure
+        static async launchStandalone () {
+            const topTest       = globalTestEnv.topTest
+            const descriptor    = topTest.descriptor
+
+            const projectPlan   = this.prototype.testDescriptorClass.new({ url : '.' })
+
+            projectPlan.planItem(descriptor)
+
+            const projectDescriptor = ProjectDescriptor.new({ projectPlan })
+
+            const isomorphicTestClass       = await this.getIsomorphicTestClass()
+
+            const launcher      = isomorphicTestClass.prototype.launcherClass.new({
+                projectDescriptor,
+                inputArguments          : isomorphicTestClass.getInputArguments()
+            })
+
+            descriptor.url      = isomorphicTestClass.getSelfUrl()
+
+            await launcher.setup()
+
+            const launch    = Launch.new({
+                launcher,
+                projectDescriptor,
+                projectPlanItemsToLaunch    : projectPlan.leavesAxis(),
+                targetContextChannelClass   : ChannelSameContext
+            })
+
+            await launch.setup()
+
+            const channel           = launch.testLauncherChannelClass.new() as ChannelTestLauncher & ChannelSameContext
+
+            const setupPromise      = channel.setup()
+
+            const testLauncher      = channel.parentPort
+
+            const reporter          = testLauncher.reporter   = launch.reporter
+
+            await setupPromise
+
+            topTest.reporter        = channel.childPort as TestLauncherChild
+
+            reporter.onTestSuiteStart()
+
+            await topTest.start()
+
+            reporter.onTestSuiteFinish()
+        }
+
+
+        static async getIsomorphicTestClass () : Promise<typeof Test> {
+            if (isNodejs())
+                return (await import('./TestNodejs.js')).TestNodejs
+            else
+                return (await import('./TestBrowser.js')).TestBrowser
+        }
     }
-) {}
+
+    return Test
+}) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -516,25 +540,20 @@ export const globalTestEnv : GlobalTestEnvironment = GlobalTestEnvironment.new()
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const it = (name : TestDescriptorArgument, code : (t : Test) => any) : Test => {
-    return Test.it(name, code)
+type TestSectionConstructor<TestClass extends Test>  = (name : TestDescriptorArgument<TestClass>, code : (t : TestClass) => any) => TestClass
+
+export const createTestSectionConstructors = <T extends typeof Test>(testClass : T) => {
+    return {
+        it          : testClass.it.bind(testClass) as TestSectionConstructor<InstanceType<T>>,
+        iit         : testClass.iit.bind(testClass) as TestSectionConstructor<InstanceType<T>>,
+        xit         : testClass.xit.bind(testClass) as TestSectionConstructor<InstanceType<T>>,
+        describe    : testClass.describe.bind(testClass) as TestSectionConstructor<InstanceType<T>>,
+        ddescribe   : testClass.ddescribe.bind(testClass) as TestSectionConstructor<InstanceType<T>>,
+        xdescribe   : testClass.xdescribe.bind(testClass) as TestSectionConstructor<InstanceType<T>>
+    }
 }
 
-export const describe = it
-
-
-export const iit = (name : TestDescriptorArgument, code : (t : Test) => any) : Test => {
-    return Test.iit(name, code)
-}
-
-export const ddescribe = iit
-
-
-export const xit = (name : TestDescriptorArgument, code : (t : Test) => any) : Test => {
-    return Test.new()
-}
-
-export const xdescribe = xit
+export const { it, iit, xit, describe, ddescribe, xdescribe } = createTestSectionConstructors(Test)
 
 
 //---------------------------------------------------------------------------------------------------------------------

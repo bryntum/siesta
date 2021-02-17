@@ -1,13 +1,8 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { prototypeValue } from "../../util/Helpers.js"
-import { Launcher } from "../launcher/Launcher.js"
 import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
-import { Test } from "./Test.js"
-import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
+import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorNodejs } from "./TestDescriptorNodejs.js"
-
-
-export { afterEach, beforeEach, expect } from "./Test.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -21,10 +16,10 @@ export class TestNodejs extends Mixin(
 
     class TestNodejs extends base {
         @prototypeValue(LauncherNodejs)
-        launcherClass           : typeof Launcher
+        launcherClass           : typeof LauncherNodejs
 
         @prototypeValue(TestDescriptorNodejs)
-        testDescriptorClass : typeof TestDescriptor
+        testDescriptorClass     : typeof TestDescriptorNodejs
 
 
         static getSelfUrl () : string {
@@ -42,24 +37,6 @@ export class TestNodejs extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const it = (name : TestDescriptorArgument, code : (t : TestNodejs) => any) : TestNodejs => {
-    return TestNodejs.it(name, code)
-}
+export const { it, iit, xit, describe, ddescribe, xdescribe } = createTestSectionConstructors(TestNodejs)
 
-export const describe = it
-
-
-export const iit = (name : TestDescriptorArgument, code : (t : TestNodejs) => any) : TestNodejs => {
-    return TestNodejs.iit(name, code)
-}
-
-export const ddescribe = iit
-
-
-export const xit = (name : TestDescriptorArgument, code : (t : TestNodejs) => any) : TestNodejs => {
-    return TestNodejs.new()
-}
-
-export const xdescribe = xit
-
-
+export { afterEach, beforeEach, expect } from "./Test.js"
