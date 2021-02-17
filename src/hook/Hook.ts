@@ -1,6 +1,8 @@
-// Hooks are not events
-// do not expect the usual event features from it
-// (which always can be emulated with just a bit different thinking
+// Hooks are type-safe, super-efficient, tiny implementation of the observable pattern.
+// Every hook is just an array of listeners, no extra objects are created
+
+// Hooks are not events, do not expect the usual event features from it.
+// Those features always can be emulated with just a little change of programming habits.
 // for example:
 // - common "event" feature is filtering the same listeners
 //   but how often did you actually experience a case when you had to subscribe to event
@@ -20,8 +22,11 @@ export type Listener<Payload extends unknown[]> = (...payload : Payload) => any
 export type Disposer = () => any
 
 //---------------------------------------------------------------------------------------------------------------------
-export class Hook<Payload extends unknown[]> {
-    hooks       : Listener<Payload> []  = []
+export class Hook<Payload extends unknown[] = []> extends Array<Listener<Payload>> {
+
+    get hooks () : Listener<Payload>[] {
+        return this
+    }
 
 
     on (listener : Listener<Payload>) : Disposer {
@@ -44,5 +49,21 @@ export class Hook<Payload extends unknown[]> {
         for (let i = 0; i < listeners.length; ++i) {
             listeners[ i ](...payload)
         }
+    }
+
+
+    async triggerAsyncSequential (...payload : Payload) {
+        const listeners     = this.hooks.slice()
+
+        for (let i = 0; i < listeners.length; ++i) {
+            await listeners[ i ](...payload)
+        }
+    }
+
+
+    async triggerAsyncParallel (...payload : Payload) {
+        const listeners     = this.hooks.slice()
+
+        await Promise.allSettled(listeners.map(listener => listener(...payload)))
     }
 }
