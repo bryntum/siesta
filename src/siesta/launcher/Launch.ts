@@ -19,9 +19,9 @@ export class Queue extends Base {
 
     onFreeSlotAvailableHook     : Hook<[ this ]>        = new Hook()
 
-    onSlotSettledHook           : Hook<[ any, PromiseSettledResult<unknown> ]>        = new Hook()
+    onSlotSettledHook           : Hook<[ this, any, PromiseSettledResult<unknown> ]>        = new Hook()
 
-    onCompletedHook             : Hook                  = new Hook()
+    onCompletedHook             : Hook<[ this ]>        = new Hook()
 
 
     initialize (props? : Partial<Queue>) {
@@ -37,23 +37,27 @@ export class Queue extends Base {
     pullSingle () {
         if (this.freeSlots.length > 0) this.onFreeSlotAvailableHook.trigger(this)
 
-        if (this.freeSlots.length === this.maxWorkers) this.onCompletedHook.trigger()
+        if (this.freeSlots.length === this.maxWorkers) this.onCompletedHook.trigger(this)
     }
 
 
     pull () {
         while (this.freeSlots.length) {
+            const before        = this.freeSlots.length
+
             this.onFreeSlotAvailableHook.trigger(this)
 
             if (this.freeSlots.length === this.maxWorkers) {
-                this.onCompletedHook.trigger()
+                this.onCompletedHook.trigger(this)
                 break
             }
+
+            if (before === this.freeSlots.length) break
         }
     }
 
 
-    async push (id : any, promise : Promise<unknown>) {
+    async push (id : unknown, promise : Promise<unknown>) {
         if (this.freeSlots.length === 0) throw new Error("All slots are busy")
 
         const freeSlot          = this.freeSlots.pop()
@@ -72,9 +76,9 @@ export class Queue extends Base {
         this.freeSlots.push(freeSlot)
 
         if (thrown)
-            this.onSlotSettledHook.trigger(id, { status : 'rejected', reason })
+            this.onSlotSettledHook.trigger(this, id, { status : 'rejected', reason })
         else
-            this.onSlotSettledHook.trigger(id, { status : 'fulfilled', value })
+            this.onSlotSettledHook.trigger(this, id, { status : 'fulfilled', value })
     }
 }
 
@@ -97,8 +101,8 @@ export class Launch extends Mixin(
 
         type                        : 'project' | 'test'    = 'project'
 
-        mode                        : 'sequential' | 'parallel' = 'sequential'
-        maxWorkers                  : number                    = 5
+        mode                        : 'sequential' | 'parallel' = 'parallel'
+        maxWorkers                  : number                    = 7
 
 
         $testLauncherChannelClass : typeof ChannelTestLauncher  = undefined
@@ -138,12 +142,12 @@ export class Launch extends Mixin(
         async launch () {
             this.reporter.onTestSuiteStart()
 
-            const projectPlanItems      = this.projectPlanItemsToLaunch
+            const projectPlanItems      = this.projectPlanItemsToLaunch.slice()
 
             const queue                 = Queue.new({ maxWorkers : this.maxWorkers})
 
             queue.onFreeSlotAvailableHook.on(() => {
-                queue.push(null, this.launchProjectPlanItem(projectPlanItems.shift()))
+                if (projectPlanItems.length) queue.push(null, this.launchProjectPlanItem(projectPlanItems.shift()))
             })
 
             if (this.mode === 'parallel') {
@@ -157,7 +161,7 @@ export class Launch extends Mixin(
                 queue.pullSingle()
             }
 
-            await new Promise<void>(resolve => queue.onCompletedHook.on(resolve))
+            await new Promise<any>(resolve => queue.onCompletedHook.on(resolve))
 
             this.reporter.onTestSuiteFinish()
         }
@@ -178,7 +182,7 @@ export class Launch extends Mixin(
 
             await testLauncher.launchTest(normalized)
 
-            testLauncher.disconnect()
+            await testLauncher.disconnect()
         }
 
 
