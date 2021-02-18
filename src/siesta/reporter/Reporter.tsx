@@ -6,7 +6,7 @@ import { SiestaJSX } from "../../jsx/Factory.js"
 import { XmlElement, XmlStream } from "../../jsx/XmlElement.js"
 import { Launch } from "../launcher/Launch.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
-import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, TestNodeResult, TestResult } from "../test/TestResult.js"
+import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, SourcePoint, TestNodeResult, TestResult } from "../test/TestResult.js"
 import { Colorer } from "../../jsx/Colorer.js"
 import { Printer } from "./Printer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
@@ -89,25 +89,23 @@ export class ReporterTheme extends Base {
             <span class="assertion_name">{ assertion.name }</span>
             <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
             { assertion.sourcePoint ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
-            { passed || !canShowSourceContext ? false : this.assertionSourcePointTemplate(assertion, sources) }
+            { passed || !canShowSourceContext ? false : this.sourcePointTemplate(assertion.sourcePoint, sources) }
             { passed ? false : assertion.annotation }
         </div>
     }
 
 
 
-    lineNumberTemplate (isSource : boolean, line : string) : XmlElement {
+    lineNumberTemplate (isHighlighted : boolean, line : string) : XmlElement {
         return <span>
-            <span class="fail_color">{ isSource ? '➤' : ' ' }</span>
-            <span class={ isSource ? 'accented' : 'gray' }> { line } | </span>
+            <span class="fail_color">{ isHighlighted ? '➤' : ' ' }</span>
+            <span class={ isHighlighted ? 'accented' : 'gray' }> { line } | </span>
         </span>
     }
 
 
-    assertionSourcePointTemplate (assertion : Assertion, sources : string[]) : XmlElement {
-        const sourcePoint           = <div class="source_point"><div></div></div>
-
-        const { line, char }        = assertion.sourcePoint
+    sourcePointTemplate ({ line, char } : SourcePoint, sources : string[]) : XmlElement {
+        const template              = <div class="source_point"><div></div></div>
 
         const firstToShow           = Math.max(1, Math.round(line - this.reporter.sourceContext / 2))
         const lastToShow            = Math.min(sources.length, Math.round(line + this.reporter.sourceContext / 2))
@@ -115,24 +113,24 @@ export class ReporterTheme extends Base {
         const lastToShowLen         = String(lastToShow).length
 
         for (let i = firstToShow; i < lastToShow; i++) {
-            const isSource          = i === line
+            const isHighlighted     = i === line
             const lineStr           = String(i)
             const lenDelta          = lastToShowLen - lineStr.length
 
-            sourcePoint.appendChild(<div>
-                { this.lineNumberTemplate(isSource, ' '.repeat(lenDelta) + lineStr) }
-                <span class={ isSource ? "accented" : "gray" }>{ sources[ i - 1 ] }</span>
+            template.appendChild(<div>
+                { this.lineNumberTemplate(isHighlighted, ' '.repeat(lenDelta) + lineStr) }
+                <span class={ isHighlighted ? "accented" : "gray" }>{ sources[ i - 1 ] }</span>
             </div>)
 
-            if (isSource) sourcePoint.appendChild(<div>
+            if (isHighlighted) template.appendChild(<div>
                 <span class="gray"> { ' '.repeat(lastToShowLen + 1) } | </span>
                 <span class="fail_color">{ ' '.repeat(char - 1) + '^' }</span>
             </div>)
         }
 
-        sourcePoint.appendChild(<div></div>)
+        template.appendChild(<div></div>)
 
-        return sourcePoint
+        return template
     }
 
 
