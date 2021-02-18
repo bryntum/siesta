@@ -75,7 +75,7 @@ export class ReporterTheme extends Base {
     }
 
 
-    assertionTemplate (assertion : Assertion) : XmlElement {
+    assertionTemplate (assertion : Assertion, sources : string[]) : XmlElement {
         return <div class="assertion">
             <span class={`assertion_icon ${ assertion.passed ? 'assertion_icon_pass' : 'assertion_icon_fail' }`}>
                 { assertion.passed ? '✔' : '✘' }
@@ -83,9 +83,16 @@ export class ReporterTheme extends Base {
             { ' ' }
             <span class="assertion_name">{ assertion.name }</span>
             <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
-            { ' ' }
-            at line <span class="assertion_source_line">{ assertion.sourceLine }</span>
+            { assertion.sourceLine ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourceLine }</span> ] : false }
+            { !sources || assertion.sourceLine == null ? false : this.assertionSourcePointTemplate(assertion, sources) }
             { assertion.annotation }
+        </div>
+    }
+
+
+    assertionSourcePointTemplate (assertion : Assertion, sources : string[]) : XmlElement {
+        return <div class="source_point">
+            { sources[ assertion.sourceLine - 1 ] }
         </div>
     }
 
@@ -184,11 +191,14 @@ export class Reporter extends Mixin(
         resultsCompleted    : Set<TestNodeResult>       = new Set()
         resultsRunning      : Set<TestNodeResult>       = new Set()
 
+        resultsFinished     : Set<{ testNode : TestNodeResult, sources : string[] }>      = new Set()
+
         t                   : ReporterTheme             = ReporterTheme.new({ reporter : this })
 
         spinner             : Spinner                   = randomSpinner()
 
         startTime           : Date                      = undefined
+        endTime             : Date                      = undefined
 
 
         // failed assertions are always included (along with all their parent sub-tests)
@@ -207,7 +217,7 @@ export class Reporter extends Mixin(
         }
 
 
-        testNodeTemplateXml (testNode : TestNodeResult, isTopLevelLastNode : boolean | null = null) : XmlElement {
+        testNodeTemplateXml (testNode : TestNodeResult, isTopLevelLastNode : boolean | null = null, sources : string[]) : XmlElement {
             let node : XmlElement       = <tree isTopLevelLastNode={ isTopLevelLastNode }></tree>
 
             if (testNode.isRoot) {
@@ -224,11 +234,11 @@ export class Reporter extends Mixin(
                 node.appendChild(<leaf>{
                     (result instanceof Assertion)
                         ?
-                            this.t.assertionTemplate(result)
+                            this.t.assertionTemplate(result, sources)
                         :
                             (result instanceof TestNodeResult)
                                 ?
-                                    this.testNodeTemplateXml(result)
+                                    this.testNodeTemplateXml(result, undefined, sources)
                                 :
                                 (result instanceof LogMessage)
                                     ?
@@ -250,25 +260,60 @@ export class Reporter extends Mixin(
             if (testNode.isRoot) this.resultsRunning.add(testNode)
         }
 
-        onSubTestFinish (testNode : TestNodeResult) {
+        async onSubTestFinish (testNode : TestNodeResult) {
             if (testNode.isRoot) {
                 if (!this.resultsRunning.has(testNode)) throw new Error("Test completed before starting")
 
                 this.resultsRunning.delete(testNode)
 
-                this.resultsCompleted.add(testNode)
+                if (testNode.passed) {
+                    this.resultsFinished.add({ testNode, sources : undefined })
+                } else {
+                    const sources       = await this.fetchSources(testNode.descriptor.url)
 
-                this[ testNode.passed ? 'filesPassed' : 'filesFailed' ]++
+                    this.resultsFinished.add({ testNode, sources })
+                }
 
-                this.write(this.testNodeTemplateXml(testNode, this.resultsCompleted.size === this.launch.projectPlanItemsToLaunch.length))
+                this.printFinished()
             }
         }
+
+
+        printFinished () : boolean {
+            this.resultsFinished.forEach(({ testNode, sources }) => {
+                this[ testNode.passed ? 'filesPassed' : 'filesFailed' ]++
+
+                this.resultsCompleted.add(testNode)
+
+                this.write(this.testNodeTemplateXml(testNode, this.isCompleted(), sources))
+            })
+
+            this.resultsFinished.clear()
+
+            if (this.isCompleted()) {
+                this.write(this.t.testSuiteFooter())
+                return true
+            } else {
+                return false
+            }
+        }
+
+
+        isCompleted () : boolean {
+            return this.resultsCompleted.size === this.launch.projectPlanItemsToLaunch.length
+        }
+
 
         onResult (testNode : TestNodeResult, assertion : Result) {
         }
 
 
         onAssertionFinish (testNode : TestNodeResult, assertion : AssertionAsyncResolution) {
+        }
+
+
+        async fetchSources (url : string) : Promise<string[]> {
+            throw new Error("Abstract method")
         }
 
 
@@ -280,7 +325,7 @@ export class Reporter extends Mixin(
 
 
         onTestSuiteFinish () {
-            this.write(this.t.testSuiteFooter())
+            this.endTime        = new Date()
         }
     }
 

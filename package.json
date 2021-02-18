@@ -31,7 +31,8 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "glob": "^7.1.6",
-    "puppeteer": "^5.5.0"
+    "puppeteer": "^5.5.0",
+    "node-fetch": "^3.0.0-beta.9"
   },
   "devDependencies": {
     "cssom": "^0.4.4",

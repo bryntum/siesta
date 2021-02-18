@@ -46,13 +46,11 @@ export class ReporterNodejsTerminal extends Mixin(
 
 
         onTestSuiteFinish () {
+            super.onTestSuiteFinish()
+
             process.stdout.write(showCursor)
 
             clearInterval(this.spinnerInterval)
-
-            this.revertFooter()
-
-            super.onTestSuiteFinish()
         }
 
 
@@ -66,12 +64,14 @@ export class ReporterNodejsTerminal extends Mixin(
         }
 
 
-        onSubTestFinish (testNode : TestNodeResult) {
-            if (testNode.isRoot) this.revertFooter()
+        printFinished () : boolean {
+            this.revertFooter()
 
-            super.onSubTestFinish(testNode)
+            const allDone = super.printFinished()
 
-            if (testNode.isRoot) this.printFooter()
+            !allDone && this.printFooter()
+
+            return allDone
         }
 
 
