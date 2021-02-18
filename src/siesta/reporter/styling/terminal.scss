@@ -50,6 +50,13 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     color   : gray;
 }
 
+.fail_color {
+    color : $main_fail_color
+}
+
+.darker_fail_color {
+    color : $darker_fail_color
+}
 
 .test_file_url_filename {
     color   : $accent_color;

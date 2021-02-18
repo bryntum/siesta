@@ -84,7 +84,7 @@ export class ReporterTheme extends Base {
             <span class="assertion_name">{ assertion.name }</span>
             <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
             { assertion.sourcePoint ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
-            { !sources || assertion.sourcePoint == null || this.reporter.sourceContext === 0 ? false : this.assertionSourcePointTemplate(assertion, sources) }
+            { assertion.passed || !sources || assertion.sourcePoint == null || this.reporter.sourceContext === 0 ? false : this.assertionSourcePointTemplate(assertion, sources) }
             { assertion.annotation }
         </div>
     }
@@ -93,8 +93,8 @@ export class ReporterTheme extends Base {
 
     lineNumberTemplate (isSource : boolean, line : string) : XmlElement {
         return <span>
-            <span class="ligther_smooth_accent_color">{ isSource ? '>' : ' ' }</span>
-            <span class={ isSource ? 'accented' : 'deccented' }> { line } | </span>
+            <span class="fail_color">{ isSource ? '➤' : ' ' }</span>
+            <span class={ isSource ? 'accented' : 'gray' }> { line } | </span>
         </span>
     }
 
@@ -120,8 +120,8 @@ export class ReporterTheme extends Base {
             </div>)
 
             if (isSource) sourcePoint.appendChild(<div>
-                <span class="deccented"> { ' '.repeat(lastToShowLen + 1) } | </span>
-                <span class="ligther_smooth_accent_color">{ ' '.repeat(char - 1) + '^' }</span>
+                <span class="gray"> { ' '.repeat(lastToShowLen + 1) } | </span>
+                <span class="fail_color">{ ' '.repeat(char - 1) + '^' }</span>
             </div>)
         }
 
