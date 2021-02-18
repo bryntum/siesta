@@ -19,7 +19,7 @@ export class Queue extends Base {
 
     onFreeSlotAvailableHook     : Hook<[ this ]>        = new Hook()
 
-    onSlotSettledHook           : Hook<[ this, any, PromiseSettledResult<unknown> ]>        = new Hook()
+    onSlotSettledHook           : Hook<[ this, unknown, PromiseSettledResult<unknown> ]>        = new Hook()
 
     onCompletedHook             : Hook<[ this ]>        = new Hook()
 
@@ -144,7 +144,7 @@ export class Launch extends Mixin(
 
             const projectPlanItems      = this.projectPlanItemsToLaunch.slice()
 
-            const queue                 = Queue.new({ maxWorkers : this.maxWorkers})
+            const queue                 = Queue.new({ maxWorkers : this.maxWorkers })
 
             queue.onFreeSlotAvailableHook.on(() => {
                 if (projectPlanItems.length) queue.push(null, this.launchProjectPlanItem(projectPlanItems.shift()))
