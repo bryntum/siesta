@@ -24,7 +24,7 @@ project.plan(
         filename    : 'assertions',
 
         items       : [
-            // 'is_deeply.t.js',
+            'is_deeply.t.js',
             // 'like.t.js',
             // 'general.t.js',
             'exception.t.js',

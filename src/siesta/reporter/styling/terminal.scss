@@ -42,6 +42,10 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     text-decoration: underline
 }
 
+.underline {
+    text-decoration: underline
+}
+
 .test_file_url_dirname {
     color   : gray;
 }
@@ -85,6 +89,10 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     color               : $main_fail_color;
 }
 
+
+.assertion_icon_pass_todo {
+    color               : $complementary_to_fail_color;
+}
 
 .assertion_icon_pass {
     color               : $main_pass_color;

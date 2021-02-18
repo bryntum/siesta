@@ -75,17 +75,22 @@ export class ReporterTheme extends Base {
     }
 
 
-    assertionTemplate (assertion : Assertion, sources : string[]) : XmlElement {
+    assertionTemplate (assertion : Assertion, testNode : TestNodeResult, sources : string[]) : XmlElement {
+        const cls   = testNode.isTodo ?
+            assertion.passed ? 'assertion_icon_pass_todo' : 'assertion_icon_pass'
+        :
+            assertion.passed ? 'assertion_icon_pass' : 'assertion_icon_fail'
+
+        const passed                = assertion.passed || testNode.isTodo
+        const canShowSourceContext  = sources && assertion.sourcePoint && this.reporter.sourceContext > 0
+
         return <div class="assertion">
-            <span class={`assertion_icon ${ assertion.passed ? 'assertion_icon_pass' : 'assertion_icon_fail' }`}>
-                { assertion.passed ? '✔' : '✘' }
-            </span>
-            { ' ' }
+            <span class={`assertion_icon ${ cls }`}>{ assertion.passed ? '✔' : '✘' }</span>{ ' ' }
             <span class="assertion_name">{ assertion.name }</span>
             <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
             { assertion.sourcePoint ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
-            { assertion.passed || !sources || assertion.sourcePoint == null || this.reporter.sourceContext === 0 ? false : this.assertionSourcePointTemplate(assertion, sources) }
-            { assertion.annotation }
+            { passed || !canShowSourceContext ? false : this.assertionSourcePointTemplate(assertion, sources) }
+            { passed ? false : assertion.annotation }
         </div>
     }
 
@@ -260,7 +265,12 @@ export class Reporter extends Mixin(
             if (testNode.isRoot) {
                 node.appendChild(this.t.testNodeState(testNode), ' ', this.t.testNodeUrl(testNode))
             } else {
-                node.appendChild(this.t.testNodeState(testNode), ' ', this.c[ this.detail === 'assertion' ? 'underline' : 'noop' ].text(testNode.descriptor.title))
+                node.appendChild(
+                    this.t.testNodeState(testNode),
+                    ' ',
+                    testNode.isTodo ? <span class="accented">[todo] </span> : '',
+                    <span class={ this.detail === 'assertion' ? 'underline' : '' }>{ testNode.descriptor.title }</span>,
+                )
             }
 
             const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result, testNode.isTodo))
@@ -271,7 +281,7 @@ export class Reporter extends Mixin(
                 node.appendChild(<leaf>{
                     (result instanceof Assertion)
                         ?
-                            this.t.assertionTemplate(result, sources)
+                            this.t.assertionTemplate(result, testNode, sources)
                         :
                             (result instanceof TestNodeResult)
                                 ?
