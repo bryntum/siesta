@@ -46,6 +46,11 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     color   : gray;
 }
 
+.gray {
+    color   : gray;
+}
+
+
 .test_file_url_filename {
     color   : $accent_color;
 }
@@ -176,6 +181,10 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
 
 .accented_value {
     color : $ligther_smooth_accent_color;
+}
+
+.deccented {
+    color : $deccent_color;
 }
 
 .option_name {

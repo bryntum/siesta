@@ -197,7 +197,7 @@ export class Expectation extends Base {
      *
      */
     async toThrow (pattern? : string | RegExp) {
-        return this.t.assertThrowInternal('expect(func).toThrow()', this.isNot, this.value as AnyFunction, this.t.getSourceLine(), pattern)
+        return this.t.assertThrowInternal('expect(func).toThrow()', this.isNot, this.value as AnyFunction, this.t.getSourcePoint(), pattern)
     }
 
 

@@ -160,6 +160,16 @@ export class Launcher extends Mixin(
         detail          : ReporterDetailing = 'file'
 
         @option({
+            type        : 'number',
+            group       : OptionsGroupOutput,
+            help        : <span>
+                How many lines of source file to show for failed assertion
+            </span>
+        })
+        sourceContext   : number    = 5
+
+
+        @option({
             type        : 'boolean',
             group       : OptionsGroupPrimary,
             help        : <span>

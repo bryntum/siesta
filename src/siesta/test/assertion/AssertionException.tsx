@@ -1,7 +1,7 @@
 import { AnyFunction, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { SiestaJSX } from "../../../jsx/Factory.js"
 import { isRegExp } from "../../../util/Typeguards.js"
-import { Assertion, TestNodeResult } from "../TestResult.js"
+import { Assertion, SourcePoint, TestNodeResult } from "../TestResult.js"
 import { GotExpectTemplate } from "./AssertionCompare.js"
 
 
@@ -33,7 +33,7 @@ export class AssertionException extends Mixin(
             assertionName   : string,
             negated         : boolean,
             func            : AnyFunction,
-            sourceLine      : number,
+            sourcePoint     : SourcePoint,
             pattern         : string | RegExp,
             description     : string = ''
         ) {
@@ -42,14 +42,14 @@ export class AssertionException extends Mixin(
             if (!thrown) {
                 if (negated)
                     this.addResult(Assertion.new({
-                        sourceLine,
+                        sourcePoint,
                         name            : this.negateExpectationName(assertionName),
                         passed          : true,
                         description
                     }))
                 else
                     this.addResult(Assertion.new({
-                        sourceLine,
+                        sourcePoint,
                         name            : assertionName,
                         passed          : false,
                         description,
@@ -69,7 +69,7 @@ export class AssertionException extends Mixin(
 
                 if (negated)
                     this.addResult(Assertion.new({
-                        sourceLine,
+                        sourcePoint,
                         name            : this.negateExpectationName(assertionName),
                         passed          : false,
                         description,
@@ -84,14 +84,14 @@ export class AssertionException extends Mixin(
                     if (isRegExp(pattern)) {
                         if (pattern.test(message))
                             this.addResult(Assertion.new({
-                                sourceLine,
+                                sourcePoint,
                                 name            : assertionName,
                                 passed          : true,
                                 description
                             }))
                         else
                             this.addResult(Assertion.new({
-                                sourceLine,
+                                sourcePoint,
                                 name            : assertionName,
                                 passed          : false,
                                 description,
@@ -107,14 +107,14 @@ export class AssertionException extends Mixin(
                     } else {
                         if (pattern === undefined || message.indexOf(pattern) !== -1)
                             this.addResult(Assertion.new({
-                                sourceLine,
+                                sourcePoint,
                                 name            : assertionName,
                                 passed          : true,
                                 description
                             }))
                         else
                             this.addResult(Assertion.new({
-                                sourceLine,
+                                sourcePoint,
                                 name            : assertionName,
                                 passed          : false,
                                 description,
@@ -134,29 +134,29 @@ export class AssertionException extends Mixin(
 
 
         async throws (func : AnyFunction, pattern : string | RegExp = '', description : string = '') {
-            return this.assertThrowInternal('throws(func, pattern)', false, func, this.getSourceLine(), pattern, description)
+            return this.assertThrowInternal('throws(func, pattern)', false, func, this.getSourcePoint(), pattern, description)
         }
 
         async doesNotThrow (func : AnyFunction, description : string = '') {
-            return this.assertThrowInternal('doesNotThrow(func)', true, func, this.getSourceLine(), '', description)
+            return this.assertThrowInternal('doesNotThrow(func)', true, func, this.getSourcePoint(), '', description)
         }
 
 
         // backward compat
         async throwsOk (func : AnyFunction, pattern : string | RegExp, description : string = '') {
-            return this.assertThrowInternal('throwsOk(func, pattern)', false, func, this.getSourceLine(), pattern, description)
+            return this.assertThrowInternal('throwsOk(func, pattern)', false, func, this.getSourcePoint(), pattern, description)
         }
 
         async livesOk (func : AnyFunction, description : string = '') {
-            return this.assertThrowInternal('livesOk(func)', true, func, this.getSourceLine(), '', description)
+            return this.assertThrowInternal('livesOk(func)', true, func, this.getSourcePoint(), '', description)
         }
 
         async lives_ok (func : AnyFunction, description : string = '') {
-            return this.assertThrowInternal('lives_ok(func)', true, func, this.getSourceLine(), '', description)
+            return this.assertThrowInternal('lives_ok(func)', true, func, this.getSourcePoint(), '', description)
         }
 
         async lives (func : AnyFunction, description : string = '') {
-            return this.assertThrowInternal('lives(func)', true, func, this.getSourceLine(), '', description)
+            return this.assertThrowInternal('lives(func)', true, func, this.getSourcePoint(), '', description)
         }
         // eof backward compat
     }

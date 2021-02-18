@@ -90,7 +90,7 @@ export class Test extends Mixin(
 
 
         addResult (result : TestResult) : TestResult {
-            if ((result instanceof Assertion) && result.sourceLine === undefined) result.sourceLine = this.getSourceLine()
+            if ((result instanceof Assertion) && result.sourcePoint === undefined) result.sourcePoint = this.getSourcePoint()
 
             super.addResult(result)
 

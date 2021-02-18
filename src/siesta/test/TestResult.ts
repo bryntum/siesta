@@ -54,6 +54,9 @@ export class Exception extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export type SourcePoint = { line : number, char : number }
+
+
 @serializable()
 export class Assertion extends Mixin(
     [ Serializable, Result ],
@@ -74,7 +77,7 @@ export class Assertion extends Mixin(
 
         description     : string            = ''
 
-        sourceLine      : number            = undefined
+        sourcePoint     : SourcePoint       = undefined
 
         annotation      : XmlElement        = undefined
     }
@@ -160,7 +163,7 @@ export class TestNodeResult extends Mixin(
         get sourceLineExtractor () : RegExp {
             if (this.$sourceLineExtractor !== undefined) return this.$sourceLineExtractor
 
-            return this.$sourceLineExtractor = new RegExp(escapeRegExp(this.url) + ':(\\d+)')
+            return this.$sourceLineExtractor = new RegExp(escapeRegExp(this.url) + ':(\\d+):(\\d+)')
         }
 
 
@@ -170,13 +173,13 @@ export class TestNodeResult extends Mixin(
 
 
         // this is here to be available for the assertion mixins
-        getSourceLine () : number | undefined {
+        getSourcePoint () : SourcePoint | undefined {
             const stack         = new Error().stack
 
             if (stack) {
                 const match     = stack.match(this.sourceLineExtractor)
 
-                if (match) return Number(match[ 1 ])
+                if (match) return { line : Number(match[ 1 ]), char : Number(match[ 2 ]) }
             }
 
             return undefined

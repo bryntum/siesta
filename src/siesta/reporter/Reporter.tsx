@@ -83,17 +83,51 @@ export class ReporterTheme extends Base {
             { ' ' }
             <span class="assertion_name">{ assertion.name }</span>
             <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
-            { assertion.sourceLine ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourceLine }</span> ] : false }
-            { !sources || assertion.sourceLine == null ? false : this.assertionSourcePointTemplate(assertion, sources) }
+            { assertion.sourcePoint ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
+            { !sources || assertion.sourcePoint == null || this.reporter.sourceContext === 0 ? false : this.assertionSourcePointTemplate(assertion, sources) }
             { assertion.annotation }
         </div>
     }
 
 
+
+    lineNumberTemplate (isSource : boolean, line : string) : XmlElement {
+        return <span>
+            <span class="ligther_smooth_accent_color">{ isSource ? '>' : ' ' }</span>
+            <span class={ isSource ? 'accented' : 'deccented' }> { line } | </span>
+        </span>
+    }
+
+
     assertionSourcePointTemplate (assertion : Assertion, sources : string[]) : XmlElement {
-        return <div class="source_point">
-            { sources[ assertion.sourceLine - 1 ] }
-        </div>
+        const sourcePoint           = <div class="source_point"><div></div></div>
+
+        const { line, char }        = assertion.sourcePoint
+
+        const firstToShow           = Math.max(1, Math.round(line - this.reporter.sourceContext / 2))
+        const lastToShow            = Math.min(sources.length, Math.round(line + this.reporter.sourceContext / 2))
+
+        const lastToShowLen         = String(lastToShow).length
+
+        for (let i = firstToShow; i < lastToShow; i++) {
+            const isSource          = i === line
+            const lineStr           = String(i)
+            const lenDelta          = lastToShowLen - lineStr.length
+
+            sourcePoint.appendChild(<div>
+                { this.lineNumberTemplate(isSource, ' '.repeat(lenDelta) + lineStr) }
+                <span class={ isSource ? "accented" : "gray" }>{ sources[ i - 1 ] }</span>
+            </div>)
+
+            if (isSource) sourcePoint.appendChild(<div>
+                <span class="deccented"> { ' '.repeat(lastToShowLen + 1) } | </span>
+                <span class="ligther_smooth_accent_color">{ ' '.repeat(char - 1) + '^' }</span>
+            </div>)
+        }
+
+        sourcePoint.appendChild(<div></div>)
+
+        return sourcePoint
     }
 
 
@@ -183,6 +217,9 @@ export class Reporter extends Mixin(
 
         get detail () : ReporterDetailing {
             return this.launch.launcher.detail
+        }
+        get sourceContext () : number {
+            return this.launch.launcher.sourceContext
         }
 
         filesPassed         : number                    = 0
