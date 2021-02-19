@@ -476,8 +476,9 @@ export class AssertionCompare extends Mixin(
 
 
         // backward compat
-        any (cls? : AnyConstructor) : FuzzyMatcherAny | FuzzyMatcherInstance {
-            return any(cls)
+        any<T extends [] | [ AnyConstructor ]> (...args : T) : [] extends T ? FuzzyMatcherAny : FuzzyMatcherInstance {
+            // @ts-ignore
+            return any(...args)
         }
 
         anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : FuzzyMatcherNumber {

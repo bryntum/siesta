@@ -236,4 +236,6 @@ export class FuzzyMatcherAny extends Mixin(
     }
 ){}
 
-export const any = (cls? : AnyConstructor) : FuzzyMatcherAny | FuzzyMatcherInstance => cls ? FuzzyMatcherInstance.new({ cls }) : FuzzyMatcherAny.new()
+export const any = <T extends [] | [ AnyConstructor ]>(...args : T) : [] extends T ? FuzzyMatcherAny : FuzzyMatcherInstance =>
+    // @ts-ignore
+    args.length === 0 ?  FuzzyMatcherAny.new() : FuzzyMatcherInstance.new({ cls : args[ 0 ] })
