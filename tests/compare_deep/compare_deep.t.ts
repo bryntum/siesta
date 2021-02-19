@@ -1,9 +1,5 @@
 import { it } from "../../index.js"
 import {
-    any,
-    anyInstanceOf,
-    anyNumberApprox,
-    anyStringLike,
     compareDeep,
     DifferenceObject,
     DifferenceReachability,
@@ -11,7 +7,8 @@ import {
     DifferenceTypesAreDifferent,
     DifferenceValuesAreDifferent,
     PathSegment
-} from "../../src/util/CompareDeep.js"
+} from "../../src/compare_deep/CompareDeep.js"
+import { any, anyInstanceOf, anyNumberApprox, anyStringLike } from "../../src/compare_deep/FuzzyMatcher.js"
 
 
 it('Deep compare should work for primitives and non-cyclic data structures', async t => {

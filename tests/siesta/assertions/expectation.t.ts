@@ -1,5 +1,5 @@
 import { describe, it } from "../../../index.js"
-import { any } from "../../../src/util/CompareDeep.js"
+import { any } from "../../../src/compare_deep/FuzzyMatcher.js"
 import { delay } from "../../../src/util/Helpers.js"
 import { verifyAllFailed } from "../helpers.js"
 

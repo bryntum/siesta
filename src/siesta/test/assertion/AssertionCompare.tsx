@@ -1,23 +1,23 @@
 import { Base } from "../../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
+import {
+    any,
+    anyNumberApprox,
+    anyStringLike, Approximation, NumberApproximation,
+    FuzzyMatcherAny,
+    FuzzyMatcherInstance,
+    FuzzyMatcherNumber,
+    FuzzyMatcherString
+} from "../../../compare_deep/FuzzyMatcher.js"
 import { CI } from "../../../iterator/Iterator.js"
 import { SiestaJSX } from "../../../jsx/Factory.js"
 import { XmlElement } from "../../../jsx/XmlElement.js"
 import { SerializerXml } from "../../../serializer/SerializerXml.js"
 import {
-    any,
-    anyNumberApprox,
-    anyStringLike,
-    Approximation,
     compareDeepGen,
     comparePrimitivesGen,
-    Difference,
-    NumberApproximation,
-    PlaceHolderAny,
-    PlaceHolderInstance,
-    PlaceHolderNumber,
-    PlaceHolderString
-} from "../../../util/CompareDeep.js"
+    Difference
+} from "../../../compare_deep/CompareDeep.js"
 import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
 
@@ -476,15 +476,15 @@ export class AssertionCompare extends Mixin(
 
 
         // backward compat
-        any (cls? : AnyConstructor) : PlaceHolderAny | PlaceHolderInstance {
+        any (cls? : AnyConstructor) : FuzzyMatcherAny | FuzzyMatcherInstance {
             return any(cls)
         }
 
-        anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : PlaceHolderNumber {
+        anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : FuzzyMatcherNumber {
             return anyNumberApprox(value, approx)
         }
 
-        anyStringLike (pattern : string | RegExp) : PlaceHolderString {
+        anyStringLike (pattern : string | RegExp) : FuzzyMatcherString {
             return anyStringLike(pattern)
         }
         // eof backward compat

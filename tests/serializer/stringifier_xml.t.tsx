@@ -1,7 +1,7 @@
 import { it } from "../../index.js"
+import { any, anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src/compare_deep/FuzzyMatcher.js"
 import { SiestaJSX } from "../../src/jsx/Factory.js"
 import { StringifierXml } from "../../src/serializer/StringifierXml.js"
-import { any, anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src/util/CompareDeep.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 const stringifierConfig : Partial<StringifierXml>  = { prettyPrint : true, maxLen : 20, indentLevel : 2 }
