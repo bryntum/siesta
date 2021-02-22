@@ -1,169 +1,8 @@
 import { Base } from "../class/Base.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
+import { ColoredString, ColoredStringPlain, ColoredStringSum } from "./ColoredString.js"
 import { Colorer } from "./Colorer.js"
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class ManagedString extends Base {
-
-    get length () : number {
-        throw new Error("Abstract method")
-    }
-
-    toString () : string {
-        throw new Error("Abstract method")
-    }
-
-
-    colorize (c : Colorer) : ManagedString {
-        return ManagedStringWrapped.new({
-            string      : this,
-
-            wrappings   : c.wrappings()
-        })
-    }
-
-
-    substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ManagedString {
-        throw new Error("Abstract method")
-    }
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class ManagedStringPlain extends ManagedString {
-    string          : string                = ''
-
-    wrappings       : [ string, string ]    = undefined
-
-
-    get length () : number {
-        return this.string.length
-    }
-
-    toString () : string {
-        const wrappings     = this.wrappings
-
-        return wrappings ? wrappings[ 0 ] + this.string + wrappings[ 1 ] : this.string
-    }
-
-
-    substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ManagedString {
-        return ManagedStringPlain.new({
-            wrappings   : this.wrappings,
-
-            string      : this.string.substr(pos, howMany)
-        })
-    }
-
-
-    static fromString<T extends typeof ManagedStringPlain> (this : T, string : string) : InstanceType<T> {
-        return this.new({ string } as Partial<InstanceType<T>>)
-    }
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class ManagedStringWrapped extends ManagedString {
-    string          : ManagedString         = ManagedStringPlain.new()
-
-    wrappings       : [ string, string ]    = undefined
-
-
-    get length () : number {
-        return this.string.length
-    }
-
-
-    toString () : string {
-        const wrappings     = this.wrappings
-
-        return wrappings ? wrappings[ 0 ] + this.string + wrappings[ 1 ] : this.string.toString()
-    }
-
-
-    substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ManagedString {
-        return ManagedStringWrapped.new({
-            wrappings   : this.wrappings,
-
-            string      : this.string.substr(pos, howMany)
-        })
-    }
-}
-
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class ManagedStringSum extends ManagedString {
-    strings         : (string | ManagedString)[]       = []
-
-
-    get length () : number {
-        return this.strings.reduce((acc, str) => acc + str.length, 0)
-    }
-
-    toString () : string {
-        return this.strings.map(str => str.toString()).join('')
-    }
-
-
-    push (string : string | ManagedString) {
-        this.strings.push(string)
-    }
-
-
-    unshift (string : string | ManagedString) {
-        this.strings.unshift(string)
-    }
-
-
-    colorize (c : Colorer) : ManagedStringSum {
-        return ManagedStringSum.new({
-            strings     : this.strings.map(string => isString(string) ? ManagedStringPlain.fromString(string).colorize(c) : string.colorize(c))
-        })
-    }
-
-
-    substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ManagedString {
-        let currentPos          = 0
-
-        // for some reason TS can't figure out the right override for this `reduce` call
-        // need to specify the generic argument explicitly
-        return this.strings.reduce<ManagedStringSum>(
-            (acc : ManagedStringSum, str : string | ManagedString) : ManagedStringSum => {
-                const charsLeftToStartCapturing     = pos - currentPos
-
-                let offset : number = 0
-
-                if (charsLeftToStartCapturing > 0) {
-                    currentPos  += str.length
-
-                    if (str.length <= charsLeftToStartCapturing) {
-                        return acc
-                    }
-                    else {
-                        offset      = str.length - charsLeftToStartCapturing
-                    }
-                }
-
-                const remaining     = howMany - acc.length
-
-                if (str.length - offset >= remaining) {
-                    acc.push(str.substr(offset, remaining))
-                } else {
-                    if (offset > 0)
-                        acc.push(str.substr(offset))
-                    else
-                        acc.push(str)
-                }
-
-                return acc
-            },
-            ManagedStringSum.new()
-        )
-    }
-}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -175,7 +14,7 @@ export class TextBlock extends Base {
 
     // minContentWidth         : number            = 2
 
-    text                    : ManagedStringSum[] = [ ManagedStringSum.new() ]
+    text                    : ColoredStringSum[] = [ ColoredStringSum.new() ]
 
     indentLevel             : number            = 0
 
@@ -212,12 +51,12 @@ export class TextBlock extends Base {
     }
 
 
-    get lastLine () : ManagedStringSum  {
+    get lastLine () : ColoredStringSum  {
         return this.text[ this.text.length - 1 ]
     }
 
 
-    pushToLastLineBuffer (str : string | ManagedString) {
+    pushToLastLineBuffer (str : string | ColoredString) {
         if (str.length === 0) return
 
         if (this.atNewLine) {
@@ -230,7 +69,7 @@ export class TextBlock extends Base {
     }
 
 
-    addSameLineText (str : string | ManagedString) {
+    addSameLineText (str : string | ColoredString) {
         let sourcePos               = 0
 
         while (sourcePos < str.length) {
@@ -254,13 +93,13 @@ export class TextBlock extends Base {
 
 
     addNewLine () {
-        this.text.push(ManagedStringSum.new())
+        this.text.push(ColoredStringSum.new())
 
         this.atNewLine      = true
     }
 
 
-    push (...strings : (string | ManagedString)[]) {
+    push (...strings : (string | ColoredString)[]) {
         strings.forEach(string => {
             if (isString(string)) {
                 saneSplit(string, '\n').forEach((str, index, array) => {
@@ -275,7 +114,7 @@ export class TextBlock extends Base {
     }
 
 
-    pushLn (...strings : (string | ManagedString)[]) {
+    pushLn (...strings : (string | ColoredString)[]) {
         this.push(...strings, '\n')
     }
 
@@ -324,9 +163,9 @@ export class TextBlock extends Base {
 
         this.text.forEach((line, index) => {
             if (index === 0) {
-                line.unshift(ManagedStringPlain.fromString(isLast ? '└' + indenterTree : '├' + indenterTree).colorize(c))
+                line.unshift(ColoredStringPlain.fromString(isLast ? '└' + indenterTree : '├' + indenterTree).colorize(c))
             } else {
-                line.unshift(ManagedStringPlain.fromString(isLast ? ' ' + indenterPlain : '│' + indenterPlain).colorize(c))
+                line.unshift(ColoredStringPlain.fromString(isLast ? ' ' + indenterPlain : '│' + indenterPlain).colorize(c))
             }
         })
     }
