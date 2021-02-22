@@ -4,11 +4,12 @@ import { Serializable, serializable } from "../serializable/Serializable.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { SiestaJSX } from "./Factory.js"
+import { RenderingBuffer } from "./RenderingBuffer.js"
+import { RenderingFrame } from "./RenderingFrame.js"
+import { XmlRenderer } from "./XmlRenderer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type XmlNode = string | XmlElement
-
-export type XmlStream = XmlNode | XmlStream[]
 
 
 @serializable()
@@ -17,9 +18,11 @@ export class XmlElement extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Base>) =>
 
     class XmlElement extends base {
+        parent          : XmlElement                = undefined
+
         childNodes      : XmlNode[]                 = []
 
-        tagName         : string                    = 'tag'
+        tagName         : string                    = ''
 
         $attributes     : { [ key : string ] : string } = undefined
 
@@ -39,6 +42,20 @@ export class XmlElement extends Mixin(
         }
 
 
+        initialize (props? : Partial<XmlElement>) {
+            super.initialize(props)
+
+            this.adoptChildren(this.childNodes)
+        }
+
+
+        adoptChildren (children : XmlNode[]) {
+            children.forEach(child => {
+                if (child instanceof XmlElement) child.parent = this
+            })
+        }
+
+
         toString () : string {
             const childrenContent       = this.childNodes.map(child => child.toString())
             const attributesContent     = this.$attributes
@@ -54,15 +71,17 @@ export class XmlElement extends Mixin(
         }
 
 
-        appendChild (...child : XmlStream[]) : XmlStream[] {
-            this.childNodes.push(...child.flat(Number.MAX_SAFE_INTEGER))
+        appendChild (...children : XmlNode[]) : XmlNode[] {
+            this.childNodes.push(...children.flat(Number.MAX_SAFE_INTEGER))
 
-            return child
+            this.adoptChildren(children)
+
+            return children
         }
 
 
         getAttribute (name : string) : any {
-            return this.attributes[ name ]
+            return this.$attributes ? this.attributes[ name ] : undefined
         }
 
 
@@ -74,6 +93,22 @@ export class XmlElement extends Mixin(
         hasClass (clsName : string) : boolean {
             return saneSplit(this.attributes.class ?? '', /\s+/).some(cls => cls === clsName)
         }
+
+
+        render (buffer : RenderingBuffer) {
+            // this.childNodes.forEach(child => {
+            //     if (isString(child)) buffer.push
+            // })
+        }
+
+
+        renderingFrame (renderer : XmlRenderer) : RenderingFrame {
+            return
+            // this.childNodes.forEach(child => {
+            //     if (isString(child)) buffer.push
+            // })
+        }
+
     }
 ){}
 
@@ -90,22 +125,10 @@ export const escapeXml = (xmlStr : string) : string => xmlStr.replace(/[&<>"']/g
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const streamToElement   = (stream : XmlStream) : XmlElement => {
-    if (isString(stream)) {
-        return <span>{ stream }</span> as XmlElement
-    }
-    else if (stream instanceof XmlElement) {
-        return stream
-    }
-    else {
-        const nodes : XmlNode[]     = stream.flat(Number.MAX_SAFE_INTEGER)
+export class XmlFragment extends Mixin(
+    [ XmlElement ],
+    (base : ClassUnion<typeof XmlElement>) =>
 
-        if (nodes.length > 1) throw new Error("Can not reduce XML stream to a single element")
-        if (nodes.length === 0) throw new Error("Empty XML stream can not be reduced to a single element")
-
-        if (isString(nodes[ 0 ]))
-            return <span>{ stream }</span> as XmlElement
-        else
-            return nodes[ 0 ]
+    class XmlFragment extends base {
     }
-}
+){}
