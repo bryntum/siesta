@@ -20,8 +20,8 @@
 /src/**/*.js.map
 /tests/**/*.js
 /tests/**/*.js.map
-/tests6/**/*.js
-/tests6/**/*.js.map
+/tests_nodejs/**/*.js
+/tests_nodejs/**/*.js.map
 /scripts/**/*.js
 /scripts/**/*.js.map
 /examples/**/*.js

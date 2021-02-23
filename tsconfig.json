@@ -33,6 +33,8 @@
         "scripts/**/*.ts",
         "tests/**/*.ts",
         "tests/**/*.tsx",
+        "tests_nodejs/**/*.ts",
+        "tests_nodejs/**/*.tsx",
         "benchmarks/**/*.ts",
         "examples/**/*.ts"
     ],
