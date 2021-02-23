@@ -7,6 +7,7 @@ const FragmentSymbol  = Symbol('Fragment')
 
 const normalizeXmlStream    = (stream : (XmlNode | false)[]) : XmlNode[] => {
     return stream
+        .flat(Number.MAX_SAFE_INTEGER)
         .filter(el => el !== false && el !== undefined && el !== null)
         .flatMap(el => {
             if (el instanceof XmlFragment) {
