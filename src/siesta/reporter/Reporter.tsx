@@ -1,13 +1,13 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { Colorer } from "../../jsx/Colorer.js"
+import { SiestaJSX } from "../../jsx/Factory.js"
+import { XmlElement } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { relative } from "../../util/Path.js"
-import { SiestaJSX } from "../../jsx/Factory.js"
-import { XmlElement, XmlStream } from "../../jsx/XmlElement.js"
 import { Launch } from "../launcher/Launch.js"
 import { ProjectDescriptor } from "../project/ProjectOptions.js"
 import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, SourcePoint, TestNodeResult, TestResult } from "../test/TestResult.js"
-import { Colorer } from "../../jsx/Colorer.js"
 import { Printer } from "./Printer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
 
@@ -34,24 +34,24 @@ export class ReporterTheme extends Base {
     }
 
 
-    testFilePass (testNode : TestNodeResult) : XmlStream {
+    testFilePass (testNode : TestNodeResult) : XmlElement {
         return <span class='test_file_pass'> PASS </span>
     }
 
-    testFileFail (testNode : TestNodeResult) : XmlStream {
+    testFileFail (testNode : TestNodeResult) : XmlElement {
         return <span class='test_file_fail'> FAIL </span>
     }
 
-    subTestPass (testNode : TestNodeResult) : XmlStream {
+    subTestPass (testNode : TestNodeResult) : XmlElement {
         return <span class='sub_test_pass'>✔</span>
     }
 
-    subTestFail (testNode : TestNodeResult) : XmlStream {
+    subTestFail (testNode : TestNodeResult) : XmlElement {
         return <span class='sub_test_fail'>✘</span>
     }
 
 
-    testNodeState (testNode : TestNodeResult) : XmlStream {
+    testNodeState (testNode : TestNodeResult) : XmlElement {
         if (testNode.isRoot) {
             return testNode.passed ? this.testFilePass(testNode) : this.testFileFail(testNode)
         } else {
