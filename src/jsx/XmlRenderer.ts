@@ -1,13 +1,13 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { StringifierXml } from "../serializer/StringifierXml.js"
+import { styles } from "../siesta/reporter/styling/terminal.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { TextBlock } from "./TextBlock.js"
-import { XmlElement, XmlNode } from "./XmlElement.js"
 import { Colorer, ColorerRule } from "./Colorer.js"
 import { ColorerNoop } from "./ColorerNoop.js"
-import { styles } from "../siesta/reporter/styling/terminal.js"
+import { TextBlock } from "./TextBlock.js"
+import { XmlElement, XmlNode } from "./XmlElement.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ export class XmlRenderer extends Mixin(
 
         colorerClass            : typeof Colorer    = ColorerNoop
 
-        $c              : Colorer   = undefined
+        $c                      : Colorer   = undefined
 
         get c () : Colorer {
             if (this.$c !== undefined) return this.$c
@@ -114,9 +114,11 @@ export class XmlRenderer extends Mixin(
                     res.pullFrom(block)
                 })
 
-                res.colorizeMut(this.getRulesFor(el).reduce((colorer, rule) => rule(colorer), this.c))
+                const rules     = this.getRulesFor(el)
 
-                if (el.hasClass('underlined')) res.colorizeMut(this.c.underline)
+                if (el.hasClass('underlined')) rules.push(c => c.underline)
+
+                if (rules.length > 0) res.colorizeMut(rules.reduce((colorer, rule) => rule(colorer), this.c))
 
                 return res
             }
