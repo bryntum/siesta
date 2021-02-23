@@ -47,5 +47,16 @@ export namespace SiestaJSX {
 declare global {
     namespace JSX {
         type Element        = XmlElement
+
+        type ElementClass   = XmlElement
+
+        interface ElementAttributesProperty {
+            props
+        }
+
+        // https://github.com/microsoft/TypeScript/issues/38108
+        // interface ElementChildrenAttribute {
+        //     childNodes
+        // }
     }
 }

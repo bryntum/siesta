@@ -18,6 +18,8 @@ export class XmlElement extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Base>) =>
 
     class XmlElement extends base {
+        props           : this
+
         parent          : XmlElement                = undefined
 
         childNodes      : XmlNode[]                 = []
