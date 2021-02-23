@@ -7,6 +7,8 @@ import { PortHandshakeChild, PortHandshakeParent } from "../../../port/PortHands
 import { SiestaJSX } from "../../../jsx/Factory.js"
 import { TestDescriptor } from "../TestDescriptor.js"
 import { globalTestEnv, Test } from "../Test.js"
+import { TestDescriptorBrowser } from "../TestDescriptorBrowser.js"
+import { TestDescriptorNodejs } from "../TestDescriptorNodejs.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -14,6 +16,9 @@ import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 // so that their `registerSerializableClass()` calls are made
 
 TestDescriptor
+// IMPORTANT the following 2 classes are assumed to be isomorphic by themselves
+TestDescriptorNodejs
+TestDescriptorBrowser
 
 //---------------------------------------------------------------------------------------------------------------------
 interface TestLauncher {

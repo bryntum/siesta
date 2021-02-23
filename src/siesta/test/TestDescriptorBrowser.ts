@@ -2,6 +2,14 @@ import { serializable } from "../../serializable/Serializable.js"
 import { option } from "../launcher/Option.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
+/**
+ * IMPORTANT
+ *
+ * this class is assumed to be isomorphic right now,
+ * see
+ *      src/siesta/test/port/TestLauncher.tsx
+ */
+
 //---------------------------------------------------------------------------------------------------------------------
 export type PreloadDescriptor = string
     | { type? : 'js' | 'css', url : string }
