@@ -2,7 +2,7 @@ import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { SiestaJSX } from "../jsx/Factory.js"
 import { XmlElement } from "../jsx/XmlElement.js"
-import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf, uppercaseFirst } from "../util/Helpers.js"
+import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
 import { Visitor } from "../visitor/Visitor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -323,3 +323,30 @@ const dateToString = (date : Date) : string => {
 }
 
 
+// //---------------------------------------------------------------------------------------------------------------------
+// export type SerializationChildNode = SerializationNumber | SerializationArray
+//
+//
+// export class Serialization extends XmlElement {
+//     tagName         : 'serialization'           = 'serialization'
+//
+//     childNodes      : SerializationChildNode[]
+// }
+//
+//
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export class SerializationArray extends XmlElement {
+//     tagName         : 'array'           = 'array'
+//
+//     childNodes      : SerializationChildNode[]
+// }
+//
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export class SerializationNumber extends XmlElement {
+//     tagName         : 'number'          = 'number'
+//
+//     childNodes      : XmlNode[]
+// }
+//
