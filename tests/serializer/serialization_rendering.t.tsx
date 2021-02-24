@@ -1,6 +1,6 @@
 import { it } from "../../index.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
-import { XmlRendererSerialization } from "../../src/jsx/XmlRenderer.js"
+import { XmlRendererSerialization } from "../../src/serializer/SerializerElements.js"
 import { SerializerXml } from "../../src/serializer/SerializerXml.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ it('Rendering of serializer output should work', async t => {
 
     t.is(renderer.renderToString(SerializerXml.serialize([])), '[]')
 
-    t.is(renderer.renderToString(SerializerXml.serialize([ 1, 2, 3 ])), '[1,2,3]')
+    t.is(renderer.renderToString(SerializerXml.serialize([ 1, 2, 3 ])), '[1, 2, 3]')
 
     t.is(rendererPretty.renderToString(
         SerializerXml.serialize([ 1, 2, 3 ])),

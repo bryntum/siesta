@@ -63,7 +63,8 @@ export class XmlRenderer extends Mixin(
                 return res
             }
             else if (el.tagName === 'serialization') {
-                return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
+                return this.renderToTextBlock(el)
+                // return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
             } else {
                 const res           = TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved })
 
@@ -159,16 +160,5 @@ export class XmlRenderer extends Mixin(
 
             return textBlock
         }
-    }
-){}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class XmlRendererSerialization extends Mixin(
-    [ XmlRenderer ],
-    (base : ClassUnion<typeof XmlRenderer>) =>
-
-    class XmlRendererSerialization extends base {
-        prettyPrint             : boolean       = false
     }
 ){}

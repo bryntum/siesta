@@ -1,5 +1,6 @@
 import { it } from "../../index.js"
 import { compareDeepGen, DifferenceArray, DifferenceDifferent, DifferenceMissing, DifferenceSame } from "../../src/compare_deep/CompareDeepDiff.js"
+import { XmlRenderer } from "../../src/jsx/XmlRenderer.js"
 
 
 it('Deep compare should work ', async t => {
@@ -22,6 +23,20 @@ it('Deep compare should work ', async t => {
             { index : 0, difference : DifferenceMissing.new({ value : 1, from : '2' }) }
         ]
     }))
-
 })
 
+
+it('Should render the diff correctly', async t => {
+
+    const renderer      = XmlRenderer.new()
+
+    const difference    = compareDeepGen([ 1 ], [ 0 ])
+
+    t.is(
+        renderer.renderToString(difference.template()),
+`[      │ │     [
+  1     │0│       0
+]       │ │     ]
+`
+    )
+})

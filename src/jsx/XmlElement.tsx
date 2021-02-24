@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Serializable, serializable } from "../serializable/Serializable.js"
-import { saneSplit } from "../util/Helpers.js"
+import { prototypeValue, saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { ColoredStringPlain } from "./ColoredString.js"
 import { TextJSX } from "./TextJSX.js"
@@ -16,7 +16,7 @@ export type XmlNode = string | XmlElement
 @serializable()
 export class XmlElement extends Mixin(
     [ Serializable, Base ],
-    (base : ClassUnion<typeof Serializable, typeof Base>) =>
+    (base : ClassUnion<typeof Serializable, typeof Base>) => {
 
     class XmlElement extends base {
         props           : object
@@ -26,6 +26,9 @@ export class XmlElement extends Mixin(
         childNodes      : XmlNode[]                 = []
 
         tagName         : string                    = ''
+
+        @prototypeValue(RenderingFrameSequence)
+        renderingSequenceClass  : typeof RenderingFrameSequence
 
         $attributes     : { [ key : string ] : string } = undefined
 
@@ -103,12 +106,10 @@ export class XmlElement extends Mixin(
         }
 
 
-        render (renderer : XmlRenderer) : RenderingFrame {
-            const sequence      = RenderingFrameSequence.new()
-
+        render (renderer : XmlRenderer, sequence : RenderingFrameSequence = this.renderingSequenceClass.new()) : RenderingFrame {
             if (this.getDisplayType(renderer) === 'block') sequence.push(RenderingFrameStartBlock.new())
 
-            if (this.childNodes.length) sequence.push(this.renderChildren(renderer))
+            this.renderSelf(renderer, sequence)
 
             let frame : RenderingFrame  = sequence
 
@@ -122,9 +123,12 @@ export class XmlElement extends Mixin(
         }
 
 
-        renderChildren (renderer : XmlRenderer) : RenderingFrame {
-            const sequence      = RenderingFrameSequence.new()
+        renderSelf (renderer : XmlRenderer, sequence : RenderingFrameSequence) {
+            this.renderChildren(renderer, sequence)
+        }
 
+
+        renderChildren (renderer : XmlRenderer, sequence : RenderingFrameSequence) {
             this.childNodes.forEach(child => {
                 sequence.push(isString(child)
                     ?
@@ -133,11 +137,11 @@ export class XmlElement extends Mixin(
                         child.render(renderer)
                 )
             })
-
-            return sequence
         }
     }
-){}
+
+    return XmlElement
+}){}
 
 //---------------------------------------------------------------------------------------------------------------------
 const escapeTable = {

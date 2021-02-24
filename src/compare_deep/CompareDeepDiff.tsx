@@ -2,10 +2,9 @@ import { Base } from "../class/Base.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { SerializerXml } from "../serializer/SerializerXml.js"
-import { TreeNode } from "../tree/TreeNode.js"
 import { typeOf } from "../util/Helpers.js"
-import { DifferenceValuesAreDifferent, PathSegment } from "./CompareDeep.js"
-import { FuzzyMatcher } from "./FuzzyMatcher.js"
+import { PathSegment } from "./CompareDeep.js"
+import { DifferenceTemplateArray, DifferenceTemplateArrayEntry, DifferenceTemplateDifferent } from "./CompareDeepDiffRendering.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -55,10 +54,10 @@ export class DifferenceDifferent extends Difference {
     v2          : unknown
 
     template (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <difference_different>
-            <lhs>{ SerializerXml.serialize(this.v1, serializerConfig) }</lhs>
-            <rhs>{ SerializerXml.serialize(this.v2, serializerConfig) }</rhs>
-        </difference_different>
+        return <DifferenceTemplateDifferent>
+            { SerializerXml.serialize(this.v1, serializerConfig) }
+            { SerializerXml.serialize(this.v2, serializerConfig) }
+        </DifferenceTemplateDifferent>
     }
 }
 
@@ -71,13 +70,13 @@ export class DifferenceArray extends Difference {
     comparisons     : { index : number, difference : Difference }[]      = []
 
     template (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <difference_array>
-            <difference_array_entry index={ 0 } type="same"></difference_array_entry>
-            <difference_array_entry index={ 1 } type="different"><difference></difference></difference_array_entry>
-            <difference_array_entry index={ 2 } type="lhs_only"><serialization></serialization></difference_array_entry>
-            <difference_array_entry index={ 3 } type="rhs_only"><serialization></serialization></difference_array_entry>
-            {/*<rhs>{ SerializerXml.serialize(this.rhs, serializerConfig) }</rhs>*/}
-        </difference_array>
+        return <DifferenceTemplateArray>
+            {
+                this.comparisons.map(({ index, difference }) =>
+                    <DifferenceTemplateArrayEntry index={ index }>{ difference.template(serializerConfig) }</DifferenceTemplateArrayEntry>
+                )
+            }
+        </DifferenceTemplateArray>
     }
 }
 

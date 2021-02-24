@@ -1,7 +1,8 @@
 import { it } from "../../index.js"
 import { anyNumberApprox } from "../../src/compare_deep/FuzzyMatcher.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
-import { Serialization, SerializationArray, SerializerXml } from "../../src/serializer/SerializerXml.js"
+import { Serialization, SerializationArray } from "../../src/serializer/SerializerElements.js"
+import { SerializerXml } from "../../src/serializer/SerializerXml.js"
 
 
 it('Serialization should work for atoms', async t => {
