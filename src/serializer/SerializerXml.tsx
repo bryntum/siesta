@@ -1,21 +1,10 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { ColoredStringPlain } from "../jsx/ColoredString.js"
 import { TextJSX } from "../jsx/TextJSX.js"
-import {
-    RenderingFrame,
-    RenderingFrameContent,
-    RenderingFrameIndent,
-    RenderingFrameOutdent,
-    RenderingFrameSequence,
-    RenderingFrameStartBlock
-} from "../jsx/RenderingFrame.js"
 import { XmlElement } from "../jsx/XmlElement.js"
-import { XmlRendererSerialization } from "../jsx/XmlRenderer.js"
-import { serializable } from "../serializable/Serializable.js"
 import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
-import { isString } from "../util/Typeguards.js"
 import { Visitor } from "../visitor/Visitor.js"
+import { Serialization, SerializationArray, SerializationNumber } from "./SerializerElements.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export const serializationVisitSymbol = Symbol('serializationVisitSymbol')
@@ -31,7 +20,9 @@ export class SerializerXml extends Mixin(
 
         outOfWideSymbol     : XmlElement    = <out_of_wide></out_of_wide>
 
-        currentElement      : XmlElement    = <Serialization></Serialization>
+        result              : Serialization = <Serialization></Serialization> as Serialization
+
+        currentElement      : XmlElement    = this.result
 
         refCounter          : number        = 1
 
@@ -271,12 +262,12 @@ export class SerializerXml extends Mixin(
         }
 
 
-        static serialize <T extends typeof SerializerXml> (this : T, value : unknown, props? : Partial<InstanceType<T>>) : XmlElement {
+        static serialize <T extends typeof SerializerXml> (this : T, value : unknown, props? : Partial<InstanceType<T>>) : Serialization {
             const serializer = this.new(props)
 
             serializer.visit(value)
 
-            return serializer.currentElement
+            return serializer.result
         }
     }
 ){}
@@ -322,88 +313,3 @@ const prependZeros = (num : number) : string => {
 const dateToString = (date : Date) : string => {
     return `new Date("${ date.getFullYear() }/${ prependZeros(date.getMonth()) }/${ prependZeros(date.getDate()) } ${ prependZeros(date.getHours()) }:${ prependZeros(date.getMinutes()) }:${ prependZeros(date.getSeconds()) }.${ date.getMilliseconds() }")`
 }
-
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export type SerializationChildNode = SerializationNumber | SerializationArray
-
-
-@serializable()
-export class Serialization extends XmlElement {
-    tagName         : 'serialization'           = 'serialization'
-
-    childNodes      : SerializationChildNode[]
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class SerializationReferencable extends XmlElement {
-    refId           : number        = undefined
-}
-
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable()
-export class SerializationArray extends SerializationReferencable {
-    props           : {
-        length          : number
-    }
-
-    length          : number            = undefined
-
-    tagName         : 'array'           = 'array'
-
-    childNodes      : SerializationChildNode[]
-
-
-    render (renderer : XmlRendererSerialization) : RenderingFrame {
-        const sequence      = RenderingFrameSequence.new()
-
-        sequence.write('[')
-
-        sequence.push(RenderingFrameIndent.new(), this.renderChildren(renderer), RenderingFrameOutdent.new())
-
-        sequence.write(']')
-
-        return sequence
-    }
-
-
-    renderChildren (renderer : XmlRendererSerialization) : RenderingFrame {
-        const sequence      = RenderingFrameSequence.new()
-
-        this.childNodes.forEach((child, index) => {
-            if (index === 0)
-                if (renderer.prettyPrint) sequence.push(RenderingFrameStartBlock.new())
-
-            sequence.push(isString(child)
-                ?
-                    RenderingFrameContent.new({ content : ColoredStringPlain.fromString(child) })
-                :
-                    child.render(renderer)
-            )
-
-            if (index !== this.childNodes.length - 1)
-                sequence.write(renderer.prettyPrint ? ',\n' : ',')
-            else
-                sequence.write(renderer.prettyPrint ? '\n' : '')
-        })
-
-        return sequence
-    }
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable()
-export class SerializationNumber extends XmlElement {
-    props           : {
-    }
-
-    tagName         : 'number'          = 'number'
-
-    childNodes      : [ string ]
-}
-
