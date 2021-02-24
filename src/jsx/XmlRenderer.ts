@@ -136,9 +136,13 @@ export class XmlRenderer extends Mixin(
 
 
         getRulesFor (el : XmlElement) : ColorerRule[] {
-            return saneSplit(el.attributes.class ?? '', /\s+/)
+            const rules = saneSplit(el.attributes.class ?? '', /\s+/)
                 .map(className => this.styles.get(className))
                 .filter(rule => Boolean(rule))
+
+            if (el.hasClass('underlined')) rules.push(c => c.underline)
+
+            return rules
         }
 
 

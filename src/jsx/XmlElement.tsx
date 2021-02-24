@@ -114,8 +114,6 @@ export class XmlElement extends Mixin(
 
             const stylingRules  = renderer.getRulesFor(this)
 
-            if (this.hasClass('underlined')) stylingRules.push(c => c.underline)
-
             if (stylingRules.length > 0) frame = frame.colorize(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
 
             if (this.hasClass('indented')) frame = frame.indent([ ' '.repeat(renderer.indentLevel) ])
