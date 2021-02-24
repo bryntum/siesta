@@ -21,7 +21,7 @@ const normalizeXmlStream    = (stream : (XmlNode | false)[]) : XmlNode[] => {
 }
 
 
-export namespace SiestaJSX {
+export namespace TextJSX {
     export const Fragment = FragmentSymbol
 
     export function createElement (

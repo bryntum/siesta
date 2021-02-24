@@ -1,6 +1,6 @@
 import { it } from "../../index.js"
 import { any, anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src/compare_deep/FuzzyMatcher.js"
-import { SiestaJSX } from "../../src/jsx/Factory.js"
+import { TextJSX } from "../../src/jsx/TextJSX.js"
 import { StringifierXml } from "../../src/serializer/StringifierXml.js"
 
 //---------------------------------------------------------------------------------------------------------------------

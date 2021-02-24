@@ -1,5 +1,5 @@
 import { it } from "../../index.js"
-import { SiestaJSX } from "../../src/jsx/Factory.js"
+import { TextJSX } from "../../src/jsx/TextJSX.js"
 import { XmlRendererSerialization } from "../../src/jsx/XmlRenderer.js"
 import { SerializerXml } from "../../src/serializer/SerializerXml.js"
 

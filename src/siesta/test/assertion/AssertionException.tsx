@@ -1,5 +1,5 @@
 import { AnyFunction, ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { SiestaJSX } from "../../../jsx/Factory.js"
+import { TextJSX } from "../../../jsx/TextJSX.js"
 import { isRegExp } from "../../../util/Typeguards.js"
 import { Assertion, SourcePoint, TestNodeResult } from "../TestResult.js"
 import { GotExpectTemplate } from "./AssertionCompare.js"

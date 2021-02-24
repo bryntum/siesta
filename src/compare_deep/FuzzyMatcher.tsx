@@ -1,6 +1,6 @@
 import { Base } from "../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
-import { SiestaJSX } from "../jsx/Factory.js"
+import { TextJSX } from "../jsx/TextJSX.js"
 import { serializationVisitSymbol, SerializerXml } from "../serializer/SerializerXml.js"
 import { typeOf } from "../util/Helpers.js"
 import { isNumber, isRegExp } from "../util/Typeguards.js"

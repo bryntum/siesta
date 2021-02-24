@@ -4,14 +4,14 @@ import { Serializable, serializable } from "../serializable/Serializable.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { ColoredStringPlain } from "./ColoredString.js"
-import { SiestaJSX } from "./Factory.js"
+import { TextJSX } from "./TextJSX.js"
 import { RenderingFrame, RenderingFrameContent, RenderingFrameNoop, RenderingFrameSequence, RenderingFrameStartBlock } from "./RenderingFrame.js"
 import { XmlRenderer } from "./XmlRenderer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type XmlNode = string | XmlElement
 
-// TODO extend the TreeNode ??
+// TODO extend the TreeNode
 
 @serializable()
 export class XmlElement extends Mixin(

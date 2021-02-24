@@ -1,7 +1,7 @@
 import chalk from "chalk"
 import { it } from "../../index.js"
 import { ColorerNodejs } from "../../src/jsx/ColorerNodejs.js"
-import { SiestaJSX } from "../../src/jsx/Factory.js"
+import { TextJSX } from "../../src/jsx/TextJSX.js"
 import { TextBlock } from "../../src/jsx/TextBlock.js"
 import { XmlElement } from "../../src/jsx/XmlElement.js"
 import { XmlRenderer } from "../../src/jsx/XmlRenderer.js"

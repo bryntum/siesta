@@ -1,5 +1,5 @@
 import { Base } from "../class/Base.js"
-import { SiestaJSX } from "../jsx/Factory.js"
+import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { SerializerXml } from "../serializer/SerializerXml.js"
 import { TreeNode } from "../tree/TreeNode.js"

@@ -6,8 +6,8 @@
         "strictBindCallApply"       : true,
 
         "jsx"                       : "react",
-        "jsxFactory"                : "SiestaJSX.createElement",
-        "jsxFragmentFactory"        : "SiestaJSX.Fragment",
+        "jsxFactory"                : "TextJSX.createElement",
+        "jsxFragmentFactory"        : "TextJSX.Fragment",
 
         "target"                    : "es2017",
         "sourceMap"                 : false,

@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { ColoredStringPlain } from "../jsx/ColoredString.js"
-import { SiestaJSX } from "../jsx/Factory.js"
+import { TextJSX } from "../jsx/TextJSX.js"
 import {
     RenderingFrame,
     RenderingFrameContent,
@@ -127,7 +127,7 @@ export class SerializerXml extends Mixin(
 
 
         visitNumber (value : number, depth : number) {
-            this.write(<number>{ value }</number>)
+            this.write(<SerializationNumber>{ value }</SerializationNumber>)
         }
 
 
@@ -399,6 +399,9 @@ export class SerializationArray extends SerializationReferencable {
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class SerializationNumber extends XmlElement {
+    props           : {
+    }
+
     tagName         : 'number'          = 'number'
 
     childNodes      : [ string ]

@@ -1,6 +1,6 @@
 import { Base } from "../class/Base.js"
 import { CI } from "../iterator/Iterator.js"
-import { SiestaJSX } from "../jsx/Factory.js"
+import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { SerializerXml } from "../serializer/SerializerXml.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "../util/Helpers.js"
