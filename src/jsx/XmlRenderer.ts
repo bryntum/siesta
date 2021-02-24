@@ -143,12 +143,17 @@ export class XmlRenderer extends Mixin(
 
 
         // TODO rename to just `render`
-        render2 (el : XmlElement) : string {
+        renderToString (el : XmlElement) : string {
+            return this.renderToTextBlock(el).toString()
+        }
+
+
+        renderToTextBlock (el : XmlElement) : TextBlock {
             const textBlock = TextBlock.new()
 
             el.render(this).toTextBlock(textBlock)
 
-            return textBlock.toString()
+            return textBlock
         }
     }
 ){}

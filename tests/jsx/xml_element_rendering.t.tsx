@@ -1,20 +1,26 @@
-import chalk from "chalk"
 import { it } from "../../index.js"
-import { ColorerNodejs } from "../../src/jsx/ColorerNodejs.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
 import { XmlRenderer } from "../../src/jsx/XmlRenderer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-const renderer      = XmlRenderer.new({ colorerClass : ColorerNodejs })
+const renderer      = XmlRenderer.new()
 
 
 //---------------------------------------------------------------------------------------------------------------------
-it('Should correctly render styled elements', async t => {
+it('XmlElement rendering should work', async t => {
 
     t.is(
         renderer.renderToString(<div>
-            Some text <span class="underlined">underlined</span>
+            Some text <span>inner</span>
         </div>),
-        `Some text ${ chalk.underline('underlined') }`
+        `Some text inner`
     )
+
+    t.is(
+        renderer.renderToString(<div class="indented">
+            Some text
+        </div>),
+        `  Some text`
+    )
+
 })

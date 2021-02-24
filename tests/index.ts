@@ -25,7 +25,8 @@ project.plan(
         filename    : 'jsx',
 
         items       : [
-            'text_block.t.js'
+            'text_block.t.js',
+            'xml_element_rendering.t.js'
         ]
     },
     {

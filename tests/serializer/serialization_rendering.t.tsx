@@ -10,13 +10,13 @@ const rendererPretty    = XmlRendererSerialization.new({ prettyPrint : true })
 
 it('Rendering of serializer output should work', async t => {
 
-    t.is(renderer.render2(SerializerXml.serialize(1)), '1')
+    t.is(renderer.renderToString(SerializerXml.serialize(1)), '1')
 
-    t.is(renderer.render2(SerializerXml.serialize([])), '[]')
+    t.is(renderer.renderToString(SerializerXml.serialize([])), '[]')
 
-    t.is(renderer.render2(SerializerXml.serialize([ 1, 2, 3 ])), '[1,2,3]')
+    t.is(renderer.renderToString(SerializerXml.serialize([ 1, 2, 3 ])), '[1,2,3]')
 
-    t.is(rendererPretty.render2(
+    t.is(rendererPretty.renderToString(
         SerializerXml.serialize([ 1, 2, 3 ])),
 `[
   1,
