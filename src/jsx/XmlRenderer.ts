@@ -11,6 +11,7 @@ import { XmlElement, XmlNode } from "./XmlElement.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// TODO rename to XmlRenderingContext
 export class XmlRenderer extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
@@ -129,7 +130,7 @@ export class XmlRenderer extends Mixin(
             if (isString(el)) {
                 return 'inline'
             } else {
-                return this.blockLevelElements.has(el.tagName) ? 'block' : 'inline'
+                return this.blockLevelElements.has(el.tagName?.toLowerCase()) ? 'block' : 'inline'
             }
         }
 
@@ -139,5 +140,26 @@ export class XmlRenderer extends Mixin(
                 .map(className => this.styles.get(className))
                 .filter(rule => Boolean(rule))
         }
+
+
+        // TODO rename to just `render`
+        render2 (el : XmlElement) : string {
+            const textBlock = TextBlock.new()
+
+            el.render(this).toTextBlock(textBlock)
+
+            return textBlock.toString()
+        }
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class XmlRendererSerialization extends Mixin(
+    [ XmlRenderer ],
+    (base : ClassUnion<typeof XmlRenderer>) =>
+
+    class XmlRendererSerialization extends base {
+        prettyPrint             : boolean       = false
     }
 ){}

@@ -1,4 +1,4 @@
-import { Project } from "../src/siesta/project/Project.js"
+import { Project } from "../index.js"
 
 const project = Project.new({
     title                   : 'Siesta 6 isomorphic test suite',
@@ -62,14 +62,16 @@ project.plan(
 
         items       : [
             'serializer_xml.t.js',
-            'stringifier_xml.t.js'
+            'stringifier_xml.t.js',
+            'serialization_rendering.t.js'
         ]
     },
     {
         filename    : 'compare_deep',
 
         items       : [
-            'compare_deep.t.js'
+            'compare_deep.t.js',
+            'compare_deep_diff.t.js'
         ]
     },
     {

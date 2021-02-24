@@ -3,6 +3,9 @@ import { isString } from "../util/Typeguards.js"
 import { Colorer } from "./Colorer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
+export type MaybeColoredString  = string | ColoredString
+
+//---------------------------------------------------------------------------------------------------------------------
 export class ColoredString extends Base {
 
     get length () : number {
@@ -56,6 +59,27 @@ export class ColoredStringPlain extends ColoredString {
 
     static fromString<T extends typeof ColoredStringPlain> (this : T, string : string, c? : Colorer) : InstanceType<T> {
         return this.new({ string, wrappings : c ? c.wrappings() : undefined } as Partial<InstanceType<T>>)
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class ColoredStringColorToken extends ColoredString {
+    token           : string        = ''
+
+
+    get length () : number {
+        return 0
+    }
+
+
+    toString () : string {
+        return this.token
+    }
+
+
+    substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
+        return ColoredStringPlain.new()
     }
 }
 

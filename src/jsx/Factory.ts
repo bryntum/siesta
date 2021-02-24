@@ -25,7 +25,7 @@ export namespace SiestaJSX {
     export const Fragment = FragmentSymbol
 
     export function createElement (
-        tagName : string | typeof FragmentSymbol, attributes : { [ key : string ] : string }, ...children : (XmlNode | false)[]
+        tagName : string | typeof FragmentSymbol | typeof XmlElement, attributes : { [ key : string ] : string }, ...children : (XmlNode | false)[]
     )
         : XmlElement
     {
@@ -33,9 +33,16 @@ export namespace SiestaJSX {
             return XmlFragment.new({
                 childNodes  : normalizeXmlStream(children)
             })
-        } else {
+        }
+        else if (isString(tagName)) {
             return XmlElement.new({
                 tagName     : tagName,
+                attributes  : attributes,
+                childNodes  : normalizeXmlStream(children)
+            })
+        }
+        else {
+            return tagName.new({
                 attributes  : attributes,
                 childNodes  : normalizeXmlStream(children)
             })

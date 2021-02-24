@@ -1,8 +1,20 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { ColoredStringPlain } from "../jsx/ColoredString.js"
 import { SiestaJSX } from "../jsx/Factory.js"
+import {
+    RenderingFrame,
+    RenderingFrameContent,
+    RenderingFrameIndent,
+    RenderingFrameOutdent,
+    RenderingFrameSequence,
+    RenderingFrameStartBlock
+} from "../jsx/RenderingFrame.js"
 import { XmlElement } from "../jsx/XmlElement.js"
+import { XmlRendererSerialization } from "../jsx/XmlRenderer.js"
+import { serializable } from "../serializable/Serializable.js"
 import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
+import { isString } from "../util/Typeguards.js"
 import { Visitor } from "../visitor/Visitor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -19,9 +31,7 @@ export class SerializerXml extends Mixin(
 
         outOfWideSymbol     : XmlElement    = <out_of_wide></out_of_wide>
 
-        result              : XmlElement[]  = [ <serialization></serialization> ]
-
-        currentElement      : XmlElement    = this.result[ 0 ]
+        currentElement      : XmlElement    = <Serialization></Serialization>
 
         refCounter          : number        = 1
 
@@ -53,16 +63,12 @@ export class SerializerXml extends Mixin(
         push (el : XmlElement) {
             this.write(el)
 
-            this.result.push(el)
-
             this.currentElement = el
         }
 
 
         pop () {
-            this.result.pop()
-
-            this.currentElement = this.result[ this.result.length - 1 ]
+            this.currentElement = this.currentElement.parent
         }
 
 
@@ -198,7 +204,7 @@ export class SerializerXml extends Mixin(
 
 
         visitArray (array : unknown[], depth : number) : any {
-            this.push(<array length={ array.length }></array>)
+            this.push(<SerializationArray length={ array.length }></SerializationArray>)
 
             super.visitArray(array, depth)
 
@@ -265,11 +271,6 @@ export class SerializerXml extends Mixin(
         }
 
 
-        toString () : string {
-            return this.result.join('')
-        }
-
-
         static serialize <T extends typeof SerializerXml> (this : T, value : unknown, props? : Partial<InstanceType<T>>) : XmlElement {
             const serializer = this.new(props)
 
@@ -323,30 +324,83 @@ const dateToString = (date : Date) : string => {
 }
 
 
-// //---------------------------------------------------------------------------------------------------------------------
-// export type SerializationChildNode = SerializationNumber | SerializationArray
-//
-//
-// export class Serialization extends XmlElement {
-//     tagName         : 'serialization'           = 'serialization'
-//
-//     childNodes      : SerializationChildNode[]
-// }
-//
-//
-//
-// //---------------------------------------------------------------------------------------------------------------------
-// export class SerializationArray extends XmlElement {
-//     tagName         : 'array'           = 'array'
-//
-//     childNodes      : SerializationChildNode[]
-// }
-//
-//
-// //---------------------------------------------------------------------------------------------------------------------
-// export class SerializationNumber extends XmlElement {
-//     tagName         : 'number'          = 'number'
-//
-//     childNodes      : XmlNode[]
-// }
-//
+
+//---------------------------------------------------------------------------------------------------------------------
+export type SerializationChildNode = SerializationNumber | SerializationArray
+
+
+@serializable()
+export class Serialization extends XmlElement {
+    tagName         : 'serialization'           = 'serialization'
+
+    childNodes      : SerializationChildNode[]
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class SerializationReferencable extends XmlElement {
+    refId           : number        = undefined
+}
+
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class SerializationArray extends SerializationReferencable {
+    props           : {
+        length          : number
+    }
+
+    length          : number            = undefined
+
+    tagName         : 'array'           = 'array'
+
+    childNodes      : SerializationChildNode[]
+
+
+    render (renderer : XmlRendererSerialization) : RenderingFrame {
+        const sequence      = RenderingFrameSequence.new()
+
+        sequence.write('[')
+
+        sequence.push(RenderingFrameIndent.new(), this.renderChildren(renderer), RenderingFrameOutdent.new())
+
+        sequence.write(']')
+
+        return sequence
+    }
+
+
+    renderChildren (renderer : XmlRendererSerialization) : RenderingFrame {
+        const sequence      = RenderingFrameSequence.new()
+
+        this.childNodes.forEach((child, index) => {
+            if (index === 0)
+                if (renderer.prettyPrint) sequence.push(RenderingFrameStartBlock.new())
+
+            sequence.push(isString(child)
+                ?
+                    RenderingFrameContent.new({ content : ColoredStringPlain.fromString(child) })
+                :
+                    child.render(renderer)
+            )
+
+            if (index !== this.childNodes.length - 1)
+                sequence.write(renderer.prettyPrint ? ',\n' : ',')
+            else
+                sequence.write(renderer.prettyPrint ? '\n' : '')
+        })
+
+        return sequence
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class SerializationNumber extends XmlElement {
+    tagName         : 'number'          = 'number'
+
+    childNodes      : [ string ]
+}
+

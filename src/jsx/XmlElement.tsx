@@ -3,14 +3,15 @@ import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Serializable, serializable } from "../serializable/Serializable.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
+import { ColoredStringPlain } from "./ColoredString.js"
 import { SiestaJSX } from "./Factory.js"
-import { RenderingBuffer } from "./RenderingBuffer.js"
-import { RenderingFrame } from "./RenderingFrame.js"
+import { RenderingFrame, RenderingFrameContent, RenderingFrameNoop, RenderingFrameSequence, RenderingFrameStartBlock } from "./RenderingFrame.js"
 import { XmlRenderer } from "./XmlRenderer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type XmlNode = string | XmlElement
 
+// TODO extend the TreeNode ??
 
 @serializable()
 export class XmlElement extends Mixin(
@@ -18,7 +19,7 @@ export class XmlElement extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Base>) =>
 
     class XmlElement extends base {
-        props           : this
+        props           : object
 
         parent          : XmlElement                = undefined
 
@@ -97,20 +98,46 @@ export class XmlElement extends Mixin(
         }
 
 
-        render (buffer : RenderingBuffer) {
-            // this.childNodes.forEach(child => {
-            //     if (isString(child)) buffer.push
-            // })
+        getDisplayType (renderer : XmlRenderer) : 'block' | 'inline' {
+            return renderer.getDisplayType(this)
         }
 
 
-        renderingFrame (renderer : XmlRenderer) : RenderingFrame {
-            return
-            // this.childNodes.forEach(child => {
-            //     if (isString(child)) buffer.push
-            // })
+        render (renderer : XmlRenderer) : RenderingFrame {
+            const sequence      = RenderingFrameSequence.new()
+
+            if (this.getDisplayType(renderer) === 'block') sequence.push(RenderingFrameStartBlock.new())
+
+            if (this.childNodes.length) sequence.push(this.renderChildren(renderer))
+
+            let frame : RenderingFrame  = sequence
+
+            const stylingRules  = renderer.getRulesFor(this)
+
+            if (this.hasClass('underlined')) stylingRules.push(c => c.underline)
+
+            if (stylingRules.length > 0) frame = frame.colorize(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
+
+            if (this.hasClass('indented')) frame = frame.indent([ ' '.repeat(renderer.indentLevel) ])
+
+            return frame
         }
 
+
+        renderChildren (renderer : XmlRenderer) : RenderingFrame {
+            const sequence      = RenderingFrameSequence.new()
+
+            this.childNodes.forEach(child => {
+                sequence.push(isString(child)
+                    ?
+                        RenderingFrameContent.new({ content : ColoredStringPlain.fromString(child) })
+                    :
+                        child.render(renderer)
+                )
+            })
+
+            return sequence
+        }
     }
 ){}
 
@@ -127,6 +154,8 @@ export const escapeXml = (xmlStr : string) : string => xmlStr.replace(/[&<>"']/g
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// TODO should probably be the opposite - Element extends Fragment
+//  (fragment only has childNodes, element adds the "shell" - tag name and attributes)
 export class XmlFragment extends Mixin(
     [ XmlElement ],
     (base : ClassUnion<typeof XmlElement>) =>

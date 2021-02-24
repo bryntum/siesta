@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { ColoredString, ColoredStringPlain, ColoredStringSum } from "./ColoredString.js"
+import { ColoredString, ColoredStringColorToken, ColoredStringPlain, ColoredStringSum, MaybeColoredString } from "./ColoredString.js"
 import { Colorer } from "./Colorer.js"
 
 
@@ -16,7 +16,7 @@ export class TextBlock extends Base {
 
     text                    : ColoredStringSum[] = [ ColoredStringSum.new() ]
 
-    indentLevel             : number            = 0
+    indentLevel             : number            = 2
 
     indentationString       : string            = ''
 
@@ -46,6 +46,12 @@ export class TextBlock extends Base {
     }
 
 
+    // TODO
+    indentWith (indentWith : MaybeColoredString[]) {
+        this.indent()
+    }
+
+
     outdent () {
         this.currentIndentation         = this.currentIndentation.slice(0, this.currentIndentation.length - this.indentLevel)
     }
@@ -70,24 +76,28 @@ export class TextBlock extends Base {
 
 
     addSameLineText (str : string | ColoredString) {
-        let sourcePos               = 0
+        if (str instanceof ColoredStringColorToken) {
+            this.lastLine.push(str)
+        } else {
+            let sourcePos               = 0
 
-        while (sourcePos < str.length) {
-            const insertPos         = this.atNewLine ? this.currentIndentation.length : this.lastLine.length
+            while (sourcePos < str.length) {
+                const insertPos         = this.atNewLine ? this.currentIndentation.length : this.lastLine.length
 
-            const freeLength        = this.maxLen - insertPos
+                const freeLength        = this.maxLen - insertPos
 
-            // if (freeLength < this.minContentWidth) freeLength = this.minContentWidth
+                // if (freeLength < this.minContentWidth) freeLength = this.minContentWidth
 
-            const toInsert          = str.substr(sourcePos, freeLength)
+                const toInsert          = str.substr(sourcePos, freeLength)
 
-            const toInsertLength    = toInsert.length
+                const toInsertLength    = toInsert.length
 
-            this.pushToLastLineBuffer(toInsert)
+                this.pushToLastLineBuffer(toInsert)
 
-            if (sourcePos + toInsertLength < str.length) this.addNewLine()
+                if (sourcePos + toInsertLength < str.length) this.addNewLine()
 
-            sourcePos               += toInsertLength
+                sourcePos               += toInsertLength
+            }
         }
     }
 
@@ -96,6 +106,13 @@ export class TextBlock extends Base {
         this.text.push(ColoredStringSum.new())
 
         this.atNewLine      = true
+    }
+
+
+    startNewBlock () {
+        const isEmpty       = this.atNewLine && this.text.length === 1
+
+        !isEmpty && this.addNewLine()
     }
 
 
