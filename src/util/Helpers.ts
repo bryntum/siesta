@@ -103,6 +103,7 @@ export const delay = (timeout : number) : Promise<any> => new Promise(resolve =>
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// TODO review whats the difference with native `String.matchAll()` and possibly remove, not supported everywhere?
 export const matchAll = function* (regexp : RegExp, testStr : string) : Generator<string[]> {
     let match : string[]
 
@@ -113,6 +114,7 @@ export const matchAll = function* (regexp : RegExp, testStr : string) : Generato
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// TODO review whats the difference with native `String.matchAll()` and possibly remove, not supported everywhere?
 export const allMatches = function (regexp : RegExp, testStr : string) : string[] {
     return CI(matchAll(regexp, testStr)).map(match => CI(match).drop(1)).concat().toArray()
 }
@@ -152,8 +154,14 @@ export const saneSplit = function (str : string, split : string | RegExp) : stri
 }
 
 
+// export const stripFirstNewLine = (str : TemplateStringsArray, ...insertions : string[]) : string =>
+//     str.map(
+//         (string, index) => (index === 0 ? string.replace(/^n/, '') : string) + (index < insertions.length ? insertions[ index ] : '')
+//     ).join('')
+
 //---------------------------------------------------------------------------------------------------------------------
 export const randomElement = <V>(array : V[]) : V => array[ Math.floor(array.length * Math.random()) ]
+export const lastElement = <V>(array : V[]) : V | undefined => array[ array.length - 1 ]
 
 
 //---------------------------------------------------------------------------------------------------------------------
