@@ -79,6 +79,62 @@ export function split<Element> (iterable : Iterable<Element>) : [ Iterable<Eleme
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export function zip2<Element1, Element2> (
+    iterable1 : Iterable<Element1>, iterable2 : Iterable<Element2>
+)
+    : Iterable<[ Element1, Element2 ]>
+{
+    return (function * () : Generator<[ Element1, Element2 ]> {
+        const iterator1     = iterable1[ Symbol.iterator ]()
+        const iterator2     = iterable2[ Symbol.iterator ]()
+
+        while (true) {
+            const { value : value1, done : done1 }      = iterator1.next()
+            const { value : value2, done : done2 }      = iterator2.next()
+
+            const allDone       = done1 && done2
+            const someDone      = done1 || done2
+
+            if (someDone && !allDone) throw new Error("Zip with iterators of different length")
+
+            if (allDone) break
+
+            yield [ value1, value2 ]
+        }
+    })()
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export function zip3<Element1, Element2, Element3> (
+    iterable1 : Iterable<Element1>, iterable2 : Iterable<Element2>, iterable3 : Iterable<Element3>
+)
+    : Iterable<[ Element1, Element2, Element3 ]>
+{
+    return (function * () : Generator<[ Element1, Element2, Element3 ]> {
+        const iterator1     = iterable1[ Symbol.iterator ]()
+        const iterator2     = iterable2[ Symbol.iterator ]()
+        const iterator3     = iterable3[ Symbol.iterator ]()
+
+        while (true) {
+            const { value : value1, done : done1 }      = iterator1.next()
+            const { value : value2, done : done2 }      = iterator2.next()
+            const { value : value3, done : done3 }      = iterator3.next()
+
+            const allDone       = done1 && done2 && done3
+            const someDone      = done1 || done2 || done3
+
+            if (someDone && !allDone) throw new Error("Zip with iterators of different length")
+
+            if (allDone) break
+
+            yield [ value1, value2, value3 ]
+        }
+    })()
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export function* inBatchesBySize<Element> (iterator : Iterable<Element>, batchSize : number) : Iterable<Element[]> {
     if (batchSize < 1) throw new Error("Batch size needs to a natural number")
     batchSize   = batchSize | 0
