@@ -4,7 +4,12 @@ import { XmlElement } from "../jsx/XmlElement.js"
 import { SerializerXml } from "../serializer/SerializerXml.js"
 import { typeOf } from "../util/Helpers.js"
 import { PathSegment } from "./CompareDeep.js"
-import { DifferenceTemplateArray, DifferenceTemplateArrayEntry, DifferenceTemplateDifferent } from "./CompareDeepDiffRendering.js"
+import {
+    DifferenceTemplateArray,
+    DifferenceTemplateArrayEntry,
+    DifferenceTemplateDifference,
+    DifferenceTemplateDifferent
+} from "./CompareDeepDiffRendering.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -14,8 +19,15 @@ export class Difference extends /*TreeNode.mix(*/Base/*)*/ {
     // parentNode      : Difference
     // childNodeT      : Difference
 
-    template (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
         throw new Error("Abstract method")
+    }
+
+
+    template (serializerConfig? : Partial<SerializerXml>) : DifferenceTemplateDifference {
+        return <DifferenceTemplateDifference>
+            { this.templateInner(serializerConfig) }
+        </DifferenceTemplateDifference> as DifferenceTemplateDifference
     }
 }
 
@@ -26,7 +38,7 @@ export class DifferenceMissing extends Difference {
 
     from            : '1' | '2'         = undefined
 
-    template (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
         return <difference_missing>
             {/*<lhs>{ SerializerXml.serialize(this.lhs, serializerConfig) }</lhs>*/}
             {/*<rhs>{ SerializerXml.serialize(this.rhs, serializerConfig) }</rhs>*/}
@@ -40,7 +52,7 @@ export class DifferenceMissing extends Difference {
 export class DifferenceSame extends Difference {
     value           : unknown       = undefined
 
-    template (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
         return <difference_same>
             <same>{ SerializerXml.serialize(this.value, serializerConfig) }</same>
         </difference_same>
@@ -53,7 +65,7 @@ export class DifferenceDifferent extends Difference {
     v1          : unknown
     v2          : unknown
 
-    template (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
         return <DifferenceTemplateDifferent>
             { SerializerXml.serialize(this.v1, serializerConfig) }
             { SerializerXml.serialize(this.v2, serializerConfig) }
@@ -69,11 +81,11 @@ export class DifferenceArray extends Difference {
 
     comparisons     : { index : number, difference : Difference }[]      = []
 
-    template (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
         return <DifferenceTemplateArray>
             {
                 this.comparisons.map(({ index, difference }) =>
-                    <DifferenceTemplateArrayEntry index={ index }>{ difference.template(serializerConfig) }</DifferenceTemplateArrayEntry>
+                    <DifferenceTemplateArrayEntry index={ index }>{ difference.templateInner(serializerConfig) }</DifferenceTemplateArrayEntry>
                 )
             }
         </DifferenceTemplateArray>

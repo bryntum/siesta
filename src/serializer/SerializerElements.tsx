@@ -7,7 +7,7 @@ import {
     RenderingFrameStartBlock
 } from "../jsx/RenderingFrame.js"
 import { XmlElement } from "../jsx/XmlElement.js"
-import { XmlRenderer } from "../jsx/XmlRenderer.js"
+import { XmlRenderer, XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
 import { serializable } from "../serializable/Serializable.js"
 import { isString } from "../util/Typeguards.js"
 
@@ -67,14 +67,14 @@ export class SerializationArray extends SerializationReferenceable {
     childNodes      : SerializationChildNode[]
 
 
-    renderSelf (renderer : XmlRendererSerialization, sequence : RenderingFrameSequence) {
+    renderSelf (renderer : XmlRendererSerialization, sequence : RenderingFrameSequence, dynamicContext : XmlRenderingDynamicContext[]) {
         this.checkForReferenceId(renderer, sequence)
 
         sequence.write('[')
 
         renderer.prettyPrint && sequence.push(RenderingFrameIndent.new())
 
-        super.renderSelf(renderer, sequence)
+        super.renderSelf(renderer, sequence, dynamicContext)
 
         renderer.prettyPrint && sequence.push(RenderingFrameOutdent.new())
 
@@ -82,7 +82,7 @@ export class SerializationArray extends SerializationReferenceable {
     }
 
 
-    renderChildren (renderer : XmlRendererSerialization, sequence : RenderingFrameSequence) {
+    renderChildren (renderer : XmlRendererSerialization, sequence : RenderingFrameSequence, dynamicContext : XmlRenderingDynamicContext[]) {
         this.childNodes.forEach((child, index) => {
             if (index === 0)
                 if (renderer.prettyPrint)
@@ -91,7 +91,7 @@ export class SerializationArray extends SerializationReferenceable {
                     sequence.write(' ')
 
 
-            sequence.push(isString(child) ? RenderingFrameContent.new({ content : child }) : child.render(renderer))
+            sequence.push(isString(child) ? RenderingFrameContent.new({ content : child }) : child.render(renderer, dynamicContext)[ 0 ])
 
             if (index !== this.childNodes.length - 1)
                 sequence.write(renderer.prettyPrint ? ',\n' : renderer.spaceBetweenElements ? ', ' : ',')

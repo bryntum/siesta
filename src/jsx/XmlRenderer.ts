@@ -1,6 +1,5 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { StringifierXml } from "../serializer/StringifierXml.js"
 import { styles } from "../siesta/reporter/styling/terminal.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
@@ -11,7 +10,7 @@ import { XmlElement, XmlNode } from "./XmlElement.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// TODO rename to XmlRenderingContext
+// TODO rename to XmlRenderingStaticContext
 export class XmlRenderer extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
@@ -148,17 +147,26 @@ export class XmlRenderer extends Mixin(
 
 
         // TODO rename to just `render`
-        renderToString (el : XmlElement) : string {
-            return this.renderToTextBlock(el).toString()
+        renderToString (el : XmlElement, textBlock? : TextBlock) : string {
+            return this.renderToTextBlock(el, textBlock).toString()
         }
 
 
-        renderToTextBlock (el : XmlElement) : TextBlock {
-            const textBlock = TextBlock.new()
-
-            el.render(this).toTextBlock(textBlock)
+        renderToTextBlock (el : XmlElement, textBlock : TextBlock = TextBlock.new()) : TextBlock {
+            el.render(this)[ 0 ].toTextBlock(textBlock)
 
             return textBlock
         }
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class XmlRenderingDynamicContext extends Mixin(
+    [ XmlRenderer ],
+    (base : ClassUnion<typeof XmlRenderer>) =>
+
+    class XmlRenderingDynamicContext extends base {
+        element         : XmlElement        = undefined
     }
 ){}

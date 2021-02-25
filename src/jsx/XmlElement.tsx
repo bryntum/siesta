@@ -6,7 +6,7 @@ import { isString } from "../util/Typeguards.js"
 import { ColoredStringPlain } from "./ColoredString.js"
 import { TextJSX } from "./TextJSX.js"
 import { RenderingFrame, RenderingFrameContent, RenderingFrameNoop, RenderingFrameSequence, RenderingFrameStartBlock } from "./RenderingFrame.js"
-import { XmlRenderer } from "./XmlRenderer.js"
+import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type XmlNode = string | XmlElement
@@ -26,9 +26,6 @@ export class XmlElement extends Mixin(
         childNodes      : XmlNode[]                 = []
 
         tagName         : string                    = ''
-
-        @prototypeValue(RenderingFrameSequence)
-        renderingSequenceClass  : typeof RenderingFrameSequence
 
         $attributes     : { [ key : string ] : string } = undefined
 
@@ -106,35 +103,48 @@ export class XmlElement extends Mixin(
         }
 
 
-        render (renderer : XmlRenderer, sequence : RenderingFrameSequence = this.renderingSequenceClass.new()) : RenderingFrame {
+        createOwnDynamicContext (parentContexts : XmlRenderingDynamicContext[]) : XmlRenderingDynamicContext {
+            return XmlRenderingDynamicContext.new({ element : this })
+        }
+
+
+        render (renderer : XmlRenderer, dynamicContext : XmlRenderingDynamicContext[] = [])
+            : [ RenderingFrame, ReturnType<this[ 'createOwnDynamicContext' ]> ]
+        {
+            const sequence              = RenderingFrameSequence.new()
+
             if (this.getDisplayType(renderer) === 'block') sequence.push(RenderingFrameStartBlock.new())
 
-            this.renderSelf(renderer, sequence)
+            const context               = this.createOwnDynamicContext(dynamicContext)
+
+            this.renderSelf(renderer, sequence, [ ...dynamicContext, context ])
 
             let frame : RenderingFrame  = sequence
 
             const stylingRules  = renderer.getRulesFor(this)
 
-            if (stylingRules.length > 0) frame = frame.colorize(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
+            if (stylingRules.length > 0)
+                frame           = frame.colorize(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
 
-            if (this.hasClass('indented')) frame = frame.indent([ ' '.repeat(renderer.indentLevel) ])
+            if (this.hasClass('indented'))
+                frame           = frame.indent([ ' '.repeat(renderer.indentLevel) ])
 
-            return frame
+            return [ frame, context as ReturnType<this[ 'createOwnDynamicContext' ]> ]
         }
 
 
-        renderSelf (renderer : XmlRenderer, sequence : RenderingFrameSequence) {
-            this.renderChildren(renderer, sequence)
+        renderSelf (renderer : XmlRenderer, sequence : RenderingFrameSequence, dynamicContext : XmlRenderingDynamicContext[]) {
+            this.renderChildren(renderer, sequence, dynamicContext)
         }
 
 
-        renderChildren (renderer : XmlRenderer, sequence : RenderingFrameSequence) {
+        renderChildren (renderer : XmlRenderer, sequence : RenderingFrameSequence, dynamicContext : XmlRenderingDynamicContext[]) {
             this.childNodes.forEach(child => {
                 sequence.push(isString(child)
                     ?
                         RenderingFrameContent.new({ content : ColoredStringPlain.fromString(child) })
                     :
-                        child.render(renderer)
+                        child.render(renderer, dynamicContext)[ 0 ]
                 )
             })
         }
