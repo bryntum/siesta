@@ -57,6 +57,11 @@ export class TextBlock extends Base {
     }
 
 
+    get maxLineLength () : number  {
+        return Math.max(...this.text.map(stringSum => stringSum.length))
+    }
+
+
     get lastLine () : ColoredStringSum  {
         return this.text[ this.text.length - 1 ]
     }
@@ -184,6 +189,17 @@ export class TextBlock extends Base {
             } else {
                 line.unshift(ColoredStringPlain.fromString(isLast ? ' ' + indenterPlain : '│' + indenterPlain).colorize(c))
             }
+        })
+    }
+
+
+    equalizeLineLengthsMut () {
+        const maxLineLength     = this.maxLineLength
+
+        this.text.forEach((line, index) => {
+            const len       = line.length
+
+            if (len < maxLineLength) line.push(' '.repeat(maxLineLength - len))
         })
     }
 }
