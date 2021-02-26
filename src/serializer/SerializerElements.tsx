@@ -141,7 +141,7 @@ export class SerializationObject extends Mixin(
             size?                   : number
         }
 
-        tagName             : string            = 'array'
+        tagName             : string            = 'object'
 
 
         renderSelf (
