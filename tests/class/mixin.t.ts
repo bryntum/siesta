@@ -311,17 +311,19 @@ it('`isInstanceOf` should typecast correctly', t => {
     if (isInstanceOf(temp, SomeMixin1)) {
         temp.prop1
 
-        // uncomment to verify that unknown properties generates compilation error
-        // temp.prop2
-        // temp.zxc
+        // @ts-expect-error
+        temp.prop2
+        // @ts-expect-error
+        temp.zxc
     }
 
     if (isInstanceOf(temp, SomeMixin2)) {
         temp.prop2
 
-        // uncomment to verify that unknown properties generates compilation error
-        // temp.zxc
-        // temp.prop3
+        // @ts-expect-error
+        temp.zxc
+        // @ts-expect-error
+        temp.prop3
     }
 
     if (isInstanceOf(temp, SomeMixin123_1)) {
@@ -329,8 +331,8 @@ it('`isInstanceOf` should typecast correctly', t => {
         temp.prop2
         temp.prop3
 
-        // uncomment to verify that unknown properties generates compilation error
-        // temp.zxc
+        // @ts-expect-error
+        temp.zxc
     }
 
 
@@ -338,17 +340,19 @@ it('`isInstanceOf` should typecast correctly', t => {
     if (temp instanceof SomeMixin1) {
         temp.prop1
 
-        // uncomment to verify that unknown properties generates compilation error
-        // temp.prop2
-        // temp.zxc
+        // @ts-expect-error
+        temp.prop2
+        // @ts-expect-error
+        temp.zxc
     }
 
     if (temp instanceof SomeMixin2) {
         temp.prop2
 
-        // uncomment to verify that unknown properties generates compilation error
-        // temp.zxc
-        // temp.prop3
+        // @ts-expect-error
+        temp.zxc
+        // @ts-expect-error
+        temp.prop3
     }
 
     if (temp instanceof SomeMixin123_1) {
@@ -356,8 +360,8 @@ it('`isInstanceOf` should typecast correctly', t => {
         temp.prop2
         temp.prop3
 
-        // uncomment to verify that unknown properties generates compilation error
-        // temp.zxc
+        // @ts-expect-error
+        temp.zxc
     }
 
 })
@@ -481,4 +485,22 @@ it('Should throw when trying to construct a mixin from contradicting base classe
             }
         ){}
     }, /Base class mismatch/)
+})
+
+
+it('`isInstanceOf` should work with plain subclasses', t => {
+    class Some1 extends Mixin(
+        [ Base ],
+        (base : ClassUnion<typeof Base>) =>
+
+        class Some1 extends base {
+            prop1       : string    = '1'
+        }
+    ){}
+
+    class Some2 extends Some1 {
+        prop2       : string    = '2'
+    }
+
+    t.false(Some1.new() instanceof Some2)
 })
