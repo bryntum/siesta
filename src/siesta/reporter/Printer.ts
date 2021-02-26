@@ -1,13 +1,13 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { XmlRendererDifference } from "../../compare_deep/CompareDeepDiffRendering.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
-import { XmlRenderer } from "../../jsx/XmlRenderer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Printer extends Mixin(
-    [ XmlRenderer, Base ],
-    (base : ClassUnion<typeof XmlRenderer, typeof Base>) => {
+    [ XmlRendererDifference, Base ],
+    (base : ClassUnion<typeof XmlRendererDifference, typeof Base>) => {
 
     class Printer extends base {
 

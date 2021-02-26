@@ -1,23 +1,22 @@
 import { Base } from "../../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
+import { compareDeepGen, comparePrimitivesGen, Difference } from "../../../compare_deep/CompareDeep.js"
+import { compareDeepDiff, DifferenceSame } from "../../../compare_deep/CompareDeepDiff.js"
 import {
     any,
     anyNumberApprox,
-    anyStringLike, Approximation, NumberApproximation,
+    anyStringLike,
+    Approximation,
     FuzzyMatcherAny,
     FuzzyMatcherInstance,
     FuzzyMatcherNumber,
-    FuzzyMatcherString
+    FuzzyMatcherString,
+    NumberApproximation
 } from "../../../compare_deep/FuzzyMatcher.js"
 import { CI } from "../../../iterator/Iterator.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { XmlElement } from "../../../jsx/XmlElement.js"
 import { SerializerXml } from "../../../serializer/SerializerXml.js"
-import {
-    compareDeepGen,
-    comparePrimitivesGen,
-    Difference
-} from "../../../compare_deep/CompareDeep.js"
 import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
 
@@ -205,6 +204,38 @@ export class AssertionCompare extends Mixin(
                     t                   : this
                 })
             }))
+        }
+
+
+        // PREVIEW
+        assertStructuralDiffEqualityInternal (
+            assertionName   : string,
+            negated         : boolean,
+            value1          : unknown,
+            value2          : unknown,
+            description     : string = ''
+        ) {
+            const difference    = compareDeepDiff(value1, value2/*, this.descriptor.deepCompareConfig*/)
+            const same          = difference instanceof DifferenceSame
+            const passed        = negated ? !same : same
+
+            debugger
+
+            this.addResult(Assertion.new({
+                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                passed,
+                description,
+
+                annotation  : passed ? undefined : negated ? NotEqualAnnotationTemplate.el({
+                    value               : value2,
+                    t                   : this
+                }) : difference.template(/*this.descriptor.serializerConfig*/)
+            }))
+        }
+
+
+        eqDiff<V> (value1 : V, value2 : V, description : string = '') {
+            this.assertStructuralDiffEqualityInternal('eqDiff(received, expected)', false, value1, value2, description)
         }
 
 

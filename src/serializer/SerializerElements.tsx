@@ -25,7 +25,7 @@ export class XmlRendererSerialization extends Mixin(
         ])
 
 
-        print (value : unknown, textBlock? : Partial<TextBlock>, serilizationProps? : Partial<SerializerXml>) : string {
+        printValue (value : unknown, textBlock? : Partial<TextBlock>, serilizationProps? : Partial<SerializerXml>) : string {
             return this.renderToString(SerializerXml.serialize(value, serilizationProps), TextBlock.maybeNew(textBlock))
         }
     }

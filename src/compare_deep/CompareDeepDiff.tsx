@@ -164,7 +164,7 @@ const defaultDeepCompareOptions : DeepCompareOptions = {
 //---------------------------------------------------------------------------------------------------------------------
 // using generator will potentially allow to easily implement "show more differences" button somewhere in the UI
 // UPDATE actually not, since data can mutate since the generator call
-export const compareDeepGen = function (
+export const compareDeepDiff = function (
     v1          : unknown,
     v2          : unknown,
     options     : DeepCompareOptions    = defaultDeepCompareOptions,
@@ -270,7 +270,7 @@ export const compareArrayDeepGen = function (
     for (let i = 0; i < minLength; i++) {
         state.keyPath.push(PathSegment.new({ type : 'array_index', key : i }))
 
-        const difference        = compareDeepGen(array1[ i ], array2[ i ], options, state)
+        const difference        = compareDeepDiff(array1[ i ], array2[ i ], options, state)
 
         if (!(difference instanceof DifferenceSame)) diffNum++
 

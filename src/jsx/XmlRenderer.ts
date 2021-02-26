@@ -61,6 +61,10 @@ export class XmlRenderer extends Mixin(
 
                 return res
             }
+            else if (el.tagName === 'difference_template_root') {
+                return this.renderToTextBlock(el, TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved }))
+                // return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
+            }
             else if (el.tagName === 'serialization') {
                 return this.renderToTextBlock(el, TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved }))
                 // return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })

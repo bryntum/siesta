@@ -10,7 +10,7 @@ const rendererPretty    = XmlRendererSerialization.new({ prettyPrint : true })
 //---------------------------------------------------------------------------------------------------------------------
 it('Should be able to render serialized numbers', async t => {
     t.is(
-        renderer.print(1),
+        renderer.printValue(1),
         "1"
     )
 })
@@ -18,11 +18,11 @@ it('Should be able to render serialized numbers', async t => {
 
 //---------------------------------------------------------------------------------------------------------------------
 it('Should be able to render serialized arrays of numbers', async t => {
-    t.is(renderer.print([]), '[]')
+    t.is(renderer.printValue([]), '[]')
 
-    t.is(renderer.print([ 1, 2, 3 ]), '[1, 2, 3]')
+    t.is(renderer.printValue([ 1, 2, 3 ]), '[1, 2, 3]')
 
-    t.is(rendererPretty.print([ 1, 2, 3 ]),
+    t.is(rendererPretty.printValue([ 1, 2, 3 ]),
 `[
   1,
   2,
@@ -35,7 +35,7 @@ it('Should be able to render serialized arrays of numbers', async t => {
 //---------------------------------------------------------------------------------------------------------------------
 it('Should be able to render objects', async t => {
     t.is(
-        renderer.print({}),
+        renderer.printValue({}),
         `{}`,
         'Empty object stringification'
     )
@@ -43,7 +43,7 @@ it('Should be able to render objects', async t => {
 
     //-----------------
     t.is(
-        renderer.print({ prop1 : { prop2 : 2 }, prop3 : 3 }),
+        renderer.printValue({ prop1 : { prop2 : 2 }, prop3 : 3 }),
         `{ "prop1": { "prop2": 2 }, "prop3": 3 }`,
         'Non-empty, non-pretty object stringification, w/o content wrapping'
     )
@@ -51,7 +51,7 @@ it('Should be able to render objects', async t => {
 
     //-----------------
     t.is(
-        rendererPretty.print({ prop1 : { prop2 : 2 }, prop3 : 3 }),
+        rendererPretty.printValue({ prop1 : { prop2 : 2 }, prop3 : 3 }),
 `{
   "prop1": {
     "prop2": 2
@@ -63,7 +63,7 @@ it('Should be able to render objects', async t => {
 
     //-----------------
     t.is(
-        rendererPretty.print({ prop1 : { prop2 : '1'.repeat(10) } }, { maxLen : 20 }),
+        rendererPretty.printValue({ prop1 : { prop2 : '1'.repeat(10) } }, { maxLen : 20 }),
 `{
   "prop1": {
     "prop2": "111111
