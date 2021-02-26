@@ -33,10 +33,12 @@ it('Should render the diff correctly', async t => {
     t.is(
         renderer.renderToString(difference1.template()),
         [
-            '[    │ │ [   ',
-            '  1, │0│   0,',
-            '  1  │1│   0 ',
-            ']    │ │ ]   '
+            'Received │ │ Expected',
+            '         │ │         ',
+            '[        │ │ [       ',
+            '  1,     │0│   0,    ',
+            '  1      │1│   0     ',
+            ']        │ │ ]       '
         ].join('\n')
     )
 
@@ -45,11 +47,13 @@ it('Should render the diff correctly', async t => {
     t.is(
         renderer.renderToString(difference2.template()),
         [
-            '[          │ │ [  ',
-            '  {        │0│   3',
-            '    "a": 1 │ │    ',
-            '  }        │ │    ',
-            ']          │ │ ]  '
+            'Received   │ │ Expected',
+            '           │ │         ',
+            '[          │ │ [       ',
+            '  {        │0│   3     ',
+            '    "a": 1 │ │         ',
+            '  }        │ │         ',
+            ']          │ │ ]       '
         ].join('\n')
     )
 
@@ -58,14 +62,16 @@ it('Should render the diff correctly', async t => {
     t.is(
         renderer.renderToString(difference3.template()),
         [
-            '[          │ │ [   ',
-            '  {        │0│   3,',
-            '    "a": 1 │ │     ',
-            '  },       │ │     ',
-            '  {        │1│   4 ',
-            '    "b": 2 │ │     ',
-            '  }        │ │     ',
-            ']          │ │ ]   '
+            'Received   │ │ Expected',
+            '           │ │         ',
+            '[          │ │ [       ',
+            '  {        │0│   3,    ',
+            '    "a": 1 │ │         ',
+            '  },       │ │         ',
+            '  {        │1│   4     ',
+            '    "b": 2 │ │         ',
+            '  }        │ │         ',
+            ']          │ │ ]       '
         ].join('\n')
     )
 

@@ -41,6 +41,9 @@ export class XmlRenderingDynamicContextDifference extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// export const NoDiffAnnotationLines  = String.fromCharCode(0)
+
+
 export class RenderingFrameTriplex extends Mixin(
     [ RenderingFrame ],
     (base : ClassUnion<typeof RenderingFrame>) =>
@@ -89,7 +92,12 @@ export class RenderingFrameTriplex extends Mixin(
             const lines         = Array.from(zip3(leftBlock.text, middleBlock.text, rightBlock.text))
 
             lines.forEach(([ leftStr, middleStr, rightStr ], index) => {
-                output.push(leftStr, ` │${middleStr}│ `, rightStr)
+                output.push(
+                    leftStr,
+                    // ` │${ middleStr.toString().indexOf(NoDiffAnnotationLines) !== -1 ? ' '.repeat(middleStr.length) : middleStr }│ `,
+                    ` │${ middleStr }│ `,
+                    rightStr
+                )
 
                 if (index !== lines.length - 1) output.addNewLine()
             })
@@ -118,6 +126,15 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
         const left          = RenderingFrameSequence.new()
         const right         = RenderingFrameSequence.new()
         const middle        = RenderingFrameSequence.new()
+
+        left.write('Received')
+        // middle.write(NoDiffAnnotationLines)
+        middle.write(' ')
+        right.write('Expected');
+
+        [ left, middle, right ].forEach(sequence => {
+            sequence.push(RenderingFrameStartBlock.new(), RenderingFrameStartBlock.new(), RenderingFrameSyncPoint.new())
+        })
 
         super.renderSelf(renderer, left, parentContexts, XmlRenderingDynamicContextDifference.new({ element : this, currentStream : 'left' }))
         super.renderSelf(renderer, right, parentContexts, XmlRenderingDynamicContextDifference.new({ element : this, currentStream : 'right' }))
