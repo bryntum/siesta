@@ -5,6 +5,7 @@ import { Colorer } from "./Colorer.js"
 import { TextBlock } from "./TextBlock.js"
 
 //---------------------------------------------------------------------------------------------------------------------
+// TODO should extend TreeNode ??
 export class RenderingFrame extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>

@@ -1,11 +1,11 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Serializable, serializable } from "../serializable/Serializable.js"
-import { prototypeValue, saneSplit } from "../util/Helpers.js"
+import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { ColoredStringPlain } from "./ColoredString.js"
+import { RenderingFrame, RenderingFrameContent, RenderingFrameSequence, RenderingFrameStartBlock } from "./RenderingFrame.js"
 import { TextJSX } from "./TextJSX.js"
-import { RenderingFrame, RenderingFrameContent, RenderingFrameNoop, RenderingFrameSequence, RenderingFrameStartBlock } from "./RenderingFrame.js"
 import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ export class XmlElement extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Base>) => {
 
     class XmlElement extends base {
-        props           : object
+        props           : { class? : string }
 
         parent          : XmlElement                = undefined
 
@@ -27,15 +27,15 @@ export class XmlElement extends Mixin(
 
         tagName         : string                    = ''
 
-        $attributes     : { [ key : string ] : string } = undefined
+        $attributes     : this[ 'props' ]           = undefined
 
-        get attributes () : { [ key : string ] : string } {
+        get attributes () : this[ 'props' ] {
             if (this.$attributes !== undefined) return this.$attributes
 
             return this.$attributes = {}
         }
 
-        set attributes (value : { [ key : string ] : string }) {
+        set attributes (value : this[ 'props' ]) {
             this.$attributes = value === null ? undefined : value
         }
 
@@ -83,12 +83,12 @@ export class XmlElement extends Mixin(
         }
 
 
-        getAttribute (name : string) : any {
+        getAttribute<T extends keyof this[ 'props' ]> (name : T) : this[ 'props' ][ T ] {
             return this.$attributes ? this.attributes[ name ] : undefined
         }
 
 
-        setAttribute (name : string, value : any) {
+        setAttribute<T extends keyof this[ 'props' ]> (name : T, value : this[ 'props' ][ T ]) {
             this.attributes[ name ] = value
         }
 
@@ -103,22 +103,21 @@ export class XmlElement extends Mixin(
         }
 
 
-        createOwnDynamicContext (parentContexts : XmlRenderingDynamicContext[]) : XmlRenderingDynamicContext {
-            return XmlRenderingDynamicContext.new({ element : this })
-        }
-
-
-        render (renderer : XmlRenderer, dynamicContext : XmlRenderingDynamicContext[] = [])
-            : [ RenderingFrame, ReturnType<this[ 'createOwnDynamicContext' ]> ]
+        render (
+            renderer : XmlRenderer, parentContexts : XmlRenderingDynamicContext[] = []
+        )
+            : [ RenderingFrame, XmlRenderingDynamicContext ]
         {
             const sequence              = RenderingFrameSequence.new()
 
             if (this.getDisplayType(renderer) === 'block') sequence.push(RenderingFrameStartBlock.new())
 
-            const context               = this.createOwnDynamicContext(dynamicContext)
+            //----------------
+            const context               = renderer.createDynamicContext(this, parentContexts)
 
-            this.renderSelf(renderer, sequence, [ ...dynamicContext, context ])
+            this.renderSelf(renderer, sequence, parentContexts, context)
 
+            //----------------
             let frame : RenderingFrame  = sequence
 
             const stylingRules  = renderer.getRulesFor(this)
@@ -129,25 +128,46 @@ export class XmlElement extends Mixin(
             if (this.hasClass('indented'))
                 frame           = frame.indent([ ' '.repeat(renderer.indentLevel) ])
 
-            return [ frame, context as ReturnType<this[ 'createOwnDynamicContext' ]> ]
+            return [ frame, context ]
         }
 
 
-        renderSelf (renderer : XmlRenderer, sequence : RenderingFrameSequence, dynamicContext : XmlRenderingDynamicContext[]) {
-            this.renderChildren(renderer, sequence, dynamicContext)
+        renderSelf (
+            renderer            : XmlRenderer,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContext[],
+            ownContext          : XmlRenderingDynamicContext,
+        ) {
+            this.renderChildren(renderer, sequence, parentContexts, ownContext)
         }
 
 
-        renderChildren (renderer : XmlRenderer, sequence : RenderingFrameSequence, dynamicContext : XmlRenderingDynamicContext[]) {
-            this.childNodes.forEach(child => {
-                sequence.push(isString(child)
-                    ?
-                        RenderingFrameContent.new({ content : ColoredStringPlain.fromString(child) })
-                    :
-                        child.render(renderer, dynamicContext)[ 0 ]
-                )
-            })
+        renderChildren (
+            renderer            : XmlRenderer,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContext[],
+            ownContext          : XmlRenderingDynamicContext,
+        ) {
+            this.childNodes.forEach((child, index) => this.renderChild(child, index, renderer, sequence, parentContexts, ownContext))
         }
+
+
+        renderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRenderer,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContext[],
+            ownContext          : XmlRenderingDynamicContext,
+        ) {
+            sequence.push(isString(child)
+                ?
+                    RenderingFrameContent.new({ content : ColoredStringPlain.fromString(child) })
+                :
+                    child.render(renderer, [ ...parentContexts, ownContext ])[ 0 ]
+            )
+        }
+
     }
 
     return XmlElement

@@ -4,7 +4,7 @@ import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
 import { Visitor } from "../visitor/Visitor.js"
-import { Serialization, SerializationArray, SerializationNumber } from "./SerializerElements.js"
+import { Serialization, SerializationArray, SerializationObject, SerializationReferenceable } from "./SerializerElements.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export const serializationVisitSymbol = Symbol('serializationVisitSymbol')
@@ -83,7 +83,7 @@ export class SerializerXml extends Mixin(
             if (valueReference !== undefined) {
                 this.write(<reference refId={ valueReference }></reference>)
             } else {
-                const alreadyVisitedAs  = this.valueToEl.get(value)
+                const alreadyVisitedAs  = this.valueToEl.get(value) as SerializationReferenceable
 
                 const refCount          = this.refCounter++
 
@@ -118,14 +118,14 @@ export class SerializerXml extends Mixin(
 
 
         visitNumber (value : number, depth : number) {
-            this.write(<SerializationNumber>{ value }</SerializationNumber>)
+            this.write(<number>{ value }</number>)
         }
 
 
         visitString (value : string, depth : number) {
             // we use `'"' +` expressions inside the {} to create a single child node
             // the form `<string>"{}"</string>` would create 3 child nodes
-            this.write(<string>{ '"' + value.replace(/"/g, '\\"').replace(/\n/g, '↵') + '"' }</string>)
+            this.write(<string>{ '"' + value /*.replace(/"/g, '\\"').replace(/\n/g, '↵')*/ + '"' }</string>)
         }
 
 
@@ -145,7 +145,7 @@ export class SerializerXml extends Mixin(
 
 
         visitObject (object : object, depth : number) : any {
-            const objectEl          = <object size={ 0 }></object>
+            const objectEl          = <SerializationObject size={ 0 }></SerializationObject> as any as SerializationObject
 
             const constructorName   = constructorNameOf(object)
 
@@ -164,7 +164,7 @@ export class SerializerXml extends Mixin(
         ) {
             // this should be set inside of the `visitObject` of course, but that would imply
             // an extra call to `Object.entries()`
-            if (index === 0) this.currentElement.setAttribute('size', entries.length)
+            if (index === 0) (this.currentElement as SerializationObject).setAttribute('size', entries.length)
 
             if (index < this.maxWide) {
                 this.push(<object_entry></object_entry>)

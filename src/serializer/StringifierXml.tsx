@@ -2,6 +2,7 @@ import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { TextBlock } from "../jsx/TextBlock.js"
 import { XmlElement } from "../jsx/XmlElement.js"
+import { SerializationReferenceable } from "./SerializerElements.js"
 import { SerializerXml } from "./SerializerXml.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -46,7 +47,7 @@ export class StringifierXml extends Mixin(
         }
 
 
-        checkForReferenceId (el : XmlElement) {
+        checkForReferenceId (el : SerializationReferenceable) {
             const refId = el.getAttribute('refId')
 
             if (refId !== undefined) this.write(`<ref *${ refId }> `)
@@ -64,14 +65,18 @@ export class StringifierXml extends Mixin(
                 this.write(`null`)
             }
             else if (value.tagName === 'reference') {
+                // @ts-ignore
                 this.write(`[Circular *${ value.getAttribute('refId') }]`)
             }
             else if (value.tagName === 'out_of_depth') {
+                // @ts-ignore
                 this.write(`${ this.outOfDepthSymbol } ${ value.getAttribute('constructorName') } { ... }`)
             }
             else if (value.tagName === 'map') {
+                // @ts-ignore
                 this.checkForReferenceId(value)
 
+                // @ts-ignore
                 this.write(`Map (${ value.getAttribute('size') }) {`)
 
                 this.output.indent()
@@ -102,8 +107,10 @@ export class StringifierXml extends Mixin(
                 this.write('}')
             }
             else if (value.tagName === 'set') {
+                // @ts-ignore
                 this.checkForReferenceId(value)
 
+                // @ts-ignore
                 this.write(`Set (${ value.getAttribute('size') }) {`)
 
                 this.output.indent()
@@ -130,6 +137,7 @@ export class StringifierXml extends Mixin(
                 this.write('}')
             }
             else if (value.tagName === 'array') {
+                // @ts-ignore
                 this.checkForReferenceId(value)
                 this.write('[')
 
@@ -141,6 +149,7 @@ export class StringifierXml extends Mixin(
                     const childElement  = childNode as XmlElement
 
                     if (childElement.tagName === 'out_of_wide') {
+                        // @ts-ignore
                         this.write(`... (${ value.getAttribute('length') - value.childNodes.length + 1 } more)`)
                     } else {
                         this.walk(childElement, index, value)
@@ -157,10 +166,12 @@ export class StringifierXml extends Mixin(
                 this.write(']')
             }
             else if (value.tagName === 'object') {
+                // @ts-ignore
                 const className     = value.getAttribute('constructorName')
 
                 if (className && className !== 'Object') this.write(className + ' ')
 
+                // @ts-ignore
                 this.checkForReferenceId(value)
 
                 this.write(`{`)
@@ -173,6 +184,7 @@ export class StringifierXml extends Mixin(
                     const childElement  = childNode as XmlElement
 
                     if (childElement.tagName === 'out_of_wide') {
+                        // @ts-ignore
                         this.write(`... (${ value.getAttribute('size') - value.childNodes.length + 1 } more)`)
                     } else {
                         const keyEl     = childElement.childNodes[ 0 ] as XmlElement

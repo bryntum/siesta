@@ -62,7 +62,7 @@ export class XmlRenderer extends Mixin(
                 return res
             }
             else if (el.tagName === 'serialization') {
-                return this.renderToTextBlock(el)
+                return this.renderToTextBlock(el, TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved }))
                 // return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
             } else {
                 const res           = TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved })
@@ -105,6 +105,7 @@ export class XmlRenderer extends Mixin(
                     }
 
                     if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
+                        // @ts-ignore
                         const attr          = el.getAttribute('isTopLevelLastNode')
 
                         const isLastNode    = attr !== null ? attr && isLast : isLast
@@ -143,6 +144,11 @@ export class XmlRenderer extends Mixin(
             if (el.hasClass('underlined')) rules.push(c => c.underline)
 
             return rules
+        }
+
+
+        createDynamicContext (element : XmlElement, parentContexts : XmlRenderingDynamicContext[]) : XmlRenderingDynamicContext {
+            return XmlRenderingDynamicContext.new({ element })
         }
 
 

@@ -7,7 +7,7 @@ import { PathSegment } from "./CompareDeep.js"
 import {
     DifferenceTemplateArray,
     DifferenceTemplateArrayEntry,
-    DifferenceTemplateDifference,
+    DifferenceTemplateRoot,
     DifferenceTemplateDifferent
 } from "./CompareDeepDiffRendering.js"
 
@@ -24,10 +24,10 @@ export class Difference extends /*TreeNode.mix(*/Base/*)*/ {
     }
 
 
-    template (serializerConfig? : Partial<SerializerXml>) : DifferenceTemplateDifference {
-        return <DifferenceTemplateDifference>
+    template (serializerConfig? : Partial<SerializerXml>) : DifferenceTemplateRoot {
+        return <DifferenceTemplateRoot>
             { this.templateInner(serializerConfig) }
-        </DifferenceTemplateDifference> as DifferenceTemplateDifference
+        </DifferenceTemplateRoot> as DifferenceTemplateRoot
     }
 }
 
