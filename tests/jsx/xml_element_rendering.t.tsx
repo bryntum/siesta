@@ -22,5 +22,4 @@ it('XmlElement rendering should work', async t => {
         </div>),
         `  Some text`
     )
-
 })

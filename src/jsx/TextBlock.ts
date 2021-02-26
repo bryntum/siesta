@@ -193,13 +193,17 @@ export class TextBlock extends Base {
     }
 
 
-    equalizeLineLengthsMut () {
+    equalizeLineLengthsMut (append : boolean = true) {
         const maxLineLength     = this.maxLineLength
 
         this.text.forEach((line, index) => {
             const len       = line.length
 
-            if (len < maxLineLength) line.push(' '.repeat(maxLineLength - len))
+            if (len < maxLineLength)
+                if (append)
+                    line.push(' '.repeat(maxLineLength - len))
+                else
+                    line.unshift(' '.repeat(maxLineLength - len))
         })
     }
 }

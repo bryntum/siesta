@@ -148,7 +148,22 @@ export class XmlElement extends Mixin(
             parentContexts      : XmlRenderingDynamicContext[],
             ownContext          : XmlRenderingDynamicContext,
         ) {
-            this.childNodes.forEach((child, index) => this.renderChild(child, index, renderer, sequence, parentContexts, ownContext))
+            this.childNodes.forEach((child, index) => {
+                this.beforeRenderChild(child, index, renderer, sequence, parentContexts, ownContext)
+                this.renderChild(child, index, renderer, sequence, parentContexts, ownContext)
+                this.afterRenderChild(child, index, renderer, sequence, parentContexts, ownContext)
+            })
+        }
+
+
+        beforeRenderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRenderer,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContext[],
+            ownContext          : XmlRenderingDynamicContext,
+        ) {
         }
 
 
@@ -168,6 +183,16 @@ export class XmlElement extends Mixin(
             )
         }
 
+
+        afterRenderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRenderer,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContext[],
+            ownContext          : XmlRenderingDynamicContext,
+        ) {
+        }
     }
 
     return XmlElement

@@ -27,16 +27,45 @@ it('Deep compare should work ', async t => {
 
 
 it('Should render the diff correctly', async t => {
-
     const renderer      = XmlRendererDifference.new()
-
-    const difference    = compareDeepGen([ 1 ], [ 0 ])
+    const difference1   = compareDeepGen([ 1, 1 ], [ 0, 0 ])
 
     t.is(
-        renderer.renderToString(difference.template()),
-`[      │ │     [
-  1     │0│       0
-]       │ │     ]
-`
+        renderer.renderToString(difference1.template()),
+        [
+            '[    │ │ [   ',
+            '  1, │0│   0,',
+            '  1  │1│   0 ',
+            ']    │ │ ]   '
+        ].join('\n')
+    )
+
+    const difference2   = compareDeepGen([ { a : 1 } ], [ 3 ])
+
+    t.is(
+        renderer.renderToString(difference2.template()),
+        [
+            '[          │ │ [  ',
+            '  {        │0│   3',
+            '    "a": 1 │ │    ',
+            '  }        │ │    ',
+            ']          │ │ ]  '
+        ].join('\n')
+    )
+
+    const difference3   = compareDeepGen([ { a : 1 }, { b : 2 } ], [ 3, 4 ])
+
+    t.is(
+        renderer.renderToString(difference3.template()),
+        [
+            '[          │ │ [   ',
+            '  {        │0│   3,',
+            '    "a": 1 │ │     ',
+            '  },       │ │     ',
+            '  {        │1│   4 ',
+            '    "b": 2 │ │     ',
+            '  }        │ │     ',
+            ']          │ │ ]   '
+        ].join('\n')
     )
 })

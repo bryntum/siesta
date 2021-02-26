@@ -5,6 +5,11 @@ import { Colorer } from "./Colorer.js"
 import { TextBlock } from "./TextBlock.js"
 
 //---------------------------------------------------------------------------------------------------------------------
+export type RenderingProgress   = typeof SyncPoint
+
+export const SyncPoint          = Symbol('SyncPoint')
+
+//---------------------------------------------------------------------------------------------------------------------
 // TODO should extend TreeNode ??
 export class RenderingFrame extends Mixin(
     [ Base ],
@@ -30,6 +35,11 @@ export class RenderingFrame extends Mixin(
         toTextBlock (output : TextBlock) {
             throw new Error("Abstract method")
         }
+
+
+        * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
+            this.toTextBlock(output)
+        }
     }
 ){}
 
@@ -39,7 +49,7 @@ export class RenderingFrameSequence extends Mixin(
     [ RenderingFrame ],
     (base : ClassUnion<typeof RenderingFrame>) =>
 
-    class RenderingFrameNoop extends base {
+    class RenderingFrameSequence extends base {
         sequence        : (MaybeColoredString | RenderingFrame)[]      = []
 
 
@@ -55,6 +65,16 @@ export class RenderingFrameSequence extends Mixin(
                 else
                     output.push(frame)
             })
+        }
+
+
+        * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
+            for (const frame of this.sequence) {
+                if (frame instanceof RenderingFrame)
+                    yield* frame.toTextBlockGen(output)
+                else
+                    output.push(frame)
+            }
         }
 
 
@@ -93,6 +113,12 @@ export class RenderingFrameConcat extends Mixin(
             this.previous.toTextBlock(output)
             this.next.toTextBlock(output)
         }
+
+
+        * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
+            yield* this.previous.toTextBlockGen(output)
+            yield* this.next.toTextBlockGen(output)
+        }
     }
 ){}
 
@@ -112,6 +138,15 @@ export class RenderingFrameColorize extends Mixin(
             output.push(ColoredStringColorToken.new({ token : this.wrappings[ 0 ] }))
 
             this.previous.toTextBlock(output)
+
+            output.push(ColoredStringColorToken.new({ token : this.wrappings[ 1 ] }))
+        }
+
+
+        * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
+            output.push(ColoredStringColorToken.new({ token : this.wrappings[ 0 ] }))
+
+            yield* this.previous.toTextBlockGen(output)
 
             output.push(ColoredStringColorToken.new({ token : this.wrappings[ 1 ] }))
         }
@@ -201,3 +236,19 @@ export class RenderingFrameOutdent extends Mixin(
 ){}
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export class RenderingFrameSyncPoint extends Mixin(
+    [ RenderingFrame ],
+    (base : ClassUnion<typeof RenderingFrame>) =>
+
+    class RenderingFrameSyncPoint extends base {
+
+        toTextBlock (output : TextBlock) {
+        }
+
+
+        * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
+            yield SyncPoint
+        }
+    }
+){}

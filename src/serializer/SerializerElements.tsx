@@ -96,7 +96,7 @@ export class SerializationArray extends Mixin(
         }
 
 
-        renderChild (
+        beforeRenderChild (
             child               : XmlNode,
             index               : number,
             renderer            : XmlRendererSerialization,
@@ -109,9 +109,17 @@ export class SerializationArray extends Mixin(
                     sequence.push(RenderingFrameStartBlock.new())
                 else if (renderer.spaceAfterOpeningBracketArray)
                     sequence.write(' ')
+        }
 
-            super.renderChild(child, index, renderer, sequence, parentContexts, ownContext)
 
+        afterRenderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRendererSerialization,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContext[],
+            ownContext          : XmlRenderingDynamicContext,
+        ) {
             if (index !== this.childNodes.length - 1)
                 sequence.write(renderer.prettyPrint ? ',\n' : renderer.spaceBetweenElements ? ', ' : ',')
             else

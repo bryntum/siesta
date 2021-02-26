@@ -1,9 +1,9 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { zip2 } from "../iterator/Iterator.js"
-import { RenderingFrame, RenderingFrameSequence } from "../jsx/RenderingFrame.js"
+import { zip3 } from "../iterator/Iterator.js"
+import { RenderingFrame, RenderingFrameSequence, RenderingFrameStartBlock, RenderingFrameSyncPoint } from "../jsx/RenderingFrame.js"
 import { TextBlock } from "../jsx/TextBlock.js"
 import { TextJSX } from "../jsx/TextJSX.js"
-import { XmlElement } from "../jsx/XmlElement.js"
+import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
 import { serializable } from "../serializable/Serializable.js"
 import { Serialization, SerializationArray, XmlRendererSerialization } from "../serializer/SerializerElements.js"
@@ -56,18 +56,40 @@ export class RenderingFrameTriplex extends Mixin(
             const rightBlock    = TextBlock.new()
             const middleBlock   = TextBlock.new()
 
-            const blocks        = [ leftBlock, rightBlock, middleBlock ] as [ TextBlock, TextBlock, TextBlock ]
+            const blocks        = [ leftBlock, middleBlock, rightBlock ]
 
-            this.left.toTextBlock(leftBlock)
-            this.right.toTextBlock(rightBlock)
-            this.middle.toTextBlock(middleBlock)
+            const iterators     = [
+                this.left.toTextBlockGen(leftBlock),
+                this.right.toTextBlockGen(rightBlock),
+                this.middle.toTextBlockGen(middleBlock),
+            ]
 
-            blocks.forEach(block => block.equalizeLineLengthsMut())
+            while (true) {
+                const { done : done0 }      = iterators[ 0 ].next()
+                const { done : done1 }      = iterators[ 1 ].next()
+                const { done : done2 }      = iterators[ 2 ].next()
 
-            const lines         = Array.from(zip2(leftBlock.text, rightBlock.text))
+                const allDone               = done0 && done1 && done2
+                const someDone              = done0 || done1 || done2
 
-            lines.forEach(([ leftStr, rightStr ], index) => {
-                output.push(leftStr, ' │ │ ', rightStr)
+                if (someDone && !allDone) throw new Error("Something is wrong")
+
+                if (allDone) break
+
+                const maxLines              = Math.max(...blocks.map(block => block.text.length))
+
+                blocks.forEach(block => {
+                    while (block.text.length < maxLines) block.addNewLine()
+                })
+            }
+
+            [ leftBlock, rightBlock ].forEach(block => block.equalizeLineLengthsMut())
+            middleBlock.equalizeLineLengthsMut(false)
+
+            const lines         = Array.from(zip3(leftBlock.text, middleBlock.text, rightBlock.text))
+
+            lines.forEach(([ leftStr, middleStr, rightStr ], index) => {
+                output.push(leftStr, ` │${middleStr}│ `, rightStr)
 
                 if (index !== lines.length - 1) output.addNewLine()
             })
@@ -90,7 +112,7 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
     renderSelf (
         renderer            : XmlRendererDifference,
         sequence            : RenderingFrameSequence,
-        parentContexts      : XmlRenderingDynamicContext[],
+        parentContexts      : XmlRenderingDynamicContextDifference[],
         ownContext          : XmlRenderingDynamicContextDifference,
     ) {
         const left          = RenderingFrameSequence.new()
@@ -116,6 +138,49 @@ export class DifferenceTemplateArray extends Mixin(
 
     class DifferenceTemplateArray extends base {
         tagName         : string            = 'difference_template_array'
+
+        renderSelf (
+            renderer            : XmlRendererDifference,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContextDifference[],
+            ownContext          : XmlRenderingDynamicContextDifference,
+        ) {
+            if (ownContext.currentStream === 'middle') {
+                sequence.write(' ')
+                sequence.push(RenderingFrameStartBlock.new())
+                super.renderChildren(renderer, sequence, parentContexts, ownContext)
+                sequence.write(' ')
+            } else
+                super.renderSelf(renderer, sequence, parentContexts, ownContext)
+        }
+
+
+        beforeRenderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRendererSerialization,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContextDifference[],
+            ownContext          : XmlRenderingDynamicContextDifference,
+        ) {
+            if (ownContext.currentStream !== 'middle')
+                super.beforeRenderChild(child, index, renderer, sequence, parentContexts, ownContext)
+        }
+
+
+        afterRenderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRendererSerialization,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContextDifference[],
+            ownContext          : XmlRenderingDynamicContextDifference,
+        ) {
+            if (ownContext.currentStream !== 'middle')
+                super.afterRenderChild(child, index, renderer, sequence, parentContexts, ownContext)
+
+            sequence.push(RenderingFrameSyncPoint.new())
+        }
     }
 ){}
 
@@ -129,7 +194,17 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
 
     tagName         : string                = 'difference_template_array_entry'
 
-    index           : number
+    renderSelf (
+        renderer            : XmlRendererDifference,
+        sequence            : RenderingFrameSequence,
+        parentContexts      : XmlRenderingDynamicContextDifference[],
+        ownContext          : XmlRenderingDynamicContextDifference,
+    ) {
+        if (ownContext.currentStream === 'middle')
+            sequence.write(String(this.getAttribute('index')))
+        else
+            super.renderSelf(renderer, sequence, parentContexts, ownContext)
+    }
 }
 
 
