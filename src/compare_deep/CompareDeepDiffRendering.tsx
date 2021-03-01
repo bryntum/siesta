@@ -6,7 +6,7 @@ import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
 import { serializable } from "../serializable/Serializable.js"
-import { Serialization, SerializationArray, XmlRendererSerialization } from "../serializer/SerializerElements.js"
+import { Serialization, SerializationArray, XmlRendererSerialization } from "../serializer/SerializerRendering.js"
 import { lastElement } from "../util/Helpers.js"
 
 

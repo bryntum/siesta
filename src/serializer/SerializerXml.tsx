@@ -11,7 +11,7 @@ import {
     SerializationObject, SerializationOutOfDepth, SerializationReference,
     SerializationReferenceable,
     SerializationSet
-} from "./SerializerElements.js"
+} from "./SerializerRendering.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export const serializationVisitSymbol = Symbol('serializationVisitSymbol')

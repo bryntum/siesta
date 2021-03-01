@@ -1,8 +1,7 @@
 import { it } from "../../index.js"
 import { any, anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src/compare_deep/FuzzyMatcher.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
-import { XmlRendererSerialization } from "../../src/serializer/SerializerElements.js"
-import { StringifierXml } from "../../src/serializer/StringifierXml.js"
+import { XmlRendererSerialization } from "../../src/serializer/SerializerRendering.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 const renderer          = XmlRendererSerialization.new()
