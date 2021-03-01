@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { XmlRendererDifference } from "../../compare_deep/CompareDeepDiffRendering.js"
+import { TextBlock } from "../../jsx/TextBlock.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 
 
@@ -27,7 +28,7 @@ export class Printer extends Mixin(
 
 
         write (el : XmlElement) {
-            this.printLn(this.render(el, this.getMaxLen()).toString())
+            this.printLn(this.renderToString(el, TextBlock.new({ maxLen : this.getMaxLen() })))
         }
     }
 

@@ -2,6 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Colorer } from "../../jsx/Colorer.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
+import { Tree } from "../../jsx/Tree.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { relative } from "../../util/Path.js"
@@ -257,8 +258,8 @@ export class Reporter extends Mixin(
         }
 
 
-        testNodeTemplateXml (testNode : TestNodeResult, isTopLevelLastNode : boolean | null = null, sources : string[]) : XmlElement {
-            let node : XmlElement       = <tree isTopLevelLastNode={ isTopLevelLastNode }></tree>
+        testNodeTemplateXml (testNode : TestNodeResult, isTopLevelLastNode : boolean | undefined = undefined, sources : string[]) : XmlElement {
+            let node : XmlElement       = <Tree isTopLevelLastNode={ isTopLevelLastNode }></Tree>
 
             if (testNode.isRoot) {
                 node.appendChild(this.t.testNodeState(testNode), ' ', this.t.testNodeUrl(testNode))

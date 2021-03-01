@@ -113,9 +113,9 @@ export class TextBlock extends Base {
 
 
     addSameLineText (str : MaybeColoredString) {
+        // push tokens directly, since they have length of 0
         if (str instanceof ColoredStringColorToken) {
-            // TODO this seems wrong - should split on `\n`
-            this.pushToLastLine(str)
+            this.lastLine.push(str)
         } else {
             let sourcePos               = 0
 
@@ -180,17 +180,17 @@ export class TextBlock extends Base {
     }
 
 
-    pullFrom (another : TextBlock) {
-        another.text.forEach((line, index, array) => {
-            if (index === 0) {
-                this.push(line.substr(another.reserved))
-            } else {
-                this.push(line)
-            }
-
-            if (index !== array.length - 1) this.addNewLine()
-        })
-    }
+    // pullFrom (another : TextBlock) {
+    //     another.text.forEach((line, index, array) => {
+    //         if (index === 0) {
+    //             this.push(line.substr(another.reserved))
+    //         } else {
+    //             this.push(line)
+    //         }
+    //
+    //         if (index !== array.length - 1) this.addNewLine()
+    //     })
+    // }
 
 
     toString () : string {
@@ -198,38 +198,38 @@ export class TextBlock extends Base {
     }
 
 
-    colorizeMut (c : Colorer) {
-        this.text   = this.text.map(string => string.colorize(c))
-    }
-
-
-    indentMut (howMany : number, includeMarker : boolean = true) {
-        const indenter              = ' '.repeat(howMany)
-        const indenterWithMarker    = ' '.repeat(howMany - 2) + '· '
-
-        this.text.forEach((line, index) => {
-
-            if (index === 0 && includeMarker) {
-                line.unshift(indenterWithMarker)
-            } else {
-                line.unshift(indenter)
-            }
-        })
-    }
-
-
-    indentAsTreeLeafMut (howMany : number, isLast : boolean, c : Colorer) {
-        const indenterPlain     = ' '.repeat(howMany - 1)
-        const indenterTree      = '─'.repeat(howMany - 1)
-
-        this.text.forEach((line, index) => {
-            if (index === 0) {
-                line.unshift(ColoredStringPlain.fromString(isLast ? '└' + indenterTree : '├' + indenterTree).colorize(c))
-            } else {
-                line.unshift(ColoredStringPlain.fromString(isLast ? ' ' + indenterPlain : '│' + indenterPlain).colorize(c))
-            }
-        })
-    }
+    // colorizeMut (c : Colorer) {
+    //     this.text   = this.text.map(string => string.colorize(c))
+    // }
+    //
+    //
+    // indentMut (howMany : number, includeMarker : boolean = true) {
+    //     const indenter              = ' '.repeat(howMany)
+    //     const indenterWithMarker    = ' '.repeat(howMany - 2) + '· '
+    //
+    //     this.text.forEach((line, index) => {
+    //
+    //         if (index === 0 && includeMarker) {
+    //             line.unshift(indenterWithMarker)
+    //         } else {
+    //             line.unshift(indenter)
+    //         }
+    //     })
+    // }
+    //
+    //
+    // indentAsTreeLeafMut (howMany : number, isLast : boolean, c : Colorer) {
+    //     const indenterPlain     = ' '.repeat(howMany - 1)
+    //     const indenterTree      = '─'.repeat(howMany - 1)
+    //
+    //     this.text.forEach((line, index) => {
+    //         if (index === 0) {
+    //             line.unshift(ColoredStringPlain.fromString(isLast ? '└' + indenterTree : '├' + indenterTree).colorize(c))
+    //         } else {
+    //             line.unshift(ColoredStringPlain.fromString(isLast ? ' ' + indenterPlain : '│' + indenterPlain).colorize(c))
+    //         }
+    //     })
+    // }
 
 
     equalizeLineLengthsMut (append : boolean = true) {

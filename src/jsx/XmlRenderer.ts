@@ -36,99 +36,99 @@ export class XmlRenderer extends Mixin(
         }
 
 
-        isSubBlockIndented (el : XmlElement, node : XmlNode) : boolean {
-            if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {
-                return true
-            }
-
-            if (el.tagName === 'unl' && !isString(node) && node.tagName === 'li') {
-                return true
-            }
-
-            if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
-                return true
-            }
-
-            return false
-        }
-
-
-        render (el : XmlNode, maxLen : number = Number.MAX_SAFE_INTEGER, reserved : number = 0) : TextBlock {
-            if (isString(el)) {
-                const res   = TextBlock.new({ maxLen, reserved })
-
-                res.push(el)
-
-                return res
-            }
-            else if (el.tagName === 'difference_template_root') {
-                return this.renderToTextBlock(el, TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved }))
-                // return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
-            }
-            else if (el.tagName === 'serialization') {
-                return this.renderToTextBlock(el, TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved }))
-                // return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
-            } else {
-                const res           = TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved })
-
-                const isIndented    = el.hasClass('indented')
-
-                if (isIndented) res.indent()
-
-                let context : 'inline' | 'opened_block' | 'closed_block' = 'opened_block'
-
-                el.childNodes.forEach((node, index, array) => {
-                    const isLast        = index === array.length - 1
-
-                    if (this.getDisplayType(node) === 'inline') {
-                        context             = 'inline'
-                    } else {
-                        if (context === 'inline' || context === 'closed_block') {
-                            context         = 'closed_block'
-
-                            res.addNewLine()
-                        } else if (context === 'opened_block') {
-                            context         = 'closed_block'
-                        }
-                    }
-
-                    const block         = this.render(
-                        node,
-                        maxLen
-                            - (this.isSubBlockIndented(el, node) ? this.indentLevel : 0)
-                            - (isIndented ? this.indentLevel : 0),
-                        context === 'inline' ? res.lastLine.length : 0
-                    )
-
-                    if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {
-                        block.indentMut(this.indentLevel, true)
-                    }
-
-                    if (el.tagName === 'unl' && !isString(node) && node.tagName === 'li') {
-                        block.indentMut(this.indentLevel, false)
-                    }
-
-                    if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
-                        // @ts-ignore
-                        const attr          = el.getAttribute('isTopLevelLastNode')
-
-                        const isLastNode    = attr !== null ? attr && isLast : isLast
-
-                        block.indentAsTreeLeafMut(this.indentLevel, isLastNode, this.styles.get('tree_line')(this.c))
-                    }
-
-                    res.pullFrom(block)
-                })
-
-                const rules     = this.getRulesFor(el)
-
-                if (el.hasClass('underlined')) rules.push(c => c.underline)
-
-                if (rules.length > 0) res.colorizeMut(rules.reduce((colorer, rule) => rule(colorer), this.c))
-
-                return res
-            }
-        }
+        // isSubBlockIndented (el : XmlElement, node : XmlNode) : boolean {
+        //     if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {
+        //         return true
+        //     }
+        //
+        //     if (el.tagName === 'unl' && !isString(node) && node.tagName === 'li') {
+        //         return true
+        //     }
+        //
+        //     if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
+        //         return true
+        //     }
+        //
+        //     return false
+        // }
+        //
+        //
+        // render (el : XmlNode, maxLen : number = Number.MAX_SAFE_INTEGER, reserved : number = 0) : TextBlock {
+        //     if (isString(el)) {
+        //         const res   = TextBlock.new({ maxLen, reserved })
+        //
+        //         res.push(el)
+        //
+        //         return res
+        //     }
+        //     else if (el.tagName === 'difference_template_root') {
+        //         return this.renderToTextBlock(el, TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved }))
+        //         // return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
+        //     }
+        //     else if (el.tagName === 'serialization') {
+        //         return this.renderToTextBlock(el, TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved }))
+        //         // return StringifierXml.stringifyToTextBlock(el, { maxLen, prettyPrint : true, indentLevel : this.indentLevel })
+        //     } else {
+        //         const res           = TextBlock.new({ maxLen, indentLevel : this.indentLevel, reserved })
+        //
+        //         const isIndented    = el.hasClass('indented')
+        //
+        //         if (isIndented) res.indent()
+        //
+        //         let context : 'inline' | 'opened_block' | 'closed_block' = 'opened_block'
+        //
+        //         el.childNodes.forEach((node, index, array) => {
+        //             const isLast        = index === array.length - 1
+        //
+        //             if (this.getDisplayType(node) === 'inline') {
+        //                 context             = 'inline'
+        //             } else {
+        //                 if (context === 'inline' || context === 'closed_block') {
+        //                     context         = 'closed_block'
+        //
+        //                     res.addNewLine()
+        //                 } else if (context === 'opened_block') {
+        //                     context         = 'closed_block'
+        //                 }
+        //             }
+        //
+        //             const block         = this.render(
+        //                 node,
+        //                 maxLen
+        //                     - (this.isSubBlockIndented(el, node) ? this.indentLevel : 0)
+        //                     - (isIndented ? this.indentLevel : 0),
+        //                 context === 'inline' ? res.lastLine.length : 0
+        //             )
+        //
+        //             if (el.tagName === 'ul' && !isString(node) && node.tagName === 'li') {
+        //                 block.indentMut(this.indentLevel, true)
+        //             }
+        //
+        //             if (el.tagName === 'unl' && !isString(node) && node.tagName === 'li') {
+        //                 block.indentMut(this.indentLevel, false)
+        //             }
+        //
+        //             if (el.tagName === 'tree' && !isString(node) && node.tagName === 'leaf') {
+        //                 // @ts-ignore
+        //                 const attr          = el.getAttribute('isTopLevelLastNode')
+        //
+        //                 const isLastNode    = attr !== undefined ? attr && isLast : isLast
+        //
+        //                 block.indentAsTreeLeafMut(this.indentLevel, isLastNode, this.styles.get('tree_line')(this.c))
+        //             }
+        //
+        //             res.pullFrom(block)
+        //         })
+        //
+        //         const rules     = this.getRulesFor(el)
+        //
+        //         if (el.hasClass('underlined')) rules.push(c => c.underline)
+        //
+        //         if (rules.length > 0) res.colorizeMut(rules.reduce((colorer, rule) => rule(colorer), this.c))
+        //
+        //         return res
+        //     }
+        // }
 
 
         getDisplayType (el : XmlNode) : 'block' | 'inline' {
