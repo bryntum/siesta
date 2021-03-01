@@ -163,6 +163,7 @@ export const saneSplit = function (str : string, split : string | RegExp) : stri
 export const randomElement = <V>(array : V[]) : V => array[ Math.floor(array.length * Math.random()) ]
 export const lastElement = <V>(array : V[]) : V | undefined => array[ array.length - 1 ]
 
+export type NonEmptyArray<T>    = [ T, ...T[] ]
 
 //---------------------------------------------------------------------------------------------------------------------
 export const escapeRegExp = (source : string) : string => source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')

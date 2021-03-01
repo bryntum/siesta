@@ -3,7 +3,6 @@ import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Serializable, serializable } from "../serializable/Serializable.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { ColoredStringPlain } from "./ColoredString.js"
 import { RenderingFrame, RenderingFrameContent, RenderingFrameSequence, RenderingFrameStartBlock } from "./RenderingFrame.js"
 import { TextJSX } from "./TextJSX.js"
 import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
@@ -11,7 +10,7 @@ import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
 //---------------------------------------------------------------------------------------------------------------------
 export type XmlNode = string | XmlElement
 
-// TODO extend the TreeNode
+// TODO extend the TreeNode ? TreeNode needs to handle the heterogeneous child list then
 
 @serializable()
 export class XmlElement extends Mixin(
@@ -103,6 +102,7 @@ export class XmlElement extends Mixin(
         }
 
 
+        // TODO probably no need to return the tuple now
         render (
             renderer : XmlRenderer, parentContexts : XmlRenderingDynamicContext[] = []
         )
@@ -136,7 +136,7 @@ export class XmlElement extends Mixin(
             renderer            : XmlRenderer,
             sequence            : RenderingFrameSequence,
             parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            ownContext          : XmlRenderingDynamicContext
         ) {
             this.beforeRenderChildren(renderer, sequence, parentContexts, ownContext)
             this.renderChildren(renderer, sequence, parentContexts, ownContext)
@@ -148,7 +148,7 @@ export class XmlElement extends Mixin(
             renderer            : XmlRenderer,
             sequence            : RenderingFrameSequence,
             parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            ownContext          : XmlRenderingDynamicContext
         ) {
         }
 
@@ -157,7 +157,7 @@ export class XmlElement extends Mixin(
             renderer            : XmlRenderer,
             sequence            : RenderingFrameSequence,
             parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            ownContext          : XmlRenderingDynamicContext
         ) {
             this.childNodes.forEach((child, index) => {
                 this.beforeRenderChild(child, index, renderer, sequence, parentContexts, ownContext)
@@ -171,7 +171,7 @@ export class XmlElement extends Mixin(
             renderer            : XmlRenderer,
             sequence            : RenderingFrameSequence,
             parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            ownContext          : XmlRenderingDynamicContext
         ) {
         }
 
@@ -182,7 +182,7 @@ export class XmlElement extends Mixin(
             renderer            : XmlRenderer,
             sequence            : RenderingFrameSequence,
             parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            ownContext          : XmlRenderingDynamicContext
         ) {
         }
 
@@ -193,14 +193,25 @@ export class XmlElement extends Mixin(
             renderer            : XmlRenderer,
             sequence            : RenderingFrameSequence,
             parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            ownContext          : XmlRenderingDynamicContext
         ) {
-            sequence.push(isString(child)
+            sequence.push(this.renderChildInner(child, index, renderer, sequence, parentContexts, ownContext))
+        }
+
+
+        renderChildInner (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRenderer,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContext[],
+            ownContext          : XmlRenderingDynamicContext
+        ) {
+            return isString(child)
                 ?
-                    RenderingFrameContent.new({ content : ColoredStringPlain.fromString(child) })
+                    RenderingFrameContent.new({ content : child })
                 :
                     child.render(renderer, [ ...parentContexts, ownContext ])[ 0 ]
-            )
         }
 
 
@@ -210,7 +221,7 @@ export class XmlElement extends Mixin(
             renderer            : XmlRenderer,
             sequence            : RenderingFrameSequence,
             parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            ownContext          : XmlRenderingDynamicContext
         ) {
         }
     }

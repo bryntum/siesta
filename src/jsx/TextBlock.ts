@@ -1,5 +1,5 @@
 import { Base } from "../class/Base.js"
-import { saneSplit } from "../util/Helpers.js"
+import { lastElement, NonEmptyArray, saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { ColoredString, ColoredStringColorToken, ColoredStringPlain, ColoredStringSum, MaybeColoredString } from "./ColoredString.js"
 import { Colorer } from "./Colorer.js"
@@ -20,9 +20,19 @@ export class TextBlock extends Base {
 
     indentationString       : string            = ''
 
-    currentIndentation      : string            = ''
-
     atNewLine               : boolean           = true
+
+
+    indentationBuffer       : MaybeColoredString[][]    = []
+
+
+    $currentIndentation     : string            = undefined
+
+    get currentIndentation () : string {
+        if (this.$currentIndentation !== undefined) return this.$currentIndentation
+
+        return this.$currentIndentation = this.indentationBuffer.map(buffer => lastElement(buffer)).join('')
+    }
 
 
     initialize (props) {
@@ -41,19 +51,24 @@ export class TextBlock extends Base {
     }
 
 
-    indent () {
-        this.currentIndentation         += this.indentationString
-    }
+    indent (indentWith : NonEmptyArray<MaybeColoredString> = [ this.indentationString ]) {
+        const lengthFirst               = indentWith[ 0 ].length
+        const allIndentsHasSameLength   = indentWith.every(str => str.length === lengthFirst)
 
+        if (!allIndentsHasSameLength) throw new Error("`indentWith` argument should contain array of strings with equal lengths")
 
-    // TODO
-    indentWith (indentWith : MaybeColoredString[]) {
-        this.indent()
+        indentWith.reverse()
+
+        this.indentationBuffer.push(indentWith)
+
+        this.$currentIndentation        = undefined
     }
 
 
     outdent () {
-        this.currentIndentation         = this.currentIndentation.slice(0, this.currentIndentation.length - this.indentLevel)
+        this.indentationBuffer.pop()
+
+        this.$currentIndentation        = undefined
     }
 
 
@@ -73,10 +88,24 @@ export class TextBlock extends Base {
         if (this.atNewLine) {
             this.atNewLine = false
 
-            this.lastLine.push(this.currentIndentation)
+            this.addNewLineInternal()
         }
 
         this.lastLine.push(str)
+    }
+
+
+    addNewLineInternal () {
+        this.lastLine.push(this.currentIndentation)
+
+        if (this.indentationBuffer.length > 0) {
+            const lastIndentation           = lastElement(this.indentationBuffer)
+
+            if (lastIndentation.length > 1) {
+                lastIndentation.pop()
+                this.$currentIndentation    = undefined
+            }
+        }
     }
 
 

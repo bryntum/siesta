@@ -1,5 +1,6 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { NonEmptyArray } from "../util/Helpers.js"
 import { ColoredStringColorToken, MaybeColoredString } from "./ColoredString.js"
 import { Colorer } from "./Colorer.js"
 import { TextBlock } from "./TextBlock.js"
@@ -22,7 +23,7 @@ export class RenderingFrame extends Mixin(
         }
 
 
-        indent (indentWith : MaybeColoredString[]) : RenderingFrame {
+        indent (indentWith : NonEmptyArray<MaybeColoredString>) : RenderingFrame {
             return RenderingFrameIndented.new({ content : this, indentWith })
         }
 
@@ -192,11 +193,11 @@ export class RenderingFrameIndented extends Mixin(
     class RenderingFrameIndented extends base {
         content         : RenderingFrame        = undefined
 
-        indentWith      : MaybeColoredString[]  = []
+        indentWith      : NonEmptyArray<MaybeColoredString>  = undefined
 
 
         toTextBlock (output : TextBlock) {
-            output.indentWith(this.indentWith)
+            output.indent(this.indentWith)
 
             this.content.toTextBlock(output)
 
@@ -212,11 +213,11 @@ export class RenderingFrameIndent extends Mixin(
     (base : ClassUnion<typeof RenderingFrame>) =>
 
     class RenderingFrameIndent extends base {
-        indentWith      : MaybeColoredString[]  = []
+        indentWith      : NonEmptyArray<MaybeColoredString>  = undefined
 
 
         toTextBlock (output : TextBlock) {
-            output.indentWith(this.indentWith)
+            output.indent(this.indentWith)
         }
     }
 ){}
