@@ -1,6 +1,12 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { zip3 } from "../iterator/Iterator.js"
-import { RenderingFrame, RenderingFrameSequence, RenderingFrameStartBlock, RenderingFrameSyncPoint } from "../jsx/RenderingFrame.js"
+import {
+    RenderingFrame,
+    RenderingFrameSequence,
+    RenderingFrameOpenBlock,
+    RenderingFrameSyncPoint,
+    RenderingFrameContent
+} from "../jsx/RenderingFrame.js"
 import { TextBlock } from "../jsx/TextBlock.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
@@ -133,7 +139,7 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
         right.write('Expected');
 
         [ left, middle, right ].forEach(sequence => {
-            sequence.push(RenderingFrameStartBlock.new(), RenderingFrameStartBlock.new(), RenderingFrameSyncPoint.new())
+            sequence.push(RenderingFrameOpenBlock.new(), RenderingFrameContent.new({ content : '\n' }), RenderingFrameSyncPoint.new())
         })
 
         super.renderSelf(renderer, left, parentContexts, XmlRenderingDynamicContextDifference.new({ element : this, currentStream : 'left' }))
@@ -167,7 +173,7 @@ export class DifferenceTemplateArray extends Mixin(
                 super.beforeRenderChildren(renderer, sequence, parentContexts, ownContext)
             else {
                 sequence.write(' ')
-                sequence.push(RenderingFrameStartBlock.new())
+                sequence.push(RenderingFrameOpenBlock.new())
             }
         }
 

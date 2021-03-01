@@ -172,14 +172,28 @@ export class RenderingFrameContent extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class RenderingFrameStartBlock extends Mixin(
+export class RenderingFrameOpenBlock extends Mixin(
     [ RenderingFrame ],
     (base : ClassUnion<typeof RenderingFrame>) =>
 
-    class RenderingFrameStartBlock extends base {
+    class RenderingFrameOpenBlock extends base {
 
         toTextBlock (output : TextBlock) {
-            output.startNewBlock()
+            output.openBlock()
+        }
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class RenderingFrameCloseBlock extends Mixin(
+    [ RenderingFrame ],
+    (base : ClassUnion<typeof RenderingFrame>) =>
+
+    class RenderingFrameCloseBlock extends base {
+
+        toTextBlock (output : TextBlock) {
+            output.closeBlock()
         }
     }
 ){}

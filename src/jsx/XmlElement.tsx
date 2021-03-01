@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Serializable, serializable } from "../serializable/Serializable.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { RenderingFrame, RenderingFrameContent, RenderingFrameSequence, RenderingFrameStartBlock } from "./RenderingFrame.js"
+import { RenderingFrame, RenderingFrameContent, RenderingFrameSequence, RenderingFrameOpenBlock, RenderingFrameCloseBlock } from "./RenderingFrame.js"
 import { TextJSX } from "./TextJSX.js"
 import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
 
@@ -110,7 +110,9 @@ export class XmlElement extends Mixin(
         {
             const sequence              = RenderingFrameSequence.new()
 
-            if (this.getDisplayType(renderer) === 'block') sequence.push(RenderingFrameStartBlock.new())
+            const isBlockLevelElement   = this.getDisplayType(renderer) === 'block'
+
+            if (isBlockLevelElement) sequence.push(RenderingFrameOpenBlock.new())
 
             //----------------
             const context               = renderer.createDynamicContext(this, parentContexts)
@@ -127,6 +129,9 @@ export class XmlElement extends Mixin(
 
             if (this.hasClass('indented'))
                 frame           = frame.indent([ ' '.repeat(renderer.indentLevel) ])
+
+            if (isBlockLevelElement)
+                frame           = frame.concat(RenderingFrameCloseBlock.new())
 
             return [ frame, context ]
         }

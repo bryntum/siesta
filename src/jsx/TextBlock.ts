@@ -22,8 +22,9 @@ export class TextBlock extends Base {
 
     atNewLine               : boolean           = true
 
-
     indentationBuffer       : MaybeColoredString[][]    = []
+
+    context                 : 'inline' | 'opened_block' | 'closed_block' = 'opened_block'
 
 
     $currentIndentation     : string            = undefined
@@ -82,7 +83,7 @@ export class TextBlock extends Base {
     }
 
 
-    pushToLastLineBuffer (str : string | ColoredString) {
+    pushToLastLine (str : MaybeColoredString) {
         if (str.length === 0) return
 
         if (this.atNewLine) {
@@ -92,6 +93,8 @@ export class TextBlock extends Base {
         }
 
         this.lastLine.push(str)
+
+        this.context    = 'inline'
     }
 
 
@@ -109,9 +112,10 @@ export class TextBlock extends Base {
     }
 
 
-    addSameLineText (str : string | ColoredString) {
+    addSameLineText (str : MaybeColoredString) {
         if (str instanceof ColoredStringColorToken) {
-            this.lastLine.push(str)
+            // TODO this seems wrong - should split on `\n`
+            this.pushToLastLine(str)
         } else {
             let sourcePos               = 0
 
@@ -126,7 +130,7 @@ export class TextBlock extends Base {
 
                 const toInsertLength    = toInsert.length
 
-                this.pushToLastLineBuffer(toInsert)
+                this.pushToLastLine(toInsert)
 
                 if (sourcePos + toInsertLength < str.length) this.addNewLine()
 
@@ -143,14 +147,20 @@ export class TextBlock extends Base {
     }
 
 
-    startNewBlock () {
-        const isEmpty       = this.atNewLine && this.text.length === 1
+    // multiple nested open block will result in a single new line
+    openBlock () {
+        if (this.context === 'inline' || this.context === 'closed_block') this.addNewLine()
 
-        !isEmpty && this.addNewLine()
+        this.context = 'opened_block'
     }
 
 
-    push (...strings : (string | ColoredString)[]) {
+    closeBlock () {
+        this.context = 'closed_block'
+    }
+
+
+    push (...strings : MaybeColoredString[]) {
         strings.forEach(string => {
             if (isString(string)) {
                 saneSplit(string, '\n').forEach((str, index, array) => {
@@ -165,7 +175,7 @@ export class TextBlock extends Base {
     }
 
 
-    pushLn (...strings : (string | ColoredString)[]) {
+    pushLn (...strings : MaybeColoredString[]) {
         this.push(...strings, '\n')
     }
 

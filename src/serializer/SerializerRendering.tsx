@@ -1,5 +1,5 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { RenderingFrameIndent, RenderingFrameOutdent, RenderingFrameSequence, RenderingFrameStartBlock } from "../jsx/RenderingFrame.js"
+import { RenderingFrameIndent, RenderingFrameOutdent, RenderingFrameSequence, RenderingFrameOpenBlock } from "../jsx/RenderingFrame.js"
 import { TextBlock } from "../jsx/TextBlock.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { XmlRenderer, XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
@@ -140,7 +140,7 @@ export class SerializationComposite extends Mixin(
         ) {
             if (index === 0)
                 if (renderer.prettyPrint)
-                    sequence.push(RenderingFrameStartBlock.new())
+                    sequence.push(RenderingFrameOpenBlock.new())
                 else if (this.getSpaceAfterOpeningBracket(renderer))
                     sequence.write(' ')
         }
