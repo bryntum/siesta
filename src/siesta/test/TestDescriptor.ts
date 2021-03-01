@@ -54,7 +54,7 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
     @option({ defaultValue : false, group : OptionsGroupTestDescriptor })
     autoCheckGlobals    : boolean
 
-    serializerConfig    : Partial<SerializerXml>        = { maxWide : 10, maxDepth : 4 }
+    serializerConfig    : Partial<SerializerXml>        = { maxBreadth : 10, maxDepth : 4 }
     stringifierConfig   : Partial<StringifierXml>       = { prettyPrint : true }
     deepCompareConfig   : DeepCompareOptions            = {}
 

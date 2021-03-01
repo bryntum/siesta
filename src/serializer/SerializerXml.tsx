@@ -4,7 +4,14 @@ import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
 import { Visitor } from "../visitor/Visitor.js"
-import { Serialization, SerializationArray, SerializationObject, SerializationReferenceable } from "./SerializerElements.js"
+import {
+    Serialization,
+    SerializationArray,
+    SerializationMap,
+    SerializationObject, SerializationOutOfDepth, SerializationReference,
+    SerializationReferenceable,
+    SerializationSet
+} from "./SerializerElements.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export const serializationVisitSymbol = Symbol('serializationVisitSymbol')
@@ -16,7 +23,9 @@ export class SerializerXml extends Mixin(
     (base : ClassUnion<typeof Visitor, typeof Base>) =>
 
     class SerializerXml extends base {
-        maxWide             : number        = Number.MAX_SAFE_INTEGER
+        maxBreadth          : number        = Number.MAX_SAFE_INTEGER
+
+        includeFunctionSources : boolean    = true
 
         outOfWideSymbol     : XmlElement    = <out_of_wide></out_of_wide>
 
@@ -67,7 +76,7 @@ export class SerializerXml extends Mixin(
             if (isAtomicValue(value)) {
                 this.visitAtomicValueEntry(value, depth)
             } else {
-                this.write(<out_of_depth constructorName={ constructorNameOf(value) || typeOf(value) }></out_of_depth>)
+                this.write(<SerializationOutOfDepth constructorName={ constructorNameOf(value) || typeOf(value) }></SerializationOutOfDepth>)
             }
         }
 
@@ -81,7 +90,7 @@ export class SerializerXml extends Mixin(
             const valueReference        = this.references.get(value)
 
             if (valueReference !== undefined) {
-                this.write(<reference refId={ valueReference }></reference>)
+                this.write(<SerializationReference refId={ valueReference }></SerializationReference>)
             } else {
                 const alreadyVisitedAs  = this.valueToEl.get(value) as SerializationReferenceable
 
@@ -91,18 +100,18 @@ export class SerializerXml extends Mixin(
 
                 alreadyVisitedAs.setAttribute('refId', refCount)
 
-                this.write(<reference refId={ refCount }></reference>)
+                this.write(<SerializationReference refId={ refCount }></SerializationReference>)
             }
         }
 
 
         visitUndefined (value : symbol, depth : number) {
-            this.write(<undefined></undefined>)
+            this.write(<undefined>undefined</undefined>)
         }
 
 
         visitNull (value : symbol, depth : number) {
-            this.write(<null></null>)
+            this.write(<null>null</null>)
         }
 
 
@@ -140,7 +149,10 @@ export class SerializerXml extends Mixin(
 
 
         visitFunction (value : Function, depth : number) {
-            this.write(<function>{ functionSources(value) }</function>)
+            if (this.includeFunctionSources)
+                this.write(<function>{ functionSources(value) }</function>)
+            else
+                this.write(<function>[Function]</function>)
         }
 
 
@@ -166,7 +178,7 @@ export class SerializerXml extends Mixin(
             // an extra call to `Object.entries()`
             if (index === 0) (this.currentElement as SerializationObject).setAttribute('size', entries.length)
 
-            if (index < this.maxWide) {
+            if (index < this.maxBreadth) {
                 this.push(<object_entry></object_entry>)
 
                 this.push(<object_entry_key></object_entry_key>)
@@ -181,7 +193,7 @@ export class SerializerXml extends Mixin(
             key : ArbitraryObjectKey, value : unknown, object : object, index : number,
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
         ) {
-            if (index < this.maxWide) {
+            if (index < this.maxBreadth) {
                 this.push(<object_entry_value></object_entry_value>)
 
                 super.visitObjectEntryValue(key, value, object, index, entries, depth)
@@ -189,7 +201,7 @@ export class SerializerXml extends Mixin(
                 this.pop()
                 this.pop()
             }
-            else if (index === this.maxWide)
+            else if (index === this.maxBreadth)
                 this.write(this.outOfWideSymbol)
         }
 
@@ -203,16 +215,16 @@ export class SerializerXml extends Mixin(
         }
 
         visitArrayEntry<V> (value : V, array : V[], index : number, depth : number) {
-            if (index < this.maxWide) {
+            if (index < this.maxBreadth) {
                 super.visitArrayEntry(value, array, index, depth)
             }
-            else if (index === this.maxWide)
+            else if (index === this.maxBreadth)
                 this.write(this.outOfWideSymbol)
         }
 
 
         visitSet (set : Set<unknown>, depth : number) : any {
-            this.push(<set size={ set.size }></set>)
+            this.push(<SerializationSet size={ set.size }></SerializationSet>)
 
             super.visitSet(set, depth)
 
@@ -220,16 +232,16 @@ export class SerializerXml extends Mixin(
         }
 
         visitSetElement<V> (value : V, set : Set<V>, index : number, depth : number) {
-            if (index < this.maxWide) {
+            if (index < this.maxBreadth) {
                 super.visitSetElement(value, set, index, depth)
             }
-            else if (index === this.maxWide)
+            else if (index === this.maxBreadth)
                 this.write(this.outOfWideSymbol)
         }
 
 
         visitMap (map : Map<unknown, unknown>, depth : number) : any {
-            this.push(<map size={ map.size }></map>)
+            this.push(<SerializationMap size={ map.size }></SerializationMap>)
 
             super.visitMap(map, depth)
 
@@ -237,7 +249,7 @@ export class SerializerXml extends Mixin(
         }
 
         visitMapEntryKey<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
-            if (index < this.maxWide) {
+            if (index < this.maxBreadth) {
                 this.push(<map_entry></map_entry>)
 
                 this.push(<map_entry_key></map_entry_key>)
@@ -249,7 +261,7 @@ export class SerializerXml extends Mixin(
         }
 
         visitMapEntryValue<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
-            if (index < this.maxWide) {
+            if (index < this.maxBreadth) {
                 this.push(<map_entry_value></map_entry_value>)
 
                 super.visitMapEntryValue(key, value, map, index, depth)
@@ -257,7 +269,7 @@ export class SerializerXml extends Mixin(
                 this.pop()
                 this.pop()
             }
-            else if (index === this.maxWide)
+            else if (index === this.maxBreadth)
                 this.write(this.outOfWideSymbol)
         }
 

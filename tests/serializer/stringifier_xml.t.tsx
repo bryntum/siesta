@@ -125,7 +125,7 @@ it('Should be able to stringify previously serialized value', async t => {
 it('Should show "out of wide" symbol', async t => {
     //-----------------
     t.is(
-        StringifierXml.print({ prop1 : 1, prop2 : 2, prop3 : 3 }, stringifierConfig, { maxWide : 2 }),
+        StringifierXml.print({ prop1 : 1, prop2 : 2, prop3 : 3 }, stringifierConfig, { maxBreadth : 2 }),
 `{
   "prop1": 1,
   "prop2": 2,
@@ -136,7 +136,7 @@ it('Should show "out of wide" symbol', async t => {
 
     //-----------------
     t.is(
-        StringifierXml.print([ 1, 2, 3 ], stringifierConfig, { maxWide : 2 }),
+        StringifierXml.print([ 1, 2, 3 ], stringifierConfig, { maxBreadth : 2 }),
 `[
   1,
   2,
@@ -147,7 +147,7 @@ it('Should show "out of wide" symbol', async t => {
 
     //-----------------
     t.is(
-        StringifierXml.print(new Set([ 1, 2, 3 ]), stringifierConfig, { maxWide : 2 }),
+        StringifierXml.print(new Set([ 1, 2, 3 ]), stringifierConfig, { maxBreadth : 2 }),
 `Set (3) {
   1,
   2,
@@ -158,7 +158,7 @@ it('Should show "out of wide" symbol', async t => {
 
     //-----------------
     t.is(
-        StringifierXml.print(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]), stringifierConfig, { maxWide : 2 }),
+        StringifierXml.print(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]), stringifierConfig, { maxBreadth : 2 }),
 `Map (3) {
   1 => 1,
   2 => 2,

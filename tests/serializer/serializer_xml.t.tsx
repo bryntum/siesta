@@ -6,9 +6,9 @@ import { SerializerXml } from "../../src/serializer/SerializerXml.js"
 
 
 it('Serialization should work for atoms', async t => {
-    t.equal(SerializerXml.serialize(undefined), <Serialization><undefined></undefined></Serialization>, '`undefined` serialization')
+    t.equal(SerializerXml.serialize(undefined), <Serialization><undefined>undefined</undefined></Serialization>, '`undefined` serialization')
 
-    t.equal(SerializerXml.serialize(null), <Serialization><null></null></Serialization>, '`null` serialization')
+    t.equal(SerializerXml.serialize(null), <Serialization><null>null</null></Serialization>, '`null` serialization')
 
     t.equal(SerializerXml.serialize(false), <Serialization><boolean>false</boolean></Serialization>, 'Boolean serialization')
 
@@ -113,7 +113,7 @@ it('Should not include "out of depth" properties', async t => {
 
 it('Should not include "out of wide" properties', async t => {
     t.equal(
-        SerializerXml.serialize({ prop1 : 1, prop2 : 2, prop3 : 3 }, { maxDepth : 1, maxWide : 2 }),
+        SerializerXml.serialize({ prop1 : 1, prop2 : 2, prop3 : 3 }, { maxDepth : 1, maxBreadth : 2 }),
         <Serialization>
             <object size={ 3 }>
                 <object_entry>
@@ -128,7 +128,7 @@ it('Should not include "out of wide" properties', async t => {
     )
 
     t.equal(
-        SerializerXml.serialize([ 1, 2, 3 ], { maxDepth : 1, maxWide : 2 }),
+        SerializerXml.serialize([ 1, 2, 3 ], { maxDepth : 1, maxBreadth : 2 }),
         <Serialization>
             <SerializationArray length={ 3 }>
                 <number>1</number>
@@ -139,7 +139,7 @@ it('Should not include "out of wide" properties', async t => {
     )
 
     t.equal(
-        SerializerXml.serialize(new Set([ 1, 2, 3 ]), { maxDepth : 1, maxWide : 2 }),
+        SerializerXml.serialize(new Set([ 1, 2, 3 ]), { maxDepth : 1, maxBreadth : 2 }),
         <Serialization>
             <set size={ 3 }>
                 <number>1</number>
@@ -150,7 +150,7 @@ it('Should not include "out of wide" properties', async t => {
     )
 
     t.equal(
-        SerializerXml.serialize(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]), { maxDepth : 1, maxWide : 2 }),
+        SerializerXml.serialize(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]), { maxDepth : 1, maxBreadth : 2 }),
         <Serialization>
             <map size={ 3 }>
                 <map_entry><map_entry_key><number>1</number></map_entry_key><map_entry_value><number>1</number></map_entry_value></map_entry>

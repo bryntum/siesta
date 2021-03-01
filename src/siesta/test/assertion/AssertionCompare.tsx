@@ -536,7 +536,7 @@ export class AnnotationTemplate extends Base {
     get serializerConfig () : Partial<SerializerXml> {
         if (this.$serializerConfig !== undefined) return this.$serializerConfig
 
-        return this.$serializerConfig = this.t ? this.t.descriptor.serializerConfig : { maxDepth : 4, maxWide : 4 }
+        return this.$serializerConfig = this.t ? this.t.descriptor.serializerConfig : { maxDepth : 4, maxBreadth : 4 }
     }
 
     set serializerConfig (value : Partial<SerializerXml>) {

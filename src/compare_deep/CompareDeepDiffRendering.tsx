@@ -156,19 +156,30 @@ export class DifferenceTemplateArray extends Mixin(
     class DifferenceTemplateArray extends base {
         tagName         : string            = 'difference_template_array'
 
-        renderSelf (
-            renderer            : XmlRendererDifference,
+
+        beforeRenderChildren (
+            renderer            : XmlRendererSerialization,
             sequence            : RenderingFrameSequence,
             parentContexts      : XmlRenderingDynamicContextDifference[],
             ownContext          : XmlRenderingDynamicContextDifference,
         ) {
-            if (ownContext.currentStream === 'middle') {
+            if (ownContext.currentStream !== 'middle')
+                super.beforeRenderChildren(renderer, sequence, parentContexts, ownContext)
+            else {
                 sequence.write(' ')
                 sequence.push(RenderingFrameStartBlock.new())
-                super.renderChildren(renderer, sequence, parentContexts, ownContext)
-                sequence.write(' ')
-            } else
-                super.renderSelf(renderer, sequence, parentContexts, ownContext)
+            }
+        }
+
+
+        afterRenderChildren (
+            renderer            : XmlRendererSerialization,
+            sequence            : RenderingFrameSequence,
+            parentContexts      : XmlRenderingDynamicContextDifference[],
+            ownContext          : XmlRenderingDynamicContextDifference,
+        ) {
+            if (ownContext.currentStream !== 'middle')
+                super.afterRenderChildren(renderer, sequence, parentContexts, ownContext)
         }
 
 
