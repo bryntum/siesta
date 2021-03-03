@@ -17,6 +17,28 @@ it('Should correctly render styled elements', async t => {
         </div>),
         `Some text ${ chalk.underline('underlined') }`
     )
+
+    t.is(
+        renderer.renderToString(<div class="indented">
+            Some text
+            <div class="underlined">underlined</div>
+        </div>),
+`  Some text
+  ${ chalk.underline('underlined') }`
+    )
+
+    t.is(
+        renderer.renderToString(<div class="indented">
+            Some text
+            <div class="underlined">
+                <p>underlined1</p>
+                <p>underlined2</p>
+            </div>
+        </div>),
+`  Some text
+  ${ chalk.underline('underlined1') }
+  ${ chalk.underline('underlined2') }`
+    )
 })
 
 

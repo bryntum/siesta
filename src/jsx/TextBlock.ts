@@ -1,69 +1,69 @@
 import { Base } from "../class/Base.js"
 import { lastElement, NonEmptyArray, saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { ColoredStringColorToken, ColoredStringSum, MaybeColoredString } from "./ColoredString.js"
+import { ColoredStringPlain, ColoredStringSum, MaybeColoredString } from "./ColoredString.js"
 import { Colorer } from "./Colorer.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
-export class TextBlockRenderingBuffer extends Base {
-    c               : Colorer           = undefined
-
-    content         : string[]          = []
-
-
-    write (str : MaybeColoredString) {
-        this.content.push(str.toString())
-    }
-
-
-    newLine () {
-        this.content.push('\n')
-    }
-
-
-    toString () : string {
-        const content       = this.content.join('')
-
-        return this.c ? this.c.text(content) : content
-    }
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class TextBlockRendering extends Base {
-
-    buffers : TextBlockRenderingBuffer[]        = [ TextBlockRenderingBuffer.new() ]
-
-
-    get buffer () : TextBlockRenderingBuffer {
-        return lastElement(this.buffers)
-    }
-
-
-    write (str : MaybeColoredString) {
-        if (str instanceof ColoredStringColorToken) {
-            if (str.type === 'open') {
-                this.buffers.push(TextBlockRenderingBuffer.new({ c : str.c }))
-            } else {
-                const buffer        = this.buffer
-
-                this.buffers.pop()
-
-                this.buffer.write(buffer.toString())
-            }
-        } else {
-            this.buffer.write(str)
-        }
-    }
-
-
-    toString () : string {
-        if (this.buffers.length > 1) throw new Error('Incorrect state')
-
-        return this.buffer.toString()
-    }
-}
+// //---------------------------------------------------------------------------------------------------------------------
+// export class TextBlockRenderingBuffer extends Base {
+//     c               : Colorer           = undefined
+//
+//     content         : string[]          = []
+//
+//
+//     write (str : MaybeColoredString) {
+//         this.content.push(str.toString())
+//     }
+//
+//
+//     newLine () {
+//         this.content.push('\n')
+//     }
+//
+//
+//     toString () : string {
+//         const content       = this.content.join('')
+//
+//         return this.c ? this.c.text(content) : content
+//     }
+// }
+//
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export class TextBlockRendering extends Base {
+//
+//     buffers : TextBlockRenderingBuffer[]        = [ TextBlockRenderingBuffer.new() ]
+//
+//
+//     get buffer () : TextBlockRenderingBuffer {
+//         return lastElement(this.buffers)
+//     }
+//
+//
+//     write (str : MaybeColoredString) {
+//         if (str instanceof ColoredStringColorToken) {
+//             if (str.type === 'open') {
+//                 this.buffers.push(TextBlockRenderingBuffer.new({ c : str.c }))
+//             } else {
+//                 const buffer        = this.buffer
+//
+//                 this.buffers.pop()
+//
+//                 this.buffer.write(buffer.toString())
+//             }
+//         } else {
+//             this.buffer.write(str)
+//         }
+//     }
+//
+//
+//     toString () : string {
+//         if (this.buffers.length > 1) throw new Error('Incorrect state')
+//
+//         return this.buffer.toString()
+//     }
+// }
 
 
 
@@ -71,8 +71,8 @@ export class TextBlockRendering extends Base {
 export class TextBlock extends Base {
     maxLen                  : number            = Number.MAX_SAFE_INTEGER
 
-    // reserveChar             : string            = String.fromCharCode(0)
-    // reserved                : number            = 0
+    reserveChar             : string            = String.fromCharCode(0)
+    reserved                : number            = 0
 
     // minContentWidth         : number            = 2
 
@@ -103,7 +103,7 @@ export class TextBlock extends Base {
 
         this.initIndent()
 
-        // this.push(this.reserveChar.repeat(this.reserved))
+        this.push(this.reserveChar.repeat(this.reserved))
     }
 
 
@@ -148,11 +148,7 @@ export class TextBlock extends Base {
     pushToLastLine (str : MaybeColoredString) {
         if (str.length === 0) return
 
-        if (this.atNewLine) {
-            this.atNewLine = false
-
-            this.addNewLineInternal()
-        }
+        this.resolveNewLine()
 
         this.lastLine.push(str)
 
@@ -160,25 +156,30 @@ export class TextBlock extends Base {
     }
 
 
-    addNewLineInternal () {
-        this.lastLine.push(this.currentIndentation)
+    resolveNewLine () {
+        if (this.atNewLine) {
+            this.atNewLine = false
 
-        if (this.indentationBuffer.length > 0) {
-            const lastIndentation           = lastElement(this.indentationBuffer)
+            this.lastLine.push(this.currentIndentation)
 
-            if (lastIndentation.length > 1) {
-                lastIndentation.pop()
-                this.$currentIndentation    = undefined
+            if (this.indentationBuffer.length > 0) {
+                const lastIndentation           = lastElement(this.indentationBuffer)
+
+                if (lastIndentation.length > 1) {
+                    lastIndentation.pop()
+                    this.$currentIndentation    = undefined
+                }
             }
         }
     }
 
 
     addSameLineText (str : MaybeColoredString) {
-        // push tokens directly, since they have length of 0
-        if (str instanceof ColoredStringColorToken) {
-            this.lastLine.push(str)
-        } else {
+        // // push tokens directly, since they have length of 0
+        // if (str instanceof ColoredStringColorToken) {
+        //     this.resolveNewLine()
+        //     this.lastLine.push(str)
+        // } else {
             let sourcePos               = 0
 
             while (sourcePos < str.length) {
@@ -198,7 +199,7 @@ export class TextBlock extends Base {
 
                 sourcePos               += toInsertLength
             }
-        }
+        // }
     }
 
 
@@ -222,6 +223,11 @@ export class TextBlock extends Base {
     }
 
 
+    write (...strings : MaybeColoredString[]) {
+        this.push(...strings)
+    }
+
+
     push (...strings : MaybeColoredString[]) {
         strings.forEach(string => {
             if (isString(string)) {
@@ -242,70 +248,72 @@ export class TextBlock extends Base {
     }
 
 
-    // pullFrom (another : TextBlock) {
-    //     another.text.forEach((line, index, array) => {
-    //         if (index === 0) {
-    //             this.push(line.substr(another.reserved))
-    //         } else {
-    //             this.push(line)
-    //         }
-    //
-    //         if (index !== array.length - 1) this.addNewLine()
-    //     })
-    // }
+    pullFrom (another : TextBlock) {
+        another.text.forEach((line, index, array) => {
+            if (index === 0) {
+                this.push(line.substr(another.reserved))
+            } else {
+                this.push(line)
+            }
 
-
-    toString () : string {
-        const rendering : TextBlockRendering     = TextBlockRendering.new()
-
-        this.text.forEach((line, index) => {
-            line.toStringBuffered(rendering)
-
-            if (index !== this.text.length - 1) rendering.write('\n')
+            if (index !== array.length - 1) this.addNewLine()
         })
-
-        return rendering.toString()
     }
 
 
-    // colorizeMut (c : Colorer) {
-    //     this.text   = this.text.map(string => string.colorize(c))
-    // }
-    //
-    //
-    // indentMut (howMany : number, includeMarker : boolean = true) {
-    //     const indenter              = ' '.repeat(howMany)
-    //     const indenterWithMarker    = ' '.repeat(howMany - 2) + '· '
-    //
-    //     this.text.forEach((line, index) => {
-    //
-    //         if (index === 0 && includeMarker) {
-    //             line.unshift(indenterWithMarker)
-    //         } else {
-    //             line.unshift(indenter)
-    //         }
-    //     })
-    // }
-    //
-    //
-    // indentAsTreeLeafMut (howMany : number, isLast : boolean, c : Colorer) {
-    //     const indenterPlain     = ' '.repeat(howMany - 1)
-    //     const indenterTree      = '─'.repeat(howMany - 1)
-    //
-    //     this.text.forEach((line, index) => {
-    //         if (index === 0) {
-    //             line.unshift(ColoredStringPlain.fromString(isLast ? '└' + indenterTree : '├' + indenterTree).colorize(c))
-    //         } else {
-    //             line.unshift(ColoredStringPlain.fromString(isLast ? ' ' + indenterPlain : '│' + indenterPlain).colorize(c))
-    //         }
-    //     })
-    // }
+    toString () : string {
+        return this.text.map(str => str.toString()).join('\n')
+
+        // const rendering : TextBlockRendering     = TextBlockRendering.new()
+        //
+        // this.text.forEach((line, index) => {
+        //     line.toStringBuffered(rendering)
+        //
+        //     if (index !== this.text.length - 1) rendering.write('\n')
+        // })
+        //
+        // return rendering.toString()
+    }
+
+
+    colorizeMut (c : Colorer) {
+        this.text   = this.text.map(string => string.colorize(c))
+    }
+
+
+    indentMut (howMany : number, includeMarker : boolean = true) {
+        const indenter              = ' '.repeat(howMany)
+        const indenterWithMarker    = ' '.repeat(howMany - 2) + '· '
+
+        this.text.forEach((line, index) => {
+
+            if (index === 0 && includeMarker) {
+                line.unshift(indenterWithMarker)
+            } else {
+                line.unshift(indenter)
+            }
+        })
+    }
+
+
+    indentAsTreeLeafMut (howMany : number, isLast : boolean, c : Colorer) {
+        const indenterPlain     = ' '.repeat(howMany - 1)
+        const indenterTree      = '─'.repeat(howMany - 1)
+
+        this.text.forEach((line, index) => {
+            if (index === 0) {
+                line.unshift(ColoredStringPlain.fromString(isLast ? '└' + indenterTree : '├' + indenterTree, c))
+            } else {
+                line.unshift(ColoredStringPlain.fromString(isLast ? ' ' + indenterPlain : '│' + indenterPlain, c))
+            }
+        })
+    }
 
 
     equalizeLineLengthsMut (append : boolean = true) {
         const maxLineLength     = this.maxLineLength
 
-        this.text.forEach((line, index) => {
+        this.text.forEach(line => {
             const len       = line.length
 
             if (len < maxLineLength)

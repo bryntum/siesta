@@ -1,9 +1,9 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { RenderingFrameIndent, RenderingFrameOutdent, RenderingFrameSequence, RenderingFrameOpenBlock } from "../jsx/RenderingFrame.js"
 import { TextBlock } from "../jsx/TextBlock.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { XmlRenderer, XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
 import { serializable } from "../serializable/Serializable.js"
+import { isString } from "../util/Typeguards.js"
 import { SerializerXml } from "./SerializerXml.js"
 
 
@@ -54,17 +54,12 @@ export class SerializationReferenceable extends Mixin(
         }
 
 
-        beforeRenderChildren (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
-        ) {
+        beforeRenderChildren (renderer : XmlRendererSerialization, output : TextBlock, context : XmlRenderingDynamicContext) {
             const refId     = this.getAttribute('refId')
 
-            if (refId !== undefined) sequence.write(`<ref *${ refId }> `)
+            if (refId !== undefined) output.push(`<ref *${ refId }> `)
 
-            super.beforeRenderChildren(renderer, sequence, parentContexts, ownContext)
+            super.beforeRenderChildren(renderer, output, context)
         }
     }
 ){}
@@ -87,46 +82,42 @@ export class SerializationComposite extends Mixin(
 
 
         renderCompositeHeader (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
         }
 
 
         renderCompositeFooter (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
         }
 
 
         beforeRenderChildren (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
-            super.beforeRenderChildren(renderer, sequence, parentContexts, ownContext)
+            super.beforeRenderChildren(renderer, output, context)
 
-            this.renderCompositeHeader(renderer, sequence, parentContexts, ownContext)
+            this.renderCompositeHeader(renderer, output, context)
 
-            renderer.prettyPrint && sequence.push(RenderingFrameIndent.new())
+            renderer.prettyPrint && output.indent()
         }
 
 
         afterRenderChildren (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
-            renderer.prettyPrint && sequence.push(RenderingFrameOutdent.new())
+            renderer.prettyPrint && output.outdent()
 
-            this.renderCompositeFooter(renderer, sequence, parentContexts, ownContext)
+            this.renderCompositeFooter(renderer, output, context)
         }
 
 
@@ -134,15 +125,14 @@ export class SerializationComposite extends Mixin(
             child               : XmlNode,
             index               : number,
             renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
             if (index === 0)
                 if (renderer.prettyPrint)
-                    sequence.push(RenderingFrameOpenBlock.new())
+                    output.write('\n')
                 else if (this.getSpaceAfterOpeningBracket(renderer))
-                    sequence.write(' ')
+                    output.write(' ')
         }
 
 
@@ -150,14 +140,28 @@ export class SerializationComposite extends Mixin(
             child               : XmlNode,
             index               : number,
             renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
             if (index !== this.childNodes.length - 1)
-                sequence.write(renderer.prettyPrint ? ',\n' : this.getSpaceBetweenElements(renderer) ? ', ' : ',')
+                output.write(renderer.prettyPrint ? ',\n' : this.getSpaceBetweenElements(renderer) ? ', ' : ',')
             else
-                sequence.write(renderer.prettyPrint ? '\n' : this.getSpaceAfterOpeningBracket(renderer) ? ' ' : '')
+                output.write(renderer.prettyPrint ? '\n' : this.getSpaceAfterOpeningBracket(renderer) ? ' ' : '')
+        }
+
+
+        renderChildInner (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRenderer,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
+        ) {
+            if (isString(child)) {
+                output.push(child)
+            } else {
+                child.renderToTextBlock(renderer, output, context)
+            }
         }
     }
 ){}
@@ -183,37 +187,34 @@ export class SerializationArray extends Mixin(
 
 
         renderCompositeHeader (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
-            sequence.write('[')
+            output.write('[')
         }
 
 
         renderCompositeFooter (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
-            sequence.write(']')
+            output.write(']')
         }
 
 
         renderChild (
-            child               : XmlElement,
+            child               : XmlNode,
             index               : number,
             renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
-            if (child.tagName === 'out_of_wide') {
-                sequence.write(`... (${ this.getAttribute('length') - this.childNodes.length + 1 } more)`)
+            if (!isString(child) && child.tagName.toLowerCase() === 'out_of_wide') {
+                output.write(`... (${ this.getAttribute('length') - this.childNodes.length + 1 } more)`)
             } else {
-                super.renderChild(child, index, renderer, sequence, parentContexts, ownContext)
+                super.renderChild(child, index, renderer, output, context)
             }
         }
     }
@@ -241,54 +242,54 @@ export class SerializationObject extends Mixin(
 
 
         renderCompositeHeader (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
             const className     = this.getAttribute('constructorName')
 
-            if (className && className !== 'Object') sequence.write(className + ' ')
+            if (className && className !== 'Object') output.write(className + ' ')
 
-            sequence.write('{')
+            output.write('{')
         }
 
 
         renderCompositeFooter (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
-            sequence.write('}')
+            output.write('}')
         }
 
 
         renderChild (
-            child               : XmlElement,
+            child               : XmlNode,
             index               : number,
             renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
-            if (child.tagName === 'out_of_wide') {
-                sequence.write(`... (${ this.getAttribute('size') - this.childNodes.length + 1 } more)`)
+            if (isString(child)) {
+                super.renderChild(child, index, renderer, output, context)
+            }
+            else if (child.tagName === 'out_of_wide') {
+                output.write(`... (${ this.getAttribute('size') - this.childNodes.length + 1 } more)`)
             } else {
                 const keyEl         = child.childNodes[ 0 ] as XmlElement
                 const valueEl       = child.childNodes[ 1 ] as XmlElement
 
-                sequence.push(keyEl.render(renderer, [ ...parentContexts, ownContext ])[ 0 ])
+                this.renderChildInner(keyEl.childNodes[ 0 ], index, renderer, output, context)
 
-                sequence.write(': ')
+                output.write(': ')
 
                 const valueIsAtomic     = renderer.leafNodes.has((valueEl.childNodes[ 0 ] as XmlElement).tagName)
 
-                if (valueIsAtomic && renderer.prettyPrint) sequence.push(RenderingFrameIndent.new())
+                if (valueIsAtomic && renderer.prettyPrint) output.indent()
 
-                sequence.push(valueEl.render(renderer, [ ...parentContexts, ownContext ])[ 0 ])
+                this.renderChildInner(valueEl.childNodes[ 0 ], index, renderer, output, context)
 
-                if (valueIsAtomic && renderer.prettyPrint) sequence.push(RenderingFrameOutdent.new())
+                if (valueIsAtomic && renderer.prettyPrint) output.outdent()
             }
         }
     }
@@ -315,37 +316,34 @@ export class SerializationSet extends Mixin(
 
 
         renderCompositeHeader (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
-            sequence.write(`Set (${ this.getAttribute('size') }) {`)
+            output.write(`Set (${ this.getAttribute('size') }) {`)
         }
 
 
         renderCompositeFooter (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
-            sequence.write('}')
+            output.write('}')
         }
 
 
         renderChild (
-            child               : XmlElement,
+            child               : XmlNode,
             index               : number,
             renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
-            if (child.tagName === 'out_of_wide') {
-                sequence.write(`...`)
+            if (!isString(child) && child.tagName === 'out_of_wide') {
+                output.write(`...`)
             } else {
-                super.renderChild(child, index, renderer, sequence, parentContexts, ownContext)
+                super.renderChild(child, index, renderer, output, context)
             }
         }
     }
@@ -372,50 +370,50 @@ export class SerializationMap extends Mixin(
 
 
         renderCompositeHeader (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
-            sequence.write(`Map (${ this.getAttribute('size') }) {`)
+            output.write(`Map (${ this.getAttribute('size') }) {`)
         }
 
 
         renderCompositeFooter (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
-            sequence.write('}')
+            output.write('}')
         }
 
 
         renderChild (
-            child               : XmlElement,
+            child               : XmlNode,
             index               : number,
             renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
-            if (child.tagName === 'out_of_wide') {
-                sequence.write(`...`)
+            if (isString(child)) {
+                super.renderChild(child, index, renderer, output, context)
+            }
+            else if (child.tagName === 'out_of_wide') {
+                output.write(`...`)
             } else {
                 const keyEl         = child.childNodes[ 0 ] as XmlElement
                 const valueEl       = child.childNodes[ 1 ] as XmlElement
 
-                sequence.push(keyEl.render(renderer, [ ...parentContexts, ownContext ])[ 0 ])
+                this.renderChildInner(keyEl.childNodes[ 0 ], index, renderer, output, context)
 
-                sequence.write(' => ')
+                output.write(' => ')
 
                 const valueIsAtomic     = renderer.leafNodes.has((valueEl.childNodes[ 0 ] as XmlElement).tagName)
 
-                if (valueIsAtomic && renderer.prettyPrint) sequence.push(RenderingFrameIndent.new())
+                if (valueIsAtomic && renderer.prettyPrint) output.indent()
 
-                sequence.push(valueEl.render(renderer, [ ...parentContexts, ownContext ])[ 0 ])
+                this.renderChildInner(valueEl.childNodes[ 0 ], index, renderer, output, context)
 
-                if (valueIsAtomic && renderer.prettyPrint) sequence.push(RenderingFrameOutdent.new())
+                if (valueIsAtomic && renderer.prettyPrint) output.outdent()
             }
         }
     }
@@ -437,12 +435,11 @@ export class SerializationOutOfDepth extends Mixin(
 
 
         renderSelf (
-            renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer        : XmlRenderer,
+            output          : TextBlock,
+            context         : XmlRenderingDynamicContext
         ) {
-            sequence.write(`▼ ${ this.getAttribute('constructorName') ?? '' } { ... }`)
+            output.write(`▼ ${ this.getAttribute('constructorName') ?? '' } { ... }`)
         }
     }
 ){}
@@ -463,12 +460,11 @@ export class SerializationReference extends Mixin(
 
 
         renderSelf (
-            renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
+            renderer        : XmlRenderer,
+            output          : TextBlock,
+            context         : XmlRenderingDynamicContext
         ) {
-            sequence.write(`[Circular *${ this.getAttribute('refId') }]`)
+            output.write(`[Circular *${ this.getAttribute('refId') }]`)
         }
     }
 ){}

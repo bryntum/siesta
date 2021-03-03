@@ -151,8 +151,8 @@ export class XmlRenderer extends Mixin(
         }
 
 
-        createDynamicContext (element : XmlElement, parentContexts : XmlRenderingDynamicContext[]) : XmlRenderingDynamicContext {
-            return XmlRenderingDynamicContext.new({ element })
+        createDynamicContext (element : XmlElement, parentContext : XmlRenderingDynamicContext) : XmlRenderingDynamicContext {
+            return XmlRenderingDynamicContext.new({ parentContext, element })
         }
 
 
@@ -163,7 +163,7 @@ export class XmlRenderer extends Mixin(
 
 
         renderToTextBlock (el : XmlElement, textBlock : TextBlock = TextBlock.new()) : TextBlock {
-            el.render(this)[ 0 ].toTextBlock(textBlock)
+            el.renderToTextBlock(this, textBlock)
 
             return textBlock
         }
@@ -177,6 +177,8 @@ export class XmlRenderingDynamicContext extends Mixin(
     (base : ClassUnion<typeof XmlRenderer>) =>
 
     class XmlRenderingDynamicContext extends base {
+        parentContext   : this              = undefined
+
         element         : XmlElement        = undefined
     }
 ){}

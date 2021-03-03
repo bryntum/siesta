@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { NonEmptyArray } from "../util/Helpers.js"
-import { ColoredStringColorToken, MaybeColoredString } from "./ColoredString.js"
+import { MaybeColoredString } from "./ColoredString.js"
 import { Colorer } from "./Colorer.js"
 import { TextBlock } from "./TextBlock.js"
 
@@ -136,20 +136,20 @@ export class RenderingFrameColorize extends Mixin(
 
 
         toTextBlock (output : TextBlock) {
-            output.push(ColoredStringColorToken.new({ type : 'open', c : this.c /*token : this.wrappings[ 0 ]*/ }))
-
-            this.previous.toTextBlock(output)
-
-            output.push(ColoredStringColorToken.new({ type : 'close', c : this.c /*token : this.wrappings[ 1 ]*/ }))
+            // output.push(ColoredStringColorToken.new({ type : 'open', c : this.c /*token : this.wrappings[ 0 ]*/ }))
+            //
+            // this.previous.toTextBlock(output)
+            //
+            // output.push(ColoredStringColorToken.new({ type : 'close', c : this.c /*token : this.wrappings[ 1 ]*/ }))
         }
 
 
         * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
-            output.push(ColoredStringColorToken.new({ type : 'open', c : this.c /*token : this.wrappings[ 0 ]*/ }))
-
-            yield* this.previous.toTextBlockGen(output)
-
-            output.push(ColoredStringColorToken.new({ type : 'close', c : this.c /*token : this.wrappings[ 1 ]*/ }))
+            // output.push(ColoredStringColorToken.new({ type : 'open', c : this.c /*token : this.wrappings[ 0 ]*/ }))
+            //
+            // yield* this.previous.toTextBlockGen(output)
+            //
+            // output.push(ColoredStringColorToken.new({ type : 'close', c : this.c /*token : this.wrappings[ 1 ]*/ }))
         }
     }
 ){}

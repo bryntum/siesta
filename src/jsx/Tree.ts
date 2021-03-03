@@ -1,10 +1,9 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { serializable } from "../serializable/Serializable.js"
 import { isString } from "../util/Typeguards.js"
-import { ColoredStringPlain } from "./ColoredString.js"
-import { RenderingFrameSequence } from "./RenderingFrame.js"
+import { TextBlock } from "./TextBlock.js"
 import { XmlElement, XmlNode } from "./XmlElement.js"
-import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
+import { XmlRenderer } from "./XmlRenderer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -20,34 +19,21 @@ export class Tree extends Mixin(
             isTopLevelLastNode?     : boolean
         }
 
-        renderChildInner (
-            child               : XmlNode,
-            index               : number,
-            renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
-        ) {
-            const frame     = super.renderChildInner(child, index, renderer, sequence, parentContexts, ownContext)
 
+        isChildIndented (child : XmlNode) : boolean {
+            return super.isChildIndented(child) || !isString(child) && child.tagName.toLowerCase() === 'leaf'
+        }
+
+
+        indentChildOutput (renderer : XmlRenderer, child : XmlNode, index : number, output : TextBlock) : TextBlock {
             const isTopLevelLastNode    = this.getAttribute('isTopLevelLastNode')
 
-            if (isString(child) )
-                return frame
-            else if (child.tagName.toLowerCase() !== 'leaf')
-                return frame
-            else {
-                const isLastNode        = index === this.childNodes.length - 1
-                const isLast            = isTopLevelLastNode !== undefined ? isLastNode && isTopLevelLastNode : isLastNode
+            const isLastNode            = index === this.childNodes.length - 1
+            const isLast                = isTopLevelLastNode !== undefined ? isLastNode && isTopLevelLastNode : isLastNode
 
-                const indenterPlain     = ' '.repeat(renderer.indentLevel - 1)
-                const indenterTree      = '─'.repeat(renderer.indentLevel - 1)
+            output.indentAsTreeLeafMut(renderer.indentLevel, isLast, renderer.styles.get('tree_line')(renderer.c))
 
-                return frame.indent([
-                    ColoredStringPlain.fromString(isLast ? '└' + indenterTree : '├' + indenterTree, renderer.styles.get('tree_line')(renderer.c)),
-                    ColoredStringPlain.fromString(isLast ? ' ' + indenterPlain : '│' + indenterPlain, renderer.styles.get('tree_line')(renderer.c))
-                ])
-            }
+            return output
         }
     }
 ) {}

@@ -1,9 +1,9 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { serializable } from "../serializable/Serializable.js"
 import { isString } from "../util/Typeguards.js"
-import { RenderingFrameSequence } from "./RenderingFrame.js"
+import { TextBlock } from "./TextBlock.js"
 import { XmlElement, XmlNode } from "./XmlElement.js"
-import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
+import { XmlRenderer } from "./XmlRenderer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -16,24 +16,15 @@ export class UL extends Mixin(
         tagName         : string            = 'ul'
 
 
-        renderChildInner (
-            child               : XmlNode,
-            index               : number,
-            renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext,
-        ) {
-            const frame     = super.renderChildInner(child, index, renderer, sequence, parentContexts, ownContext)
+        isChildIndented (child : XmlNode) : boolean {
+            return super.isChildIndented(child) || !isString(child) && child.tagName.toLowerCase() === 'li'
+        }
 
-            return !isString(child) && child.tagName.toLowerCase() === 'li'
-                ?
-                    frame.indent([
-                        ' '.repeat(renderer.indentLevel - 2) + '· ',
-                        ' '.repeat(renderer.indentLevel)
-                    ])
-                :
-                    frame
+
+        indentChildOutput (renderer : XmlRenderer, child : XmlNode, index : number, output : TextBlock) : TextBlock {
+            output.indentMut(renderer.indentLevel, true)
+
+            return output
         }
     }
 ) {}

@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Serializable, serializable } from "../serializable/Serializable.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { RenderingFrame, RenderingFrameContent, RenderingFrameSequence, RenderingFrameOpenBlock, RenderingFrameCloseBlock } from "./RenderingFrame.js"
+import { TextBlock } from "./TextBlock.js"
 import { TextJSX } from "./TextJSX.js"
 import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
 
@@ -102,82 +102,96 @@ export class XmlElement extends Mixin(
         }
 
 
-        // TODO probably no need to return the tuple now
-        render (
-            renderer : XmlRenderer, parentContexts : XmlRenderingDynamicContext[] = []
-        )
-            : [ RenderingFrame, XmlRenderingDynamicContext ]
-        {
-            const sequence              = RenderingFrameSequence.new()
+        isChildIndented (child : XmlNode) : boolean {
+            return this.hasClass('indented')
+        }
 
-            const isBlockLevelElement   = this.getDisplayType(renderer) === 'block'
 
-            if (isBlockLevelElement) sequence.push(RenderingFrameOpenBlock.new())
+        indentChildOutput (renderer : XmlRenderer, child : XmlNode, index : number, output : TextBlock) : TextBlock {
+            output.indentMut(renderer.indentLevel, false)
 
-            //----------------
-            const context               = renderer.createDynamicContext(this, parentContexts)
+            return output
+        }
 
-            this.renderSelf(renderer, sequence, parentContexts, context)
+        // // TODO probably no need to return the tuple now
+        // render (
+        //     renderer : XmlRenderer, parentContexts : XmlRenderingDynamicContext[] = []
+        // )
+        //     : [ RenderingFrame, XmlRenderingDynamicContext ]
+        // {
+        //     const sequence              = RenderingFrameSequence.new()
+        //
+        //     const isBlockLevelElement   = this.getDisplayType(renderer) === 'block'
+        //
+        //     if (isBlockLevelElement) sequence.push(RenderingFrameOpenBlock.new())
+        //
+        //     //----------------
+        //     const context               = renderer.createDynamicContext(this, parentContexts)
+        //
+        //     this.renderSelf(renderer, sequence, parentContexts, context)
+        //
+        //     //----------------
+        //     let frame : RenderingFrame  = sequence
+        //
+        //     const stylingRules  = renderer.getRulesFor(this)
+        //
+        //     if (stylingRules.length > 0)
+        //         frame           = frame.colorize(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
+        //
+        //     if (this.hasClass('indented'))
+        //         frame           = frame.indent([ ' '.repeat(renderer.indentLevel) ])
+        //
+        //     if (isBlockLevelElement)
+        //         frame           = frame.concat(RenderingFrameCloseBlock.new())
+        //
+        //     return [ frame, context ]
+        // }
 
-            //----------------
-            let frame : RenderingFrame  = sequence
+
+        renderToTextBlock (renderer : XmlRenderer, output : TextBlock, parentContext? : XmlRenderingDynamicContext) {
+            const context               = renderer.createDynamicContext(this, parentContext)
+
+            this.renderSelf(renderer, output, context)
 
             const stylingRules  = renderer.getRulesFor(this)
 
             if (stylingRules.length > 0)
-                frame           = frame.colorize(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
+                output.colorizeMut(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
 
-            if (this.hasClass('indented'))
-                frame           = frame.indent([ ' '.repeat(renderer.indentLevel) ])
-
-            if (isBlockLevelElement)
-                frame           = frame.concat(RenderingFrameCloseBlock.new())
-
-            return [ frame, context ]
+            // if (this.hasClass('indented'))
+            //     output.indent([ ' '.repeat(renderer.indentLevel) ])
         }
 
 
         renderSelf (
-            renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext
+            renderer        : XmlRenderer,
+            output          : TextBlock,
+            context         : XmlRenderingDynamicContext
         ) {
-            this.beforeRenderChildren(renderer, sequence, parentContexts, ownContext)
-            this.renderChildren(renderer, sequence, parentContexts, ownContext)
-            this.afterRenderChildren(renderer, sequence, parentContexts, ownContext)
+            this.beforeRenderChildren(renderer, output, context)
+            this.renderChildren(renderer, output, context)
+            this.afterRenderChildren(renderer, output, context)
         }
 
 
         beforeRenderChildren (
-            renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext
+            renderer    : XmlRenderer,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
         ) {
         }
 
 
-        renderChildren (
-            renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext
-        ) {
+        renderChildren (renderer : XmlRenderer, output : TextBlock, context : XmlRenderingDynamicContext) {
             this.childNodes.forEach((child, index) => {
-                this.beforeRenderChild(child, index, renderer, sequence, parentContexts, ownContext)
-                this.renderChild(child, index, renderer, sequence, parentContexts, ownContext)
-                this.afterRenderChild(child, index, renderer, sequence, parentContexts, ownContext)
+                this.beforeRenderChild(child, index, renderer, output, context)
+                this.renderChild(child, index, renderer, output, context)
+                this.afterRenderChild(child, index, renderer, output, context)
             })
         }
 
 
-        afterRenderChildren (
-            renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext
-        ) {
+        afterRenderChildren (renderer : XmlRenderer, output : TextBlock, context : XmlRenderingDynamicContext) {
         }
 
 
@@ -185,9 +199,8 @@ export class XmlElement extends Mixin(
             child               : XmlNode,
             index               : number,
             renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
         }
 
@@ -196,11 +209,10 @@ export class XmlElement extends Mixin(
             child               : XmlNode,
             index               : number,
             renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
-            sequence.push(this.renderChildInner(child, index, renderer, sequence, parentContexts, ownContext))
+            this.renderChildInner(child, index, renderer, output, context)
         }
 
 
@@ -208,15 +220,30 @@ export class XmlElement extends Mixin(
             child               : XmlNode,
             index               : number,
             renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
-            return isString(child)
-                ?
-                    RenderingFrameContent.new({ content : child })
-                :
-                    child.render(renderer, [ ...parentContexts, ownContext ])[ 0 ]
+            const isBlockLevel      = isString(child) ? false : child.getDisplayType(renderer) === 'block'
+            const isChildIndented   = this.isChildIndented(child)
+
+            const childBlock    = TextBlock.new({
+                maxLen      : output.maxLen - (isChildIndented ? renderer.indentLevel : 0),
+                reserved    : isBlockLevel ? 0 : output.lastLine.length
+            })
+
+            if (isString(child)) {
+                childBlock.push(child)
+            } else {
+                child.renderToTextBlock(renderer, childBlock, context)
+            }
+
+            if (isChildIndented) this.indentChildOutput(renderer, child, index, childBlock)
+
+            if (isBlockLevel) output.openBlock()
+
+            output.pullFrom(childBlock)
+
+            if (isBlockLevel) output.closeBlock()
         }
 
 
@@ -224,9 +251,8 @@ export class XmlElement extends Mixin(
             child               : XmlNode,
             index               : number,
             renderer            : XmlRenderer,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContext[],
-            ownContext          : XmlRenderingDynamicContext
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContext
         ) {
         }
     }
@@ -247,8 +273,8 @@ export const escapeXml = (xmlStr : string) : string => xmlStr.replace(/[&<>"']/g
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// TODO should probably be the opposite - Element extends Fragment
-//  (fragment only has childNodes, element adds the "shell" - tag name and attributes)
+// TODO should probably be the opposite - Element should extend Fragment
+//  (fragment only has child nodes, element adds the "shell" - tag name and attributes)
 export class XmlFragment extends Mixin(
     [ XmlElement ],
     (base : ClassUnion<typeof XmlElement>) =>

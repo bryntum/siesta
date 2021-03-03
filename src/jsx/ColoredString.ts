@@ -1,7 +1,6 @@
 import { Base } from "../class/Base.js"
 import { isString } from "../util/Typeguards.js"
 import { Colorer } from "./Colorer.js"
-import { TextBlockRendering } from "./TextBlock.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type MaybeColoredString  = string | ColoredString
@@ -19,9 +18,9 @@ export class ColoredString extends Base {
     }
 
 
-    toStringBuffered (buffer : TextBlockRendering) {
-        buffer.write(this)
-    }
+    // toStringBuffered (buffer : TextBlockRendering) {
+    //     buffer.write(this)
+    // }
 
 
     colorize (c : Colorer) : ColoredString {
@@ -67,27 +66,27 @@ export class ColoredStringPlain extends ColoredString {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
-export class ColoredStringColorToken extends ColoredString {
-    c               : Colorer           = undefined
-
-    type            : 'open' | 'close'  = 'open'
-
-
-    get length () : number {
-        return 0
-    }
-
-
-    toString () : string {
-        return ''
-    }
-
-
-    substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
-        return this
-    }
-}
+// //---------------------------------------------------------------------------------------------------------------------
+// export class ColoredStringColorToken extends ColoredString {
+//     c               : Colorer           = undefined
+//
+//     type            : 'open' | 'close'  = 'open'
+//
+//
+//     get length () : number {
+//         return 0
+//     }
+//
+//
+//     toString () : string {
+//         return ''
+//     }
+//
+//
+//     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
+//         return this
+//     }
+// }
 
 
 
@@ -134,9 +133,9 @@ export class ColoredStringSum extends ColoredString {
     }
 
 
-    toStringBuffered (buffer : TextBlockRendering) {
-        this.strings.forEach(string => isString(string) ? buffer.write(string) : string.toStringBuffered(buffer))
-    }
+    // toStringBuffered (buffer : TextBlockRendering) {
+    //     this.strings.forEach(string => isString(string) ? buffer.write(string) : string.toStringBuffered(buffer))
+    // }
 
 
     push (string : string | ColoredString) {
