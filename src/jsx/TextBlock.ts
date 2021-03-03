@@ -1,16 +1,78 @@
 import { Base } from "../class/Base.js"
 import { lastElement, NonEmptyArray, saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { ColoredString, ColoredStringColorToken, ColoredStringPlain, ColoredStringSum, MaybeColoredString } from "./ColoredString.js"
+import { ColoredStringColorToken, ColoredStringSum, MaybeColoredString } from "./ColoredString.js"
 import { Colorer } from "./Colorer.js"
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class TextBlockRenderingBuffer extends Base {
+    c               : Colorer           = undefined
+
+    content         : string[]          = []
+
+
+    write (str : MaybeColoredString) {
+        this.content.push(str.toString())
+    }
+
+
+    newLine () {
+        this.content.push('\n')
+    }
+
+
+    toString () : string {
+        const content       = this.content.join('')
+
+        return this.c ? this.c.text(content) : content
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class TextBlockRendering extends Base {
+
+    buffers : TextBlockRenderingBuffer[]        = [ TextBlockRenderingBuffer.new() ]
+
+
+    get buffer () : TextBlockRenderingBuffer {
+        return lastElement(this.buffers)
+    }
+
+
+    write (str : MaybeColoredString) {
+        if (str instanceof ColoredStringColorToken) {
+            if (str.type === 'open') {
+                this.buffers.push(TextBlockRenderingBuffer.new({ c : str.c }))
+            } else {
+                const buffer        = this.buffer
+
+                this.buffers.pop()
+
+                this.buffer.write(buffer.toString())
+            }
+        } else {
+            this.buffer.write(str)
+        }
+    }
+
+
+    toString () : string {
+        if (this.buffers.length > 1) throw new Error('Incorrect state')
+
+        return this.buffer.toString()
+    }
+}
+
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TextBlock extends Base {
     maxLen                  : number            = Number.MAX_SAFE_INTEGER
 
-    reserveChar             : string            = String.fromCharCode(0)
-    reserved                : number            = 0
+    // reserveChar             : string            = String.fromCharCode(0)
+    // reserved                : number            = 0
 
     // minContentWidth         : number            = 2
 
@@ -41,7 +103,7 @@ export class TextBlock extends Base {
 
         this.initIndent()
 
-        this.push(this.reserveChar.repeat(this.reserved))
+        // this.push(this.reserveChar.repeat(this.reserved))
     }
 
 
@@ -194,7 +256,15 @@ export class TextBlock extends Base {
 
 
     toString () : string {
-        return this.text.map(parts => parts.toString()).join('\n')
+        const rendering : TextBlockRendering     = TextBlockRendering.new()
+
+        this.text.forEach((line, index) => {
+            line.toStringBuffered(rendering)
+
+            if (index !== this.text.length - 1) rendering.write('\n')
+        })
+
+        return rendering.toString()
     }
 
 

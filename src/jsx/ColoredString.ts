@@ -1,6 +1,7 @@
 import { Base } from "../class/Base.js"
 import { isString } from "../util/Typeguards.js"
 import { Colorer } from "./Colorer.js"
+import { TextBlockRendering } from "./TextBlock.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type MaybeColoredString  = string | ColoredString
@@ -18,8 +19,13 @@ export class ColoredString extends Base {
     }
 
 
+    toStringBuffered (buffer : TextBlockRendering) {
+        buffer.write(this)
+    }
+
+
     colorize (c : Colorer) : ColoredString {
-        return ColoredStringWrapped.new({ string : this, wrappings : c.wrappings() })
+        return ColoredStringWrapped.new({ string : this, c /*wrappings : c.wrappings()*/ })
     }
 
 
@@ -33,7 +39,7 @@ export class ColoredString extends Base {
 export class ColoredStringPlain extends ColoredString {
     string          : string                = ''
 
-    wrappings       : [ string, string ]    = undefined
+    c               : Colorer               = undefined
 
 
     get length () : number {
@@ -42,15 +48,13 @@ export class ColoredStringPlain extends ColoredString {
 
 
     toString () : string {
-        const wrappings     = this.wrappings
-
-        return wrappings ? wrappings[ 0 ] + this.string + wrappings[ 1 ] : this.string
+        return this.c.text(this.string)
     }
 
 
     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
         return ColoredStringPlain.new({
-            wrappings   : this.wrappings,
+            c           : this.c,
 
             string      : this.string.substr(pos, howMany)
         })
@@ -58,14 +62,16 @@ export class ColoredStringPlain extends ColoredString {
 
 
     static fromString<T extends typeof ColoredStringPlain> (this : T, string : string, c? : Colorer) : InstanceType<T> {
-        return this.new({ string, wrappings : c ? c.wrappings() : undefined } as Partial<InstanceType<T>>)
+        return this.new({ string, c/*, wrappings : c ? c.wrappings() : undefined*/ } as Partial<InstanceType<T>>)
     }
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ColoredStringColorToken extends ColoredString {
-    token           : string        = ''
+    c               : Colorer           = undefined
+
+    type            : 'open' | 'close'  = 'open'
 
 
     get length () : number {
@@ -74,21 +80,23 @@ export class ColoredStringColorToken extends ColoredString {
 
 
     toString () : string {
-        return this.token
+        return ''
     }
 
 
     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
-        return ColoredStringPlain.new()
+        return this
     }
 }
+
+
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ColoredStringWrapped extends ColoredString {
     string          : ColoredString         = ColoredStringPlain.new()
 
-    wrappings       : [ string, string ]    = undefined
+    c               : Colorer               = undefined
 
 
     get length () : number {
@@ -97,21 +105,18 @@ export class ColoredStringWrapped extends ColoredString {
 
 
     toString () : string {
-        const wrappings     = this.wrappings
-
-        return wrappings ? wrappings[ 0 ] + this.string + wrappings[ 1 ] : this.string.toString()
+        return this.c.text(this.string.toString())
     }
 
 
     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
         return ColoredStringWrapped.new({
-            wrappings   : this.wrappings,
+            c           : this.c,
 
             string      : this.string.substr(pos, howMany)
         })
     }
 }
-
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -126,6 +131,11 @@ export class ColoredStringSum extends ColoredString {
 
     toString () : string {
         return this.strings.map(str => str.toString()).join('')
+    }
+
+
+    toStringBuffered (buffer : TextBlockRendering) {
+        this.strings.forEach(string => isString(string) ? buffer.write(string) : string.toStringBuffered(buffer))
     }
 
 

@@ -19,7 +19,7 @@ export class RenderingFrame extends Mixin(
     class RenderingFrame extends base {
 
         colorize (c : Colorer) : RenderingFrame {
-            return RenderingFrameColorize.new({ previous : this, wrappings : c.wrappings() })
+            return RenderingFrameColorize.new({ previous : this, c /*wrappings : c.wrappings()*/ })
         }
 
 
@@ -132,24 +132,24 @@ export class RenderingFrameColorize extends Mixin(
     class RenderingFrameColorize extends base {
         previous    : RenderingFrame        = undefined
 
-        wrappings   : [ string, string ]    = undefined
+        c           : Colorer               = undefined
 
 
         toTextBlock (output : TextBlock) {
-            output.push(ColoredStringColorToken.new({ token : this.wrappings[ 0 ] }))
+            output.push(ColoredStringColorToken.new({ type : 'open', c : this.c /*token : this.wrappings[ 0 ]*/ }))
 
             this.previous.toTextBlock(output)
 
-            output.push(ColoredStringColorToken.new({ token : this.wrappings[ 1 ] }))
+            output.push(ColoredStringColorToken.new({ type : 'close', c : this.c /*token : this.wrappings[ 1 ]*/ }))
         }
 
 
         * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
-            output.push(ColoredStringColorToken.new({ token : this.wrappings[ 0 ] }))
+            output.push(ColoredStringColorToken.new({ type : 'open', c : this.c /*token : this.wrappings[ 0 ]*/ }))
 
             yield* this.previous.toTextBlockGen(output)
 
-            output.push(ColoredStringColorToken.new({ token : this.wrappings[ 1 ] }))
+            output.push(ColoredStringColorToken.new({ type : 'close', c : this.c /*token : this.wrappings[ 1 ]*/ }))
         }
     }
 ){}
