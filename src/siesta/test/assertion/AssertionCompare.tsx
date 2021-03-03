@@ -15,7 +15,7 @@ import {
 } from "../../../compare_deep/FuzzyMatcher.js"
 import { CI } from "../../../iterator/Iterator.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
-import { XmlElement } from "../../../jsx/XmlElement.js"
+import { XmlElement, XmlNode } from "../../../jsx/XmlElement.js"
 import { SerializerXml } from "../../../serializer/SerializerXml.js"
 import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
@@ -556,9 +556,9 @@ export class AnnotationTemplate extends Base {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class GotExpectTemplate extends AnnotationTemplate {
-    description         : string        = ''
+    description         : XmlNode       = ''
 
-    description2        : string | XmlElement = ''
+    description2        : XmlNode       = ''
 
     got                 : unknown
 
