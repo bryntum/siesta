@@ -182,7 +182,11 @@ export class XmlElement extends Mixin(
         }
 
 
-        renderChildren (renderer : XmlRenderer, output : TextBlock, context : XmlRenderingDynamicContext) {
+        renderChildren (
+            renderer    : XmlRenderer,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContext
+        ) {
             this.childNodes.forEach((child, index) => {
                 this.beforeRenderChild(child, index, renderer, output, context)
                 this.renderChild(child, index, renderer, output, context)

@@ -1,6 +1,13 @@
 import { Base } from "../class/Base.js"
 import { isString } from "../util/Typeguards.js"
 import { Colorer } from "./Colorer.js"
+import { TextBlock } from "./TextBlock.js"
+
+//---------------------------------------------------------------------------------------------------------------------
+export type RenderingProgress   = typeof SyncPoint
+
+export const SyncPoint          = Symbol('SyncPoint')
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export type MaybeColoredString  = string | ColoredString
@@ -18,9 +25,9 @@ export class ColoredString extends Base {
     }
 
 
-    // toStringBuffered (buffer : TextBlockRendering) {
-    //     buffer.write(this)
-    // }
+    * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
+        output.lastLine.push(this)
+    }
 
 
     colorize (c : Colorer) : ColoredString {
@@ -89,6 +96,28 @@ export class ColoredStringPlain extends ColoredString {
 // }
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export class ColoredStringSyncPoint extends ColoredString {
+
+    get length () : number {
+        return 0
+    }
+
+
+    toString () : string {
+        return ''
+    }
+
+
+    * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
+        yield SyncPoint
+    }
+
+
+    substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
+        return this
+    }
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -132,6 +161,16 @@ export class ColoredStringSum extends ColoredString {
         return this.strings.map(str => str.toString()).join('')
     }
 
+
+    * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
+        for (const string of this.strings) {
+            if (isString(string)) {
+                output.lastLine.push(string)
+            } else {
+                yield* string.toTextBlockGen(output)
+            }
+        }
+    }
 
     // toStringBuffered (buffer : TextBlockRendering) {
     //     this.strings.forEach(string => isString(string) ? buffer.write(string) : string.toStringBuffered(buffer))

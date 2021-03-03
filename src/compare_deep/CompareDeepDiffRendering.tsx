@@ -1,19 +1,13 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { zip3 } from "../iterator/Iterator.js"
-import {
-    RenderingFrame,
-    RenderingFrameSequence,
-    RenderingFrameOpenBlock,
-    RenderingFrameSyncPoint,
-    RenderingFrameContent
-} from "../jsx/RenderingFrame.js"
+import { ColoredStringSyncPoint } from "../jsx/ColoredString.js"
 import { TextBlock } from "../jsx/TextBlock.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
-import { XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
+import { XmlRenderer, XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
 import { serializable } from "../serializable/Serializable.js"
 import { Serialization, SerializationArray, XmlRendererSerialization } from "../serializer/SerializerRendering.js"
-import { lastElement } from "../util/Helpers.js"
+import { isString } from "../util/Typeguards.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -25,10 +19,11 @@ export class XmlRendererDifference extends Mixin(
         prettyPrint     : boolean       = true
 
 
-        createDynamicContext (element : XmlElement, parentContexts : XmlRenderingDynamicContextDifference[]) : XmlRenderingDynamicContextDifference {
+        createDynamicContext (element : XmlElement, parentContext : XmlRenderingDynamicContextDifference) : XmlRenderingDynamicContextDifference {
             return XmlRenderingDynamicContextDifference.new({
+                parentContext,
                 element,
-                currentStream   : parentContexts.length > 0 ? lastElement(parentContexts).currentStream : undefined
+                currentStream   : parentContext ? parentContext.currentStream : undefined
             })
         }
     }
@@ -50,70 +45,71 @@ export class XmlRenderingDynamicContextDifference extends Mixin(
 // export const NoDiffAnnotationLines  = String.fromCharCode(0)
 
 
-export class RenderingFrameTriplex extends Mixin(
-    [ RenderingFrame ],
-    (base : ClassUnion<typeof RenderingFrame>) =>
-
-    class RenderingFrameTriplex extends base {
-        left        : RenderingFrameSequence    = undefined
-        middle      : RenderingFrameSequence    = undefined
-        right       : RenderingFrameSequence    = undefined
-
-
-        toTextBlock (output : TextBlock) {
-            const leftBlock     = TextBlock.new()
-            const rightBlock    = TextBlock.new()
-            const middleBlock   = TextBlock.new()
-
-            const blocks        = [ leftBlock, middleBlock, rightBlock ]
-
-            const iterators     = [
-                this.left.toTextBlockGen(leftBlock),
-                this.right.toTextBlockGen(rightBlock),
-                this.middle.toTextBlockGen(middleBlock),
-            ]
-
-            while (true) {
-                const { done : done0 }      = iterators[ 0 ].next()
-                const { done : done1 }      = iterators[ 1 ].next()
-                const { done : done2 }      = iterators[ 2 ].next()
-
-                const allDone               = done0 && done1 && done2
-                const someDone              = done0 || done1 || done2
-
-                if (someDone && !allDone) throw new Error("Something is wrong")
-
-                if (allDone) break
-
-                const maxLines              = Math.max(...blocks.map(block => block.text.length))
-
-                blocks.forEach(block => {
-                    while (block.text.length < maxLines) block.addNewLine()
-                })
-            }
-
-            [ leftBlock, rightBlock ].forEach(block => block.equalizeLineLengthsMut())
-            middleBlock.equalizeLineLengthsMut(false)
-
-            const lines         = Array.from(zip3(leftBlock.text, middleBlock.text, rightBlock.text))
-
-            lines.forEach(([ leftStr, middleStr, rightStr ], index) => {
-                output.push(
-                    leftStr,
-                    // ` │${ middleStr.toString().indexOf(NoDiffAnnotationLines) !== -1 ? ' '.repeat(middleStr.length) : middleStr }│ `,
-                    ` │${ middleStr }│ `,
-                    rightStr
-                )
-
-                if (index !== lines.length - 1) output.addNewLine()
-            })
-        }
-    }
-){}
-
-
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceTemplateElement extends XmlElement {
+    renderChildInner (
+        child               : XmlNode,
+        index               : number,
+        renderer            : XmlRenderer,
+        output              : TextBlock,
+        context             : XmlRenderingDynamicContext
+    ) {
+        if (isString(child)) {
+            output.push(child)
+        } else {
+            child.renderToTextBlock(renderer, output, context)
+        }
+    }
+
+
+    combineDiffStreams (output : TextBlock, leftSource : TextBlock, rightSource : TextBlock, middleSource : TextBlock) {
+        const leftBlock     = TextBlock.new()
+        const rightBlock    = TextBlock.new()
+        const middleBlock   = TextBlock.new()
+
+        const blocks        = [ leftBlock, middleBlock, rightBlock ]
+
+        const iterators     = [
+            leftSource.copySynced(leftBlock),
+            rightSource.copySynced(rightBlock),
+            middleSource.copySynced(middleBlock),
+        ]
+
+        while (true) {
+            const { done : done0 }      = iterators[ 0 ].next()
+            const { done : done1 }      = iterators[ 1 ].next()
+            const { done : done2 }      = iterators[ 2 ].next()
+
+            const allDone               = done0 && done1 && done2
+            const someDone              = done0 || done1 || done2
+
+            if (someDone && !allDone) throw new Error("Something is wrong")
+
+            if (allDone) break
+
+            const maxLines              = Math.max(...blocks.map(block => block.text.length))
+
+            blocks.forEach(block => {
+                while (block.text.length < maxLines) block.addNewLine()
+            })
+        }
+
+        [ leftBlock, rightBlock ].forEach(block => block.equalizeLineLengthsMut())
+        middleBlock.equalizeLineLengthsMut(false)
+
+        const lines         = Array.from(zip3(leftBlock.text, middleBlock.text, rightBlock.text))
+
+        lines.forEach(([ leftStr, middleStr, rightStr ], index) => {
+            output.push(
+                leftStr,
+                // ` │${ middleStr.toString().indexOf(NoDiffAnnotationLines) !== -1 ? ' '.repeat(middleStr.length) : middleStr }│ `,
+                ` │${ middleStr }│ `,
+                rightStr
+            )
+
+            if (index !== lines.length - 1) output.addNewLine()
+        })
+    }
 }
 
 
@@ -124,29 +120,28 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
 
 
     renderSelf (
-        renderer            : XmlRendererDifference,
-        sequence            : RenderingFrameSequence,
-        parentContexts      : XmlRenderingDynamicContextDifference[],
-        ownContext          : XmlRenderingDynamicContextDifference,
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
     ) {
-        const left          = RenderingFrameSequence.new()
-        const right         = RenderingFrameSequence.new()
-        const middle        = RenderingFrameSequence.new()
+        const left          = TextBlock.new()
+        const right         = TextBlock.new()
+        const middle        = TextBlock.new()
 
         left.write('Received')
         // middle.write(NoDiffAnnotationLines)
         middle.write(' ')
         right.write('Expected');
 
-        [ left, middle, right ].forEach(sequence => {
-            sequence.push(RenderingFrameOpenBlock.new(), RenderingFrameContent.new({ content : '\n' }), RenderingFrameSyncPoint.new())
-        })
+        [ left, middle, right ].forEach(output => output.push('\n\n', ColoredStringSyncPoint.new()))
 
-        super.renderSelf(renderer, left, parentContexts, XmlRenderingDynamicContextDifference.new({ element : this, currentStream : 'left' }))
-        super.renderSelf(renderer, right, parentContexts, XmlRenderingDynamicContextDifference.new({ element : this, currentStream : 'right' }))
-        super.renderSelf(renderer, middle, parentContexts, XmlRenderingDynamicContextDifference.new({ element : this, currentStream : 'middle' }))
+        const shadowContext = currentStream => XmlRenderingDynamicContextDifference.new({ parentContext : context.parentContext, element : this, currentStream })
 
-        sequence.push(RenderingFrameTriplex.new({ left, right, middle }))
+        super.renderSelf(renderer, left, shadowContext('left'))
+        super.renderSelf(renderer, right, shadowContext('right'))
+        super.renderSelf(renderer, middle, shadowContext('middle'))
+
+        this.combineDiffStreams(output, left, right, middle)
     }
 
 }
@@ -164,28 +159,25 @@ export class DifferenceTemplateArray extends Mixin(
 
 
         beforeRenderChildren (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContextDifference[],
-            ownContext          : XmlRenderingDynamicContextDifference,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContextDifference
         ) {
-            if (ownContext.currentStream !== 'middle')
-                super.beforeRenderChildren(renderer, sequence, parentContexts, ownContext)
+            if (context.currentStream !== 'middle')
+                super.beforeRenderChildren(renderer, output, context)
             else {
-                sequence.write(' ')
-                sequence.push(RenderingFrameOpenBlock.new())
+                output.write('\n')
             }
         }
 
 
         afterRenderChildren (
-            renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContextDifference[],
-            ownContext          : XmlRenderingDynamicContextDifference,
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContextDifference
         ) {
-            if (ownContext.currentStream !== 'middle')
-                super.afterRenderChildren(renderer, sequence, parentContexts, ownContext)
+            if (context.currentStream !== 'middle')
+                super.afterRenderChildren(renderer, output, context)
         }
 
 
@@ -193,12 +185,11 @@ export class DifferenceTemplateArray extends Mixin(
             child               : XmlNode,
             index               : number,
             renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContextDifference[],
-            ownContext          : XmlRenderingDynamicContextDifference,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContextDifference
         ) {
-            if (ownContext.currentStream !== 'middle')
-                super.beforeRenderChild(child, index, renderer, sequence, parentContexts, ownContext)
+            if (context.currentStream !== 'middle')
+                super.beforeRenderChild(child, index, renderer, output, context)
         }
 
 
@@ -206,14 +197,13 @@ export class DifferenceTemplateArray extends Mixin(
             child               : XmlNode,
             index               : number,
             renderer            : XmlRendererSerialization,
-            sequence            : RenderingFrameSequence,
-            parentContexts      : XmlRenderingDynamicContextDifference[],
-            ownContext          : XmlRenderingDynamicContextDifference,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContextDifference
         ) {
-            if (ownContext.currentStream !== 'middle')
-                super.afterRenderChild(child, index, renderer, sequence, parentContexts, ownContext)
+            if (context.currentStream !== 'middle')
+                super.afterRenderChild(child, index, renderer, output, context)
 
-            sequence.push(RenderingFrameSyncPoint.new())
+            output.push(ColoredStringSyncPoint.new())
         }
     }
 ){}
@@ -229,15 +219,14 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
     tagName         : string                = 'difference_template_array_entry'
 
     renderSelf (
-        renderer            : XmlRendererDifference,
-        sequence            : RenderingFrameSequence,
-        parentContexts      : XmlRenderingDynamicContextDifference[],
-        ownContext          : XmlRenderingDynamicContextDifference,
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
     ) {
-        if (ownContext.currentStream === 'middle')
-            sequence.write(String(this.getAttribute('index')))
+        if (context.currentStream === 'middle')
+            output.write(String(this.getAttribute('index')))
         else
-            super.renderSelf(renderer, sequence, parentContexts, ownContext)
+            super.renderSelf(renderer, output, context)
     }
 }
 
@@ -251,15 +240,14 @@ export class DifferenceTemplateDifferent extends DifferenceTemplateElement {
 
 
     renderChildren (
-        renderer            : XmlRendererDifference,
-        sequence            : RenderingFrameSequence,
-        parentContexts      : XmlRenderingDynamicContextDifference[],
-        ownContext          : XmlRenderingDynamicContextDifference,
+        renderer    : XmlRendererDifference,
+        output      : TextBlock,
+        context     : XmlRenderingDynamicContextDifference
     ) {
-        if (ownContext.currentStream === 'left')
-            sequence.push(this.childNodes[ 0 ].render(renderer, [ ...parentContexts, ownContext ])[ 0 ])
-        else if (ownContext.currentStream === 'right')
-            sequence.push(this.childNodes[ 1 ].render(renderer, [ ...parentContexts, ownContext ])[ 0 ])
+        if (context.currentStream === 'left')
+            this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
+        else if (context.currentStream === 'right')
+            this.renderChildInner(this.childNodes[ 1 ].childNodes[ 0 ], 0, renderer, output, context)
     }
 }
 

@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { lastElement, NonEmptyArray, saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { ColoredStringPlain, ColoredStringSum, MaybeColoredString } from "./ColoredString.js"
+import { ColoredStringPlain, ColoredStringSum, ColoredStringSyncPoint, MaybeColoredString, RenderingProgress } from "./ColoredString.js"
 import { Colorer } from "./Colorer.js"
 
 
@@ -176,10 +176,10 @@ export class TextBlock extends Base {
 
     addSameLineText (str : MaybeColoredString) {
         // // push tokens directly, since they have length of 0
-        // if (str instanceof ColoredStringColorToken) {
-        //     this.resolveNewLine()
-        //     this.lastLine.push(str)
-        // } else {
+        if (str instanceof ColoredStringSyncPoint) {
+            // this.resolveNewLine()
+            this.lastLine.push(str)
+        } else {
             let sourcePos               = 0
 
             while (sourcePos < str.length) {
@@ -199,7 +199,7 @@ export class TextBlock extends Base {
 
                 sourcePos               += toInsertLength
             }
-        // }
+        }
     }
 
 
@@ -273,6 +273,17 @@ export class TextBlock extends Base {
         // })
         //
         // return rendering.toString()
+    }
+
+
+    * copySynced (output : TextBlock) : Generator<RenderingProgress> {
+        let i = 0
+
+        for (const line of this.text) {
+            yield* line.toTextBlockGen(output)
+
+            if (i++ !== this.text.length - 1) output.addNewLine()
+        }
     }
 
 
