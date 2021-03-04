@@ -234,7 +234,7 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class DifferenceTemplateDifferent extends DifferenceTemplateElement {
-    tagName         : 'difference_template_different'     = 'difference_template_different'
+    tagName         : string            = 'difference_template_different'
 
     childNodes      : [ Serialization, Serialization ]
 
@@ -254,12 +254,42 @@ export class DifferenceTemplateDifferent extends DifferenceTemplateElement {
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
+export class DifferenceTemplateSame extends DifferenceTemplateDifferent {
+    tagName         : string            = 'difference_template_same'
+}
+
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
 export class DifferenceTemplateMissing extends DifferenceTemplateElement {
     props           : DifferenceTemplateElement[ 'props' ] & {
-        from?            : '1' | '2'
+        presentIn?          : '1' | '2'
     }
 
-    tagName         : 'difference_template_missing'     = 'difference_template_missing'
+    tagName         : string        = 'difference_template_missing'
 
     childNodes      : [ Serialization ]
+
+
+    renderChildren (
+        renderer    : XmlRendererDifference,
+        output      : TextBlock,
+        context     : XmlRenderingDynamicContextDifference
+    ) {
+        const presentIn     = this.getAttribute('presentIn')
+
+        if (context.currentStream === 'left') {
+            if (presentIn === '1')
+                this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
+            else
+                output.write('░')
+        }
+        else if (context.currentStream === 'right') {
+            if (presentIn === '2')
+                this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
+            else
+                output.write('░')
+        }
+    }
 }

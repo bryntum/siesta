@@ -8,7 +8,7 @@ import {
     DifferenceTemplateArray,
     DifferenceTemplateArrayEntry,
     DifferenceTemplateRoot,
-    DifferenceTemplateDifferent
+    DifferenceTemplateDifferent, DifferenceTemplateSame, DifferenceTemplateMissing
 } from "./CompareDeepDiffRendering.js"
 
 
@@ -36,13 +36,12 @@ export class Difference extends /*TreeNode.mix(*/Base/*)*/ {
 export class DifferenceMissing extends Difference {
     value           : unknown           = undefined
 
-    from            : '1' | '2'         = undefined
+    presentIn       : '1' | '2'         = undefined
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <difference_missing>
-            {/*<lhs>{ SerializerXml.serialize(this.lhs, serializerConfig) }</lhs>*/}
-            {/*<rhs>{ SerializerXml.serialize(this.rhs, serializerConfig) }</rhs>*/}
-        </difference_missing>
+        return <DifferenceTemplateMissing presentIn={ this.presentIn }>
+            { SerializerXml.serialize(this.value, serializerConfig) }
+        </DifferenceTemplateMissing>
     }
 }
 
@@ -50,20 +49,22 @@ export class DifferenceMissing extends Difference {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceSame extends Difference {
-    value           : unknown       = undefined
+    v1          : unknown       = undefined
+    v2          : unknown       = undefined
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <difference_same>
-            <same>{ SerializerXml.serialize(this.value, serializerConfig) }</same>
-        </difference_same>
+        return <DifferenceTemplateSame>
+            { SerializerXml.serialize(this.v1, serializerConfig) }
+            { SerializerXml.serialize(this.v2, serializerConfig) }
+        </DifferenceTemplateSame>
     }
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceDifferent extends Difference {
-    v1          : unknown
-    v2          : unknown
+    v1          : unknown       = undefined
+    v2          : unknown       = undefined
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
         return <DifferenceTemplateDifferent>
@@ -82,13 +83,11 @@ export class DifferenceArray extends Difference {
     comparisons     : { index : number, difference : Difference }[]      = []
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <DifferenceTemplateArray>
-            {
-                this.comparisons.map(({ index, difference }) =>
-                    <DifferenceTemplateArrayEntry index={ index }>{ difference.templateInner(serializerConfig) }</DifferenceTemplateArrayEntry>
-                )
-            }
-        </DifferenceTemplateArray>
+        return <DifferenceTemplateArray>{
+            this.comparisons.map(({ index, difference }) =>
+                <DifferenceTemplateArrayEntry index={ index }>{ difference.templateInner(serializerConfig) }</DifferenceTemplateArrayEntry>
+            )
+        }</DifferenceTemplateArray>
     }
 }
 
@@ -287,7 +286,7 @@ export const compareArrayDeepGen = function (
         for (let i = minLength; i < maxLength; i++) {
             state.keyPath.push(PathSegment.new({ type : 'array_index', key : i }))
 
-            comparisons.push({ index : i, difference : DifferenceMissing.new({ value : sourceOfExtra[ i ], from }) })
+            comparisons.push({ index : i, difference : DifferenceMissing.new({ value : sourceOfExtra[ i ], presentIn: from }) })
 
             diffNum++
 
@@ -303,7 +302,7 @@ export const compareArrayDeepGen = function (
                 length2     : array2.length
             })
         :
-            DifferenceSame.new({ value : array2 })
+            DifferenceSame.new({ v1 : array1, v2 : array2 })
 }
 
 
@@ -311,7 +310,7 @@ export const compareArrayDeepGen = function (
 export const comparePrimitivesGen = (
     v1 : unknown, v2 : unknown, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 ) : Difference => {
-    if (v1 === v2 || (Number.isNaN(v1) && Number.isNaN(v2))) return DifferenceSame.new({ value : v2 })
+    if (v1 === v2 || (Number.isNaN(v1) && Number.isNaN(v2))) return DifferenceSame.new({ v1, v2 })
 
     return DifferenceDifferent.new({ v1, v2 })
 

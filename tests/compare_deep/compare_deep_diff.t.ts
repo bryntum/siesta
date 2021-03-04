@@ -4,7 +4,7 @@ import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRen
 
 
 it('Deep compare should work ', async t => {
-    t.equal(compareDeepDiff([ 1 ], [ 1 ]), DifferenceSame.new({ value : [ 1 ] }))
+    t.equal(compareDeepDiff([ 1 ], [ 1 ]), DifferenceSame.new({ v1 : [ 1 ], v2 : [ 1 ] }))
 
     t.equal(compareDeepDiff([ 1 ], [ 0 ]), DifferenceArray.new({
         length1         : 1,
@@ -15,12 +15,22 @@ it('Deep compare should work ', async t => {
         ]
     }))
 
+    t.equal(compareDeepDiff([ 1, 1 ], [ 1, 0 ]), DifferenceArray.new({
+        length1         : 2,
+        length2         : 2,
+
+        comparisons     : [
+            { index : 0, difference : DifferenceSame.new({ v1 : 1, v2 : 1 }) },
+            { index : 1, difference : DifferenceDifferent.new({ v1 : 1, v2 : 0 }) }
+        ]
+    }))
+
     t.equal(compareDeepDiff([], [ 1 ]), DifferenceArray.new({
         length1         : 0,
         length2         : 1,
 
         comparisons     : [
-            { index : 0, difference : DifferenceMissing.new({ value : 1, from : '2' }) }
+            { index : 0, difference : DifferenceMissing.new({ value : 1, presentIn : '2' }) }
         ]
     }))
 })
@@ -42,6 +52,7 @@ it('Should render the diff correctly', async t => {
         ].join('\n')
     )
 
+    //------------------
     const difference2   = compareDeepDiff([ { a : 1 } ], [ 3 ])
 
     t.is(
@@ -57,6 +68,7 @@ it('Should render the diff correctly', async t => {
         ].join('\n')
     )
 
+    //------------------
     const difference3   = compareDeepDiff([ { a : 1 }, { b : 2 } ], [ 3, 4 ])
 
     t.is(
@@ -76,5 +88,44 @@ it('Should render the diff correctly', async t => {
     )
 
 
-    t.eqDiff([ { a : 1 } ], [ 3 ])
+    //------------------
+    const difference4   = compareDeepDiff([ { a : 1 }, 3, 4 ], [ { a : 1 }, 2 ])
+
+    t.is(
+        renderer.renderToString(difference4.template()),
+        [
+            'Received   │ │ Expected  ',
+            '           │ │           ',
+            '[          │ │ [         ',
+            '  {        │0│   {       ',
+            '    "a": 1 │ │     "a": 1',
+            '  },       │ │   },      ',
+            '  3,       │1│   2,      ',
+            '  4        │2│   ░       ',
+            ']          │ │ ]         '
+        ].join('\n')
+    )
+
+    //------------------
+    const difference5   = compareDeepDiff([ 3, { a : 1 }, { b : 2 } ], [ 2 ])
+
+    t.is(
+        renderer.renderToString(difference5.template()),
+        [
+            'Received   │ │ Expected',
+            '           │ │         ',
+            '[          │ │ [       ',
+            '  3,       │0│   2,    ',
+            '  {        │1│   ░,    ',
+            '    "a": 1 │ │         ',
+            '  },       │ │         ',
+            '  {        │2│   ░     ',
+            '    "b": 2 │ │         ',
+            '  }        │ │         ',
+            ']          │ │ ]       '
+        ].join('\n')
+    )
+
+
+    t.eqDiff([ { a : 1 }, 4, 5 ], [ 3 ])
 })
