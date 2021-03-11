@@ -6,7 +6,13 @@ import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { XmlRenderer, XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
 import { serializable } from "../serializable/Serializable.js"
-import { Serialization, SerializationArray, XmlRendererSerialization } from "../serializer/SerializerRendering.js"
+import {
+    Serialization,
+    SerializationArray,
+    SerializationObject,
+    SerializationObjectEntry,
+    XmlRendererSerialization
+} from "../serializer/SerializerRendering.js"
 import { isString } from "../util/Typeguards.js"
 
 
@@ -44,6 +50,11 @@ export class XmlRenderingDynamicContextDifference extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 // export const NoDiffAnnotationLines  = String.fromCharCode(0)
 
+//---------------------------------------------------------------------------------------------------------------------
+export class MissingValue extends XmlElement {
+    tagName             : 'missing_value'           = 'missing_value'
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceTemplateElement extends XmlElement {
@@ -59,6 +70,39 @@ export class DifferenceTemplateElement extends XmlElement {
         } else {
             child.renderToTextBlock(renderer, output, context)
         }
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class DifferenceTemplateRoot extends DifferenceTemplateElement {
+    tagName         : 'difference_template_root'           = 'difference_template_root'
+
+
+    renderSelf (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+        const left          = TextBlock.new()
+        const right         = TextBlock.new()
+        const middle        = TextBlock.new()
+
+        left.write('Received')
+        // middle.write(NoDiffAnnotationLines)
+        middle.write(' ')
+        right.write('Expected');
+
+        [ left, middle, right ].forEach(output => output.push('\n\n', ColoredStringSyncPoint.new()))
+
+        const shadowContext = currentStream => XmlRenderingDynamicContextDifference.new({ parentContext : context.parentContext, element : this, currentStream })
+
+        super.renderSelf(renderer, left, shadowContext('left'))
+        super.renderSelf(renderer, right, shadowContext('right'))
+        super.renderSelf(renderer, middle, shadowContext('middle'))
+
+        this.combineDiffStreams(output, left, right, middle)
     }
 
 
@@ -111,41 +155,6 @@ export class DifferenceTemplateElement extends XmlElement {
         })
     }
 }
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable()
-export class DifferenceTemplateRoot extends DifferenceTemplateElement {
-    tagName         : 'difference_template_root'           = 'difference_template_root'
-
-
-    renderSelf (
-        renderer        : XmlRendererDifference,
-        output          : TextBlock,
-        context         : XmlRenderingDynamicContextDifference
-    ) {
-        const left          = TextBlock.new()
-        const right         = TextBlock.new()
-        const middle        = TextBlock.new()
-
-        left.write('Received')
-        // middle.write(NoDiffAnnotationLines)
-        middle.write(' ')
-        right.write('Expected');
-
-        [ left, middle, right ].forEach(output => output.push('\n\n', ColoredStringSyncPoint.new()))
-
-        const shadowContext = currentStream => XmlRenderingDynamicContextDifference.new({ parentContext : context.parentContext, element : this, currentStream })
-
-        super.renderSelf(renderer, left, shadowContext('left'))
-        super.renderSelf(renderer, right, shadowContext('right'))
-        super.renderSelf(renderer, middle, shadowContext('middle'))
-
-        this.combineDiffStreams(output, left, right, middle)
-    }
-
-}
-
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -233,43 +242,10 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class DifferenceTemplateDifferent extends DifferenceTemplateElement {
-    tagName         : string            = 'difference_template_different'
+export class DifferenceTemplateValue extends DifferenceTemplateElement {
+    tagName         : string            = 'difference_template_value'
 
-    childNodes      : [ Serialization, Serialization ]
-
-
-    renderChildren (
-        renderer    : XmlRendererDifference,
-        output      : TextBlock,
-        context     : XmlRenderingDynamicContextDifference
-    ) {
-        if (context.currentStream === 'left')
-            this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
-        else if (context.currentStream === 'right')
-            this.renderChildInner(this.childNodes[ 1 ].childNodes[ 0 ], 0, renderer, output, context)
-    }
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable()
-export class DifferenceTemplateSame extends DifferenceTemplateDifferent {
-    tagName         : string            = 'difference_template_same'
-}
-
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable()
-export class DifferenceTemplateMissing extends DifferenceTemplateElement {
-    props           : DifferenceTemplateElement[ 'props' ] & {
-        presentIn?          : '1' | '2'
-    }
-
-    tagName         : string        = 'difference_template_missing'
-
-    childNodes      : [ Serialization ]
+    childNodes      : [ Serialization | MissingValue, Serialization | MissingValue ]
 
 
     renderChildren (
@@ -277,19 +253,200 @@ export class DifferenceTemplateMissing extends DifferenceTemplateElement {
         output      : TextBlock,
         context     : XmlRenderingDynamicContextDifference
     ) {
-        const presentIn     = this.getAttribute('presentIn')
-
         if (context.currentStream === 'left') {
-            if (presentIn === '1')
-                this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
-            else
+            if (this.childNodes[ 0 ].tagName.toLowerCase() === 'missing_value')
                 output.write('░')
+            else
+                this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
+        } else if (context.currentStream === 'right') {
+            if (this.childNodes[ 1 ].tagName.toLowerCase() === 'missing_value')
+                output.write('░')
+            else
+                this.renderChildInner(this.childNodes[ 1 ].childNodes[ 0 ], 0, renderer, output, context)
         }
-        else if (context.currentStream === 'right') {
-            if (presentIn === '2')
-                this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
-            else
+    }
+}
+
+
+// //---------------------------------------------------------------------------------------------------------------------
+// @serializable()
+// export class DifferenceTemplateDifferent extends DifferenceTemplateElement {
+//     tagName         : string            = 'difference_template_different'
+//
+//     childNodes      : [ Serialization, Serialization ]
+//
+//
+//     renderChildren (
+//         renderer    : XmlRendererDifference,
+//         output      : TextBlock,
+//         context     : XmlRenderingDynamicContextDifference
+//     ) {
+//         if (context.currentStream === 'left')
+//             this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
+//         else if (context.currentStream === 'right')
+//             this.renderChildInner(this.childNodes[ 1 ].childNodes[ 0 ], 0, renderer, output, context)
+//     }
+// }
+//
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// @serializable()
+// export class DifferenceTemplateSame extends DifferenceTemplateDifferent {
+//     tagName         : string            = 'difference_template_same'
+// }
+//
+//
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// @serializable()
+// export class DifferenceTemplateMissing extends DifferenceTemplateElement {
+//     props           : DifferenceTemplateElement[ 'props' ] & {
+//         presentIn?          : '1' | '2'
+//     }
+//
+//     tagName         : string        = 'difference_template_missing'
+//
+//     childNodes      : [ Serialization ]
+//
+//
+//     renderChildren (
+//         renderer    : XmlRendererDifference,
+//         output      : TextBlock,
+//         context     : XmlRenderingDynamicContextDifference
+//     ) {
+//         const presentIn     = this.getAttribute('presentIn')
+//
+//         if (context.currentStream === 'left') {
+//             if (presentIn === '1')
+//                 this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
+//             else
+//                 output.write('░')
+//         }
+//         else if (context.currentStream === 'right') {
+//             if (presentIn === '2')
+//                 this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
+//             else
+//                 output.write('░')
+//         }
+//     }
+// }
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class DifferenceTemplateObject extends Mixin(
+    [ SerializationObject, DifferenceTemplateElement ],
+    (base : ClassUnion<typeof SerializationObject, typeof DifferenceTemplateElement>) =>
+
+    class DifferenceTemplateObject extends base {
+        tagName         : string            = 'difference_template_object'
+
+
+        beforeRenderChildren (
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream !== 'middle')
+                super.beforeRenderChildren(renderer, output, context)
+            else {
+                output.write('\n')
+            }
+        }
+
+
+        afterRenderChildren (
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream !== 'middle')
+                super.afterRenderChildren(renderer, output, context)
+        }
+
+
+        beforeRenderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRendererSerialization,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream !== 'middle')
+                super.beforeRenderChild(child, index, renderer, output, context)
+        }
+
+
+        needCommaAfterChild (
+            child               : DifferenceTemplateObjectEntry,
+            index               : number,
+            renderer            : XmlRendererSerialization,
+            context             : XmlRenderingDynamicContextDifference
+        )
+            : boolean
+        {
+            if (this.childEntryHasMissingIn(child, context.currentStream === 'left' ? 'left' : 'right')) {
+                return false
+            } else {
+                return super.needCommaAfterChild(child, index, renderer, context)
+            }
+        }
+
+
+        afterRenderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRendererSerialization,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream !== 'middle')
+                super.afterRenderChild(child, index, renderer, output, context)
+
+            output.push(ColoredStringSyncPoint.new())
+        }
+
+
+        childEntryHasMissingIn (child : DifferenceTemplateObjectEntry, stream : 'left' | 'right') : boolean {
+            const keyEl     = child.childNodes[ 0 ] as DifferenceTemplateValue
+
+            return keyEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
+        }
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
+    props           : DifferenceTemplateElement[ 'props' ] & {
+        type?       : 'common' | 'onlyIn1' | 'onlyIn2'
+    }
+
+    tagName         : string                = 'difference_template_object_entry'
+
+
+    renderSelf (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+        if (context.currentStream === 'middle')
+            output.write(' ')
+        else {
+            const keyEl     = this.childNodes[ 0 ]
+
+            if (
+                (keyEl.childNodes[ 0 ] as XmlElement).tagName.toLowerCase() === 'missing_value'
+                && context.currentStream === 'left'
+                ||
+                (keyEl.childNodes[ 1 ] as XmlElement).tagName.toLowerCase() === 'missing_value'
+                && context.currentStream === 'right'
+            ) {
                 output.write('░')
+            }
+            else
+                super.renderSelf(renderer, output, context)
         }
     }
 }

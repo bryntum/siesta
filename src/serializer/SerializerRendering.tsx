@@ -33,7 +33,7 @@ export class XmlRendererSerialization extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type SerializationChildNode = SerializationArray
+export type SerializationChildNode = XmlElement
 
 
 @serializable()
@@ -136,6 +136,18 @@ export class SerializationComposite extends Mixin(
         }
 
 
+        needCommaAfterChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRendererSerialization,
+            context             : XmlRenderingDynamicContext
+        )
+            : boolean
+        {
+            return index !== this.childNodes.length - 1
+        }
+
+
         afterRenderChild (
             child               : XmlNode,
             index               : number,
@@ -143,7 +155,7 @@ export class SerializationComposite extends Mixin(
             output              : TextBlock,
             context             : XmlRenderingDynamicContext
         ) {
-            if (index !== this.childNodes.length - 1)
+            if (this.needCommaAfterChild(child, index, renderer, context))
                 output.write(renderer.prettyPrint ? ',\n' : this.getSpaceBetweenElements(renderer) ? ', ' : ',')
             else
                 output.write(renderer.prettyPrint ? '\n' : this.getSpaceAfterOpeningBracket(renderer) ? ' ' : '')
@@ -276,24 +288,48 @@ export class SerializationObject extends Mixin(
             else if (child.tagName === 'out_of_wide') {
                 output.write(`... (${ this.getAttribute('size') - this.childNodes.length + 1 } more)`)
             } else {
-                const keyEl         = child.childNodes[ 0 ] as XmlElement
-                const valueEl       = child.childNodes[ 1 ] as XmlElement
-
-                this.renderChildInner(keyEl.childNodes[ 0 ], index, renderer, output, context)
-
-                output.write(': ')
-
-                const valueIsAtomic     = renderer.leafNodes.has((valueEl.childNodes[ 0 ] as XmlElement).tagName)
-
-                if (valueIsAtomic && renderer.prettyPrint) output.indent()
-
-                this.renderChildInner(valueEl.childNodes[ 0 ], index, renderer, output, context)
-
-                if (valueIsAtomic && renderer.prettyPrint) output.outdent()
+                super.renderChild(child, index, renderer, output, context)
             }
         }
     }
 ){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class SerializationObjectEntry extends Mixin(
+    [ XmlElement ],
+    (base : ClassUnion<typeof XmlElement>) =>
+
+    class SerializationObjectEntry extends base {
+        tagName         : string                = 'object_entry'
+
+        childNodes      : [ SerializationChildNode, SerializationChildNode ]
+
+
+        renderSelf (
+            renderer        : XmlRendererSerialization,
+            output          : TextBlock,
+            context         : XmlRenderingDynamicContext
+        ) {
+            const keyEl         = this.childNodes[ 0 ]
+            const valueEl       = this.childNodes[ 1 ]
+
+            keyEl.renderToTextBlock(renderer, output, context)
+
+            output.write(': ')
+
+            const valueIsAtomic     = renderer.leafNodes.has(valueEl.tagName)
+
+            if (valueIsAtomic && renderer.prettyPrint) output.indent()
+
+            valueEl.renderToTextBlock(renderer, output, context)
+
+            if (valueIsAtomic && renderer.prettyPrint) output.outdent()
+        }
+    }
+) {}
+
 
 
 //---------------------------------------------------------------------------------------------------------------------

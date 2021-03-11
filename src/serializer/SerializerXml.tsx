@@ -8,7 +8,7 @@ import {
     Serialization,
     SerializationArray,
     SerializationMap,
-    SerializationObject, SerializationOutOfDepth, SerializationReference,
+    SerializationObject, SerializationObjectEntry, SerializationOutOfDepth, SerializationReference,
     SerializationReferenceable,
     SerializationSet
 } from "./SerializerRendering.js"
@@ -179,13 +179,9 @@ export class SerializerXml extends Mixin(
             if (index === 0) (this.currentElement as SerializationObject).setAttribute('size', entries.length)
 
             if (index < this.maxBreadth) {
-                this.push(<object_entry></object_entry>)
-
-                this.push(<object_entry_key></object_entry_key>)
+                this.push(<SerializationObjectEntry></SerializationObjectEntry>)
 
                 super.visitObjectEntryKey(key, value, object, index, entries, depth)
-
-                this.pop()
             }
         }
 
@@ -194,11 +190,8 @@ export class SerializerXml extends Mixin(
             entries : [ ArbitraryObjectKey, unknown ][], depth : number
         ) {
             if (index < this.maxBreadth) {
-                this.push(<object_entry_value></object_entry_value>)
-
                 super.visitObjectEntryValue(key, value, object, index, entries, depth)
 
-                this.pop()
                 this.pop()
             }
             else if (index === this.maxBreadth)

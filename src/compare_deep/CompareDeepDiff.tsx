@@ -1,26 +1,71 @@
 import { Base } from "../class/Base.js"
+import { CI } from "../iterator/Iterator.js"
 import { TextJSX } from "../jsx/TextJSX.js"
-import { XmlElement } from "../jsx/XmlElement.js"
+import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { SerializerXml } from "../serializer/SerializerXml.js"
-import { typeOf } from "../util/Helpers.js"
-import { PathSegment } from "./CompareDeep.js"
+import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "../util/Helpers.js"
 import {
     DifferenceTemplateArray,
     DifferenceTemplateArrayEntry,
+    DifferenceTemplateObject, DifferenceTemplateObjectEntry,
     DifferenceTemplateRoot,
-    DifferenceTemplateDifferent, DifferenceTemplateSame, DifferenceTemplateMissing
+    DifferenceTemplateValue,
+    MissingValue
 } from "./CompareDeepDiffRendering.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export class PathSegment extends Base {
+    type            : 'object_key' | 'map_key' | 'array_index' | 'set_element'    = 'object_key'
+
+    key             : unknown                       = undefined
+
+    asXmlNode (serializerConfig : Partial<SerializerXml> = {}) : XmlNode[] {
+        let str : string    = undefined
+
+        switch (this.type) {
+            case "object_key" :
+                str = `.${ this.key }`
+                break
+
+            case "array_index" :
+                str = `[ ${ this.key } ]`
+                break
+
+            case "map_key" :
+                str = `.get(${ SerializerXml.serialize(this.key, serializerConfig) })`
+                break
+
+            case "set_element" :
+                str = `.element(${ SerializerXml.serialize(this.key, serializerConfig) })`
+                break
+        }
+
+        return [ str ]
+    }
+}
+
+
+const Missing   = Symbol('Missing')
+type Missing    = typeof Missing
+
+//---------------------------------------------------------------------------------------------------------------------
 export class Difference extends /*TreeNode.mix(*/Base/*)*/ {
-    parent          : Difference
+    value1          : unknown | Missing         = Missing
+    value2          : unknown | Missing         = Missing
+
+    same            : boolean                   = false
+
+    parent          : Difference                = undefined
 
     // parentNode      : Difference
     // childNodeT      : Difference
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        throw new Error("Abstract method")
+        return <DifferenceTemplateValue>
+            { this.value1 === Missing ? <MissingValue></MissingValue> : SerializerXml.serialize(this.value1, serializerConfig) }
+            { this.value2 === Missing ? <MissingValue></MissingValue> : SerializerXml.serialize(this.value2, serializerConfig) }
+        </DifferenceTemplateValue>
     }
 
 
@@ -32,55 +77,61 @@ export class Difference extends /*TreeNode.mix(*/Base/*)*/ {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
-export class DifferenceMissing extends Difference {
-    value           : unknown           = undefined
-
-    presentIn       : '1' | '2'         = undefined
-
-    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <DifferenceTemplateMissing presentIn={ this.presentIn }>
-            { SerializerXml.serialize(this.value, serializerConfig) }
-        </DifferenceTemplateMissing>
-    }
-}
-
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class DifferenceSame extends Difference {
-    v1          : unknown       = undefined
-    v2          : unknown       = undefined
-
-    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <DifferenceTemplateSame>
-            { SerializerXml.serialize(this.v1, serializerConfig) }
-            { SerializerXml.serialize(this.v2, serializerConfig) }
-        </DifferenceTemplateSame>
-    }
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class DifferenceDifferent extends Difference {
-    v1          : unknown       = undefined
-    v2          : unknown       = undefined
-
-    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <DifferenceTemplateDifferent>
-            { SerializerXml.serialize(this.v1, serializerConfig) }
-            { SerializerXml.serialize(this.v2, serializerConfig) }
-        </DifferenceTemplateDifferent>
-    }
-}
+// //---------------------------------------------------------------------------------------------------------------------
+// export class DifferenceMissing extends Difference {
+//     value           : unknown           = undefined
+//
+//     presentIn       : '1' | '2'         = undefined
+//
+//     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+//         return <DifferenceTemplateMissing presentIn={ this.presentIn }>
+//             { SerializerXml.serialize(this.value, serializerConfig) }
+//         </DifferenceTemplateMissing>
+//     }
+// }
+//
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export class DifferenceSame extends Difference {
+//     v1          : unknown       = undefined
+//     v2          : unknown       = undefined
+//
+//     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+//         return <DifferenceTemplateSame>
+//             { SerializerXml.serialize(this.v1, serializerConfig) }
+//             { SerializerXml.serialize(this.v2, serializerConfig) }
+//         </DifferenceTemplateSame>
+//     }
+// }
+//
+//
+// //---------------------------------------------------------------------------------------------------------------------
+// export class DifferenceDifferent extends Difference {
+//     v1          : unknown       = undefined
+//     v2          : unknown       = undefined
+//
+//     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+//         return <DifferenceTemplateDifferent>
+//             { SerializerXml.serialize(this.v1, serializerConfig) }
+//             { SerializerXml.serialize(this.v2, serializerConfig) }
+//         </DifferenceTemplateDifferent>
+//     }
+// }
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceArray extends Difference {
-    length1         : number        = 0
-    length2         : number        = 0
+    same            : boolean           = true
 
     comparisons     : { index : number, difference : Difference }[]      = []
+
+
+    addComparison (index : number, difference : Difference) {
+        this.comparisons.push({ index, difference })
+
+        if (this.same && !difference.same) this.same = false
+    }
+
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
         return <DifferenceTemplateArray>{
@@ -93,7 +144,62 @@ export class DifferenceArray extends Difference {
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export type DifferenceObjectType    = 'common' | 'onlyIn1' | 'onlyIn2'
+
+export class DifferenceObject extends Difference {
+    same            : boolean           = true
+
+    comparisons     : Map<ArbitraryObjectKey, { type : DifferenceObjectType, difference : Difference }>   = new Map()
+
+    common          : ArbitraryObjectKey[]      = undefined
+
+    onlyIn1         : Set<ArbitraryObjectKey>   = undefined
+    onlyIn2         : Set<ArbitraryObjectKey>   = undefined
+
+
+    addComparison (key : ArbitraryObjectKey, type : DifferenceObjectType, difference : Difference) {
+        this.comparisons.set(key, { type, difference })
+
+        if (this.same && !difference.same) this.same = false
+    }
+
+
+    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+        return <DifferenceTemplateObject>{
+            CI(this.comparisons).map(([ key, { type, difference } ]) =>
+                <DifferenceTemplateObjectEntry>
+                    {
+                        type === 'common'
+                            ?
+                                <DifferenceTemplateValue>
+                                    { SerializerXml.serialize(key, serializerConfig) }
+                                    { SerializerXml.serialize(key, serializerConfig) }
+                                </DifferenceTemplateValue>
+                            :
+                                type === 'onlyIn1'
+                                    ?
+                                        <DifferenceTemplateValue>
+                                            { SerializerXml.serialize(key, serializerConfig) }
+                                            <MissingValue></MissingValue>
+                                        </DifferenceTemplateValue>
+                                    :
+                                        <DifferenceTemplateValue>
+                                            <MissingValue></MissingValue>
+                                            { SerializerXml.serialize(key, serializerConfig) }
+                                        </DifferenceTemplateValue>
+                    }
+                    { difference.templateInner(serializerConfig) }
+                </DifferenceTemplateObjectEntry>
+            ).toArray()
+        }</DifferenceTemplateObject>
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export class DeepCompareState extends Base {
+    // currentDiff     : Difference                = undefined
+
     idSource        : number                    = 0
 
     keyPath         : PathSegment[]             = []
@@ -209,18 +315,18 @@ export const compareDeepDiff = function (
     const type2         = typeOf(v2)
 
     if (type1 !== type2) {
-        return DifferenceDifferent.new({ v1, v2 })
+        return Difference.new({ value1 : v1, value2 : v2 })
     }
     else if (type1 === 'Array') {
-        // state.markVisited(v1, v2)
+        state.markVisited(v1, v2)
 
-        return compareArrayDeepGen(v1 as unknown[], v2 as unknown[], options, state)
+        return compareArrayDeepDiff(v1 as unknown[], v2 as unknown[], options, state)
     }
-    // else if (type1 === 'Object') {
-    //     state.markVisited(v1, v2)
-    //
-    //     yield* compareObjectDeepGen(v1 as ArbitraryObject, v2 as ArbitraryObject, options, state)
-    // }
+    else if (type1 === 'Object') {
+        state.markVisited(v1, v2)
+
+        return compareObjectDeepDiff(v1 as ArbitraryObject, v2 as ArbitraryObject, options, state)
+    }
     // else if (type1 === 'Map') {
     //     state.markVisited(v1, v2)
     //
@@ -254,7 +360,7 @@ export const compareDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const compareArrayDeepGen = function (
+export const compareArrayDeepDiff = function (
     array1 : unknown[], array2 : unknown[], options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 )
     : Difference
@@ -262,57 +368,132 @@ export const compareArrayDeepGen = function (
     const minLength     = Math.min(array1.length, array2.length)
     const maxLength     = Math.max(array1.length, array2.length)
 
-    const comparisons : { index : number, difference : Difference }[]  = []
-
-    let diffNum : number    = 0
+    const difference    = DifferenceArray.new({ value1 : array1, value2 : array2 })
 
     for (let i = 0; i < minLength; i++) {
         state.keyPath.push(PathSegment.new({ type : 'array_index', key : i }))
 
-        const difference        = compareDeepDiff(array1[ i ], array2[ i ], options, state)
+        const diff        = compareDeepDiff(array1[ i ], array2[ i ], options, state)
 
-        if (!(difference instanceof DifferenceSame)) diffNum++
-
-        comparisons.push({ index : i, difference })
+        difference.addComparison(i, diff)
 
         state.keyPath.pop()
     }
 
-
     if (maxLength > minLength) {
         const sourceOfExtra     = array1.length === maxLength ? array1 : array2
-        const from              = array1.length === maxLength ? '1' : '2'
+        const from              = array1.length === maxLength ? 'value1' : 'value2'
 
         for (let i = minLength; i < maxLength; i++) {
             state.keyPath.push(PathSegment.new({ type : 'array_index', key : i }))
 
-            comparisons.push({ index : i, difference : DifferenceMissing.new({ value : sourceOfExtra[ i ], presentIn: from }) })
-
-            diffNum++
+            difference.addComparison(i, Difference.new({ [ from ] : sourceOfExtra[ i ] }))
 
             state.keyPath.pop()
         }
     }
 
-    return diffNum > 0
-        ?
-            DifferenceArray.new({
-                comparisons,
-                length1     : array1.length,
-                length2     : array2.length
-            })
-        :
-            DifferenceSame.new({ v1 : array1, v2 : array2 })
+    return difference
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const comparePrimitivesGen = (
-    v1 : unknown, v2 : unknown, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
-) : Difference => {
-    if (v1 === v2 || (Number.isNaN(v1) && Number.isNaN(v2))) return DifferenceSame.new({ v1, v2 })
+export const compareKeys = function <K, V>(
+    setMap1                 : Set<K> | Map<K, V>,
+    setMap2                 : Set<K> | Map<K, V>,
+    compareStructurally     : boolean,
+    options                 : DeepCompareOptions,
+    state                   : DeepCompareState = DeepCompareState.new()
+)
+    : { common1 : K[], common2 : K[], onlyIn1 : Set<K>, onlyIn2 : Set<K> }
+{
+    const pathSegmentType   = setMap1 instanceof Map ? 'map_key' : 'set_element'
 
-    return DifferenceDifferent.new({ v1, v2 })
+    const common1           = [] as K[]
+    const common2           = [] as K[]
+    const onlyIn1           = new Set<K>()
+    const onlyIn2           = new Set<K>(setMap2.keys())
+
+    for (const [ item1, _ ] of setMap1.entries()) {
+        // shortcut for primitive types - strings, numbers etc and for case when both sets has the same objects
+        // (sets may contain structurally equal objects)
+        if (setMap2.has(item1)) {
+            common1.push(item1)
+            common2.push(item1)
+            onlyIn2.delete(item1)
+        }
+        // full scan with structural comparison
+        else if (compareStructurally && Array.from(onlyIn2).some(item2 => {
+            const innerState = state.in()
+
+            innerState.push(PathSegment.new({ type : pathSegmentType, key : item2 }))
+
+            const equal = compareDeepDiff(item1, item2, options, innerState).same
+
+            if (equal) {
+                state.out(innerState)
+
+                common1.push(item1)
+                common2.push(item2)
+                onlyIn2.delete(item2)
+            }
+
+            return equal
+        })) {
+        } else {
+            onlyIn1.add(item1)
+        }
+    }
+
+    return { common1, common2, onlyIn1, onlyIn2 }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const compareObjectDeepDiff = function (
+    object1 : ArbitraryObject, object2 : ArbitraryObject, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+)
+    : Difference
+{
+    const { common1, common2, onlyIn1, onlyIn2 } = compareKeys(new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state)
+
+    const difference = DifferenceObject.new({
+        value1      : object1,
+        value2      : object2,
+
+        common      : common1,
+        onlyIn1,
+        onlyIn2
+    })
+
+    for (let i = 0; i < common1.length; i++) {
+        const key1      = common1[ i ]
+        const key2      = common2[ i ]
+
+        state.push(PathSegment.new({ type : 'object_key', key : key1 }))
+
+        const diff    = compareDeepDiff(object1[ key1 ], object2[ key2 ], options, state)
+
+        difference.addComparison(key1, 'common', diff)
+
+        state.pop()
+    }
+
+    onlyIn1.forEach(key1 => difference.addComparison(key1, 'onlyIn1', Difference.new({ value1 : object1[ key1 ]})))
+    onlyIn2.forEach(key2 => difference.addComparison(key2, 'onlyIn2', Difference.new({ value2 : object2[ key2 ]})))
+
+    return difference
+}
+
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const comparePrimitivesGen = (
+    value1 : unknown, value2 : unknown, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+) : Difference => {
+    if (value1 === value2 || (Number.isNaN(value1) && Number.isNaN(value2))) return Difference.new({ value1, value2, same : true })
+
+    return Difference.new({ value1, value2 })
 
     // // some (or both) of the inputs is a PlaceHolder instance
     // if (v1 instanceof FuzzyMatcher && v2 instanceof FuzzyMatcher) {

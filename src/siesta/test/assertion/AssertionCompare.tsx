@@ -1,7 +1,7 @@
 import { Base } from "../../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { compareDeepGen, comparePrimitivesGen, Difference } from "../../../compare_deep/CompareDeep.js"
-import { compareDeepDiff, DifferenceSame } from "../../../compare_deep/CompareDeepDiff.js"
+import { compareDeepDiff } from "../../../compare_deep/CompareDeepDiff.js"
 import {
     any,
     anyNumberApprox,
@@ -216,7 +216,7 @@ export class AssertionCompare extends Mixin(
             description     : string = ''
         ) {
             const difference    = compareDeepDiff(value1, value2/*, this.descriptor.deepCompareConfig*/)
-            const same          = difference instanceof DifferenceSame
+            const same          = difference.same
             const passed        = negated ? !same : same
 
             debugger

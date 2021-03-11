@@ -39,10 +39,10 @@ it('Serialization should work for objects', async t => {
         <Serialization>
             <object size={ 2 }>
                 <object_entry>
-                    <object_entry_key><string>"prop1"</string></object_entry_key><object_entry_value><number>1</number></object_entry_value>
+                    <string>"prop1"</string><number>1</number>
                 </object_entry>
                 <object_entry>
-                    <object_entry_key><string>"prop2"</string></object_entry_key><object_entry_value><number>2</number></object_entry_value>
+                    <string>"prop2"</string><number>2</number>
                 </object_entry>
             </object>
         </Serialization>
@@ -100,10 +100,10 @@ it('Should not include "out of depth" properties', async t => {
         <Serialization>
             <object size={ 2 }>
                 <object_entry>
-                    <object_entry_key><string>"prop1"</string></object_entry_key><object_entry_value><number>1</number></object_entry_value>
+                    <string>"prop1"</string><number>1</number>
                 </object_entry>
                 <object_entry>
-                    <object_entry_key><string>"prop2"</string></object_entry_key><object_entry_value><out_of_depth constructorName="Object"></out_of_depth></object_entry_value>
+                    <string>"prop2"</string><out_of_depth constructorName="Object"></out_of_depth>
                 </object_entry>
             </object>
         </Serialization>
@@ -117,10 +117,10 @@ it('Should not include "out of wide" properties', async t => {
         <Serialization>
             <object size={ 3 }>
                 <object_entry>
-                    <object_entry_key><string>"prop1"</string></object_entry_key><object_entry_value><number>1</number></object_entry_value>
+                    <string>"prop1"</string><number>1</number>
                 </object_entry>
                 <object_entry>
-                    <object_entry_key><string>"prop2"</string></object_entry_key><object_entry_value><number>2</number></object_entry_value>
+                    <string>"prop2"</string><number>2</number>
                 </object_entry>
                 <out_of_wide></out_of_wide>
             </object>
@@ -173,7 +173,7 @@ it('Should include class name into serialization', async t => {
         <Serialization>
             <object size={ 1 } constructorName="SomeClass">
                 <object_entry>
-                    <object_entry_key><string>"a"</string></object_entry_key><object_entry_value><number>1</number></object_entry_value>
+                    <string>"a"</string><number>1</number>
                 </object_entry>
             </object>
         </Serialization>
@@ -190,7 +190,7 @@ it('Serialization of cyclic structures should include references information', a
         <Serialization>
             <object size={ 1 } refId={ 1 }>
                 <object_entry>
-                    <object_entry_key><string>"a"</string></object_entry_key><object_entry_value><reference refId={ 1 }></reference></object_entry_value>
+                    <string>"a"</string><reference refId={ 1 }></reference>
                 </object_entry>
             </object>
         </Serialization>
@@ -205,10 +205,10 @@ it('Serialization of cyclic structures should include references information', a
         <Serialization>
             <object size={ 2 } refId={ 1 }>
                 <object_entry>
-                    <object_entry_key><string>"b"</string></object_entry_key><object_entry_value><reference refId={ 1 }></reference></object_entry_value>
+                    <string>"b"</string><reference refId={ 1 }></reference>
                 </object_entry>
                 <object_entry>
-                    <object_entry_key><string>"c"</string></object_entry_key><object_entry_value><reference refId={ 1 }></reference></object_entry_value>
+                    <string>"c"</string><reference refId={ 1 }></reference>
                 </object_entry>
             </object>
         </Serialization>
