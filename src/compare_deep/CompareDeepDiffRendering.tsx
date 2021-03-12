@@ -392,7 +392,13 @@ export class DifferenceTemplateObject extends Mixin(
         )
             : boolean
         {
-            if (this.childEntryHasMissingIn(child, context.currentStream === 'left' ? 'left' : 'right')) {
+            const stream        = context.currentStream === 'left' ? 'left' : 'right'
+
+            if (
+                this.childEntryHasMissingIn(child, stream)
+                ||
+                stream === 'left' && this.nextChildEntryHasMissingIn(index, stream)
+            ) {
                 return false
             } else {
                 return super.needCommaAfterChild(child, index, renderer, context)
@@ -411,6 +417,16 @@ export class DifferenceTemplateObject extends Mixin(
                 super.afterRenderChild(child, index, renderer, output, context)
 
             output.push(ColoredStringSyncPoint.new({ el : child as XmlElement }))
+        }
+
+
+        nextChildEntryHasMissingIn (index : number, stream : 'left' | 'right') : boolean {
+            if (index + 1 > this.childNodes.length - 1) return false
+
+            const entryEl       = this.childNodes[ index + 1 ] as DifferenceTemplateObjectEntry
+            const keyEl         = entryEl.childNodes[ 0 ] as DifferenceTemplateValue
+
+            return keyEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
         }
 
 
