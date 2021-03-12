@@ -1,12 +1,17 @@
-import { it, iit } from "../../index.js"
+import { it } from "../../index.js"
 import { compareDeepDiff, Difference, DifferenceArray, DifferenceObject, DifferenceObjectType } from "../../src/compare_deep/CompareDeepDiff.js"
-import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRendering.js"
 
 
 it('Deep compare of primitives should work', async t => {
     t.equal(compareDeepDiff(1, 1), Difference.new({ value1 : 1, value2 : 1, same : true }))
 
     t.equal(compareDeepDiff("string", "string"), Difference.new({ value1 : "string", value2 : "string", same : true }))
+
+    t.equal(compareDeepDiff(1, '1'), Difference.new({ value1 : 1, value2 : '1' }))
+
+    t.equal(compareDeepDiff(/a/, /a/), Difference.new({ value1 : /a/, value2 : /a/, same : true }))
+
+    t.equal(compareDeepDiff(/a/, /a/i), Difference.new({ value1 : /a/, value2 : /a/i, same : false }))
 })
 
 
@@ -77,7 +82,6 @@ it('Deep compare of objects should work', async t => {
             [ "a", { type : 'common' as DifferenceObjectType, difference : Difference.new({ value1 : 1, value2 : 1, same : true }) } ]
         ])
     }))
-
 
     t.equal(compareDeepDiff({ a : 1, b : 3 }, { a : 2, c : 4 }), DifferenceObject.new({
         same            : false,

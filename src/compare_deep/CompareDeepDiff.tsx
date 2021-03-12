@@ -56,10 +56,6 @@ export class Difference extends /*TreeNode.mix(*/Base/*)*/ {
 
     same            : boolean                   = false
 
-    parent          : Difference                = undefined
-
-    // parentNode      : Difference
-    // childNodeT      : Difference
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
         return <DifferenceTemplateValue>
@@ -75,48 +71,6 @@ export class Difference extends /*TreeNode.mix(*/Base/*)*/ {
         </DifferenceTemplateRoot> as DifferenceTemplateRoot
     }
 }
-
-
-// //---------------------------------------------------------------------------------------------------------------------
-// export class DifferenceMissing extends Difference {
-//     value           : unknown           = undefined
-//
-//     presentIn       : '1' | '2'         = undefined
-//
-//     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-//         return <DifferenceTemplateMissing presentIn={ this.presentIn }>
-//             { SerializerXml.serialize(this.value, serializerConfig) }
-//         </DifferenceTemplateMissing>
-//     }
-// }
-//
-//
-// //---------------------------------------------------------------------------------------------------------------------
-// export class DifferenceSame extends Difference {
-//     v1          : unknown       = undefined
-//     v2          : unknown       = undefined
-//
-//     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-//         return <DifferenceTemplateSame>
-//             { SerializerXml.serialize(this.v1, serializerConfig) }
-//             { SerializerXml.serialize(this.v2, serializerConfig) }
-//         </DifferenceTemplateSame>
-//     }
-// }
-//
-//
-// //---------------------------------------------------------------------------------------------------------------------
-// export class DifferenceDifferent extends Difference {
-//     v1          : unknown       = undefined
-//     v2          : unknown       = undefined
-//
-//     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-//         return <DifferenceTemplateDifferent>
-//             { SerializerXml.serialize(this.v1, serializerConfig) }
-//             { SerializerXml.serialize(this.v2, serializerConfig) }
-//         </DifferenceTemplateDifferent>
-//     }
-// }
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -147,7 +101,7 @@ export class DifferenceArray extends Difference {
 export type DifferenceObjectType    = 'common' | 'onlyIn1' | 'onlyIn2'
 
 export class DifferenceObject extends Difference {
-    same            : boolean           = true
+    same            : boolean                   = true
 
     comparisons     : Map<ArbitraryObjectKey, { type : DifferenceObjectType, difference : Difference }>   = new Map()
 
@@ -251,6 +205,7 @@ export class DeepCompareState extends Base {
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// none of these options are implemented yet
 export type DeepCompareOptions = {
     omitEqual               : boolean,
     // if `true` instances of difference classes will be considered different,
@@ -267,8 +222,6 @@ const defaultDeepCompareOptions : DeepCompareOptions = {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// using generator will potentially allow to easily implement "show more differences" button somewhere in the UI
-// UPDATE actually not, since data can mutate since the generator call
 export const compareDeepDiff = function (
     v1          : unknown,
     v2          : unknown,
@@ -337,24 +290,24 @@ export const compareDeepDiff = function (
     //
     //     yield* compareSetDeepGen(v1 as Set<unknown>, v2 as Set<unknown>, options, state)
     // }
-    // else if (type1 == 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
-    //     state.markVisited(v1, v2)
-    //
-    //     yield* compareFunctionDeepGen(v1 as Function, v2 as Function, options, state)
-    // }
-    // else if (type1 == 'RegExp') {
-    //     state.markVisited(v1, v2)
-    //
-    //     yield* compareRegExpDeepGen(v1 as RegExp, v2 as RegExp, options, state)
-    // }
-    // else if (type1 == 'Date') {
-    //     state.markVisited(v1, v2)
-    //
-    //     yield* compareDateDeepGen(v1 as Date, v2 as Date, options, state)
-    // }
+    else if (type1 == 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
+        state.markVisited(v1, v2)
+
+        return compareFunctionDeepDiff(v1 as Function, v2 as Function, options, state)
+    }
+    else if (type1 == 'RegExp') {
+        state.markVisited(v1, v2)
+
+        return compareRegExpDeepDiff(v1 as RegExp, v2 as RegExp, options, state)
+    }
+    else if (type1 == 'Date') {
+        state.markVisited(v1, v2)
+
+        return compareDateDeepDiff(v1 as Date, v2 as Date, options, state)
+    }
     // // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
     else {
-        return comparePrimitivesGen(v1, v2, options, state)
+        return comparePrimitivesDiff(v1, v2, options, state)
     }
 }
 
@@ -373,7 +326,7 @@ export const compareArrayDeepDiff = function (
     for (let i = 0; i < minLength; i++) {
         state.keyPath.push(PathSegment.new({ type : 'array_index', key : i }))
 
-        const diff        = compareDeepDiff(array1[ i ], array2[ i ], options, state)
+        const diff      = compareDeepDiff(array1[ i ], array2[ i ], options, state)
 
         difference.addComparison(i, diff)
 
@@ -479,16 +432,49 @@ export const compareObjectDeepDiff = function (
         state.pop()
     }
 
-    onlyIn1.forEach(key1 => difference.addComparison(key1, 'onlyIn1', Difference.new({ value1 : object1[ key1 ]})))
-    onlyIn2.forEach(key2 => difference.addComparison(key2, 'onlyIn2', Difference.new({ value2 : object2[ key2 ]})))
+    onlyIn1.forEach(key1 => difference.addComparison(key1, 'onlyIn1', Difference.new({ value1 : object1[ key1 ] })))
+    onlyIn2.forEach(key2 => difference.addComparison(key2, 'onlyIn2', Difference.new({ value2 : object2[ key2 ] })))
 
     return difference
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export const compareFunctionDeepDiff = function (
+    func1 : Function, func2 : Function, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+) : Difference {
+    return Difference.new({ value1 : func1, value2 : func2, same : func1 === func2 })
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------
-export const comparePrimitivesGen = (
+export const compareRegExpDeepDiff = function (
+    regexp1 : RegExp, regexp2 : RegExp, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+) : Difference {
+    const regexpProps   = [ 'source', 'dotAll', 'global', 'ignoreCase', 'multiline', 'sticky', 'unicode' ]
+
+    return Difference.new({
+        value1  : regexp1,
+        value2  : regexp2,
+        same    : regexpProps.every(propertyName => regexp1[ propertyName ] === regexp2[ propertyName])
+    })
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const compareDateDeepDiff = function (
+    date1 : Date, date2 : Date, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+) : Difference {
+    return Difference.new({
+        value1  : date1,
+        value2  : date2,
+        same    : date1.getTime() === date2.getTime()
+    })
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const comparePrimitivesDiff = (
     value1 : unknown, value2 : unknown, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 ) : Difference => {
     if (value1 === value2 || (Number.isNaN(value1) && Number.isNaN(value2))) return Difference.new({ value1, value2, same : true })
