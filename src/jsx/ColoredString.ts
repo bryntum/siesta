@@ -2,12 +2,10 @@ import { Base } from "../class/Base.js"
 import { isString } from "../util/Typeguards.js"
 import { Colorer } from "./Colorer.js"
 import { TextBlock } from "./TextBlock.js"
+import { XmlElement } from "./XmlElement.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export type RenderingProgress   = typeof SyncPoint
-
-export const SyncPoint          = Symbol('SyncPoint')
-
+export type RenderingProgress   = ColoredStringSyncPoint
 
 //---------------------------------------------------------------------------------------------------------------------
 export type MaybeColoredString  = string | ColoredString
@@ -73,31 +71,9 @@ export class ColoredStringPlain extends ColoredString {
 }
 
 
-// //---------------------------------------------------------------------------------------------------------------------
-// export class ColoredStringColorToken extends ColoredString {
-//     c               : Colorer           = undefined
-//
-//     type            : 'open' | 'close'  = 'open'
-//
-//
-//     get length () : number {
-//         return 0
-//     }
-//
-//
-//     toString () : string {
-//         return ''
-//     }
-//
-//
-//     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
-//         return this
-//     }
-// }
-
-
 //---------------------------------------------------------------------------------------------------------------------
 export class ColoredStringSyncPoint extends ColoredString {
+    el          : XmlElement        = undefined
 
     get length () : number {
         return 0
@@ -110,7 +86,7 @@ export class ColoredStringSyncPoint extends ColoredString {
 
 
     * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
-        yield SyncPoint
+        yield this
     }
 
 

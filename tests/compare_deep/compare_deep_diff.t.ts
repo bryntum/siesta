@@ -47,7 +47,7 @@ it('Deep compare of arrays should work', async t => {
 })
 
 
-iit('Deep compare of objects should work', async t => {
+it('Deep compare of objects should work', async t => {
     t.equal(compareDeepDiff({}, {}), DifferenceObject.new({
         same            : true,
 
@@ -101,6 +101,7 @@ iit('Deep compare of objects should work', async t => {
 
 it('Should render the array diff correctly', async t => {
     const renderer      = XmlRendererDifference.new()
+
     const difference1   = compareDeepDiff([ 1, 1 ], [ 0, 0 ])
 
     t.is(
@@ -150,7 +151,6 @@ it('Should render the array diff correctly', async t => {
         ].join('\n')
     )
 
-
     //------------------
     const difference4   = compareDeepDiff([ { a : 1 }, 3, 4 ], [ { a : 1 }, 2 ])
 
@@ -194,7 +194,7 @@ it('Should render the array diff correctly', async t => {
 })
 
 
-iit('Should render the object diff correctly', async t => {
+it('Should render the object diff correctly', async t => {
     const renderer      = XmlRendererDifference.new()
     const difference1   = compareDeepDiff({ a : 1 }, { a : 2 })
 
@@ -241,45 +241,5 @@ iit('Should render the object diff correctly', async t => {
         ].join('\n')
     )
 
-
-    // //------------------
-    // const difference4   = compareDeepDiff([ { a : 1 }, 3, 4 ], [ { a : 1 }, 2 ])
-    //
-    // t.is(
-    //     renderer.renderToString(difference4.template()),
-    //     [
-    //         'Received   │ │ Expected  ',
-    //         '           │ │           ',
-    //         '[          │ │ [         ',
-    //         '  {        │0│   {       ',
-    //         '    "a": 1 │ │     "a": 1',
-    //         '  },       │ │   },      ',
-    //         '  3,       │1│   2,      ',
-    //         '  4        │2│   ░       ',
-    //         ']          │ │ ]         '
-    //     ].join('\n')
-    // )
-    //
-    // //------------------
-    // const difference5   = compareDeepDiff([ 3, { a : 1 }, { b : 2 } ], [ 2 ])
-    //
-    // t.is(
-    //     renderer.renderToString(difference5.template()),
-    //     [
-    //         'Received   │ │ Expected',
-    //         '           │ │         ',
-    //         '[          │ │ [       ',
-    //         '  3,       │0│   2,    ',
-    //         '  {        │1│   ░,    ',
-    //         '    "a": 1 │ │         ',
-    //         '  },       │ │         ',
-    //         '  {        │2│   ░     ',
-    //         '    "b": 2 │ │         ',
-    //         '  }        │ │         ',
-    //         ']          │ │ ]       '
-    //     ].join('\n')
-    // )
-    //
-    //
     // t.eqDiff([ { a : 1 }, 4, 5 ], [ 3 ])
 })

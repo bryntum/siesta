@@ -44,6 +44,20 @@ export class XmlElement extends Mixin(
         }
 
 
+        $depth           : number    = undefined
+
+        get depth () : number {
+            if (this.$depth !== undefined) return this.$depth
+
+            let depth                   = 0
+            let node : XmlElement       = this
+
+            while (node.parent) { node = node.parent; depth++ }
+
+            return this.$depth = depth
+        }
+
+
         initialize (props? : Partial<XmlElement>) {
             super.initialize(props)
 

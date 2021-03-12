@@ -48,9 +48,6 @@ export class XmlRenderingDynamicContextDifference extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// export const NoDiffAnnotationLines  = String.fromCharCode(0)
-
-//---------------------------------------------------------------------------------------------------------------------
 export class MissingValue extends XmlElement {
     tagName             : 'missing_value'           = 'missing_value'
 }
@@ -90,11 +87,9 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
         const middle        = TextBlock.new()
 
         left.write('Received')
-        // middle.write(NoDiffAnnotationLines)
-        middle.write(' ')
         right.write('Expected');
 
-        [ left, middle, right ].forEach(output => output.push('\n\n', ColoredStringSyncPoint.new()))
+        [ left, middle, right ].forEach(output => output.push('\n\n', ColoredStringSyncPoint.new({ el : this })))
 
         const shadowContext = currentStream => XmlRenderingDynamicContextDifference.new({ parentContext : context.parentContext, element : this, currentStream })
 
@@ -119,23 +114,33 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
             middleSource.copySynced(middleBlock),
         ]
 
+        const advanceIterator = (iterator : Generator<ColoredStringSyncPoint, any, unknown>) : number => {
+            const iteration     = iterator.next()
+
+            if (iteration.done === true)
+                return Number.MAX_SAFE_INTEGER
+            else
+                return iteration.value.el.depth
+        }
+
+        const depths        = iterators.map(advanceIterator)
+
         while (true) {
-            const { done : done0 }      = iterators[ 0 ].next()
-            const { done : done1 }      = iterators[ 1 ].next()
-            const { done : done2 }      = iterators[ 2 ].next()
-
-            const allDone               = done0 && done1 && done2
-            const someDone              = done0 || done1 || done2
-
-            if (someDone && !allDone) throw new Error("Something is wrong")
-
-            if (allDone) break
-
             const maxLines              = Math.max(...blocks.map(block => block.text.length))
 
             blocks.forEach(block => {
                 while (block.text.length < maxLines) block.addNewLine()
             })
+
+            let minDepth                = Math.min(...depths)
+
+            if (minDepth === Number.MAX_SAFE_INTEGER) break
+
+            if (depths.every(depth => depth === minDepth)) minDepth = Number.MIN_SAFE_INTEGER
+
+            for (let i = 0; i < iterators.length; i++) {
+                if (depths[ i ] > minDepth) depths[ i ] = advanceIterator(iterators[ i ])
+            }
         }
 
         [ leftBlock, rightBlock ].forEach(block => block.equalizeLineLengthsMut())
@@ -146,7 +151,6 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
         lines.forEach(([ leftStr, middleStr, rightStr ], index) => {
             output.push(
                 leftStr,
-                // ` │${ middleStr.toString().indexOf(NoDiffAnnotationLines) !== -1 ? ' '.repeat(middleStr.length) : middleStr }│ `,
                 ` │${ middleStr }│ `,
                 rightStr
             )
@@ -187,6 +191,8 @@ export class DifferenceTemplateArray extends Mixin(
         ) {
             if (context.currentStream !== 'middle')
                 super.afterRenderChildren(renderer, output, context)
+
+            output.push(ColoredStringSyncPoint.new({ el : this }))
         }
 
 
@@ -212,7 +218,7 @@ export class DifferenceTemplateArray extends Mixin(
             if (context.currentStream !== 'middle')
                 super.afterRenderChild(child, index, renderer, output, context)
 
-            output.push(ColoredStringSyncPoint.new())
+            output.push(ColoredStringSyncPoint.new({ el : child as XmlElement }))
         }
     }
 ){}
@@ -226,6 +232,7 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
     }
 
     tagName         : string                = 'difference_template_array_entry'
+
 
     renderSelf (
         renderer        : XmlRendererDifference,
@@ -403,7 +410,7 @@ export class DifferenceTemplateObject extends Mixin(
             if (context.currentStream !== 'middle')
                 super.afterRenderChild(child, index, renderer, output, context)
 
-            output.push(ColoredStringSyncPoint.new())
+            output.push(ColoredStringSyncPoint.new({ el : child as XmlElement }))
         }
 
 
