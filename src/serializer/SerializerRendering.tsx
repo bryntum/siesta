@@ -351,12 +351,17 @@ export class SerializationSet extends Mixin(
         }
 
 
+        getSize (context : XmlRenderingDynamicContext) : number {
+            return this.getAttribute('size')
+        }
+
+
         renderCompositeHeader (
             renderer    : XmlRendererSerialization,
             output      : TextBlock,
             context     : XmlRenderingDynamicContext
         ) {
-            output.write(`Set (${ this.getAttribute('size') }) {`)
+            output.write(`Set (${ this.getSize(context) }) {`)
         }
 
 

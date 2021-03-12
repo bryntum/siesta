@@ -1,5 +1,4 @@
 import { Base } from "../class/Base.js"
-import { CI } from "../iterator/Iterator.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { SerializerXml } from "../serializer/SerializerXml.js"
@@ -7,8 +6,10 @@ import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "../util/Helpers.js"
 import {
     DifferenceTemplateArray,
     DifferenceTemplateArrayEntry,
-    DifferenceTemplateObject, DifferenceTemplateObjectEntry,
+    DifferenceTemplateObject,
+    DifferenceTemplateObjectEntry,
     DifferenceTemplateRoot,
+    DifferenceTemplateSet,
     DifferenceTemplateValue,
     MissingValue
 } from "./CompareDeepDiffRendering.js"
@@ -50,11 +51,19 @@ const Missing   = Symbol('Missing')
 type Missing    = typeof Missing
 
 //---------------------------------------------------------------------------------------------------------------------
-export class Difference extends /*TreeNode.mix(*/Base/*)*/ {
+export class Difference extends Base {
     value1          : unknown | Missing         = Missing
     value2          : unknown | Missing         = Missing
 
     same            : boolean                   = false
+
+
+    get type () : 'both' | 'onlyIn1' | 'onlyIn2' {
+        const has1  = this.value1 !== Missing
+        const has2  = this.value2 !== Missing
+
+        return has1 && has2 ? 'both' : has1 ? 'onlyIn1' : 'onlyIn2'
+    }
 
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
@@ -103,16 +112,16 @@ export type DifferenceObjectType    = 'common' | 'onlyIn1' | 'onlyIn2'
 export class DifferenceObject extends Difference {
     same            : boolean                   = true
 
-    comparisons     : Map<ArbitraryObjectKey, { type : DifferenceObjectType, difference : Difference }>   = new Map()
+    comparisons     : { key : ArbitraryObjectKey, type : DifferenceObjectType, difference : Difference }[]  = []
 
-    common          : ArbitraryObjectKey[]      = undefined
-
-    onlyIn1         : Set<ArbitraryObjectKey>   = undefined
-    onlyIn2         : Set<ArbitraryObjectKey>   = undefined
+    // common          : { el1 : ArbitraryObjectKey, el2 : ArbitraryObjectKey, difference : Difference }[] = undefined
+    //
+    // onlyIn1         : Set<ArbitraryObjectKey>   = undefined
+    // onlyIn2         : Set<ArbitraryObjectKey>   = undefined
 
 
     addComparison (key : ArbitraryObjectKey, type : DifferenceObjectType, difference : Difference) {
-        this.comparisons.set(key, { type, difference })
+        this.comparisons.push({ key, type, difference })
 
         if (this.same && !difference.same) this.same = false
     }
@@ -120,7 +129,7 @@ export class DifferenceObject extends Difference {
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
         return <DifferenceTemplateObject>{
-            CI(this.comparisons).map(([ key, { type, difference } ]) =>
+            this.comparisons.map(({ key, type, difference }) =>
                 <DifferenceTemplateObjectEntry>
                     {
                         type === 'common'
@@ -144,8 +153,40 @@ export class DifferenceObject extends Difference {
                     }
                     { difference.templateInner(serializerConfig) }
                 </DifferenceTemplateObjectEntry>
-            ).toArray()
+            )
         }</DifferenceTemplateObject>
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export type DifferenceSetType    = 'common' | 'onlyIn1' | 'onlyIn2'
+
+export class DifferenceSet extends Difference {
+    value1          : Set<unknown>
+    value2          : Set<unknown>
+
+    same            : boolean                   = true
+
+    comparisons     : { type : DifferenceSetType, difference : Difference }[]     = []
+
+    // common          : unknown[]      = undefined
+    //
+    // onlyIn1         : Set<unknown>   = undefined
+    // onlyIn2         : Set<unknown>   = undefined
+
+
+    addComparison (type : DifferenceSetType, difference : Difference) {
+        this.comparisons.push({ type, difference })
+
+        if (this.same && !difference.same) this.same = false
+    }
+
+
+    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+        return <DifferenceTemplateSet size={ this.value1.size } size2={ this.value2.size }>{
+            this.comparisons.map(({ difference }) => difference.templateInner(serializerConfig))
+        }</DifferenceTemplateSet>
     }
 }
 
@@ -285,11 +326,11 @@ export const compareDeepDiff = function (
     //
     //     yield* compareMapDeepGen(v1 as Map<unknown, unknown>, v2 as Map<unknown, unknown>, options, state)
     // }
-    // else if (type1 === 'Set') {
-    //     state.markVisited(v1, v2)
-    //
-    //     yield* compareSetDeepGen(v1 as Set<unknown>, v2 as Set<unknown>, options, state)
-    // }
+    else if (type1 === 'Set') {
+        state.markVisited(v1, v2)
+
+        return compareSetDeepDiff(v1 as Set<unknown>, v2 as Set<unknown>, options, state)
+    }
     else if (type1 == 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
         state.markVisited(v1, v2)
 
@@ -358,12 +399,11 @@ export const compareKeys = function <K, V>(
     options                 : DeepCompareOptions,
     state                   : DeepCompareState = DeepCompareState.new()
 )
-    : { common1 : K[], common2 : K[], onlyIn1 : Set<K>, onlyIn2 : Set<K> }
+    : { common : { el1 : K, el2 : K, difference : Difference }[], onlyIn1 : Set<K>, onlyIn2 : Set<K> }
 {
     const pathSegmentType   = setMap1 instanceof Map ? 'map_key' : 'set_element'
 
-    const common1           = [] as K[]
-    const common2           = [] as K[]
+    const common            = [] as { el1 : K, el2 : K, difference : Difference}[]
     const onlyIn1           = new Set<K>()
     const onlyIn2           = new Set<K>(setMap2.keys())
 
@@ -371,23 +411,28 @@ export const compareKeys = function <K, V>(
         // shortcut for primitive types - strings, numbers etc and for case when both sets has the same objects
         // (sets may contain structurally equal objects)
         if (setMap2.has(item1)) {
-            common1.push(item1)
-            common2.push(item1)
+            common.push({
+                el1             : item1,
+                el2             : item1,
+                difference      : compareStructurally ? Difference.new({ value1 : item1, value2 : item1, same : true }) : null
+            })
             onlyIn2.delete(item1)
         }
         // full scan with structural comparison
+        // we don't need this branch for objects comparison, thus the flag
         else if (compareStructurally && Array.from(onlyIn2).some(item2 => {
-            const innerState = state.in()
+            const innerState    = state.in()
 
             innerState.push(PathSegment.new({ type : pathSegmentType, key : item2 }))
 
-            const equal = compareDeepDiff(item1, item2, options, innerState).same
+            const difference    = compareDeepDiff(item1, item2, options, innerState)
+            const equal         = difference.same
 
             if (equal) {
                 state.out(innerState)
 
-                common1.push(item1)
-                common2.push(item2)
+                common.push({ el1 : item1, el2 : item2, difference })
+
                 onlyIn2.delete(item2)
             }
 
@@ -398,7 +443,54 @@ export const compareKeys = function <K, V>(
         }
     }
 
-    return { common1, common2, onlyIn1, onlyIn2 }
+    return { common, onlyIn1, onlyIn2 }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const compareSetDeepDiff = function (
+    set1 : Set<unknown>, set2 : Set<unknown>, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+)
+    : Difference
+{
+    const { common, onlyIn1, onlyIn2 } = compareKeys(set1, set2, true, options, state)
+
+    const difference        = DifferenceSet.new({ value1 : set1, value2 : set2 })
+
+    common.forEach(commonEntry => difference.addComparison('common', commonEntry.difference))
+
+    onlyIn1.forEach(el1 => difference.addComparison('onlyIn1', Difference.new({ value1 : el1 })))
+    onlyIn2.forEach(el2 => difference.addComparison('onlyIn2', Difference.new({ value2 : el2 })))
+
+    return difference
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const compareMapDeepDiff = function (
+    map1 : Map<unknown, unknown>, map2 : Map<unknown, unknown>, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+)
+    : Difference
+{
+    return
+    // const { common1, common2, onlyIn1, onlyIn2 } = compareKeys(map1, map2, true, options, state)
+    //
+    // for (let i = 0; i < common1.length; i++) {
+    //     const key1      = common1[ i ]
+    //     const key2      = common2[ i ]
+    //
+    //     state.push(PathSegment.new({ type : 'map_key', key : key1 }))
+    //
+    //     yield* compareDeepGen(map1.get(key1), map2.get(key2), options, state)
+    //
+    //     state.pop()
+    // }
+    //
+    // if (onlyIn1.size > 0 || onlyIn2.size > 0) {
+    //     yield DifferenceMap.new({
+    //         map1, map2, common1, common2, onlyIn1, onlyIn2
+    //     })
+    // }
 }
 
 
@@ -408,20 +500,20 @@ export const compareObjectDeepDiff = function (
 )
     : Difference
 {
-    const { common1, common2, onlyIn1, onlyIn2 } = compareKeys(new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state)
+    const { common, onlyIn1, onlyIn2 } = compareKeys(new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state)
 
     const difference = DifferenceObject.new({
         value1      : object1,
         value2      : object2,
 
-        common      : common1,
-        onlyIn1,
-        onlyIn2
+        // common      : common,
+        // onlyIn1,
+        // onlyIn2
     })
 
-    for (let i = 0; i < common1.length; i++) {
-        const key1      = common1[ i ]
-        const key2      = common2[ i ]
+    for (let i = 0; i < common.length; i++) {
+        const key1      = common[ i ].el1
+        const key2      = common[ i ].el2
 
         state.push(PathSegment.new({ type : 'object_key', key : key1 }))
 

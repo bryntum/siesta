@@ -6,6 +6,7 @@ import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRen
 it('Should render the array diff correctly', async t => {
     const renderer      = XmlRendererDifference.new()
 
+    //------------------
     const difference1   = compareDeepDiff([ 1, 1 ], [ 0, 0 ])
 
     t.is(
@@ -99,6 +100,8 @@ it('Should render the array diff correctly', async t => {
 
 it('Should render the object diff correctly', async t => {
     const renderer      = XmlRendererDifference.new()
+
+    //------------------
     const difference1   = compareDeepDiff({ a : 1 }, { a : 2 })
 
     t.is(
@@ -180,6 +183,30 @@ it('Should render the object diff correctly', async t => {
             '}           │ │ }          ',
         ].join('\n')
     )
+
+    // t.eqDiff({ a : 1, b : { c : 2, d : 4 } }, { a : 1, b : { c : 3, e : 5 } })
+})
+
+
+it('Should render the set diff correctly', async t => {
+    const renderer      = XmlRendererDifference.new()
+
+    //------------------
+    const difference1   = compareDeepDiff(new Set([ 1, 2 ]), new Set([ 2, 3 ]))
+
+    t.is(
+        renderer.renderToString(difference1.template()),
+        [
+            'Received  │ │ Expected ',
+            '          │ │          ',
+            'Set (2) { │ │ Set (2) {',
+            '  2,      │ │   2,     ',
+            '  1       │ │   ░      ',
+            '  ░       │ │   3      ',
+            '}         │ │ }        ',
+        ].join('\n')
+    )
+
 
     // t.eqDiff({ a : 1, b : { c : 2, d : 4 } }, { a : 1, b : { c : 3, e : 5 } })
 })

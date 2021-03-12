@@ -1,5 +1,12 @@
 import { it } from "../../index.js"
-import { compareDeepDiff, Difference, DifferenceArray, DifferenceObject, DifferenceObjectType } from "../../src/compare_deep/CompareDeepDiff.js"
+import {
+    compareDeepDiff,
+    Difference,
+    DifferenceArray,
+    DifferenceObject,
+    DifferenceObjectType,
+    DifferenceSet
+} from "../../src/compare_deep/CompareDeepDiff.js"
 
 
 it('Deep compare of primitives should work', async t => {
@@ -59,12 +66,12 @@ it('Deep compare of objects should work', async t => {
         value1          : {},
         value2          : {},
 
-        common          : [],
+        // common          : [],
+        //
+        // onlyIn1         : new Set(),
+        // onlyIn2         : new Set(),
 
-        onlyIn1         : new Set(),
-        onlyIn2         : new Set(),
-
-        comparisons     : new Map()
+        comparisons     : []
     }))
 
     t.equal(compareDeepDiff({ a : 1 }, { a : 1 }), DifferenceObject.new({
@@ -73,14 +80,14 @@ it('Deep compare of objects should work', async t => {
         value1          : { a : 1 },
         value2          : { a : 1 },
 
-        common          : [ 'a' ],
+        // common          : [ { el1 : 'a', el2 : 'a', difference : null } ],
+        //
+        // onlyIn1         : new Set(),
+        // onlyIn2         : new Set(),
 
-        onlyIn1         : new Set(),
-        onlyIn2         : new Set(),
-
-        comparisons     : new Map([
-            [ "a", { type : 'common' as DifferenceObjectType, difference : Difference.new({ value1 : 1, value2 : 1, same : true }) } ]
-        ])
+        comparisons     : [
+            { key : "a", type : 'common' as DifferenceObjectType, difference : Difference.new({ value1 : 1, value2 : 1, same : true }) }
+        ]
     }))
 
     t.equal(compareDeepDiff({ a : 1, b : 3 }, { a : 2, c : 4 }), DifferenceObject.new({
@@ -89,15 +96,41 @@ it('Deep compare of objects should work', async t => {
         value1          : { a : 1, b : 3 },
         value2          : { a : 2, c : 4 },
 
-        common          : [ 'a' ],
+        // common          : [ { el1 : 'a', el2 : 'a', difference : null } ],
+        //
+        // onlyIn1         : new Set([ 'b' ]),
+        // onlyIn2         : new Set([ 'c' ]),
 
-        onlyIn1         : new Set([ 'b' ]),
-        onlyIn2         : new Set([ 'c' ]),
+        comparisons     : [
+            { key : "a", type : 'common' as DifferenceObjectType, difference : Difference.new({ value1 : 1, value2 : 2 }) },
+            { key : "b", type : 'onlyIn1' as DifferenceObjectType, difference : Difference.new({ value1 : 3 }) },
+            { key : "c", type : 'onlyIn2' as DifferenceObjectType, difference : Difference.new({ value2 : 4 }) }
+        ]
+    }))
+})
 
-        comparisons     : new Map([
-            [ "a", { type : 'common' as DifferenceObjectType, difference : Difference.new({ value1 : 1, value2 : 2 }) } ],
-            [ "b", { type : 'onlyIn1' as DifferenceObjectType, difference : Difference.new({ value1 : 3 }) } ],
-            [ "c", { type : 'onlyIn2' as DifferenceObjectType, difference : Difference.new({ value2 : 4 }) } ]
-        ])
+
+it('Deep compare of sets should work', async t => {
+    t.equal(compareDeepDiff(new Set(), new Set()), DifferenceSet.new({
+        same            : true,
+
+        value1          : new Set(),
+        value2          : new Set(),
+
+        comparisons     : []
+    }))
+
+    t.equal(compareDeepDiff(new Set([ 1, 2, 3 ]), new Set([ 2, 3, 4 ])), DifferenceSet.new({
+        same            : false,
+
+        value1          : new Set([ 1, 2, 3 ]),
+        value2          : new Set([ 2, 3, 4 ]),
+
+        comparisons     : [
+            { type : "common", difference : Difference.new({ value1 : 2, value2 : 2, same : true }) },
+            { type : "common", difference : Difference.new({ value1 : 3, value2 : 3, same : true }) },
+            { type : "onlyIn1", difference : Difference.new({ value1 : 1 }) },
+            { type : "onlyIn2", difference : Difference.new({ value2 : 4 }) },
+        ]
     }))
 })
