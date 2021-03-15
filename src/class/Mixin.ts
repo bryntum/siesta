@@ -156,6 +156,7 @@ class MixinState {
 
         const mixinLambdaWrapper : MixinFunction          = Object.assign(function (base : AnyConstructor) : AnyConstructor {
             const extendedClass                 = mixinLambda(base)
+
             extendedClass.prototype[ symbol ]   = true
             return extendedClass
         }, {
@@ -235,7 +236,13 @@ class MixinState {
             [MixinInstanceOfProperty] : this.identitySymbol,
             [MixinStateProperty]    : this,
             mix                     : this.mixinLambda,
-            derive                  : (base) => Mixin([ minimalClass, base ], base => class extends base {}),
+            // we suppose the `derive` method to always be used as a call from constructor
+            // (so `this` is set to constructor)
+            // this is to provide a uniform prototype structure for `isMixinClass` function to work correctly
+            // right now, a mixin class is an empty wrapper around the minimal mixin class:
+            //        wrapper
+            // `class SomeMixin extends Mixin() {}`
+            derive                  : function (this : AnyConstructor, base) { return Mixin([ this, base ], base => class extends base {}) },
             $                       : this,
             toString                : this.toString.bind(this)
         })
@@ -486,9 +493,8 @@ const mixin = <T>(required : (AnyConstructor | MixinClass)[], mixinLambda : T) :
     const requirements : MixinState[]    = []
 
     required.forEach((requirement, index) => {
-        const mixinState        = requirement[ MixinStateProperty ] as MixinState
-
-        if (mixinState !== undefined) {
+        if (isMixinClass(requirement)) {
+            const mixinState        = requirement[ MixinStateProperty ] as MixinState
             const currentBaseClass  = mixinState.baseClass
 
             // ignore ZeroBaseClass - since those are compatible with any other base class
@@ -530,8 +536,11 @@ const mixin = <T>(required : (AnyConstructor | MixinClass)[], mixinLambda : T) :
 //---------------------------------------------------------------------------------------------------------------------
 // this function works both with default mixin class and mixin application function
 // it supplied internally as [Symbol.hasInstance] for the default mixin class and mixin application function
-const isInstanceOfStatic  = function (this : MixinStateExtension, instance : any) : boolean {
-    return Boolean(instance && instance[ this[ MixinInstanceOfProperty ] ])
+const isInstanceOfStatic  = function (this : MixinFunction | MixinClass, instance : any) : boolean {
+    if (isMixinClass(this as any))
+        return Boolean(instance && instance[ this[ MixinInstanceOfProperty ] ])
+    else
+        return this.prototype.isPrototypeOf(instance)
 }
 
 
@@ -545,10 +554,13 @@ const isInstanceOfStatic  = function (this : MixinStateExtension, instance : any
  * @param instance Any value, normally an instance of the mixin class
  * @param func The constructor function of the class, created with [[Mixin]]
  */
-export const isInstanceOf = <T>(instance : any, func : T)
+export const isInstanceOf = <T extends AnyConstructor>(instance : any, func : T)
     : instance is (T extends AnyConstructor<infer A> ? A : unknown) =>
 {
-    return Boolean(instance && instance[ func[ MixinInstanceOfProperty ] ])
+    if (isMixinClass(func))
+        return Boolean(instance && instance[ func[ MixinInstanceOfProperty ] ])
+    else
+        return func.prototype.isPrototypeOf(instance)
 }
 
 

@@ -503,4 +503,32 @@ it('`isInstanceOf` should work with plain subclasses', t => {
     }
 
     t.false(Some1.new() instanceof Some2)
+
+    t.false(isInstanceOf(Some1.new(), Some2))
+})
+
+
+it('Should throw exception when plain class extended from mixin is used as a non-last requirement', t => {
+    class Some1 extends Mixin(
+        [ Base ],
+        (base : ClassUnion<typeof Base>) =>
+
+        class Some1 extends base {
+            prop1       : string    = '1'
+        }
+    ){}
+
+    class Some2 extends Some1 {
+        prop2       : string    = '2'
+    }
+
+    t.throwsOk(() => {
+        class Some3 extends Mixin(
+            [ Some2, Some1 ],
+            (base : ClassUnion<typeof Some2, typeof Some1>) =>
+
+            class Some3 extends base {
+            }
+        ){}
+    }, /Base class should be provided as the last element of the requirements array/)
 })
