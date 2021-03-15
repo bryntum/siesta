@@ -382,3 +382,59 @@ it('Should render the map diff correctly', async t => {
     //     { b : 11 }
     // ]))
 })
+
+
+it('Should render the diff of circular data structures correctly #1', async t => {
+    const renderer      = XmlRendererDifference.new()
+
+    const a1    = { a : undefined }
+    a1.a        = a1
+
+    const a2    = { a : undefined }
+    a2.a        = a2
+
+    //------------------
+    const difference0   = compareDeepDiff(a1, a2)
+
+    t.is(
+        renderer.renderToString(difference0.template()),
+        [
+            'Received               │ │ Expected              ',
+            '                       │ │                       ',
+            '{                      │ │ {                     ',
+            '  "a": <ref *1> {      │ │   "a": <ref *1> {     ',
+            '    "a": [Circular *1] │ │     "a": [Circular *1]',
+            '  }                    │ │   }                   ',
+            '}                      │ │ }                     ',
+        ].join('\n')
+    )
+})
+
+
+// it('Should render the diff of circular data structures correctly #2', async t => {
+//     const renderer      = XmlRendererDifference.new()
+//
+//     const a1    = { a : undefined }
+//     a1.a        = a1
+//
+//     const a2    = { a : undefined }
+//     a2.a        = a2
+//
+//     const a3    = { a : a2 }
+//
+//     //------------------
+//     const difference0   = compareDeepDiff(a1, a3)
+//
+//     t.is(
+//         renderer.renderToString(difference0.template()),
+//         [
+//             'Received               │ │ Expected              ',
+//             '                       │ │                       ',
+//             '{                      │ │ {                     ',
+//             '  "a": <ref *1> {      │ │   "a": <ref *1> {     ',
+//             '    "a": [Circular *1] │ │     "a": [Circular *1]',
+//             '  }                    │ │   }                   ',
+//             '}                      │ │ }                     ',
+//         ].join('\n')
+//     )
+// })

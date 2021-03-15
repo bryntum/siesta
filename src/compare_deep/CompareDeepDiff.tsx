@@ -296,17 +296,19 @@ export class DeepCompareState extends Base {
 //---------------------------------------------------------------------------------------------------------------------
 // none of these options are implemented yet
 export type DeepCompareOptions = {
-    omitEqual               : boolean,
+    omitEqual                   : boolean,
     // if `true` instances of difference classes will be considered different,
     // even if they contain the same properties
-    requireSameClass        : boolean
-    maxDifferences          : number
+    requireSameClass            : boolean
+    maxDifferences              : number,
+    cycleIsPartOfDataStructure  : boolean
 }
 
 const defaultDeepCompareOptions : DeepCompareOptions = {
-    omitEqual               : false,
-    requireSameClass        : false,
-    maxDifferences          : Number.MAX_SAFE_INTEGER
+    omitEqual                   : false,
+    requireSameClass            : false,
+    maxDifferences              : Number.MAX_SAFE_INTEGER,
+    cycleIsPartOfDataStructure  : true
 }
 
 
@@ -335,23 +337,37 @@ export const compareDeepDiff = function (
     //     yield* v2.equalsToGen(v1, true, options, state)
     //     return
     // }
-    //
-    // const v1Visit   = state.visited1.get(v1)
-    // const v2Visit   = state.visited2.get(v2)
-    //
-    // if (v1Visit && !v2Visit || !v1Visit && v2Visit || v1Visit && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
-    //     yield DifferenceReachability.new({
-    //         v1, v2,
-    //         keyPath     : state.keyPathSnapshot(),
-    //         v1Path      : v1Visit !== undefined ? v1Visit[ 1 ] : undefined,
-    //         v2Path      : v2Visit !== undefined ? v2Visit[ 1 ] : undefined,
-    //     })
-    //
-    //     return
-    // }
-    // else if (v1Visit && v1Visit[ 0 ] === v2Visit[ 0 ]) {
-    //     return
-    // }
+
+    const v1Visit   = state.visited1.get(v1)
+    const v2Visit   = state.visited2.get(v2)
+
+    if (v1Visit && v2Visit && v1Visit[ 0 ] === v2Visit[ 0 ]) {
+        // cyclic visit from the same location in both data structures
+        // this is considered as an equal value - the real difference
+        // will be determined by the 1st visit
+        return Difference.new({ value1 : v1, value2 : v2, same : true })
+    }
+    else if (v1Visit && !v2Visit || !v1Visit && v2Visit && options.cycleIsPartOfDataStructure) {
+
+
+        // if (v1Visit && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
+        //
+        // }
+        //
+        // debugger
+        //
+        // // yield DifferenceReachability.new({
+        // //     v1, v2,
+        // //     keyPath     : state.keyPathSnapshot(),
+        // //     v1Path      : v1Visit !== undefined ? v1Visit[ 1 ] : undefined,
+        // //     v2Path      : v2Visit !== undefined ? v2Visit[ 1 ] : undefined,
+        // // })
+        //
+        // return
+    }
+    else if (v1Visit && v1Visit[ 0 ] === v2Visit[ 0 ]) {
+        return Difference.new({ value1 : v1, value2 : v2, same : true })
+    }
 
     const type1         = typeOf(v1)
     const type2         = typeOf(v2)
@@ -396,7 +412,7 @@ export const compareDeepDiff = function (
     }
     // // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
     else {
-        return comparePrimitivesDiff(v1, v2, options, state)
+        return comparePrimitiveDeepDiff(v1, v2, options, state)
     }
 }
 
@@ -605,7 +621,7 @@ export const compareDateDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const comparePrimitivesDiff = (
+export const comparePrimitiveDeepDiff = (
     value1 : unknown, value2 : unknown, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 ) : Difference => {
     if (value1 === value2 || (Number.isNaN(value1) && Number.isNaN(value2))) return Difference.new({ value1, value2, same : true })
