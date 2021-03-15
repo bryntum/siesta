@@ -7,7 +7,7 @@ import { Visitor } from "../visitor/Visitor.js"
 import {
     Serialization,
     SerializationArray,
-    SerializationMap,
+    SerializationMap, SerializationMapEntry,
     SerializationObject, SerializationObjectEntry, SerializationOutOfDepth, SerializationReference,
     SerializationReferenceable,
     SerializationSet
@@ -243,23 +243,16 @@ export class SerializerXml extends Mixin(
 
         visitMapEntryKey<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
             if (index < this.maxBreadth) {
-                this.push(<map_entry></map_entry>)
-
-                this.push(<map_entry_key></map_entry_key>)
+                this.push(<SerializationMapEntry></SerializationMapEntry>)
 
                 super.visitMapEntryKey(key, value, map, index, depth)
-
-                this.pop()
             }
         }
 
         visitMapEntryValue<K, V> (key : K, value : V, map : Map<K, V>, index : number, depth : number) {
             if (index < this.maxBreadth) {
-                this.push(<map_entry_value></map_entry_value>)
-
                 super.visitMapEntryValue(key, value, map, index, depth)
 
-                this.pop()
                 this.pop()
             }
             else if (index === this.maxBreadth)

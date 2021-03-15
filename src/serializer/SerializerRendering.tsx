@@ -20,7 +20,7 @@ export class XmlRendererSerialization extends Mixin(
         spaceAfterOpeningBracketArray   : boolean       = false
         spaceAfterOpeningBracketObject  : boolean       = true
 
-        leafNodes               : Set<string>   = new Set([
+        atomicElementNodes              : Set<string>   = new Set([
             'boolean', 'number', 'string', 'date', 'regexp', 'symbol', 'function', 'special'
         ])
 
@@ -319,7 +319,7 @@ export class SerializationObjectEntry extends Mixin(
 
             output.write(': ')
 
-            const valueIsAtomic     = renderer.leafNodes.has(valueEl.tagName)
+            const valueIsAtomic     = renderer.atomicElementNodes.has(valueEl.tagName)
 
             if (valueIsAtomic && renderer.prettyPrint) output.indent()
 
@@ -441,24 +441,54 @@ export class SerializationMap extends Mixin(
             else if (child.tagName === 'out_of_wide') {
                 output.write(`...`)
             } else {
-                const keyEl         = child.childNodes[ 0 ] as XmlElement
-                const valueEl       = child.childNodes[ 1 ] as XmlElement
-
-                this.renderChildInner(keyEl.childNodes[ 0 ], index, renderer, output, context)
-
-                output.write(' => ')
-
-                const valueIsAtomic     = renderer.leafNodes.has((valueEl.childNodes[ 0 ] as XmlElement).tagName)
-
-                if (valueIsAtomic && renderer.prettyPrint) output.indent()
-
-                this.renderChildInner(valueEl.childNodes[ 0 ], index, renderer, output, context)
-
-                if (valueIsAtomic && renderer.prettyPrint) output.outdent()
+                super.renderChild(child, index, renderer, output, context)
             }
         }
     }
 ){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class SerializationMapEntry extends Mixin(
+    [ XmlElement ],
+    (base : ClassUnion<typeof XmlElement>) =>
+
+    class SerializationMapEntry extends base {
+        tagName         : string                = 'map_entry'
+
+        childNodes      : [ SerializationChildNode, SerializationChildNode ]
+
+
+        renderSelf (
+            renderer        : XmlRendererSerialization,
+            output          : TextBlock,
+            context         : XmlRenderingDynamicContext
+        ) {
+            const keyEl         = this.childNodes[ 0 ] as XmlElement
+            const valueEl       = this.childNodes[ 1 ] as XmlElement
+
+            keyEl.renderToTextBlock(renderer, output, context)
+
+            output.write(' => ')
+
+            const valueIsAtomic     = this.valueIsAtomic(renderer, context)
+
+            if (valueIsAtomic && renderer.prettyPrint) output.indent()
+
+            valueEl.renderToTextBlock(renderer, output, context)
+
+            if (valueIsAtomic && renderer.prettyPrint) output.outdent()
+        }
+
+
+        valueIsAtomic (renderer : XmlRendererSerialization, context : XmlRenderingDynamicContext) : boolean {
+            const valueEl       = this.childNodes[ 1 ] as XmlElement
+
+            return renderer.atomicElementNodes.has((valueEl as XmlElement).tagName.toLowerCase())
+        }
+    }
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -5,7 +5,7 @@ import { SerializerXml } from "../serializer/SerializerXml.js"
 import { ArbitraryObject, ArbitraryObjectKey, typeOf } from "../util/Helpers.js"
 import {
     DifferenceTemplateArray,
-    DifferenceTemplateArrayEntry,
+    DifferenceTemplateArrayEntry, DifferenceTemplateMap, DifferenceTemplateMapEntry,
     DifferenceTemplateObject,
     DifferenceTemplateObjectEntry,
     DifferenceTemplateRoot,
@@ -51,6 +51,8 @@ const Missing   = Symbol('Missing')
 type Missing    = typeof Missing
 
 //---------------------------------------------------------------------------------------------------------------------
+export type DifferenceType = 'both' | 'onlyIn1' | 'onlyIn2'
+
 export class Difference extends Base {
     value1          : unknown | Missing         = Missing
     value2          : unknown | Missing         = Missing
@@ -58,7 +60,7 @@ export class Difference extends Base {
     same            : boolean                   = false
 
 
-    get type () : 'both' | 'onlyIn1' | 'onlyIn2' {
+    get type () : DifferenceType {
         const has1  = this.value1 !== Missing
         const has2  = this.value2 !== Missing
 
@@ -67,7 +69,7 @@ export class Difference extends Base {
 
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <DifferenceTemplateValue>
+        return <DifferenceTemplateValue type={ this.type }>
             { this.value1 === Missing ? <MissingValue></MissingValue> : SerializerXml.serialize(this.value1, serializerConfig) }
             { this.value2 === Missing ? <MissingValue></MissingValue> : SerializerXml.serialize(this.value2, serializerConfig) }
         </DifferenceTemplateValue>
@@ -84,6 +86,9 @@ export class Difference extends Base {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceArray extends Difference {
+    value1          : unknown[]
+    value2          : unknown[]
+
     same            : boolean           = true
 
     comparisons     : { index : number, difference : Difference }[]      = []
@@ -97,9 +102,11 @@ export class DifferenceArray extends Difference {
 
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <DifferenceTemplateArray>{
+        return <DifferenceTemplateArray type={ this.type } length={ this.value1.length } length2={ this.value2.length }>{
             this.comparisons.map(({ index, difference }) =>
-                <DifferenceTemplateArrayEntry index={ index }>{ difference.templateInner(serializerConfig) }</DifferenceTemplateArrayEntry>
+                <DifferenceTemplateArrayEntry type={ difference.type } index={ index }>
+                    { difference.templateInner(serializerConfig) }
+                </DifferenceTemplateArrayEntry>
             )
         }</DifferenceTemplateArray>
     }
@@ -128,25 +135,25 @@ export class DifferenceObject extends Difference {
 
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <DifferenceTemplateObject>{
+        return <DifferenceTemplateObject type={ this.type }>{
             this.comparisons.map(({ key, type, difference }) =>
-                <DifferenceTemplateObjectEntry>
+                <DifferenceTemplateObjectEntry type={ difference.type }>
                     {
                         type === 'common'
                             ?
-                                <DifferenceTemplateValue>
+                                <DifferenceTemplateValue type={ difference.type }>
                                     { SerializerXml.serialize(key, serializerConfig) }
                                     { SerializerXml.serialize(key, serializerConfig) }
                                 </DifferenceTemplateValue>
                             :
                                 type === 'onlyIn1'
                                     ?
-                                        <DifferenceTemplateValue>
+                                        <DifferenceTemplateValue type={ difference.type }>
                                             { SerializerXml.serialize(key, serializerConfig) }
                                             <MissingValue></MissingValue>
                                         </DifferenceTemplateValue>
                                     :
-                                        <DifferenceTemplateValue>
+                                        <DifferenceTemplateValue type={ difference.type }>
                                             <MissingValue></MissingValue>
                                             { SerializerXml.serialize(key, serializerConfig) }
                                         </DifferenceTemplateValue>
@@ -184,9 +191,46 @@ export class DifferenceSet extends Difference {
 
 
     templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
-        return <DifferenceTemplateSet size={ this.value1.size } size2={ this.value2.size }>{
+        return <DifferenceTemplateSet type={ this.type } size={ this.value1.size } size2={ this.value2.size }>{
             this.comparisons.map(({ difference }) => difference.templateInner(serializerConfig))
         }</DifferenceTemplateSet>
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export type DifferenceMapType    = 'common' | 'onlyIn1' | 'onlyIn2'
+
+export class DifferenceMap extends Difference {
+    value1          : Map<unknown, unknown>
+    value2          : Map<unknown, unknown>
+
+    same            : boolean                   = true
+
+    comparisons     : { type : DifferenceMapType, differenceKeys : Difference, differenceValues : Difference }[]     = []
+
+    // common          : unknown[]      = undefined
+    //
+    // onlyIn1         : Set<unknown>   = undefined
+    // onlyIn2         : Set<unknown>   = undefined
+
+
+    addComparison (type : DifferenceMapType, differenceKeys : Difference, differenceValues : Difference) {
+        this.comparisons.push({ type, differenceKeys, differenceValues })
+
+        if (this.same && (!differenceKeys.same || !differenceValues.same)) this.same = false
+    }
+
+
+    templateInner (serializerConfig? : Partial<SerializerXml>) : XmlElement {
+        return <DifferenceTemplateMap type={ this.type } size={ this.value1.size } size2={ this.value2.size }>{
+            this.comparisons.map(({ differenceKeys, differenceValues }) =>
+                <DifferenceTemplateMapEntry type={ differenceKeys.type }>
+                    { differenceKeys.templateInner(serializerConfig) }
+                    { differenceValues.templateInner(serializerConfig) }
+                </DifferenceTemplateMapEntry>
+            )
+        }</DifferenceTemplateMap>
     }
 }
 
@@ -321,11 +365,11 @@ export const compareDeepDiff = function (
 
         return compareObjectDeepDiff(v1 as ArbitraryObject, v2 as ArbitraryObject, options, state)
     }
-    // else if (type1 === 'Map') {
-    //     state.markVisited(v1, v2)
-    //
-    //     yield* compareMapDeepGen(v1 as Map<unknown, unknown>, v2 as Map<unknown, unknown>, options, state)
-    // }
+    else if (type1 === 'Map') {
+        state.markVisited(v1, v2)
+
+        return compareMapDeepDiff(v1 as Map<unknown, unknown>, v2 as Map<unknown, unknown>, options, state)
+    }
     else if (type1 === 'Set') {
         state.markVisited(v1, v2)
 
@@ -472,25 +516,20 @@ export const compareMapDeepDiff = function (
 )
     : Difference
 {
-    return
-    // const { common1, common2, onlyIn1, onlyIn2 } = compareKeys(map1, map2, true, options, state)
-    //
-    // for (let i = 0; i < common1.length; i++) {
-    //     const key1      = common1[ i ]
-    //     const key2      = common2[ i ]
-    //
-    //     state.push(PathSegment.new({ type : 'map_key', key : key1 }))
-    //
-    //     yield* compareDeepGen(map1.get(key1), map2.get(key2), options, state)
-    //
-    //     state.pop()
-    // }
-    //
-    // if (onlyIn1.size > 0 || onlyIn2.size > 0) {
-    //     yield DifferenceMap.new({
-    //         map1, map2, common1, common2, onlyIn1, onlyIn2
-    //     })
-    // }
+    const { common, onlyIn1, onlyIn2 } = compareKeys(map1, map2, true, options, state)
+
+    const difference        = DifferenceMap.new({ value1 : map1, value2 : map2 })
+
+    common.forEach(commonEntry => difference.addComparison(
+        'common',
+        commonEntry.difference,
+        compareDeepDiff(map1.get(commonEntry.el1), map2.get(commonEntry.el2), options, state)
+    ))
+
+    onlyIn1.forEach(el1 => difference.addComparison('onlyIn1', Difference.new({ value1 : el1 }), Difference.new({ value1 : map1.get(el1) })))
+    onlyIn2.forEach(el2 => difference.addComparison('onlyIn2', Difference.new({ value2 : el2 }), Difference.new({ value2 : map2.get(el2) })))
+
+    return difference
 }
 
 
@@ -505,10 +544,6 @@ export const compareObjectDeepDiff = function (
     const difference = DifferenceObject.new({
         value1      : object1,
         value2      : object2,
-
-        // common      : common,
-        // onlyIn1,
-        // onlyIn2
     })
 
     for (let i = 0; i < common.length; i++) {

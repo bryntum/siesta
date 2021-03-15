@@ -8,13 +8,14 @@ import { XmlRenderer, XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
 import { serializable } from "../serializable/Serializable.js"
 import {
     Serialization,
-    SerializationArray,
+    SerializationArray, SerializationMap, SerializationMapEntry,
     SerializationObject,
     SerializationObjectEntry,
     SerializationSet,
     XmlRendererSerialization
 } from "../serializer/SerializerRendering.js"
 import { isString } from "../util/Typeguards.js"
+import { DifferenceType } from "./CompareDeepDiff.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -56,6 +57,10 @@ export class MissingValue extends XmlElement {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceTemplateElement extends XmlElement {
+    props           : SerializationArray[ 'props' ] & {
+        type?           : DifferenceType
+    }
+
     renderChildInner (
         child               : XmlNode,
         index               : number,
@@ -171,6 +176,10 @@ export class DifferenceTemplateArray extends Mixin(
     (base : ClassUnion<typeof SerializationArray, typeof DifferenceTemplateElement>) =>
 
     class DifferenceTemplateArray extends base {
+        props           : SerializationArray[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
+            length2       : number
+        }
+
         tagName         : string            = 'difference_template_array'
 
 
@@ -182,7 +191,10 @@ export class DifferenceTemplateArray extends Mixin(
             if (context.currentStream !== 'middle')
                 super.beforeRenderChildren(renderer, output, context)
             else {
-                output.write('\n')
+                const length1   = this.getAttribute('length')
+                const length2   = this.getAttribute('length2')
+
+                if (length1 > 0 || length2 > 0) output.write('\n')
             }
         }
 
@@ -264,15 +276,15 @@ export class DifferenceTemplateValue extends DifferenceTemplateElement {
         context     : XmlRenderingDynamicContextDifference
     ) {
         if (context.currentStream === 'left') {
-            if (this.childNodes[ 0 ].tagName.toLowerCase() === 'missing_value')
+            if (this.getAttribute('type') === 'onlyIn2')
                 output.write('░')
             else
-                this.renderChildInner(this.childNodes[ 0 ].childNodes[ 0 ], 0, renderer, output, context)
+                this.renderChildInner(this.childNodes[ 0 ], 0, renderer, output, context)
         } else if (context.currentStream === 'right') {
-            if (this.childNodes[ 1 ].tagName.toLowerCase() === 'missing_value')
+            if (this.getAttribute('type') === 'onlyIn1')
                 output.write('░')
             else
-                this.renderChildInner(this.childNodes[ 1 ].childNodes[ 0 ], 0, renderer, output, context)
+                this.renderChildInner(this.childNodes[ 1 ], 0, renderer, output, context)
         }
     }
 }
@@ -296,7 +308,7 @@ export class DifferenceTemplateObject extends Mixin(
             if (context.currentStream !== 'middle')
                 super.beforeRenderChildren(renderer, output, context)
             else {
-                output.write('\n')
+                // output.write('\n')
             }
         }
 
@@ -381,9 +393,7 @@ export class DifferenceTemplateObject extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
-    props           : DifferenceTemplateElement[ 'props' ] & {
-        type?       : 'common' | 'onlyIn1' | 'onlyIn2'
-    }
+    props           : DifferenceTemplateElement[ 'props' ]
 
     tagName         : string                = 'difference_template_object_entry'
 
@@ -421,7 +431,7 @@ export class DifferenceTemplateSet extends Mixin(
     (base : ClassUnion<typeof SerializationSet, typeof DifferenceTemplateElement>) =>
 
     class DifferenceTemplateSet extends base {
-        props           : SerializationSet[ 'props' ] & {
+        props           : SerializationSet[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
             size2?          : number
         }
 
@@ -440,12 +450,10 @@ export class DifferenceTemplateSet extends Mixin(
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
-            debugger
-
             if (context.currentStream !== 'middle')
                 super.beforeRenderChildren(renderer, output, context)
             else {
-                output.write('\n')
+                // output.write('\n')
             }
         }
 
@@ -472,26 +480,26 @@ export class DifferenceTemplateSet extends Mixin(
         }
 
 
-        needCommaAfterChild (
-            child               : DifferenceTemplateValue,
-            index               : number,
-            renderer            : XmlRendererSerialization,
-            context             : XmlRenderingDynamicContextDifference
-        )
-            : boolean
-        {
-            const stream        = context.currentStream === 'left' ? 'left' : 'right'
-
-            if (
-                this.childEntryHasMissingIn(child, stream)
-                ||
-                stream === 'left' && this.nextChildEntryHasMissingIn(index, stream)
-            ) {
-                return false
-            } else {
-                return super.needCommaAfterChild(child, index, renderer, context)
-            }
-        }
+        // needCommaAfterChild (
+        //     child               : DifferenceTemplateValue,
+        //     index               : number,
+        //     renderer            : XmlRendererSerialization,
+        //     context             : XmlRenderingDynamicContextDifference
+        // )
+        //     : boolean
+        // {
+        //     const stream        = context.currentStream === 'left' ? 'left' : 'right'
+        //
+        //     if (
+        //         this.childEntryHasMissingIn(child, stream)
+        //         ||
+        //         stream === 'left' && this.nextChildEntryHasMissingIn(index, stream)
+        //     ) {
+        //         return false
+        //     } else {
+        //         return super.needCommaAfterChild(child, index, renderer, context)
+        //     }
+        // }
 
 
         afterRenderChild (
@@ -508,18 +516,18 @@ export class DifferenceTemplateSet extends Mixin(
         }
 
 
-        nextChildEntryHasMissingIn (index : number, stream : 'left' | 'right') : boolean {
-            if (index + 1 > this.childNodes.length - 1) return false
-
-            const entryEl       = this.childNodes[ index + 1 ] as DifferenceTemplateValue
-
-            return entryEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
-        }
-
-
-        childEntryHasMissingIn (child : DifferenceTemplateValue, stream : 'left' | 'right') : boolean {
-            return child.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
-        }
+        // nextChildEntryHasMissingIn (index : number, stream : 'left' | 'right') : boolean {
+        //     if (index + 1 > this.childNodes.length - 1) return false
+        //
+        //     const entryEl       = this.childNodes[ index + 1 ] as DifferenceTemplateValue
+        //
+        //     return entryEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
+        // }
+        //
+        //
+        // childEntryHasMissingIn (child : DifferenceTemplateValue, stream : 'left' | 'right') : boolean {
+        //     return child.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
+        // }
     }
 ){}
 
@@ -558,3 +566,148 @@ export class DifferenceTemplateSet extends Mixin(
 //         }
 //     }
 // }
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class DifferenceTemplateMap extends Mixin(
+    [ SerializationMap, DifferenceTemplateElement ],
+    (base : ClassUnion<typeof SerializationMap, typeof DifferenceTemplateElement>) =>
+
+    class DifferenceTemplateMap extends base {
+        props           : SerializationMap[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
+            size2?          : number
+        }
+
+        tagName         : string            = 'difference_template_map'
+
+        childNodes      : DifferenceTemplateValue[]
+
+
+        getSize (context : XmlRenderingDynamicContextDifference) : number {
+            return context.currentStream === 'left' ? this.getAttribute('size') : this.getAttribute('size2')
+        }
+
+
+        beforeRenderChildren (
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream !== 'middle')
+                super.beforeRenderChildren(renderer, output, context)
+            else {
+                // output.write('\n')
+            }
+        }
+
+
+        afterRenderChildren (
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream !== 'middle')
+                super.afterRenderChildren(renderer, output, context)
+        }
+
+
+        beforeRenderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRendererSerialization,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream !== 'middle')
+                super.beforeRenderChild(child, index, renderer, output, context)
+        }
+
+
+        // needCommaAfterChild (
+        //     child               : DifferenceTemplateValue,
+        //     index               : number,
+        //     renderer            : XmlRendererSerialization,
+        //     context             : XmlRenderingDynamicContextDifference
+        // )
+        //     : boolean
+        // {
+        //     const stream        = context.currentStream === 'left' ? 'left' : 'right'
+        //
+        //     if (
+        //         this.childEntryHasMissingIn(child, stream)
+        //         ||
+        //         stream === 'left' && this.nextChildEntryHasMissingIn(index, stream)
+        //     ) {
+        //         return false
+        //     } else {
+        //         return super.needCommaAfterChild(child, index, renderer, context)
+        //     }
+        // }
+
+
+        afterRenderChild (
+            child               : XmlNode,
+            index               : number,
+            renderer            : XmlRendererSerialization,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream !== 'middle')
+                super.afterRenderChild(child, index, renderer, output, context)
+
+            output.push(ColoredStringSyncPoint.new({ el : child as XmlElement }))
+        }
+
+
+        // nextChildEntryHasMissingIn (index : number, stream : 'left' | 'right') : boolean {
+        //     if (index + 1 > this.childNodes.length - 1) return false
+        //
+        //     const entryEl       = this.childNodes[ index + 1 ] as DifferenceTemplateValue
+        //
+        //     return entryEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
+        // }
+        //
+        //
+        // childEntryHasMissingIn (child : DifferenceTemplateValue, stream : 'left' | 'right') : boolean {
+        //     return child.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
+        // }
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class DifferenceTemplateMapEntry extends SerializationMapEntry {
+    props           : SerializationMap[ 'props' ] & DifferenceTemplateElement[ 'props' ]
+
+    tagName         : string                = 'difference_template_map_entry'
+
+
+    renderSelf (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+        if (context.currentStream === 'middle')
+            output.write(' ')
+        else {
+            if (
+                this.getAttribute('type') === 'onlyIn2' && context.currentStream === 'left'
+                ||
+                this.getAttribute('type') === 'onlyIn1' && context.currentStream === 'right'
+            ) {
+                output.write('░')
+            }
+            else
+                super.renderSelf(renderer, output, context)
+        }
+    }
+
+
+    valueIsAtomic (renderer : XmlRendererDifference, context : XmlRenderingDynamicContextDifference) : boolean {
+        const valueDiffEl       = this.childNodes[ context.currentStream === 'left' ? 0 : 1 ] as XmlElement
+
+        return valueDiffEl.tagName === 'difference_template_value'
+    }
+}

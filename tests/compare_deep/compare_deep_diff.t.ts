@@ -2,7 +2,7 @@ import { it } from "../../index.js"
 import {
     compareDeepDiff,
     Difference,
-    DifferenceArray,
+    DifferenceArray, DifferenceMap,
     DifferenceObject,
     DifferenceObjectType,
     DifferenceSet
@@ -131,6 +131,48 @@ it('Deep compare of sets should work', async t => {
             { type : "common", difference : Difference.new({ value1 : 3, value2 : 3, same : true }) },
             { type : "onlyIn1", difference : Difference.new({ value1 : 1 }) },
             { type : "onlyIn2", difference : Difference.new({ value2 : 4 }) },
+        ]
+    }))
+})
+
+
+it('Deep compare of maps should work', async t => {
+    t.equal(compareDeepDiff(new Map(), new Map()), DifferenceMap.new({
+        same            : true,
+
+        value1          : new Map(),
+        value2          : new Map(),
+
+        comparisons     : []
+    }))
+
+    t.equal(compareDeepDiff(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ], ]), new Map([ [ 2, 2 ], [ 3, 3 ], [ 4, 4 ], ])), DifferenceMap.new({
+        same            : false,
+
+        value1          : new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ], ]),
+        value2          : new Map([ [ 2, 2 ], [ 3, 3 ], [ 4, 4 ], ]),
+
+        comparisons     : [
+            {
+                type                : "common",
+                differenceKeys      : Difference.new({ value1 : 2, value2 : 2, same : true }),
+                differenceValues    : Difference.new({ value1 : 2, value2 : 2, same : true })
+            },
+            {
+                type                : "common",
+                differenceKeys      : Difference.new({ value1 : 3, value2 : 3, same : true }),
+                differenceValues    : Difference.new({ value1 : 3, value2 : 3, same : true })
+            },
+            {
+                type                : "onlyIn1",
+                differenceKeys      : Difference.new({ value1 : 1 }),
+                differenceValues    : Difference.new({ value1 : 1 })
+            },
+            {
+                type                : "onlyIn2",
+                differenceKeys      : Difference.new({ value2 : 4 }),
+                differenceValues    : Difference.new({ value2 : 4 })
+            }
         ]
     }))
 })

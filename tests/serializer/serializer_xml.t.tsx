@@ -81,12 +81,12 @@ it('Serialization should work for maps', async t => {
         <Serialization>
             <map size={ 2 }>
                 <map_entry>
-                    <map_entry_key><number>1</number></map_entry_key>
-                    <map_entry_value><string>"1"</string></map_entry_value>
+                    <number>1</number>
+                    <string>"1"</string>
                 </map_entry>
                 <map_entry>
-                    <map_entry_key><number>2</number></map_entry_key>
-                    <map_entry_value><string>"2"</string></map_entry_value>
+                    <number>2</number>
+                    <string>"2"</string>
                 </map_entry>
             </map>
         </Serialization>
@@ -153,8 +153,8 @@ it('Should not include "out of wide" properties', async t => {
         SerializerXml.serialize(new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]), { maxDepth : 1, maxBreadth : 2 }),
         <Serialization>
             <map size={ 3 }>
-                <map_entry><map_entry_key><number>1</number></map_entry_key><map_entry_value><number>1</number></map_entry_value></map_entry>
-                <map_entry><map_entry_key><number>2</number></map_entry_key><map_entry_value><number>2</number></map_entry_value></map_entry>
+                <map_entry><number>1</number><number>1</number></map_entry>
+                <map_entry><number>2</number><number>2</number></map_entry>
                 <out_of_wide></out_of_wide>
             </map>
         </Serialization>
