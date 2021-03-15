@@ -41,6 +41,13 @@ export class Serialization extends XmlElement {
     tagName         : 'serialization'           = 'serialization'
 
     childNodes      : SerializationChildNode[]
+
+
+    valueIsAtomic (renderer : XmlRendererSerialization, context : XmlRenderingDynamicContext) : boolean {
+        const valueEl       = this.childNodes[ 0 ] as XmlElement
+
+        return renderer.atomicElementNodes.has(valueEl.tagName.toLowerCase())
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -253,12 +260,20 @@ export class SerializationObject extends Mixin(
         }
 
 
+        getConstructorName (
+            renderer    : XmlRendererSerialization,
+            context     : XmlRenderingDynamicContext
+        ) {
+            return this.getAttribute('constructorName')
+        }
+
+
         renderCompositeHeader (
             renderer    : XmlRendererSerialization,
             output      : TextBlock,
             context     : XmlRenderingDynamicContext
         ) {
-            const className     = this.getAttribute('constructorName')
+            const className     = this.getConstructorName(renderer, context)
 
             if (className && className !== 'Object') output.write(className + ' ')
 

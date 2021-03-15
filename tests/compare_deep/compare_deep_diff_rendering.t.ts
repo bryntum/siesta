@@ -315,25 +315,61 @@ it('Should render the map diff correctly', async t => {
     t.is(
         renderer.renderToString(difference3.template()),
         [
-            'Received     │ │ Expected    ',
-            '             │ │             ',
-            'Map (2) {    │ │ Map (2) {   ',
-            '  {          │ │   {         ',
-            '    "a": 1   │ │     "a": 1  ',
-            '  } => {     │ │   } => {    ',
-            '    "b": 2   │ │     "b": 3  ',
-            '  },         │ │   },        ',
-            '  {          │ │   ░,        ',
-            '    "b": 2   │ │             ',
-            '  } => {     │ │             ',
-            '      "c": 3 │ │             ',
-            '    },       │ │             ',
-            '  ░          │ │   {         ',
-            '             │ │     "c": 3  ',
-            '             │ │   } => {    ',
-            '             │ │       "b": 2',
-            '             │ │     }       ',
-            '}            │ │ }           ',
+            'Received   │ │ Expected  ',
+            '           │ │           ',
+            'Map (2) {  │ │ Map (2) { ',
+            '  {        │ │   {       ',
+            '    "a": 1 │ │     "a": 1',
+            '  } => {   │ │   } => {  ',
+            '    "b": 2 │ │     "b": 3',
+            '  },       │ │   },      ',
+            '  {        │ │   ░,      ',
+            '    "b": 2 │ │           ',
+            '  } => {   │ │           ',
+            '    "c": 3 │ │           ',
+            '  },       │ │           ',
+            '  ░        │ │   {       ',
+            '           │ │     "c": 3',
+            '           │ │   } => {  ',
+            '           │ │     "b": 2',
+            '           │ │   }       ',
+            '}          │ │ }         ',
+        ].join('\n')
+    )
+
+
+    //------------------
+    class Key {
+        constructor (public a : number) {}
+    }
+
+    class Mey {
+        constructor (public a : number) {}
+    }
+
+    const difference4   = compareDeepDiff(
+        new Map([ [ new Key(10), { b : 2 } ], [ new Key(11), { c : 3 } ] ]),
+        new Map([ [ new Mey(10), { b : 3 } ], [ new Mey(11), { b : 2 } ] ])
+    )
+
+    t.is(
+        renderer.renderToString(difference4.template()),
+        [
+            'Received    │ │ Expected   ',
+            '            │ │            ',
+            'Map (2) {   │ │ Map (2) {  ',
+            '  Key {     │ │   Mey {    ',
+            '    "a": 10 │ │     "a": 10',
+            '  } => {    │ │   } => {   ',
+            '    "b": 2  │ │     "b": 3 ',
+            '  },        │ │   },       ',
+            '  Key {     │ │   Mey {    ',
+            '    "a": 11 │ │     "a": 11',
+            '  } => {    │ │   } => {   ',
+            '    "c": 3  │ │     ░      ',
+            '    ░       │ │     "b": 2 ',
+            '  }         │ │   }        ',
+            '}           │ │ }          ',
         ].join('\n')
     )
 

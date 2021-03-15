@@ -86,7 +86,7 @@ it('Deep compare of objects should work', async t => {
         // onlyIn2         : new Set(),
 
         comparisons     : [
-            { key : "a", type : 'common' as DifferenceObjectType, difference : Difference.new({ value1 : 1, value2 : 1, same : true }) }
+            { key : "a", difference : Difference.new({ value1 : 1, value2 : 1, same : true }) }
         ]
     }))
 
@@ -102,9 +102,9 @@ it('Deep compare of objects should work', async t => {
         // onlyIn2         : new Set([ 'c' ]),
 
         comparisons     : [
-            { key : "a", type : 'common' as DifferenceObjectType, difference : Difference.new({ value1 : 1, value2 : 2 }) },
-            { key : "b", type : 'onlyIn1' as DifferenceObjectType, difference : Difference.new({ value1 : 3 }) },
-            { key : "c", type : 'onlyIn2' as DifferenceObjectType, difference : Difference.new({ value2 : 4 }) }
+            { key : "a", difference : Difference.new({ value1 : 1, value2 : 2 }) },
+            { key : "b", difference : Difference.new({ value1 : 3 }) },
+            { key : "c", difference : Difference.new({ value2 : 4 }) }
         ]
     }))
 })

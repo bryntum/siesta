@@ -299,9 +299,21 @@ export class DifferenceTemplateObject extends Mixin(
     class DifferenceTemplateObject extends base {
         tagName         : string            = 'difference_template_object'
 
+        props           : SerializationObject[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
+            constructorName2?       : string
+        }
+
+
+        getConstructorName (
+            renderer    : XmlRendererDifference,
+            context     : XmlRenderingDynamicContextDifference
+        ) {
+            return context.currentStream === 'left' ? this.getAttribute('constructorName') : this.getAttribute('constructorName2')
+        }
+
 
         beforeRenderChildren (
-            renderer    : XmlRendererSerialization,
+            renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
@@ -314,7 +326,7 @@ export class DifferenceTemplateObject extends Mixin(
 
 
         afterRenderChildren (
-            renderer    : XmlRendererSerialization,
+            renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
@@ -326,7 +338,7 @@ export class DifferenceTemplateObject extends Mixin(
         beforeRenderChild (
             child               : XmlNode,
             index               : number,
-            renderer            : XmlRendererSerialization,
+            renderer            : XmlRendererDifference,
             output              : TextBlock,
             context             : XmlRenderingDynamicContextDifference
         ) {
@@ -338,7 +350,7 @@ export class DifferenceTemplateObject extends Mixin(
         needCommaAfterChild (
             child               : DifferenceTemplateObjectEntry,
             index               : number,
-            renderer            : XmlRendererSerialization,
+            renderer            : XmlRendererDifference,
             context             : XmlRenderingDynamicContextDifference
         )
             : boolean
@@ -360,7 +372,7 @@ export class DifferenceTemplateObject extends Mixin(
         afterRenderChild (
             child               : XmlNode,
             index               : number,
-            renderer            : XmlRendererSerialization,
+            renderer            : XmlRendererDifference,
             output              : TextBlock,
             context             : XmlRenderingDynamicContextDifference
         ) {
@@ -446,7 +458,7 @@ export class DifferenceTemplateSet extends Mixin(
 
 
         beforeRenderChildren (
-            renderer    : XmlRendererSerialization,
+            renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
@@ -459,7 +471,7 @@ export class DifferenceTemplateSet extends Mixin(
 
 
         afterRenderChildren (
-            renderer    : XmlRendererSerialization,
+            renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
@@ -471,7 +483,7 @@ export class DifferenceTemplateSet extends Mixin(
         beforeRenderChild (
             child               : XmlNode,
             index               : number,
-            renderer            : XmlRendererSerialization,
+            renderer            : XmlRendererDifference,
             output              : TextBlock,
             context             : XmlRenderingDynamicContextDifference
         ) {
@@ -483,7 +495,7 @@ export class DifferenceTemplateSet extends Mixin(
         // needCommaAfterChild (
         //     child               : DifferenceTemplateValue,
         //     index               : number,
-        //     renderer            : XmlRendererSerialization,
+        //     renderer            : XmlRendererDifference,
         //     context             : XmlRenderingDynamicContextDifference
         // )
         //     : boolean
@@ -505,7 +517,7 @@ export class DifferenceTemplateSet extends Mixin(
         afterRenderChild (
             child               : XmlNode,
             index               : number,
-            renderer            : XmlRendererSerialization,
+            renderer            : XmlRendererDifference,
             output              : TextBlock,
             context             : XmlRenderingDynamicContextDifference
         ) {
@@ -590,7 +602,7 @@ export class DifferenceTemplateMap extends Mixin(
 
 
         beforeRenderChildren (
-            renderer    : XmlRendererSerialization,
+            renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
@@ -603,7 +615,7 @@ export class DifferenceTemplateMap extends Mixin(
 
 
         afterRenderChildren (
-            renderer    : XmlRendererSerialization,
+            renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
@@ -615,7 +627,7 @@ export class DifferenceTemplateMap extends Mixin(
         beforeRenderChild (
             child               : XmlNode,
             index               : number,
-            renderer            : XmlRendererSerialization,
+            renderer            : XmlRendererDifference,
             output              : TextBlock,
             context             : XmlRenderingDynamicContextDifference
         ) {
@@ -627,7 +639,7 @@ export class DifferenceTemplateMap extends Mixin(
         // needCommaAfterChild (
         //     child               : DifferenceTemplateValue,
         //     index               : number,
-        //     renderer            : XmlRendererSerialization,
+        //     renderer            : XmlRendererDifference,
         //     context             : XmlRenderingDynamicContextDifference
         // )
         //     : boolean
@@ -649,7 +661,7 @@ export class DifferenceTemplateMap extends Mixin(
         afterRenderChild (
             child               : XmlNode,
             index               : number,
-            renderer            : XmlRendererSerialization,
+            renderer            : XmlRendererDifference,
             output              : TextBlock,
             context             : XmlRenderingDynamicContextDifference
         ) {
@@ -706,8 +718,20 @@ export class DifferenceTemplateMapEntry extends SerializationMapEntry {
 
 
     valueIsAtomic (renderer : XmlRendererDifference, context : XmlRenderingDynamicContextDifference) : boolean {
-        const valueDiffEl       = this.childNodes[ context.currentStream === 'left' ? 0 : 1 ] as XmlElement
+        const childIndex        = context.currentStream === 'left' ? 0 : 1
 
-        return valueDiffEl.tagName === 'difference_template_value'
+        const valueDiffEl       = this.childNodes[ childIndex ] as XmlElement
+
+        if (valueDiffEl.tagName.toLowerCase() === 'difference_template_value') {
+            const serializedNode    = (valueDiffEl as DifferenceTemplateValue).childNodes[ childIndex ]
+
+            // TODO replace to `instanceof` after fixing bug in mixins code
+            if (serializedNode.tagName === 'missing_value'/* instanceof MissingValue*/) {
+                throw new Error("Should not happen")
+            } else
+                return serializedNode.valueIsAtomic(renderer, context)
+        } else {
+            return false
+        }
     }
 }
