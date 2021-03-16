@@ -2,9 +2,9 @@ import { it } from "../../index.js"
 import {
     compareDeepDiff,
     Difference,
-    DifferenceArray, DifferenceMap,
+    DifferenceArray,
+    DifferenceMap,
     DifferenceObject,
-    DifferenceObjectType,
     DifferenceSet
 } from "../../src/compare_deep/CompareDeepDiff.js"
 
@@ -207,7 +207,10 @@ it('Deep compare should work with circular data structures #1', async t => {
 //
 //     const a3    = { a : a2 }
 //
-//     t.equal(compareDeepDiff(a1, a3), DifferenceObject.new({
+//
+//     const rendererPretty    = XmlRendererSerialization.new({ prettyPrint : true })
+//
+//     t.is(rendererPretty.printValue(DifferenceObject.new({
 //         same            : false,
 //
 //         value1          : a1,
@@ -216,28 +219,109 @@ it('Deep compare should work with circular data structures #1', async t => {
 //         comparisons     : [
 //             { key : "a", difference : Difference.new({ value1 : a1, value2 : a2, same : true }) },
 //         ]
+//     })), ' ')
+//
+//
+//     // t.eqDiff(compareDeepDiff(a1, a3), DifferenceObject.new({
+//     //     same            : false,
+//     //
+//     //     value1          : a1,
+//     //     value2          : a3,
+//     //
+//     //     comparisons     : [
+//     //         { key : "a", difference : Difference.new({ value1 : a1, value2 : a2, same : true }) },
+//     //     ]
+//     // }))
+// })
+
+
+// it('Deep compare should work with circular data structures #2', async t => {
+//     const a     = [ { ref : null }, { ref : null } ]
+//
+//     a[ 0 ].ref  = a[ 1 ]
+//     a[ 1 ].ref  = a[ 0 ]
+//
+//     const b     = [ { ref : null }, { ref : null } ]
+//
+//     b[ 0 ].ref  = b[ 1 ]
+//     b[ 1 ].ref  = b[ 1 ]
+//
+//     t.eqDiff(compareDeepDiff(a, b), DifferenceArray.new({
+//         same            : false,
+//
+//         value1          : a,
+//         value2          : b,
+//
+//         comparisons     : [
+//             {
+//                 index           : 0,
+//                 difference      : DifferenceObject.new({
+//                     same    : false,
+//
+//                     value1  : a[ 0 ],
+//                     value2  : b[ 0 ],
+//
+//                     comparisons : [
+//                         {
+//                             key             : 'ref',
+//
+//                             difference      : DifferenceObject.new({
+//                                 same    : false,
+//
+//                                 value1  : a[ 1 ],
+//                                 value2  : b[ 1 ],
+//
+//                                 comparisons : [
+//                                     {
+//                                         key             : 'ref',
+//
+//                                         difference      : Difference.new({
+//                                             same            : false,
+//                                             value1          : a[ 0 ],
+//                                             value2          : b[ 1 ],
+//                                             reachability1   : any(Number) as any as number,
+//                                             reachability2   : any(Number) as any as number,
+//                                         })
+//                                     }
+//                                 ]
+//                             })
+//                         }
+//                     ]
+//                 })
+//             },
+//             {
+//                 index           : 1,
+//                 difference      : Difference.new({
+//                     same            : false,
+//                     value1          : a[ 0 ],
+//                     value2          : b[ 1 ],
+//                     reachability1   : any(Number) as any as number,
+//                     reachability2   : any(Number) as any as number,
+//                 })
+//             }
+//         ]
 //     }))
 // })
 
 
-// it('Deep compare should work with circular data structures #3', async t => {
-//     const b11   = { next : undefined }
-//     const b21   = { prev : undefined }
-//
-//     b11.next    = b21
-//     b21.prev    = b11
-//
-//     const c11   = { next : undefined }
-//     const c21   = { prev : undefined }
-//
-//     c11.next    = c21
-//     c21.prev    = c11
-//
-//     t.equal(compareDeep(b11, c11), [])
-//
-//     //----------------
-//     const d1    = new Set([ b11, b21 ])
-//     const d2    = new Set([ c11, c21 ])
-//
-//     t.equal(compareDeep(d1, d2), [])
-// })
+// // it('Deep compare should work with circular data structures #3', async t => {
+// //     const b11   = { next : undefined }
+// //     const b21   = { prev : undefined }
+// //
+// //     b11.next    = b21
+// //     b21.prev    = b11
+// //
+// //     const c11   = { next : undefined }
+// //     const c21   = { prev : undefined }
+// //
+// //     c11.next    = c21
+// //     c21.prev    = c11
+// //
+// //     t.equal(compareDeep(b11, c11), [])
+// //
+// //     //----------------
+// //     const d1    = new Set([ b11, b21 ])
+// //     const d2    = new Set([ c11, c21 ])
+// //
+// //     t.equal(compareDeep(d1, d2), [])
+// // })

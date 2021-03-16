@@ -57,7 +57,7 @@ export class MissingValue extends XmlElement {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceTemplateElement extends XmlElement {
-    props           : SerializationArray[ 'props' ] & {
+    props           : XmlElement[ 'props' ] & {
         type?           : DifferenceType
     }
 
@@ -415,9 +415,9 @@ export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
         output          : TextBlock,
         context         : XmlRenderingDynamicContextDifference
     ) {
-        if (context.currentStream === 'middle')
-            output.write(' ')
-        else {
+        if (context.currentStream === 'middle') {
+            this.renderChildren(renderer, output, context)
+        } else {
             const keyEl     = this.childNodes[ 0 ]
 
             if (

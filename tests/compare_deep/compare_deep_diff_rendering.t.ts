@@ -209,7 +209,24 @@ it('Should render the object diff correctly', async t => {
         ].join('\n')
     )
 
-    // t.eqDiff({ a : 1, b : { c : 2, d : 4 } }, { a : 1, b : { c : 3, e : 5 } })
+    //------------------
+    const difference6   = compareDeepDiff({ a : 1, b : [ 2, 3 ] }, { a : 1, b : [ 3, 4, 5 ] })
+
+    t.is(
+        renderer.renderToString(difference6.template()),
+        [
+            'Received  │ │ Expected ',
+            '          │ │          ',
+            '{         │ │ {        ',
+            '  "a": 1, │ │   "a": 1,',
+            '  "b": [  │ │   "b": [ ',
+            '    2,    │0│     3,   ',
+            '    3,    │1│     4,   ',
+            '    ░     │2│     5    ',
+            '  ]       │ │   ]      ',
+            '}         │ │ }        ',
+        ].join('\n')
+    )
 })
 
 

@@ -2,7 +2,7 @@ import { Base } from "../class/Base.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
 import { SerializerXml } from "../serializer/SerializerXml.js"
-import { ArbitraryObject, ArbitraryObjectKey, constructorNameOf, typeOf } from "../util/Helpers.js"
+import { ArbitraryObject, ArbitraryObjectKey, constructorNameOf, MIN_SMI, typeOf } from "../util/Helpers.js"
 import {
     DifferenceTemplateArray,
     DifferenceTemplateArrayEntry, DifferenceTemplateMap, DifferenceTemplateMapEntry,
@@ -56,6 +56,9 @@ export type DifferenceType = 'both' | 'onlyIn1' | 'onlyIn2'
 export class Difference extends Base {
     value1          : unknown | Missing         = Missing
     value2          : unknown | Missing         = Missing
+
+    reachability1   : number                    = MIN_SMI
+    reachability2   : number                    = MIN_SMI
 
     same            : boolean                   = false
 
@@ -243,12 +246,12 @@ export class DifferenceMap extends Difference {
 export class DeepCompareState extends Base {
     // currentDiff     : Difference                = undefined
 
-    idSource        : number                    = 0
+    idSource        : number                    = MIN_SMI + 1
 
     keyPath         : PathSegment[]             = []
 
-    visited1        : Map<unknown, [ number, PathSegment[] ]>       = new Map()
-    visited2        : Map<unknown, [ number, PathSegment[] ]>       = new Map()
+    visited1        : Map<unknown, number>      = new Map()
+    visited2        : Map<unknown, number>      = new Map()
 
 
     keyPathSnapshot () : PathSegment[] {
@@ -257,10 +260,10 @@ export class DeepCompareState extends Base {
 
 
     markVisited (v1 : unknown, v2 : unknown) {
-        const visitInfo : [ number, PathSegment[] ]    = [ this.idSource++, this.keyPathSnapshot() ]
+        const visitInfo : number    = this.idSource++
 
-        this.visited1.set(v1, visitInfo)
-        this.visited2.set(v2, visitInfo)
+        !this.visited1.has(v1) && this.visited1.set(v1, visitInfo)
+        !this.visited2.has(v2) && this.visited2.set(v2, visitInfo)
     }
 
 
@@ -341,33 +344,35 @@ export const compareDeepDiff = function (
     const v1Visit   = state.visited1.get(v1)
     const v2Visit   = state.visited2.get(v2)
 
-    if (v1Visit && v2Visit && v1Visit[ 0 ] === v2Visit[ 0 ]) {
+    const hasBoth   = v1Visit !== undefined && v2Visit !== undefined
+
+    if (hasBoth && v1Visit === v2Visit) {
         // cyclic visit from the same location in both data structures
         // this is considered as an equal value - the real difference
         // will be determined by the 1st visit
         return Difference.new({ value1 : v1, value2 : v2, same : true })
     }
-    else if (v1Visit && !v2Visit || !v1Visit && v2Visit && options.cycleIsPartOfDataStructure) {
-
-
-        // if (v1Visit && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
-        //
-        // }
-        //
-        // debugger
-        //
-        // // yield DifferenceReachability.new({
-        // //     v1, v2,
-        // //     keyPath     : state.keyPathSnapshot(),
-        // //     v1Path      : v1Visit !== undefined ? v1Visit[ 1 ] : undefined,
-        // //     v2Path      : v2Visit !== undefined ? v2Visit[ 1 ] : undefined,
-        // // })
-        //
-        // return
+    else if (options.cycleIsPartOfDataStructure && hasBoth && v1Visit !== v2Visit) {
+        return Difference.new({ value1 : v1, value2 : v2, reachability1 : v1Visit, reachability2 : v2Visit })
     }
-    else if (v1Visit && v1Visit[ 0 ] === v2Visit[ 0 ]) {
-        return Difference.new({ value1 : v1, value2 : v2, same : true })
-    }
+
+    //
+    //
+    //     // if (v1Visit && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
+    //     //
+    //     // }
+    //     //
+    //     // debugger
+    //     //
+    //     // // yield DifferenceReachability.new({
+    //     // //     v1, v2,
+    //     // //     keyPath     : state.keyPathSnapshot(),
+    //     // //     v1Path      : v1Visit !== undefined ? v1Visit[ 1 ] : undefined,
+    //     // //     v2Path      : v2Visit !== undefined ? v2Visit[ 1 ] : undefined,
+    //     // // })
+    //     //
+    //     // return
+    // }
 
     const type1         = typeOf(v1)
     const type2         = typeOf(v2)

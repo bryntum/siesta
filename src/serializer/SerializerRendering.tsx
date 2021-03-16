@@ -40,7 +40,7 @@ export type SerializationChildNode = XmlElement
 export class Serialization extends XmlElement {
     tagName         : 'serialization'           = 'serialization'
 
-    childNodes      : SerializationChildNode[]
+    childNodes      : [ SerializationChildNode ]
 
 
     valueIsAtomic (renderer : XmlRendererSerialization, context : XmlRenderingDynamicContext) : boolean {

@@ -283,6 +283,18 @@ it('Should include reference number into serialization', async t => {
 
 
 //---------------------------------------------------------------------------------------------------------------------
+it('Should include reference number into serialization', async t => {
+    //-----------------
+    const a     = [ { ref : null }, { ref : null } ]
+
+    a[ 0 ].ref  = a[ 1 ]
+    a[ 1 ].ref  = a[ 0 ]
+
+    t.is(renderer.printValue(a), '[<ref *1> { "ref": <ref *2> { "ref": [Circular *1] } }, [Circular *2]]')
+})
+
+
+//---------------------------------------------------------------------------------------------------------------------
 it('Should include class name into serialization', async t => {
 
     class SomeClass {
