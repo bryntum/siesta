@@ -198,41 +198,17 @@ it('Deep compare should work with circular data structures #1', async t => {
 })
 
 
-// it('Deep compare should work with circular data structures #2', async t => {
-//     const a1    = { a : undefined }
-//     a1.a        = a1
-//
-//     const a2    = { a : undefined }
-//     a2.a        = a2
-//
-//     const a3    = { a : a2 }
-//
-//
-//     const rendererPretty    = XmlRendererSerialization.new({ prettyPrint : true })
-//
-//     t.is(rendererPretty.printValue(DifferenceObject.new({
-//         same            : false,
-//
-//         value1          : a1,
-//         value2          : a3,
-//
-//         comparisons     : [
-//             { key : "a", difference : Difference.new({ value1 : a1, value2 : a2, same : true }) },
-//         ]
-//     })), ' ')
-//
-//
-//     // t.eqDiff(compareDeepDiff(a1, a3), DifferenceObject.new({
-//     //     same            : false,
-//     //
-//     //     value1          : a1,
-//     //     value2          : a3,
-//     //
-//     //     comparisons     : [
-//     //         { key : "a", difference : Difference.new({ value1 : a1, value2 : a2, same : true }) },
-//     //     ]
-//     // }))
-// })
+it('Deep compare should work with circular data structures #2', async t => {
+    const a1    = { a : undefined }
+    a1.a        = a1
+
+    const a2    = { a : undefined }
+    a2.a        = a2
+
+    const a3    = { a : a2 }
+
+    t.eqDiff(compareDeepDiff(a1, a3).same, false)
+})
 
 
 // it('Deep compare should work with circular data structures #2', async t => {
