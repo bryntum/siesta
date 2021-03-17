@@ -150,6 +150,8 @@ export class Launch extends Mixin(
                 if (projectPlanItems.length) queue.push(null, this.launchProjectPlanItem(projectPlanItems.shift()))
             })
 
+            const completed             = new Promise<any>(resolve => queue.onCompletedHook.on(resolve))
+
             if (this.mode === 'parallel') {
                 queue.onSlotSettledHook.on(() => queue.pull())
 
@@ -161,7 +163,7 @@ export class Launch extends Mixin(
                 queue.pullSingle()
             }
 
-            await new Promise<any>(resolve => queue.onCompletedHook.on(resolve))
+            await completed
 
             this.reporter.onTestSuiteFinish()
         }
