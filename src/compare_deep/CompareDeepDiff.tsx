@@ -87,7 +87,9 @@ export class Difference extends Base {
 
 
     excludeValue (valueProp : 'value1' | 'value2') {
-        this[ valueProp ] = Missing
+        this[ valueProp ]   = Missing
+
+        this.same           = false
     }
 }
 
