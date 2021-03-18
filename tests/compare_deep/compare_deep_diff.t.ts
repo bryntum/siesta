@@ -1,24 +1,27 @@
 import { it } from "../../index.js"
 import {
     compareDeepDiff,
-    Difference,
+    DifferenceAtomic,
     DifferenceArray,
     DifferenceMap,
     DifferenceObject, DifferenceReference,
-    DifferenceSet
+    DifferenceSet, DifferenceHeterogeneous
 } from "../../src/compare_deep/CompareDeepDiff.js"
 
 
 it('Deep compare of primitives should work', async t => {
-    t.equal(compareDeepDiff(1, 1), Difference.new({ value1 : 1, value2 : 1, same : true }))
+    t.equal(compareDeepDiff(1, 1), DifferenceAtomic.new({ value1 : 1, value2 : 1, same : true }))
 
-    t.equal(compareDeepDiff("string", "string"), Difference.new({ value1 : "string", value2 : "string", same : true }))
+    t.equal(compareDeepDiff("string", "string"), DifferenceAtomic.new({ value1 : "string", value2 : "string", same : true }))
 
-    t.equal(compareDeepDiff(1, '1'), Difference.new({ value1 : 1, value2 : '1' }))
+    t.equal(compareDeepDiff(1, '1'), DifferenceHeterogeneous.new({
+        value1 : DifferenceAtomic.new({ value1 : 1 }),
+        value2 : DifferenceAtomic.new({ value2 : '1' }),
+    }))
 
-    t.equal(compareDeepDiff(/a/, /a/), Difference.new({ value1 : /a/, value2 : /a/, same : true }))
+    t.equal(compareDeepDiff(/a/, /a/), DifferenceAtomic.new({ value1 : /a/, value2 : /a/, same : true }))
 
-    t.equal(compareDeepDiff(/a/, /a/i), Difference.new({ value1 : /a/, value2 : /a/i, same : false }))
+    t.equal(compareDeepDiff(/a/, /a/i), DifferenceAtomic.new({ value1 : /a/, value2 : /a/i, same : false }))
 })
 
 
@@ -30,7 +33,7 @@ it('Deep compare of arrays should work', async t => {
         same            : false,
 
         comparisons     : [
-            { index : 0, difference : Difference.new({ value1 : 1, value2 : 0 }) }
+            { index : 0, difference : DifferenceAtomic.new({ value1 : 1, value2 : 0 }) }
         ]
     }))
 
@@ -41,8 +44,8 @@ it('Deep compare of arrays should work', async t => {
         same            : false,
 
         comparisons     : [
-            { index : 0, difference : Difference.new({ value1 : 1, value2 : 1, same : true }) },
-            { index : 1, difference : Difference.new({ value1 : 1, value2 : 0 }) },
+            { index : 0, difference : DifferenceAtomic.new({ value1 : 1, value2 : 1, same : true }) },
+            { index : 1, difference : DifferenceAtomic.new({ value1 : 1, value2 : 0 }) },
         ]
     }))
 
@@ -53,7 +56,7 @@ it('Deep compare of arrays should work', async t => {
         same            : false,
 
         comparisons     : [
-            { index : 0, difference : Difference.new({ value2 : 1 }) }
+            { index : 0, difference : DifferenceAtomic.new({ value2 : 1 }) }
         ]
     }))
 })
@@ -86,7 +89,7 @@ it('Deep compare of objects should work', async t => {
         // onlyIn2         : new Set(),
 
         comparisons     : [
-            { key : "a", difference : Difference.new({ value1 : 1, value2 : 1, same : true }) }
+            { key : "a", difference : DifferenceAtomic.new({ value1 : 1, value2 : 1, same : true }) }
         ]
     }))
 
@@ -102,9 +105,9 @@ it('Deep compare of objects should work', async t => {
         // onlyIn2         : new Set([ 'c' ]),
 
         comparisons     : [
-            { key : "a", difference : Difference.new({ value1 : 1, value2 : 2 }) },
-            { key : "b", difference : Difference.new({ value1 : 3 }) },
-            { key : "c", difference : Difference.new({ value2 : 4 }) }
+            { key : "a", difference : DifferenceAtomic.new({ value1 : 1, value2 : 2 }) },
+            { key : "b", difference : DifferenceAtomic.new({ value1 : 3 }) },
+            { key : "c", difference : DifferenceAtomic.new({ value2 : 4 }) }
         ]
     }))
 })
@@ -127,10 +130,10 @@ it('Deep compare of sets should work', async t => {
         value2          : new Set([ 2, 3, 4 ]),
 
         comparisons     : [
-            { type : "common", difference : Difference.new({ value1 : 2, value2 : 2, same : true }) },
-            { type : "common", difference : Difference.new({ value1 : 3, value2 : 3, same : true }) },
-            { type : "onlyIn1", difference : Difference.new({ value1 : 1 }) },
-            { type : "onlyIn2", difference : Difference.new({ value2 : 4 }) },
+            { type : "common", difference : DifferenceAtomic.new({ value1 : 2, value2 : 2, same : true }) },
+            { type : "common", difference : DifferenceAtomic.new({ value1 : 3, value2 : 3, same : true }) },
+            { type : "onlyIn1", difference : DifferenceAtomic.new({ value1 : 1 }) },
+            { type : "onlyIn2", difference : DifferenceAtomic.new({ value2 : 4 }) },
         ]
     }))
 })
@@ -155,23 +158,23 @@ it('Deep compare of maps should work', async t => {
         comparisons     : [
             {
                 type                : "common",
-                differenceKeys      : Difference.new({ value1 : 2, value2 : 2, same : true }),
-                differenceValues    : Difference.new({ value1 : 2, value2 : 2, same : true })
+                differenceKeys      : DifferenceAtomic.new({ value1 : 2, value2 : 2, same : true }),
+                differenceValues    : DifferenceAtomic.new({ value1 : 2, value2 : 2, same : true })
             },
             {
                 type                : "common",
-                differenceKeys      : Difference.new({ value1 : 3, value2 : 3, same : true }),
-                differenceValues    : Difference.new({ value1 : 3, value2 : 3, same : true })
+                differenceKeys      : DifferenceAtomic.new({ value1 : 3, value2 : 3, same : true }),
+                differenceValues    : DifferenceAtomic.new({ value1 : 3, value2 : 3, same : true })
             },
             {
                 type                : "onlyIn1",
-                differenceKeys      : Difference.new({ value1 : 1 }),
-                differenceValues    : Difference.new({ value1 : 1 })
+                differenceKeys      : DifferenceAtomic.new({ value1 : 1 }),
+                differenceValues    : DifferenceAtomic.new({ value1 : 1 })
             },
             {
                 type                : "onlyIn2",
-                differenceKeys      : Difference.new({ value2 : 4 }),
-                differenceValues    : Difference.new({ value2 : 4 })
+                differenceKeys      : DifferenceAtomic.new({ value2 : 4 }),
+                differenceValues    : DifferenceAtomic.new({ value2 : 4 })
             }
         ]
     }))
@@ -210,7 +213,42 @@ it('Deep compare should work with circular data structures #2', async t => {
 
     const a3    = { a : a2 }
 
-    t.eqDiff(compareDeepDiff(a1, a3).same, false)
+    t.eqDiff(
+        compareDeepDiff(a1, a3),
+        DifferenceObject.new({
+            value1  : a1,
+            value2  : a3,
+            reachability1   : undefined,
+            reachability2   : undefined,
+            refId1  : 1,
+            refId2  : undefined,
+            same    : false,
+            comparisons     : [
+                {
+                    key     : "a",
+                    difference  : DifferenceObject.new({
+                        value1  : a1,
+                        value2  : a2,
+                        reachability1   : undefined,
+                        reachability2   : undefined,
+                        refId1  : undefined,
+                        refId2  : 1,
+                        same    : false,
+                        comparisons     : [
+                            {
+                                key     : "a",
+                                difference  : DifferenceReference.new({
+                                    value1  : 1,
+                                    value2  : 1,
+                                    same    : false
+                                })
+                            }
+                        ]
+                    })
+                }
+            ]
+        })
+    )
 })
 
 

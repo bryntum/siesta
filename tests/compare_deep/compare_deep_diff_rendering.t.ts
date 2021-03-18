@@ -1,12 +1,10 @@
-import { it, xit } from "../../index.js"
+import { it, iit } from "../../index.js"
 import { compareDeepDiff } from "../../src/compare_deep/CompareDeepDiff.js"
 import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRendering.js"
 
+const renderer      = XmlRendererDifference.new()
 
-it('Should render the array diff correctly', async t => {
-    const renderer      = XmlRendererDifference.new()
-
-    //------------------
+it('Should render the array diff correctly #1', async t => {
     const difference0   = compareDeepDiff([], [])
 
     t.is(
@@ -17,8 +15,10 @@ it('Should render the array diff correctly', async t => {
             '[]       │ │ []      ',
         ].join('\n')
     )
+})
 
-    //------------------
+
+it('Should render the array diff correctly #2', async t => {
     const difference1   = compareDeepDiff([ 1, 1 ], [ 0, 0 ])
 
     t.is(
@@ -32,8 +32,10 @@ it('Should render the array diff correctly', async t => {
             ']        │ │ ]       '
         ].join('\n')
     )
+})
 
-    //------------------
+
+it('Should render the array diff correctly #3', async t => {
     const difference2   = compareDeepDiff([ { a : 1 } ], [ 3 ])
 
     t.is(
@@ -48,8 +50,10 @@ it('Should render the array diff correctly', async t => {
             ']          │ │ ]       '
         ].join('\n')
     )
+})
 
-    //------------------
+
+it('Should render the array diff correctly #4', async t => {
     const difference3   = compareDeepDiff([ { a : 1 }, { b : 2 } ], [ 3, 4 ])
 
     t.is(
@@ -67,8 +71,10 @@ it('Should render the array diff correctly', async t => {
             ']          │ │ ]       '
         ].join('\n')
     )
+})
 
-    //------------------
+
+it('Should render the array diff correctly #5', async t => {
     const difference4   = compareDeepDiff([ { a : 1 }, 3, 4 ], [ { a : 1 }, 2 ])
 
     t.is(
@@ -85,8 +91,10 @@ it('Should render the array diff correctly', async t => {
             ']          │ │ ]         '
         ].join('\n')
     )
+})
 
-    //------------------
+
+iit('Should render the array diff correctly #6', async t => {
     const difference5   = compareDeepDiff([ 3, { a : 1 }, { b : 2 } ], [ 2 ])
 
     t.is(
@@ -105,14 +113,10 @@ it('Should render the array diff correctly', async t => {
             ']          │ │ ]       '
         ].join('\n')
     )
-
-    // t.eqDiff([ { a : 1 }, 4, 5 ], [ 3 ])
 })
 
 
 it('Should render the object diff correctly', async t => {
-    const renderer      = XmlRendererDifference.new()
-
     //------------------
     const difference0   = compareDeepDiff({}, {})
 
@@ -231,8 +235,6 @@ it('Should render the object diff correctly', async t => {
 
 
 it('Should render the set diff correctly', async t => {
-    const renderer      = XmlRendererDifference.new()
-
     //------------------
     const difference1   = compareDeepDiff(new Set([ 1, 2 ]), new Set([ 2, 3 ]))
 
@@ -273,8 +275,6 @@ it('Should render the set diff correctly', async t => {
 
 
 it('Should render the map diff correctly', async t => {
-    const renderer      = XmlRendererDifference.new()
-
     //------------------
     const difference0   = compareDeepDiff(new Map([]), new Map([]))
 
@@ -389,21 +389,10 @@ it('Should render the map diff correctly', async t => {
             '}           │ │ }          ',
         ].join('\n')
     )
-
-
-    // t.eqDiff(new Set([
-    //     { a : 1 }
-    // ]), new Set([
-    //     { a : 2 },
-    //     { a : 1 },
-    //     { b : 11 }
-    // ]))
 })
 
 
 it('Should render the diff of circular data structures correctly #1', async t => {
-    const renderer      = XmlRendererDifference.new()
-
     const a1    = { a : undefined }
     a1.a        = a1
 
@@ -426,9 +415,35 @@ it('Should render the diff of circular data structures correctly #1', async t =>
 })
 
 
-xit('Should render the diff of circular data structures correctly #2', async t => {
-    const renderer      = XmlRendererDifference.new()
+it('Should render the diff of circular data structures correctly #2', async t => {
+    const a1    = { a : undefined }
+    a1.a        = a1
 
+    const a2    = { a : undefined }
+    a2.a        = a2
+
+    //------------------
+    const difference0   = compareDeepDiff([ a1, a2 ], [ a1, false])
+
+    t.is(
+        renderer.renderToString(difference0.template()),
+        [
+            'Received               │ │ Expected              ',
+            '                       │ │                       ',
+            '[                      │ │ [                     ',
+            '  <ref *1> {           │0│   <ref *1> {          ',
+            '    "a": [Circular *1] │ │     "a": [Circular *1]',
+            '  },                   │ │   },                  ',
+            '  <ref *2> {           │1│   false               ',
+            '    "a": [Circular *2] │ │                       ',
+            '  }                    │ │                       ',
+            ']                      │ │ ]                     ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff of circular data structures correctly #3', async t => {
     const a1    = { a : undefined }
     a1.a        = a1
 
@@ -447,9 +462,9 @@ xit('Should render the diff of circular data structures correctly #2', async t =
             '                     │ │                       ',
             '<ref *1> {           │ │ {                     ',
             '  "a": [Circular *1] │ │   "a": <ref *1> {     ',
-            '}                    │ │     "a": [Circular *1]',
+            '                     │ │     "a": [Circular *1]',
             '                     │ │   }                   ',
-            '                     │ │ }                     ',
+            '}                    │ │ }                     ',
         ].join('\n')
     )
 })

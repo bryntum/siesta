@@ -128,6 +128,32 @@ export class DifferenceTemplateReference extends DifferenceTemplateElement {
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
+export class DifferenceTemplateHeterogeneous extends DifferenceTemplateElement {
+    props   : DifferenceTemplateElement[ 'props' ]
+
+
+    renderSelf (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+        if (context.currentStream === 'left') {
+            if (this.getAttribute('type') === 'onlyIn2')
+                output.write('░')
+            else
+                this.renderChildInner(this.childNodes[ 0 ], 0, renderer, output, context)
+        } else if (context.currentStream === 'right') {
+            if (this.getAttribute('type') === 'onlyIn1')
+                output.write('░')
+            else
+                this.renderChildInner(this.childNodes[ 1 ], 1, renderer, output, context)
+        }
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
 export class DifferenceTemplateRoot extends DifferenceTemplateElement {
     tagName         : 'difference_template_root'           = 'difference_template_root'
 
@@ -313,7 +339,7 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class DifferenceTemplateValue extends DifferenceTemplateElement {
+export class DifferenceTemplateAtomic extends DifferenceTemplateElement {
     tagName         : string            = 'difference_template_value'
 
     childNodes      : [ Serialization | MissingValue, Serialization | MissingValue ]
@@ -436,14 +462,14 @@ export class DifferenceTemplateObject extends Mixin(
             if (index + 1 > this.childNodes.length - 1) return false
 
             const entryEl       = this.childNodes[ index + 1 ] as DifferenceTemplateObjectEntry
-            const keyEl         = entryEl.childNodes[ 0 ] as DifferenceTemplateValue
+            const keyEl         = entryEl.childNodes[ 0 ] as DifferenceTemplateAtomic
 
             return keyEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
         }
 
 
         childEntryHasMissingIn (child : DifferenceTemplateObjectEntry, stream : 'left' | 'right') : boolean {
-            const keyEl     = child.childNodes[ 0 ] as DifferenceTemplateValue
+            const keyEl     = child.childNodes[ 0 ] as DifferenceTemplateAtomic
 
             return keyEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
         }
@@ -498,7 +524,7 @@ export class DifferenceTemplateSet extends Mixin(
 
         tagName         : string            = 'difference_template_set'
 
-        childNodes      : DifferenceTemplateValue[]
+        childNodes      : DifferenceTemplateAtomic[]
 
 
         getSize (context : XmlRenderingDynamicContextDifference) : number {
@@ -642,7 +668,7 @@ export class DifferenceTemplateMap extends Mixin(
 
         tagName         : string            = 'difference_template_map'
 
-        childNodes      : DifferenceTemplateValue[]
+        childNodes      : DifferenceTemplateMapEntry[]
 
 
         getSize (context : XmlRenderingDynamicContextDifference) : number {
@@ -772,7 +798,7 @@ export class DifferenceTemplateMapEntry extends SerializationMapEntry {
         const valueDiffEl       = this.childNodes[ childIndex ] as XmlElement
 
         if (valueDiffEl.tagName.toLowerCase() === 'difference_template_value') {
-            const serializedNode    = (valueDiffEl as DifferenceTemplateValue).childNodes[ childIndex ] as XmlElement
+            const serializedNode    = (valueDiffEl as DifferenceTemplateAtomic).childNodes[ childIndex ] as XmlElement
 
             if (serializedNode instanceof MissingValue) {
                 throw new Error("Should not happen")
