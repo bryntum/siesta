@@ -602,11 +602,11 @@ export class DifferenceTemplateSetEntry extends DifferenceTemplateElement {
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class DifferenceTemplateMap extends Mixin(
-    [ SerializationMap, DifferenceTemplateReferenceable ],
-    (base : ClassUnion<typeof SerializationMap, typeof DifferenceTemplateReferenceable>) =>
+    [ SerializationMap, DifferenceTemplateComposite ],
+    (base : ClassUnion<typeof SerializationMap, typeof DifferenceTemplateComposite>) =>
 
     class DifferenceTemplateMap extends base {
-        props           : SerializationMap[ 'props' ] & DifferenceTemplateReferenceable[ 'props' ] & {
+        props           : SerializationMap[ 'props' ] & DifferenceTemplateComposite[ 'props' ] & {
             size2?          : number
         }
 
@@ -620,89 +620,16 @@ export class DifferenceTemplateMap extends Mixin(
         }
 
 
-        beforeRenderChildren (
+        beforeRenderChildrenMiddle (
             renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
-            if (context.currentStream !== 'middle')
-                super.beforeRenderChildren(renderer, output, context)
-            else {
-                // output.write('\n')
-            }
+            const size1   = this.getAttribute('size')
+            const size2   = this.getAttribute('size2')
+
+            if (size1 > 0 || size2 > 0) output.write('\n')
         }
-
-
-        afterRenderChildren (
-            renderer    : XmlRendererDifference,
-            output      : TextBlock,
-            context     : XmlRenderingDynamicContextDifference
-        ) {
-            if (context.currentStream !== 'middle')
-                super.afterRenderChildren(renderer, output, context)
-        }
-
-
-        beforeRenderChild (
-            child               : XmlNode,
-            index               : number,
-            renderer            : XmlRendererDifference,
-            output              : TextBlock,
-            context             : XmlRenderingDynamicContextDifference
-        ) {
-            if (context.currentStream !== 'middle')
-                super.beforeRenderChild(child, index, renderer, output, context)
-        }
-
-
-        // needCommaAfterChild (
-        //     child               : DifferenceTemplateValue,
-        //     index               : number,
-        //     renderer            : XmlRendererDifference,
-        //     context             : XmlRenderingDynamicContextDifference
-        // )
-        //     : boolean
-        // {
-        //     const stream        = context.currentStream === 'left' ? 'left' : 'right'
-        //
-        //     if (
-        //         this.childEntryHasMissingIn(child, stream)
-        //         ||
-        //         stream === 'left' && this.nextChildEntryHasMissingIn(index, stream)
-        //     ) {
-        //         return false
-        //     } else {
-        //         return super.needCommaAfterChild(child, index, renderer, context)
-        //     }
-        // }
-
-
-        afterRenderChild (
-            child               : XmlNode,
-            index               : number,
-            renderer            : XmlRendererDifference,
-            output              : TextBlock,
-            context             : XmlRenderingDynamicContextDifference
-        ) {
-            if (context.currentStream !== 'middle')
-                super.afterRenderChild(child, index, renderer, output, context)
-
-            output.push(ColoredStringSyncPoint.new({ el : child as XmlElement }))
-        }
-
-
-        // nextChildEntryHasMissingIn (index : number, stream : 'left' | 'right') : boolean {
-        //     if (index + 1 > this.childNodes.length - 1) return false
-        //
-        //     const entryEl       = this.childNodes[ index + 1 ] as DifferenceTemplateValue
-        //
-        //     return entryEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
-        // }
-        //
-        //
-        // childEntryHasMissingIn (child : DifferenceTemplateValue, stream : 'left' | 'right') : boolean {
-        //     return child.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
-        // }
     }
 ){}
 
@@ -720,9 +647,12 @@ export class DifferenceTemplateMapEntry extends SerializationMapEntry {
         output          : TextBlock,
         context         : XmlRenderingDynamicContextDifference
     ) {
-        if (context.currentStream === 'middle')
+        if (context.currentStream === 'middle') {
             output.write(' ')
-        else {
+
+            this.renderChildren(renderer, output, context)
+        } else {
+            // TODO REMOVE
             if (
                 this.getAttribute('type') === 'onlyIn2' && context.currentStream === 'left'
                 ||
@@ -731,6 +661,7 @@ export class DifferenceTemplateMapEntry extends SerializationMapEntry {
                 output.write('░')
             }
             else
+            // eof TODO REMOVE
                 super.renderSelf(renderer, output, context)
         }
     }

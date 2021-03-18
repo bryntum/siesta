@@ -406,7 +406,10 @@ it('Should render the map diff correctly #3', async t => {
 
 
 it('Should render the map diff correctly #4', async t => {
-    const difference3   = compareDeepDiff(new Map([ [ { a : 1 }, { b : 2 } ], [ { b : 2 }, { c : 3 } ] ]), new Map([ [ { a : 1 }, { b : 3 } ], [ { c : 3 }, { b : 2 } ] ]))
+    const difference3   = compareDeepDiff(
+        new Map([ [ { a : 1 }, { b : 2 } ], [ { b : 2 }, { c : 3 } ] ]),
+        new Map([ [ { a : 1 }, { b : 3 } ], [ { c : 3 }, { b : 2 } ] ])
+    )
 
     t.is(
         renderer.renderToString(difference3.template()),
@@ -467,6 +470,45 @@ it('Should render the map diff correctly #5', async t => {
             '    ░       │ │     "b": 2 ',
             '  }         │ │   }        ',
             '}           │ │ }          ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the map diff correctly #6', async t => {
+    const difference3   = compareDeepDiff(
+        new Map([ [ [ 1, 2 ], [ 3, 4 ] ], [ [ 11, 22 ], [ 33, 44 ] ] ]),
+        new Map([ [ [ 1, 2 ], [ 3, 4 ] ], [ [ 10, 20 ], [ 30, 40 ] ] ]),
+    )
+
+    t.is(
+        renderer.renderToString(difference3.template()),
+        [
+            'Received  │ │ Expected ',
+            '          │ │          ',
+            'Map (2) { │ │ Map (2) {',
+            '  [       │ │   [      ',
+            '    1,    │0│     1,   ',
+            '    2     │1│     2    ',
+            '  ] => [  │ │   ] => [ ',
+            '    3,    │0│     3,   ',
+            '    4     │1│     4    ',
+            '  ],      │ │   ],     ',
+            '  [       │ │   ░,     ',
+            '    11,   │0│          ',
+            '    22    │1│          ',
+            '  ] => [  │ │          ',
+            '    33,   │0│          ',
+            '    44    │1│          ',
+            '  ],      │ │          ',
+            '  ░       │ │   [      ',
+            '          │0│     10,  ',
+            '          │1│     20   ',
+            '          │ │   ] => [ ',
+            '          │0│     30,  ',
+            '          │1│     40   ',
+            '          │ │   ]      ',
+            '}         │ │ }        ',
         ].join('\n')
     )
 })
