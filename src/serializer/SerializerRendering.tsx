@@ -25,8 +25,8 @@ export class XmlRendererSerialization extends Mixin(
         ])
 
 
-        printValue (value : unknown, textBlock? : Partial<TextBlock>, serilizationProps? : Partial<SerializerXml>) : string {
-            return this.renderToString(SerializerXml.serialize(value, serilizationProps), TextBlock.maybeNew(textBlock))
+        printValue (value : unknown, textBlock? : Partial<TextBlock>, serializationProps? : Partial<SerializerXml>) : string {
+            return this.renderToString(SerializerXml.serialize(value, serializationProps), TextBlock.maybeNew(textBlock))
         }
     }
 ){}
@@ -43,11 +43,11 @@ export class Serialization extends XmlElement {
     childNodes      : [ SerializationChildNode ]
 
 
-    valueIsAtomic (renderer : XmlRendererSerialization, context : XmlRenderingDynamicContext) : boolean {
-        const valueEl       = this.childNodes[ 0 ] as XmlElement
-
-        return renderer.atomicElementNodes.has(valueEl.tagName.toLowerCase())
-    }
+    // valueIsAtomic (renderer : XmlRendererSerialization, context : XmlRenderingDynamicContext) : boolean {
+    //     const valueEl       = this.childNodes[ 0 ] as XmlElement
+    //
+    //     return renderer.atomicElementNodes.has(valueEl.tagName.toLowerCase())
+    // }
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -61,8 +61,13 @@ export class SerializationReferenceable extends Mixin(
         }
 
 
+        getRefId (context : XmlRenderingDynamicContext) : number {
+            return this.getAttribute('refId')
+        }
+
+
         beforeRenderChildren (renderer : XmlRendererSerialization, output : TextBlock, context : XmlRenderingDynamicContext) {
-            const refId     = this.getAttribute('refId')
+            const refId     = this.getRefId(context)
 
             if (refId !== undefined) output.push(`<ref *${ refId }> `)
 
@@ -80,7 +85,7 @@ export class SerializationComposite extends Mixin(
     class SerializationComposite extends base {
 
         getSpaceAfterOpeningBracket (renderer : XmlRendererSerialization) : boolean {
-            throw new Error("Implement me")
+            throw new Error("Abstract method")
         }
 
         getSpaceBetweenElements (renderer : XmlRendererSerialization) : boolean {

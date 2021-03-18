@@ -29,9 +29,9 @@ export class SerializerXml extends Mixin(
 
         outOfWideSymbol     : XmlElement    = <out_of_wide></out_of_wide>
 
-        result              : Serialization = <Serialization></Serialization> as Serialization
+        result              : XmlElement    = undefined
 
-        currentElement      : XmlElement    = this.result
+        currentElement      : XmlElement    = undefined
 
         refCounter          : number        = 1
 
@@ -54,7 +54,10 @@ export class SerializerXml extends Mixin(
 
 
         write (el : XmlElement) {
-            this.currentElement.appendChild(el)
+            if (!this.currentElement) {
+                this.currentElement = this.result = el
+            } else
+                this.currentElement.appendChild(el)
 
             if (!this.valueToEl.has(this.beforeVisitEl)) this.valueToEl.set(this.beforeVisitEl, el)
         }
@@ -260,12 +263,25 @@ export class SerializerXml extends Mixin(
         }
 
 
+        serialize (value : unknown) : XmlElement {
+            this.visit(value)
+
+            const result        = this.result
+
+            this.currentElement = this.result = undefined
+
+            return result
+        }
+
+
         static serialize <T extends typeof SerializerXml> (this : T, value : unknown, props? : Partial<InstanceType<T>>) : Serialization {
-            const serializer = this.new(props)
+            const serializer    = this.new(props)
+
+            serializer.currentElement   = <Serialization></Serialization> as Serialization
 
             serializer.visit(value)
 
-            return serializer.result
+            return serializer.currentElement as Serialization
         }
     }
 ){}

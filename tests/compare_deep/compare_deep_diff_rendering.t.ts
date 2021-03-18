@@ -416,13 +416,11 @@ it('Should render the diff of circular data structures correctly #1', async t =>
     t.is(
         renderer.renderToString(difference0.template()),
         [
-            'Received               │ │ Expected              ',
-            '                       │ │                       ',
-            '{                      │ │ {                     ',
-            '  "a": <ref *1> {      │ │   "a": <ref *1> {     ',
-            '    "a": [Circular *1] │ │     "a": [Circular *1]',
-            '  }                    │ │   }                   ',
-            '}                      │ │ }                     ',
+            'Received             │ │ Expected            ',
+            '                     │ │                     ',
+            '<ref *1> {           │ │ <ref *1> {          ',
+            '  "a": [Circular *1] │ │   "a": [Circular *1]',
+            '}                    │ │ }                   ',
         ].join('\n')
     )
 })
@@ -445,15 +443,13 @@ xit('Should render the diff of circular data structures correctly #2', async t =
     t.is(
         renderer.renderToString(difference0.template()),
         [
-            'Received               │ │ Expected                ',
-            '                       │ │                         ',
-            '{                      │ │ {                       ',
-            '  "a": <ref *1> {      │ │   "a": {                ',
-            '    "a": [Circular *1] │ │     "a": <ref *1> {     ',
-            '  }                    │ │       "a": [Circular *1]',
-            '                       │ │     }                   ',
-            '                       │ │   }                     ',
-            '}                      │ │ }                       ',
+            'Received             │ │ Expected              ',
+            '                     │ │                       ',
+            '<ref *1> {           │ │ {                     ',
+            '  "a": [Circular *1] │ │   "a": <ref *1> {     ',
+            '}                    │ │     "a": [Circular *1]',
+            '                     │ │   }                   ',
+            '                     │ │ }                     ',
         ].join('\n')
     )
 })

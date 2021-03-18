@@ -10,7 +10,7 @@ import {
     Serialization,
     SerializationArray, SerializationMap, SerializationMapEntry,
     SerializationObject,
-    SerializationObjectEntry,
+    SerializationObjectEntry, SerializationReferenceable,
     SerializationSet,
     XmlRendererSerialization
 } from "../serializer/SerializerRendering.js"
@@ -56,6 +56,8 @@ export class MissingValue extends XmlElement {
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// this class renders the children directly to its own output textblock
+// regular styling/indentation/etc does not apply
 export class DifferenceTemplateElement extends XmlElement {
     props           : XmlElement[ 'props' ] & {
         type?           : DifferenceType
@@ -72,6 +74,53 @@ export class DifferenceTemplateElement extends XmlElement {
             output.push(child)
         } else {
             child.renderToTextBlock(renderer, output, context)
+        }
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class DifferenceTemplateReferenceable extends Mixin(
+    [ SerializationReferenceable, DifferenceTemplateElement ],
+    (base : ClassUnion<typeof SerializationReferenceable, typeof DifferenceTemplateElement>) =>
+
+    class DifferenceTemplateReferenceable extends base {
+        props   : SerializationReferenceable[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
+            refId2?          : number
+        }
+
+
+        getRefId (context : XmlRenderingDynamicContextDifference) : number {
+            return context.currentStream === 'left' ? this.getAttribute('refId') : this.getAttribute('refId2')
+        }
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class DifferenceTemplateReference extends DifferenceTemplateElement {
+    props   : DifferenceTemplateElement[ 'props' ] & {
+        refId1?          : number
+        refId2?          : number
+    }
+
+
+    renderSelf (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+        if (context.currentStream === 'left') {
+            if (this.getAttribute('type') === 'onlyIn2')
+                output.write('░')
+            else
+                output.write(`[Circular *${ this.getAttribute('refId1') }]`)
+        } else if (context.currentStream === 'right') {
+            if (this.getAttribute('type') === 'onlyIn1')
+                output.write('░')
+            else
+                output.write(`[Circular *${ this.getAttribute('refId2') }]`)
         }
     }
 }
@@ -172,11 +221,11 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class DifferenceTemplateArray extends Mixin(
-    [ SerializationArray, DifferenceTemplateElement ],
-    (base : ClassUnion<typeof SerializationArray, typeof DifferenceTemplateElement>) =>
+    [ SerializationArray, DifferenceTemplateReferenceable ],
+    (base : ClassUnion<typeof SerializationArray, typeof DifferenceTemplateReferenceable>) =>
 
     class DifferenceTemplateArray extends base {
-        props           : SerializationArray[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
+        props           : SerializationArray[ 'props' ] & DifferenceTemplateReferenceable[ 'props' ] & {
             length2       : number
         }
 
@@ -293,13 +342,13 @@ export class DifferenceTemplateValue extends DifferenceTemplateElement {
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class DifferenceTemplateObject extends Mixin(
-    [ SerializationObject, DifferenceTemplateElement ],
-    (base : ClassUnion<typeof SerializationObject, typeof DifferenceTemplateElement>) =>
+    [ SerializationObject, DifferenceTemplateReferenceable ],
+    (base : ClassUnion<typeof SerializationObject, typeof DifferenceTemplateReferenceable>) =>
 
     class DifferenceTemplateObject extends base {
         tagName         : string            = 'difference_template_object'
 
-        props           : SerializationObject[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
+        props           : SerializationObject[ 'props' ] & DifferenceTemplateReferenceable[ 'props' ] & {
             constructorName2?       : string
         }
 
@@ -439,11 +488,11 @@ export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class DifferenceTemplateSet extends Mixin(
-    [ SerializationSet, DifferenceTemplateElement ],
-    (base : ClassUnion<typeof SerializationSet, typeof DifferenceTemplateElement>) =>
+    [ SerializationSet, DifferenceTemplateReferenceable ],
+    (base : ClassUnion<typeof SerializationSet, typeof DifferenceTemplateReferenceable>) =>
 
     class DifferenceTemplateSet extends base {
-        props           : SerializationSet[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
+        props           : SerializationSet[ 'props' ] & DifferenceTemplateReferenceable[ 'props' ] & {
             size2?          : number
         }
 
@@ -583,11 +632,11 @@ export class DifferenceTemplateSet extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class DifferenceTemplateMap extends Mixin(
-    [ SerializationMap, DifferenceTemplateElement ],
-    (base : ClassUnion<typeof SerializationMap, typeof DifferenceTemplateElement>) =>
+    [ SerializationMap, DifferenceTemplateReferenceable ],
+    (base : ClassUnion<typeof SerializationMap, typeof DifferenceTemplateReferenceable>) =>
 
     class DifferenceTemplateMap extends base {
-        props           : SerializationMap[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
+        props           : SerializationMap[ 'props' ] & DifferenceTemplateReferenceable[ 'props' ] & {
             size2?          : number
         }
 
@@ -723,13 +772,13 @@ export class DifferenceTemplateMapEntry extends SerializationMapEntry {
         const valueDiffEl       = this.childNodes[ childIndex ] as XmlElement
 
         if (valueDiffEl.tagName.toLowerCase() === 'difference_template_value') {
-            const serializedNode    = (valueDiffEl as DifferenceTemplateValue).childNodes[ childIndex ]
+            const serializedNode    = (valueDiffEl as DifferenceTemplateValue).childNodes[ childIndex ] as XmlElement
 
-            // TODO replace to `instanceof` after fixing bug in mixins code
-            if (serializedNode.tagName === 'missing_value'/* instanceof MissingValue*/) {
+            if (serializedNode instanceof MissingValue) {
                 throw new Error("Should not happen")
             } else
-                return serializedNode.valueIsAtomic(renderer, context)
+                // return serializedNode.valueIsAtomic(renderer, context)
+                return renderer.atomicElementNodes.has(serializedNode.tagName.toLowerCase())
         } else {
             return false
         }

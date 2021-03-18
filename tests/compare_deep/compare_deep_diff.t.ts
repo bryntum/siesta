@@ -4,7 +4,7 @@ import {
     Difference,
     DifferenceArray,
     DifferenceMap,
-    DifferenceObject,
+    DifferenceObject, DifferenceReference,
     DifferenceSet
 } from "../../src/compare_deep/CompareDeepDiff.js"
 
@@ -191,8 +191,11 @@ it('Deep compare should work with circular data structures #1', async t => {
         value1          : a1,
         value2          : a2,
 
+        refId1          : 1,
+        refId2          : 1,
+
         comparisons     : [
-            { key : "a", difference : Difference.new({ value1 : a1, value2 : a2, same : true }) },
+            { key : "a", difference : DifferenceReference.new({ value1 : 1, value2 : 1, same : true }) },
         ]
     }))
 })

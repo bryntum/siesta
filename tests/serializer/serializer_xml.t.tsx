@@ -224,3 +224,42 @@ it('Should serialize placeholders as numbers', async t => {
         'Number serialization'
     )
 })
+
+
+it('Should support incremental serialization', async t => {
+
+    const serializer        = SerializerXml.new()
+
+    const a     = { a : undefined }
+    a.a         = a
+
+    // serializing the `a` object first
+    t.equal(
+        serializer.serialize(a),
+        <object size={ 1 } refId={ 1 }>
+            <object_entry>
+                <string>"a"</string>
+                <reference refId={ 1 }></reference>
+            </object_entry>
+        </object>
+    )
+
+    const b     = { b : undefined, c : a }
+    b.b         = b
+
+    // now serializing the `b`, which contains reference to `a` which is just
+    // displayed as a reference with the same `refId` as in previous serialization
+    t.equal(
+        serializer.serialize(b),
+        <object size={ 2 } refId={ 2 }>
+            <object_entry>
+                <string>"b"</string>
+                <reference refId={ 2 }></reference>
+            </object_entry>
+            <object_entry>
+                <string>"c"</string>
+                <reference refId={ 1 }></reference>
+            </object_entry>
+        </object>
+    )
+})
