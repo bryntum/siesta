@@ -14,7 +14,7 @@ import {
     DifferenceTemplateRoot,
     DifferenceTemplateSet,
     DifferenceTemplateAtomic,
-    MissingValue
+    MissingValue, DifferenceTemplateSetEntry
 } from "./CompareDeepDiffRendering.js"
 
 
@@ -230,7 +230,10 @@ export class DifferenceSet extends DifferenceReferenceable {
             type={ this.type } size={ this.value1.size } size2={ this.value2.size }
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
-            this.comparisons.map(({ difference }) => difference.templateInner(serializerConfig, diffState))
+            this.comparisons.map(({ difference }) =>
+                <DifferenceTemplateSetEntry>
+                    { difference.templateInner(serializerConfig, diffState) }
+                </DifferenceTemplateSetEntry>)
         }</DifferenceTemplateSet>
     }
 }
