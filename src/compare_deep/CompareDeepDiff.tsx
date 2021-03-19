@@ -53,6 +53,10 @@ export class PathSegment extends Base {
 const Missing   = Symbol('Missing')
 type Missing    = typeof Missing
 
+// a wrapper for `Missing` - to render the diff for internal diff data structures correctly
+const MissingWrapper   = Symbol('Missing')
+
+
 //---------------------------------------------------------------------------------------------------------------------
 export type DifferenceType = 'both' | 'onlyIn1' | 'onlyIn2'
 
@@ -317,52 +321,14 @@ export class DifferenceHeterogeneous extends Difference {
 
 //---------------------------------------------------------------------------------------------------------------------
 const valueAsDifference = (value : unknown, valueProp : 'value1' | 'value2', options : DeepCompareOptions, state : DeepCompareState) : Difference => {
+    if (value === Missing) value = MissingWrapper
+
     const res = compareDeepDiff(value, value, options, state)
 
     res.excludeValue(valueProp === 'value1' ? 'value2' : 'value1')
 
     return res
 }
-
-// const valueAsDifferenceInternal = (value : unknown, valueIndex : 0 | 1, options : DeepCompareOptions, state : DeepCompareState) : Difference => {
-//     const values : [ any, any, DeepCompareOptions, DeepCompareState ] =
-//         valueIndex === 0 ? [ value, undefined, options, state ] : [ undefined, value, options, state ]
-//
-//     const placeHolderIndex  = valueIndex === 0 ? 1 : 0
-//
-//     const type      = typeOf(value)
-//
-//     if (type === 'Array') {
-//         values[ placeHolderIndex ] = []
-//         return compareArrayDeepDiff(...values)
-//     }
-//     else if (type === 'Object') {
-//         values[ placeHolderIndex ] = {}
-//         return compareObjectDeepDiff(...values)
-//     }
-//     else if (type === 'Map') {
-//         values[ placeHolderIndex ] = new Map()
-//         return compareMapDeepDiff(...values)
-//     }
-//     else if (type === 'Set') {
-//         values[ placeHolderIndex ] = new Set()
-//         return compareSetDeepDiff(...values)
-//     }
-//     else if (type == 'Function' || type === 'AsyncFunction' || type === 'GeneratorFunction' || type === 'AsyncGeneratorFunction') {
-//         values[ placeHolderIndex ] = () => {}
-//         return compareFunctionDeepDiff(...values)
-//     }
-//     else if (type == 'RegExp') {
-//         values[ placeHolderIndex ] = new RegExp('')
-//         return compareRegExpDeepDiff(...values)
-//     }
-//     else if (type == 'Date') {
-//         values[ placeHolderIndex ] = new Date()
-//         return compareDateDeepDiff(...values)
-//     } else {
-//         return DifferenceAtomic.new({ [ valueIndex === 0 ? 'value1' : 'value2' ] : value })
-//     }
-// }
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -450,6 +416,12 @@ export const compareDeepDiff = function (
 )
     : Difference
 {
+    // if we are passed the internal constant `Missing`, we are probably
+    // doing diff for own internal data structures
+    // in such case, replace that constant with another value,
+    // so that code can distinguish it
+    if (v1 === v2 && v1 === Missing) { v1 = v2 = MissingWrapper }
+
     // // shortcut exit to save time, this also allows to compare the placeholder with itself
     // if (v1 === v2) return
     //
