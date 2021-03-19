@@ -321,24 +321,48 @@ it('Deep compare should work with circular data structures #3', async t => {
 })
 
 
-// // it('Deep compare should work with circular data structures #3', async t => {
-// //     const b11   = { next : undefined }
-// //     const b21   = { prev : undefined }
-// //
-// //     b11.next    = b21
-// //     b21.prev    = b11
-// //
-// //     const c11   = { next : undefined }
-// //     const c21   = { prev : undefined }
-// //
-// //     c11.next    = c21
-// //     c21.prev    = c11
-// //
-// //     t.equal(compareDeep(b11, c11), [])
-// //
-// //     //----------------
-// //     const d1    = new Set([ b11, b21 ])
-// //     const d2    = new Set([ c11, c21 ])
-// //
-// //     t.equal(compareDeep(d1, d2), [])
-// // })
+it('Deep compare should work with circular data structures #4', async t => {
+    const b11   = { next : undefined }
+    const b21   = { prev : undefined }
+
+    b11.next    = b21
+    b21.prev    = b11
+
+    const c11   = { next : undefined }
+    const c21   = { prev : undefined }
+
+    c11.next    = c21
+    c21.prev    = c11
+
+    t.eqDiff(
+        compareDeepDiff(b11, c11),
+
+        DifferenceObject.new({
+            value1      : b11,
+            value2      : c11,
+            same        : true,
+            refId1      : 1,
+            refId2      : 1,
+            comparisons         : [
+                {
+                    key         : "next",
+                    difference      : DifferenceObject.new({
+                        value1      : b21,
+                        value2      : c21,
+                        same        : true,
+                        comparisons         : [
+                            {
+                                key         : "prev",
+                                difference      : DifferenceReference.new({
+                                    value1      : 1,
+                                    value2      : 1,
+                                    same        : true
+                                })
+                            }
+                        ]
+                    })
+                }
+            ]
+        })
+    )
+})
