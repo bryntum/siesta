@@ -635,3 +635,25 @@ it('Should render the diff of heterogeneous data correctly #1', async t => {
     )
 })
 
+
+it('Should render the diff of heterogeneous data correctly #2', async t => {
+    const difference0   = compareDeepDiff([ { a : { b : 2 } }, new Set([ 1 ]) ], [ 1, { c : 2 } ])
+
+    t.is(
+        renderer.renderToString(difference0.template()),
+        [
+            'Received     │ │ Expected  ',
+            '             │ │           ',
+            '[            │ │ [         ',
+            '  {          │0│   1,      ',
+            '    "a": {   │ │           ',
+            '      "b": 2 │ │           ',
+            '    }        │ │           ',
+            '  },         │ │           ',
+            '  Set (1) {  │1│   {       ',
+            '    1        │ │     "c": 2',
+            '  }          │ │   }       ',
+            ']            │ │ ]         ',
+        ].join('\n')
+    )
+})
