@@ -116,7 +116,7 @@ it('Should render the array diff correctly #6', async t => {
 })
 
 
-it('Should render the array diff correctly #8', async t => {
+it('Should render the array diff correctly #7', async t => {
     const difference5   = compareDeepDiff([ [ 1 ], [ 2, 3 ] ], [ [ 1 ] ])
 
     t.is(
