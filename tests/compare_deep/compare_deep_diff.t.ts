@@ -130,10 +130,10 @@ it('Deep compare of sets should work', async t => {
         value2          : new Set([ 2, 3, 4 ]),
 
         comparisons     : [
-            { type : "common", difference : DifferenceAtomic.new({ value1 : 2, value2 : 2, same : true }) },
-            { type : "common", difference : DifferenceAtomic.new({ value1 : 3, value2 : 3, same : true }) },
-            { type : "onlyIn1", difference : DifferenceAtomic.new({ value1 : 1 }) },
-            { type : "onlyIn2", difference : DifferenceAtomic.new({ value2 : 4 }) },
+            { difference : DifferenceAtomic.new({ value1 : 2, value2 : 2, same : true }) },
+            { difference : DifferenceAtomic.new({ value1 : 3, value2 : 3, same : true }) },
+            { difference : DifferenceAtomic.new({ value1 : 1 }) },
+            { difference : DifferenceAtomic.new({ value2 : 4 }) },
         ]
     }))
 })
@@ -157,22 +157,18 @@ it('Deep compare of maps should work', async t => {
 
         comparisons     : [
             {
-                type                : "common",
                 differenceKeys      : DifferenceAtomic.new({ value1 : 2, value2 : 2, same : true }),
                 differenceValues    : DifferenceAtomic.new({ value1 : 2, value2 : 2, same : true })
             },
             {
-                type                : "common",
                 differenceKeys      : DifferenceAtomic.new({ value1 : 3, value2 : 3, same : true }),
                 differenceValues    : DifferenceAtomic.new({ value1 : 3, value2 : 3, same : true })
             },
             {
-                type                : "onlyIn1",
                 differenceKeys      : DifferenceAtomic.new({ value1 : 1 }),
                 differenceValues    : DifferenceAtomic.new({ value1 : 1 })
             },
             {
-                type                : "onlyIn2",
                 differenceKeys      : DifferenceAtomic.new({ value2 : 4 }),
                 differenceValues    : DifferenceAtomic.new({ value2 : 4 })
             }

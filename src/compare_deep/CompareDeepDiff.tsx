@@ -21,37 +21,6 @@ import {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class PathSegment extends Base {
-    type            : 'object_key' | 'map_key' | 'array_index' | 'set_element'    = 'object_key'
-
-    key             : unknown                       = undefined
-
-    // asXmlNode (serializerConfig : Partial<SerializerXml> = {}) : XmlNode[] {
-    //     let str : string    = undefined
-    //
-    //     switch (this.type) {
-    //         case "object_key" :
-    //             str = `.${ this.key }`
-    //             break
-    //
-    //         case "array_index" :
-    //             str = `[ ${ this.key } ]`
-    //             break
-    //
-    //         case "map_key" :
-    //             str = `.get(${ SerializerXml.serialize(this.key, serializerConfig) })`
-    //             break
-    //
-    //         case "set_element" :
-    //             str = `.element(${ SerializerXml.serialize(this.key, serializerConfig) })`
-    //             break
-    //     }
-    //
-    //     return [ str ]
-    // }
-}
-
-
 const Missing           = Symbol('Missing')
 type Missing            = typeof Missing
 
@@ -171,8 +140,6 @@ export class DifferenceArray extends DifferenceReferenceable {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// export type DifferenceObjectType    = 'common' | 'onlyIn1' | 'onlyIn2'
-
 export class DifferenceObject extends DifferenceReferenceable {
     same            : boolean                   = true
 
@@ -216,15 +183,13 @@ export class DifferenceObject extends DifferenceReferenceable {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type DifferenceSetType    = 'common' | 'onlyIn1' | 'onlyIn2'
-
 export class DifferenceSet extends DifferenceReferenceable {
     value1          : Set<unknown>
     value2          : Set<unknown>
 
     same            : boolean                   = true
 
-    comparisons     : { type : DifferenceSetType, difference : Difference }[]     = []
+    comparisons     : { difference : Difference }[]     = []
 
 
     excludeValue (valueProp : 'value1' | 'value2') {
@@ -234,8 +199,8 @@ export class DifferenceSet extends DifferenceReferenceable {
     }
 
 
-    addComparison (type : DifferenceSetType, difference : Difference) {
-        this.comparisons.push({ type, difference })
+    addComparison (difference : Difference) {
+        this.comparisons.push({ difference })
 
         if (this.same && !difference.same) this.same = false
     }
@@ -247,7 +212,7 @@ export class DifferenceSet extends DifferenceReferenceable {
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ difference }) =>
-                <DifferenceTemplateSetEntry>
+                <DifferenceTemplateSetEntry type={ difference.type }>
                     { difference.templateInner(serializerConfig, diffState) }
                 </DifferenceTemplateSetEntry>)
         }</DifferenceTemplateSet>
@@ -256,15 +221,13 @@ export class DifferenceSet extends DifferenceReferenceable {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type DifferenceMapType    = 'common' | 'onlyIn1' | 'onlyIn2'
-
 export class DifferenceMap extends DifferenceReferenceable {
     value1          : Map<unknown, unknown>
     value2          : Map<unknown, unknown>
 
     same            : boolean                   = true
 
-    comparisons     : { type : DifferenceMapType, differenceKeys : Difference, differenceValues : Difference }[]     = []
+    comparisons     : { differenceKeys : Difference, differenceValues : Difference }[]     = []
 
 
     excludeValue (valueProp : 'value1' | 'value2') {
@@ -277,8 +240,8 @@ export class DifferenceMap extends DifferenceReferenceable {
     }
 
 
-    addComparison (type : DifferenceMapType, differenceKeys : Difference, differenceValues : Difference) {
-        this.comparisons.push({ type, differenceKeys, differenceValues })
+    addComparison (differenceKeys : Difference, differenceValues : Difference) {
+        this.comparisons.push({ differenceKeys, differenceValues })
 
         if (this.same && (!differenceKeys.same || !differenceValues.same)) this.same = false
     }
@@ -350,15 +313,8 @@ export class DeepCompareState extends Base {
     refIdSource1    : number                    = 1
     refIdSource2    : number                    = 1
 
-    keyPath         : PathSegment[]             = []
-
     visited1        : Map<unknown, [ number, DifferenceReferenceable ]>  = new Map()
     visited2        : Map<unknown, [ number, DifferenceReferenceable ]>  = new Map()
-
-
-    keyPathSnapshot () : PathSegment[] {
-        return this.keyPath.slice()
-    }
 
 
     markVisited (v1 : unknown, v2 : unknown, difference : DifferenceReferenceable) {
@@ -369,20 +325,9 @@ export class DeepCompareState extends Base {
     }
 
 
-    push (segment : PathSegment) {
-        this.keyPath.push(segment)
-    }
-
-
-    pop () {
-        this.keyPath.pop()
-    }
-
-
     in () : DeepCompareState {
         return DeepCompareState.new({
             idSource        : this.idSource,
-            keyPath         : [],
             visited1        : new Map(this.visited1),
             visited2        : new Map(this.visited2)
         })
@@ -544,13 +489,9 @@ export const compareArrayDeepDiff = function (
     state.markVisited(array1, array2, difference)
 
     for (let i = 0; i < minLength; i++) {
-        state.keyPath.push(PathSegment.new({ type : 'array_index', key : i }))
-
         const diff      = compareDeepDiff(array1[ i ], array2[ i ], options, state)
 
         difference.addComparison(i, diff)
-
-        state.keyPath.pop()
     }
 
     if (maxLength > minLength) {
@@ -558,11 +499,7 @@ export const compareArrayDeepDiff = function (
         const valueProp         = array1.length === maxLength ? 'value1' : 'value2'
 
         for (let i = minLength; i < maxLength; i++) {
-            state.keyPath.push(PathSegment.new({ type : 'array_index', key : i }))
-
             difference.addComparison(i, valueAsDifference(sourceOfExtra[ i ], valueProp, options, state))
-
-            state.keyPath.pop()
         }
     }
 
@@ -602,8 +539,6 @@ export const compareKeys = function <K, V>(
         else if (compareStructurally && !isAtomicValue(item1) && Array.from(onlyIn2).some(item2 => {
             const innerState    = state.in()
 
-            innerState.push(PathSegment.new({ type : pathSegmentType, key : item2 }))
-
             const difference    = compareDeepDiff(item1, item2, options, innerState)
             const equal         = difference.same
 
@@ -638,10 +573,10 @@ export const compareSetDeepDiff = function (
 
     const { common, onlyIn1, onlyIn2 } = compareKeys(set1, set2, true, options, state)
 
-    common.forEach(commonEntry => difference.addComparison('common', commonEntry.difference))
+    common.forEach(commonEntry => difference.addComparison(commonEntry.difference))
 
-    onlyIn1.forEach(el1 => difference.addComparison('onlyIn1', valueAsDifference(el1, 'value1', options, state)))
-    onlyIn2.forEach(el2 => difference.addComparison('onlyIn2', valueAsDifference(el2, 'value2', options, state)))
+    onlyIn1.forEach(el1 => difference.addComparison(valueAsDifference(el1, 'value1', options, state)))
+    onlyIn2.forEach(el2 => difference.addComparison(valueAsDifference(el2, 'value2', options, state)))
 
     return difference
 }
@@ -660,21 +595,18 @@ export const compareMapDeepDiff = function (
     const { common, onlyIn1, onlyIn2 } = compareKeys(map1, map2, true, options, state)
 
     common.forEach(commonEntry => difference.addComparison(
-        'common',
         commonEntry.difference,
         compareDeepDiff(map1.get(commonEntry.el1), map2.get(commonEntry.el2), options, state)
     ))
 
     onlyIn1.forEach(el1 =>
         difference.addComparison(
-            'onlyIn1',
             valueAsDifference(el1, 'value1', options, state),
             valueAsDifference(map1.get(el1), 'value1', options, state)
         )
     )
     onlyIn2.forEach(el2 =>
         difference.addComparison(
-            'onlyIn2',
             valueAsDifference(el2, 'value2', options, state),
             valueAsDifference(map2.get(el2), 'value2', options, state)
         )
@@ -700,13 +632,9 @@ export const compareObjectDeepDiff = function (
         const key1      = common[ i ].el1
         const key2      = common[ i ].el2
 
-        state.push(PathSegment.new({ type : 'object_key', key : key1 }))
-
         const diff      = compareDeepDiff(object1[ key1 ], object2[ key2 ], options, state)
 
         difference.addComparison(key1, diff)
-
-        state.pop()
     }
 
     onlyIn1.forEach(key1 => difference.addComparison(key1, valueAsDifference(object1[ key1 ], 'value1', options, state)))
