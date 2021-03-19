@@ -5,7 +5,7 @@ import { TextBlock } from "./TextBlock.js"
 import { XmlElement } from "./XmlElement.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export type RenderingProgress   = ColoredStringSyncPoint
+export type RenderingProgress   = ColoredStringSyncPoint | ColoredStringSuppressSyncPoints | ColoredStringResumeSyncPoints
 
 //---------------------------------------------------------------------------------------------------------------------
 export type MaybeColoredString  = string | ColoredString
@@ -72,8 +72,7 @@ export class ColoredStringPlain extends ColoredString {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ColoredStringSyncPoint extends ColoredString {
-    el          : XmlElement        = undefined
+export class ColoredStringToken extends ColoredString {
 
     get length () : number {
         return 0
@@ -95,6 +94,21 @@ export class ColoredStringSyncPoint extends ColoredString {
     }
 }
 
+
+//---------------------------------------------------------------------------------------------------------------------
+export class ColoredStringSyncPoint extends ColoredStringToken {
+    el          : XmlElement        = undefined
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class ColoredStringSuppressSyncPoints extends ColoredStringToken {
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class ColoredStringResumeSyncPoints extends ColoredStringToken {
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ColoredStringWrapped extends ColoredString {

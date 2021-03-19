@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { zip3 } from "../iterator/Iterator.js"
-import { ColoredStringSyncPoint } from "../jsx/ColoredString.js"
+import { ColoredStringResumeSyncPoints, ColoredStringSuppressSyncPoints, ColoredStringSyncPoint, RenderingProgress } from "../jsx/ColoredString.js"
 import { TextBlock } from "../jsx/TextBlock.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
@@ -233,13 +233,23 @@ export class DifferenceTemplateHeterogeneous extends DifferenceTemplateElement {
         if (context.currentStream === 'left') {
             if (this.getAttribute('type') === 'onlyIn2')
                 output.write('░')
-            else
+            else {
+                output.push(ColoredStringSuppressSyncPoints.new())
+
                 this.renderChildInner(this.childNodes[ 0 ], 0, renderer, output, context)
+
+                output.push(ColoredStringResumeSyncPoints.new())
+            }
         } else if (context.currentStream === 'right') {
             if (this.getAttribute('type') === 'onlyIn1')
                 output.write('░')
-            else
+            else {
+                output.push(ColoredStringSuppressSyncPoints.new())
+
                 this.renderChildInner(this.childNodes[ 1 ], 1, renderer, output, context)
+
+                output.push(ColoredStringResumeSyncPoints.new())
+            }
         }
     }
 }
@@ -290,13 +300,25 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
             middleSource.copySynced(middleBlock),
         ]
 
-        const advanceIterator = (iterator : Generator<ColoredStringSyncPoint, any, unknown>) : number => {
-            const iteration     = iterator.next()
+        const advanceIterator = (iterator : Generator<RenderingProgress, any, unknown>) : number => {
+            let syncPointsSuppressed        = false
 
-            if (iteration.done === true)
-                return Number.MAX_SAFE_INTEGER
-            else
-                return iteration.value.el.depth
+            do {
+                const iteration             = iterator.next()
+
+                if (iteration.done === true) return Number.MAX_SAFE_INTEGER
+
+                const command               = iteration.value
+
+                if (!syncPointsSuppressed && (command instanceof ColoredStringSyncPoint)) {
+                    return command.el.depth
+                } else if (command instanceof ColoredStringSuppressSyncPoints) {
+                    syncPointsSuppressed    = true
+                }
+                else if (command instanceof ColoredStringResumeSyncPoints) {
+                    syncPointsSuppressed    = false
+                }
+            } while (true)
         }
 
         const depths        = iterators.map(advanceIterator)
@@ -325,11 +347,7 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
         const lines         = Array.from(zip3(leftBlock.text, middleBlock.text, rightBlock.text))
 
         lines.forEach(([ leftStr, middleStr, rightStr ], index) => {
-            output.push(
-                leftStr,
-                ` │${ middleStr }│ `,
-                rightStr
-            )
+            output.push(leftStr, ` │${ middleStr }│ `, rightStr)
 
             if (index !== lines.length - 1) output.addNewLine()
         })

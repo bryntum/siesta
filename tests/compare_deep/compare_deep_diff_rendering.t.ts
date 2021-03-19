@@ -613,19 +613,25 @@ it('Should render the diff of internal data correctly #1', async t => {
 })
 
 
-// it('Should render the diff of heterogeneous data correctly #1', async t => {
-//     const difference0   = compareDeepDiff([ { a : { b : 2 } } ], [ [ 1, 2 ] ])
-//
-//     t.is(
-//         renderer.renderToString(difference0.template()),
-//         [
-//             'Received             │ │ Expected              ',
-//             '                     │ │                       ',
-//             '<ref *1> {           │ │ {                     ',
-//             '  "a": [Circular *1] │ │   "a": <ref *1> {     ',
-//             '                     │ │     "a": [Circular *1]',
-//             '                     │ │   }                   ',
-//             '}                    │ │ }                     ',
-//         ].join('\n')
-//     )
-// })
+it('Should render the diff of heterogeneous data correctly #1', async t => {
+    const difference0   = compareDeepDiff([ { a : { b : 2 } }, [] ], [ [ 1, 2 ], { c : 2 } ])
+
+    t.is(
+        renderer.renderToString(difference0.template()),
+        [
+            'Received     │ │ Expected  ',
+            '             │ │           ',
+            '[            │ │ [         ',
+            '  {          │0│   [       ',
+            '    "a": {   │ │     1,    ',
+            '      "b": 2 │ │     2     ',
+            '    }        │ │   ],      ',
+            '  },         │ │           ',
+            '  []         │1│   {       ',
+            '             │ │     "c": 2',
+            '             │ │   }       ',
+            ']            │ │ ]         ',
+        ].join('\n')
+    )
+})
+
