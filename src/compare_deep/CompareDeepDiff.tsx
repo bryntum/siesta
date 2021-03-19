@@ -73,7 +73,9 @@ export class Difference extends Base {
 export class DifferenceAtomic extends Difference {
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-        return <DifferenceTemplateAtomic type={ this.type }>
+        return <DifferenceTemplateAtomic
+            type={ this.type } same={ this.same }
+        >
             { this.value1 === Missing ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(this.value1) }
             { this.value2 === Missing ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(this.value2) }
         </DifferenceTemplateAtomic>
@@ -92,7 +94,9 @@ export class DifferenceReferenceable extends Difference {
 export class DifferenceReferenceableAtomic extends DifferenceReferenceable {
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-        return <DifferenceTemplateReferenceableAtomic type={ this.type } refId={ this.refId1 } refId2={ this.refId2 }>
+        return <DifferenceTemplateReferenceableAtomic
+            type={ this.type } same={ this.same } refId={ this.refId1 } refId2={ this.refId2 }
+        >
             { this.value1 === Missing ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(this.value1) }
             { this.value2 === Missing ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(this.value2) }
         </DifferenceTemplateReferenceableAtomic>
@@ -126,7 +130,8 @@ export class DifferenceArray extends DifferenceReferenceable {
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
         return <DifferenceTemplateArray
-            type={ this.type } length={ this.value1.length } length2={ this.value2.length }
+            type={ this.type } same={ this.same }
+            length={ this.value1.length } length2={ this.value2.length }
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ index, difference }) =>
@@ -162,11 +167,10 @@ export class DifferenceObject extends DifferenceReferenceable {
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
         return <DifferenceTemplateObject
-            type={ this.type }
+            type={ this.type } same={ this.same }
             constructorName={ this.value1 !== Missing ? constructorNameOf(this.value1) : undefined }
             constructorName2={ this.value2 !== Missing ? constructorNameOf(this.value2) : undefined }
-            refId={ this.refId1 }
-            refId2={ this.refId2 }
+            refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ key, difference }) =>
                 <DifferenceTemplateObjectEntry type={ difference.type }>
@@ -208,7 +212,8 @@ export class DifferenceSet extends DifferenceReferenceable {
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
         return <DifferenceTemplateSet
-            type={ this.type } size={ this.value1.size } size2={ this.value2.size }
+            type={ this.type } same={ this.same }
+            size={ this.value1.size } size2={ this.value2.size }
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ difference }) =>
@@ -249,7 +254,8 @@ export class DifferenceMap extends DifferenceReferenceable {
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
         return <DifferenceTemplateMap
-            type={ this.type } size={ this.value1.size } size2={ this.value2.size }
+            type={ this.type } same={ this.same }
+            size={ this.value1.size } size2={ this.value2.size }
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ differenceKeys, differenceValues }) =>
@@ -270,7 +276,7 @@ export class DifferenceReference extends Difference {
 
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-        return <DifferenceTemplateReference type={ this.type } refId1={ this.value1 } refId2={ this.value2 }>
+        return <DifferenceTemplateReference type={ this.type } same={ this.same } refId1={ this.value1 } refId2={ this.value2 }>
         </DifferenceTemplateReference>
     }
 }
@@ -286,7 +292,7 @@ export class DifferenceHeterogeneous extends Difference {
 
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-        return <DifferenceTemplateHeterogeneous type={ this.type }>
+        return <DifferenceTemplateHeterogeneous type={ this.type } same={ false }>
             { this.value1 !== Missing ? this.value1.templateInner(serializerConfig, diffState) : <MissingValue></MissingValue> }
             { this.value2 !== Missing ? this.value2.templateInner(serializerConfig, diffState) : <MissingValue></MissingValue> }
         </DifferenceTemplateHeterogeneous>
@@ -459,13 +465,13 @@ export const compareDeepDiff = function (
     else if (type1 === 'Set') {
         return compareSetDeepDiff(v1 as Set<unknown>, v2 as Set<unknown>, options, state)
     }
-    else if (type1 == 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
+    else if (type1 === 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
         return compareFunctionDeepDiff(v1 as Function, v2 as Function, options, state)
     }
-    else if (type1 == 'RegExp') {
+    else if (type1 === 'RegExp') {
         return compareRegExpDeepDiff(v1 as RegExp, v2 as RegExp, options, state)
     }
-    else if (type1 == 'Date') {
+    else if (type1 === 'Date') {
         return compareDateDeepDiff(v1 as Date, v2 as Date, options, state)
     }
     // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
