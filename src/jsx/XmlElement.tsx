@@ -35,7 +35,11 @@ export class XmlElement extends Mixin(
         }
 
         set attributes (value : this[ 'props' ]) {
-            this.$attributes = value === null ? undefined : value
+            this.$attributes = value === null
+                ?
+                    undefined
+                :
+                    Object.fromEntries(Object.entries(value).filter(entry => entry[ 1 ] !== undefined))
         }
 
 
