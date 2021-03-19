@@ -657,3 +657,31 @@ it('Should render the diff of heterogeneous data correctly #2', async t => {
         ].join('\n')
     )
 })
+
+
+it('Should render the diff of RegExp correctly #1', async t => {
+    const difference0   = compareDeepDiff(/a/, /a/i)
+
+    t.is(
+        renderer.renderToString(difference0.template()),
+        [
+            'Received │ │ Expected',
+            '         │ │         ',
+            '/a/      │ │ /a/i    ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff of Date correctly #1', async t => {
+    const difference0   = compareDeepDiff(new Date(2020, 1, 1), new Date(2020, 1, 2))
+
+    t.is(
+        renderer.renderToString(difference0.template()),
+        [
+            'Received                          │ │ Expected                         ',
+            '                                  │ │                                  ',
+            'new Date("2020/01/01 00:00:00.0") │ │ new Date("2020/01/02 00:00:00.0")',
+        ].join('\n')
+    )
+})

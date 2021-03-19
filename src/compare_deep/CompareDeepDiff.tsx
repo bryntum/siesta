@@ -1,20 +1,22 @@
 import { Base } from "../class/Base.js"
 import { TextJSX } from "../jsx/TextJSX.js"
-import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
+import { XmlElement } from "../jsx/XmlElement.js"
 import { SerializerXml } from "../serializer/SerializerXml.js"
-import { ArbitraryObject, ArbitraryObjectKey, constructorNameOf, isAtomicValue, MIN_SMI, typeOf } from "../util/Helpers.js"
+import { ArbitraryObject, ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
 import {
     DifferenceTemplateArray,
-    DifferenceTemplateArrayEntry, DifferenceTemplateHeterogeneous,
+    DifferenceTemplateArrayEntry,
+    DifferenceTemplateAtomic,
+    DifferenceTemplateHeterogeneous,
     DifferenceTemplateMap,
     DifferenceTemplateMapEntry,
     DifferenceTemplateObject,
     DifferenceTemplateObjectEntry,
-    DifferenceTemplateReference,
+    DifferenceTemplateReference, DifferenceTemplateReferenceableAtomic,
     DifferenceTemplateRoot,
     DifferenceTemplateSet,
-    DifferenceTemplateAtomic,
-    MissingValue, DifferenceTemplateSetEntry
+    DifferenceTemplateSetEntry,
+    MissingValue
 } from "./CompareDeepDiffRendering.js"
 
 
@@ -50,11 +52,11 @@ export class PathSegment extends Base {
 }
 
 
-const Missing   = Symbol('Missing')
-type Missing    = typeof Missing
+const Missing           = Symbol('Missing')
+type Missing            = typeof Missing
 
-// a wrapper for `Missing` - to render the diff for internal diff data structures correctly
-const MissingWrapper   = Symbol('Missing')
+// a replacer for `Missing` - to render the diff for internal diff data structures correctly
+const MissingInternal   = Symbol('Missing')
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -98,6 +100,7 @@ export class Difference extends Base {
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
 export class DifferenceAtomic extends Difference {
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
@@ -111,11 +114,20 @@ export class DifferenceAtomic extends Difference {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceReferenceable extends Difference {
-    // reachability1   : number                    = undefined
-    // reachability2   : number                    = undefined
-
     refId1          : number                    = undefined
     refId2          : number                    = undefined
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class DifferenceReferenceableAtomic extends DifferenceReferenceable {
+
+    templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
+        return <DifferenceTemplateReferenceableAtomic type={ this.type } refId={ this.refId1 } refId2={ this.refId2 }>
+            { this.value1 === Missing ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(this.value1) }
+            { this.value2 === Missing ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(this.value2) }
+        </DifferenceTemplateReferenceableAtomic>
+    }
 }
 
 
@@ -321,20 +333,18 @@ export class DifferenceHeterogeneous extends Difference {
 
 //---------------------------------------------------------------------------------------------------------------------
 const valueAsDifference = (value : unknown, valueProp : 'value1' | 'value2', options : DeepCompareOptions, state : DeepCompareState) : Difference => {
-    if (value === Missing) value = MissingWrapper
+    if (value === Missing) value = MissingInternal
 
-    const res = compareDeepDiff(value, value, options, state)
+    const difference = compareDeepDiff(value, value, options, state)
 
-    res.excludeValue(valueProp === 'value1' ? 'value2' : 'value1')
+    difference.excludeValue(valueProp === 'value1' ? 'value2' : 'value1')
 
-    return res
+    return difference
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DeepCompareState extends Base {
-    // currentDiff     : Difference                = undefined
-
     idSource        : number                    = 1
 
     refIdSource1    : number                    = 1
@@ -416,11 +426,11 @@ export const compareDeepDiff = function (
 )
     : Difference
 {
-    // if we are passed the internal constant `Missing`, we are probably
+    // if we are passed the internal constant `Missing` for both values, we are probably
     // doing diff for own internal data structures
     // in such case, replace that constant with another value,
     // so that code can distinguish it
-    if (v1 === v2 && v1 === Missing) { v1 = v2 = MissingWrapper }
+    if (v1 === Missing && v2 === Missing) { v1 = v2 = MissingInternal }
 
     // // shortcut exit to save time, this also allows to compare the placeholder with itself
     // if (v1 === v2) return
@@ -513,7 +523,7 @@ export const compareDeepDiff = function (
     else if (type1 == 'Date') {
         return compareDateDeepDiff(v1 as Date, v2 as Date, options, state)
     }
-    // // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
+    // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
     else {
         return comparePrimitiveDeepDiff(v1, v2, options, state)
     }
@@ -710,7 +720,7 @@ export const compareObjectDeepDiff = function (
 export const compareFunctionDeepDiff = function (
     func1 : Function, func2 : Function, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 ) : Difference {
-    const difference = DifferenceReferenceable.new({ value1 : func1, value2 : func2, same : func1 === func2 })
+    const difference = DifferenceReferenceableAtomic.new({ value1 : func1, value2 : func2, same : func1 === func2 })
 
     state.markVisited(func1, func2, difference)
 
@@ -724,7 +734,7 @@ export const compareRegExpDeepDiff = function (
 ) : Difference {
     const regexpProps   = [ 'source', 'dotAll', 'global', 'ignoreCase', 'multiline', 'sticky', 'unicode' ]
 
-    const difference    = DifferenceReferenceable.new({
+    const difference    = DifferenceReferenceableAtomic.new({
         value1  : regexp1,
         value2  : regexp2,
         same    : regexpProps.every(propertyName => regexp1[ propertyName ] === regexp2[ propertyName])
@@ -740,7 +750,7 @@ export const compareRegExpDeepDiff = function (
 export const compareDateDeepDiff = function (
     date1 : Date, date2 : Date, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 ) : Difference {
-    const difference = DifferenceReferenceable.new({ value1 : date1, value2 : date2, same : date1.getTime() === date2.getTime() })
+    const difference = DifferenceReferenceableAtomic.new({ value1 : date1, value2 : date2, same : date1.getTime() === date2.getTime() })
 
     state.markVisited(date1, date2, difference)
 
