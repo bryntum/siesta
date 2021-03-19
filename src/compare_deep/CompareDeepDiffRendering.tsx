@@ -222,7 +222,7 @@ export class DifferenceTemplateReference extends DifferenceTemplateElement {
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class DifferenceTemplateHeterogeneous extends DifferenceTemplateElement {
-    props   : DifferenceTemplateElement[ 'props' ]
+    tagName         : 'difference_template_heterogeneous'           = 'difference_template_heterogeneous'
 
 
     renderSelf (
