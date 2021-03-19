@@ -5,7 +5,7 @@ import {
     DifferenceArray,
     DifferenceMap,
     DifferenceObject, DifferenceReference,
-    DifferenceSet, DifferenceHeterogeneous
+    DifferenceSet, DifferenceHeterogeneous, DifferenceReferenceable
 } from "../../src/compare_deep/CompareDeepDiff.js"
 
 
@@ -19,9 +19,9 @@ it('Deep compare of primitives should work', async t => {
         value2 : DifferenceAtomic.new({ value2 : '1' }),
     }))
 
-    t.equal(compareDeepDiff(/a/, /a/), DifferenceAtomic.new({ value1 : /a/, value2 : /a/, same : true }))
+    t.equal(compareDeepDiff(/a/, /a/), DifferenceReferenceable.new({ value1 : /a/, value2 : /a/, same : true }))
 
-    t.equal(compareDeepDiff(/a/, /a/i), DifferenceAtomic.new({ value1 : /a/, value2 : /a/i, same : false }))
+    t.equal(compareDeepDiff(/a/, /a/i), DifferenceReferenceable.new({ value1 : /a/, value2 : /a/i, same : false }))
 })
 
 
@@ -213,37 +213,38 @@ it('Deep compare should work with circular data structures #2', async t => {
 
     const a3    = { a : a2 }
 
-    t.eqDiff(
+    t.equal(
         compareDeepDiff(a1, a3),
         DifferenceObject.new({
-            value1  : a1,
-            value2  : a3,
-            reachability1   : undefined,
-            reachability2   : undefined,
-            refId1  : 1,
-            refId2  : undefined,
-            same    : false,
-            comparisons     : [
+            value1      : a1,
+            value2      : a3,
+            same        : false,
+            refId1      : 1,
+            refId2      : undefined,
+            comparisons         : [
                 {
-                    key     : "a",
-                    difference  : DifferenceObject.new({
-                        value1  : a1,
-                        value2  : a2,
-                        reachability1   : undefined,
-                        reachability2   : undefined,
-                        refId1  : undefined,
-                        refId2  : 1,
-                        same    : false,
-                        comparisons     : [
-                            {
-                                key     : "a",
-                                difference  : DifferenceReference.new({
-                                    value1  : 1,
-                                    value2  : 1,
-                                    same    : false
-                                })
-                            }
-                        ]
+                    key         : "a",
+                    difference      : DifferenceHeterogeneous.new({
+                        value1      : DifferenceReference.new({
+                            value1      : 1,
+                            same        : false
+                        }),
+                        value2      : DifferenceObject.new({
+                            value2      : a2,
+                            same        : false,
+                            refId1      : 2,
+                            refId2      : 1,
+                            comparisons         : [
+                                {
+                                    key         : "a",
+                                    difference      : DifferenceReference.new({
+                                        value2      : 1,
+                                        same        : false
+                                    })
+                                }
+                            ]
+                        }),
+                        same        : false
                     })
                 }
             ]
@@ -252,73 +253,72 @@ it('Deep compare should work with circular data structures #2', async t => {
 })
 
 
-// it('Deep compare should work with circular data structures #2', async t => {
-//     const a     = [ { ref : null }, { ref : null } ]
-//
-//     a[ 0 ].ref  = a[ 1 ]
-//     a[ 1 ].ref  = a[ 0 ]
-//
-//     const b     = [ { ref : null }, { ref : null } ]
-//
-//     b[ 0 ].ref  = b[ 1 ]
-//     b[ 1 ].ref  = b[ 1 ]
-//
-//     t.eqDiff(compareDeepDiff(a, b), DifferenceArray.new({
-//         same            : false,
-//
-//         value1          : a,
-//         value2          : b,
-//
-//         comparisons     : [
-//             {
-//                 index           : 0,
-//                 difference      : DifferenceObject.new({
-//                     same    : false,
-//
-//                     value1  : a[ 0 ],
-//                     value2  : b[ 0 ],
-//
-//                     comparisons : [
-//                         {
-//                             key             : 'ref',
-//
-//                             difference      : DifferenceObject.new({
-//                                 same    : false,
-//
-//                                 value1  : a[ 1 ],
-//                                 value2  : b[ 1 ],
-//
-//                                 comparisons : [
-//                                     {
-//                                         key             : 'ref',
-//
-//                                         difference      : Difference.new({
-//                                             same            : false,
-//                                             value1          : a[ 0 ],
-//                                             value2          : b[ 1 ],
-//                                             reachability1   : any(Number) as any as number,
-//                                             reachability2   : any(Number) as any as number,
-//                                         })
-//                                     }
-//                                 ]
-//                             })
-//                         }
-//                     ]
-//                 })
-//             },
-//             {
-//                 index           : 1,
-//                 difference      : Difference.new({
-//                     same            : false,
-//                     value1          : a[ 0 ],
-//                     value2          : b[ 1 ],
-//                     reachability1   : any(Number) as any as number,
-//                     reachability2   : any(Number) as any as number,
-//                 })
-//             }
-//         ]
-//     }))
-// })
+it('Deep compare should work with circular data structures #3', async t => {
+    const a     = [ { ref : null }, { ref : null } ]
+
+    a[ 0 ].ref  = a[ 1 ]
+    a[ 1 ].ref  = a[ 0 ]
+
+    const b     = [ { ref : null }, { ref : null } ]
+
+    b[ 0 ].ref  = b[ 1 ]
+    b[ 1 ].ref  = b[ 1 ]
+
+    t.equal(
+        compareDeepDiff(a, b),
+
+        DifferenceArray.new({
+            value1      : a,
+            value2      : b,
+            same        : false,
+            comparisons         : [
+                {
+                    index       : 0,
+                    difference      : DifferenceObject.new({
+                        value1      : a[ 0 ],
+                        value2      : b[ 0 ],
+                        same        : false,
+                        refId1      : 1,
+                        refId2      : undefined,
+                        comparisons         : [
+                            {
+                                key         : "ref",
+                                difference      : DifferenceObject.new({
+                                    value1      : a[ 1 ],
+                                    value2      : b[ 1 ],
+                                    same        : false,
+                                    refId1      : 2,
+                                    refId2      : 1,
+                                    comparisons         : [
+                                        {
+                                            key         : "ref",
+                                            difference      : DifferenceReference.new({
+                                                value1      : 1,
+                                                value2      : 1,
+                                                same        : false
+                                            })
+                                        }
+                                    ]
+                                })
+                            }
+                        ]
+                    })
+                },
+                {
+                    index       : 1,
+                    // might seems strange that references are equal, but if you draw a graph
+                    // of the depth-first iteration, you'll see that the a[ 1 ] and b[ 1 ]
+                    // points to the same location in graph
+                    difference      : DifferenceReference.new({
+                        value1      : 2,
+                        value2      : 1,
+                        same        : true
+                    })
+                }
+            ]
+        })
+    )
+})
 
 
 // // it('Deep compare should work with circular data structures #3', async t => {

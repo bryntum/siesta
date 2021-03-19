@@ -1,5 +1,5 @@
 import { it, iit } from "../../index.js"
-import { compareDeepDiff } from "../../src/compare_deep/CompareDeepDiff.js"
+import { compareDeepDiff, DifferenceReference } from "../../src/compare_deep/CompareDeepDiff.js"
 import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRendering.js"
 
 const renderer      = XmlRendererDifference.new()
@@ -590,3 +590,42 @@ it('Should render the diff of circular data structures correctly #3', async t =>
         ].join('\n')
     )
 })
+
+
+it('Should render the diff of internal data correctly #1', async t => {
+    const difference0   = compareDeepDiff(
+        DifferenceReference.new({ value1 : 1, same : false }),
+        false
+    )
+
+    t.is(
+        renderer.renderToString(difference0.template()),
+        [
+            'Received                     │ │ Expected',
+            '                             │ │         ',
+            'DifferenceReference {        │ │ false   ',
+            '  "value1": 1,               │ │         ',
+            `  "value2": Symbol(Missing), │ │         `,
+            '  "same": false              │ │         ',
+            '}                            │ │         ',
+        ].join('\n')
+    )
+})
+
+
+// it('Should render the diff of heterogeneous data correctly #1', async t => {
+//     const difference0   = compareDeepDiff([ { a : { b : 2 } } ], [ [ 1, 2 ] ])
+//
+//     t.is(
+//         renderer.renderToString(difference0.template()),
+//         [
+//             'Received             │ │ Expected              ',
+//             '                     │ │                       ',
+//             '<ref *1> {           │ │ {                     ',
+//             '  "a": [Circular *1] │ │   "a": <ref *1> {     ',
+//             '                     │ │     "a": [Circular *1]',
+//             '                     │ │   }                   ',
+//             '}                    │ │ }                     ',
+//         ].join('\n')
+//     )
+// })
