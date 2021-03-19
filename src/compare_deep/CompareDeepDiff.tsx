@@ -107,8 +107,8 @@ export class DifferenceAtomic extends Difference {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceReferenceable extends Difference {
-    reachability1   : number                    = undefined
-    reachability2   : number                    = undefined
+    // reachability1   : number                    = undefined
+    // reachability2   : number                    = undefined
 
     refId1          : number                    = undefined
     refId2          : number                    = undefined
@@ -155,7 +155,7 @@ export class DifferenceArray extends DifferenceReferenceable {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type DifferenceObjectType    = 'common' | 'onlyIn1' | 'onlyIn2'
+// export type DifferenceObjectType    = 'common' | 'onlyIn1' | 'onlyIn2'
 
 export class DifferenceObject extends DifferenceReferenceable {
     same            : boolean                   = true
@@ -386,10 +386,10 @@ export class DeepCompareState extends Base {
 
 
     markVisited (v1 : unknown, v2 : unknown, difference : DifferenceReferenceable) {
-        const visitId : number    = this.idSource++
+        const visitInfo     = [ this.idSource++, difference ] as [ number, DifferenceReferenceable ]
 
-        !this.visited1.has(v1) && this.visited1.set(v1, [ visitId, difference ])
-        !this.visited2.has(v2) && this.visited2.set(v2, [ visitId, difference ])
+        !this.visited1.has(v1) && this.visited1.set(v1, visitInfo)
+        !this.visited2.has(v2) && this.visited2.set(v2, visitInfo)
     }
 
 
