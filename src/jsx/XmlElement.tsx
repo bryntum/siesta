@@ -80,7 +80,9 @@ export class XmlElement extends Mixin(
             const childrenContent       = this.childNodes.map(child => child.toString())
             const attributesContent     = this.$attributes
                 ?
-                    Object.entries(this.attributes).map(( [ name, value ] ) => name + '="' + escapeXml(String(value)) + '"')
+                    Object.entries(this.attributes)
+                        .filter(entry => entry[ 1 ] !== undefined)
+                        .map(( [ name, value ] ) => name + '="' + escapeXml(String(value)) + '"')
                 :
                     []
 
