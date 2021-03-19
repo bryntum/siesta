@@ -135,7 +135,7 @@ export class DifferenceArray extends DifferenceReferenceable {
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ index, difference }) =>
-                <DifferenceTemplateArrayEntry type={ difference.type } index={ index }>
+                <DifferenceTemplateArrayEntry type={ difference.type } same={ difference.same } index={ index }>
                     { difference.templateInner(serializerConfig, diffState) }
                 </DifferenceTemplateArrayEntry>
             )
@@ -173,8 +173,8 @@ export class DifferenceObject extends DifferenceReferenceable {
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ key, difference }) =>
-                <DifferenceTemplateObjectEntry type={ difference.type }>
-                    <DifferenceTemplateAtomic type={ difference.type }>
+                <DifferenceTemplateObjectEntry type={ difference.type } same={ difference.same }>
+                    <DifferenceTemplateAtomic type={ difference.type } same={ difference.same }>
                         { difference.type === 'onlyIn2' ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(key) }
                         { difference.type === 'onlyIn1' ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(key) }
                     </DifferenceTemplateAtomic>
@@ -217,7 +217,7 @@ export class DifferenceSet extends DifferenceReferenceable {
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ difference }) =>
-                <DifferenceTemplateSetEntry type={ difference.type }>
+                <DifferenceTemplateSetEntry type={ difference.type } same={ difference.same }>
                     { difference.templateInner(serializerConfig, diffState) }
                 </DifferenceTemplateSetEntry>)
         }</DifferenceTemplateSet>
@@ -259,7 +259,7 @@ export class DifferenceMap extends DifferenceReferenceable {
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ differenceKeys, differenceValues }) =>
-                <DifferenceTemplateMapEntry type={ differenceKeys.type }>
+                <DifferenceTemplateMapEntry type={ differenceKeys.type } same={ differenceKeys.same && differenceValues.same }>
                     { differenceKeys.templateInner(serializerConfig, diffState) }
                     { differenceValues.templateInner(serializerConfig, diffState) }
                 </DifferenceTemplateMapEntry>
