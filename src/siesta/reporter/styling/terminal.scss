@@ -54,6 +54,9 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     color   : gray;
 }
 
+.pass_color {
+    color : $main_pass_color
+}
 .fail_color {
     color : $main_fail_color
 }
