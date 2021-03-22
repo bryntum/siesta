@@ -181,6 +181,9 @@ export class DifferenceTemplateComposite extends Mixin(
 
     class DifferenceTemplateComposite extends base {
 
+        childNodes          : DifferenceTemplateElement[]
+
+
         renderSelf (
             renderer        : XmlRendererDifference,
             output          : TextBlock,
@@ -283,6 +286,38 @@ export class DifferenceTemplateComposite extends Mixin(
                 super.afterRenderChild(child, index, renderer, output, context)
 
             output.push(ColoredStringSyncPoint.new({ el : child as XmlElement }))
+        }
+
+
+        getOnlyIn2Size () : number {
+            throw new Error('Abstract method')
+        }
+
+
+        needCommaAfterChild (
+            child               : DifferenceTemplateElement,
+            index               : number,
+            renderer            : XmlRendererDifference,
+            context             : XmlRenderingDynamicContextDifference
+        )
+            : boolean
+        {
+            const stream        = context.currentStream === 'left' ? 'left' : 'right'
+            const nextChild     = this.childNodes[ index + 1 ]
+
+            if (
+                child.isMissingIn(stream)
+                ||
+                nextChild === undefined
+                ||
+                stream === 'left' && nextChild.isMissingIn(stream)
+                ||
+                stream === 'right' && nextChild.isMissingIn(stream) && this.getOnlyIn2Size() === 0
+            ) {
+                return false
+            } else {
+                return super.needCommaAfterChild(child, index, renderer, context)
+            }
         }
     }
 ){}
@@ -595,30 +630,8 @@ export class DifferenceTemplateObject extends Mixin(
         }
 
 
-        needCommaAfterChild (
-            child               : DifferenceTemplateObjectEntry,
-            index               : number,
-            renderer            : XmlRendererDifference,
-            context             : XmlRenderingDynamicContextDifference
-        )
-            : boolean
-        {
-            const stream        = context.currentStream === 'left' ? 'left' : 'right'
-            const nextChild     = this.childNodes[ index + 1 ]
-
-            if (
-                child.isMissingIn(stream)
-                ||
-                nextChild === undefined
-                ||
-                stream === 'left' && nextChild.isMissingIn(stream)
-                ||
-                stream === 'right' && nextChild.isMissingIn(stream) && this.getAttribute('onlyIn2Size') === 0
-            ) {
-                return false
-            } else {
-                return super.needCommaAfterChild(child, index, renderer, context)
-            }
+        getOnlyIn2Size () : number {
+            return this.getAttribute('onlyIn2Size')
         }
     }
 ){}
@@ -680,30 +693,8 @@ export class DifferenceTemplateSet extends Mixin(
         }
 
 
-        needCommaAfterChild (
-            child               : DifferenceTemplateSetEntry,
-            index               : number,
-            renderer            : XmlRendererDifference,
-            context             : XmlRenderingDynamicContextDifference
-        )
-            : boolean
-        {
-            const stream        = context.currentStream === 'left' ? 'left' : 'right'
-            const nextChild     = this.childNodes[ index + 1 ]
-
-            if (
-                child.isMissingIn(stream)
-                ||
-                nextChild === undefined
-                ||
-                stream === 'left' && nextChild.isMissingIn(stream)
-                ||
-                stream === 'right' && nextChild.isMissingIn(stream) && this.getAttribute('onlyIn2Size') === 0
-            ) {
-                return false
-            } else {
-                return super.needCommaAfterChild(child, index, renderer, context)
-            }
+        getOnlyIn2Size () : number {
+            return this.getAttribute('onlyIn2Size')
         }
     }
 ){}
@@ -759,30 +750,8 @@ export class DifferenceTemplateMap extends Mixin(
         }
 
 
-        needCommaAfterChild (
-            child               : DifferenceTemplateMapEntry,
-            index               : number,
-            renderer            : XmlRendererDifference,
-            context             : XmlRenderingDynamicContextDifference
-        )
-            : boolean
-        {
-            const stream        = context.currentStream === 'left' ? 'left' : 'right'
-            const nextChild     = this.childNodes[ index + 1 ]
-
-            if (
-                child.isMissingIn(stream)
-                ||
-                nextChild === undefined
-                ||
-                stream === 'left' && nextChild.isMissingIn(stream)
-                ||
-                stream === 'right' && nextChild.isMissingIn(stream) && this.getAttribute('onlyIn2Size') === 0
-            ) {
-                return false
-            } else {
-                return super.needCommaAfterChild(child, index, renderer, context)
-            }
+        getOnlyIn2Size () : number {
+            return this.getAttribute('onlyIn2Size')
         }
     }
 ){}
