@@ -95,8 +95,11 @@ it('Should be able to render objects', async t => {
 }`,
         'Non-empty, pretty object stringification, w/o content wrapping'
     )
+})
 
-    //-----------------
+
+//---------------------------------------------------------------------------------------------------------------------
+it('Should be able to render objects #2', async t => {
     t.is(
         rendererPretty.printValue({ prop1 : { prop2 : '1'.repeat(10) } }, { maxLen : 20 }),
 `{
