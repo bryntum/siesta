@@ -150,6 +150,8 @@ export class DifferenceObject extends DifferenceReferenceable {
     value1          : object | Missing
     value2          : object | Missing
 
+    onlyIn2Size     : number                    = undefined
+
     same            : boolean                   = true
 
     comparisons     : { key : ArbitraryObjectKey, difference : Difference }[]  = []
@@ -176,6 +178,7 @@ export class DifferenceObject extends DifferenceReferenceable {
             constructorName2={ this.value2 !== Missing ? constructorNameOf(this.value2) : undefined }
             size={ this.value1 !== Missing ? Object.keys(this.value1).length : undefined }
             size2={ this.value2 !== Missing ? Object.keys(this.value2).length : undefined }
+            onlyIn2Size={ this.onlyIn2Size }
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ key, difference }) =>
@@ -638,7 +641,9 @@ export const compareObjectDeepDiff = function (
 
     state.markVisited(object1, object2, difference)
 
-    const { common, onlyIn1, onlyIn2 } = compareKeys(new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state)
+    const { common, onlyIn1, onlyIn2 }  = compareKeys(new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state)
+
+    difference.onlyIn2Size              = onlyIn2.size
 
     for (let i = 0; i < common.length; i++) {
         const key1      = common[ i ].el1

@@ -575,7 +575,11 @@ export class DifferenceTemplateObject extends Mixin(
         props           : SerializationObject[ 'props' ] & DifferenceTemplateComposite[ 'props' ] & {
             constructorName2?       : string
             size2?                  : number
+
+            onlyIn2Size?            : number
         }
+
+        childNodes      : DifferenceTemplateObjectEntry[]
 
 
         hasEntries () : boolean {
@@ -600,37 +604,21 @@ export class DifferenceTemplateObject extends Mixin(
             : boolean
         {
             const stream        = context.currentStream === 'left' ? 'left' : 'right'
+            const nextChild     = this.childNodes[ index + 1 ]
 
             if (
-                this.childEntryHasMissingIn(child, stream)
+                child.isMissingIn(stream)
                 ||
-                stream === 'left' && this.nextChildEntryHasMissingIn(index, stream)
+                nextChild === undefined
+                ||
+                stream === 'left' && nextChild.isMissingIn(stream)
+                ||
+                stream === 'right' && nextChild.isMissingIn(stream) && this.getAttribute('onlyIn2Size') === 0
             ) {
                 return false
             } else {
                 return super.needCommaAfterChild(child, index, renderer, context)
             }
-        }
-
-
-        nextChildEntryHasMissingIn (index : number, stream : 'left' | 'right') : boolean {
-            if (index + 1 > this.childNodes.length - 1) return false
-
-            const entryEl       = this.childNodes[ index + 1 ] as DifferenceTemplateObjectEntry
-            const keyEl         = entryEl.childNodes[ 0 ] as DifferenceTemplateAtomic
-
-            // return stream === 'left' ? keyEl.getAttribute('type') === 'onlyIn2' : keyEl.getAttribute('type') === 'onlyIn1'
-
-            return keyEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
-        }
-
-
-        childEntryHasMissingIn (child : DifferenceTemplateObjectEntry, stream : 'left' | 'right') : boolean {
-            const keyEl     = child.childNodes[ 0 ] as DifferenceTemplateAtomic
-
-            // return stream === 'left' ? keyEl.getAttribute('type') === 'onlyIn2' : keyEl.getAttribute('type') === 'onlyIn1'
-
-            return keyEl.childNodes[ stream === 'left' ? 0 : 1 ].tagName.toLowerCase() === 'missing_value'
         }
     }
 ){}
@@ -638,27 +626,31 @@ export class DifferenceTemplateObject extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
-    props           : DifferenceTemplateElement[ 'props' ]
+export class DifferenceTemplateObjectEntry extends Mixin(
+    [ SerializationObjectEntry, DifferenceTemplateElement ],
+    (base : ClassUnion<typeof SerializationObjectEntry, typeof DifferenceTemplateElement>) =>
 
-    tagName         : string                = 'difference_template_object_entry'
+    class DifferenceTemplateObjectEntry extends base {
+        props           : DifferenceTemplateElement[ 'props' ]
+
+        tagName         : string                = 'difference_template_object_entry'
 
 
-    renderSelf (
-        renderer        : XmlRendererDifference,
-        output          : TextBlock,
-        context         : XmlRenderingDynamicContextDifference
-    ) {
-        if (context.currentStream === 'middle') {
-            output.push(' ')
+        renderSelf (
+            renderer        : XmlRendererDifference,
+            output          : TextBlock,
+            context         : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream === 'middle') {
+                output.push(' ')
 
-            this.renderChildren(renderer, output, context)
-        } else {
-            super.renderSelf(renderer, output, context)
+                this.renderChildren(renderer, output, context)
+            } else {
+                super.renderSelf(renderer, output, context)
+            }
         }
     }
-}
-
+){}
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
