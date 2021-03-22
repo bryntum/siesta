@@ -172,21 +172,6 @@ export class SerializationComposite extends Mixin(
             else
                 output.write(renderer.prettyPrint ? '\n' : this.getSpaceAfterOpeningBracket(renderer) ? ' ' : '')
         }
-
-
-        renderChildInner (
-            child               : XmlNode,
-            index               : number,
-            renderer            : XmlRenderer,
-            output              : TextBlock,
-            context             : XmlRenderingDynamicContext
-        ) {
-            if (isString(child)) {
-                output.push(child)
-            } else {
-                child.renderToTextBlock(renderer, output, context)
-            }
-        }
     }
 ){}
 

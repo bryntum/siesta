@@ -251,8 +251,8 @@ export class XmlElement extends Mixin(
             const isChildIndented   = this.isChildIndented(child)
 
             const childBlock    = TextBlock.new({
-                maxLen      : output.maxLen - (isChildIndented ? renderer.indentLevel : 0),
-                reserved    : isBlockLevel ? 0 : output.lastLine.length
+                maxLen      : output.maxLen - (isChildIndented ? renderer.indentLevel : 0) - output.currentIndentation.length,
+                reserved    : isBlockLevel ? 0 : output.lastLineLengthWithIndent
             })
 
             if (isString(child)) {

@@ -145,6 +145,12 @@ export class TextBlock extends Base {
     }
 
 
+    // this is used as `reserved` argument for a child text block
+    get lastLineLengthWithIndent () : number  {
+        return this.lastLine.length === 0 ? 0 : this.lastLine.length - this.currentIndentation.length
+    }
+
+
     pushToLastLine (str : MaybeColoredString) {
         if (str.length === 0) return
 
