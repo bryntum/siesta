@@ -490,7 +490,7 @@ export class SerializationMapEntry extends Mixin(
         valueIsAtomic (renderer : XmlRendererSerialization, context : XmlRenderingDynamicContext) : boolean {
             const valueEl       = this.childNodes[ 1 ] as XmlElement
 
-            return renderer.atomicElementNodes.has((valueEl as XmlElement).tagName.toLowerCase())
+            return renderer.atomicElementNodes.has(valueEl.tagName.toLowerCase())
         }
     }
 ) {}
