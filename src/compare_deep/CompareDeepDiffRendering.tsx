@@ -1,5 +1,5 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { zip3 } from "../iterator/Iterator.js"
+import { CI, zip3 } from "../iterator/Iterator.js"
 import {
     ColoredStringPlain,
     ColoredStringResumeSyncPoints,
@@ -78,31 +78,27 @@ export class DifferenceTemplateElement extends XmlElement {
     renderToTextBlock (renderer : XmlRenderer, output : TextBlock, parentContext? : XmlRenderingDynamicContext) {
         super.renderToTextBlock(renderer, output, parentContext)
 
-        if (this.getAttribute('same'))
-            output.colorizeMut(styles.get('gray')(renderer.c))
-        else if (this.getAttribute('type') === 'onlyIn1')
-            output.colorizeMut(styles.get('fail_color')(renderer.c))
-        else if (this.getAttribute('type') === 'onlyIn2')
-            output.colorizeMut(styles.get('pass_color')(renderer.c))
-        else
-            if (this.getAttribute('same') === false)
-                output.colorizeMut(styles.get('accented')(renderer.c))
+        this.colorizeSelf(renderer, output, parentContext)
     }
 
 
-    // renderChildInner (
-    //     child               : XmlNode,
-    //     index               : number,
-    //     renderer            : XmlRenderer,
-    //     output              : TextBlock,
-    //     context             : XmlRenderingDynamicContext
-    // ) {
-    //     if (isString(child)) {
-    //         output.push(child)
-    //     } else {
-    //         child.renderToTextBlock(renderer, output, context)
-    //     }
-    // }
+    colorizeSelf (renderer : XmlRenderer, output : TextBlock, parentContext? : XmlRenderingDynamicContext) {
+        if (CI(this.parentAxis()).some(el => el instanceof DifferenceTemplateHeterogeneous)) {
+            output.colorizeMut(styles.get('accented')(renderer.c))
+        }
+        else if (this.getAttribute('same')) {
+            output.colorizeMut(styles.get('gray')(renderer.c))
+        }
+        else if (this.getAttribute('type') === 'onlyIn1') {
+            output.colorizeMut(styles.get('fail_color')(renderer.c))
+        }
+        else if (this.getAttribute('type') === 'onlyIn2') {
+            output.colorizeMut(styles.get('pass_color')(renderer.c))
+        }
+        else if (this.getAttribute('same') === false) {
+            output.colorizeMut(styles.get('accented')(renderer.c))
+        }
+    }
 }
 
 
@@ -142,17 +138,9 @@ export class DifferenceTemplateComposite extends Mixin(
                 context.currentStream === 'right' && this.getAttribute('type') === 'onlyIn1'
             ) {
                 output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
-
-                // this.beforeRenderChildren(renderer, output, context)
-                // this.renderChildren(renderer, output, context)
-                // this.afterRenderChildren(renderer, output, context)
-
-                // output.push(ColoredStringSyncPoint.new({ el : this }))
             }
             else
                 super.renderSelf(renderer, output, context)
-
-            // output.push(ColoredStringSyncPoint.new({ el : this }))
         }
 
 
