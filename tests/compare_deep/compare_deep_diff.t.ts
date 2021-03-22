@@ -69,11 +69,6 @@ it('Deep compare of objects should work', async t => {
         value1          : {},
         value2          : {},
 
-        // common          : [],
-        //
-        // onlyIn1         : new Set(),
-        // onlyIn2         : new Set(),
-
         comparisons     : []
     }))
 
@@ -82,11 +77,6 @@ it('Deep compare of objects should work', async t => {
 
         value1          : { a : 1 },
         value2          : { a : 1 },
-
-        // common          : [ { el1 : 'a', el2 : 'a', difference : null } ],
-        //
-        // onlyIn1         : new Set(),
-        // onlyIn2         : new Set(),
 
         comparisons     : [
             { key : "a", difference : DifferenceAtomic.new({ value1 : 1, value2 : 1, same : true }) }
@@ -99,10 +89,7 @@ it('Deep compare of objects should work', async t => {
         value1          : { a : 1, b : 3 },
         value2          : { a : 2, c : 4 },
 
-        // common          : [ { el1 : 'a', el2 : 'a', difference : null } ],
-        //
-        // onlyIn1         : new Set([ 'b' ]),
-        // onlyIn2         : new Set([ 'c' ]),
+        onlyIn2Size     : 1,
 
         comparisons     : [
             { key : "a", difference : DifferenceAtomic.new({ value1 : 1, value2 : 2 }) },
@@ -129,6 +116,8 @@ it('Deep compare of sets should work', async t => {
         value1          : new Set([ 1, 2, 3 ]),
         value2          : new Set([ 2, 3, 4 ]),
 
+        onlyIn2Size     : 1,
+
         comparisons     : [
             { difference : DifferenceAtomic.new({ value1 : 2, value2 : 2, same : true }) },
             { difference : DifferenceAtomic.new({ value1 : 3, value2 : 3, same : true }) },
@@ -154,6 +143,8 @@ it('Deep compare of maps should work', async t => {
 
         value1          : new Map([ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ], ]),
         value2          : new Map([ [ 2, 2 ], [ 3, 3 ], [ 4, 4 ], ]),
+
+        onlyIn2Size     : 1,
 
         comparisons     : [
             {
