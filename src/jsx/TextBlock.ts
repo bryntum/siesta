@@ -266,6 +266,12 @@ export class TextBlock extends Base {
     }
 
 
+    // debugging convenience aid
+    get asString () : string {
+        return this.toString()
+    }
+
+
     toString () : string {
         return this.text.map(str => str.toString()).join('\n')
 

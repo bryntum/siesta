@@ -1,6 +1,12 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { zip3 } from "../iterator/Iterator.js"
-import { ColoredStringResumeSyncPoints, ColoredStringSuppressSyncPoints, ColoredStringSyncPoint, RenderingProgress } from "../jsx/ColoredString.js"
+import {
+    ColoredStringPlain,
+    ColoredStringResumeSyncPoints,
+    ColoredStringSuppressSyncPoints,
+    ColoredStringSyncPoint,
+    RenderingProgress
+} from "../jsx/ColoredString.js"
 import { TextBlock } from "../jsx/TextBlock.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
@@ -8,13 +14,17 @@ import { XmlRenderer, XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
 import { serializable } from "../serializable/Serializable.js"
 import {
     Serialization,
-    SerializationArray, SerializationComposite, SerializationMap, SerializationMapEntry,
+    SerializationArray,
+    SerializationComposite,
+    SerializationMap,
+    SerializationMapEntry,
     SerializationObject,
-    SerializationObjectEntry, SerializationReferenceable,
+    SerializationObjectEntry,
+    SerializationReferenceable,
     SerializationSet,
     XmlRendererSerialization
 } from "../serializer/SerializerRendering.js"
-import { isString } from "../util/Typeguards.js"
+import { styles } from "../siesta/reporter/styling/terminal.js"
 import { DifferenceType } from "./CompareDeepDiff.js"
 
 
@@ -61,21 +71,38 @@ export class MissingValue extends XmlElement {
 export class DifferenceTemplateElement extends XmlElement {
     props           : XmlElement[ 'props' ] & {
         type?           : DifferenceType
+        same?           : boolean
     }
 
-    renderChildInner (
-        child               : XmlNode,
-        index               : number,
-        renderer            : XmlRenderer,
-        output              : TextBlock,
-        context             : XmlRenderingDynamicContext
-    ) {
-        if (isString(child)) {
-            output.push(child)
-        } else {
-            child.renderToTextBlock(renderer, output, context)
-        }
+
+    renderToTextBlock (renderer : XmlRenderer, output : TextBlock, parentContext? : XmlRenderingDynamicContext) {
+        super.renderToTextBlock(renderer, output, parentContext)
+
+        if (this.getAttribute('same'))
+            output.colorizeMut(styles.get('gray')(renderer.c))
+        else if (this.getAttribute('type') === 'onlyIn1')
+            output.colorizeMut(styles.get('fail_color')(renderer.c))
+        else if (this.getAttribute('type') === 'onlyIn2')
+            output.colorizeMut(styles.get('pass_color')(renderer.c))
+        else
+            if (this.getAttribute('same') === false)
+                output.colorizeMut(styles.get('accented')(renderer.c))
     }
+
+
+    // renderChildInner (
+    //     child               : XmlNode,
+    //     index               : number,
+    //     renderer            : XmlRenderer,
+    //     output              : TextBlock,
+    //     context             : XmlRenderingDynamicContext
+    // ) {
+    //     if (isString(child)) {
+    //         output.push(child)
+    //     } else {
+    //         child.renderToTextBlock(renderer, output, context)
+    //     }
+    // }
 }
 
 
@@ -114,7 +141,7 @@ export class DifferenceTemplateComposite extends Mixin(
                 ||
                 context.currentStream === 'right' && this.getAttribute('type') === 'onlyIn1'
             ) {
-                output.write('░')
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
 
                 // this.beforeRenderChildren(renderer, output, context)
                 // this.renderChildren(renderer, output, context)
@@ -206,12 +233,12 @@ export class DifferenceTemplateReference extends DifferenceTemplateElement {
     ) {
         if (context.currentStream === 'left') {
             if (this.getAttribute('type') === 'onlyIn2')
-                output.write('░')
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
             else
                 output.write(`[Circular *${ this.getAttribute('refId1') }]`)
         } else if (context.currentStream === 'right') {
             if (this.getAttribute('type') === 'onlyIn1')
-                output.write('░')
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
             else
                 output.write(`[Circular *${ this.getAttribute('refId2') }]`)
         }
@@ -232,7 +259,7 @@ export class DifferenceTemplateHeterogeneous extends DifferenceTemplateElement {
     ) {
         if (context.currentStream === 'left') {
             if (this.getAttribute('type') === 'onlyIn2')
-                output.write('░')
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
             else {
                 output.push(ColoredStringSuppressSyncPoints.new())
 
@@ -242,7 +269,7 @@ export class DifferenceTemplateHeterogeneous extends DifferenceTemplateElement {
             }
         } else if (context.currentStream === 'right') {
             if (this.getAttribute('type') === 'onlyIn1')
-                output.write('░')
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
             else {
                 output.push(ColoredStringSuppressSyncPoints.new())
 
@@ -369,15 +396,17 @@ export class DifferenceTemplateArray extends Mixin(
         tagName         : string            = 'difference_template_array'
 
 
+        hasEntries () : boolean {
+            return this.getAttribute('length') > 0 || this.getAttribute('length2') > 0
+        }
+
+
         beforeRenderChildrenMiddle (
             renderer    : XmlRendererSerialization,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
-            const length1   = this.getAttribute('length')
-            const length2   = this.getAttribute('length2')
-
-            if (length1 > 0 || length2 > 0) output.write('\n')
+            if (this.hasEntries()) output.write('\n')
         }
     }
 ){}
@@ -427,12 +456,12 @@ export class DifferenceTemplateAtomic extends Mixin(
         ) {
             if (context.currentStream === 'left') {
                 if (this.getAttribute('type') === 'onlyIn2')
-                    output.write('░')
+                    output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
                 else
                     this.renderChildInner(this.childNodes[ 0 ], 0, renderer, output, context)
             } else if (context.currentStream === 'right') {
                 if (this.getAttribute('type') === 'onlyIn1')
-                    output.write('░')
+                    output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
                 else
                     this.renderChildInner(this.childNodes[ 1 ], 1, renderer, output, context)
             }
@@ -464,6 +493,7 @@ export class DifferenceTemplateObject extends Mixin(
 
         props           : SerializationObject[ 'props' ] & DifferenceTemplateComposite[ 'props' ] & {
             constructorName2?       : string
+            size2?                  : number
         }
 
 
@@ -472,6 +502,15 @@ export class DifferenceTemplateObject extends Mixin(
             context     : XmlRenderingDynamicContextDifference
         ) {
             return context.currentStream === 'left' ? this.getAttribute('constructorName') : this.getAttribute('constructorName2')
+        }
+
+
+        beforeRenderChildrenMiddle (
+            renderer    : XmlRendererSerialization,
+            output      : TextBlock,
+            context     : XmlRenderingDynamicContextDifference
+        ) {
+            if (this.childNodes.length > 0) output.write('\n')
         }
 
 
@@ -535,14 +574,14 @@ export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
     // ) {
     //     if (context.currentStream === 'left') {
     //         if (this.getAttribute('type') === 'onlyIn2')
-    //             output.write('░')
-    //         else
+    //             output.write(ColoredStringPlain.new({ string : '░')
+ // , c : renderer.c.gray }   //         else)
     //             super.renderSelf(renderer, output, context)
     //     }
     //     else if (context.currentStream === 'right') {
     //         if (this.getAttribute('type') === 'onlyIn1')
-    //             output.write('░')
-    //         else
+    //             output.write(ColoredStringPlain.new({ string : '░')
+ // , c : renderer.c.gray }   //         else)
     //             super.renderSelf(renderer, output, context)
     //     }
     //     else {
@@ -557,7 +596,11 @@ export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
         context         : XmlRenderingDynamicContextDifference
     ) {
         if (context.currentStream === 'middle') {
+            output.push(' ')
+
             this.renderChildren(renderer, output, context)
+
+            // output.push(ColoredStringSyncPoint.new({ el : this }))
         } else {
             const keyEl     = this.childNodes[ 0 ]
 
@@ -568,7 +611,7 @@ export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
                 (keyEl.childNodes[ 1 ] as XmlElement).tagName.toLowerCase() === 'missing_value'
                 && context.currentStream === 'right'
             ) {
-                output.write('░')
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
             }
             else
                 super.renderSelf(renderer, output, context)
@@ -693,7 +736,7 @@ export class DifferenceTemplateMapEntry extends SerializationMapEntry {
                 ||
                 this.getAttribute('type') === 'onlyIn1' && context.currentStream === 'right'
             ) {
-                output.write('░')
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
             }
             else
             // eof TODO REMOVE

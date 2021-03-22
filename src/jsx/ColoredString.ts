@@ -127,6 +127,11 @@ export class ColoredStringWrapped extends ColoredString {
     }
 
 
+    * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
+        yield* this.string.toTextBlockGen(output)
+    }
+
+
     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
         return ColoredStringWrapped.new({
             c           : this.c,
