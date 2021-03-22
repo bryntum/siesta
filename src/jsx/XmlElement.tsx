@@ -112,6 +112,17 @@ export class XmlElement extends Mixin(
         }
 
 
+        * parentAxis () : Generator<XmlElement> {
+            let el : XmlElement     = this
+
+            while (el.parent) {
+                yield el.parent
+
+                el                  = el.parent
+            }
+        }
+
+
         hasClass (clsName : string) : boolean {
             return saneSplit(this.attributes.class ?? '', /\s+/).some(cls => cls === clsName)
         }
