@@ -660,7 +660,9 @@ export class DifferenceTemplateSet extends Mixin(
 
     class DifferenceTemplateSet extends base {
         props           : SerializationSet[ 'props' ] & DifferenceTemplateComposite[ 'props' ] & {
-            size2?          : number
+            size2?              : number
+
+            onlyIn2Size?        : number
         }
 
         tagName         : string            = 'difference_template_set'
@@ -675,6 +677,33 @@ export class DifferenceTemplateSet extends Mixin(
 
         hasEntries () : boolean {
             return this.getAttribute('size') > 0 || this.getAttribute('size2') > 0
+        }
+
+
+        needCommaAfterChild (
+            child               : DifferenceTemplateSetEntry,
+            index               : number,
+            renderer            : XmlRendererDifference,
+            context             : XmlRenderingDynamicContextDifference
+        )
+            : boolean
+        {
+            const stream        = context.currentStream === 'left' ? 'left' : 'right'
+            const nextChild     = this.childNodes[ index + 1 ]
+
+            if (
+                child.isMissingIn(stream)
+                ||
+                nextChild === undefined
+                ||
+                stream === 'left' && nextChild.isMissingIn(stream)
+                ||
+                stream === 'right' && nextChild.isMissingIn(stream) && this.getAttribute('onlyIn2Size') === 0
+            ) {
+                return false
+            } else {
+                return super.needCommaAfterChild(child, index, renderer, context)
+            }
         }
     }
 ){}

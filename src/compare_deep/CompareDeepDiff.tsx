@@ -200,6 +200,8 @@ export class DifferenceSet extends DifferenceReferenceable {
     value1          : Set<unknown>
     value2          : Set<unknown>
 
+    onlyIn2Size     : number                    = undefined
+
     same            : boolean                   = true
 
     comparisons     : { difference : Difference }[]     = []
@@ -223,6 +225,7 @@ export class DifferenceSet extends DifferenceReferenceable {
         return <DifferenceTemplateSet
             type={ this.type } same={ this.same }
             size={ this.value1.size } size2={ this.value2.size }
+            onlyIn2Size={ this.onlyIn2Size }
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ difference }) =>
@@ -587,6 +590,8 @@ export const compareSetDeepDiff = function (
     state.markVisited(set1, set2, difference)
 
     const { common, onlyIn1, onlyIn2 } = compareKeys(set1, set2, true, options, state)
+
+    difference.onlyIn2Size  = onlyIn2.size
 
     common.forEach(commonEntry => difference.addComparison(commonEntry.difference))
 
