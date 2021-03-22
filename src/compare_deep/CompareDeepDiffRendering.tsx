@@ -739,7 +739,9 @@ export class DifferenceTemplateMap extends Mixin(
 
     class DifferenceTemplateMap extends base {
         props           : SerializationMap[ 'props' ] & DifferenceTemplateComposite[ 'props' ] & {
-            size2?          : number
+            size2?              : number
+
+            onlyIn2Size?        : number
         }
 
         tagName         : string            = 'difference_template_map'
@@ -755,47 +757,79 @@ export class DifferenceTemplateMap extends Mixin(
         hasEntries () : boolean {
             return this.getAttribute('size') > 0 || this.getAttribute('size2') > 0
         }
+
+
+        needCommaAfterChild (
+            child               : DifferenceTemplateMapEntry,
+            index               : number,
+            renderer            : XmlRendererDifference,
+            context             : XmlRenderingDynamicContextDifference
+        )
+            : boolean
+        {
+            const stream        = context.currentStream === 'left' ? 'left' : 'right'
+            const nextChild     = this.childNodes[ index + 1 ]
+
+            if (
+                child.isMissingIn(stream)
+                ||
+                nextChild === undefined
+                ||
+                stream === 'left' && nextChild.isMissingIn(stream)
+                ||
+                stream === 'right' && nextChild.isMissingIn(stream) && this.getAttribute('onlyIn2Size') === 0
+            ) {
+                return false
+            } else {
+                return super.needCommaAfterChild(child, index, renderer, context)
+            }
+        }
     }
 ){}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class DifferenceTemplateMapEntry extends SerializationMapEntry {
-    props           : SerializationMap[ 'props' ] & DifferenceTemplateElement[ 'props' ]
+export class DifferenceTemplateMapEntry extends Mixin(
+    [ SerializationMapEntry, DifferenceTemplateElement ],
+    (base : ClassUnion<typeof SerializationMapEntry, typeof DifferenceTemplateElement>) =>
 
-    tagName         : string                = 'difference_template_map_entry'
+    class DifferenceTemplateMapEntry extends base {
+        props           : SerializationMap[ 'props' ] & DifferenceTemplateElement[ 'props' ]
+
+        tagName         : string                = 'difference_template_map_entry'
 
 
-    renderSelf (
-        renderer        : XmlRendererDifference,
-        output          : TextBlock,
-        context         : XmlRenderingDynamicContextDifference
-    ) {
-        if (context.currentStream === 'middle') {
-            output.write(' ')
+        renderSelf (
+            renderer        : XmlRendererDifference,
+            output          : TextBlock,
+            context         : XmlRenderingDynamicContextDifference
+        ) {
+            if (context.currentStream === 'middle') {
+                output.write(' ')
 
-            this.renderChildren(renderer, output, context)
-        } else {
-            super.renderSelf(renderer, output, context)
+                this.renderChildren(renderer, output, context)
+            } else {
+                super.renderSelf(renderer, output, context)
+            }
+        }
+
+
+        valueIsAtomic (renderer : XmlRendererDifference, context : XmlRenderingDynamicContextDifference) : boolean {
+            const valueDiffEl       = this.childNodes[ 1 ] as XmlElement
+
+            if (valueDiffEl.tagName.toLowerCase() === 'difference_template_atomic') {
+                const childIndex        = context.currentStream === 'left' ? 0 : 1
+
+                const serializedNode    = (valueDiffEl as DifferenceTemplateAtomic).childNodes[ childIndex ] as XmlElement
+
+                if (serializedNode instanceof MissingValue) {
+                    throw new Error("Should never try to render a missing element")
+                } else
+                    return renderer.atomicElementNodes.has(serializedNode.tagName.toLowerCase())
+            } else {
+                return false
+            }
         }
     }
-
-
-    valueIsAtomic (renderer : XmlRendererDifference, context : XmlRenderingDynamicContextDifference) : boolean {
-        const valueDiffEl       = this.childNodes[ 1 ] as XmlElement
-
-        if (valueDiffEl.tagName.toLowerCase() === 'difference_template_atomic') {
-            const childIndex        = context.currentStream === 'left' ? 0 : 1
-
-            const serializedNode    = (valueDiffEl as DifferenceTemplateAtomic).childNodes[ childIndex ] as XmlElement
-
-            if (serializedNode instanceof MissingValue) {
-                throw new Error("Should never try to render a missing element")
-            } else
-                return renderer.atomicElementNodes.has(serializedNode.tagName.toLowerCase())
-        } else {
-            return false
-        }
-    }
-}
+){}

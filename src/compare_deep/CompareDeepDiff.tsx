@@ -150,7 +150,7 @@ export class DifferenceObject extends DifferenceReferenceable {
     value1          : object | Missing
     value2          : object | Missing
 
-    onlyIn2Size     : number                    = undefined
+    onlyIn2Size     : number                    = 0
 
     same            : boolean                   = true
 
@@ -200,7 +200,7 @@ export class DifferenceSet extends DifferenceReferenceable {
     value1          : Set<unknown>
     value2          : Set<unknown>
 
-    onlyIn2Size     : number                    = undefined
+    onlyIn2Size     : number                    = 0
 
     same            : boolean                   = true
 
@@ -242,6 +242,8 @@ export class DifferenceMap extends DifferenceReferenceable {
     value1          : Map<unknown, unknown>
     value2          : Map<unknown, unknown>
 
+    onlyIn2Size     : number                    = 0
+
     same            : boolean                   = true
 
     comparisons     : { differenceKeys : Difference, differenceValues : Difference }[]     = []
@@ -268,6 +270,7 @@ export class DifferenceMap extends DifferenceReferenceable {
         return <DifferenceTemplateMap
             type={ this.type } same={ this.same }
             size={ this.value1.size } size2={ this.value2.size }
+            onlyIn2Size={ this.onlyIn2Size }
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ differenceKeys, differenceValues }) =>
@@ -613,6 +616,8 @@ export const compareMapDeepDiff = function (
     state.markVisited(map1, map2, difference)
 
     const { common, onlyIn1, onlyIn2 } = compareKeys(map1, map2, true, options, state)
+
+    difference.onlyIn2Size  = onlyIn2.size
 
     common.forEach(commonEntry => difference.addComparison(
         commonEntry.difference,
