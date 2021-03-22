@@ -96,6 +96,13 @@ export class DifferenceTemplateElement extends XmlElement {
             output.colorizeMut(styles.get('accented')(renderer.c))
         }
     }
+
+
+    isMissingIn (stream : 'left' | 'right') : boolean {
+        const type      = this.getAttribute('type')
+
+        return stream === 'left' && type === 'onlyIn2' || stream === 'right' && type === 'onlyIn1'
+    }
 }
 
 
@@ -502,6 +509,30 @@ export class DifferenceTemplateArray extends Mixin(
 
         hasEntries () : boolean {
             return this.getAttribute('length') > 0 || this.getAttribute('length2') > 0
+        }
+
+
+        needCommaAfterChild (
+            child               : DifferenceTemplateArrayEntry,
+            index               : number,
+            renderer            : XmlRendererDifference,
+            context             : XmlRenderingDynamicContextDifference
+        )
+            : boolean
+        {
+            const stream        = context.currentStream === 'left' ? 'left' : 'right'
+
+            if (
+                child.isMissingIn(stream)
+                ||
+                (stream === 'right' && child.getAttribute('index') >= this.getAttribute('length2') - 1)
+                ||
+                (stream === 'left' && child.getAttribute('index') >= this.getAttribute('length') - 1)
+            ) {
+                return false
+            } else {
+                return super.needCommaAfterChild(child, index, renderer, context)
+            }
         }
     }
 ){}

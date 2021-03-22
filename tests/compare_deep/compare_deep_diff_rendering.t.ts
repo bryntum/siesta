@@ -86,7 +86,7 @@ it('Should render the array diff correctly #5', async t => {
             '  {        │0│   {       ',
             '    "a": 1 │ │     "a": 1',
             '  },       │ │   },      ',
-            '  3,       │1│   2,      ',
+            '  3,       │1│   2       ',
             '  4        │2│   ░       ',
             ']          │ │ ]         '
         ].join('\n')
@@ -95,22 +95,22 @@ it('Should render the array diff correctly #5', async t => {
 
 
 it('Should render the array diff correctly #6', async t => {
-    const difference5   = compareDeepDiff([ 3, { a : 1 }, { b : 2 } ], [ 2 ])
+    const difference5   = compareDeepDiff([ 3 ], [ 2, { a : 1 }, { b : 2 } ])
 
     t.is(
         renderer.render(difference5.template()),
         [
-            'Received   │ │ Expected',
-            '           │ │         ',
-            '[          │ │ [       ',
-            '  3,       │0│   2,    ',
-            '  {        │1│   ░,    ',
-            '    "a": 1 │ │         ',
-            '  },       │ │         ',
-            '  {        │2│   ░     ',
-            '    "b": 2 │ │         ',
-            '  }        │ │         ',
-            ']          │ │ ]       '
+            'Received │ │ Expected  ',
+            '         │ │           ',
+            '[        │ │ [         ',
+            '  3      │0│   2,      ',
+            '  ░      │1│   {       ',
+            '         │ │     "a": 1',
+            '         │ │   },      ',
+            '  ░      │2│   {       ',
+            '         │ │     "b": 2',
+            '         │ │   }       ',
+            ']        │ │ ]         '
         ].join('\n')
     )
 })
