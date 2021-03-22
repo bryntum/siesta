@@ -12,14 +12,14 @@ const renderer      = XmlRenderer.new()
 it('XmlElement rendering should work', async t => {
 
     t.is(
-        renderer.renderToString(<div>
+        renderer.render(<div>
             Some text <span>inner</span>
         </div>),
         `Some text inner`
     )
 
     t.is(
-        renderer.renderToString(<div class="indented">
+        renderer.render(<div class="indented">
             Some text
         </div>),
         `  Some text`
@@ -31,7 +31,7 @@ it('XmlElement rendering should work', async t => {
 it('Unordered list rendering should work', async t => {
 
     t.is(
-        renderer.renderToString(<UL>
+        renderer.render(<UL>
             Some text
             <li>
                 <div>Element1-1</div>
@@ -55,7 +55,7 @@ it('Unordered list rendering should work', async t => {
 it('Tree rendering should work', async t => {
 
     t.is(
-        renderer.renderToString(
+        renderer.render(
             <Tree>
                 Tree 0 header
                 <leaf>
@@ -101,7 +101,7 @@ it('Tree rendering should work', async t => {
 it('Continuous tree rendering should work', async t => {
 
     t.is(
-        renderer.renderToString(
+        renderer.render(
             <Tree isTopLevelLastNode={ false }>
                 Tree 0 header
                 <leaf>

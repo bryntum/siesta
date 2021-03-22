@@ -28,7 +28,7 @@ export class Printer extends Mixin(
 
 
         write (el : XmlElement) {
-            this.printLn(this.renderToString(el, TextBlock.new({ maxLen : this.getMaxLen() })))
+            this.printLn(this.render(el, TextBlock.new({ maxLen : this.getMaxLen() })))
         }
     }
 

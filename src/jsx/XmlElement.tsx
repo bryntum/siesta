@@ -144,40 +144,6 @@ export class XmlElement extends Mixin(
             return output
         }
 
-        // // TODO probably no need to return the tuple now
-        // render (
-        //     renderer : XmlRenderer, parentContexts : XmlRenderingDynamicContext[] = []
-        // )
-        //     : [ RenderingFrame, XmlRenderingDynamicContext ]
-        // {
-        //     const sequence              = RenderingFrameSequence.new()
-        //
-        //     const isBlockLevelElement   = this.getDisplayType(renderer) === 'block'
-        //
-        //     if (isBlockLevelElement) sequence.push(RenderingFrameOpenBlock.new())
-        //
-        //     //----------------
-        //     const context               = renderer.createDynamicContext(this, parentContexts)
-        //
-        //     this.renderSelf(renderer, sequence, parentContexts, context)
-        //
-        //     //----------------
-        //     let frame : RenderingFrame  = sequence
-        //
-        //     const stylingRules  = renderer.getRulesFor(this)
-        //
-        //     if (stylingRules.length > 0)
-        //         frame           = frame.colorize(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
-        //
-        //     if (this.hasClass('indented'))
-        //         frame           = frame.indent([ ' '.repeat(renderer.indentLevel) ])
-        //
-        //     if (isBlockLevelElement)
-        //         frame           = frame.concat(RenderingFrameCloseBlock.new())
-        //
-        //     return [ frame, context ]
-        // }
-
 
         renderToTextBlock (renderer : XmlRenderer, output : TextBlock, parentContext? : XmlRenderingDynamicContext) {
             const context               = renderer.createDynamicContext(this, parentContext)

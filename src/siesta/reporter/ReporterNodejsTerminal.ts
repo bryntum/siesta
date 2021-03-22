@@ -103,7 +103,7 @@ export class ReporterNodejsTerminal extends Mixin(
 
 
         printProgressBar () {
-            this.print(this.renderToString(this.t.progressBar()))
+            this.print(this.render(this.t.progressBar()))
         }
 
 

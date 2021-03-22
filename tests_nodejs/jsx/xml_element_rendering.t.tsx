@@ -12,14 +12,14 @@ const renderer      = XmlRenderer.new({ colorerClass : ColorerNodejs })
 it('Should correctly render styled elements', async t => {
 
     t.is(
-        renderer.renderToString(<div>
+        renderer.render(<div>
             Some text <span class="underlined">underlined</span>
         </div>),
         `Some text ${ chalk.underline('underlined') }`
     )
 
     t.is(
-        renderer.renderToString(<div class="indented">
+        renderer.render(<div class="indented">
             Some text
             <div class="underlined">underlined</div>
         </div>),
@@ -28,7 +28,7 @@ it('Should correctly render styled elements', async t => {
     )
 
     t.is(
-        renderer.renderToString(<div class="indented">
+        renderer.render(<div class="indented">
             Some text
             <div class="underlined">
                 <p>underlined1</p>

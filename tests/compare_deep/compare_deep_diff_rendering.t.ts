@@ -8,7 +8,7 @@ it('Should render the array diff correctly #1', async t => {
     const difference0   = compareDeepDiff([], [])
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received │ │ Expected',
             '         │ │         ',
@@ -22,7 +22,7 @@ it('Should render the array diff correctly #2', async t => {
     const difference1   = compareDeepDiff([ 1, 1 ], [ 0, 0 ])
 
     t.is(
-        renderer.renderToString(difference1.template()),
+        renderer.render(difference1.template()),
         [
             'Received │ │ Expected',
             '         │ │         ',
@@ -39,7 +39,7 @@ it('Should render the array diff correctly #3', async t => {
     const difference2   = compareDeepDiff([ { a : 1 } ], [ 3 ])
 
     t.is(
-        renderer.renderToString(difference2.template()),
+        renderer.render(difference2.template()),
         [
             'Received   │ │ Expected',
             '           │ │         ',
@@ -57,7 +57,7 @@ it('Should render the array diff correctly #4', async t => {
     const difference3   = compareDeepDiff([ { a : 1 }, { b : 2 } ], [ 3, 4 ])
 
     t.is(
-        renderer.renderToString(difference3.template()),
+        renderer.render(difference3.template()),
         [
             'Received   │ │ Expected',
             '           │ │         ',
@@ -78,7 +78,7 @@ it('Should render the array diff correctly #5', async t => {
     const difference4   = compareDeepDiff([ { a : 1 }, 3, 4 ], [ { a : 1 }, 2 ])
 
     t.is(
-        renderer.renderToString(difference4.template()),
+        renderer.render(difference4.template()),
         [
             'Received   │ │ Expected  ',
             '           │ │           ',
@@ -98,7 +98,7 @@ it('Should render the array diff correctly #6', async t => {
     const difference5   = compareDeepDiff([ 3, { a : 1 }, { b : 2 } ], [ 2 ])
 
     t.is(
-        renderer.renderToString(difference5.template()),
+        renderer.render(difference5.template()),
         [
             'Received   │ │ Expected',
             '           │ │         ',
@@ -120,7 +120,7 @@ it('Should render the array diff correctly #7', async t => {
     const difference5   = compareDeepDiff([ [ 1 ], [ 2, 3 ] ], [ [ 1 ] ])
 
     t.is(
-        renderer.renderToString(difference5.template()),
+        renderer.render(difference5.template()),
         [
             'Received │ │ Expected',
             '         │ │         ',
@@ -142,7 +142,7 @@ it('Should render the object diff correctly #1', async t => {
     const difference0   = compareDeepDiff({}, {})
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received │ │ Expected',
             '         │ │         ',
@@ -156,7 +156,7 @@ it('Should render the object diff correctly #2', async t => {
     const difference1   = compareDeepDiff({ a : 1 }, { a : 2 })
 
     t.is(
-        renderer.renderToString(difference1.template()),
+        renderer.render(difference1.template()),
         [
             'Received │ │ Expected',
             '         │ │         ',
@@ -172,7 +172,7 @@ it('Should render the object diff correctly #3', async t => {
     const difference2   = compareDeepDiff({ a : 1 }, { b : 2 })
 
     t.is(
-        renderer.renderToString(difference2.template()),
+        renderer.render(difference2.template()),
         [
             'Received │ │ Expected',
             '         │ │         ',
@@ -189,7 +189,7 @@ it('Should render the object diff correctly #4', async t => {
     const difference3   = compareDeepDiff({ a : 1, b : 2 }, { a : 1, c : 3 })
 
     t.is(
-        renderer.renderToString(difference3.template()),
+        renderer.render(difference3.template()),
         [
             'Received  │ │ Expected ',
             '          │ │          ',
@@ -207,7 +207,7 @@ it('Should render the object diff correctly #5', async t => {
     const difference4   = compareDeepDiff({ a : 1, b : 2, d : 4 }, { a : 1, c : 3, e : 5 })
 
     t.is(
-        renderer.renderToString(difference4.template()),
+        renderer.render(difference4.template()),
         [
             'Received  │ │ Expected ',
             '          │ │          ',
@@ -227,7 +227,7 @@ it('Should render the object diff correctly #6', async t => {
     const difference5   = compareDeepDiff({ a : 1, b : { c : 2, d : 4 } }, { a : 1, b : { c : 3, e : 5 } })
 
     t.is(
-        renderer.renderToString(difference5.template()),
+        renderer.render(difference5.template()),
         [
             'Received    │ │ Expected   ',
             '            │ │            ',
@@ -248,7 +248,7 @@ it('Should render the object diff correctly #7', async t => {
     const difference6   = compareDeepDiff({ a : 1, b : [ 2, 3 ], c : [ 6, 7 ] }, { a : 1, b : [ 3, 4, 5 ] })
 
     t.is(
-        renderer.renderToString(difference6.template()),
+        renderer.render(difference6.template()),
         [
             'Received  │ │ Expected ',
             '          │ │          ',
@@ -273,7 +273,7 @@ it('Should render the set diff correctly #1', async t => {
     const difference2   = compareDeepDiff(new Set([]), new Set([]))
 
     t.is(
-        renderer.renderToString(difference2.template()),
+        renderer.render(difference2.template()),
         [
             'Received   │ │ Expected  ',
             '           │ │           ',
@@ -287,7 +287,7 @@ it('Should render the set diff correctly #2', async t => {
     const difference1   = compareDeepDiff(new Set([ 1, 2 ]), new Set([ 2, 3 ]))
 
     t.is(
-        renderer.renderToString(difference1.template()),
+        renderer.render(difference1.template()),
         [
             'Received  │ │ Expected ',
             '          │ │          ',
@@ -305,7 +305,7 @@ it('Should render the set diff correctly #3', async t => {
     const difference1   = compareDeepDiff(new Set([ { a : 1 }, { b : 2 } ]), new Set([ { a : 1 }, { c : 3 } ]))
 
     t.is(
-        renderer.renderToString(difference1.template()),
+        renderer.render(difference1.template()),
         [
             'Received   │ │ Expected  ',
             '           │ │           ',
@@ -329,7 +329,7 @@ it('Should render the set diff correctly #4', async t => {
     const difference1   = compareDeepDiff(new Set([ [ 1, 2 ] ]), new Set([ [ 3, 4 ] ]))
 
     t.is(
-        renderer.renderToString(difference1.template()),
+        renderer.render(difference1.template()),
         [
             'Received  │ │ Expected ',
             '          │ │          ',
@@ -353,7 +353,7 @@ it('Should render the map diff correctly #1', async t => {
     const difference0   = compareDeepDiff(new Map([]), new Map([]))
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received   │ │ Expected  ',
             '           │ │           ',
@@ -367,7 +367,7 @@ it('Should render the map diff correctly #2', async t => {
     const difference1   = compareDeepDiff(new Map([ [ 1, 1 ], [ 2, 2 ] ]), new Map([ [ 2, 2 ], [ 3, 3 ] ]))
 
     t.is(
-        renderer.renderToString(difference1.template()),
+        renderer.render(difference1.template()),
         [
             'Received  │ │ Expected ',
             '          │ │          ',
@@ -385,7 +385,7 @@ it('Should render the map diff correctly #3', async t => {
     const difference2   = compareDeepDiff(new Map([ [ { a : 1 }, 1 ], [ { b : 2 }, 2 ] ]), new Map([ [ { a : 1 }, 2 ], [ { c : 3 }, 3 ] ]))
 
     t.is(
-        renderer.renderToString(difference2.template()),
+        renderer.render(difference2.template()),
         [
             'Received   │ │ Expected  ',
             '           │ │           ',
@@ -412,7 +412,7 @@ it('Should render the map diff correctly #4', async t => {
     )
 
     t.is(
-        renderer.renderToString(difference3.template()),
+        renderer.render(difference3.template()),
         [
             'Received   │ │ Expected  ',
             '           │ │           ',
@@ -453,7 +453,7 @@ it('Should render the map diff correctly #5', async t => {
     )
 
     t.is(
-        renderer.renderToString(difference4.template()),
+        renderer.render(difference4.template()),
         [
             'Received    │ │ Expected   ',
             '            │ │            ',
@@ -482,7 +482,7 @@ it('Should render the map diff correctly #6', async t => {
     )
 
     t.is(
-        renderer.renderToString(difference3.template()),
+        renderer.render(difference3.template()),
         [
             'Received  │ │ Expected ',
             '          │ │          ',
@@ -525,7 +525,7 @@ it('Should render the diff of circular data structures correctly #1', async t =>
     const difference0   = compareDeepDiff(a1, a2)
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received             │ │ Expected            ',
             '                     │ │                     ',
@@ -548,7 +548,7 @@ it('Should render the diff of circular data structures correctly #2', async t =>
     const difference0   = compareDeepDiff([ a1, a2 ], [ a1, false])
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received               │ │ Expected              ',
             '                       │ │                       ',
@@ -578,7 +578,7 @@ it('Should render the diff of circular data structures correctly #3', async t =>
     const difference0   = compareDeepDiff(a1, a3)
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received             │ │ Expected              ',
             '                     │ │                       ',
@@ -599,7 +599,7 @@ it('Should render the diff of internal data correctly #1', async t => {
     )
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received                     │ │ Expected',
             '                             │ │         ',
@@ -617,7 +617,7 @@ it('Should render the diff of heterogeneous data correctly #1', async t => {
     const difference0   = compareDeepDiff([ { a : { b : 2 } }, [] ], [ [ 1, 2 ], { c : 2 } ])
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received     │ │ Expected  ',
             '             │ │           ',
@@ -640,7 +640,7 @@ it('Should render the diff of heterogeneous data correctly #2', async t => {
     const difference0   = compareDeepDiff([ { a : { b : 2 } }, new Set([ 1 ]) ], [ 1, { c : 2 } ])
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received     │ │ Expected  ',
             '             │ │           ',
@@ -663,7 +663,7 @@ it('Should render the diff of RegExp correctly #1', async t => {
     const difference0   = compareDeepDiff(/a/, /a/i)
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received │ │ Expected',
             '         │ │         ',
@@ -677,7 +677,7 @@ it('Should render the diff of Date correctly #1', async t => {
     const difference0   = compareDeepDiff(new Date(2020, 1, 1), new Date(2020, 1, 2))
 
     t.is(
-        renderer.renderToString(difference0.template()),
+        renderer.render(difference0.template()),
         [
             'Received                          │ │ Expected                         ',
             '                                  │ │                                  ',
