@@ -398,6 +398,23 @@ it('Should render the map diff correctly #2', async t => {
 })
 
 
+it('Should render the map diff correctly #2.1', async t => {
+    const difference1   = compareDeepDiff(new Map([ [ 1, 1 ], [ 2, 2 ] ]), new Map([ [ 2, 2 ] ]))
+
+    t.is(
+        renderer.render(difference1.template()),
+        [
+            'Received  │ │ Expected ',
+            '          │ │          ',
+            'Map (2) { │ │ Map (1) {',
+            '  2 => 2, │ │   2 => 2 ',
+            '  1 => 1  │ │   ░      ',
+            '}         │ │ }        ',
+        ].join('\n')
+    )
+})
+
+
 it('Should render the map diff correctly #3', async t => {
     const difference2   = compareDeepDiff(new Map([ [ { a : 1 }, 1 ], [ { b : 2 }, 2 ] ]), new Map([ [ { a : 1 }, 2 ], [ { c : 3 }, 3 ] ]))
 
