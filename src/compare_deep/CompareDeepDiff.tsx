@@ -12,7 +12,8 @@ import {
     DifferenceTemplateMapEntry,
     DifferenceTemplateObject,
     DifferenceTemplateObjectEntry,
-    DifferenceTemplateReference, DifferenceTemplateReferenceableAtomic,
+    DifferenceTemplateReference,
+    DifferenceTemplateReferenceableAtomic,
     DifferenceTemplateRoot,
     DifferenceTemplateSet,
     DifferenceTemplateSetEntry,
@@ -146,6 +147,9 @@ export class DifferenceArray extends DifferenceReferenceable {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceObject extends DifferenceReferenceable {
+    value1          : object | Missing
+    value2          : object | Missing
+
     same            : boolean                   = true
 
     comparisons     : { key : ArbitraryObjectKey, difference : Difference }[]  = []
@@ -170,6 +174,8 @@ export class DifferenceObject extends DifferenceReferenceable {
             type={ this.type } same={ this.same }
             constructorName={ this.value1 !== Missing ? constructorNameOf(this.value1) : undefined }
             constructorName2={ this.value2 !== Missing ? constructorNameOf(this.value2) : undefined }
+            size={ this.value1 !== Missing ? Object.keys(this.value1).length : undefined }
+            size2={ this.value2 !== Missing ? Object.keys(this.value2).length : undefined }
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ key, difference }) =>

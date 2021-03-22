@@ -184,13 +184,15 @@ export class XmlElement extends Mixin(
 
             this.renderSelf(renderer, output, context)
 
+            this.colorizeSelf(renderer, output, context)
+        }
+
+
+        colorizeSelf (renderer : XmlRenderer, output : TextBlock, context : XmlRenderingDynamicContext) {
             const stylingRules  = renderer.getRulesFor(this)
 
             if (stylingRules.length > 0)
                 output.colorizeMut(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
-
-            // if (this.hasClass('indented'))
-            //     output.indent([ ' '.repeat(renderer.indentLevel) ])
         }
 
 

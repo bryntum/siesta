@@ -25,6 +25,7 @@ import {
     XmlRendererSerialization
 } from "../serializer/SerializerRendering.js"
 import { styles } from "../siesta/reporter/styling/terminal.js"
+import { isString } from "../util/Typeguards.js"
 import { DifferenceType } from "./CompareDeepDiff.js"
 
 
@@ -75,14 +76,9 @@ export class DifferenceTemplateElement extends XmlElement {
     }
 
 
-    renderToTextBlock (renderer : XmlRenderer, output : TextBlock, parentContext? : XmlRenderingDynamicContext) {
-        super.renderToTextBlock(renderer, output, parentContext)
+    colorizeSelf (renderer : XmlRenderer, output : TextBlock, context : XmlRenderingDynamicContext) {
+        super.colorizeSelf(renderer, output, context)
 
-        this.colorizeSelf(renderer, output, parentContext)
-    }
-
-
-    colorizeSelf (renderer : XmlRenderer, output : TextBlock, parentContext? : XmlRenderingDynamicContext) {
         if (CI(this.parentAxis()).some(el => el instanceof DifferenceTemplateHeterogeneous)) {
             output.colorizeMut(styles.get('accented')(renderer.c))
         }
@@ -145,7 +141,7 @@ export class DifferenceTemplateComposite extends Mixin(
 
 
         beforeRenderChildren (
-            renderer    : XmlRendererSerialization,
+            renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
@@ -157,16 +153,22 @@ export class DifferenceTemplateComposite extends Mixin(
         }
 
 
+        hasEntries () : boolean {
+            throw new Error("Abstract method")
+        }
+
+
         beforeRenderChildrenMiddle (
-            renderer    : XmlRendererSerialization,
+            renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
+            if (this.hasEntries()) output.write('\n')
         }
 
 
         afterRenderChildren (
-            renderer    : XmlRendererSerialization,
+            renderer    : XmlRendererDifference,
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
@@ -180,7 +182,7 @@ export class DifferenceTemplateComposite extends Mixin(
         beforeRenderChild (
             child               : XmlNode,
             index               : number,
-            renderer            : XmlRendererSerialization,
+            renderer            : XmlRendererDifference,
             output              : TextBlock,
             context             : XmlRenderingDynamicContextDifference
         ) {
@@ -189,10 +191,33 @@ export class DifferenceTemplateComposite extends Mixin(
         }
 
 
+        renderChild (
+            child               : string | DifferenceTemplateElement,
+            index               : number,
+            renderer            : XmlRendererDifference,
+            output              : TextBlock,
+            context             : XmlRenderingDynamicContextDifference
+        ) {
+            if (isString(child)) {
+                super.renderChild(child, index, renderer, output, context)
+            }
+            else if (
+                child.getAttribute('type') === 'onlyIn2' && context.currentStream === 'left'
+                ||
+                child.getAttribute('type') === 'onlyIn1' && context.currentStream === 'right'
+            ) {
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
+            }
+            else {
+                super.renderChild(child, index, renderer, output, context)
+            }
+        }
+
+
         afterRenderChild (
             child               : XmlNode,
             index               : number,
-            renderer            : XmlRendererSerialization,
+            renderer            : XmlRendererDifference,
             output              : TextBlock,
             context             : XmlRenderingDynamicContextDifference
         ) {
@@ -387,15 +412,6 @@ export class DifferenceTemplateArray extends Mixin(
         hasEntries () : boolean {
             return this.getAttribute('length') > 0 || this.getAttribute('length2') > 0
         }
-
-
-        beforeRenderChildrenMiddle (
-            renderer    : XmlRendererSerialization,
-            output      : TextBlock,
-            context     : XmlRenderingDynamicContextDifference
-        ) {
-            if (this.hasEntries()) output.write('\n')
-        }
     }
 ){}
 
@@ -485,20 +501,16 @@ export class DifferenceTemplateObject extends Mixin(
         }
 
 
+        hasEntries () : boolean {
+            return this.getAttribute('size') > 0 || this.getAttribute('size2') > 0
+        }
+
+
         getConstructorName (
             renderer    : XmlRendererDifference,
             context     : XmlRenderingDynamicContextDifference
         ) {
             return context.currentStream === 'left' ? this.getAttribute('constructorName') : this.getAttribute('constructorName2')
-        }
-
-
-        beforeRenderChildrenMiddle (
-            renderer    : XmlRendererSerialization,
-            output      : TextBlock,
-            context     : XmlRenderingDynamicContextDifference
-        ) {
-            if (this.childNodes.length > 0) output.write('\n')
         }
 
 
@@ -555,29 +567,6 @@ export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
     tagName         : string                = 'difference_template_object_entry'
 
 
-    // renderSelf (
-    //     renderer        : XmlRendererDifference,
-    //     output          : TextBlock,
-    //     context         : XmlRenderingDynamicContextDifference
-    // ) {
-    //     if (context.currentStream === 'left') {
-    //         if (this.getAttribute('type') === 'onlyIn2')
-    //             output.write(ColoredStringPlain.new({ string : '░')
- // , c : renderer.c.gray }   //         else)
-    //             super.renderSelf(renderer, output, context)
-    //     }
-    //     else if (context.currentStream === 'right') {
-    //         if (this.getAttribute('type') === 'onlyIn1')
-    //             output.write(ColoredStringPlain.new({ string : '░')
- // , c : renderer.c.gray }   //         else)
-    //             super.renderSelf(renderer, output, context)
-    //     }
-    //     else {
-    //         this.renderChildren(renderer, output, context)
-    //     }
-    // }
-
-
     renderSelf (
         renderer        : XmlRendererDifference,
         output          : TextBlock,
@@ -587,22 +576,8 @@ export class DifferenceTemplateObjectEntry extends SerializationObjectEntry {
             output.push(' ')
 
             this.renderChildren(renderer, output, context)
-
-            // output.push(ColoredStringSyncPoint.new({ el : this }))
         } else {
-            const keyEl     = this.childNodes[ 0 ]
-
-            if (
-                (keyEl.childNodes[ 0 ] as XmlElement).tagName.toLowerCase() === 'missing_value'
-                && context.currentStream === 'left'
-                ||
-                (keyEl.childNodes[ 1 ] as XmlElement).tagName.toLowerCase() === 'missing_value'
-                && context.currentStream === 'right'
-            ) {
-                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
-            }
-            else
-                super.renderSelf(renderer, output, context)
+            super.renderSelf(renderer, output, context)
         }
     }
 }
@@ -629,15 +604,8 @@ export class DifferenceTemplateSet extends Mixin(
         }
 
 
-        beforeRenderChildrenMiddle (
-            renderer    : XmlRendererDifference,
-            output      : TextBlock,
-            context     : XmlRenderingDynamicContextDifference
-        ) {
-            const size1   = this.getAttribute('size')
-            const size2   = this.getAttribute('size2')
-
-            if (size1 > 0 || size2 > 0) output.write('\n')
+        hasEntries () : boolean {
+            return this.getAttribute('size') > 0 || this.getAttribute('size2') > 0
         }
     }
 ){}
@@ -686,15 +654,8 @@ export class DifferenceTemplateMap extends Mixin(
         }
 
 
-        beforeRenderChildrenMiddle (
-            renderer    : XmlRendererDifference,
-            output      : TextBlock,
-            context     : XmlRenderingDynamicContextDifference
-        ) {
-            const size1   = this.getAttribute('size')
-            const size2   = this.getAttribute('size2')
-
-            if (size1 > 0 || size2 > 0) output.write('\n')
+        hasEntries () : boolean {
+            return this.getAttribute('size') > 0 || this.getAttribute('size2') > 0
         }
     }
 ){}
@@ -718,17 +679,7 @@ export class DifferenceTemplateMapEntry extends SerializationMapEntry {
 
             this.renderChildren(renderer, output, context)
         } else {
-            // TODO REMOVE
-            if (
-                this.getAttribute('type') === 'onlyIn2' && context.currentStream === 'left'
-                ||
-                this.getAttribute('type') === 'onlyIn1' && context.currentStream === 'right'
-            ) {
-                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
-            }
-            else
-            // eof TODO REMOVE
-                super.renderSelf(renderer, output, context)
+            super.renderSelf(renderer, output, context)
         }
     }
 
