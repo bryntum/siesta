@@ -108,7 +108,10 @@ export class XmlElement extends Mixin(
 
 
         setAttribute<T extends keyof this[ 'props' ]> (name : T, value : this[ 'props' ][ T ]) {
-            this.attributes[ name ] = value
+            if (value === undefined) {
+                delete this.attributes[ name ]
+            } else
+                this.attributes[ name ] = value
         }
 
 
