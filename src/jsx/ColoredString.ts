@@ -29,7 +29,7 @@ export class ColoredString extends Base {
 
 
     colorize (c : Colorer) : ColoredString {
-        return ColoredStringWrapped.new({ string : this, c /*wrappings : c.wrappings()*/ })
+        return ColoredStringWrapped.new({ string : this, c })
     }
 
 
@@ -66,7 +66,7 @@ export class ColoredStringPlain extends ColoredString {
 
 
     static fromString<T extends typeof ColoredStringPlain> (this : T, string : string, c? : Colorer) : InstanceType<T> {
-        return this.new({ string, c/*, wrappings : c ? c.wrappings() : undefined*/ } as Partial<InstanceType<T>>)
+        return this.new({ string, c } as Partial<InstanceType<T>>)
     }
 }
 
@@ -127,6 +127,11 @@ export class ColoredStringWrapped extends ColoredString {
     }
 
 
+    // TODO not sure how this works... probably because there are several elements levels
+    // in this method, we loose the color information (`c`)
+    // it should probably push a new color start / color end tokens into the output
+    // and then output should have an extra processing for these tokens
+    // but seems to work somehow, leaving this for future
     * toTextBlockGen (output : TextBlock) : Generator<RenderingProgress> {
         yield* this.string.toTextBlockGen(output)
     }
@@ -166,10 +171,6 @@ export class ColoredStringSum extends ColoredString {
             }
         }
     }
-
-    // toStringBuffered (buffer : TextBlockRendering) {
-    //     this.strings.forEach(string => isString(string) ? buffer.write(string) : string.toStringBuffered(buffer))
-    // }
 
 
     push (string : string | ColoredString) {
