@@ -731,17 +731,16 @@ export class DifferenceTemplateMapEntry extends SerializationMapEntry {
 
 
     valueIsAtomic (renderer : XmlRendererDifference, context : XmlRenderingDynamicContextDifference) : boolean {
-        const childIndex        = context.currentStream === 'left' ? 0 : 1
-
-        const valueDiffEl       = this.childNodes[ childIndex ] as XmlElement
+        const valueDiffEl       = this.childNodes[ 1 ] as XmlElement
 
         if (valueDiffEl.tagName.toLowerCase() === 'difference_template_atomic') {
+            const childIndex        = context.currentStream === 'left' ? 0 : 1
+
             const serializedNode    = (valueDiffEl as DifferenceTemplateAtomic).childNodes[ childIndex ] as XmlElement
 
             if (serializedNode instanceof MissingValue) {
-                throw new Error("Should not happen")
+                throw new Error("Should never try to render a missing element")
             } else
-                // return serializedNode.valueIsAtomic(renderer, context)
                 return renderer.atomicElementNodes.has(serializedNode.tagName.toLowerCase())
         } else {
             return false
