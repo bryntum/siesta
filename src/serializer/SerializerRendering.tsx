@@ -41,13 +41,6 @@ export class Serialization extends XmlElement {
     tagName         : 'serialization'           = 'serialization'
 
     childNodes      : [ SerializationChildNode ]
-
-
-    // valueIsAtomic (renderer : XmlRendererSerialization, context : XmlRenderingDynamicContext) : boolean {
-    //     const valueEl       = this.childNodes[ 0 ] as XmlElement
-    //
-    //     return renderer.atomicElementNodes.has(valueEl.tagName.toLowerCase())
-    // }
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -415,12 +408,17 @@ export class SerializationMap extends Mixin(
         }
 
 
+        getSize (context : XmlRenderingDynamicContext) : number {
+            return this.getAttribute('size')
+        }
+
+
         renderCompositeHeader (
             renderer    : XmlRendererSerialization,
             output      : TextBlock,
             context     : XmlRenderingDynamicContext
         ) {
-            output.write(`Map (${ this.getAttribute('size') }) {`)
+            output.write(`Map (${ this.getSize(context) }) {`)
         }
 
 
