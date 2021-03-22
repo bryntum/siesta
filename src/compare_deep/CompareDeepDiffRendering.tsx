@@ -35,7 +35,8 @@ export class XmlRendererDifference extends Mixin(
     (base : ClassUnion<typeof XmlRendererSerialization>) =>
 
     class XmlRendererDifference extends base {
-        prettyPrint     : boolean       = true
+        // always true for diff renderer
+        prettyPrint     : true          = true
 
 
         createDynamicContext (element : XmlElement, parentContext : XmlRenderingDynamicContextDifference) : XmlRenderingDynamicContextDifference {
@@ -114,6 +115,56 @@ export class DifferenceTemplateReferenceable extends Mixin(
         }
     }
 ){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class DifferenceTemplateStreamed extends DifferenceTemplateElement {
+
+    renderSelfLeft (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+    }
+
+
+    renderSelfRight (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+    }
+
+
+    renderSelfMiddle (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+    }
+
+
+    renderSelf (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+        if (context.currentStream === 'left') {
+            if (this.getAttribute('type') === 'onlyIn2')
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
+            else
+                this.renderSelfLeft(renderer, output, context)
+        } else if (context.currentStream === 'right') {
+            if (this.getAttribute('type') === 'onlyIn1')
+                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
+            else
+                this.renderSelfRight(renderer, output, context)
+        } else {
+            this.renderSelfMiddle(renderer, output, context)
+        }
+    }
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -232,65 +283,105 @@ export class DifferenceTemplateComposite extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class DifferenceTemplateReference extends DifferenceTemplateElement {
+export class DifferenceTemplateAtomic extends Mixin(
+    [ DifferenceTemplateStreamed ],
+    (base : ClassUnion<typeof DifferenceTemplateStreamed>) =>
+
+    class DifferenceTemplateAtomic extends base {
+        tagName         : string            = 'difference_template_atomic'
+
+        childNodes      : [ Serialization | MissingValue, Serialization | MissingValue ]
+
+
+        renderSelfLeft (
+            renderer        : XmlRendererDifference,
+            output          : TextBlock,
+            context         : XmlRenderingDynamicContextDifference
+        ) {
+            this.renderChildInner(this.childNodes[ 0 ], 0, renderer, output, context)
+        }
+
+
+        renderSelfRight (
+            renderer        : XmlRendererDifference,
+            output          : TextBlock,
+            context         : XmlRenderingDynamicContextDifference
+        ) {
+            this.renderChildInner(this.childNodes[ 1 ], 1, renderer, output, context)
+        }
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class DifferenceTemplateReferenceableAtomic extends Mixin(
+    [ DifferenceTemplateReferenceable, DifferenceTemplateAtomic ],
+    (base : ClassUnion<typeof DifferenceTemplateReferenceable, typeof DifferenceTemplateAtomic>) =>
+
+    class DifferenceTemplateReferenceableAtomic extends base {
+        tagName         : string            = 'difference_template_referenceable_atomic'
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable()
+export class DifferenceTemplateReference extends DifferenceTemplateStreamed {
     props   : DifferenceTemplateElement[ 'props' ] & {
         refId1?          : number
         refId2?          : number
     }
 
 
-    renderSelf (
+    renderSelfLeft (
         renderer        : XmlRendererDifference,
         output          : TextBlock,
         context         : XmlRenderingDynamicContextDifference
     ) {
-        if (context.currentStream === 'left') {
-            if (this.getAttribute('type') === 'onlyIn2')
-                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
-            else
-                output.write(`[Circular *${ this.getAttribute('refId1') }]`)
-        } else if (context.currentStream === 'right') {
-            if (this.getAttribute('type') === 'onlyIn1')
-                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
-            else
-                output.write(`[Circular *${ this.getAttribute('refId2') }]`)
-        }
+        output.write(`[Circular *${ this.getAttribute('refId1') }]`)
+    }
+
+
+    renderSelfRight (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+        output.write(`[Circular *${ this.getAttribute('refId2') }]`)
     }
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class DifferenceTemplateHeterogeneous extends DifferenceTemplateElement {
+export class DifferenceTemplateHeterogeneous extends DifferenceTemplateStreamed {
     tagName         : 'difference_template_heterogeneous'           = 'difference_template_heterogeneous'
 
 
-    renderSelf (
+    renderSelfLeft (
         renderer        : XmlRendererDifference,
         output          : TextBlock,
         context         : XmlRenderingDynamicContextDifference
     ) {
-        if (context.currentStream === 'left') {
-            if (this.getAttribute('type') === 'onlyIn2')
-                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
-            else {
-                output.push(ColoredStringSuppressSyncPoints.new())
+        output.push(ColoredStringSuppressSyncPoints.new())
 
-                this.renderChildInner(this.childNodes[ 0 ], 0, renderer, output, context)
+        this.renderChildInner(this.childNodes[ 0 ], 0, renderer, output, context)
 
-                output.push(ColoredStringResumeSyncPoints.new())
-            }
-        } else if (context.currentStream === 'right') {
-            if (this.getAttribute('type') === 'onlyIn1')
-                output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
-            else {
-                output.push(ColoredStringSuppressSyncPoints.new())
+        output.push(ColoredStringResumeSyncPoints.new())
+    }
 
-                this.renderChildInner(this.childNodes[ 1 ], 1, renderer, output, context)
 
-                output.push(ColoredStringResumeSyncPoints.new())
-            }
-        }
+    renderSelfRight (
+        renderer        : XmlRendererDifference,
+        output          : TextBlock,
+        context         : XmlRenderingDynamicContextDifference
+    ) {
+        output.push(ColoredStringSuppressSyncPoints.new())
+
+        this.renderChildInner(this.childNodes[ 1 ], 1, renderer, output, context)
+
+        output.push(ColoredStringResumeSyncPoints.new())
     }
 }
 
@@ -439,51 +530,6 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
             super.renderSelf(renderer, output, context)
     }
 }
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable()
-export class DifferenceTemplateAtomic extends Mixin(
-    [ DifferenceTemplateElement ],
-    (base : ClassUnion<typeof DifferenceTemplateElement>) =>
-
-    class DifferenceTemplateAtomic extends base {
-        tagName         : string            = 'difference_template_atomic'
-
-        childNodes      : [ Serialization | MissingValue, Serialization | MissingValue ]
-
-
-        renderChildren (
-            renderer    : XmlRendererDifference,
-            output      : TextBlock,
-            context     : XmlRenderingDynamicContextDifference
-        ) {
-            if (context.currentStream === 'left') {
-                if (this.getAttribute('type') === 'onlyIn2')
-                    output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
-                else
-                    this.renderChildInner(this.childNodes[ 0 ], 0, renderer, output, context)
-            } else if (context.currentStream === 'right') {
-                if (this.getAttribute('type') === 'onlyIn1')
-                    output.write(ColoredStringPlain.new({ string : '░', c : renderer.c.gray }))
-                else
-                    this.renderChildInner(this.childNodes[ 1 ], 1, renderer, output, context)
-            }
-        }
-    }
-){}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-@serializable()
-export class DifferenceTemplateReferenceableAtomic extends Mixin(
-    [ DifferenceTemplateReferenceable, DifferenceTemplateAtomic ],
-    (base : ClassUnion<typeof DifferenceTemplateReferenceable, typeof DifferenceTemplateAtomic>) =>
-
-    class DifferenceTemplateReferenceableAtomic extends base {
-        tagName         : string            = 'difference_template_referenceable_atomic'
-    }
-){}
 
 
 //---------------------------------------------------------------------------------------------------------------------
