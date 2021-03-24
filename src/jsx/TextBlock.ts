@@ -118,6 +118,13 @@ export class TextBlock extends Base {
     }
 
 
+    // TODO this method is still a hack instead of a proper solution
+    // problem is that it possibly can omit the tokens at the end of the string
+    // this may happen if the `freeLength` will match the remaining string length precisely
+    // in this case the `substr` will return only the text characters, and leave the
+    // tokens
+    // probably need to fix the `substr`, so that it ignore the tokens during initial
+    // search and include them once the content is filled
     addSameLineText (str : MaybeColoredString) {
         // push tokens directly, since they have length of 0
         if ((str instanceof ColoredString) && str.length === 0) {
