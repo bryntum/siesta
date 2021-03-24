@@ -512,7 +512,14 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
             const maxLines              = Math.max(...blocks.map(block => block.text.length))
 
             blocks.forEach(block => {
-                while (block.text.length < maxLines) block.addNewLine()
+                while (block.text.length < maxLines) {
+                    const lastLine      = block.lastLine.toString()
+
+                    block.addNewLine()
+
+                    // preserve the empty space in the beginning of the sync point for left/right streams
+                    if (block !== middleBlock && /^\s+$/.test(lastLine)) block.push(lastLine)
+                }
             })
 
             let minDepth                = Math.min(...depths)

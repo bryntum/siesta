@@ -5,7 +5,7 @@ import { TextBlock } from "../../src/jsx/TextBlock.js"
 
 const renderer      = XmlRendererDifference.new()
 
-it('Should limit the width of the diff streams', async t => {
+it('Should limit the width of the diff streams #1', async t => {
     const difference0   = compareDeepDiff('0'.repeat(10), '1'.repeat(20))
 
     t.is(
@@ -20,7 +20,7 @@ it('Should limit the width of the diff streams', async t => {
 })
 
 
-iit('Should indent the atomic object entries', async t => {
+it('Should indent the atomic object entries', async t => {
     const difference5   = compareDeepDiff({ a : '0'.repeat(10) }, { a : '1'.repeat(20) })
 
     t.is(
@@ -39,10 +39,32 @@ iit('Should indent the atomic object entries', async t => {
 })
 
 
-// iit('Should limit the width of the diff streams #2', async t => {
-//     const difference5   = compareDeepDiff({ a : 1, b : { c : 2, d : 4 } }, { a : 1, b : { c : 3, e : 5 } })
-//
-//     debugger
+it('Should limit the width of the diff streams #2', async t => {
+    const difference5   = compareDeepDiff({ a : 1, b : { c : 2, d : 4 } }, { a : 1, b : { c : 3, e : 5 } })
+
+    t.is(
+        renderer.render(difference5.template(), TextBlock.new({ maxLen : 25 })),
+        [
+            'Received  │ │ Expected ',
+            '          │ │          ',
+            '{         │ │ {        ',
+            '  "a": 1, │ │   "a": 1,',
+            '  "b": {  │ │   "b": { ',
+            '    "c":  │ │     "c": ',
+            '      2,  │ │       3, ',
+            '    "d":  │ │     ░    ',
+            '      4   │ │          ',
+            '    ░     │ │     "e": ',
+            '          │ │       5  ',
+            '  }       │ │   }      ',
+            '}         │ │ }        ',
+        ].join('\n')
+    )
+})
+
+
+// it('Should limit the width of the diff streams #2', async t => {
+//     const difference5   = compareDeepDiff({ a : 1, b : { c : { d : 4 } } }, { a : 1, b : { c : { d : 5 } } })
 //
 //     t.is(
 //         renderer.render(difference5.template(), TextBlock.new({ maxLen : 25 })),
@@ -53,9 +75,9 @@ iit('Should indent the atomic object entries', async t => {
 //             '  "a": 1, │ │   "a": 1,',
 //             '  "b": {  │ │   "b": { ',
 //             '    "c":  │ │     "c": ',
-//             '    2,    │ │     3,   ',
+//             '      2,  │ │       3, ',
 //             '    "d":  │ │     ░    ',
-//             '    4     │ │          ',
+//             '      4   │ │          ',
 //             '    ░     │ │     "e": ',
 //             '          │ │       5  ',
 //             '  }       │ │   }      ',
@@ -63,8 +85,6 @@ iit('Should indent the atomic object entries', async t => {
 //         ].join('\n')
 //     )
 // })
-
-
 
 
 // it('Should render the array diff correctly #2', async t => {
