@@ -77,8 +77,8 @@ export class XmlRenderer extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class XmlRenderingDynamicContext extends Mixin(
-    [ XmlRenderer ],
-    (base : ClassUnion<typeof XmlRenderer>) =>
+    [ Base ],
+    (base : ClassUnion<typeof Base>) =>
 
     class XmlRenderingDynamicContext extends base {
         parentContext   : this              = undefined
