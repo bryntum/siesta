@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { lastElement, NonEmptyArray, saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { ColoredStringPlain, ColoredStringSum, ColoredStringToken, MaybeColoredString, RenderingProgress } from "./ColoredString.js"
+import { ColoredString, ColoredStringPlain, ColoredStringSum, ColoredStringToken, MaybeColoredString, RenderingProgress } from "./ColoredString.js"
 import { Colorer } from "./Colorer.js"
 
 
@@ -120,8 +120,8 @@ export class TextBlock extends Base {
 
     addSameLineText (str : MaybeColoredString) {
         // push tokens directly, since they have length of 0
-        if (str instanceof ColoredStringToken) {
-            this.lastLine.push(str)
+        if ((str instanceof ColoredString) && str.length === 0) {
+            this.lastLine.strings.push(...str.tokens())
         } else {
             let sourcePos               = 0
 

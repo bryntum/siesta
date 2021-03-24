@@ -29,12 +29,20 @@ export class ColoredString extends Base {
 
 
     colorize (c : Colorer) : ColoredString {
-        return ColoredStringWrapped.new({ string : this, c })
+        if (this.length === 0)
+            return this
+        else
+            return ColoredStringWrapped.new({ string : this, c })
     }
 
 
     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
         throw new Error("Abstract method")
+    }
+
+
+    tokens () : ColoredStringToken[] {
+        return []
     }
 }
 
@@ -97,6 +105,11 @@ export class ColoredStringToken extends ColoredString {
     colorize (c : Colorer) : ColoredString {
         return this
     }
+
+
+    tokens () : ColoredStringToken[] {
+        return [ this ]
+    }
 }
 
 
@@ -148,6 +161,11 @@ export class ColoredStringWrapped extends ColoredString {
 
             string      : this.string.substr(pos, howMany)
         })
+    }
+
+
+    tokens () : ColoredStringToken[] {
+        return isString(this.string) ? [] : this.string.tokens()
     }
 }
 
@@ -233,5 +251,10 @@ export class ColoredStringSum extends ColoredString {
             },
             ColoredStringSum.new()
         )
+    }
+
+
+    tokens () : ColoredStringToken[] {
+        return this.strings.flatMap(string => isString(string) ? [] : string.tokens())
     }
 }

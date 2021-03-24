@@ -224,7 +224,7 @@ export class DifferenceTemplateComposite extends Mixin(
             output      : TextBlock,
             context     : XmlRenderingDynamicContextDifference
         ) {
-            if (this.hasEntries()) output.write('\n')
+            // if (this.hasEntries()) output.write('\n')
         }
 
 
@@ -249,6 +249,8 @@ export class DifferenceTemplateComposite extends Mixin(
         ) {
             if (context.currentStream !== 'middle')
                 super.beforeRenderChild(child, index, renderer, output, context)
+            else
+                if (index === 0) output.write('\n')
         }
 
 
@@ -284,6 +286,8 @@ export class DifferenceTemplateComposite extends Mixin(
         ) {
             if (context.currentStream !== 'middle')
                 super.afterRenderChild(child, index, renderer, output, context)
+            else
+                output.write('\n')
 
             output.push(ColoredStringSyncPoint.new({ el : child as XmlElement }))
         }
