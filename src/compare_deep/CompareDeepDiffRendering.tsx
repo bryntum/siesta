@@ -208,23 +208,6 @@ export class DifferenceTemplateComposite extends Mixin(
         ) {
             if (context.currentStream !== 'middle')
                 super.beforeRenderChildren(renderer, output, context)
-            else {
-                this.beforeRenderChildrenMiddle(renderer, output, context)
-            }
-        }
-
-
-        hasEntries () : boolean {
-            throw new Error("Abstract method")
-        }
-
-
-        beforeRenderChildrenMiddle (
-            renderer    : XmlRendererDifference,
-            output      : TextBlock,
-            context     : XmlRenderingDynamicContextDifference
-        ) {
-            // if (this.hasEntries()) output.write('\n')
         }
 
 
@@ -565,11 +548,6 @@ export class DifferenceTemplateArray extends Mixin(
         tagName         : string            = 'difference_template_array'
 
 
-        hasEntries () : boolean {
-            return this.getAttribute('length') > 0 || this.getAttribute('length2') > 0
-        }
-
-
         needCommaAfterChild (
             child               : DifferenceTemplateArrayEntry,
             index               : number,
@@ -638,11 +616,6 @@ export class DifferenceTemplateObject extends Mixin(
         }
 
         childNodes      : DifferenceTemplateObjectEntry[]
-
-
-        hasEntries () : boolean {
-            return this.getAttribute('size') > 0 || this.getAttribute('size2') > 0
-        }
 
 
         getConstructorName (
@@ -716,11 +689,6 @@ export class DifferenceTemplateSet extends Mixin(
         }
 
 
-        hasEntries () : boolean {
-            return this.getAttribute('size') > 0 || this.getAttribute('size2') > 0
-        }
-
-
         getOnlyIn2Size () : number {
             return this.getAttribute('onlyIn2Size')
         }
@@ -770,11 +738,6 @@ export class DifferenceTemplateMap extends Mixin(
 
         getSize (context : XmlRenderingDynamicContextDifference) : number {
             return context.currentStream === 'left' ? this.getAttribute('size') : this.getAttribute('size2')
-        }
-
-
-        hasEntries () : boolean {
-            return this.getAttribute('size') > 0 || this.getAttribute('size2') > 0
         }
 
 
