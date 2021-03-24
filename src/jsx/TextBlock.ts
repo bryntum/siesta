@@ -126,7 +126,7 @@ export class TextBlock extends Base {
     // probably need to fix the `substr`, so that it ignore the tokens during initial
     // search and include them once the content is filled
     addSameLineText (str : MaybeColoredString) {
-        // push tokens directly, since they have length of 0
+        // push tokens or (string consisting from tokens only) directly, since they have length of 0
         if ((str instanceof ColoredString) && str.length === 0) {
             this.lastLine.strings.push(...str.tokens())
         } else {
