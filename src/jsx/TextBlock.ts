@@ -39,19 +39,12 @@ export class TextBlock extends Base {
     initialize (props) {
         super.initialize(props)
 
-        this.initIndent()
+        this.indentationString          = ' '.repeat(this.indentLevel)
 
         if (this.reserved < 0) this.reserved = 0
         if (this.maxLen <= 0) this.maxLen = this.minContentWidth
 
         this.push(this.reserveChar.repeat(this.reserved))
-    }
-
-
-    initIndent () {
-        this.indentationString          = ' '.repeat(this.indentLevel)
-
-        // if (this.maxLen < this.minContentWidth) this.maxLen = this.minContentWidth
     }
 
 
@@ -196,7 +189,7 @@ export class TextBlock extends Base {
 
     pullFrom (another : TextBlock) {
         another.text.forEach((line, index, array) => {
-            if (index === 0) {
+            if (index === 0 && another.reserved > 0) {
                 this.push(line.substr(another.reserved))
             } else {
                 this.push(line)
