@@ -439,22 +439,33 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
         output          : TextBlock,
         context         : XmlRenderingDynamicContextDifference
     ) {
-        const left          = TextBlock.new()
-        const right         = TextBlock.new()
+        const shadowContext = (currentStream : 'left' | 'right' | 'middle') => XmlRenderingDynamicContextDifference.new({
+            parentContext : context.parentContext, element : this, currentStream
+        })
+
+        const stream = (stream : 'left' | 'right' | 'middle', output : TextBlock, header : string) => {
+            output.write(header)
+            output.push('\n\n', ColoredStringSyncPoint.new({ el : this }))
+
+            super.renderSelf(renderer, output, shadowContext(stream))
+        }
+
+        //----------------
+        // first render the middle stream to determine the remaining available with for left/right streams
         const middle        = TextBlock.new()
 
-        left.write('Received')
-        // ensure at least one space width for central region
-        middle.write(' ')
-        right.write('Expected');
+        stream('middle', middle, ' ')
 
-        [ left, middle, right ].forEach(output => output.push('\n\n', ColoredStringSyncPoint.new({ el : this })))
+        //----------------
+        // the wrapper for content in middle stream ` |CONTENT| ` is 4 chars length
+        const available     = output.maxLen - (middle.maxLineLength + 4)
 
-        const shadowContext = currentStream => XmlRenderingDynamicContextDifference.new({ parentContext : context.parentContext, element : this, currentStream })
+        // extra 1 space because of the possibly oddity of the `available` goes to the left region
+        const left          = TextBlock.new({ maxLen : Math.round(available / 2) })
+        const right         = TextBlock.new({ maxLen : Math.floor(available / 2) })
 
-        super.renderSelf(renderer, left, shadowContext('left'))
-        super.renderSelf(renderer, right, shadowContext('right'))
-        super.renderSelf(renderer, middle, shadowContext('middle'))
+        stream('left', left, 'Received')
+        stream('right', right, 'Expected')
 
         this.combineDiffStreams(output, left, right, middle)
     }
