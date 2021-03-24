@@ -317,13 +317,18 @@ export class SerializationObjectEntry extends Mixin(
 
             output.write(': ')
 
-            const valueIsAtomic     = renderer.atomicElementNodes.has(valueEl.tagName)
+            const valueIsAtomic     = this.valueIsAtomic(valueEl, renderer, context)
 
             if (valueIsAtomic && renderer.prettyPrint) output.indent()
 
             valueEl.renderToTextBlock(renderer, output, context)
 
             if (valueIsAtomic && renderer.prettyPrint) output.outdent()
+        }
+
+
+        valueIsAtomic (valueEl : XmlElement, renderer : XmlRendererSerialization, context : XmlRenderingDynamicContext) : boolean {
+            return renderer.atomicElementNodes.has(valueEl.tagName)
         }
     }
 ) {}

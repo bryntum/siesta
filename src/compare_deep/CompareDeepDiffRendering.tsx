@@ -496,7 +496,8 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
 
                 if (!syncPointsSuppressed && (command instanceof ColoredStringSyncPoint)) {
                     return command.el.depth
-                } else if (command instanceof ColoredStringSuppressSyncPoints) {
+                }
+                else if (command instanceof ColoredStringSuppressSyncPoints) {
                     syncPointsSuppressed    = true
                 }
                 else if (command instanceof ColoredStringResumeSyncPoints) {
@@ -672,6 +673,11 @@ export class DifferenceTemplateObjectEntry extends Mixin(
             } else {
                 super.renderSelf(renderer, output, context)
             }
+        }
+
+
+        valueIsAtomic (valueEl : DifferenceTemplateElement, renderer : XmlRendererSerialization, context : XmlRenderingDynamicContext) : boolean {
+            return valueEl.tagName.toLowerCase() === 'difference_template_atomic'
         }
     }
 ){}
