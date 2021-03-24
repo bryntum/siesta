@@ -92,6 +92,11 @@ export class ColoredStringToken extends ColoredString {
     substr (pos : number, howMany : number = Number.MAX_SAFE_INTEGER) : ColoredString {
         return this
     }
+
+
+    colorize (c : Colorer) : ColoredString {
+        return this
+    }
 }
 
 
