@@ -74,7 +74,7 @@ export class TextBlock extends Base {
     reserveChar             : string            = String.fromCharCode(0)
     reserved                : number            = 0
 
-    // minContentWidth         : number            = 2
+    minContentWidth         : number            = 10
 
     text                    : ColoredStringSum[] = [ ColoredStringSum.new() ]
 
@@ -102,6 +102,9 @@ export class TextBlock extends Base {
         super.initialize(props)
 
         this.initIndent()
+
+        if (this.reserved < 0) this.reserved = 0
+        if (this.maxLen <= 0) this.maxLen = this.minContentWidth
 
         this.push(this.reserveChar.repeat(this.reserved))
     }
@@ -146,7 +149,7 @@ export class TextBlock extends Base {
 
 
     // this is used as `reserved` argument for a child text block
-    get lastLineLengthWithIndent () : number  {
+    get lastLineContentLength () : number  {
         return this.lastLine.length === 0 ? 0 : this.lastLine.length - this.currentIndentation.length
     }
 
@@ -190,9 +193,9 @@ export class TextBlock extends Base {
             while (sourcePos < str.length) {
                 const insertPos         = this.atNewLine ? this.currentIndentation.length : this.lastLine.length
 
-                const freeLength        = this.maxLen - insertPos
+                let freeLength          = this.maxLen - insertPos
 
-                // if (freeLength < this.minContentWidth) freeLength = this.minContentWidth
+                // if (freeLength <= 0) freeLength = this.minContentWidth
 
                 const toInsert          = str.substr(sourcePos, freeLength)
 
