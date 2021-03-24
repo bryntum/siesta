@@ -63,28 +63,34 @@ it('Should limit the width of the diff streams #2', async t => {
 })
 
 
-// it('Should limit the width of the diff streams #2', async t => {
-//     const difference5   = compareDeepDiff({ a : 1, b : { c : { d : 4 } } }, { a : 1, b : { c : { d : 5 } } })
-//
-//     t.is(
-//         renderer.render(difference5.template(), TextBlock.new({ maxLen : 25 })),
-//         [
-//             'Received  │ │ Expected ',
-//             '          │ │          ',
-//             '{         │ │ {        ',
-//             '  "a": 1, │ │   "a": 1,',
-//             '  "b": {  │ │   "b": { ',
-//             '    "c":  │ │     "c": ',
-//             '      2,  │ │       3, ',
-//             '    "d":  │ │     ░    ',
-//             '      4   │ │          ',
-//             '    ░     │ │     "e": ',
-//             '          │ │       5  ',
-//             '  }       │ │   }      ',
-//             '}         │ │ }        ',
-//         ].join('\n')
-//     )
-// })
+it('Should limit the width of the diff streams #2', async t => {
+    const difference5   = compareDeepDiff({ a : 1, b : { c : { d : { e : 4 } } } }, { a : 1, b : { c : { d : { e : 5 } } } })
+
+    t.is(
+        renderer.render(difference5.template(), TextBlock.new({ maxLen : 25 })),
+        [
+            'Received   │ │ Expected ',
+            '           │ │          ',
+            '{          │ │ {        ',
+            '  "a": 1,  │ │   "a": 1,',
+            '  "b": {   │ │   "b": { ',
+            '    "c": { │ │     "c": ',
+            '      "d": │ │     {    ',
+            '       {   │ │       "d"',
+            '        "e │ │       : {',
+            '        ": │ │         "',
+            '         4 │ │         e',
+            '           │ │         "',
+            '           │ │         :',
+            '           │ │          ',
+            '           │ │         5',
+            '      }    │ │       }  ',
+            '    }      │ │     }    ',
+            '  }        │ │   }      ',
+            '}          │ │ }        ',
+        ].join('\n')
+    )
+})
 
 
 // it('Should render the array diff correctly #2', async t => {
