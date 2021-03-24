@@ -229,7 +229,7 @@ export class AssertionCompare extends Mixin(
                 annotation  : passed ? undefined : negated ? NotEqualAnnotationTemplate.el({
                     value               : value2,
                     t                   : this
-                }) : <div>{ difference.template(/*this.descriptor.serializerConfig*/) }</div>
+                }) : <div>{ difference.template(/*this.descriptor.serializerConfig*/) }<div></div></div>
             }))
         }
 
