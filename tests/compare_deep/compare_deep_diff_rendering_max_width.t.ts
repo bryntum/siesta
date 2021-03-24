@@ -43,7 +43,8 @@ it('Should limit the width of the diff streams #2', async t => {
     const difference5   = compareDeepDiff({ a : 1, b : { c : 2, d : 4 } }, { a : 1, b : { c : 3, e : 5 } })
 
     t.is(
-        renderer.render(difference5.template(), TextBlock.new({ maxLen : 25 })),
+        // 9 chars for left/right streams, 9 + 5 + 9 = 23
+        renderer.render(difference5.template(), TextBlock.new({ maxLen : 23 })),
         [
             'Received  │ │ Expected ',
             '          │ │          ',
@@ -67,7 +68,8 @@ it('Should limit the width of the diff streams #2', async t => {
     const difference5   = compareDeepDiff({ a : 1, b : { c : { d : { e : 4 } } } }, { a : 1, b : { c : { d : { e : 5 } } } })
 
     t.is(
-        renderer.render(difference5.template(), TextBlock.new({ maxLen : 25 })),
+        // 10 chars for left stream, 9 for right
+        renderer.render(difference5.template(), TextBlock.new({ maxLen : 24 })),
         [
             'Received   │ │ Expected ',
             '           │ │          ',

@@ -457,7 +457,7 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
         stream('middle', middle, ' ')
 
         //----------------
-        // the wrapper for content in middle stream ` |CONTENT| ` is 4 chars length
+        // the wrapper for content in the middle stream ` |CONTENT| ` is 4 chars length
         const available     = output.maxLen - (middle.maxLineLength + 4)
 
         // extra 1 space because of the possibly oddity of the `available` goes to the left region

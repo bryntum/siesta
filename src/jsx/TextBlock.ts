@@ -49,6 +49,10 @@ export class TextBlock extends Base {
 
 
     indent (indentWith : NonEmptyArray<MaybeColoredString> = [ this.indentationString ]) {
+        if (this.currentIndentation.length + lastElement(indentWith).length >= this.maxLen) {
+            indentWith                  = [ '' ]
+        }
+
         const lengthFirst               = indentWith[ 0 ].length
         const allIndentsHasSameLength   = indentWith.every(str => str.length === lengthFirst)
 
@@ -124,9 +128,7 @@ export class TextBlock extends Base {
             while (sourcePos < str.length) {
                 const insertPos         = this.atNewLine ? this.currentIndentation.length : this.lastLine.length
 
-                let freeLength          = this.maxLen - insertPos
-
-                // if (freeLength <= 0) freeLength = this.minContentWidth
+                const freeLength        = this.maxLen - insertPos
 
                 const toInsert          = str.substr(sourcePos, freeLength)
 
