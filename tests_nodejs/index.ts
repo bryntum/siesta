@@ -8,6 +8,13 @@ const project = Project.new({
 
 project.plan(
     {
+        filename    : 'compare_deep',
+
+        items       : [
+            'compare_deep_diff_rendering.t.js',
+        ]
+    },
+    {
         filename    : 'jsx',
 
         items       : [
