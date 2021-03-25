@@ -455,13 +455,9 @@ export const compareDeepDiff = function (
         // is being converted to Difference with `valueAsDifference`
         // in such case the value in 2nd stream is actually missing
         if (has1)
-            return DifferenceHeterogeneous.new({
-                value1      : DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1 }),
-            })
+            return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1 })
         else
-            return DifferenceHeterogeneous.new({
-                value2      : DifferenceReference.new({ value2 : v2Visit[ 1 ].refId2 }),
-            })
+            return DifferenceReference.new({ value2 : v2Visit[ 1 ].refId2 })
     }
     else if (options.cycleIsPartOfDataStructure && hasOne && !convertToDiff) {
         if (has1)
