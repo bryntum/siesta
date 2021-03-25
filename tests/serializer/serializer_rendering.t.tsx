@@ -255,7 +255,7 @@ it('Should show "out of depth" symbol', async t => {
         rendererPretty.printValue({ prop1 : 1, prop2 : { prop3 : 3 } }, undefined, { maxDepth : 1 }),
 `{
   "prop1": 1,
-  "prop2": ▼ Object { ... }
+  "prop2": ▼ Object {…}
 }`,
         'Stringification of object with "out of depth" entry value'
     )
