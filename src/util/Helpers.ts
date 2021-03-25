@@ -31,7 +31,11 @@ export const typeOf = (value : any) : string => Object.prototype.toString.call(v
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const constructorNameOf = (value : any) : string => Object.getPrototypeOf(value).constructor.name
+export const constructorNameOf = (value : any) : string => {
+    const proto = Object.getPrototypeOf(value)
+
+    return proto ? proto.constructor.name : typeOf(value)
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
