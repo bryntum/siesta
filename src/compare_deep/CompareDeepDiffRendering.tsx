@@ -605,6 +605,10 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class DifferenceTemplateObject extends Mixin(
+    // note, that `SerializationObject` and `DifferenceTemplateComposite` are not ordered
+    // (the order of their application is not defined)
+    // this still works correctly, because they override different methods
+    // the same applies to all other mixins, that uses `Serialization*` mixins
     [ SerializationObject, DifferenceTemplateComposite ],
     (base : ClassUnion<typeof SerializationObject, typeof DifferenceTemplateComposite>) =>
 
