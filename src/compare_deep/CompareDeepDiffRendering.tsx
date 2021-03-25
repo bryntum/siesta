@@ -26,6 +26,7 @@ import {
 } from "../serializer/SerializerRendering.js"
 import { styles } from "../siesta/reporter/styling/terminal.js"
 import { isString } from "../util/Typeguards.js"
+import { stripAnsiControlCharacters } from "../util_nodejs/Terminal.js"
 import { DifferenceType } from "./CompareDeepDiff.js"
 
 
@@ -503,7 +504,7 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
 
             blocks.forEach(block => {
                 while (block.text.length < maxLines) {
-                    const lastLine      = block.lastLine.toString()
+                    const lastLine      = stripAnsiControlCharacters(block.lastLine.toString())
 
                     block.addNewLine()
 
