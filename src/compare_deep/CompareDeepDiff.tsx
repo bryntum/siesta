@@ -19,6 +19,7 @@ import {
     DifferenceTemplateSetEntry,
     MissingValue
 } from "./CompareDeepDiffRendering.js"
+import { FuzzyMatcher } from "./FuzzyMatcherDiff.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -316,10 +317,10 @@ export class DifferenceHeterogeneous extends Difference {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-const valueAsDifference = (value : unknown, valueProp : 'value1' | 'value2', options : DeepCompareOptions, state : DeepCompareState) : Difference => {
+export const valueAsDifference = (value : unknown, valueProp : 'value1' | 'value2', options : DeepCompareOptions, state : DeepCompareState) : Difference => {
     if (value === Missing) value = MissingInternal
 
-    const difference = compareDeepDiff(value, value, options, state)
+    const difference = compareDeepDiff(value, value, options, state, true)
 
     difference.excludeValue(valueProp === 'value1' ? 'value2' : 'value1')
 
@@ -385,10 +386,13 @@ const defaultDeepCompareOptions : DeepCompareOptions = {
 
 //---------------------------------------------------------------------------------------------------------------------
 export const compareDeepDiff = function (
-    v1          : unknown,
-    v2          : unknown,
-    options     : DeepCompareOptions    = defaultDeepCompareOptions,
-    state       : DeepCompareState      = DeepCompareState.new()
+    v1                  : unknown,
+    v2                  : unknown,
+    options             : DeepCompareOptions    = defaultDeepCompareOptions,
+    state               : DeepCompareState      = DeepCompareState.new(),
+    // this argument is used when some value is compared with itself, to convert it into a Difference instance
+    // (which can be used for rendering later)
+    convertToDiff       : boolean               = false
 )
     : Difference
 {
@@ -398,22 +402,22 @@ export const compareDeepDiff = function (
     // so that code can distinguish it
     if (v1 === Missing && v2 === Missing) { v1 = v2 = MissingInternal }
 
-    // // shortcut exit to save time, this also allows to compare the placeholder with itself
-    // if (v1 === v2) return
-    //
-    // // some (or both) of the inputs is a PlaceHolder instance
-    // if (v1 instanceof FuzzyMatcher && v2 instanceof FuzzyMatcher) {
-    //     yield* v1.equalsToGen(v2, false, options, state)
-    //     return
-    // }
-    // else if (v1 instanceof FuzzyMatcher) {
-    //     yield* v1.equalsToGen(v2, false, options, state)
-    //     return
-    // }
-    // else if (v2 instanceof FuzzyMatcher) {
-    //     yield* v2.equalsToGen(v1, true, options, state)
-    //     return
-    // }
+    const v1IsMatcher   = v1 instanceof FuzzyMatcher
+    const v2IsMatcher   = v2 instanceof FuzzyMatcher
+
+    if (v1IsMatcher && !v2IsMatcher) {
+        return (v1 as FuzzyMatcher).equalsToDiff(v2, false, options, state)
+    }
+    else if (v2IsMatcher && !v1IsMatcher) {
+        return (v2 as FuzzyMatcher).equalsToDiff(v1, true, options, state)
+    }
+    else if (v1IsMatcher && v2IsMatcher && v1 === v2) {
+        return DifferenceAtomic.new({
+            value1  : v1,
+            value2  : v2,
+            same    : true
+        })
+    }
 
     const v1Visit   = state.visited1.get(v1)
     const v2Visit   = state.visited2.get(v2)
@@ -446,7 +450,7 @@ export const compareDeepDiff = function (
     else if (options.cycleIsPartOfDataStructure && hasBoth && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
         return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1, value2 : v2Visit[ 1 ].refId2, same : false })
     }
-    else if (options.cycleIsPartOfDataStructure && hasOne) {
+    else if (options.cycleIsPartOfDataStructure && hasOne && !convertToDiff) {
         if (has1)
             return DifferenceHeterogeneous.new({
                 value1      : DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1 }),
@@ -497,7 +501,7 @@ export const compareDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const compareArrayDeepDiff = function (
+const compareArrayDeepDiff = function (
     array1 : unknown[], array2 : unknown[], options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 )
     : Difference
@@ -529,7 +533,7 @@ export const compareArrayDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const compareKeys = function <K, V>(
+const compareKeys = function <K, V>(
     setMap1                 : Set<K> | Map<K, V>,
     setMap2                 : Set<K> | Map<K, V>,
     compareStructurally     : boolean,
@@ -583,7 +587,7 @@ export const compareKeys = function <K, V>(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const compareSetDeepDiff = function (
+const compareSetDeepDiff = function (
     set1 : Set<unknown>, set2 : Set<unknown>, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 )
     : Difference
@@ -606,7 +610,7 @@ export const compareSetDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const compareMapDeepDiff = function (
+const compareMapDeepDiff = function (
     map1 : Map<unknown, unknown>, map2 : Map<unknown, unknown>, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 )
     : Difference
@@ -642,7 +646,7 @@ export const compareMapDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const compareObjectDeepDiff = function (
+const compareObjectDeepDiff = function (
     object1 : ArbitraryObject, object2 : ArbitraryObject, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 )
     : Difference
@@ -672,7 +676,7 @@ export const compareObjectDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const compareFunctionDeepDiff = function (
+const compareFunctionDeepDiff = function (
     func1 : Function, func2 : Function, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 ) : Difference {
     const difference = DifferenceReferenceableAtomic.new({ value1 : func1, value2 : func2, same : func1 === func2 })
@@ -684,7 +688,7 @@ export const compareFunctionDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const compareRegExpDeepDiff = function (
+const compareRegExpDeepDiff = function (
     regexp1 : RegExp, regexp2 : RegExp, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 ) : Difference {
     const regexpProps   = [ 'source', 'dotAll', 'global', 'ignoreCase', 'multiline', 'sticky', 'unicode' ]
@@ -702,7 +706,7 @@ export const compareRegExpDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const compareDateDeepDiff = function (
+const compareDateDeepDiff = function (
     date1 : Date, date2 : Date, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 ) : Difference {
     const difference = DifferenceReferenceableAtomic.new({ value1 : date1, value2 : date2, same : date1.getTime() === date2.getTime() })
@@ -714,24 +718,12 @@ export const compareDateDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const comparePrimitiveDeepDiff = (
+const comparePrimitiveDeepDiff = (
     value1 : unknown, value2 : unknown, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
 ) : Difference => {
-    if (value1 === value2 || (Number.isNaN(value1) && Number.isNaN(value2))) return DifferenceAtomic.new({ value1, value2, same : true })
-
-    return DifferenceAtomic.new({ value1, value2 })
-
-    // // some (or both) of the inputs is a PlaceHolder instance
-    // if (v1 instanceof FuzzyMatcher && v2 instanceof FuzzyMatcher) {
-    //     yield* v1.equalsToGen(v2, false, options, state)
-    // }
-    // else if (v1 instanceof FuzzyMatcher) {
-    //     yield* v1.equalsToGen(v2, false, options, state)
-    // }
-    // else if (v2 instanceof FuzzyMatcher) {
-    //     yield* v2.equalsToGen(v1, true, options, state)
-    // }
-    // else {
-    //     yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
-    // }
+    return DifferenceAtomic.new({
+        value1,
+        value2,
+        same : value1 === value2 || (Number.isNaN(value1) && Number.isNaN(value2))
+    })
 }
