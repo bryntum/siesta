@@ -450,6 +450,19 @@ export const compareDeepDiff = function (
     else if (options.cycleIsPartOfDataStructure && hasBoth && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
         return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1, value2 : v2Visit[ 1 ].refId2, same : false })
     }
+    else if (options.cycleIsPartOfDataStructure && hasOne && convertToDiff && v1 === v2) {
+        // special processing of the case, when a cyclic, already visited in a _single_ stream, value
+        // is being converted to Difference with `valueAsDifference`
+        // in such case the value in 2nd stream is actually missing
+        if (has1)
+            return DifferenceHeterogeneous.new({
+                value1      : DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1 }),
+            })
+        else
+            return DifferenceHeterogeneous.new({
+                value2      : DifferenceReference.new({ value2 : v2Visit[ 1 ].refId2 }),
+            })
+    }
     else if (options.cycleIsPartOfDataStructure && hasOne && !convertToDiff) {
         if (has1)
             return DifferenceHeterogeneous.new({

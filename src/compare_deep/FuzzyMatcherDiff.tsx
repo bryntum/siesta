@@ -235,6 +235,7 @@ export class FuzzyMatcherInstance extends Mixin(
 
 
         equalsToDiff (v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Difference {
+            return
             // const v1        = flipped ? v : this
             // const v2        = flipped ? this : v
             //
@@ -273,6 +274,7 @@ export class FuzzyMatcherAny extends Mixin(
 
 
         equalsToDiff (v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Difference {
+            return
         }
     }
 ){}

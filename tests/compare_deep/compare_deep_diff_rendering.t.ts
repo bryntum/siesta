@@ -626,6 +626,38 @@ it('Should render the diff of circular data structures correctly #3', async t =>
 })
 
 
+it('Should render the diff of circular data structures correctly #4', async t => {
+    const a = {
+        prop : {
+            maxDepth : 4
+        }
+    }
+
+    const circular = { ref : undefined }
+    circular.ref = circular
+
+    const b = {
+        prop : circular
+    }
+
+    const difference0   = compareDeepDiff(a, b)
+
+    t.is(
+        renderer.render(difference0.template()),
+        [
+            'Received          │ │ Expected                ',
+            '                  │ │                         ',
+            '{                 │ │ {                       ',
+            '  "prop": {       │ │   "prop": <ref *1> {    ',
+            '    "maxDepth": 4 │ │     ░                   ',
+            '    ░             │ │     "ref": [Circular *1]',
+            '  }               │ │   }                     ',
+            '}                 │ │ }                       ',
+        ].join('\n')
+    )
+})
+
+
 it('Should render the diff of internal data correctly #1', async t => {
     const difference0   = compareDeepDiff(
         DifferenceReference.new({ value1 : 1, same : false }),
@@ -644,6 +676,146 @@ it('Should render the diff of internal data correctly #1', async t => {
             '}                            │ │         ',
         ].join('\n')
     )
+})
+
+
+it('Should render the diff of internal data correctly #2', async t => {
+    debugger
+
+    // t.eqDiff(t, t.parentNode)
+
+    // const difference0   = compareDeepDiff(
+    //     compareDeepDiff(10, anyNumberApprox(10)),
+    //     DifferenceAtomic.new({ value1 : 10, value2 : anyNumberApprox(10), same : true })
+    // )
+    //
+    // t.is(
+    //     renderer.render(difference0.template()),
+    //     [
+    //         'Received                     │ │ Expected',
+    //         '                             │ │         ',
+    //         'DifferenceReference {        │ │ false   ',
+    //         '  "value1": 1,               │ │         ',
+    //         `  "value2": Symbol(Missing), │ │         `,
+    //         '  "same": false              │ │         ',
+    //         '}                            │ │         ',
+    //     ].join('\n')
+    // )
+
+
+//   DifferenceHeterogeneous {                        │ │ DifferenceAtomic {
+// │     "value1": DifferenceAtomic {                 │ │   "value1": 10,
+// │       "value1": 10,                              │ │
+// │       "value2": Symbol(Missing),                 │ │
+// │       "same": false                              │ │
+// │     },                                           │ │
+// │     "value2": DifferenceObject {                 │ │   "value2": FuzzyMatcherNumber {
+// │       "value1": Symbol(Missing),                 │ │     ░
+// │       "value2": FuzzyMatcherNumber {             │ │     ░
+// │         "value": 10,                             │ │
+// │         "approx": <ref *1> NumberApproximation { │ │
+// │           "percent": 5,                          │ │
+// │           "threshold": undefined,                │ │
+// │           "digits": undefined                    │ │
+// │         },                                       │ │
+// │         "min": undefined,                        │ │
+// │         "max": undefined                         │ │
+// │       },                                         │ │
+// │       "same": false,                             │ │   ░
+// │       "refId1": undefined,                       │ │     ░
+// │       "refId2": undefined,                       │ │     ░
+// │       "onlyIn2Size": 0,                          │ │     ░
+// │       "comparisons": [                           │ │     ░
+// │         {                                        │0│
+// │           "key": "value",                        │ │
+// │           "difference": DifferenceAtomic {       │ │
+// │             "value1": Symbol(Missing),           │ │
+// │             "value2": 10,                        │ │
+// │             "same": false                        │ │
+// │           }                                      │ │
+// │         },                                       │ │
+// │         {                                        │1│
+// │           "key": "approx",                       │ │
+// │           "difference": DifferenceObject {       │ │
+// │             "value1": Symbol(Missing),           │ │
+// │             "value2": [Circular *1],             │ │
+// │             "same": false,                       │ │
+// │             "refId1": undefined,                 │ │
+// │             "refId2": undefined,                 │ │
+// │             "onlyIn2Size": 0,                    │ │
+// │             "comparisons": [                     │ │
+// │               {                                  │0│
+// │                 "key": "percent",                │ │
+// │                 "difference": DifferenceAtomic { │ │
+// │                   "value1": Symbol(Missing),     │ │
+// │                   "value2": 5,                   │ │
+// │                   "same": false                  │ │
+// │                 }                                │ │
+// │               },                                 │ │
+// │               {                                  │1│
+// │                 "key": "threshold",              │ │
+// │                 "difference": DifferenceAtomic { │ │
+// │                   "value1": Symbol(Missing),     │ │
+// │                   "value2": undefined,           │ │
+// │                   "same": false                  │ │
+// │                 }                                │ │
+// │               },                                 │ │
+// │               {                                  │2│
+// │                 "key": "digits",                 │ │
+// │                 "difference": DifferenceAtomic { │ │
+// │                   "value1": Symbol(Missing),     │ │
+// │                   "value2": undefined,           │ │
+// │                   "same": false                  │ │
+// │                 }                                │ │
+// │               }                                  │ │
+// │             ]                                    │ │
+// │           }                                      │ │
+// │         },                                       │ │
+// │         {                                        │2│
+// │           "key": "min",                          │ │
+// │           "difference": DifferenceAtomic {       │ │
+// │             "value1": Symbol(Missing),           │ │
+// │             "value2": undefined,                 │ │
+// │             "same": false                        │ │
+// │           }                                      │ │
+// │         },                                       │ │
+// │         {                                        │3│
+// │           "key": "max",                          │ │
+// │           "difference": DifferenceAtomic {       │ │
+// │             "value1": Symbol(Missing),           │ │
+// │             "value2": undefined,                 │ │
+// │             "same": false                        │ │
+// │           }                                      │ │
+// │         }                                        │ │
+// │       ]                                          │ │
+// │       ░                                          │ │   "value": 10,
+// │       ░                                          │ │     "approx": NumberApproximation {
+// │                                                  │ │       "percent": 5,
+// │                                                  │ │       "threshold": undefined,
+// │                                                  │ │       "digits": undefined
+// │                                                  │ │     },
+// │     ░                                            │ │     "min": undefined,
+// │       ░                                          │ │     "max": undefined
+// │     },                                           │ │   },
+// │     "same": false                                │ │   "same": true
+// │   }                                              │ │ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 })
 
 
@@ -719,3 +891,123 @@ it('Should render the diff of Date correctly #1', async t => {
         ].join('\n')
     )
 })
+
+
+it('Should render the diff with empty array correctly', async t => {
+    const a = {
+        "descriptor": {
+            "parentNode": undefined
+        }
+    }
+
+    const b = {
+        "descriptor": {
+            "tags": [],
+            "isTodo": false
+        }
+    }
+
+    const difference0   = compareDeepDiff(a, b)
+
+    t.is(
+        renderer.render(difference0.template()),
+        [
+            'Received                    │ │ Expected           ',
+            '                            │ │                    ',
+            '{                           │ │ {                  ',
+            '  "descriptor": {           │ │   "descriptor": {  ',
+            '    "parentNode": undefined │ │     ░              ',
+            '    ░                       │ │     "tags": [],    ',
+            '    ░                       │ │     "isTodo": false',
+            '  }                         │ │   }                ',
+            '}                           │ │ }                  ',
+        ].join('\n')
+    )
+})
+
+
+
+
+
+
+// iit('Should render the diff with empty array correctly', async t => {
+//     const a = {
+//         "logLevel": 2,
+//         "localId": 31,
+//         "frozen": false,
+//         "state": "created",
+//         "descriptor": {
+//             "parentNode": undefined,
+//             "childNodes": undefined,
+//             "title": "Should render the diff of internal data correctly #2",
+//             "filename": "",
+//             "serializerConfig": {
+//                 "maxBreadth": 10,
+//                 "maxDepth": 4
+//             },
+//             "stringifierConfig": {
+//                 "prettyPrint": true
+//             },
+//             "deepCompareConfig": {},
+//             "$flatten": undefined
+//         }
+//     }
+//
+//
+//     const circular = { ref : undefined }
+//     circular.ref = circular
+//
+//     const b = {
+//         "logLevel": 2,
+//         "localId": 0,
+//         "frozen": false,
+//         "state": "created",
+//         "descriptor": {
+//             "parentNode": {
+//                 "parentNode": undefined,
+//                 "childNodes": [
+//                     1
+//                 ],
+//                 "title": "tests/compare_deep/compare_deep_diff_rendering.t.js",
+//                 "filename": "",
+//                 "serializerConfig": {
+//                     "maxBreadth": 10,
+//                     "maxDepth": 4
+//                 },
+//                 "stringifierConfig": {
+//                     "prettyPrint": true
+//                 },
+//                 "deepCompareConfig": {},
+//                 "$flatten": undefined,
+//                 "url": "."
+//             },
+//             "childNodes": undefined,
+//             "title": "",
+//             "filename": "",
+//             "serializerConfig": circular,
+//             "stringifierConfig": circular,
+//             "deepCompareConfig": circular,
+//             "$flatten": undefined,
+//             "url": "tests/compare_deep/compare_deep_diff_rendering.t.js"
+//         }
+//     }
+//
+//     const difference0   = compareDeepDiff(a, b)
+//
+//     t.is(
+//         renderer.render(difference0.template()),
+//         [
+//             'Received                    │ │ Expected           ',
+//             '                            │ │                    ',
+//             '{                           │ │ {                  ',
+//             '  "descriptor": {           │ │   "descriptor": {  ',
+//             '    "parentNode": undefined │ │     ░              ',
+//             '    ░                       │ │     "tags": [],    ',
+//             '    ░                       │ │     "isTodo": false',
+//             '  }                         │ │   }                ',
+//             '}                           │ │ }                  ',
+//         ].join('\n')
+//     )
+// })
+//
+//

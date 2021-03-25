@@ -518,7 +518,7 @@ export class SerializationOutOfDepth extends Mixin(
             output          : TextBlock,
             context         : XmlRenderingDynamicContext
         ) {
-            output.write(`▼ ${ this.getAttribute('constructorName') ?? '' } { ... }`)
+            output.write(`▼ ${ this.getAttribute('constructorName') ?? '' } {…}`)
         }
     }
 ){}
