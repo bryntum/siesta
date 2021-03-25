@@ -136,7 +136,7 @@ export class DifferenceArray extends DifferenceReferenceable {
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons.map(({ index, difference }) =>
-                <DifferenceTemplateArrayEntry type={ difference.type } index={ index }>
+                <DifferenceTemplateArrayEntry type={ difference.type } index={ index } same={ difference.same }>
                     { difference.templateInner(serializerConfig, diffState) }
                 </DifferenceTemplateArrayEntry>
             )

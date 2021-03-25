@@ -77,10 +77,13 @@ export class DifferenceTemplateElement extends XmlElement {
     }
 
 
-    colorizeSelf (renderer : XmlRenderer, output : TextBlock, context : XmlRenderingDynamicContext) {
+    colorizeSelf (renderer : XmlRendererDifference, output : TextBlock, context : XmlRenderingDynamicContextDifference) {
         super.colorizeSelf(renderer, output, context)
 
-        if (CI(this.parentAxis()).some(el => el instanceof DifferenceTemplateHeterogeneous)) {
+        if (context.currentStream === 'middle') {
+            output.colorizeMut(this.getAttribute('same') ? styles.get('gray')(renderer.c) : renderer.c.reset)
+        }
+        else if (CI(this.parentAxis()).some(el => el instanceof DifferenceTemplateHeterogeneous)) {
             output.colorizeMut(styles.get('accented')(renderer.c))
         }
         else if (this.getAttribute('same')) {
