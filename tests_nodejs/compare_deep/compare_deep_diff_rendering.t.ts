@@ -1,6 +1,7 @@
 import { iit, it } from "../../index.js"
 import { compareDeepDiff, DifferenceReference } from "../../src/compare_deep/CompareDeepDiff.js"
 import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRendering.js"
+import { anyNumberApprox } from "../../src/compare_deep/FuzzyMatcherDiff.js"
 import { ColorerNodejs } from "../../src/jsx/ColorerNodejs.js"
 import { stripAnsiControlCharacters } from "../../src/util_nodejs/Terminal.js"
 
@@ -1023,6 +1024,69 @@ it('Should render the colored diff in the same way as non-colored #1', async t =
     }
 
     const difference0   = compareDeepDiff(a, b)
+
+    t.is(
+        stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
+        rendererPlain.render(difference0.template())
+    )
+})
+
+
+it('Should render the diff with number matcher correctly #1', async t => {
+    const difference0   = compareDeepDiff({ a : 10 }, { a : anyNumberApprox(10, { threshold : 1 }) })
+
+    t.is(
+        rendererPlain.render(difference0.template()),
+        [
+            'Received  │ │ Expected   ',
+            '          │ │            ',
+            '{         │ │ {          ',
+            '  "a": 10 │ │   "a": 10±1',
+            '}         │ │ }          ',
+        ].join('\n')
+    )
+
+    t.is(
+        stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
+        rendererPlain.render(difference0.template())
+    )
+})
+
+
+it('Should render the diff with number matcher correctly #2', async t => {
+    const difference0   = compareDeepDiff({ a : 10 }, { a : anyNumberApprox(10, { percent : 3 }) })
+
+    t.is(
+        rendererPlain.render(difference0.template()),
+        [
+            'Received  │ │ Expected    ',
+            '          │ │             ',
+            '{         │ │ {           ',
+            '  "a": 10 │ │   "a": 10±3%',
+            '}         │ │ }           ',
+        ].join('\n')
+    )
+
+    t.is(
+        stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
+        rendererPlain.render(difference0.template())
+    )
+})
+
+
+it('Should render the diff with number matcher correctly #3', async t => {
+    const difference0   = compareDeepDiff({ a : 10.12 }, { a : anyNumberApprox(10.1234, { digits : 2 }) })
+
+    t.is(
+        rendererPlain.render(difference0.template()),
+        [
+            'Received     │ │ Expected      ',
+            '             │ │               ',
+            '{            │ │ {             ',
+            '  "a": 10.12 │ │   "a": 10.12xx',
+            '}            │ │ }             ',
+        ].join('\n')
+    )
 
     t.is(
         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),

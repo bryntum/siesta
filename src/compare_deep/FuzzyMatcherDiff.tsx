@@ -78,7 +78,19 @@ export class FuzzyMatcherNumberApproximation extends Mixin(
 
 
         toString () : string {
-            return `${ this.value }±${ this.approx.getThreshold(this.value) }`
+            if (this.approx.threshold !== undefined) {
+                return `${ this.value }±${ this.approx.getThreshold(this.value) }`
+            }
+            else if (this.approx.percent !== undefined) {
+                return `${ this.value }±${ this.approx.percent }%`
+            }
+            else if (this.approx.digits !== undefined) {
+                const parts     = String(this.value).split('.')
+
+                if (parts.length < 2) parts.push('0'.repeat(this.approx.digits))
+
+                return `${ parts[ 0 ] }.${ parts[ 1 ].substr(0, this.approx.digits) }${ parts[ 1 ].length - this.approx.digits > 0 ? 'x'.repeat(parts[ 1 ].length - this.approx.digits) : '' }`
+            }
         }
 
 

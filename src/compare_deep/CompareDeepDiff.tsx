@@ -431,6 +431,13 @@ export const compareDeepDiff = function (
 )
     : Difference
 {
+    // if we are passed the internal constant `Missing` to convert into `Difference`,
+    // we are probably doing diff for own internal data structures (since its not used anywhere else)
+    // in such case, replace the `Missing` constant with another value,
+    // so that code can distinguish it
+    if (v1 === Missing) v1 = MissingInternal
+    if (v2 === Missing) v2 = MissingInternal
+
     const v1IsMatcher   = v1 instanceof FuzzyMatcher
     const v2IsMatcher   = v2 instanceof FuzzyMatcher
 
@@ -440,21 +447,8 @@ export const compareDeepDiff = function (
     else if (v2IsMatcher && !v1IsMatcher) {
         return (v2 as FuzzyMatcher).equalsToDiff(v1, true, options, state)
     }
-    else if (v1IsMatcher && v2IsMatcher && v1 === v2) {
-        return DifferenceAtomic.new({
-            value1  : v1,
-            value2  : v2,
-            same    : true
-        })
-    }
 
     if (convertingToDiff !== undefined) {
-        // if we are passed the internal constant `Missing` for both values, we are probably
-        // doing diff for own internal data structures
-        // in such case, replace the `Missing` constant with another value,
-        // so that code can distinguish it
-        if (v1 === Missing && v2 === Missing) { v1 = v2 = MissingInternal }
-
         const prevVisit     = state[ convertingToDiff === 'value1' ? 'visited1' : 'visited2' ].get(v1)
         const hasPrevious   = prevVisit !== undefined
 
