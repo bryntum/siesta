@@ -320,7 +320,7 @@ export class DifferenceHeterogeneous extends Difference {
 export const valueAsDifference = (value : unknown, valueProp : 'value1' | 'value2', options : DeepCompareOptions, state : DeepCompareState) : Difference => {
     if (value === Missing) value = MissingInternal
 
-    const difference = compareDeepDiff(value, value, options, state, true)
+    const difference = compareDeepDiff(value, value, options, state, valueProp)
 
     difference.excludeValue(valueProp === 'value1' ? 'value2' : 'value1')
 
@@ -339,17 +339,27 @@ export class DeepCompareState extends Base {
     visited2        : Map<unknown, [ number, DifferenceReferenceable ]>  = new Map()
 
 
-    markVisited (v1 : unknown, v2 : unknown, difference : DifferenceReferenceable) {
+    markVisited (v1 : unknown, v2 : unknown, difference : DifferenceReferenceable, convertingToDiff : 'value1' | 'value2' | undefined) {
         const visitInfo     = [ this.idSource++, difference ] as [ number, DifferenceReferenceable ]
 
-        !this.visited1.has(v1) && this.visited1.set(v1, visitInfo)
-        !this.visited2.has(v2) && this.visited2.set(v2, visitInfo)
+        if (convertingToDiff === undefined) {
+            !this.visited1.has(v1) && this.visited1.set(v1, visitInfo)
+            !this.visited2.has(v2) && this.visited2.set(v2, visitInfo)
+        }
+        else if (convertingToDiff === 'value1') {
+            !this.visited1.has(v1) && this.visited1.set(v1, visitInfo)
+        }
+        else {
+            !this.visited2.has(v2) && this.visited2.set(v2, visitInfo)
+        }
     }
 
 
     in () : DeepCompareState {
         return DeepCompareState.new({
             idSource        : this.idSource,
+            refIdSource1    : this.refIdSource1,
+            refIdSource2    : this.refIdSource2,
             visited1        : new Map(this.visited1),
             visited2        : new Map(this.visited2)
         })
@@ -358,7 +368,8 @@ export class DeepCompareState extends Base {
 
     out (state : DeepCompareState) {
         this.idSource       = state.idSource
-
+        this.refIdSource1   = state.refIdSource1
+        this.refIdSource2   = state.refIdSource2
         this.visited1       = state.visited1
         this.visited2       = state.visited2
     }
@@ -392,16 +403,10 @@ export const compareDeepDiff = function (
     state               : DeepCompareState      = DeepCompareState.new(),
     // this argument is used when some value is compared with itself, to convert it into a Difference instance
     // (which can be used for rendering later)
-    convertToDiff       : boolean               = false
+    convertingToDiff    : 'value1' | 'value2' | undefined = undefined
 )
     : Difference
 {
-    // if we are passed the internal constant `Missing` for both values, we are probably
-    // doing diff for own internal data structures
-    // in such case, replace that constant with another value,
-    // so that code can distinguish it
-    if (v1 === Missing && v2 === Missing) { v1 = v2 = MissingInternal }
-
     const v1IsMatcher   = v1 instanceof FuzzyMatcher
     const v2IsMatcher   = v2 instanceof FuzzyMatcher
 
@@ -419,57 +424,79 @@ export const compareDeepDiff = function (
         })
     }
 
-    const v1Visit   = state.visited1.get(v1)
-    const v2Visit   = state.visited2.get(v2)
+    if (convertingToDiff !== undefined) {
+        // if we are passed the internal constant `Missing` for both values, we are probably
+        // doing diff for own internal data structures
+        // in such case, replace the `Missing` constant with another value,
+        // so that code can distinguish it
+        if (v1 === Missing && v2 === Missing) { v1 = v2 = MissingInternal }
 
-    const has1      = v1Visit !== undefined
+        const prevVisit     = state[ convertingToDiff === 'value1' ? 'visited1' : 'visited2' ].get(v1)
+        const hasPrevious   = prevVisit !== undefined
 
-    if (has1) {
-        let refId1  = v1Visit[ 1 ].refId1
+        if (hasPrevious) {
+            const refProp           = convertingToDiff === 'value1' ? 'refId1' : 'refId2'
+            const refIdSourceProp   = convertingToDiff === 'value1' ? 'refIdSource1' : 'refIdSource2'
 
-        if (refId1 === undefined) refId1 = v1Visit[ 1 ].refId1 = state.refIdSource1++
-    }
+            let refId               = prevVisit[ 1 ][ refProp ]
 
-    const has2      = v2Visit !== undefined
+            if (refId === undefined) refId = prevVisit[ 1 ][ refProp ] = state[ refIdSourceProp ]++
+        }
 
-    if (has2) {
-        let refId2  = v2Visit[ 1 ].refId2
+        if (options.cycleIsPartOfDataStructure && hasPrevious) {
+            // special processing of the case, when a cyclic, already visited in a _single_ stream, value
+            // is being converted to Difference with `valueAsDifference`
+            // in such case the value in 2nd stream is actually missing
+            if (convertingToDiff === 'value1')
+                return DifferenceReference.new({ value1 : prevVisit[ 1 ].refId1 })
+            else
+                return DifferenceReference.new({ value2 : prevVisit[ 1 ].refId2 })
+        }
 
-        if (refId2 === undefined) refId2 = v2Visit[ 1 ].refId2 = state.refIdSource2++
-    }
+    } else {
+        const v1Visit   = state.visited1.get(v1)
+        const v2Visit   = state.visited2.get(v2)
 
-    const hasBoth   = has1 && has2
-    const hasOne    = has1 || has2
+        const hasPrevious1      = v1Visit !== undefined
 
-    if (hasBoth && v1Visit[ 0 ] === v2Visit[ 0 ]) {
-        // cyclic visit from the same location in both data structures
-        // this is considered as an equal value - the real difference
-        // will be determined by the 1st visit
-        return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1, value2 : v2Visit[ 1 ].refId2, same : true })
-    }
-    else if (options.cycleIsPartOfDataStructure && hasBoth && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
-        return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1, value2 : v2Visit[ 1 ].refId2, same : false })
-    }
-    else if (options.cycleIsPartOfDataStructure && hasOne && convertToDiff && v1 === v2) {
-        // special processing of the case, when a cyclic, already visited in a _single_ stream, value
-        // is being converted to Difference with `valueAsDifference`
-        // in such case the value in 2nd stream is actually missing
-        if (has1)
-            return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1 })
-        else
-            return DifferenceReference.new({ value2 : v2Visit[ 1 ].refId2 })
-    }
-    else if (options.cycleIsPartOfDataStructure && hasOne && !convertToDiff) {
-        if (has1)
-            return DifferenceHeterogeneous.new({
-                value1      : DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1 }),
-                value2      : valueAsDifference(v2, 'value2', options, state)
-            })
-        else
-            return DifferenceHeterogeneous.new({
-                value1      : valueAsDifference(v1, 'value1', options, state),
-                value2      : DifferenceReference.new({ value2 : v2Visit[ 1 ].refId2 }),
-            })
+        if (hasPrevious1) {
+            let refId1  = v1Visit[ 1 ].refId1
+
+            if (refId1 === undefined) refId1 = v1Visit[ 1 ].refId1 = state.refIdSource1++
+        }
+
+        const hasPrevious2      = v2Visit !== undefined
+
+        if (hasPrevious2) {
+            let refId2  = v2Visit[ 1 ].refId2
+
+            if (refId2 === undefined) refId2 = v2Visit[ 1 ].refId2 = state.refIdSource2++
+        }
+
+        const hasBothPrevious   = hasPrevious1 && hasPrevious2
+        const hasOnePrevious    = hasPrevious1 || hasPrevious2
+
+        if (hasBothPrevious && v1Visit[ 0 ] === v2Visit[ 0 ]) {
+            // cyclic visit from the same location in both data structures
+            // this is considered as an equal value - the real difference
+            // will be determined by the 1st visit
+            return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1, value2 : v2Visit[ 1 ].refId2, same : true })
+        }
+        else if (options.cycleIsPartOfDataStructure && hasBothPrevious && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
+            return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1, value2 : v2Visit[ 1 ].refId2, same : false })
+        }
+        else if (options.cycleIsPartOfDataStructure && hasOnePrevious) {
+            if (hasPrevious1)
+                return DifferenceHeterogeneous.new({
+                    value1      : DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1 }),
+                    value2      : valueAsDifference(v2, 'value2', options, state)
+                })
+            else
+                return DifferenceHeterogeneous.new({
+                    value1      : valueAsDifference(v1, 'value1', options, state),
+                    value2      : DifferenceReference.new({ value2 : v2Visit[ 1 ].refId2 }),
+                })
+        }
     }
 
     const type1         = typeOf(v1)
@@ -482,25 +509,25 @@ export const compareDeepDiff = function (
         })
     }
     else if (type1 === 'Array') {
-        return compareArrayDeepDiff(v1 as unknown[], v2 as unknown[], options, state)
+        return compareArrayDeepDiff(v1 as unknown[], v2 as unknown[], options, state, convertingToDiff)
     }
     else if (type1 === 'Object') {
-        return compareObjectDeepDiff(v1 as ArbitraryObject, v2 as ArbitraryObject, options, state)
+        return compareObjectDeepDiff(v1 as ArbitraryObject, v2 as ArbitraryObject, options, state, convertingToDiff)
     }
     else if (type1 === 'Map') {
-        return compareMapDeepDiff(v1 as Map<unknown, unknown>, v2 as Map<unknown, unknown>, options, state)
+        return compareMapDeepDiff(v1 as Map<unknown, unknown>, v2 as Map<unknown, unknown>, options, state, convertingToDiff)
     }
     else if (type1 === 'Set') {
-        return compareSetDeepDiff(v1 as Set<unknown>, v2 as Set<unknown>, options, state)
+        return compareSetDeepDiff(v1 as Set<unknown>, v2 as Set<unknown>, options, state, convertingToDiff)
     }
     else if (type1 === 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
-        return compareFunctionDeepDiff(v1 as Function, v2 as Function, options, state)
+        return compareFunctionDeepDiff(v1 as Function, v2 as Function, options, state, convertingToDiff)
     }
     else if (type1 === 'RegExp') {
-        return compareRegExpDeepDiff(v1 as RegExp, v2 as RegExp, options, state)
+        return compareRegExpDeepDiff(v1 as RegExp, v2 as RegExp, options, state, convertingToDiff)
     }
     else if (type1 === 'Date') {
-        return compareDateDeepDiff(v1 as Date, v2 as Date, options, state)
+        return compareDateDeepDiff(v1 as Date, v2 as Date, options, state, convertingToDiff)
     }
     // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
     else {
@@ -511,7 +538,8 @@ export const compareDeepDiff = function (
 
 //---------------------------------------------------------------------------------------------------------------------
 const compareArrayDeepDiff = function (
-    array1 : unknown[], array2 : unknown[], options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+    array1 : unknown[], array2 : unknown[],
+    options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 )
     : Difference
 {
@@ -520,10 +548,10 @@ const compareArrayDeepDiff = function (
 
     const difference    = DifferenceArray.new({ value1 : array1, value2 : array2 })
 
-    state.markVisited(array1, array2, difference)
+    state.markVisited(array1, array2, difference, convertingToDiff)
 
     for (let i = 0; i < minLength; i++) {
-        const diff      = compareDeepDiff(array1[ i ], array2[ i ], options, state)
+        const diff      = compareDeepDiff(array1[ i ], array2[ i ], options, state, convertingToDiff)
 
         difference.addComparison(i, diff)
     }
@@ -547,7 +575,8 @@ const compareKeys = function <K, V>(
     setMap2                 : Set<K> | Map<K, V>,
     compareStructurally     : boolean,
     options                 : DeepCompareOptions,
-    state                   : DeepCompareState = DeepCompareState.new()
+    state                   : DeepCompareState,
+    convertingToDiff        : 'value1' | 'value2' | undefined
 )
     : { common : { el1 : K, el2 : K, difference : Difference }[], onlyIn1 : Set<K>, onlyIn2 : Set<K> }
 {
@@ -564,7 +593,7 @@ const compareKeys = function <K, V>(
             common.push({
                 el1             : item1,
                 el2             : item1,
-                difference      : compareStructurally ? compareDeepDiff(item1, item1, options, state) : null
+                difference      : compareStructurally ? compareDeepDiff(item1, item1, options, state, convertingToDiff) : null
             })
             onlyIn2.delete(item1)
         }
@@ -573,7 +602,7 @@ const compareKeys = function <K, V>(
         else if (compareStructurally && !isAtomicValue(item1) && Array.from(onlyIn2).some(item2 => {
             const innerState    = state.in()
 
-            const difference    = compareDeepDiff(item1, item2, options, innerState)
+            const difference    = compareDeepDiff(item1, item2, options, innerState, convertingToDiff)
             const equal         = difference.same
 
             if (equal) {
@@ -597,15 +626,16 @@ const compareKeys = function <K, V>(
 
 //---------------------------------------------------------------------------------------------------------------------
 const compareSetDeepDiff = function (
-    set1 : Set<unknown>, set2 : Set<unknown>, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+    set1 : Set<unknown>, set2 : Set<unknown>,
+    options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 )
     : Difference
 {
     const difference        = DifferenceSet.new({ value1 : set1, value2 : set2 })
 
-    state.markVisited(set1, set2, difference)
+    state.markVisited(set1, set2, difference, convertingToDiff)
 
-    const { common, onlyIn1, onlyIn2 } = compareKeys(set1, set2, true, options, state)
+    const { common, onlyIn1, onlyIn2 } = compareKeys(set1, set2, true, options, state, convertingToDiff)
 
     difference.onlyIn2Size  = onlyIn2.size
 
@@ -620,21 +650,22 @@ const compareSetDeepDiff = function (
 
 //---------------------------------------------------------------------------------------------------------------------
 const compareMapDeepDiff = function (
-    map1 : Map<unknown, unknown>, map2 : Map<unknown, unknown>, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+    map1 : Map<unknown, unknown>, map2 : Map<unknown, unknown>,
+    options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 )
     : Difference
 {
     const difference        = DifferenceMap.new({ value1 : map1, value2 : map2 })
 
-    state.markVisited(map1, map2, difference)
+    state.markVisited(map1, map2, difference, convertingToDiff)
 
-    const { common, onlyIn1, onlyIn2 } = compareKeys(map1, map2, true, options, state)
+    const { common, onlyIn1, onlyIn2 } = compareKeys(map1, map2, true, options, state, convertingToDiff)
 
     difference.onlyIn2Size  = onlyIn2.size
 
     common.forEach(commonEntry => difference.addComparison(
         commonEntry.difference,
-        compareDeepDiff(map1.get(commonEntry.el1), map2.get(commonEntry.el2), options, state)
+        compareDeepDiff(map1.get(commonEntry.el1), map2.get(commonEntry.el2), options, state, convertingToDiff)
     ))
 
     onlyIn1.forEach(el1 =>
@@ -656,15 +687,18 @@ const compareMapDeepDiff = function (
 
 //---------------------------------------------------------------------------------------------------------------------
 const compareObjectDeepDiff = function (
-    object1 : ArbitraryObject, object2 : ArbitraryObject, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+    object1 : ArbitraryObject, object2 : ArbitraryObject,
+    options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 )
     : Difference
 {
     const difference = DifferenceObject.new({ value1 : object1, value2 : object2 })
 
-    state.markVisited(object1, object2, difference)
+    state.markVisited(object1, object2, difference, convertingToDiff)
 
-    const { common, onlyIn1, onlyIn2 }  = compareKeys(new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state)
+    const { common, onlyIn1, onlyIn2 }  = compareKeys(
+        new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state, convertingToDiff
+    )
 
     difference.onlyIn2Size              = onlyIn2.size
 
@@ -672,7 +706,7 @@ const compareObjectDeepDiff = function (
         const key1      = common[ i ].el1
         const key2      = common[ i ].el2
 
-        const diff      = compareDeepDiff(object1[ key1 ], object2[ key2 ], options, state)
+        const diff      = compareDeepDiff(object1[ key1 ], object2[ key2 ], options, state, convertingToDiff)
 
         difference.addComparison(key1, diff)
     }
@@ -686,11 +720,12 @@ const compareObjectDeepDiff = function (
 
 //---------------------------------------------------------------------------------------------------------------------
 const compareFunctionDeepDiff = function (
-    func1 : Function, func2 : Function, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+    func1 : Function, func2 : Function,
+    options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 ) : Difference {
     const difference = DifferenceReferenceableAtomic.new({ value1 : func1, value2 : func2, same : func1 === func2 })
 
-    state.markVisited(func1, func2, difference)
+    state.markVisited(func1, func2, difference, convertingToDiff)
 
     return difference
 }
@@ -698,7 +733,8 @@ const compareFunctionDeepDiff = function (
 
 //---------------------------------------------------------------------------------------------------------------------
 const compareRegExpDeepDiff = function (
-    regexp1 : RegExp, regexp2 : RegExp, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+    regexp1 : RegExp, regexp2 : RegExp,
+    options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 ) : Difference {
     const regexpProps   = [ 'source', 'dotAll', 'global', 'ignoreCase', 'multiline', 'sticky', 'unicode' ]
 
@@ -708,7 +744,7 @@ const compareRegExpDeepDiff = function (
         same    : regexpProps.every(propertyName => regexp1[ propertyName ] === regexp2[ propertyName])
     })
 
-    state.markVisited(regexp1, regexp2, difference)
+    state.markVisited(regexp1, regexp2, difference, convertingToDiff)
 
     return difference
 }
@@ -716,11 +752,12 @@ const compareRegExpDeepDiff = function (
 
 //---------------------------------------------------------------------------------------------------------------------
 const compareDateDeepDiff = function (
-    date1 : Date, date2 : Date, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
+    date1 : Date, date2 : Date,
+    options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 ) : Difference {
     const difference = DifferenceReferenceableAtomic.new({ value1 : date1, value2 : date2, same : date1.getTime() === date2.getTime() })
 
-    state.markVisited(date1, date2, difference)
+    state.markVisited(date1, date2, difference, convertingToDiff)
 
     return difference
 }
