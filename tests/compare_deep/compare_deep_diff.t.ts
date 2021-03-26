@@ -1,4 +1,4 @@
-import { it } from "../../index.js"
+import { it, iit } from "../../index.js"
 import {
     compareDeepDiff,
     DifferenceAtomic,
@@ -219,7 +219,6 @@ it('Deep compare should work with circular data structures #2', async t => {
                         value2      : DifferenceObject.new({
                             value2      : a2,
                             same        : false,
-                            refId1      : 2,
                             refId2      : 1,
                             comparisons         : [
                                 {
@@ -321,7 +320,7 @@ it('Deep compare should work with circular data structures #4', async t => {
     c11.next    = c21
     c21.prev    = c11
 
-    t.eqDiff(
+    t.equal(
         compareDeepDiff(b11, c11),
 
         DifferenceObject.new({
@@ -344,6 +343,99 @@ it('Deep compare should work with circular data structures #4', async t => {
                                     value1      : 1,
                                     value2      : 1,
                                     same        : true
+                                })
+                            }
+                        ]
+                    })
+                }
+            ]
+        })
+    )
+})
+
+
+it('Deep compare should work with circular data structures #4', async t => {
+    const child     = { parent : undefined, children : [] }
+    const parent    = { parent : undefined, children : [ child ] }
+    child.parent    = parent
+
+    t.eqDiff(
+        compareDeepDiff(child, parent),
+
+        DifferenceObject.new({
+            "value1": child,
+            "value2": parent,
+            "same": false,
+            "refId1": 1,
+            "refId2": 1,
+            "onlyIn2Size": 0,
+            "comparisons": [
+                {
+                    "key": "parent",
+                    "difference": DifferenceHeterogeneous.new({
+                        "value1": DifferenceObject.new({
+                            "value1": parent,
+                            "same": false,
+                            "onlyIn2Size": 0,
+                            "comparisons": [
+                                {
+                                    "key": "parent",
+                                    "difference": DifferenceAtomic.new({
+                                        "value1": undefined
+                                    })
+                                },
+                                {
+                                    "key": "children",
+                                    "difference": DifferenceArray.new({
+                                        "same": false,
+                                        "value1": parent.children,
+                                        "comparisons": [
+                                            {
+                                                "index": 0,
+                                                "difference": DifferenceReference.new({
+                                                    "value1": 1
+                                                })
+                                            }
+                                        ]
+                                    })
+                                }
+                            ]
+                        }),
+                        "value2": DifferenceAtomic.new({
+                            "value2": undefined,
+                        }),
+                        "same": false
+                    })
+                },
+                {
+                    "key": "children",
+                    "difference": DifferenceArray.new({
+                        "value1": child.children,
+                        "value2": parent.children,
+                        "same": false,
+                        "comparisons": [
+                            {
+                                "index": 0,
+                                "difference": DifferenceObject.new({
+                                    "value2": child,
+                                    "same": false,
+                                    "onlyIn2Size": 0,
+                                    "comparisons": [
+                                        {
+                                            "key": "parent",
+                                            "difference": DifferenceReference.new({
+                                                "value2": 1,
+                                            })
+                                        },
+                                        {
+                                            "key": "children",
+                                            "difference": DifferenceArray.new({
+                                                "same": false,
+                                                "value2": child.children,
+                                                "comparisons": []
+                                            })
+                                        }
+                                    ]
                                 })
                             }
                         ]
