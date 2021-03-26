@@ -97,57 +97,43 @@ it('Deep compare should work for number fuzzy matcher', async t => {
 })
 
 
-// it('Deep compare should work for string placeholders', async t => {
-//     t.equal(compareDeepDiff('10', anyStringLike('1')), [])
-//     t.equal(compareDeepDiff('FOO', anyStringLike(/foo/i)), [])
-//
-//     //------------------------
-//     const placeholder   = anyStringLike(/foo/i)
-//
-//     t.equal(
-//         compareDeepDiff(1, placeholder),
-//         [ DifferenceTypesAreDifferent.new({ v1 : 1, v2 : placeholder, type1 : 'Number', type2 : 'String' }) ]
-//     )
-//
-//     t.equal(
-//         compareDeepDiff('bar', placeholder),
-//         [ DifferenceValuesAreDifferent.new({ v1 : 'bar', v2 : placeholder }) ]
-//     )
-// })
-//
-//
-// it('Deep compare should work for instance placeholders', async t => {
-//     t.equal(compareDeepDiff(false, anyInstanceOf(Boolean)), [])
-//
-//     t.equal(compareDeepDiff('foo', anyInstanceOf(String)), [])
-//
-//     t.equal(compareDeepDiff(10, anyInstanceOf(Number)), [])
-//
-//     t.equal(compareDeepDiff(new Date, anyInstanceOf(Date)), [])
-//
-//     t.equal(compareDeepDiff(new Date, anyInstanceOf(Object)), [])
-//
-//     t.equal(compareDeepDiff({}, anyInstanceOf(Object)), [])
-//
-//     t.equal(compareDeepDiff([ 1, 2, 3 ], anyInstanceOf(Array)), [])
-//
-//     t.equal(compareDeepDiff(() => {}, anyInstanceOf(Function)), [])
-//
-//     //------------------------
-//     const placeholder   = anyInstanceOf(Date)
-//
-//     t.equal(
-//         compareDeepDiff('10', placeholder),
-//         [ DifferenceValuesAreDifferent.new({ v1 : '10', v2 : placeholder }) ]
-//     )
-//
-// })
-//
-//
-// it('Deep compare should work for any placeholders', async t => {
-//     t.equal(compareDeepDiff(10, any()), [])
-//
-//     t.equal(compareDeepDiff(new Date, any()), [])
-//
-//     t.equal(compareDeepDiff([ 1, 2, 3 ], any()), [])
-// })
+it('Deep compare should work for string fuzzy matcher', async t => {
+    t.equal(compareDeepDiff('10', anyStringLike('1')).same, true)
+
+    t.equal(compareDeepDiff('FOO', anyStringLike(/foo/i)).same, true)
+
+
+    t.equal(compareDeepDiff(1, anyStringLike(/foo/i)).same, false)
+
+    t.equal(compareDeepDiff('bar', anyStringLike(/foo/i)).same, false)
+})
+
+
+it('Deep compare should work for "instance" fuzzy matcher', async t => {
+    t.equal(compareDeepDiff(false, anyInstanceOf(Boolean)).same, true)
+
+    t.equal(compareDeepDiff('foo', anyInstanceOf(String)).same, true)
+
+    t.equal(compareDeepDiff(10, anyInstanceOf(Number)).same, true)
+
+    t.equal(compareDeepDiff(new Date, anyInstanceOf(Date)).same, true)
+
+    t.equal(compareDeepDiff(new Date, anyInstanceOf(Object)).same, true)
+
+    t.equal(compareDeepDiff({}, anyInstanceOf(Object)).same, true)
+
+    t.equal(compareDeepDiff([ 1, 2, 3 ], anyInstanceOf(Array)).same, true)
+
+    t.equal(compareDeepDiff(() => {}, anyInstanceOf(Function)).same, true)
+
+    t.equal(compareDeepDiff('10', anyInstanceOf(Date)).same, false)
+})
+
+
+it('Deep compare should work for "any" fuzzy matcher', async t => {
+    t.equal(compareDeepDiff(10, any()).same, true)
+
+    t.equal(compareDeepDiff(new Date, any()).same, true)
+
+    t.equal(compareDeepDiff([ 1, 2, 3 ], any()).same, true)
+})

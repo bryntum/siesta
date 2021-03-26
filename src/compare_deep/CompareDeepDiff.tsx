@@ -324,8 +324,8 @@ export class DifferenceReference extends Difference {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class DifferenceHeterogeneous extends Difference {
-    // heterogeneous values (values of different type) are always unequal
-    same        : false
+    // heterogeneous values (values of different type) are pretty much always unequal
+    // however, they can be equal in the case of comparing with fuzzy matcher (like `anyInstanceOf/any`)
 
     value1      : Difference | Missing
     value2      : Difference | Missing

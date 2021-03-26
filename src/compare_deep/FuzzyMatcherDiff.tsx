@@ -188,7 +188,7 @@ export class FuzzyMatcherString extends Mixin(
             if (isRegExp(this.pattern))
                 return `any string matching ${ this.pattern }`
             else
-                return `any string containing ${ this.pattern }`
+                return `any string containing "${ this.pattern }"`
         }
 
 
@@ -247,16 +247,18 @@ export class FuzzyMatcherInstance extends Mixin(
 
 
         equalsToDiff (v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Difference {
-            return
-            // const v1        = flipped ? v : this
-            // const v2        = flipped ? this : v
-            //
-            // // this handles the primitives, like `1 instanceof Number` and other simple cases
-            // if (Object.getPrototypeOf(v) === this.cls.prototype) return
-            //
-            // // generic `instanceof` check, possibly using [Symbol.hasInstance]
-            // if (!(v instanceof this.cls))
-            //     yield DifferenceValuesAreDifferent.new({ v1, v2, keyPath : state.keyPathSnapshot() })
+            const selfAtomicDifference = DifferenceAtomic.new({
+                [ flipped ? 'value2' : 'value1' ] : this
+            })
+
+            return DifferenceHeterogeneous.new({
+                // the 1st part of `||` handles the case of primitives,
+                // like `1 instanceof Number === false`, but `Object.getPrototypeOf(1) === Number.prototype` - true
+                same        : Object.getPrototypeOf(v) === this.cls.prototype || (v instanceof this.cls),
+
+                value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfAtomicDifference,
+                value2      : flipped ? selfAtomicDifference : valueAsDifference(v, 'value2', options, state)
+            })
         }
     }
 ){}
@@ -286,7 +288,16 @@ export class FuzzyMatcherAny extends Mixin(
 
 
         equalsToDiff (v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()) : Difference {
-            return
+            const selfAtomicDifference = DifferenceAtomic.new({
+                [ flipped ? 'value2' : 'value1' ] : this
+            })
+
+            return DifferenceHeterogeneous.new({
+                same        : true,
+
+                value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfAtomicDifference,
+                value2      : flipped ? selfAtomicDifference : valueAsDifference(v, 'value2', options, state)
+            })
         }
     }
 ){}
