@@ -530,7 +530,7 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
         const lines         = Array.from(zip3(leftBlock.text, middleBlock.text, rightBlock.text))
 
         lines.forEach(([ leftStr, middleStr, rightStr ], index) => {
-            output.push(leftStr, ` │${ middleStr }│ `, rightStr)
+            output.push(leftStr, ' │', middleStr, '│ ', rightStr)
 
             if (index !== lines.length - 1) output.addNewLine()
         })
