@@ -811,6 +811,42 @@ it('Should render the diff of circular data structures correctly #4', async t =>
 })
 
 
+it('Should render the diff of circular data structures correctly #5', async t => {
+    const child     = { parent : undefined, children : [] }
+    const parent    = { parent : undefined, children : [ child ] }
+    child.parent    = parent
+
+    const difference0   = compareDeepDiff(child, parent)
+
+    t.is(
+        rendererPlain.render(difference0.template()),
+        [
+            'Received                 │ │ Expected                      ',
+            '                         │ │                               ',
+            '<ref *1> {               │ │ <ref *1> {                    ',
+            '  "parent": {            │ │   "parent": undefined,        ',
+            '    "parent": undefined, │ │                               ',
+            '    "children": [        │ │                               ',
+            '      [Circular *1]      │ │                               ',
+            '    ]                    │ │                               ',
+            '  },                     │ │                               ',
+            '  "children": [          │ │   "children": [               ',
+            '    ░                    │0│     {                         ',
+            '                         │ │       "parent": [Circular *1],',
+            '                         │ │       "children": []          ',
+            '                         │ │     }                         ',
+            '  ]                      │ │   ]                           ',
+            '}                        │ │ }                             ',
+        ].join('\n')
+    )
+
+    t.is(
+        stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
+        rendererPlain.render(difference0.template())
+    )
+})
+
+
 it('Should render the diff of internal data correctly #1', async t => {
     const difference0   = compareDeepDiff(
         DifferenceReference.new({ value1 : 1, same : false }),
@@ -838,11 +874,6 @@ it('Should render the diff of internal data correctly #1', async t => {
 
 
 it('Should render the diff of internal data correctly #2', async t => {
-
-    // t.is(
-    //     stripAnsiControlCharacters(rendererNodejs.render((.template())),
-    //     rendererPlain.render((.template())
-    // )
     // debugger
 
     // t.eqDiff(t, t.parentNode)
@@ -962,22 +993,6 @@ it('Should render the diff of internal data correctly #2', async t => {
 // │     },                                           │ │   },
 // │     "same": false                                │ │   "same": true
 // │   }                                              │ │ }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 })
 
