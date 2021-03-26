@@ -443,13 +443,18 @@ export class ChainedIteratorClass<T> {
     }
 
 
-    toArray () : T[] {
-        return Array.from(this)
+    sort (order : (v1 : T, v2 : T) => number) : T[] {
+        return Array.from(this).sort(order)
     }
 
 
-    sort (order : (v1 : T, v2 : T) => number) : T[] {
-        return Array.from(this).sort(order)
+    sorted (order : (v1 : T, v2 : T) => number) : ChainedIteratorClass<T> {
+        return this.derive(this.sort(order))
+    }
+
+
+    toArray () : T[] {
+        return Array.from(this)
     }
 
 
@@ -458,7 +463,7 @@ export class ChainedIteratorClass<T> {
     }
 
 
-    toMap () : T extends [ infer K, infer V ] ? Map<K, V> : never  {
+    toMap () : T extends [ infer K, infer V ] ? Map<K, V> : never {
         //@ts-ignore
         return new Map(this)
     }
