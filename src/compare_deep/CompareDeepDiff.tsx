@@ -438,15 +438,9 @@ export const compareDeepDiff = function (
     if (v1 === Missing) v1 = MissingInternal
     if (v2 === Missing) v2 = MissingInternal
 
-    const v1IsMatcher   = v1 instanceof FuzzyMatcher
-    const v2IsMatcher   = v2 instanceof FuzzyMatcher
+    const matchersDiff  = compareFuzzyMatchersDeepDiff(v1, v2, options, state, convertingToDiff)
 
-    if (v1IsMatcher && !v2IsMatcher) {
-        return (v1 as FuzzyMatcher).equalsToDiff(v2, false, options, state)
-    }
-    else if (v2IsMatcher && !v1IsMatcher) {
-        return (v2 as FuzzyMatcher).equalsToDiff(v1, true, options, state)
-    }
+    if (matchersDiff) return matchersDiff
 
     if (convertingToDiff !== undefined) {
         const prevVisit     = state[ convertingToDiff === 'value1' ? 'visited1' : 'visited2' ].get(v1)
@@ -549,7 +543,11 @@ export const compareDeepDiff = function (
     }
     // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
     else {
-        return comparePrimitiveDeepDiff(v1, v2, options, state)
+        return DifferenceAtomic.new({
+            value1  : v1,
+            value2  : v2,
+            same    : compareAtomic(v1, v2)
+        })
     }
 }
 
@@ -782,12 +780,51 @@ const compareDateDeepDiff = function (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-const comparePrimitiveDeepDiff = (
-    value1 : unknown, value2 : unknown, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new()
-) : Difference => {
-    return DifferenceAtomic.new({
-        value1,
-        value2,
-        same : value1 === value2 || (Number.isNaN(value1) && Number.isNaN(value2))
-    })
+const compareFuzzyMatchersDeepDiff = function (
+    v1                  : unknown,
+    v2                  : unknown,
+    options             : DeepCompareOptions,
+    state               : DeepCompareState,
+    // this argument is used when some value is compared with itself, to convert it into a Difference instance
+    // (which can be used for rendering later)
+    convertingToDiff    : 'value1' | 'value2' | undefined
+)
+    : Difference | undefined
+{
+    const v1IsMatcher   = v1 instanceof FuzzyMatcher
+    const v2IsMatcher   = v2 instanceof FuzzyMatcher
+
+    if (v1IsMatcher && !v2IsMatcher) {
+        return (v1 as FuzzyMatcher).equalsToDiff(v2, false, options, state, convertingToDiff)
+    }
+    else if (v2IsMatcher && !v1IsMatcher) {
+        return (v2 as FuzzyMatcher).equalsToDiff(v1, true, options, state, convertingToDiff)
+    }
+
+    return undefined
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+const compareAtomic = (v1 : unknown, v2 : unknown) : boolean => v1 === v2 || (Number.isNaN(v1) && Number.isNaN(v2))
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const comparePrimitiveAndFuzzyMatchers = function (
+    v1                  : unknown,
+    v2                  : unknown,
+    options             : DeepCompareOptions    = defaultDeepCompareOptions,
+)
+    : boolean
+{
+    const state         = DeepCompareState.new()
+
+    const matchersDiff  = compareFuzzyMatchersDeepDiff(v1, v2, options, state, undefined)
+
+    if (matchersDiff) return matchersDiff.same
+
+    const type1         = typeOf(v1)
+    const type2         = typeOf(v2)
+
+    return type1 === type2 && compareAtomic(v1, v2)
 }

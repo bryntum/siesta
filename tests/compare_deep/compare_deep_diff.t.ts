@@ -359,7 +359,7 @@ it('Deep compare should work with circular data structures #4', async t => {
     const parent    = { parent : undefined, children : [ child ] }
     child.parent    = parent
 
-    t.eqDiff(
+    t.equal(
         compareDeepDiff(child, parent),
 
         DifferenceObject.new({

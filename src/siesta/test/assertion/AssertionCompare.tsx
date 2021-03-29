@@ -1,18 +1,16 @@
 import { Base } from "../../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { compareDeepGen, comparePrimitivesGen, Difference } from "../../../compare_deep/CompareDeep.js"
-import { compareDeepDiff } from "../../../compare_deep/CompareDeepDiff.js"
+import { compareDeepDiff, comparePrimitiveAndFuzzyMatchers } from "../../../compare_deep/CompareDeepDiff.js"
 import {
     any,
     anyNumberApprox,
     anyStringLike,
     Approximation,
     FuzzyMatcherAny,
-    FuzzyMatcherInstance,
-    FuzzyMatcherNumber,
+    FuzzyMatcherInstance, FuzzyMatcherNumberApproximation,
     FuzzyMatcherString,
     NumberApproximation
-} from "../../../compare_deep/FuzzyMatcher.js"
+} from "../../../compare_deep/FuzzyMatcherDiff.js"
 import { CI } from "../../../iterator/Iterator.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../../jsx/XmlElement.js"
@@ -67,7 +65,7 @@ export class AssertionCompare extends Mixin(
 
     class AssertionCompare extends base {
 
-        maxEqualityDifferences          : number        = 5
+        // maxEqualityDifferences          : number        = 5
 
 
         //----------------------------------------------------
@@ -181,6 +179,32 @@ export class AssertionCompare extends Mixin(
         }
 
 
+        // assertStructuralEqualityInternal (
+        //     assertionName   : string,
+        //     negated         : boolean,
+        //     value1          : unknown,
+        //     value2          : unknown,
+        //     description     : string = ''
+        // ) {
+        //     const differences   = CI(compareDeepGen(value1, value2, this.descriptor.deepCompareConfig)).take(this.maxEqualityDifferences)
+        //     const passed        = negated ? differences.length > 0 : differences.length === 0
+        //
+        //     this.addResult(Assertion.new({
+        //         name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+        //         passed,
+        //         description,
+        //
+        //         annotation  : passed ? undefined : negated ? NotEqualAnnotationTemplate.el({
+        //             value               : value2,
+        //             t                   : this
+        //         }) : DeepEqualAnnotationTemplate.el({
+        //             differences,
+        //             t                   : this
+        //         })
+        //     }))
+        // }
+
+
         assertStructuralEqualityInternal (
             assertionName   : string,
             negated         : boolean,
@@ -188,39 +212,10 @@ export class AssertionCompare extends Mixin(
             value2          : unknown,
             description     : string = ''
         ) {
-            const differences   = CI(compareDeepGen(value1, value2, this.descriptor.deepCompareConfig)).take(this.maxEqualityDifferences)
-            const passed        = negated ? differences.length > 0 : differences.length === 0
-
-            this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
-                passed,
-                description,
-
-                annotation  : passed ? undefined : negated ? NotEqualAnnotationTemplate.el({
-                    value               : value2,
-                    t                   : this
-                }) : DeepEqualAnnotationTemplate.el({
-                    differences,
-                    t                   : this
-                })
-            }))
-        }
-
-
-        // PREVIEW
-        assertStructuralDiffEqualityInternal (
-            assertionName   : string,
-            negated         : boolean,
-            value1          : unknown,
-            value2          : unknown,
-            description     : string = ''
-        ) {
-            const difference    = compareDeepDiff(value1, value2/*, this.descriptor.deepCompareConfig*/)
+            const difference    = compareDeepDiff(value1, value2, this.descriptor.deepCompareConfig)
             const same          = difference.same
             const passed        = negated ? !same : same
 
-            debugger
-
             this.addResult(Assertion.new({
                 name            : negated ? this.negateExpectationName(assertionName) : assertionName,
                 passed,
@@ -229,14 +224,14 @@ export class AssertionCompare extends Mixin(
                 annotation  : passed ? undefined : negated ? NotEqualAnnotationTemplate.el({
                     value               : value2,
                     t                   : this
-                }) : <div>{ difference.template(/*this.descriptor.serializerConfig*/) }<div></div></div>
+                }) : <div>{ difference.template(this.descriptor.serializerConfig) }<div></div></div>
             }))
         }
 
 
-        eqDiff<V> (value1 : V, value2 : V, description : string = '') {
-            this.assertStructuralDiffEqualityInternal('eqDiff(received, expected)', false, value1, value2, description)
-        }
+        // eqDiff<V> (value1 : V, value2 : V, description : string = '') {
+        //     this.assertStructuralDiffEqualityInternal('eqDiff(received, expected)', false, value1, value2, description)
+        // }
 
 
         eq<V> (value1 : V, value2 : V, description : string = '') {
@@ -324,7 +319,7 @@ export class AssertionCompare extends Mixin(
         // region "is" comparison
 
         comparePrimitives (value1 : unknown, value2 : unknown) : boolean {
-            return CI(comparePrimitivesGen(value1, value2, this.descriptor.deepCompareConfig)).take(1).length === 0
+            return comparePrimitiveAndFuzzyMatchers(value1, value2, this.descriptor.deepCompareConfig)
         }
 
 
@@ -374,7 +369,7 @@ export class AssertionCompare extends Mixin(
             description     : string = ''
         ) {
             const contains  = CI(iterable).some(value =>
-                CI(compareDeepGen(value, element, this.descriptor.deepCompareConfig)).take(1).length === 0
+                compareDeepDiff(value, element, this.descriptor.deepCompareConfig).same === true
             )
 
             const passed    = negated ? !contains : contains
@@ -512,7 +507,7 @@ export class AssertionCompare extends Mixin(
             return any(...args)
         }
 
-        anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : FuzzyMatcherNumber {
+        anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : FuzzyMatcherNumberApproximation {
             return anyNumberApprox(value, approx)
         }
 
@@ -599,32 +594,32 @@ export class GotExpectTemplate extends AnnotationTemplate {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
-export class DeepEqualAnnotationTemplate extends AnnotationTemplate {
-    differences         : Difference[]              = []
-
-
-    toXmlElement () : XmlElement {
-        return <div>
-            {/*Provided values are different. Here {*/}
-            {/*    differences.length === 1*/}
-            {/*        ?*/}
-            {/*    'is the difference found'*/}
-            {/*        :*/}
-            {/*    differences.length <= this.maxIsDeeplyDifferences*/}
-            {/*        ?*/}
-            {/*    'are the differences found'*/}
-            {/*        :*/}
-            {/*    `are the ${ this.maxIsDeeplyDifferences } differences from ${ differences.length } total`*/}
-            {/*}:*/}
-            <ul>{
-                this.differences.map(difference =>
-                    <li class="difference">{ difference.asXmlNode(this.serializerConfig) }</li>
-                )
-            }</ul>
-        </div>
-    }
-}
+// //---------------------------------------------------------------------------------------------------------------------
+// export class DeepEqualAnnotationTemplate extends AnnotationTemplate {
+//     differences         : Difference[]              = []
+//
+//
+//     toXmlElement () : XmlElement {
+//         return <div>
+//             {/*Provided values are different. Here {*/}
+//             {/*    differences.length === 1*/}
+//             {/*        ?*/}
+//             {/*    'is the difference found'*/}
+//             {/*        :*/}
+//             {/*    differences.length <= this.maxIsDeeplyDifferences*/}
+//             {/*        ?*/}
+//             {/*    'are the differences found'*/}
+//             {/*        :*/}
+//             {/*    `are the ${ this.maxIsDeeplyDifferences } differences from ${ differences.length } total`*/}
+//             {/*}:*/}
+//             <ul>{
+//                 this.differences.map(difference =>
+//                     <li class="difference">{ difference.asXmlNode(this.serializerConfig) }</li>
+//                 )
+//             }</ul>
+//         </div>
+//     }
+// }
 
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -47,7 +47,7 @@ it('Deep compare should work for number fuzzy matcher', async t => {
     //------------------------
     const matcher   = anyNumberApprox(10)
 
-    t.eqDiff(
+    t.equal(
         compareDeepDiff('10', matcher),
         DifferenceHeterogeneous.new({
             value1 : DifferenceAtomic.new({ value1 : '10' }),

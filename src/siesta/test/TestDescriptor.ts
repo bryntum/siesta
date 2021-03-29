@@ -1,5 +1,5 @@
 import { Base } from "../../class/Base.js"
-import { DeepCompareOptions } from "../../compare_deep/CompareDeep.js"
+import { DeepCompareOptions } from "../../compare_deep/CompareDeepDiff.js"
 import { XmlRendererDifference } from "../../compare_deep/CompareDeepDiffRendering.js"
 import { CI } from "../../iterator/Iterator.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
@@ -56,7 +56,7 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
 
     serializerConfig    : Partial<SerializerXml>            = { maxBreadth : 10, maxDepth : 4 }
     stringifierConfig   : Partial<XmlRendererDifference>    = { prettyPrint : true }
-    deepCompareConfig   : DeepCompareOptions                = {}
+    deepCompareConfig   : DeepCompareOptions                = undefined
 
 
     planItem (item : TestDescriptor) : TestDescriptor {
