@@ -104,7 +104,7 @@ export class TextBlock extends Base {
         if (this.atNewLine) {
             this.atNewLine = false
 
-            this.lastLine.push(this.currentIndentation)
+            if (this.currentIndentation.length > 0) this.lastLine.push(this.currentIndentation)
 
             if (this.indentationBuffer.length > 0) {
                 const lastIndentation           = lastElement(this.indentationBuffer)
