@@ -1,6 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { AnyFunction } from "../../class/Mixin.js"
-import { equalDeep } from "../../compare_deep/CompareDeep.js"
+import { equalDeep } from "../../compare_deep/CompareDeepDiff.js"
 import { Approximation, NumberApproximation } from "../../compare_deep/FuzzyMatcher.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { isString } from "../../util/Typeguards.js"

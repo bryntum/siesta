@@ -420,6 +420,16 @@ const defaultDeepCompareOptions : DeepCompareOptions = {
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// TODO should stop at 1st difference
+export const equalDeep = (
+    v1          : unknown,
+    v2          : unknown,
+    options     : DeepCompareOptions    = defaultDeepCompareOptions
+) : boolean =>
+    compareDeepDiff(v1, v2, options).same
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export const compareDeepDiff = function (
     v1                  : unknown,
     v2                  : unknown,
