@@ -206,7 +206,7 @@ export class DifferenceObject extends DifferenceReferenceable {
                 .map(
                     ({ key, difference }) =>
                     <DifferenceTemplateObjectEntry type={ difference.type }>
-                        <DifferenceTemplateAtomic type={ difference.type }>
+                        <DifferenceTemplateAtomic type={ difference.type } same={ difference.same }>
                             { difference.type === 'onlyIn2' ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(key) }
                             { difference.type === 'onlyIn1' ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(key) }
                         </DifferenceTemplateAtomic>

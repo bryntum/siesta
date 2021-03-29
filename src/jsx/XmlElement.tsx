@@ -245,12 +245,24 @@ export class XmlElement extends Mixin(
 
             if (isChildIndented) this.indentChildOutput(renderer, child, index, childBlock)
 
+            // this.colorizeChild(child, index, renderer, childBlock, context)
+
             if (isBlockLevel) output.openBlock()
 
             output.pullFrom(childBlock)
 
             if (isBlockLevel) output.closeBlock()
         }
+
+
+        // colorizeChild (
+        //     child               : XmlNode,
+        //     index               : number,
+        //     renderer            : XmlRenderer,
+        //     childBlock          : TextBlock,
+        //     context             : XmlRenderingDynamicContext
+        // ) {
+        // }
 
 
         afterRenderChild (
