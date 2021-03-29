@@ -21,28 +21,82 @@ Supported styles:
 
 @use "sass:color";
 
-$main_fail_color: #e76f51;
-$main_pass_color: #2a9d8f;
+// the primary palette
+$primary_fail: #e76f51;
+$secondary_fail: #f4a261;
+$secondary_pass: #e9c46a;
+$primary_pass: #2a9d8f;
+// not used pretty much anywhere..
+// need to replace with some other color?
+$deccent: #264653;
 
-$complementary_to_fail_color: #f4a261;
-$complementary_to_pass_color: #e9c46a;
+// does not suite the white-background theme
+$accent: whitesmoke;
 
-$deccent_color: #264653;
+$primary_pass_lighter: color.scale($primary_pass, $lightness: 25%);
+$primary_pass_darker: color.scale($primary_pass, $lightness: -25%);
 
-$accent_color: whitesmoke;
+$primary_fail_lighter: color.scale($primary_fail, $lightness: 25%);
+$primary_fail_darker: color.scale($primary_fail, $lightness: -25%);
 
-$smooth_accent_color: #e9c46a;
+$secondary_pass_lighter: color.scale($secondary_pass, $lightness: 25%);
+$secondary_pass_darker: color.scale($secondary_pass, $lightness: -25%);
 
-$ligther_smooth_accent_color: color.scale($smooth_accent_color, $lightness: 25%);
+$secondary_fail_lighter: color.scale($secondary_fail, $lightness: 25%);
+$secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 
-$darker_fail_color: color.scale($main_fail_color, $lightness: -25%);
-$darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
+//-------------------------------------------------------------------------
+// Utility-first part
 
-.project_title {
+.underline {
     text-decoration: underline
 }
 
-.underline {
+.gray {
+    color   : gray;
+}
+
+.secondary_pass {
+    color   : $secondary_pass;
+}
+
+.secondary_pass_lighter {
+    color   : $secondary_pass_lighter;
+}
+
+.secondary_fail {
+    color   : $secondary_fail;
+}
+
+.primary_pass {
+    color : $primary_pass
+}
+
+.primary_fail {
+    color : $primary_fail
+}
+
+.primary_fail_darker {
+    color : $primary_fail_darker
+}
+
+.secondary_pass_lighter {
+    color : $secondary_pass_lighter;
+}
+
+.accented {
+    color : $accent;
+}
+
+.deccented {
+    color : $deccent;
+}
+
+
+//-------------------------------------------------------------------------
+// semantic part
+
+.project_title {
     text-decoration: underline
 }
 
@@ -50,169 +104,132 @@ $darker_pass_color: color.scale($main_pass_color, $lightness: -25%);
     color   : gray;
 }
 
-.gray {
-    color   : gray;
-}
-
-.smooth_accent_color {
-    color   : $smooth_accent_color;
-}
-
-.pass_color {
-    color : $main_pass_color
-}
-.fail_color {
-    color : $main_fail_color
-}
-
-.darker_fail_color {
-    color : $darker_fail_color
-}
-
 .test_file_url_filename {
-    color   : $accent_color;
+    color   : $accent;
 }
 
 .test_file_pass {
     color               : black;
-    background-color    : $main_pass_color;
+    background-color    : $primary_pass;
 }
 
 .test_file_fail {
     color               : black;
-    background-color    : $main_fail_color;
+    background-color    : $primary_fail;
 }
 
 .test_file_runs {
     color               : black;
-    background-color    : $complementary_to_pass_color;
+    background-color    : $secondary_pass;
 }
 
 .sub_test_pass {
-    color               : $main_pass_color;
+    color               : $primary_pass;
 }
 
 .sub_test_fail {
-    color               : $main_fail_color;
+    color               : $primary_fail;
 }
 
-
 .assertion_icon_pass_todo {
-    color               : $complementary_to_fail_color;
+    color               : $secondary_fail;
 }
 
 .assertion_icon_pass {
-    color               : $main_pass_color;
+    color               : $primary_pass;
 }
 
 .assertion_icon_fail {
-    color               : $main_fail_color;
+    color               : $primary_fail;
 }
 
 .assertion_name {
-    color: $smooth_accent_color;
+    color: $secondary_pass;
 }
 
 .assertion_source_line {
-    color : $smooth_accent_color;
+    color : $secondary_pass;
 }
 
 .assertion_description {
-    color : $accent_color
+    color : $accent
 }
 
 
 .log_message_icon {
-    color : $complementary_to_fail_color;
+    color : $secondary_fail;
 }
 
 .log_message_error {
-    background-color : $main_fail_color;
+    background-color : $primary_fail;
     color: black;
 }
 
 .log_message_warn {
-    background-color : $complementary_to_fail_color;
+    background-color : $secondary_fail;
     color: black;
 }
 
 .log_message_log {
-    background-color : $complementary_to_pass_color;
+    background-color : $secondary_pass;
     color: black;
 }
 
 .log_message_debug {
-    background-color : $main_pass_color;
+    background-color : $primary_pass;
     color: black;
 }
 
 .log_message_info {
-    background-color : $deccent_color;
+    background-color : $deccent;
     color: black;
 }
 
 .exception_icon {
-    background-color : $main_fail_color;
+    background-color : $primary_fail;
     color: black;
 }
 
 
 
-.difference_key_path {
-    color   : $accent_color;
-}
-
-
 .summary {
-    color : $accent_color;
+    color : $accent;
 }
 
 .summary_tests_passed {
-    color : $main_pass_color
+    color : $primary_pass
 }
 
 .summary_tests_failed {
-    color : $main_fail_color
+    color : $primary_fail
 }
 
 .progress_bar_completed_passed {
-    background-color: $darker_pass_color;
+    background-color: $primary_pass_darker;
 }
 
 .progress_bar_completed_failed {
-    background-color: $darker_fail_color;
+    background-color: $primary_fail_darker;
 }
 
-
-.ligther_smooth_accent_color {
-    color : $ligther_smooth_accent_color;
-}
 
 .typename {
-    color : $smooth_accent_color;
+    color : $secondary_pass;
 }
 
 
 .tree_line {
-    color : #404040;
-}
-
-.accented {
-    color : $accent_color;
+    color : gray;
 }
 
 .accented_value {
-    color : $ligther_smooth_accent_color;
-}
-
-.deccented {
-    color : $deccent_color;
+    color : $secondary_pass_lighter;
 }
 
 .option_name {
-    color : $accent_color;
+    color : $accent;
 }
 
 .option_group_name {
-    color               : $main_pass_color;
+    color               : $primary_pass;
 }
