@@ -1,5 +1,5 @@
 import { it } from "../../index.js"
-import { anyNumberApprox } from "../../src/compare_deep/FuzzyMatcher.js"
+import { anyNumberApprox } from "../../src/compare_deep/FuzzyMatcherDiff.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
 import { Serialization, SerializationArray } from "../../src/serializer/SerializerRendering.js"
 import { SerializerXml } from "../../src/serializer/SerializerXml.js"

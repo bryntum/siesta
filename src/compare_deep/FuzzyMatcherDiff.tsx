@@ -126,7 +126,7 @@ export class FuzzyMatcherNumberApproximation extends Mixin(
     }
 ){}
 
-export const anyNumberApprox = (value : number, approx : Approximation = { percent : 5 }) : FuzzyMatcherNumberApproximation =>
+export const anyNumberApprox = (value : number, approx : Approximation = { threshold : 0.05 * value }) : FuzzyMatcherNumberApproximation =>
     FuzzyMatcherNumberApproximation.new({ value, approx : NumberApproximation.fromApproximation(approx) })
 
 

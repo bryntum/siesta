@@ -72,13 +72,13 @@ it('Deep compare should work for number fuzzy matcher', async t => {
                                 {
                                     "key": "percent",
                                     "difference": DifferenceAtomic.new({
-                                        "value2": 5,
+                                        "value2": undefined,
                                     })
                                 },
                                 {
                                     "key": "threshold",
                                     "difference": DifferenceAtomic.new({
-                                        "value2": undefined,
+                                        "value2": 0.5,
                                     })
                                 },
                                 {
