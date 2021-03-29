@@ -313,8 +313,8 @@ export class SerializationObjectEntry extends Mixin(
             const keyEl         = this.childNodes[ 0 ]
             const valueEl       = this.childNodes[ 1 ]
 
-            keyEl.renderToTextBlock(renderer, output, context)
-            // this.renderChildInner(keyEl, 0, renderer, output, context)
+            // keyEl.renderToTextBlock(renderer, output, context)
+            this.renderChildInner(keyEl, 0, renderer, output, context)
 
             output.write(': ')
 
@@ -322,8 +322,8 @@ export class SerializationObjectEntry extends Mixin(
 
             if (valueIsAtomic && renderer.prettyPrint) output.indent()
 
-            valueEl.renderToTextBlock(renderer, output, context)
-            // this.renderChildInner(valueEl, 1, renderer, output, context)
+            // valueEl.renderToTextBlock(renderer, output, context)
+            this.renderChildInner(valueEl, 1, renderer, output, context)
 
             if (valueIsAtomic && renderer.prettyPrint) output.outdent()
         }

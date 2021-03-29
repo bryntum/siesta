@@ -99,7 +99,7 @@ export class ReporterTheme extends Base {
 
     lineNumberTemplate (isHighlighted : boolean, line : string) : XmlElement {
         return <span>
-            <span class="fail_color">{ isHighlighted ? '➤' : ' ' }</span>
+            <span class="primary_fail">{ isHighlighted ? '➤' : ' ' }</span>
             <span class={ isHighlighted ? 'accented' : 'gray' }> { line } | </span>
         </span>
     }
@@ -125,7 +125,7 @@ export class ReporterTheme extends Base {
 
             if (isHighlighted) template.appendChild(<div>
                 <span class="gray"> { ' '.repeat(lastToShowLen + 1) } | </span>
-                <span class="fail_color">{ ' '.repeat(char - 1) + '^' }</span>
+                <span class="primary_fail">{ ' '.repeat(char - 1) + '^' }</span>
             </div>)
         }
 

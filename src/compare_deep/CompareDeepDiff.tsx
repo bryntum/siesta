@@ -206,7 +206,7 @@ export class DifferenceObject extends DifferenceReferenceable {
                 .map(
                     ({ key, difference }) =>
                     <DifferenceTemplateObjectEntry type={ difference.type }>
-                        <DifferenceTemplateAtomic type={ difference.type } same={ difference.same }>
+                        <DifferenceTemplateAtomic type={ difference.type } same={ difference.type === 'both' ? true : false }>
                             { difference.type === 'onlyIn2' ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(key) }
                             { difference.type === 'onlyIn1' ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(key) }
                         </DifferenceTemplateAtomic>
@@ -332,7 +332,7 @@ export class DifferenceHeterogeneous extends Difference {
 
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-        return <DifferenceTemplateHeterogeneous type={ this.type } same={ false }>
+        return <DifferenceTemplateHeterogeneous type={ this.type } same={ this.same }>
             { this.value1 !== Missing ? this.value1.templateInner(serializerConfig, diffState) : <MissingValue></MissingValue> }
             { this.value2 !== Missing ? this.value2.templateInner(serializerConfig, diffState) : <MissingValue></MissingValue> }
         </DifferenceTemplateHeterogeneous>

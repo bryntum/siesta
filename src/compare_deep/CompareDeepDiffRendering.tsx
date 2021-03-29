@@ -81,23 +81,22 @@ export class DifferenceTemplateElement extends XmlElement {
     colorizeSelf (renderer : XmlRendererDifference, output : TextBlock, context : XmlRenderingDynamicContextDifference) {
         super.colorizeSelf(renderer, output, context)
 
+        const insideHetero  = CI(this.parentAxis()).some(el => el instanceof DifferenceTemplateHeterogeneous)
+
         if (context.currentStream === 'middle') {
             output.colorizeMut(this.getAttribute('same') ? styles.get('gray')(renderer.c) : renderer.c.reset)
-        }
-        else if (CI(this.parentAxis()).some(el => el instanceof DifferenceTemplateHeterogeneous)) {
-            output.colorizeMut(styles.get('accented')(renderer.c))
         }
         else if (this.getAttribute('same')) {
             output.colorizeMut(styles.get('gray')(renderer.c))
         }
-        else if (this.getAttribute('type') === 'onlyIn1') {
-            output.colorizeMut(styles.get('fail_color')(renderer.c))
-        }
-        else if (this.getAttribute('type') === 'onlyIn2') {
-            output.colorizeMut(styles.get('pass_color')(renderer.c))
-        }
-        else if (this.getAttribute('same') === false) {
+        else if (this.getAttribute('same') === false && this.getAttribute('type') === 'both') {
             output.colorizeMut(styles.get('accented')(renderer.c))
+        }
+        else if (this.getAttribute('type') === 'onlyIn1' && !insideHetero) {
+            output.colorizeMut(styles.get('primary_fail')(renderer.c))
+        }
+        else if (this.getAttribute('type') === 'onlyIn2' && !insideHetero) {
+            output.colorizeMut(styles.get('primary_pass')(renderer.c))
         }
     }
 
@@ -342,6 +341,15 @@ export class DifferenceTemplateAtomic extends Mixin(
         ) {
             this.renderChildInner(this.childNodes[ 1 ], 1, renderer, output, context)
         }
+
+
+        colorizeSelf (renderer : XmlRendererDifference, output : TextBlock, context : XmlRenderingDynamicContextDifference) {
+            if (this.getAttribute('type') === 'both' && this.getAttribute('same') === false && context.currentStream !== 'middle') {
+                output.colorizeMut(styles.get('secondary_pass')(renderer.c))
+            } else
+                super.colorizeSelf(renderer, output, context)
+        }
+
     }
 ){}
 
@@ -415,6 +423,14 @@ export class DifferenceTemplateHeterogeneous extends DifferenceTemplateStreamed 
         this.renderChildInner(this.childNodes[ 1 ], 1, renderer, output, context)
 
         output.push(ColoredStringResumeSyncPoints.new())
+    }
+
+
+    colorizeSelf (renderer : XmlRendererDifference, output : TextBlock, context : XmlRenderingDynamicContextDifference) {
+        if (this.getAttribute('type') === 'both' && this.getAttribute('same') === false && context.currentStream !== 'middle') {
+            output.colorizeMut(styles.get('secondary_pass')(renderer.c))
+        } else
+            super.colorizeSelf(renderer, output, context)
     }
 }
 
