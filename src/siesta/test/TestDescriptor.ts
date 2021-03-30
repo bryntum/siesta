@@ -19,6 +19,13 @@ export const OptionsGroupTestDescriptor  = OptionGroup.new({
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// some properties in this class don't have an initializer, that intentional,
+// because when "flattening" the descriptor and its parent descriptors,
+// we check `descriptor.hasOwnProperty('property')` to find out if there's an
+// explicitly provided value for that property
+// obviously with initializer, that check will always be `true`, which is not
+// what we want
+
 @serializable()
 export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix(Base))) {
     childNodeT      : TestDescriptor
