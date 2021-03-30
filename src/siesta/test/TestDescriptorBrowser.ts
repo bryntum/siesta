@@ -1,5 +1,5 @@
 import { serializable } from "../../serializable/Serializable.js"
-import { option } from "../launcher/Option.js"
+import { option } from "../option/Option.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
 /**

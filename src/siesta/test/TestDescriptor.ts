@@ -7,7 +7,7 @@ import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { ArbitraryObject, cloneObject, objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
-import { HasOptions, option, OptionGroup } from "../launcher/Option.js"
+import { HasOptions, option, OptionGroup } from "../option/Option.js"
 import { Test } from "./Test.js"
 
 

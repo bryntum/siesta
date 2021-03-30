@@ -13,7 +13,7 @@ import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary, PrepareOptionsResult } from "./Launcher.js"
-import { option } from "./Option.js"
+import { option } from "../option/Option.js"
 import { ChannelProjectExtractor } from "./ProjectExtractor.js"
 
 

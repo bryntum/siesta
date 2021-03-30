@@ -23,7 +23,7 @@ import {
     OptionsBag,
     OptionsParseWarningCodes,
     optionWarningTemplateByCode
-} from "./Option.js"
+} from "../option/Option.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
