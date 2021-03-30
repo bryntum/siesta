@@ -1,6 +1,6 @@
 {
   "name": "@bryntum/siesta",
-  "version": "6.0.0",
+  "version": "6.0.0-alpha.1",
   "description": "Next generation JavaScript/TypeScript testing and benchmarking tool",
   "main": "index.js",
   "module": "index.js",
@@ -18,8 +18,8 @@
   "bugs": "https://github.com/bryntum/siesta/issues",
   "repository": "git@github.com:bryntum/siesta.git",
   "keywords": [
-    "JavaScript",
-    "TypeScript",
+    "javascript",
+    "typescript",
     "testing",
     "benchmarking"
   ],
