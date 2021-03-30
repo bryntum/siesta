@@ -14,18 +14,18 @@ export class TreeNode extends Mixin(
         childNodes      : this[ 'childNodeT' ][]    = undefined
 
 
-        // $depth           : number    = undefined
-        //
-        // get depth () : number {
-        //     if (this.$depth !== undefined) return this.$depth
-        //
-        //     let depth                   = 0
-        //     let node : TestNodeResult   = this
-        //
-        //     while (node.parentNode) { node = node.parentNode; depth++ }
-        //
-        //     return this.$depth = depth
-        // }
+        $depth           : number    = undefined
+
+        get depth () : number {
+            if (this.$depth !== undefined) return this.$depth
+
+            let depth                   = 0
+            let node : TreeNode         = this
+
+            while (node.parentNode) { node = node.parentNode; depth++ }
+
+            return this.$depth = depth
+        }
 
 
         getRootNode () : TreeNode {
