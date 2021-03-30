@@ -93,7 +93,7 @@ export class LauncherNodejs extends Mixin(
 
 
         prepareLauncherOptions () : PrepareOptionsResult {
-            const res    = super.prepareLauncherOptions()
+            const res               = super.prepareLauncherOptions()
 
             const projectFileUrl    = this.project || this.argv[ 0 ]
 
@@ -141,8 +141,8 @@ export class LauncherNodejs extends Mixin(
         // }
 
 
-        async setupInner () {
-            await super.setupInner()
+        async setupProjectData () {
+            await super.setupProjectData()
 
             // TODO cleanup the case when `projectDescriptor` is already provided
 

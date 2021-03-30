@@ -154,7 +154,7 @@ export class Launcher extends Mixin(
             enumeration : [ 'file', 'subtest', 'assertion' ],
             group       : OptionsGroupOutput,
             help        : <span>
-
+                The detail level of the text output.
             </span>
         })
         detail          : ReporterDetailing = 'file'
@@ -265,16 +265,6 @@ export class Launcher extends Mixin(
         prepareProjectOptions () : PrepareOptionsResult {
             const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectData.options.$options))
 
-            // extractRes.errors.forEach(error => {
-            //     this.write(optionErrorTemplateByCode.get(error.error)(error))
-            // })
-            //
-            // extractRes.warnings.forEach(warning => {
-            //     this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
-            // })
-            //
-            // if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
-
             extractRes.values.forEach((value, option) => option.applyValue(this.projectData.options, value))
 
             return { extractResult : extractRes, errors : [] }
@@ -283,16 +273,6 @@ export class Launcher extends Mixin(
 
         prepareTestDescriptorOptions () : PrepareOptionsResult {
             const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectData.projectPlan.$options))
-
-            // extractRes.errors.forEach(error => {
-            //     this.write(optionErrorTemplateByCode.get(error.error)(error))
-            // })
-            //
-            // extractRes.warnings.forEach(warning => {
-            //     this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
-            // })
-            //
-            // if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
             extractRes.values.forEach((value, option) => option.applyValue(this.projectData.projectPlan, value))
 
@@ -319,20 +299,20 @@ export class Launcher extends Mixin(
         async setup () {
             // extracting the launcher options from the input arguments (command line / URL search params)
             // at this point there might be no `projectData` yet (project is running in remote context)
-            const prepareLauncherOptions    = this.prepareLauncherOptions()
+            const prepareLauncherOptions        = this.prepareLauncherOptions()
 
-            await this.setupInner()
+            await this.setupProjectData()
 
-            const prepareProjectOptions     = this.prepareProjectOptions()
+            const prepareProjectOptions         = this.prepareProjectOptions()
 
-            const prepareTestDescriptorOptions    = this.prepareTestDescriptorOptions()
+            const prepareTestDescriptorOptions  = this.prepareTestDescriptorOptions()
 
             //-----------------------
-            const errors : XmlElement[]     = [
-                ...prepareLauncherOptions.extractResult.errors,
-                ...prepareProjectOptions.extractResult.errors,
-                ...prepareTestDescriptorOptions.extractResult.errors
-            ].map(error => optionErrorTemplateByCode.get(error.error)(error)).concat(
+            const errors : XmlElement[]     = [].concat(
+                prepareLauncherOptions.extractResult.errors,
+                prepareProjectOptions.extractResult.errors,
+                prepareTestDescriptorOptions.extractResult.errors
+            ).map(error => optionErrorTemplateByCode.get(error.error)(error)).concat(
                 prepareLauncherOptions.errors,
                 prepareProjectOptions.errors,
                 prepareTestDescriptorOptions.errors
@@ -355,26 +335,11 @@ export class Launcher extends Mixin(
 
             warnings.forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
 
-
-            // if (this.optionsBag.entries.length) {
-            //     const warnings = CI(this.optionsBag.entries).map(entry => entry.key).uniqueOnly().map(optionName => {
-            //         const warning : OptionParseWarning = {
-            //             warning     : OptionsParseWarningCodes.UnknownOption,
-            //             option      : Option.new({ name : optionName })
-            //         }
-            //
-            //         return warning
-            //     }).toArray().forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
-            //
-            //     this.print('\n')
-            // }
-
-
             if (errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
         }
 
 
-        async setupInner () {
+        async setupProjectData () {
         }
 
 
@@ -383,7 +348,7 @@ export class Launcher extends Mixin(
 
             const launch    = Launch.new({
                 launcher                                : this,
-                projectData                       : this.projectData,
+                projectData                             : this.projectData,
                 projectPlanItemsToLaunch,
 
                 targetContextChannelClass               : this.targetContextChannelClass
@@ -415,7 +380,7 @@ export class Launcher extends Mixin(
 
             groups.sort((group1, group2) => group2.weight - group1.weight)
 
-            return <div class="help_screen">
+            return <div>
                 <p><span class="accented">npx siesta URL [--option=value]</span></p>
                 <p>URL should point to your project file. All options are optional.</p>
 

@@ -65,7 +65,7 @@ export class Test extends Mixin(
         isExclusive         : boolean               = false
 
         // not related to `before/afterEach` hooks, completely different thing
-        preStartHook           : Hook<[ this ]>     = new Hook()
+        preStartHook        : Hook<[ this ]>        = new Hook()
         startHook           : Hook<[ this ]>        = new Hook()
 
         finishHook          : Hook<[ this ]>        = new Hook()
@@ -219,6 +219,11 @@ export class Test extends Mixin(
             // extra-late finish hook, test is already not marked as active in the reporter
             this.postFinishHook.trigger(this)
 
+            this.cleanup()
+        }
+
+
+        cleanup () {
             this.spies.forEach(spy => spy.remove())
         }
 
