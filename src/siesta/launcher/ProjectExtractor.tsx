@@ -5,12 +5,12 @@ import { PortHandshakeChild, PortHandshakeParent } from "../../port/PortHandshak
 import { Channel } from "../../channel/Channel.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { Project, projectExtraction } from "../project/Project.js"
-import { ProjectDescriptor } from "../project/ProjectOptions.js"
+import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ExitCodes, LauncherError } from "./Launcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 interface ProjectExtractor {
-    extractProject (projectUrl : string) : Promise<ProjectDescriptor>
+    extractProject (projectUrl : string) : Promise<ProjectSerializableData>
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ export class ProjectExtractorParent extends Mixin(
         class ProjectExtractorParent extends base implements ProjectExtractor {
 
             @remote()
-            extractProject : (projectUrl : string) => Promise<ProjectDescriptor>
+            extractProject : (projectUrl : string) => Promise<ProjectSerializableData>
         }
 
         return ProjectExtractorParent
@@ -36,7 +36,7 @@ export class ProjectExtractorChild extends Mixin(
 
         class ProjectExtractorChild extends base implements ProjectExtractor {
             @local()
-            async extractProject (projectUrl : string) : Promise<ProjectDescriptor> {
+            async extractProject (projectUrl : string) : Promise<ProjectSerializableData> {
                 const promise                   = new Promise<Project>(resolve => projectExtraction.resolve = resolve)
 
                 let res : Project
@@ -69,7 +69,7 @@ export class ProjectExtractorChild extends Mixin(
                     })
                 }
 
-                return res.asProjectDescriptor()
+                return res.asProjectSerializableData()
             }
         }
 

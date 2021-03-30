@@ -3,7 +3,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { Logger } from "../../logger/Logger.js"
-import { ProjectDescriptor } from "../project/ProjectOptions.js"
+import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { ChannelTestLauncher } from "../test/port/TestLauncher.js"
@@ -90,8 +90,8 @@ export class Launch extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class Launch extends base {
-        launcher                    : Launcher              = undefined
-        projectDescriptor           : ProjectDescriptor     = undefined
+        launcher                    : Launcher                  = undefined
+        projectData                 : ProjectSerializableData   = undefined
 
         projectPlanItemsToLaunch    : TestDescriptor[]      = []
 

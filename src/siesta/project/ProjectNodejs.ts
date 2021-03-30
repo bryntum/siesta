@@ -2,7 +2,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { Project } from "./Project.js"
-import { ProjectOptionsNodejs } from "./ProjectOptions.js"
+import { ProjectOptionsNodejs } from "./ProjectDescriptor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ export class ProjectNodejs extends Mixin(
 
         getStandaloneLauncher () : LauncherNodejs {
             const launcher = this.launcherClass.new({
-                projectDescriptor       : this.asProjectDescriptor(),
+                projectDescriptor       : this.asProjectSerializableData(),
 
                 inputArguments          : this.buildInputArguments(),
 

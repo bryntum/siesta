@@ -2,13 +2,13 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { isNodejs } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/TestDescriptor.js"
-import { ProjectDescriptor, ProjectOptions } from "./ProjectOptions.js"
+import { ProjectSerializableData, ProjectDescriptor } from "./ProjectDescriptor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Project extends Mixin(
-    [ ProjectOptions ],
-    (base : ClassUnion<typeof ProjectOptions>) => {
+    [ ProjectDescriptor ],
+    (base : ClassUnion<typeof ProjectDescriptor>) => {
 
     class Project extends base {
         launcherClass           : typeof Launcher           = undefined
@@ -55,7 +55,7 @@ export class Project extends Mixin(
             if (projectExtraction.resolve) {
                 projectExtraction.resolve(this)
             } else {
-                (await this.getIsomorphicSelfInstance()).launchStandalone()
+                await (await this.getIsomorphicSelfInstance()).launchStandalone()
             }
         }
 
@@ -81,7 +81,7 @@ export class Project extends Mixin(
 
         getStandaloneLauncher () : Launcher {
             const launcher = this.launcherClass.new({
-                projectDescriptor       : this.asProjectDescriptor(),
+                projectDescriptor       : this.asProjectSerializableData(),
 
                 inputArguments          : this.buildInputArguments()
             })
@@ -99,10 +99,10 @@ export class Project extends Mixin(
         }
 
 
-        asProjectDescriptor () : ProjectDescriptor {
-            return ProjectDescriptor.new({
+        asProjectSerializableData () : ProjectSerializableData {
+            return ProjectSerializableData.new({
                 projectPlan     : this.projectPlan,
-                options         : ProjectOptions.new(this)
+                options         : ProjectDescriptor.new(this)
             })
         }
     }

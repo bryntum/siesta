@@ -13,7 +13,7 @@ import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 // (which contains extra properties which all will be applied to the `ProjectOptions` instance,
 // because of the way `Base` `initialize` method works)
 @serializable({ mode : 'optIn' })
-export class ProjectOptions extends Mixin(
+export class ProjectDescriptor extends Mixin(
     [ Serializable, HasOptions, Base ],
     (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof Base>) => {
 
@@ -29,8 +29,8 @@ export class ProjectOptions extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ mode : 'optIn' })
 export class ProjectOptionsBrowser extends Mixin(
-    [ ProjectOptions ],
-    (base : ClassUnion<typeof ProjectOptions>) => {
+    [ ProjectDescriptor ],
+    (base : ClassUnion<typeof ProjectDescriptor>) => {
 
     class ProjectOptionsBrowser extends base {
         testDescriptor      : Partial<TestDescriptorBrowser>
@@ -43,8 +43,8 @@ export class ProjectOptionsBrowser extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ mode : 'optIn' })
 export class ProjectOptionsNodejs extends Mixin(
-    [ ProjectOptions ],
-    (base : ClassUnion<typeof ProjectOptions>) => {
+    [ ProjectDescriptor ],
+    (base : ClassUnion<typeof ProjectDescriptor>) => {
 
     class ProjectOptionsNodejs extends base {
         testDescriptor      : Partial<TestDescriptorNodejs>
@@ -56,15 +56,15 @@ export class ProjectOptionsNodejs extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class ProjectDescriptor extends Mixin(
+export class ProjectSerializableData extends Mixin(
     [ Serializable, Base ],
     (base : ClassUnion<typeof Serializable, typeof Base>) => {
 
-    class ProjectDescriptor extends base {
+    class ProjectSerializableData extends base {
         projectPlan     : TestDescriptor            = undefined
 
-        options         : ProjectOptions            = ProjectOptions.new()
+        options         : ProjectDescriptor         = ProjectDescriptor.new()
     }
 
-    return ProjectDescriptor
+    return ProjectSerializableData
 }) {}

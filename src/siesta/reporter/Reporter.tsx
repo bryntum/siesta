@@ -7,7 +7,7 @@ import { XmlElement } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { relative } from "../../util/Path.js"
 import { Launch } from "../launcher/Launch.js"
-import { ProjectDescriptor } from "../project/ProjectOptions.js"
+import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, SourcePoint, TestNodeResult, TestResult } from "../test/TestResult.js"
 import { Printer } from "./Printer.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
@@ -26,8 +26,8 @@ export class ReporterTheme extends Base {
         return this.reporter.c
     }
 
-    get projectDescriptor () : ProjectDescriptor {
-        return this.reporter.launch.projectDescriptor
+    get projectData () : ProjectSerializableData {
+        return this.reporter.launch.projectData
     }
 
     get launch () : Launch {
@@ -67,7 +67,7 @@ export class ReporterTheme extends Base {
 
 
     testNodeUrl (testNode : TestNodeResult) : XmlElement {
-        const rel       = relative(this.projectDescriptor.projectPlan.url, testNode.descriptor.url)
+        const rel       = relative(this.projectData.projectPlan.url, testNode.descriptor.url)
         const match     = /(.*\/)?([^\/]+)/.exec(rel)
 
         return <span>
@@ -156,7 +156,7 @@ export class ReporterTheme extends Base {
 
     testSuiteHeader () : XmlElement {
         return <div>
-            Launching { this.launch.type === 'project' ? 'test suite project' : 'test file'}: <span class="project_title">{ this.projectDescriptor.projectPlan.title }</span>
+            Launching { this.launch.type === 'project' ? 'test suite project' : 'test file'}: <span class="project_title">{ this.projectData.projectPlan.title }</span>
             <div></div>
         </div>
     }

@@ -2,7 +2,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Project } from "./Project.js"
-import { ProjectOptionsBrowser } from "./ProjectOptions.js"
+import { ProjectOptionsBrowser } from "./ProjectDescriptor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ export class ProjectBrowser extends Mixin(
 
         getStandaloneLauncher () : LauncherBrowser {
             const launcher = this.launcherClass.new({
-                projectDescriptor       : this.asProjectDescriptor(),
+                projectDescriptor       : this.asProjectSerializableData(),
 
                 inputArguments          : this.buildInputArguments()
             })

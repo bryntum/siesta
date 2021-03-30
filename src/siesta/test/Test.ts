@@ -6,7 +6,7 @@ import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { ArbitraryObject, ArbitraryObjectKey, isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher, LauncherError } from "../launcher/Launcher.js"
-import { ProjectDescriptor } from "../project/ProjectOptions.js"
+import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
 import { AssertionException } from "./assertion/AssertionException.js"
@@ -460,7 +460,7 @@ export class Test extends Mixin(
 
             projectPlan.planItem(descriptor)
 
-            const projectDescriptor = ProjectDescriptor.new({ projectPlan })
+            const projectDescriptor = ProjectSerializableData.new({ projectPlan })
 
             const isomorphicTestClass       = await this.getIsomorphicTestClass()
 
@@ -483,7 +483,7 @@ export class Test extends Mixin(
             const launch    = Launch.new({
                 type                        : 'test',
                 launcher,
-                projectDescriptor,
+                projectData: projectDescriptor,
                 projectPlanItemsToLaunch    : projectPlan.leavesAxis(),
                 targetContextChannelClass   : ChannelSameContext
             })

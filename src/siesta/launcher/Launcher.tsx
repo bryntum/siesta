@@ -8,7 +8,7 @@ import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
-import { ProjectDescriptor, ProjectOptions } from "../project/ProjectOptions.js"
+import { ProjectSerializableData, ProjectDescriptor } from "../project/ProjectDescriptor.js"
 import { Printer } from "../reporter/Printer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
@@ -114,12 +114,12 @@ export class Launcher extends Mixin(
 
         optionsBag          : OptionsBag            = undefined
 
-        projectOptionsClass : typeof ProjectOptions = ProjectOptions
+        projectOptionsClass : typeof ProjectDescriptor = ProjectDescriptor
         testDescriptorClass : typeof TestDescriptor = TestDescriptor
 
         reporterClass       : typeof Reporter       = undefined
 
-        projectDescriptor   : ProjectDescriptor     = undefined
+        projectDescriptor   : ProjectSerializableData     = undefined
 
         setupDone       : boolean           = false
         setupPromise    : Promise<any>      = undefined
@@ -391,7 +391,7 @@ export class Launcher extends Mixin(
 
             const launch    = Launch.new({
                 launcher                                : this,
-                projectDescriptor                       : this.projectDescriptor,
+                projectData                       : this.projectDescriptor,
                 projectPlanItemsToLaunch,
 
                 targetContextChannelClass               : this.targetContextChannelClass
