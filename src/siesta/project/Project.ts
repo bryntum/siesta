@@ -81,7 +81,7 @@ export class Project extends Mixin(
 
         getStandaloneLauncher () : Launcher {
             const launcher = this.launcherClass.new({
-                projectDescriptor       : this.asProjectSerializableData(),
+                projectData             : this.asProjectSerializableData(),
 
                 inputArguments          : this.buildInputArguments()
             })

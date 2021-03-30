@@ -189,6 +189,7 @@ export class Launch extends Mixin(
 
 
         getExitCode () : ExitCodes {
+            // TODO
             return ExitCodes.PASSED
         }
     }

@@ -119,7 +119,7 @@ export class Launcher extends Mixin(
 
         reporterClass       : typeof Reporter       = undefined
 
-        projectDescriptor   : ProjectSerializableData     = undefined
+        projectData         : ProjectSerializableData     = undefined
 
         setupDone       : boolean           = false
         setupPromise    : Promise<any>      = undefined
@@ -210,7 +210,7 @@ export class Launcher extends Mixin(
 
 
         getDescriptorsToLaunch () : TestDescriptor[] {
-            return this.projectDescriptor.projectPlan.leavesAxis().filter(descriptor => {
+            return this.projectData.projectPlan.leavesAxis().filter(descriptor => {
                 return (this.include.length === 0 || this.include.some(pattern => pattern.test(descriptor.flatten.url)))
                     && (this.exclude.length === 0 || !this.exclude.some(pattern => pattern.test(descriptor.flatten.url)))
             })
@@ -226,14 +226,14 @@ export class Launcher extends Mixin(
         }
 
 
-        // earliest point at which launcher options has been applied already
+        // earliest point at which launcher options already have been applied
         onLauncherOptionsAvailable () {
             if (this.help) {
                 this.write(this.helpScreenTemplate(
                     [
                         ...optionsToArray(this.$options),
-                        ...optionsToArray(this.projectDescriptor ? this.projectDescriptor.options.$options : this.projectOptionsClass.prototype.$options),
-                        ...optionsToArray(this.projectDescriptor ? this.projectDescriptor.projectPlan.$options : this.testDescriptorClass.prototype.$options)
+                        ...optionsToArray(this.projectData ? this.projectData.options.$options : this.projectOptionsClass.prototype.$options),
+                        ...optionsToArray(this.projectData ? this.projectData.projectPlan.$options : this.testDescriptorClass.prototype.$options)
                     ]
                 ))
             }
@@ -255,16 +255,6 @@ export class Launcher extends Mixin(
 
             this.onLauncherOptionsAvailable()
 
-            // extractRes.errors.forEach(error => {
-            //     this.write(optionErrorTemplateByCode.get(error.error)(error))
-            // })
-            //
-            // extractRes.warnings.forEach(warning => {
-            //     this.write(optionWarningTemplateByCode.get(warning.warning)(warning))
-            // })
-            //
-            // if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
-
             this.include    = this.include.map(pattern => new RegExp(pattern))
             this.exclude    = this.exclude.map(pattern => new RegExp(pattern))
 
@@ -273,7 +263,7 @@ export class Launcher extends Mixin(
 
 
         prepareProjectOptions () : PrepareOptionsResult {
-            const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectDescriptor.options.$options))
+            const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectData.options.$options))
 
             // extractRes.errors.forEach(error => {
             //     this.write(optionErrorTemplateByCode.get(error.error)(error))
@@ -285,14 +275,14 @@ export class Launcher extends Mixin(
             //
             // if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
-            extractRes.values.forEach((value, option) => option.applyValue(this.projectDescriptor.options, value))
+            extractRes.values.forEach((value, option) => option.applyValue(this.projectData.options, value))
 
             return { extractResult : extractRes, errors : [] }
         }
 
 
         prepareTestDescriptorOptions () : PrepareOptionsResult {
-            const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectDescriptor.projectPlan.$options))
+            const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.projectData.projectPlan.$options))
 
             // extractRes.errors.forEach(error => {
             //     this.write(optionErrorTemplateByCode.get(error.error)(error))
@@ -304,7 +294,7 @@ export class Launcher extends Mixin(
             //
             // if (extractRes.errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
-            extractRes.values.forEach((value, option) => option.applyValue(this.projectDescriptor.projectPlan, value))
+            extractRes.values.forEach((value, option) => option.applyValue(this.projectData.projectPlan, value))
 
             return { extractResult : extractRes, errors : [] }
         }
@@ -327,6 +317,8 @@ export class Launcher extends Mixin(
 
 
         async setup () {
+            // extracting the launcher options from the input arguments (command line / URL search params)
+            // at this point there might be no `projectData` yet (project is running in remote context)
             const prepareLauncherOptions    = this.prepareLauncherOptions()
 
             await this.setupInner()
@@ -391,7 +383,7 @@ export class Launcher extends Mixin(
 
             const launch    = Launch.new({
                 launcher                                : this,
-                projectData                       : this.projectDescriptor,
+                projectData                       : this.projectData,
                 projectPlanItemsToLaunch,
 
                 targetContextChannelClass               : this.targetContextChannelClass

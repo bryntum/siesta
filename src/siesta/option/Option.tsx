@@ -252,12 +252,12 @@ export const option = (config? : Partial<Option>, optionCls : typeof Option = Op
 //---------------------------------------------------------------------------------------------------------------------
 type OptionValueEntry = { key : string, value : string }
 
-type OptionsParseResult = {
+type OptionsTokenizingResult = {
     argv        : string[],
     opts        : OptionValueEntry[]
 }
 
-function parseOptions (input : string[]) : OptionsParseResult {
+function parseOptions (input : string[]) : OptionsTokenizingResult {
     let currentOption : string
 
     const argv : string[]                               = []

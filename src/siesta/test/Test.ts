@@ -460,12 +460,12 @@ export class Test extends Mixin(
 
             projectPlan.planItem(descriptor)
 
-            const projectDescriptor = ProjectSerializableData.new({ projectPlan })
+            const projectData   = ProjectSerializableData.new({ projectPlan })
 
             const isomorphicTestClass       = await this.getIsomorphicTestClass()
 
             const launcher      = isomorphicTestClass.prototype.launcherClass.new({
-                projectDescriptor,
+                projectData,
                 inputArguments          : isomorphicTestClass.getInputArguments()
             })
 
@@ -483,7 +483,7 @@ export class Test extends Mixin(
             const launch    = Launch.new({
                 type                        : 'test',
                 launcher,
-                projectData: projectDescriptor,
+                projectData,
                 projectPlanItemsToLaunch    : projectPlan.leavesAxis(),
                 targetContextChannelClass   : ChannelSameContext
             })

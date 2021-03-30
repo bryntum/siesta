@@ -34,7 +34,7 @@ export class ProjectBrowser extends Mixin(
 
         getStandaloneLauncher () : LauncherBrowser {
             const launcher = this.launcherClass.new({
-                projectDescriptor       : this.asProjectSerializableData(),
+                projectData             : this.asProjectSerializableData(),
 
                 inputArguments          : this.buildInputArguments()
             })
@@ -44,7 +44,7 @@ export class ProjectBrowser extends Mixin(
             url.hash            = ''
             url.search          = ''
 
-            launcher.projectDescriptor.projectPlan.url  = url.toString().replace(/\/[^/]*?$/, '')
+            launcher.projectData.projectPlan.url  = url.toString().replace(/\/[^/]*?$/, '')
 
             return launcher
         }

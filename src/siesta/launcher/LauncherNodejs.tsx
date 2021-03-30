@@ -97,7 +97,7 @@ export class LauncherNodejs extends Mixin(
 
             const projectFileUrl    = this.project || this.argv[ 0 ]
 
-            if (!projectFileUrl && !this.projectDescriptor) throw LauncherError.new({
+            if (!projectFileUrl && !this.projectData) throw LauncherError.new({
                 exitCode        : ExitCodes.INCORRECT_ARGUMENTS,
                 annotation      : <div>
                     <p><span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url </span></p>
@@ -148,7 +148,7 @@ export class LauncherNodejs extends Mixin(
 
             // `projectDescriptor` might be already provided
             // if project file is launched directly as node executable
-            if (!this.projectDescriptor) {
+            if (!this.projectData) {
                 const projectUrl            = this.project = this.prepareProjectFileUrl(this.project)
 
                 const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
@@ -158,14 +158,14 @@ export class LauncherNodejs extends Mixin(
                 const parentPort            = channel.parentPort
 
                 try {
-                    this.projectDescriptor  = await parentPort.extractProject(projectUrl)
+                    this.projectData  = await parentPort.extractProject(projectUrl)
                 } finally {
                     await parentPort.disconnect()
                 }
             }
 
             if (this.project) {
-                this.projectDescriptor.projectPlan.url   = this.project.replace(/\/[^/]*?$/, '')
+                this.projectData.projectPlan.url   = this.project.replace(/\/[^/]*?$/, '')
             }
         }
 

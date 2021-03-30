@@ -27,7 +27,7 @@ export class ProjectNodejs extends Mixin(
 
         getStandaloneLauncher () : LauncherNodejs {
             const launcher = this.launcherClass.new({
-                projectDescriptor       : this.asProjectSerializableData(),
+                projectData             : this.asProjectSerializableData(),
 
                 inputArguments          : this.buildInputArguments(),
 
