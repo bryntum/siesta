@@ -97,10 +97,11 @@ export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix
         }
     }
 
+    // here the type should be `this`, but TS got mad when mixin `Project` and `ProjectBrowser` for example
+    // `TestDescriptor` seems to be enough, since `flatten` is always used in generic `TestDescriptor` context it seems
+    $flatten        : TestDescriptor      = undefined
 
-    $flatten        : this      = undefined
-
-    get flatten () : this {
+    get flatten () : TestDescriptor {
         if (this.$flatten !== undefined) return this.$flatten
 
         if (this.childNodes) throw new Error("Can only flatten leaf descriptors, not groups")
