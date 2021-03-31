@@ -184,6 +184,26 @@ export class LauncherNodejs extends Mixin(
 
             return url
         }
+
+
+        static async run () {
+            process.on('unhandledRejection', (reason, promise) => {
+                console.log('Unhandled promise rejection, reason:', reason)
+
+                process.exit(ExitCodes.UNHANLED_EXCEPTION)
+            })
+
+            const launcher  = this.new({
+                inputArguments      : process.argv.slice(2)
+            })
+
+
+            const launch        = await launcher.start()
+
+            // we just set the `exitCode` property and not call `process.exit()` directly,
+            // because some output might not be processed yet
+            process.exitCode    = process.exitCode ?? launch.getExitCode()
+        }
     }
 
     return LauncherNodejs
