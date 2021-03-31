@@ -82,19 +82,19 @@ export class ReporterTheme extends Base {
         :
             assertion.passed ? 'assertion_icon_pass' : 'assertion_icon_fail'
 
-        const passed                = assertion.passed || testNode.isTodo
-        const canShowSourceContext  = sources && assertion.sourcePoint && this.reporter.sourceContext > 0
+        const passed                    = assertion.passed || testNode.isTodo
+        const canShowSourceContext      = sources && assertion.sourcePoint
+        const shouldShowSourceContext   = this.reporter.sourceContext > 0
 
         return <div class="assertion">
             <span class={`assertion_icon ${ cls }`}>{ assertion.passed ? '✔' : '✘' }</span>{ ' ' }
             <span class="assertion_name">{ assertion.name }</span>
             <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
-            { assertion.sourcePoint ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
-            { passed || !canShowSourceContext ? false : this.sourcePointTemplate(assertion.sourcePoint, sources) }
+            { assertion.sourcePoint && !shouldShowSourceContext ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
+            { !passed && canShowSourceContext && shouldShowSourceContext ? this.sourcePointTemplate(assertion.sourcePoint, sources) : false }
             { passed ? false : assertion.annotation }
         </div>
     }
-
 
 
     lineNumberTemplate (isHighlighted : boolean, line : string) : XmlElement {
