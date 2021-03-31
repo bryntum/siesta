@@ -1,7 +1,7 @@
 import { Channel } from "../../channel/Channel.js"
 import { ChannelBrowserIframe } from "../../channel/ChannelBrowserIframe.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { ProjectOptionsBrowser } from "../project/ProjectDescriptor.js"
+import { ProjectDescriptorBrowser } from "../project/ProjectDescriptor.js"
 import { ReporterBrowser } from "../reporter/ReporterBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Launcher } from "./Launcher.js"
@@ -16,7 +16,7 @@ export class LauncherBrowser extends Mixin(
 
         reporterClass   : typeof ReporterBrowser            = ReporterBrowser
 
-        projectOptionsClass : typeof ProjectOptionsBrowser  = ProjectOptionsBrowser
+        projectDescriptorClass : typeof ProjectDescriptorBrowser  = ProjectDescriptorBrowser
         testDescriptorClass : typeof TestDescriptorBrowser  = TestDescriptorBrowser
 
 

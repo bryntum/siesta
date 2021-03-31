@@ -114,8 +114,8 @@ export class Launcher extends Mixin(
 
         optionsBag          : OptionsBag            = undefined
 
-        projectOptionsClass : typeof ProjectDescriptor = ProjectDescriptor
-        testDescriptorClass : typeof TestDescriptor = TestDescriptor
+        projectDescriptorClass  : typeof ProjectDescriptor  = ProjectDescriptor
+        testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
         reporterClass       : typeof Reporter       = undefined
 
@@ -232,7 +232,7 @@ export class Launcher extends Mixin(
                 this.write(this.helpScreenTemplate(
                     [
                         ...optionsToArray(this.$options),
-                        ...optionsToArray(this.projectData ? this.projectData.options.$options : this.projectOptionsClass.prototype.$options),
+                        ...optionsToArray(this.projectData ? this.projectData.options.$options : this.projectDescriptorClass.prototype.$options),
                         ...optionsToArray(this.projectData ? this.projectData.projectPlan.$options : this.testDescriptorClass.prototype.$options)
                     ]
                 ))

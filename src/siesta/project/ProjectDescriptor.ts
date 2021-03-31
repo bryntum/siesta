@@ -28,29 +28,29 @@ export class ProjectDescriptor extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ mode : 'optIn' })
-export class ProjectOptionsBrowser extends Mixin(
+export class ProjectDescriptorBrowser extends Mixin(
     [ ProjectDescriptor ],
     (base : ClassUnion<typeof ProjectDescriptor>) => {
 
-    class ProjectOptionsBrowser extends base {
+    class ProjectDescriptorBrowser extends base {
         testDescriptor      : Partial<TestDescriptorBrowser>
     }
 
-    return ProjectOptionsBrowser
+    return ProjectDescriptorBrowser
 }) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ mode : 'optIn' })
-export class ProjectOptionsNodejs extends Mixin(
+export class ProjectDescriptorNodejs extends Mixin(
     [ ProjectDescriptor ],
     (base : ClassUnion<typeof ProjectDescriptor>) => {
 
-    class ProjectOptionsNodejs extends base {
+    class ProjectDescriptorNodejs extends base {
         testDescriptor      : Partial<TestDescriptorNodejs>
     }
 
-    return ProjectOptionsNodejs
+    return ProjectDescriptorNodejs
 }) {}
 
 

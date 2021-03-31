@@ -2,13 +2,13 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { Project } from "./Project.js"
-import { ProjectOptionsNodejs } from "./ProjectDescriptor.js"
+import { ProjectDescriptorNodejs } from "./ProjectDescriptor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ProjectNodejs extends Mixin(
-    [ Project, ProjectOptionsNodejs ],
-    (base : ClassUnion<typeof Project, typeof ProjectOptionsNodejs>) =>
+    [ Project, ProjectDescriptorNodejs ],
+    (base : ClassUnion<typeof Project, typeof ProjectDescriptorNodejs>) =>
 
     class ProjectNodejs extends base {
 

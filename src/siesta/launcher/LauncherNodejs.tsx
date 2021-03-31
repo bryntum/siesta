@@ -8,7 +8,7 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { ProjectOptionsNodejs } from "../project/ProjectDescriptor.js"
+import { ProjectDescriptorNodejs } from "../project/ProjectDescriptor.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
@@ -47,7 +47,7 @@ export class LauncherNodejs extends Mixin(
         reporterClass   : typeof ReporterNodejs             = ReporterNodejsTerminal
         colorerClass    : typeof Colorer                    = ColorerNodejs
 
-        projectOptionsClass : typeof ProjectOptionsNodejs   = ProjectOptionsNodejs
+        projectDescriptorClass : typeof ProjectDescriptorNodejs   = ProjectDescriptorNodejs
         testDescriptorClass : typeof TestDescriptorNodejs   = TestDescriptorNodejs
 
 

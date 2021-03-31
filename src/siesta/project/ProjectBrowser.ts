@@ -2,13 +2,13 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Project } from "./Project.js"
-import { ProjectOptionsBrowser } from "./ProjectDescriptor.js"
+import { ProjectDescriptorBrowser } from "./ProjectDescriptor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ProjectBrowser extends Mixin(
-    [ Project, ProjectOptionsBrowser ],
-    (base : ClassUnion<typeof Project, typeof ProjectOptionsBrowser>) => {
+    [ Project, ProjectDescriptorBrowser ],
+    (base : ClassUnion<typeof Project, typeof ProjectDescriptorBrowser>) => {
 
     class ProjectBrowser extends base {
 
