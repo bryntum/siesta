@@ -41,5 +41,3 @@ export class TestNodejs extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export const { it, iit, xit, describe, ddescribe, xdescribe } = createTestSectionConstructors(TestNodejs)
-
-export { afterEach, beforeEach, expect } from "./Test.js"

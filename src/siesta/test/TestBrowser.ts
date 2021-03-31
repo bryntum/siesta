@@ -29,5 +29,3 @@ export class TestBrowser extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export const { it, iit, xit, describe, ddescribe, xdescribe } = createTestSectionConstructors(TestBrowser)
-
-export { afterEach, beforeEach, expect } from "./Test.js"
