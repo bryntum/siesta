@@ -136,15 +136,8 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        // prepareProjectOptions () {
-        //     return super.prepareProjectOptions()
-        // }
-
-
         async setupProjectData () {
             await super.setupProjectData()
-
-            // TODO cleanup the case when `projectDescriptor` is already provided
 
             // `projectDescriptor` might be already provided
             // if project file is launched directly as node executable
@@ -202,6 +195,7 @@ export class LauncherNodejs extends Mixin(
 
             // we just set the `exitCode` property and not call `process.exit()` directly,
             // because some output might not be processed yet
+            // slight risk of leaking some async cyclic process
             process.exitCode    = process.exitCode ?? launch.getExitCode()
         }
     }
