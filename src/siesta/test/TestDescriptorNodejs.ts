@@ -1,3 +1,4 @@
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
@@ -13,6 +14,13 @@ import { TestDescriptor } from "./TestDescriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class TestDescriptorNodejs extends TestDescriptor {
-}
+export class TestDescriptorNodejs extends Mixin(
+    [ TestDescriptor ],
+    (base : ClassUnion<typeof TestDescriptor>) => {
+
+    class TestDescriptorNodejs extends base {
+    }
+
+    return TestDescriptorNodejs
+}){}
 

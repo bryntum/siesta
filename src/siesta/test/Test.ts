@@ -42,7 +42,7 @@ export class Test extends Mixin(
     >) => {
 
     class Test extends base {
-        // value in prototype
+        @prototypeValue(Launcher)
         launcherClass       : typeof Launcher
 
         @prototypeValue(TestDescriptor)

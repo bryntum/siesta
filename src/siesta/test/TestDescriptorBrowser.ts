@@ -1,3 +1,4 @@
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
 import { option } from "../option/Option.js"
 import { TestDescriptor } from "./TestDescriptor.js"
@@ -20,14 +21,21 @@ export type PreloadDescriptor = string
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
-export class TestDescriptorBrowser extends TestDescriptor {
-    @option()
-    preload             : PreloadDescriptor[]       = []
+export class TestDescriptorBrowser extends Mixin(
+    [ TestDescriptor ],
+    (base : ClassUnion<typeof TestDescriptor>) => {
 
-    @option()
-    alsoPreload         : PreloadDescriptor[]       = []
+    class TestDescriptorBrowser extends base {
+        @option()
+        preload             : PreloadDescriptor[]       = []
 
-    @option()
-    pageUrl             : string                    = ''
-}
+        @option()
+        alsoPreload         : PreloadDescriptor[]       = []
+
+        @option()
+        pageUrl             : string                    = ''
+    }
+
+    return TestDescriptorBrowser
+}){}
 

@@ -1,4 +1,5 @@
 import { Base } from "../../class/Base.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { DeepCompareOptions } from "../../compare_deep/CompareDeepDiff.js"
 import { XmlRendererDifference } from "../../compare_deep/CompareDeepDiffRendering.js"
 import { CI } from "../../iterator/Iterator.js"
@@ -25,148 +26,154 @@ export const OptionsGroupTestDescriptor  = OptionGroup.new({
 // explicitly provided value for that property
 // obviously with initializer, that check will always be `true`, which is not
 // what we want
-
 @serializable()
-export class TestDescriptor extends Serializable.mix(HasOptions.mix(TreeNode.mix(Base))) {
-    childNodeT      : TestDescriptor
-    parentNode      : TestDescriptor
+export class TestDescriptor extends Mixin(
+    [ Serializable, HasOptions, TreeNode, Base ],
+    (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof TreeNode, typeof Base>) => {
 
-    // TODO should support `name` alias (primary and recommended should be `title` to avoid
-    // confusion with `filename`
-    title           : string                = ''
+    class TestDescriptor extends base {
+        childNodeT      : TestDescriptor
+        parentNode      : TestDescriptor
 
-    // TODO support `fileName` alias?
-    filename        : string                = ''
+        // TODO should support `name` alias (primary and recommended should be `title` to avoid
+        // confusion with `filename`
+        title           : string                = ''
 
-    url             : string
+        // TODO support `fileName` alias?
+        filename        : string                = ''
 
-    @option({ defaultValue : [], group : OptionsGroupTestDescriptor })
-    tags            : string[]
+        url             : string
 
-    @option({ type : 'boolean', defaultValue : false, group : OptionsGroupTestDescriptor })
-    isTodo          : boolean
+        @option({ defaultValue : [], group : OptionsGroupTestDescriptor })
+        tags            : string[]
 
-    @option({ type : 'string', group : OptionsGroupTestDescriptor })
-    snooze          : string | Date
+        @option({ type : 'boolean', defaultValue : false, group : OptionsGroupTestDescriptor })
+        isTodo          : boolean
 
-    // @option()
-    // isolation       : IsolationLevel
+        @option({ type : 'string', group : OptionsGroupTestDescriptor })
+        snooze          : string | Date
 
-    @option({ type : 'boolean', defaultValue : false, group : OptionsGroupTestDescriptor })
-    failOnIit           : boolean
+        // @option()
+        // isolation       : IsolationLevel
 
-    // will be applied directly to test instance
-    config          : ArbitraryObject
+        @option({ type : 'boolean', defaultValue : false, group : OptionsGroupTestDescriptor })
+        failOnIit           : boolean
 
-    @option({ defaultValue : false, group : OptionsGroupTestDescriptor })
-    autoCheckGlobals    : boolean
+        // will be applied directly to test instance
+        config          : ArbitraryObject
 
-    serializerConfig    : Partial<SerializerXml>            = { maxBreadth : 10, maxDepth : 4 }
-    stringifierConfig   : Partial<XmlRendererDifference>    = { prettyPrint : true }
-    deepCompareConfig   : DeepCompareOptions                = undefined
+        @option({ defaultValue : false, group : OptionsGroupTestDescriptor })
+        autoCheckGlobals    : boolean
 
-
-    planItem (item : TestDescriptor) : TestDescriptor {
-        this.appendChild(item)
-
-        return item
-    }
+        serializerConfig    : Partial<SerializerXml>            = { maxBreadth : 10, maxDepth : 4 }
+        stringifierConfig   : Partial<XmlRendererDifference>    = { prettyPrint : true }
+        deepCompareConfig   : DeepCompareOptions                = undefined
 
 
-    getOptionValueReducers () : { [ key in keyof this ]? : (name : keyof this, parentsAxis : this[]) => this[ typeof name ] } {
-        return {
-            url     : (name : 'url', parentsAxis : this[]) : this[ typeof name ] => {
-                const urlParts      = []
+        planItem (item : TestDescriptor) : TestDescriptor {
+            this.appendChild(item)
 
-                CI(parentsAxis).forEach(desc => {
-                    if (desc.url) {
-                        urlParts.push(desc.url.replace(/\/$/, '')); return false
-                    }
-                    else {
-                        urlParts.push(desc.filename)
-                    }
+            return item
+        }
+
+
+        getOptionValueReducers () : { [ key in keyof this ]? : (name : keyof this, parentsAxis : this[]) => this[ typeof name ] } {
+            return {
+                url     : (name : 'url', parentsAxis : this[]) : this[ typeof name ] => {
+                    const urlParts      = []
+
+                    CI(parentsAxis).forEach(desc => {
+                        if (desc.url) {
+                            urlParts.push(desc.url.replace(/\/$/, '')); return false
+                        }
+                        else {
+                            urlParts.push(desc.filename)
+                        }
+                    })
+
+                    urlParts.reverse()
+
+                    return urlParts.join('/')
+                },
+                tags    : (name : 'tags', parentsAxis : this[]) : this[ typeof name ] => {
+                    return CI(parentsAxis.flatMap(desc => desc.tags)).uniqueOnly().toArray()
+                }
+            }
+        }
+
+        // here the type should be `this`, but TS got mad when mixin `Project` and `ProjectBrowser` for example
+        // `TestDescriptor` seems to be enough, since `flatten` is always used in generic `TestDescriptor` context it seems
+        $flatten        : TestDescriptor      = undefined
+
+        get flatten () : TestDescriptor {
+            if (this.$flatten !== undefined) return this.$flatten
+
+            if (this.childNodes) throw new Error("Can only flatten leaf descriptors, not groups")
+
+            const descriptor        = cloneObject(this)
+            descriptor.parentNode   = undefined
+
+            if (!descriptor.url && !descriptor.filename) throw new Error("Descriptor needs to have either `filename` or `url` property defined")
+
+            const parentsAxis       = [ this, ...this.parentsAxis() ]
+
+            const reducers          = this.getOptionValueReducers()
+
+            const defaultReducer    = (name : keyof this, parentsAxis : this[]) : this[ typeof name ] => {
+                let res : this[ typeof name ]
+
+                CI(parentsAxis).forEach((desc, index) => {
+                    if (desc.hasOwnProperty(name) || index === parentsAxis.length - 1) { res = desc[ name ]; return false }
                 })
 
-                urlParts.reverse()
+                return res
+            }
 
-                return urlParts.join('/')
-            },
-            tags    : (name : 'tags', parentsAxis : this[]) : this[ typeof name ] => {
-                return CI(parentsAxis.flatMap(desc => desc.tags)).uniqueOnly().toArray()
+            objectEntriesDeep(this.$options).map(([ key, _ ]) => key).concat('url', 'config').forEach(key => {
+                const reducer       = reducers[ key ] || defaultReducer
+
+                descriptor[ key ]   = reducer(key, parentsAxis)
+            })
+
+            return this.$flatten    = descriptor
+        }
+
+
+        static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, desc : string | Partial<InstanceType<T>>) : InstanceType<T> {
+            if (isString(desc)) {
+                return this.new({ title : desc } as Partial<InstanceType<T>>)
+            } else {
+                return this.new(desc)
+            }
+        }
+
+
+        static fromProjectPlanItemDescriptor<T extends typeof TestDescriptor> (this : T, desc : ProjectPlanItemDescriptor<InstanceType<T>>) : InstanceType<T> {
+            if (isString(desc)) {
+                return this.new({ filename : desc } as Partial<InstanceType<T>>)
+            }
+            else if (desc.items !== undefined) {
+                const groupDesc     = Object.assign({}, desc)
+
+                delete groupDesc.items
+
+                const group         = this.new(groupDesc)
+
+                // need to force-create the `childNodes` array for the case when the `items` array is empty
+                // so that this descriptor will be counted as a group, not leaf
+                group.childNodes    = []
+
+                desc.items.forEach(item => group.planItem(this.fromProjectPlanItemDescriptor(item)))
+
+                return group
+            } else {
+                return this.new(desc)
             }
         }
     }
 
-    // here the type should be `this`, but TS got mad when mixin `Project` and `ProjectBrowser` for example
-    // `TestDescriptor` seems to be enough, since `flatten` is always used in generic `TestDescriptor` context it seems
-    $flatten        : TestDescriptor      = undefined
-
-    get flatten () : TestDescriptor {
-        if (this.$flatten !== undefined) return this.$flatten
-
-        if (this.childNodes) throw new Error("Can only flatten leaf descriptors, not groups")
-
-        const descriptor        = cloneObject(this)
-        descriptor.parentNode   = undefined
-
-        if (!descriptor.url && !descriptor.filename) throw new Error("Descriptor needs to have either `filename` or `url` property defined")
-
-        const parentsAxis       = [ this, ...this.parentsAxis() ]
-
-        const reducers          = this.getOptionValueReducers()
-
-        const defaultReducer    = (name : keyof this, parentsAxis : this[]) : this[ typeof name ] => {
-            let res : this[ typeof name ]
-
-            CI(parentsAxis).forEach((desc, index) => {
-                if (desc.hasOwnProperty(name) || index === parentsAxis.length - 1) { res = desc[ name ]; return false }
-            })
-
-            return res
-        }
-
-        objectEntriesDeep(this.$options).map(([ key, _ ]) => key).concat('url', 'config').forEach(key => {
-            const reducer       = reducers[ key ] || defaultReducer
-
-            descriptor[ key ]   = reducer(key, parentsAxis)
-        })
-
-        return this.$flatten    = descriptor
-    }
-
-
-    static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, desc : string | Partial<InstanceType<T>>) : InstanceType<T> {
-        if (isString(desc)) {
-            return this.new({ title : desc } as Partial<InstanceType<T>>)
-        } else {
-            return this.new(desc)
-        }
-    }
-
-
-    static fromProjectPlanItemDescriptor<T extends typeof TestDescriptor> (this : T, desc : ProjectPlanItemDescriptor<InstanceType<T>>) : InstanceType<T> {
-        if (isString(desc)) {
-            return this.new({ filename : desc } as Partial<InstanceType<T>>)
-        }
-        else if (desc.items !== undefined) {
-            const groupDesc     = Object.assign({}, desc)
-
-            delete groupDesc.items
-
-            const group         = this.new(groupDesc)
-
-            // need to force-create the `childNodes` array for the case when the `items` array is empty
-            // so that this descriptor will be counted as a group, not leaf
-            group.childNodes    = []
-
-            desc.items.forEach(item => group.planItem(this.fromProjectPlanItemDescriptor(item)))
-
-            return group
-        } else {
-            return this.new(desc)
-        }
-    }
-}
+    return TestDescriptor
+}) {}
 
 export type TestDescriptorArgument<T extends Test> = string | Partial<InstanceType<T[ 'testDescriptorClass' ]>>
 
