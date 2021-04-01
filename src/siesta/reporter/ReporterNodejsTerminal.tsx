@@ -64,6 +64,11 @@ export class ReporterNodejsTerminal extends Mixin(
             this.spinnerInterval    = setInterval(this.onSpinnerTick.bind(this), this.spinner.interval)
 
             super.onTestSuiteStart()
+        }
+
+
+        onTestSuiteStartDo () {
+            super.onTestSuiteStartDo()
 
             this.printFooter()
         }

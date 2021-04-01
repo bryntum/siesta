@@ -110,7 +110,13 @@ export class Reporter extends Mixin(
 
         onSubTestStart (testNode : TestNodeResult) {
             if (testNode.isRoot) this.resultsRunning.add(testNode)
+
+            this.onSubTestStartDo(testNode)
         }
+
+        onSubTestStartDo (testNode : TestNodeResult) {
+        }
+
 
         async onSubTestFinish (testNode : TestNodeResult) {
             if (testNode.isRoot) {
@@ -125,7 +131,13 @@ export class Reporter extends Mixin(
 
                     this.resultsFinished.add({ testNode, sources })
                 }
+            }
 
+            this.onSubTestFinishDo(testNode)
+        }
+
+        onSubTestFinishDo (testNode : TestNodeResult) {
+            if (testNode.isRoot) {
                 this.printFinished()
             }
         }
@@ -172,6 +184,11 @@ export class Reporter extends Mixin(
         onTestSuiteStart () {
             this.startTime      = new Date()
 
+            this.onTestSuiteStartDo()
+        }
+
+
+        onTestSuiteStartDo () {
             this.write(this.testSuiteHeader())
         }
 
