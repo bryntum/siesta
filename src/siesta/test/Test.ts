@@ -42,10 +42,10 @@ export class Test extends Mixin(
     >) => {
 
     class Test extends base {
-        @prototypeValue(Launcher)
+        // @prototypeValue(Launcher)
         launcherClass       : typeof Launcher
 
-        @prototypeValue(TestDescriptor)
+        // @prototypeValue(TestDescriptor)
         testDescriptorClass : typeof TestDescriptor
 
         // "upgrade" types from TreeNode
