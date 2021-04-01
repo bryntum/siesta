@@ -17,6 +17,7 @@ import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
 TestDescriptor
 // IMPORTANT the following 2 classes are assumed to be isomorphic by themselves
+// (even that they represent the data for non-isomorphic classes)
 TestDescriptorNodejs
 TestDescriptorBrowser
 
