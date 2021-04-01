@@ -29,8 +29,14 @@ export class TestNodejs extends Mixin(
             return path.relative(path.resolve(), testUrl)
         }
 
+
         static getInputArguments () : string[] {
             return process.argv.slice(2)
+        }
+
+
+        static async getIsomorphicTestClass () : Promise<typeof Test> {
+            return this
         }
     }
 

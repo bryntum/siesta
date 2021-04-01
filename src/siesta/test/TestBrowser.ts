@@ -20,6 +20,11 @@ export class TestBrowser extends Mixin(
 
         @prototypeValue(TestDescriptorBrowser)
         testDescriptorClass     : typeof TestDescriptorBrowser
+
+
+        static async getIsomorphicTestClass () : Promise<typeof Test> {
+            return this
+        }
     }
 
     return TestBrowser
