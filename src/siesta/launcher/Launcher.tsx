@@ -114,6 +114,8 @@ export class Launcher extends Mixin(
 
         optionsBag          : OptionsBag            = undefined
 
+        launchClass             : typeof Launch             = Launch
+
         projectDescriptorClass  : typeof ProjectDescriptor  = ProjectDescriptor
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
@@ -346,7 +348,7 @@ export class Launcher extends Mixin(
         async launch (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<Launch> {
             await this.performSetup()
 
-            const launch    = Launch.new({
+            const launch    = this.launchClass.new({
                 launcher                                : this,
                 projectData                             : this.projectData,
                 projectPlanItemsToLaunch,
