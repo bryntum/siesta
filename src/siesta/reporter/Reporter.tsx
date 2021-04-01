@@ -68,7 +68,7 @@ export class Reporter extends Mixin(
             let node : XmlElement       = <Tree isTopLevelLastNode={ isTopLevelLastNode }></Tree>
 
             if (testNode.isRoot) {
-                node.appendChild(this.testNodeState(testNode), ' ', this.testNodeUrl(testNode))
+                node.appendChild(this.testNodeState(testNode), ' ', this.testNodeUrlTemplate(testNode))
             } else {
                 node.appendChild(
                     this.testNodeState(testNode),
@@ -80,8 +80,7 @@ export class Reporter extends Mixin(
 
             const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result, testNode.isTodo))
 
-            nodesToShow.forEach((result, index) => {
-                const isLast            = index === nodesToShow.length - 1
+            nodesToShow.forEach(result => {
 
                 node.appendChild(<leaf>{
                     (result instanceof Assertion)
@@ -110,11 +109,6 @@ export class Reporter extends Mixin(
 
         onSubTestStart (testNode : TestNodeResult) {
             if (testNode.isRoot) this.resultsRunning.add(testNode)
-
-            this.onSubTestStartDo(testNode)
-        }
-
-        onSubTestStartDo (testNode : TestNodeResult) {
         }
 
 
@@ -131,15 +125,14 @@ export class Reporter extends Mixin(
 
                     this.resultsFinished.add({ testNode, sources })
                 }
-            }
 
-            this.onSubTestFinishDo(testNode)
-        }
-
-        onSubTestFinishDo (testNode : TestNodeResult) {
-            if (testNode.isRoot) {
                 this.printFinished()
             }
+        }
+
+
+        printTest (testNode : TestNodeResult, sources : string[]) {
+            this.write(this.testNodeTemplateXml(testNode, this.isCompleted(), sources))
         }
 
 
@@ -149,17 +142,22 @@ export class Reporter extends Mixin(
 
                 this.resultsCompleted.add(testNode)
 
-                this.write(this.testNodeTemplateXml(testNode, this.isCompleted(), sources))
+                this.printTest(testNode, sources)
             })
 
             this.resultsFinished.clear()
 
             if (this.isCompleted()) {
-                this.write(this.testSuiteFooter())
+                this.printSuiteFooter()
                 return true
             } else {
                 return false
             }
+        }
+
+
+        printSuiteFooter () {
+            this.write(this.testSuiteFooter())
         }
 
 
@@ -231,8 +229,13 @@ export class Reporter extends Mixin(
         }
 
 
-        testNodeUrl (testNode : TestNodeResult) : XmlElement {
-            const rel       = relative(this.projectData.projectPlan.url, testNode.descriptor.url)
+        testNodeUrl (testNode : TestNodeResult) : string {
+            return relative(this.projectData.projectPlan.url, testNode.descriptor.url)
+        }
+
+
+        testNodeUrlTemplate (testNode : TestNodeResult) : XmlElement {
+            const rel       = this.testNodeUrl(testNode)
             const match     = /(.*\/)?([^\/]+)/.exec(rel)
 
             return <span>
@@ -336,7 +339,7 @@ export class Reporter extends Mixin(
                 text.appendChild(
                     this.testFileRunning(testNodeResult),
                     ' ',
-                    this.testNodeUrl(testNodeResult)
+                    this.testNodeUrlTemplate(testNodeResult)
                 )
             })
 

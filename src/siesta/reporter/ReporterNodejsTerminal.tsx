@@ -121,7 +121,7 @@ export class ReporterNodejsTerminal extends Mixin(
 
             this.isPrintingFooter   = true
 
-            this.write(this.testSuiteFooter())
+            this.printSuiteFooter()
 
             this.printProgressBar()
             this.print(' ')
