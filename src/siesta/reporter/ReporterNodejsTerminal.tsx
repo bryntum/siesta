@@ -1,9 +1,12 @@
 import readline from "readline"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { TextJSX } from "../../jsx/TextJSX.js"
+import { XmlElement } from "../../jsx/XmlElement.js"
 import { SetIntervalHandler } from "../../util/Helpers.js"
 import { hideCursor, showCursor } from "../../util_nodejs/Terminal.js"
 import { TestNodeResult } from "../test/TestResult.js"
 import { ReporterNodejs } from "./ReporterNodejs.js"
+import { randomSpinner, Spinner } from "./Spinner.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterNodejsTerminal extends Mixin(
@@ -11,14 +14,35 @@ export class ReporterNodejsTerminal extends Mixin(
     (base : ClassUnion<typeof ReporterNodejs>) => {
 
     class ReporterNodejsTerminal extends base {
+        spinner             : Spinner                   = randomSpinner()
 
-        spinnerInterval : SetIntervalHandler            = undefined
+        spinnerInterval     : SetIntervalHandler            = undefined
 
         isPrintingFooter    : boolean                   = false
 
         footerLines     : number                        = 0
 
         spinnerChars    : number                        = 0
+
+
+        progressBar () : XmlElement {
+            const completedChars = Math.round(this.resultsCompleted.size / this.launch.projectPlanItemsToLaunch.length * this.progressBarTotalLength)
+
+            return <span>
+                <span class={ this.filesFailed > 0 ? 'progress_bar_completed_failed' : 'progress_bar_completed_passed' }>{ ' '.repeat(completedChars) }</span>
+                <span class="progress_bar_pending">{ '░'.repeat(this.progressBarTotalLength - completedChars) }</span>
+            </span>
+        }
+
+
+        spinnerFrame () : string {
+            return this.spinner.frame
+        }
+
+
+        get progressBarTotalLength () : number {
+            return Math.min(this.getMaxLen() - this.spinnerFrame().length - 2, 50)
+        }
 
 
         print (str : string) {
@@ -92,7 +116,7 @@ export class ReporterNodejsTerminal extends Mixin(
 
             this.isPrintingFooter   = true
 
-            this.write(this.t.testSuiteFooter())
+            this.write(this.testSuiteFooter())
 
             this.printProgressBar()
             this.print(' ')
@@ -103,14 +127,14 @@ export class ReporterNodejsTerminal extends Mixin(
 
 
         printProgressBar () {
-            this.print(this.render(this.t.progressBar()))
+            this.print(this.render(this.progressBar()))
         }
 
 
         printSpinner () {
             if (this.spinnerChars > 0) process.stdout.write('\b'.repeat(this.spinnerChars))
 
-            const spinnerText       = this.t.spinner()
+            const spinnerText       = this.spinnerFrame()
 
             this.print(spinnerText)
 
