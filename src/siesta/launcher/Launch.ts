@@ -118,6 +118,10 @@ export class Launch extends Mixin(
             ) {}
         }
 
+        get testLauncherChannelConfig () : Partial<ChannelTestLauncher> {
+            return {}
+        }
+
 
         get logger () : Logger {
             return this.launcher.logger
@@ -182,7 +186,7 @@ export class Launch extends Mixin(
 
             this.logger.log("Launching project item: ", normalized.url)
 
-            const channel           = this.testLauncherChannelClass.new()
+            const channel           = this.testLauncherChannelClass.new(this.testLauncherChannelConfig)
 
             await channel.setup()
 
