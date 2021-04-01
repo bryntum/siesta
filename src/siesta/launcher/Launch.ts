@@ -153,12 +153,20 @@ export class Launch extends Mixin(
             const completed             = new Promise<any>(resolve => queue.onCompletedHook.on(resolve))
 
             if (this.mode === 'parallel') {
-                queue.onSlotSettledHook.on(() => queue.pull())
+                queue.onSlotSettledHook.on((queue, id, result) => {
+                    if (result.status === 'rejected') throw result.reason
+
+                    queue.pull()
+                })
 
                 queue.pull()
             }
             else {
-                queue.onSlotSettledHook.on(() => queue.pullSingle())
+                queue.onSlotSettledHook.on((queue, id, result) => {
+                    if (result.status === 'rejected') throw result.reason
+
+                    queue.pullSingle()
+                })
 
                 queue.pullSingle()
             }
