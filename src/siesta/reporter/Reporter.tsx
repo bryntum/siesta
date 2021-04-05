@@ -64,49 +64,6 @@ export class Reporter extends Mixin(
         }
 
 
-        testNodeTemplateXml (testNode : TestNodeResult, isTopLevelLastNode : boolean | undefined = undefined, sources : string[]) : XmlElement {
-            let node : XmlElement       = <Tree isTopLevelLastNode={ isTopLevelLastNode }></Tree>
-
-            if (testNode.isRoot) {
-                node.appendChild(this.testNodeState(testNode), ' ', this.testNodeUrlTemplate(testNode))
-            } else {
-                node.appendChild(
-                    this.testNodeState(testNode),
-                    ' ',
-                    testNode.isTodo ? <span class="accented">[todo] </span> : '',
-                    <span class={ this.detail === 'assertion' ? 'underline' : '' }>{ testNode.descriptor.title }</span>,
-                )
-            }
-
-            const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result, testNode.isTodo))
-
-            nodesToShow.forEach(result => {
-
-                node.appendChild(<leaf>{
-                    (result instanceof Assertion)
-                        ?
-                            this.assertionTemplate(result, testNode, sources)
-                        :
-                            (result instanceof TestNodeResult)
-                                ?
-                                    this.testNodeTemplateXml(result, undefined, sources)
-                                :
-                                (result instanceof LogMessage)
-                                    ?
-                                        this.logMessageTemplate(result)
-                                    :
-                                        (result instanceof Exception)
-                                            ?
-                                                this.exceptionTemplate(result)
-                                            :
-                                                <span>Unknown element</span>
-                }</leaf>)
-            })
-
-            return node
-        }
-
-
         onSubTestStart (testNode : TestNodeResult) {
             if (testNode.isRoot) this.resultsRunning.add(testNode)
         }
@@ -197,6 +154,49 @@ export class Reporter extends Mixin(
 
 
         // region templates
+
+        testNodeTemplateXml (testNode : TestNodeResult, isTopLevelLastNode : boolean | undefined = undefined, sources : string[]) : XmlElement {
+            let node : XmlElement       = <Tree isTopLevelLastNode={ isTopLevelLastNode }></Tree>
+
+            if (testNode.isRoot) {
+                node.appendChild(this.testNodeState(testNode), ' ', this.testNodeUrlTemplate(testNode))
+            } else {
+                node.appendChild(
+                    this.testNodeState(testNode),
+                    ' ',
+                    testNode.isTodo ? <span class="accented">[todo] </span> : '',
+                    <span class={ this.detail === 'assertion' ? 'underline' : '' }>{ testNode.descriptor.title }</span>,
+                )
+            }
+
+            const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result, testNode.isTodo))
+
+            nodesToShow.forEach(result => {
+
+                node.appendChild(<leaf>{
+                    (result instanceof Assertion)
+                        ?
+                            this.assertionTemplate(result, testNode, sources)
+                        :
+                            (result instanceof TestNodeResult)
+                                ?
+                                    this.testNodeTemplateXml(result, undefined, sources)
+                                :
+                                (result instanceof LogMessage)
+                                    ?
+                                        this.logMessageTemplate(result)
+                                    :
+                                        (result instanceof Exception)
+                                            ?
+                                                this.exceptionTemplate(result)
+                                            :
+                                                <span>Unknown element</span>
+                }</leaf>)
+            })
+
+            return node
+        }
+
 
         testFilePass (testNode : TestNodeResult) : XmlElement {
             return <span class='test_file_pass'> PASS </span>
