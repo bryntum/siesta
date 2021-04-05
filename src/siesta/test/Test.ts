@@ -485,6 +485,9 @@ export class Test extends Mixin(
                     throw e
             }
 
+            // for standalone launch we use different test launch procedure, since we want to avoid deriving extra context
+            // we don't use `TestLauncher.launchTest()` method for example
+
             const launch    = Launch.new({
                 type                        : 'test',
                 launcher,
