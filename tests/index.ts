@@ -45,10 +45,10 @@ project.plan(
         ]
     },
     {
-        filename    : 'channel',
+        filename    : 'rpc',
 
         items       : [
-            'channel.t.js'
+            'port.t.js'
         ]
     },
     {

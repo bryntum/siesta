@@ -1,5 +1,5 @@
 import { Serializable } from "child_process"
-import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSerializablePlain } from "./MediaSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------

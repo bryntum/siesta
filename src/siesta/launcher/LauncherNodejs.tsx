@@ -1,8 +1,8 @@
 import path from 'path'
 import { fileURLToPath } from "url"
-import { Channel } from "../../channel/Channel.js"
-import { ChannelNodeIpc } from "../../channel/ChannelNodeIpc.js"
-import { ChannelSameContext } from "../../channel/ChannelSameContext.js"
+import { Channel } from "../../rpc/channel/Channel.js"
+import { ChannelNodeIpc } from "../../rpc/channel/ChannelNodeIpc.js"
+import { ChannelSameContext } from "../../rpc/channel/ChannelSameContext.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"

@@ -1,5 +1,5 @@
-import { Channel } from "../../channel/Channel.js"
-import { ChannelBrowserIframe } from "../../channel/ChannelBrowserIframe.js"
+import { Channel } from "../../rpc/channel/Channel.js"
+import { ChannelBrowserIframe } from "../../rpc/channel/ChannelBrowserIframe.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ProjectDescriptorBrowser } from "../project/ProjectDescriptor.js"
 import { ReporterBrowser } from "../reporter/ReporterBrowser.js"

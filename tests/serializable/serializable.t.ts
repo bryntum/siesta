@@ -53,7 +53,7 @@ it('Should throw exception if `@serializable` class does not include Serializabl
             prop1       : number    = 1
             prop2       : string    = '2'
         }
-    }, 'Serializable')
+    })
 
 
     t.throws(() => {
@@ -62,7 +62,7 @@ it('Should throw exception if `@serializable` class does not include Serializabl
             [ Base ],
             (base : ClassUnion<typeof Base>) => class SomeClass2 extends base {}
         ) {}
-    }, 'Serializable')
+    })
 
 
     t.doesNotThrow(() => {

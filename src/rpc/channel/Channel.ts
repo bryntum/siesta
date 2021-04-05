@@ -1,4 +1,4 @@
-import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Media, Port } from "../port/Port.js"
 
 //---------------------------------------------------------------------------------------------------------------------

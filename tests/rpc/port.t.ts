@@ -1,6 +1,6 @@
 import { it } from "../../index.js"
-import { MediaSameContext } from "../../src/port/MediaSameContext.js"
-import { local, Port, remote } from "../../src/port/Port.js"
+import { MediaSameContext } from "../../src/rpc/port/MediaSameContext.js"
+import { local, Port, remote } from "../../src/rpc/port/Port.js"
 
 it('Same context channel should work', async t => {
     class Server extends Port {

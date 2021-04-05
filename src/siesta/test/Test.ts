@@ -1,4 +1,4 @@
-import { ChannelSameContext } from "../../channel/ChannelSameContext.js"
+import { ChannelSameContext } from "../../rpc/channel/ChannelSameContext.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"

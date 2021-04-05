@@ -1,4 +1,4 @@
-import { Port, local, remote } from "../../../port/Port.js"
+import { Port, local, remote } from "../../../rpc/port/Port.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { XmlElement } from "../../../jsx/XmlElement.js"
 import { Reporter } from "../../reporter/Reporter.js"

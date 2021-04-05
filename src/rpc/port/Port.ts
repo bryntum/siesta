@@ -1,7 +1,7 @@
-import { Base } from "../class/Base.js"
-import { AnyConstructor, Mixin } from "../class/Mixin.js"
-import { Logger } from "../logger/Logger.js"
-import { delay, MIN_SMI, SetTimeoutHandler } from "../util/Helpers.js"
+import { Base } from "../../class/Base.js"
+import { AnyConstructor, Mixin } from "../../class/Mixin.js"
+import { Logger } from "../../logger/Logger.js"
+import { delay, MIN_SMI, SetTimeoutHandler } from "../../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type EnvelopId   = number

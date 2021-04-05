@@ -1,5 +1,5 @@
-import { Base } from "../class/Base.js"
-import { AnyFunction, ClassUnion, Mixin } from "../class/Mixin.js"
+import { Base } from "../../class/Base.js"
+import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaBrowserMessagePortChild, MediaBrowserMessagePortParent } from "../port/MediaBrowserMessagePort.js"
 import { Channel } from "./Channel.js"
 

@@ -1,5 +1,5 @@
 import { Port, local, remote } from "./Port.js"
-import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 interface PortEvaluate {

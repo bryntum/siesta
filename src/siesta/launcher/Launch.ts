@@ -1,4 +1,4 @@
-import { Channel } from "../../channel/Channel.js"
+import { Channel } from "../../rpc/channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
