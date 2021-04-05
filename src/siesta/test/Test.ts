@@ -45,7 +45,7 @@ export class Test extends Mixin(
         // @prototypeValue(Launcher)
         launcherClass       : typeof Launcher
 
-        // @prototypeValue(TestDescriptor)
+        @prototypeValue(TestDescriptor)
         testDescriptorClass : typeof TestDescriptor
 
         // "upgrade" types from TreeNode
