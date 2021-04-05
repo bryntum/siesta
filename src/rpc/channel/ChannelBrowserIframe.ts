@@ -1,6 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaBrowserMessagePortChild, MediaBrowserMessagePortParent } from "../port/MediaBrowserMessagePort.js"
+import { MediaBrowserMessagePortChild, MediaBrowserMessagePortParent } from "../media/MediaBrowserMessagePort.js"
 import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -10,7 +10,7 @@ export class ChannelBrowserIframe extends Mixin(
 
         class ChannelBrowserIframe extends base {
             childMediaClassUrl      : string                = import.meta.url
-                .replace(/channel\/ChannelBrowserIframe.js$/, 'port/MediaBrowserMessagePort.js')
+                .replace(/channel\/ChannelBrowserIframe.js$/, 'media/MediaBrowserMessagePort.js')
             childMediaClassSymbol   : string                = 'MediaBrowserMessagePortChild'
 
             parentMedia             : MediaBrowserMessagePortParent           = undefined

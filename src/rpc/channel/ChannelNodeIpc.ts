@@ -1,7 +1,7 @@
 import child_process from "child_process"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaNodeIpcParent } from "../port/MediaNodeIpc.js"
+import { MediaNodeIpcParent } from "../media/MediaNodeIpc.js"
 import { Channel } from "./Channel.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ export class ChannelNodeIpc extends Mixin(
 
         class ChannelNodeIpc extends base {
             childMediaClassUrl      : string                = import.meta.url
-                .replace(/channel\/ChannelNodeIpc.js$/, 'port/MediaNodeIpc.js')
+                .replace(/channel\/ChannelNodeIpc.js$/, 'media/MediaNodeIpc.js')
             childMediaClassSymbol   : string                = 'MediaNodeIpcChild'
 
             parentMedia             : MediaNodeIpcParent     = undefined
