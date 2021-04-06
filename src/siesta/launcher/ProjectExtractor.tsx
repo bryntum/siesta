@@ -37,9 +37,8 @@ export class ProjectExtractorChild extends Mixin(
         class ProjectExtractorChild extends base implements ProjectExtractor {
             @local()
             async extractProject (projectUrl : string) : Promise<ProjectSerializableData> {
+                // this line setup the global (`projectExtraction`) waiting for the project instance to be available
                 const promise                   = new Promise<Project>(resolve => projectExtraction.resolve = resolve)
-
-                let res : Project
 
                 try {
                     await import(projectUrl)
@@ -54,6 +53,8 @@ export class ProjectExtractorChild extends Mixin(
                         exitCode        : ExitCodes.EXCEPTION_IN_PROJECT_FILE
                     })
                 }
+
+                let res : Project
 
                 try {
                     res                         = await promise
