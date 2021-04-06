@@ -67,6 +67,7 @@ export enum ExitCodes {
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class LauncherError extends Serializable.mix(Base) {
     annotation          : XmlElement    = undefined
@@ -74,6 +75,7 @@ export class LauncherError extends Serializable.mix(Base) {
     exitCode            : ExitCodes     = undefined
 }
 
+//---------------------------------------------------------------------------------------------------------------------
 export const OptionsGroupFiltering  = OptionGroup.new({
     name        : 'Filtering',
     weight      : 100
