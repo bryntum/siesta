@@ -1,5 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Media, Port } from "../port/Port.js"
+import { Media } from "../media/Media.js"
+import { Port } from "../port/Port.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Channel extends Mixin(

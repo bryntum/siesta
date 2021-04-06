@@ -73,7 +73,7 @@ export class ChannelBrowserIframe extends Mixin(
                 parentPort.media            = parentMedia
 
                 //-----------------------------
-                const seed = async function (
+                const seed                  = async function (
                     modulePortUrl : string, portClassSymbol : string,
                     moduleMediaUrl : string, mediaClassSymbol : string
                 ) {

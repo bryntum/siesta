@@ -8,15 +8,15 @@ export class MediaNodeIpcParent extends Mixin(
     (base : ClassUnion<typeof MediaSerializableJSON>) =>
 
     class MediaNodeIpcParent extends base {
-        childProcess            : ChildProcess
+        childProcess            : ChildProcess                  = undefined
 
-        messageListener         : (...args : any[]) => void      = undefined
-        exitListener            : (...args : any[]) => void      = undefined
+        messageListener         : (...args : any[]) => void     = undefined
+        exitListener            : (...args : any[]) => void     = undefined
 
 
         async doConnect () : Promise<any> {
             this.childProcess.addListener('message', this.messageListener = message => {
-                this.port.receiveEnvelop(this.messageToEnvelop(message))
+                this.receiveMessage(message)
             })
 
             this.childProcess.addListener('exit', this.exitListener = () => {
