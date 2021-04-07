@@ -25,8 +25,8 @@ export class EnvelopCall extends Base {
 
 export class EnvelopResult extends Base {
     inResponseOf        : EnvelopId     = MIN_SMI
-    isRejection         : boolean       = false
 
+    isRejection         : boolean       = false
     rejectionMessage    : string        = undefined
     rejectionStack      : string        = undefined
 
@@ -56,10 +56,10 @@ export const remote = (messageDesc : Partial<Message> = Message.new()) : Propert
 
         Object.defineProperty(target, propertyKey, {
 
-            value   : function (this : Port) : Promise<unknown> {
+            value   : function (this : Port, ...args : unknown[]) : Promise<unknown> {
                 return this.callRemote(
                     EnvelopCall.new({
-                        payload     : [ propertyKey, ...arguments ]
+                        payload     : [ propertyKey, ...args ]
                     }),
                     message
                 )
@@ -87,6 +87,7 @@ export class Port extends Mixin(
         media                   : Media         = undefined
         connected               : boolean       = false
 
+        // prototype values
         localMessages           : object
         remoteMessages          : object
 
