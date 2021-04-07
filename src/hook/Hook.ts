@@ -36,6 +36,17 @@ export class Hook<Payload extends unknown[] = []> extends Array<Listener<Payload
     }
 
 
+    once (listener : Listener<Payload>) : Disposer {
+        const actualListener = (...payload : Payload) => {
+            this.un(actualListener)
+
+            return listener(...payload)
+        }
+
+        return this.on(actualListener)
+    }
+
+
     un (listener : Listener<Payload>) {
         const index = this.hooks.indexOf(listener)
 
