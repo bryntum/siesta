@@ -45,6 +45,7 @@ export type PartialWOC<T>       = Omit<Partial<T>, 'constructor'>
 //---------------------------------------------------------------------------------------------------------------------
 export type OrPromise<T>        = T | Promise<T>
 
+export type UnwrapPromise<T>    = T extends Promise<infer P> ? P : T
 
 //---------------------------------------------------------------------------------------------------------------------
 export type ArbitraryObjectKey  = string | number | symbol
