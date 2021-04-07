@@ -1,3 +1,4 @@
+import { UnwrapPromise } from "../../util/Helpers.js"
 import { Port, local, remote } from "./Port.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 
@@ -18,8 +19,8 @@ export class PortEvaluateParent extends Mixin(
             doEvaluate : (functionSource : string, args : unknown[]) => Promise<unknown>
 
 
-            async evaluate <A extends unknown[], R extends unknown> (func : (...args : A) => R | Promise<R>, ...args : A) : Promise<R> {
-                return await this.doEvaluate(func.toString(), args) as R
+            async evaluate <A extends unknown[], R extends unknown> (func : (...args : A) => R, ...args : A) : Promise<UnwrapPromise<R>> {
+                return await this.doEvaluate(func.toString(), args) as Promise<UnwrapPromise<R>>
             }
         }
 
