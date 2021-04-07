@@ -31,7 +31,7 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "glob": "^7.1.6",
-    "puppeteer": "^5.5.0",
+    "puppeteer": "^8.0.0",
     "node-fetch": "^3.0.0-beta.9",
     "ws": "^7.4.4"
   },
@@ -48,7 +48,7 @@
     "tslint": "^6.1.3",
     "typedoc": "git://github.com/bryntum/typedoc.git#custom",
     "typedoc-default-themes": "git://github.com/bryntum/typedoc-default-themes.git",
-    "typescript": "^4.1.5"
+    "typescript": "^4.2.3"
   },
   "snowpack": {
     "installOptions": {
