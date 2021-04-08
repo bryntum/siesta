@@ -60,7 +60,7 @@ export class Project extends Mixin(
 
             const extraction = globalThis.__SIESTA_PROJECT_EXTRACTION__
 
-            if (extraction.resolve) {
+            if (extraction?.resolve) {
                 extraction.resolve(this)
             } else {
                 await (await this.getIsomorphicSelfInstance()).launchStandalone()

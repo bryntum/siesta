@@ -17,29 +17,6 @@ export class ContextProviderNodeChildProcess extends Mixin(
         contextClass            : typeof ContextNodeChildProcess    = ContextNodeChildProcess
 
 
-        evaluateBasicHandler () : Function {
-            return () => {
-                // poor-man, zero-dep `evaluate` handler
-                process.on('message', async message => {
-                    if (message && message.__SIESTA_CONTEXT_EVALUATE_REQUEST__) {
-                        const func      = globalThis.eval('(' + message.functionSource + ')')
-
-                        try {
-                            const result    = await func(...message.arguments)
-
-                            process.send({ __SIESTA_CONTEXT_EVALUATE_RESPONSE__ : true, status : 'resolved', result })
-                        } catch (rejected) {
-                            const stack         = String(rejected.stack || '')
-                            const message       = String(rejected.message || '')
-
-                            process.send({ __SIESTA_CONTEXT_EVALUATE_RESPONSE__ : true, status : 'rejected', result : { stack, message } })
-                        }
-                    }
-                })
-            }
-        }
-
-
         async doCreateContext () : Promise<InstanceType<this[ 'contextClass' ]>> {
             const childProcess  = child_process.fork(
                 '',
@@ -50,7 +27,7 @@ export class ContextProviderNodeChildProcess extends Mixin(
                         '--trace-warnings',
                         '--input-type', 'module',
                         '--eval', [
-                            '(' + this.evaluateBasicHandler().toString() + ')()'
+                            '(' + evaluateBasicHandler.toString() + ')()'
                         ].join('\n')
                     ]
                 }
@@ -64,4 +41,23 @@ export class ContextProviderNodeChildProcess extends Mixin(
 }) {}
 
 
+//---------------------------------------------------------------------------------------------------------------------
+const evaluateBasicHandler = () => {
+    // poor-man, zero-dep `evaluate` handler
+    process.on('message', async message => {
+        if (message && message.__SIESTA_CONTEXT_EVALUATE_REQUEST__) {
+            const func      = globalThis.eval('(' + message.functionSource + ')')
 
+            try {
+                const result    = await func(...message.arguments)
+
+                process.send({ __SIESTA_CONTEXT_EVALUATE_RESPONSE__ : true, status : 'resolved', result })
+            } catch (rejected) {
+                const stack         = String(rejected.stack || '')
+                const message       = String(rejected.message || '')
+
+                process.send({ __SIESTA_CONTEXT_EVALUATE_RESPONSE__ : true, status : 'rejected', result : { stack, message } })
+            }
+        }
+    })
+}

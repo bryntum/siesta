@@ -34,7 +34,7 @@ export class MediaNodeIpcParent extends Mixin(
             this.messageListener    = undefined
             this.exitListener       = undefined
 
-            this.childProcess.disconnect()
+            if (this.childProcess.connected) this.childProcess.disconnect()
         }
 
 
@@ -57,9 +57,7 @@ export class MediaNodeIpcChild extends Mixin(
 
 
         async doConnect () : Promise<any> {
-            this.process.addListener('message', this.messageListener = message => {
-                this.port.receiveEnvelop(this.messageToEnvelop(message))
-            })
+            this.process.addListener('message', this.messageListener = message => this.receiveMessage(message))
         }
 
 

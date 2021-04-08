@@ -1,7 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Media } from "../../rpc/media/Media.js"
-import { Port } from "../../rpc/port/Port.js"
+import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
 import { ContextProvider } from "./context_provider/ContextProvider.js"
 
@@ -34,7 +34,7 @@ export class Context extends Mixin(
         }
 
 
-        async setupChannel (parentPort : Port, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
+        async setupChannel (parentPort : PortHandshakeParent, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
             throw new Error("Abstract method")
         }
 

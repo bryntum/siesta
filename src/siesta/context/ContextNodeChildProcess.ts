@@ -1,7 +1,7 @@
 import { ChildProcess } from "child_process"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaNodeIpcParent } from "../../rpc/media/MediaNodeIpc.js"
-import { Port } from "../../rpc/port/Port.js"
+import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
 import { Context } from "./Context.js"
 
@@ -17,7 +17,7 @@ export class ContextNodeChildProcess extends Mixin(
 
         parentMediaClass        : typeof MediaNodeIpcParent         = MediaNodeIpcParent
 
-        relativeChildMediaModuleUrl     : string    = 'src/siesta/rpc/media/MediaNodeIpc.js'
+        relativeChildMediaModuleUrl     : string    = 'src/rpc/media/MediaNodeIpc.js'
         relativeChildMediaClassSymbol   : string    = 'MediaNodeIpcChild'
 
 
@@ -25,7 +25,7 @@ export class ContextNodeChildProcess extends Mixin(
             // TODO need to add some basic queuing to this method to avoid race conditions
 
             const promise = new Promise<UnwrapPromise<R>>((resolve, reject) => {
-                process.once('message', message => {
+                this.childProcess.once('message', (message : any) => {
                     if (message && message.__SIESTA_CONTEXT_EVALUATE_RESPONSE__) {
                         if (message.status === 'resolved')
                             resolve(message.result)
@@ -46,20 +46,28 @@ export class ContextNodeChildProcess extends Mixin(
 
 
         async destroy () {
-            this.childProcess.disconnect()
+            if (this.childProcess.connected) this.childProcess.disconnect()
 
             await super.destroy()
         }
 
 
-        async setupChannel (parentPort : Port, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
-            parentPort.media        = new this.parentMediaClass()
+        async setupChannel (parentPort : PortHandshakeParent, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
+            const parentMedia           = new this.parentMediaClass()
 
-            const awaitConnection   = parentPort.connect()
+            parentMedia.childProcess    = this.childProcess
 
-            await this.seedChildPort(relativeChildPortModuleUrl, relativeChildPortClassSymbol, {}, {})
+            parentPort.media            = parentMedia
+            parentPort.handshakeType    = 'parent_first'
 
-            await awaitConnection
+            await this.seedChildPort(
+                relativeChildPortModuleUrl,
+                relativeChildPortClassSymbol,
+                { handshakeType : 'parent_first' },
+                {}
+            )
+
+            await parentPort.connect()
         }
     }
 ) {}
