@@ -403,6 +403,11 @@ export class Launcher extends Mixin(
         }
 
 
+        async destroy () {
+            await Promise.all(this.contextProviders.map(provider => provider.destroy()))
+        }
+
+
         async setupProjectData () {
         }
 

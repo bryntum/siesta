@@ -266,6 +266,8 @@ export class LauncherNodejs extends Mixin(
 
             const launch        = await launcher.start()
 
+            await launcher.destroy()
+
             // we just set the `exitCode` property and not call `process.exit()` directly,
             // because some output might not be processed yet
             // slight risk of leaking some async cyclic process
