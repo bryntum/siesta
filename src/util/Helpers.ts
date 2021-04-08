@@ -108,6 +108,39 @@ export const delay = (timeout : number) : Promise<any> => new Promise(resolve =>
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export const timeout = <T>(promise : Promise<T>, timeout : number, errorMessage : string = `Timeout of ${ timeout }ms exceeded`) : Promise<T> => {
+
+    return new Promise((resolve, reject) => {
+        let timeOutHappened     = false
+        let promiseSettled      = false
+
+        promise.then(resolved => {
+            promiseSettled      = true
+
+            if (!timeOutHappened) {
+                clearTimeout(timeoutHandler)
+                resolve(resolved)
+            }
+
+        }, rejected => {
+            promiseSettled      = true
+
+            if (!timeOutHappened) {
+                clearTimeout(timeoutHandler)
+                reject(rejected)
+            }
+        })
+
+        const timeoutHandler    = setTimeout(() => {
+            timeOutHappened     = true
+
+            if (!promiseSettled) reject(new Error(errorMessage))
+        }, timeout)
+    })
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 // TODO review whats the difference with native `String.matchAll()` and possibly remove, not supported everywhere?
 export const matchAll = function* (regexp : RegExp, testStr : string) : Generator<string[]> {
     let match : string[]
