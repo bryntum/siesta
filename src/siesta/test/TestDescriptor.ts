@@ -8,6 +8,7 @@ import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { ArbitraryObject, cloneObject, objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
+import { Environment } from "../common/Types.js"
 import { HasOptions, option, OptionGroup } from "../option/Option.js"
 import { Test } from "./Test.js"
 
@@ -32,6 +33,8 @@ export class TestDescriptor extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof TreeNode, typeof Base>) => {
 
     class TestDescriptor extends base {
+        environment             : Environment                   = 'isomorphic'
+
         childNodeT      : TestDescriptor
         parentNode      : TestDescriptor
 

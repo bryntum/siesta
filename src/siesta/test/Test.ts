@@ -4,6 +4,8 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { ArbitraryObject, ArbitraryObjectKey, isNodejs, prototypeValue } from "../../util/Helpers.js"
+import { Environment } from "../common/Types.js"
+import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher, LauncherError } from "../launcher/Launcher.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
@@ -72,6 +74,11 @@ export class Test extends Mixin(
         postFinishHook      : Hook<[ this ]>        = new Hook()
 
         spies               : Spy[]                 = []
+
+
+        get environment () : Environment {
+            return this.descriptor.environment
+        }
 
 
         expect (value : unknown) : Expectation {
@@ -465,9 +472,14 @@ export class Test extends Mixin(
 
             projectPlan.planItem(descriptor)
 
-            const projectData   = ProjectSerializableData.new({ projectPlan })
-
             const isomorphicTestClass       = await this.getIsomorphicTestClass()
+
+            const projectData   = ProjectSerializableData.new({
+                projectPlan,
+                siestaPackageRootUrl    : import.meta.url.replace(/src\/siesta\/test\/Test.js$/, ''),
+                // TODO should get the environment from `isomorphicTestClass` somehow instead of descriptor
+                environment             : descriptor.environment
+            })
 
             const launcher      = isomorphicTestClass.prototype.launcherClass.new({
                 projectData,
@@ -493,6 +505,8 @@ export class Test extends Mixin(
                 launcher,
                 projectData,
                 projectPlanItemsToLaunch    : projectPlan.leavesAxis(),
+
+                contextProviders            : [ ContextProviderSameContext.new({ launcher }) ],
                 targetContextChannelClass   : ChannelSameContext
             })
 

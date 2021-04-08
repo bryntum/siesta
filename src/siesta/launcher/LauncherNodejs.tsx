@@ -1,20 +1,32 @@
 import path from 'path'
 import { fileURLToPath } from "url"
-import { Channel } from "../../rpc/channel/Channel.js"
-import { ChannelNodeIpc } from "../../rpc/channel/ChannelNodeIpc.js"
-import { ChannelSameContext } from "../../rpc/channel/ChannelSameContext.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { ProjectDescriptorNodejs } from "../project/ProjectDescriptor.js"
+import { Channel } from "../../rpc/channel/Channel.js"
+import { ChannelNodeIpc } from "../../rpc/channel/ChannelNodeIpc.js"
+import { parse } from "../../serializable/Serializable.js"
+import { Environment } from "../common/Types.js"
+import { Context } from "../context/Context.js"
+import { ContextProvider } from "../context/context_provider/ContextProvider.js"
+import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
+import { ContextProviderNodePuppeteer } from "../context/context_provider/ContextProviderNodePuppeteer.js"
+import { option, OptionGroup } from "../option/Option.js"
+import { ProjectDescriptorNodejs, ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary, PrepareOptionsResult } from "./Launcher.js"
-import { option } from "../option/Option.js"
-import { ChannelProjectExtractor } from "./ProjectExtractor.js"
+import { extractProjectInfo } from "./ProjectExtractor.js"
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const OptionsGroupBrowser  = OptionGroup.new({
+    name        : 'Browser',
+    weight      : 900
+})
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -44,12 +56,36 @@ export class LauncherNodejs extends Mixin(
         noColor         : boolean               = false
 
 
+        @option({
+            type        : 'boolean',
+            group       : OptionsGroupBrowser,
+            help        : <div>
+                Whether to launch browser in the headless mode. Enabled by default. Supported by Chrome, Firefox, Puppeteer.
+            </div>
+        })
+        headless        : boolean               = true
+
+
+        @option({
+            type        : 'string',
+            structure   : 'array',
+            group       : OptionsGroupBrowser,
+            help        : <div>
+                The command-line arguments to be passed to the browser process being launched.
+            </div>
+        })
+        browserArg      : string[]              = []
+
+        contextProviderConstructors : (typeof ContextProvider)[]    = [
+            ContextProviderNodePuppeteer, ContextProviderNodeChildProcess
+        ]
+
+
         reporterClass   : typeof ReporterNodejs             = ReporterNodejsTerminal
         colorerClass    : typeof Colorer                    = ColorerNodejs
 
         projectDescriptorClass : typeof ProjectDescriptorNodejs   = ProjectDescriptorNodejs
         testDescriptorClass : typeof TestDescriptorNodejs   = TestDescriptorNodejs
-
 
 
         get targetContextChannelClass () : typeof Channel {
@@ -67,23 +103,27 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        $projectExtractorChannelClass : typeof ChannelProjectExtractor  = undefined
-
-        get projectExtractorChannelClass () : typeof ChannelProjectExtractor {
-            if (this.$projectExtractorChannelClass !== undefined) return this.$projectExtractorChannelClass
-
-            // TODO this should use other channel, when launching browser project
-            return this.$projectExtractorChannelClass = class ChannelProjectExtractorImplementation extends Mixin(
-                [ ChannelProjectExtractor, ChannelSameContext ],
-                (base : ClassUnion<typeof ChannelProjectExtractor, typeof ChannelSameContext>) =>
-
-                class ChannelProjectExtractorImplementation extends base {}
-            ) {}
+        getEnvironmentByUrl (url : string) : Environment {
+            return /^https?:/.test(url) ? 'browser' : 'nodejs'
         }
 
 
-        onLauncherOptionsAvailable () {
-            super.onLauncherOptionsAvailable()
+        getSuitableContextProviders (environment : Environment) : ContextProvider[] {
+            if (environment === 'browser') {
+                return this.contextProviderBrowser
+            }
+            else if (environment === 'nodejs') {
+                return this.contextProviderNode
+            }
+            else if (this.project) {
+                return this.getSuitableContextProviders(this.getEnvironmentByUrl(this.project))
+            } else
+                throw new Error("Can't determine suitable context providers")
+        }
+
+
+        async onLauncherOptionsAvailable () {
+            await super.onLauncherOptionsAvailable()
 
             if (this.noColor || !process.stdout.isTTY) {
                 this.colorerClass       = ColorerNoop
@@ -92,8 +132,8 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        prepareLauncherOptions () : PrepareOptionsResult {
-            const res               = super.prepareLauncherOptions()
+        async prepareLauncherOptions () : Promise<PrepareOptionsResult> {
+            const res               = await super.prepareLauncherOptions()
 
             const projectFileUrl    = this.project || this.argv[ 0 ]
 
@@ -132,7 +172,28 @@ export class LauncherNodejs extends Mixin(
 
             console.log('Unhandled exception:', e)
 
-            process.exit(ExitCodes.UNHANLED_EXCEPTION)
+            process.exit(ExitCodes.UNHANDLED_EXCEPTION)
+        }
+
+
+        async extractProjectData (context : Context, projectUrl : string) : Promise<ProjectSerializableData> {
+            try {
+                return parse(await context.evaluateBasic(extractProjectInfo, projectUrl))
+            } catch (e) {
+                const [ message, stack ]    = e.message.split(String.fromCharCode(0))
+
+                throw LauncherError.new({
+                    annotation      : <div>
+                        <span class="log_message_error"> ERROR </span> <span class="accented">{ message }</span>
+                        <div>
+                            { stack }
+                        </div>
+                    </div>,
+                    exitCode        : ExitCodes.EXCEPTION_IN_PROJECT_FILE
+                })
+            } finally {
+                await context.destroy()
+            }
         }
 
 
@@ -144,16 +205,20 @@ export class LauncherNodejs extends Mixin(
             if (!this.projectData) {
                 const projectUrl            = this.project = this.prepareProjectFileUrl(this.project)
 
-                const channel : ChannelProjectExtractor    = this.projectExtractorChannelClass.new()
+                if (/^https?:/i.test(projectUrl)) {
+                    const contextProvider       = this.contextProviderBrowser[ 0 ]
 
-                await channel.setup()
+                    const context               = await contextProvider.createContext()
 
-                const parentPort            = channel.parentPort
+                    await context.navigate(projectUrl)
 
-                try {
-                    this.projectData  = await parentPort.extractProject(projectUrl)
-                } finally {
-                    await parentPort.disconnect()
+                    this.projectData            = await this.extractProjectData(context, projectUrl)
+                } else {
+                    const contextProvider       = this.contextProviderSameContext
+
+                    const context               = await contextProvider.createContext()
+
+                    this.projectData            = await this.extractProjectData(context, projectUrl)
                 }
             }
 
@@ -164,18 +229,16 @@ export class LauncherNodejs extends Mixin(
 
 
         prepareProjectFileUrl (url : string) : string {
-            if (/https?:/i.test(url)) {
-
+            if (/^https?:/i.test(url)) {
+                return url
             }
-            else if (/file:/.test(url)) {
+            else if (/^file:/.test(url)) {
                 return path.resolve(fileURLToPath(url))
             }
             else {
                 // assume plain fs path here
                 return path.resolve(url)
             }
-
-            return url
         }
 
 
@@ -183,7 +246,7 @@ export class LauncherNodejs extends Mixin(
             process.on('unhandledRejection', (reason, promise) => {
                 console.log('Unhandled promise rejection, reason:', reason)
 
-                process.exit(ExitCodes.UNHANLED_EXCEPTION)
+                process.exit(ExitCodes.UNHANDLED_EXCEPTION)
             })
 
             const launcher  = this.new({

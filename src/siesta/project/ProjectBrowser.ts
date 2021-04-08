@@ -1,4 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { Environment } from "../common/Types.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Project } from "./Project.js"
@@ -11,6 +12,7 @@ export class ProjectBrowser extends Mixin(
     (base : ClassUnion<typeof Project, typeof ProjectDescriptorBrowser>) => {
 
     class ProjectBrowser extends base {
+        environment             : Environment                   = 'browser'
 
         launcherClass           : typeof LauncherBrowser        = LauncherBrowser
         testDescriptorClass     : typeof TestDescriptorBrowser  = TestDescriptorBrowser

@@ -1,12 +1,13 @@
-import { Channel } from "../../rpc/channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { Logger } from "../../logger/Logger.js"
+import { Channel } from "../../rpc/channel/Channel.js"
+import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
+import { ChannelTestLauncher, TestLauncherParent } from "../test/port/TestLauncher.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { ChannelTestLauncher } from "../test/port/TestLauncher.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -99,10 +100,13 @@ export class Launch extends Mixin(
 
         targetContextChannelClass   : typeof Channel        = undefined
 
+        contextProviders            : ContextProvider[]     = []
+
         type                        : 'project' | 'test'    = 'project'
 
         mode                        : 'sequential' | 'parallel' = 'parallel'
-        maxWorkers                  : number                    = 7
+
+        maxWorkers                  : number                    = 5
 
 
         $testLauncherChannelClass : typeof ChannelTestLauncher  = undefined
@@ -186,17 +190,20 @@ export class Launch extends Mixin(
 
             this.logger.log("Launching project item: ", normalized.url)
 
-            const channel           = this.testLauncherChannelClass.new(this.testLauncherChannelConfig)
+            const context           = await this.contextProviders[ 0 ].createContext()
 
-            await channel.setup()
-
-            const testLauncher      = channel.parentPort
+            const testLauncher      = TestLauncherParent.new()
 
             testLauncher.reporter   = this.reporter
 
-            await testLauncher.launchTest(normalized)
+            await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
 
-            await testLauncher.disconnect()
+            try {
+                await testLauncher.launchTest(normalized)
+            } finally {
+                await testLauncher.disconnect()
+                await context.destroy()
+            }
         }
 
 

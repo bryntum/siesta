@@ -1,5 +1,8 @@
+import { siestaPackageRootUrl } from "../../../index.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { stringify } from "../../serializable/Serializable.js"
 import { isNodejs } from "../../util/Helpers.js"
+import { Environment } from "../common/Types.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/TestDescriptor.js"
 import { ProjectSerializableData, ProjectDescriptor } from "./ProjectDescriptor.js"
@@ -11,6 +14,9 @@ export class Project extends Mixin(
     (base : ClassUnion<typeof ProjectDescriptor>) => {
 
     class Project extends base {
+        environment             : Environment               = 'isomorphic'
+        siestaPackageRootUrl    : string                    = siestaPackageRootUrl
+
         launcherClass           : typeof Launcher           = undefined
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
@@ -52,8 +58,10 @@ export class Project extends Mixin(
         async start () {
             await this.setup()
 
-            if (projectExtraction.resolve) {
-                projectExtraction.resolve(this)
+            const extraction = globalThis.__SIESTA_PROJECT_EXTRACTION__
+
+            if (extraction.resolve) {
+                extraction.resolve(this)
             } else {
                 await (await this.getIsomorphicSelfInstance()).launchStandalone()
             }
@@ -101,14 +109,18 @@ export class Project extends Mixin(
 
         asProjectSerializableData () : ProjectSerializableData {
             return ProjectSerializableData.new({
-                projectPlan     : this.projectPlan,
-                options         : ProjectDescriptor.new(this)
+                siestaPackageRootUrl    : this.siestaPackageRootUrl,
+                environment             : this.environment,
+                projectPlan             : this.projectPlan,
+                options                 : ProjectDescriptor.new(this)
             })
+        }
+
+
+        asProjectDataSerialized () : string {
+            return stringify(this.asProjectSerializableData())
         }
     }
 
     return Project
 }) {}
-
-
-export const projectExtraction : { resolve : (p : Project) => any } = { resolve : undefined }

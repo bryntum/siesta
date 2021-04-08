@@ -1,4 +1,3 @@
-import { Channel } from "../../rpc/channel/Channel.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { CI } from "../../iterator/Iterator.js"
@@ -6,13 +5,13 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
+import { Channel } from "../../rpc/channel/Channel.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
-import { ProjectSerializableData, ProjectDescriptor } from "../project/ProjectDescriptor.js"
-import { Printer } from "../reporter/Printer.js"
-import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
-import { TestDescriptor } from "../test/TestDescriptor.js"
-import { Launch } from "./Launch.js"
+import { Environment } from "../common/Types.js"
+import { ContextProvider } from "../context/context_provider/ContextProvider.js"
+import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
+import { ContextProviderTargetBrowser } from "../context/context_provider/ContextProviderTargetBrowser.js"
 import {
     ExtractOptionsResult,
     HasOptions,
@@ -24,6 +23,11 @@ import {
     OptionsParseWarningCodes,
     optionWarningTemplateByCode
 } from "../option/Option.js"
+import { ProjectDescriptor, ProjectSerializableData } from "../project/ProjectDescriptor.js"
+import { Printer } from "../reporter/Printer.js"
+import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
+import { Launch } from "./Launch.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +62,7 @@ export enum ExitCodes {
     /**
      * Internal exception, please report as a bug.
      */
-    'UNHANLED_EXCEPTION'    = 7,
+    'UNHANDLED_EXCEPTION'   = 7,
 
     /**
      * Dry run exit, for example after printing the helps screen or package version.
@@ -110,23 +114,48 @@ export class Launcher extends Mixin(
     (base : ClassUnion<typeof HasOptions, typeof Printer, typeof LoggerConsole, typeof Base>) => {
 
     class Launcher extends base {
-        logger              : Logger                = LoggerConsole.new({ logLevel : LogLevel.warn })
+        logger              : Logger                        = LoggerConsole.new({ logLevel : LogLevel.warn })
 
-        inputArguments      : string[]              = []
+        inputArguments      : string[]                      = []
 
-        optionsBag          : OptionsBag            = undefined
+        optionsBag          : OptionsBag                    = undefined
 
         launchClass             : typeof Launch             = Launch
 
         projectDescriptorClass  : typeof ProjectDescriptor  = ProjectDescriptor
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
-        reporterClass       : typeof Reporter       = undefined
+        reporterClass       : typeof Reporter               = undefined
 
-        projectData         : ProjectSerializableData     = undefined
+        projectData         : ProjectSerializableData       = undefined
 
-        setupDone       : boolean           = false
-        setupPromise    : Promise<any>      = undefined
+        setupDone       : boolean                           = false
+        setupPromise    : Promise<any>                      = undefined
+
+        contextProviderConstructors : (typeof ContextProvider)[]    = []
+
+        contextProviders        : ContextProvider[]         = []
+
+        contextProviderSameContext  : ContextProviderSameContext    = undefined
+
+        // region options
+        @option({
+            type        : 'number',
+            group       : OptionsGroupFiltering,
+            help        : <span>
+                This option defines the number of parallel "workers" for test processing.
+            </span>
+        })
+        maxWorkers      : number            = 5
+
+        @option({
+            type        : 'string',
+            group       : OptionsGroupFiltering,
+            help        : <span>
+                This option defines the detail level of the output. By default only warnings and errors are printed.
+            </span>
+        })
+        logLevel        : LogLevel          = LogLevel.warn
 
         @option({
             type        : 'string',
@@ -191,6 +220,27 @@ export class Launcher extends Mixin(
         })
         version         : boolean           = false
 
+        // endregion
+
+
+        get contextProviderBrowser () : ContextProviderTargetBrowser[] {
+            return this.contextProviders.filter(provider => provider instanceof ContextProviderTargetBrowser) as ContextProviderTargetBrowser[]
+        }
+
+        get contextProviderNode () : ContextProvider[] {
+            return this.contextProviders.filter(provider => provider.supportsNodejs)
+        }
+
+
+        getSuitableContextProviders (environment : Environment) : ContextProvider[] {
+            if (environment === 'browser')
+                return this.contextProviderBrowser
+            else if (environment === 'nodejs')
+                return this.contextProviderNode
+            else
+                throw new Error("Should not be trying to find suitable providers for isomorphic case")
+        }
+
 
         get argv () : string [] {
             return this.optionsBag.argv
@@ -200,7 +250,7 @@ export class Launcher extends Mixin(
         async start () : Promise<Launch> {
             try {
                 // need to await for setup, because `projectDescriptor` might not be available yet
-                await this.performSetup()
+                await this.performSetupOnce()
 
                 return await this.launch(this.getDescriptorsToLaunch())
             } catch (e) {
@@ -231,7 +281,10 @@ export class Launcher extends Mixin(
 
 
         // earliest point at which launcher options already have been applied
-        onLauncherOptionsAvailable () {
+        async onLauncherOptionsAvailable () {
+            this.logger.logLevel        = this.logLevel
+
+            //--------------------------
             if (this.help) {
                 this.write(this.helpScreenTemplate(
                     [
@@ -247,17 +300,22 @@ export class Launcher extends Mixin(
             }
 
             if (this.help || this.version) throw LauncherError.new({ exitCode : ExitCodes.DRY_RUN })
+
+            //--------------------------
+            this.contextProviders               = this.contextProviderConstructors.map(cls => cls.new({ launcher : this }))
+
+            this.contextProviderSameContext     = ContextProviderSameContext.new({ launcher : this })
+
+            await Promise.all(this.contextProviders.map(provider => provider.setup()))
         }
 
 
-        prepareLauncherOptions () : PrepareOptionsResult {
+        async prepareLauncherOptions () : Promise<PrepareOptionsResult> {
             this.optionsBag     = OptionsBag.new({ input : this.inputArguments })
 
             const extractRes    = this.optionsBag.extractOptions(optionsToArray(this.$options))
 
             extractRes.values.forEach((value, option) => option.applyValue(this, value))
-
-            this.onLauncherOptionsAvailable()
 
             this.include    = this.include.map(pattern => new RegExp(pattern))
             this.exclude    = this.exclude.map(pattern => new RegExp(pattern))
@@ -289,7 +347,7 @@ export class Launcher extends Mixin(
         }
 
 
-        async performSetup ()  {
+        async performSetupOnce ()  {
             if (!this.setupDone) {
                 // setup may be already started (by another launch)
                 await (this.setupPromise || (this.setupPromise = this.setup()))
@@ -303,7 +361,9 @@ export class Launcher extends Mixin(
         async setup () {
             // extracting the launcher options from the input arguments (command line / URL search params)
             // at this point there might be no `projectData` yet (project is running in remote context)
-            const prepareLauncherOptions        = this.prepareLauncherOptions()
+            const prepareLauncherOptions        = await this.prepareLauncherOptions()
+
+            await this.onLauncherOptionsAvailable()
 
             await this.setupProjectData()
 
@@ -348,12 +408,16 @@ export class Launcher extends Mixin(
 
 
         async launch (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<Launch> {
-            await this.performSetup()
+            await this.performSetupOnce()
 
             const launch    = this.launchClass.new({
                 launcher                                : this,
                 projectData                             : this.projectData,
                 projectPlanItemsToLaunch,
+
+                maxWorkers                              : this.maxWorkers,
+
+                contextProviders                        : this.getSuitableContextProviders(this.projectData.environment),
 
                 targetContextChannelClass               : this.targetContextChannelClass
             })

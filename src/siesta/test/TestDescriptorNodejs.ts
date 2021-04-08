@@ -1,5 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
+import { Environment } from "../common/Types.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
 /**
@@ -19,6 +20,7 @@ export class TestDescriptorNodejs extends Mixin(
     (base : ClassUnion<typeof TestDescriptor>) => {
 
     class TestDescriptorNodejs extends base {
+        environment             : Environment                   = 'nodejs'
     }
 
     return TestDescriptorNodejs

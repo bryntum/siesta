@@ -28,8 +28,8 @@ interface TestLauncher {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherParent extends Mixin(
-    [ TestReporterParent, PortEvaluateParent, PortHandshakeParent ],
-    (base : ClassUnion<typeof TestReporterParent, typeof PortEvaluateParent, typeof PortHandshakeParent>) => {
+    [ TestReporterParent, PortEvaluateParent, PortHandshakeParent, Base ],
+    (base : ClassUnion<typeof TestReporterParent, typeof PortEvaluateParent, typeof PortHandshakeParent, typeof Base>) => {
 
         class TestLauncherParent extends base implements TestLauncher {
             @remote()
@@ -43,8 +43,8 @@ export class TestLauncherParent extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherChild extends Mixin(
-    [ TestReporterChild, PortEvaluateChild, PortHandshakeChild ],
-    (base : ClassUnion<typeof TestReporterChild, typeof PortEvaluateChild, typeof PortHandshakeChild>) => {
+    [ TestReporterChild, PortEvaluateChild, PortHandshakeChild, Base ],
+    (base : ClassUnion<typeof TestReporterChild, typeof PortEvaluateChild, typeof PortHandshakeChild, typeof Base>) => {
 
         class TestLauncherChild extends base implements TestLauncher {
 
