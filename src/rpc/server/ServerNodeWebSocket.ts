@@ -1,61 +1,62 @@
-// import ws from 'ws'
-// import { Base } from "../../class/Base.js"
-// import { AnyConstructor } from "../../class/Mixin.js"
-// import { MediaNodeWebSocketParent } from "../media/MediaNodeWebSocketParent.js"
-//
-//
-// export class ConnectionServer extends Base {
-//     serverClass             : AnyConstructor<MediaNodeWebSocketParent>
-//     serverConfig            : Partial<MediaNodeWebSocketParent>
-//
-//     port                    : number = 0
-//
-//     connectionServerWS      : any
-//
-//
-//     async start () : Promise<any> {
-//         const connectionServerWS    = this.connectionServerWS = new ws.Server({
-//             clientTracking      : true,
-//
-//             port                : this.port
-//         }, () => {
-//             this.port       = this.connectionServerWS.address().port
-//
-//             resolve()
-//         })
-//
-//         connectionServerWS.on('connection', (wsClient : ws) => {
-//             const cls       = this.serverClass
-//
-//             const config    = Object.assign({
-//                 socket      : wsClient,
-//                 logLevel    : this.logLevel
-//             }, this.serverConfig || {})
-//
-//             const webSocketServer = new cls(config)
-//
-//             webSocketServer.connect()
-//         })
-//
-//         connectionServerWS.on('error', () => { this.stop() } )
-//
-//         await new Promise(resolve => connectionServerWS.on('listening', resolve))
-//
-//         // wsServer.on('error', (e) => console.log("ERROR: ", e));
-//         // wsServer.on('headers', (headers, request) => console.log("HEADERS: ", headers, request));
-//     }
-//
-//
-//     async stop () : Promise<any> {
-//         return new Promise((resolve, reject) => {
-//             if (this.connectionServerWS)
-//                 this.connectionServerWS.close(() => {
-//                     this.connectionServerWS = null
-//
-//                     resolve()
-//                 })
-//             else
-//                 resolve()
-//         })
-//     }
-// }
+import ws from 'ws'
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { isString } from "../../util/Typeguards.js"
+
+//---------------------------------------------------------------------------------------------------------------------
+// to no confuse `ws` as namespace
+type WebSocket = ws
+
+//---------------------------------------------------------------------------------------------------------------------
+export class ServerNodeWebSocket extends Mixin(
+    [],
+    (base : ClassUnion) =>
+
+    class ServerNodeWebSocket extends base {
+        wsPort                  : number        = 0
+
+        wsServer                : ws.Server     = undefined
+
+
+        startWebSocketServer () : Promise<any> {
+            return new Promise<void>((resolve, reject) => {
+                const wsServer    = this.wsServer = new ws.Server({
+                    clientTracking      : true,
+                    port                : this.wsPort
+                }, () => {
+                    const address       = wsServer.address()
+
+                    if (!isString(address)) this.wsPort = address.port
+
+                    resolve()
+                })
+
+                wsServer.on('connection', socket => this.onConnection(socket))
+                wsServer.on('error', error => this.onError(error) )
+
+                // wsServer.on('headers', (headers, request) => console.log("HEADERS: ", headers, request));
+            })
+        }
+
+
+        onConnection (socket : WebSocket) {
+        }
+
+
+        onError (error : Error) {
+        }
+
+
+        stopWebSocketServer () : Promise<any> {
+            return new Promise<void>((resolve, reject) => {
+                if (this.wsServer)
+                    this.wsServer.close(() => {
+                        this.wsServer = null
+
+                        resolve()
+                    })
+                else
+                    resolve()
+            })
+        }
+    }
+){}
