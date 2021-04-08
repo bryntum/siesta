@@ -368,7 +368,7 @@ export class Reporter extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 export const humanReadableDuration = (milliSeconds : number) : string => {
     if (milliSeconds >= 1000) {
-        const seconds       = Math.floor(milliSeconds / 1000)
+        const seconds       = Math.floor(milliSeconds / 100) / 10
 
         if (seconds >= 60) {
             const minutes   = Math.floor(seconds / 60)
