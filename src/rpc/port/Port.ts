@@ -121,7 +121,7 @@ export class Port extends Mixin(
                 try {
                     connectionAttempts++
 
-                    this.logger && this.logger.debug(`Connection attempt: ${ connectionAttempts }`)
+                    this.logger?.debug(`Connection attempt: ${ connectionAttempts }`)
 
                     await this.media.doConnect()
 
@@ -129,7 +129,7 @@ export class Port extends Mixin(
 
                     return
                 } catch (e) {
-                    this.logger && this.logger.debug(`Connection attempt ${ connectionAttempts } failed: ${e}`)
+                    this.logger?.debug(`Connection attempt ${ connectionAttempts } failed: ${ e.stack || e.message || e }`)
 
                     await delay(this.connectionInterval)
                 }
@@ -159,7 +159,7 @@ export class Port extends Mixin(
                 const handler       = this.awaitingResponse.get(inResponseOf)
 
                 if (!handler) {
-                    this.logger && this.logger.debug(`Response for unknown envelop, timeout occurred?\n${ JSON.stringify(envelop) }`)
+                    this.logger?.debug(`Response for unknown envelop, timeout occurred?\n${ JSON.stringify(envelop) }`)
                 } else {
                     if (handler[ 3 ] !== null) clearTimeout(handler[ 3 ])
 
@@ -218,7 +218,7 @@ export class Port extends Mixin(
                     timeoutHandler = setTimeout(() => {
                         this.awaitingResponse.delete(envelop.id)
 
-                        this.logger && this.logger.debug("Timeout occurred for: " + JSON.stringify(envelop))
+                        this.logger?.debug("Timeout occurred for: " + JSON.stringify(envelop))
 
                         reject(new Error("Timeout while waiting for remote call"))
                     }, message.timeout)
