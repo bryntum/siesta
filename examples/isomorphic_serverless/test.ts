@@ -1,6 +1,45 @@
-export const aa = 1
+// import puppeteer from "puppeteer"
+//
+// (async () => {
+//     const browser   = await puppeteer.launch({
+//         headless                : true,
+//         ignoreHTTPSErrors       : true,
+//         timeout                 : 60000
+//     })
+//
+//     const page      = await browser.newPage()
+//
+//     await page.goto('http://lh/siesta-monorepo/siesta/index.js')
+//
+//     const name      = await page.evaluate(async () => {
+//
+//         const [ modulePort, moduleMedia ]   = await Promise.all([
+//             import('http://lh/siesta-monorepo/siesta/src/siesta/test/port/TestLauncher.js'),
+//             import('http://lh/siesta-monorepo/siesta/src/rpc/media/MediaBrowserWebSocketChild.js')
+//         ])
+//
+//
+//         // const module = await import('http://lh/siesta-monorepo/siesta/src/siesta/test/port/TestLauncher.js')
+//         //
+//         // return module[ 'TestLauncherChild' ].name
+//     })
+//
+//     console.log("NAME=", name)
+//
+//     await browser.close()
+// })()
+//
 
-throw new Error()
+
+
+
+
+
+
+
+
+
+
 
 // import readline from "readline"
 // import chalk from "chalk"
