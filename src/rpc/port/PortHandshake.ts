@@ -1,10 +1,21 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { timeout } from "../../util/Helpers.js"
 import { Port, local, remote } from "./Port.js"
 
+//---------------------------------------------------------------------------------------------------------------------
+export type HandshakeType   = 'child_first' | 'parent_first'
 
 //---------------------------------------------------------------------------------------------------------------------
 interface PortHandshake {
-    childConnected ()
+    childConnectionId   : number
+    parentConnectionId  : number
+
+    handshakeTimeout    : number
+
+    handshakeType       : HandshakeType
+
+    handShakeFromChild (childConnectionId : number) : Promise<number>
+    handShakeFromParent (parentConnectionId : number) : Promise<number>
 }
 
 
@@ -14,24 +25,34 @@ export class PortHandshakeParent extends Mixin(
     (base : ClassUnion<typeof Port>) => {
 
         class PortHandshakeParent extends base implements PortHandshake {
-            childConnectedResolve : Function        = undefined
+            handshakeType           : HandshakeType = 'child_first'
+            handshakeTimeout        : number        = 60000
+
+            parentConnectionId      : number        = 0
+            childConnectionId       : number        = 0
+
+            onChildConnected        : Function      = undefined
+
+            @remote()
+            handShakeFromParent : (parentConnectionId : number) => Promise<number>
 
 
-            // TODO should have a timeout for how long to wait for child connection
             async connect () : Promise<any> {
-                this.childConnectedResolve      = undefined
-
                 await super.connect()
 
-                await new Promise((resolve, reject) => {
-                    this.childConnectedResolve  = resolve
-                })
+                if (this.handshakeType === 'child_first')
+                    await timeout(new Promise(resolve => this.onChildConnected = resolve), this.handshakeTimeout, "Handshake timeout")
+                else
+                    await this.handShakeFromParent(this.parentConnectionId)
             }
 
 
             @local()
-            childConnected () {
-                this.childConnectedResolve()
+            async handShakeFromChild (childConnectionId : number) : Promise<number> {
+                this.childConnectionId  = childConnectionId
+                this.onChildConnected()
+
+                return this.parentConnectionId
             }
         }
 
@@ -46,14 +67,34 @@ export class PortHandshakeChild extends Mixin(
     (base : ClassUnion<typeof Port>) => {
 
         class PortHandshakeChild extends base implements PortHandshake {
+            handshakeType           : HandshakeType = 'child_first'
+            handshakeTimeout        : number        = 60000
+
+            parentConnectionId      : number        = 0
+            childConnectionId       : number        = 0
+
+            onParentConnected       : Function      = undefined
+
             @remote()
-            childConnected : () => Promise<any>
+            handShakeFromChild : (childConnectionId : number) => Promise<any>
 
 
             async connect () : Promise<any> {
                 await super.connect()
 
-                await this.childConnected()
+                if (this.handshakeType === 'child_first')
+                    await this.handShakeFromChild(this.childConnectionId)
+                else
+                    await timeout(new Promise(resolve => this.onParentConnected = resolve), this.handshakeTimeout, "Handshake timeout")
+            }
+
+
+            @local()
+            async handShakeFromParent (parentConnectionId : number) : Promise<number> {
+                this.parentConnectionId  = parentConnectionId
+                this.onParentConnected()
+
+                return this.childConnectionId
             }
         }
 
