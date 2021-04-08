@@ -21,6 +21,8 @@ export class ContextPuppeteer extends Mixin(
 
         page            : puppeteer.Page        = undefined
 
+        maintainsBrowser    : boolean           = false
+
 
         async evaluateBasic <A extends unknown[], R extends unknown> (func : (...args : A) => R, ...args : A) : Promise<UnwrapPromise<R>> {
             // we are not going to bother with fixing the type of Puppeteer's `evaluate` -
@@ -36,7 +38,8 @@ export class ContextPuppeteer extends Mixin(
             const browser       = this.page.browser()
 
             await this.page.close()
-            await browser.close()
+
+            if (this.maintainsBrowser) await browser.close()
 
             await super.destroy()
         }

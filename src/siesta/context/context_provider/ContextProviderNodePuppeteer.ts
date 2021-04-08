@@ -19,9 +19,28 @@ export class ContextProviderNodePuppeteer extends Mixin(
 
         launcher                : LauncherNodejs            = undefined
 
+        // `true` is a bit slower, seems more robust though
+        separateBrowserForEveryPage : boolean       = true
+
+
+        $primaryBrowser     : puppeteer.Browser     = undefined
+
+        async getPrimaryBrowser () : Promise<puppeteer.Browser> {
+            if (this.$primaryBrowser !== undefined) return this.$primaryBrowser
+
+            return this.$primaryBrowser = await this.createBrowser()
+        }
+
+
+        async destroy () {
+            await super.destroy()
+
+            if (this.$primaryBrowser) await this.$primaryBrowser.close()
+        }
+
 
         async doCreateContext () : Promise<InstanceType<this[ 'contextClass' ]>> {
-            const browser           = await this.createBrowser()
+            const browser           = this.separateBrowserForEveryPage ? await this.createBrowser() : await this.getPrimaryBrowser()
 
             const page              = await browser.newPage()
 
@@ -31,7 +50,7 @@ export class ContextProviderNodePuppeteer extends Mixin(
             //     console.log(`${ i }: ${ msg.args()[ i ] }`)
             // })
 
-            return this.contextClass.new({ page }) as InstanceType<this[ 'contextClass' ]>
+            return this.contextClass.new({ page, maintainsBrowser : this.separateBrowserForEveryPage }) as InstanceType<this[ 'contextClass' ]>
         }
 
 
