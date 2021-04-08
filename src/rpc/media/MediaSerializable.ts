@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { parse, stringify } from "../../serializable/Serializable.js"
-import { EnvelopCall, EnvelopResult} from "../port/Port.js"
+import { EnvelopCall, EnvelopResult } from "../port/Port.js"
 import { Media } from "./Media.js"
 
 //---------------------------------------------------------------------------------------------------------------------
