@@ -146,7 +146,7 @@ export class Launcher extends Mixin(
                 This option defines the number of parallel "workers" for test processing.
             </span>
         })
-        maxWorkers      : number            = 5
+        maxWorkers      : number            = 7
 
         @option({
             type        : 'string',

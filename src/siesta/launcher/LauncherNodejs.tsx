@@ -197,6 +197,16 @@ export class LauncherNodejs extends Mixin(
         }
 
 
+        async setup () {
+            // probably Puppeteer adds a SIGINT listener to `process`
+            // many workers may cause a console warning about having too many
+            // listeners, suppress that
+            process.setMaxListeners(Number.MAX_SAFE_INTEGER)
+
+            await super.setup()
+        }
+
+
         async setupProjectData () {
             await super.setupProjectData()
 
