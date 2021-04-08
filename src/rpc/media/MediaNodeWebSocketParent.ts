@@ -1,20 +1,21 @@
-import WebSocket from 'ws'
+import ws from 'ws'
+import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSerializableJSON } from "./MediaSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class MediaNodeWebSocketParent extends Mixin(
-    [ MediaSerializableJSON ],
-    (base : ClassUnion<typeof MediaSerializableJSON>) =>
+    [ MediaSerializableJSON, Base ],
+    (base : ClassUnion<typeof MediaSerializableJSON, typeof Base>) =>
 
     class MediaNodeWebSocketParent extends base {
-        socket                  : WebSocket                     = undefined
+        socket                  : ws                     = undefined
 
         messageListener         : (...args : any[]) => void     = undefined
 
 
         async doConnect () : Promise<void> {
-            this.socket.addEventListener('message', this.messageListener = message => this.receiveMessage(message))
+            this.socket.addEventListener('message', this.messageListener = (message : ws.MessageEvent) => this.receiveMessage(message.data))
         }
 
 

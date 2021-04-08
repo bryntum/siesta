@@ -1,10 +1,11 @@
+import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSerializableJSON } from "./MediaSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class MediaBrowserWebSocketChild extends Mixin(
-    [ MediaSerializableJSON ],
-    (base : ClassUnion<typeof MediaSerializableJSON>) =>
+    [ MediaSerializableJSON, Base ],
+    (base : ClassUnion<typeof MediaSerializableJSON, typeof Base>) =>
 
     class MediaBrowserWebSocketChild extends base {
         socket                  : WebSocket                     = undefined
@@ -23,15 +24,16 @@ export class MediaBrowserWebSocketChild extends Mixin(
                     socket.removeEventListener('close', connectionErrorRejection)
 
                     socket.addEventListener('close', event => this.onSocketClose(event))
+                    socket.addEventListener('error', event => this.onSocketError(event))
 
-                    socket.addEventListener('message', this.messageListener = message => this.receiveMessage(message))
+                    socket.addEventListener('message', this.messageListener = (message : MessageEvent) => this.receiveMessage(message.data))
 
                     this.onSocketOpen(event)
 
                     resolve()
                 })
 
-                const connectionErrorRejection = event => reject("Connection error")
+                const connectionErrorRejection = event => reject(new Error("WebSocket child media connection error"))
 
                 socket.addEventListener('close', connectionErrorRejection)
             })
@@ -59,6 +61,10 @@ export class MediaBrowserWebSocketChild extends Mixin(
 
         onSocketClose (event : CloseEvent) {
             this.port.disconnect()
+        }
+
+
+        onSocketError (event : Event) {
         }
 
 
