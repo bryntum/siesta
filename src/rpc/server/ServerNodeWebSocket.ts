@@ -1,5 +1,6 @@
 import ws from 'ws'
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { Hook } from "../../hook/Hook.js"
 import { isString } from "../../util/Typeguards.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -15,6 +16,9 @@ export class ServerNodeWebSocket extends Mixin(
         wsPort                  : number        = 0
 
         wsServer                : ws.Server     = undefined
+
+        onConnectionHook        : Hook<[ this, WebSocket ]>     = new Hook()
+        onErrorHook             : Hook<[ this, Error ]>         = new Hook()
 
 
         startWebSocketServer () : Promise<any> {
@@ -39,10 +43,12 @@ export class ServerNodeWebSocket extends Mixin(
 
 
         onConnection (socket : WebSocket) {
+            this.onConnectionHook.trigger(this, socket)
         }
 
 
         onError (error : Error) {
+            this.onErrorHook.trigger(this, error)
         }
 
 
