@@ -2,11 +2,11 @@ import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 
 export enum LogLevel {
-    info,
-    debug,
-    log,
-    warn,
-    error
+    info    = 'info',
+    debug   = 'debug',
+    log     = 'log',
+    warn    = 'warn',
+    error   = 'error'
 }
 
 export type LogMethod = 'info' | 'debug' | 'log' | 'warn' | 'error'
