@@ -192,9 +192,7 @@ export class Launch extends Mixin(
 
             const context           = await this.contextProviders[ 0 ].createContext()
 
-            const testLauncher      = TestLauncherParent.new()
-
-            testLauncher.reporter   = this.reporter
+            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
 
             await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
 
