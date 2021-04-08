@@ -18,12 +18,10 @@ export class ChannelSameContext extends Mixin(
             parentMedia             : MediaSameContext      = undefined
             childMedia              : MediaSameContext      = undefined
 
-            mediaClass              : typeof MediaSameContext   = MediaSameContext
-
 
             async setup () {
-                const parentMedia           = this.parentMedia  = new this.mediaClass()
-                const childMedia            = this.childMedia   = new this.mediaClass()
+                const parentMedia           = this.parentMedia  = new MediaSameContext()
+                const childMedia            = this.childMedia   = new MediaSameContext()
 
                 parentMedia.targetMedia     = childMedia
                 childMedia.targetMedia      = parentMedia
@@ -32,9 +30,9 @@ export class ChannelSameContext extends Mixin(
                 parentPort.media            = parentMedia
 
                 const module                = await import(this.childPortClassUrl)
-                const symbol                = module[ this.childPortClassSymbol ]
+                const childPortClass        = module[ this.childPortClassSymbol ]
 
-                const childPort             = this.childPort = new symbol()
+                const childPort             = this.childPort = new childPortClass()
                 childPort.media             = childMedia
 
                 await Promise.all([ parentPort.connect(), childPort.connect() ])
