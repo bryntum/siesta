@@ -320,7 +320,9 @@ export class Launcher extends Mixin(
 
             extractRes.values.forEach((value, option) => option.applyValue(this, value))
 
+            // TODO cleanup, need "reviver" concept on option
             this.include    = this.include.map(pattern => new RegExp(pattern))
+            // TODO cleanup, need "reviver" concept on option
             this.exclude    = this.exclude.map(pattern => new RegExp(pattern))
 
             // TODO cleanup, need "reviver" concept on option
