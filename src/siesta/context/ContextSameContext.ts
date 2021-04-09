@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
-import { Port } from "../../rpc/port/Port.js"
+import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
 import { Context } from "./Context.js"
 
@@ -14,7 +14,7 @@ export class ContextSameContext extends Mixin(
 
         parentMediaClass        : typeof MediaSameContext         = MediaSameContext
 
-        relativeChildMediaModuleUrl     : string    = 'src/siesta/rpc/media/MediaSameContext.js'
+        relativeChildMediaModuleUrl     : string    = 'src/rpc/media/MediaSameContext.js'
         relativeChildMediaClassSymbol   : string    = 'MediaSameContext'
 
 
@@ -24,10 +24,26 @@ export class ContextSameContext extends Mixin(
         }
 
 
-        async setupChannel (parentPort : Port, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
-            parentPort.media    = new this.parentMediaClass()
+        async setupChannel (parentPort : PortHandshakeParent, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
+            const parentMedia   = new this.parentMediaClass()
 
-            await this.seedChildPort(relativeChildPortModuleUrl, relativeChildPortClassSymbol, {}, {})
+            parentPort.media            = parentMedia
+            parentPort.handshakeType    = 'parent_first'
+
+            const childPort     = await this.seedChildPort(
+                relativeChildPortModuleUrl,
+                relativeChildPortClassSymbol,
+                { handshakeType : 'parent_first' },
+                {},
+                true
+            )
+
+            const childMedia    = childPort.media as MediaSameContext
+
+            parentMedia.targetMedia = childMedia
+            childMedia.targetMedia  = parentMedia
+
+            await parentPort.connect()
         }
     }
 ) {}

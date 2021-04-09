@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Media } from "../../rpc/media/Media.js"
+import { Port } from "../../rpc/port/Port.js"
 import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
 import { ContextProvider } from "./context_provider/ContextProvider.js"
@@ -39,17 +40,24 @@ export class Context extends Mixin(
         }
 
 
-        async seedChildPort (relativePortModuleUrl : string, relativePortClassSymbol : string, portConfig : object, mediaConfig : object) {
+        async seedChildPort (
+            relativePortModuleUrl : string, relativePortClassSymbol : string,
+            portConfig : object, mediaConfig : object,
+            returnPort : boolean = false
+        )
+            : Promise<Port | undefined>
+        {
             const siestaPackageRoot = this.provider.launcher.projectData.siestaPackageRootUrl
 
-            await this.evaluateBasic(
+            return await this.evaluateBasic(
                 seedChildPort,
                 siestaPackageRoot + relativePortModuleUrl,
                 relativePortClassSymbol,
                 siestaPackageRoot + this.relativeChildMediaModuleUrl,
                 this.relativeChildMediaClassSymbol,
                 portConfig,
-                mediaConfig
+                mediaConfig,
+                returnPort
             )
         }
     }
@@ -58,11 +66,15 @@ export class Context extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 const seedChildPort = async (
-    portModuleUrl : string, portClassSymbol : string,
-    mediaModuleUrl : string, mediaClassSymbol : string,
-    portConfig : object,
-    mediaConfig : object
-) => {
+    portModuleUrl   : string, portClassSymbol : string,
+    mediaModuleUrl  : string, mediaClassSymbol : string,
+    portConfig      : object,
+    mediaConfig     : object,
+    // the only case when its safe to return the port from this method is same context
+    returnPort      : boolean = false
+)
+    : Promise<Port | undefined>  =>
+{
     const [ modulePort, moduleMedia ]   = await Promise.all([ import(portModuleUrl), import(mediaModuleUrl) ])
 
     const media     = new moduleMedia[ mediaClassSymbol ]
@@ -74,4 +86,6 @@ const seedChildPort = async (
     port.media      = media
 
     port.connect()
+
+    if (returnPort) return port
 }
