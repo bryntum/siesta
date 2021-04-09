@@ -1,6 +1,10 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
+import { isNodejs } from "../../util/Helpers.js"
 import { Environment } from "../common/Types.js"
+import { Launcher } from "../launcher/Launcher.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
+import { styles } from "../reporter/styling/terminal.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Project } from "./Project.js"
 import { ProjectDescriptorBrowser } from "./ProjectDescriptor.js"
@@ -31,6 +35,30 @@ export class ProjectBrowser extends Mixin(
         buildInputArguments () : string[] {
             // TODO should extract search params from location.href here
             return []
+        }
+
+
+        async getIsomorphicSelfInstance () : Promise<ProjectBrowser> {
+            return this
+        }
+
+
+        async launchStandalone () : Promise<Launcher> {
+            if (isNodejs()) {
+                const colorerClass          = (await import('../../jsx/ColorerNodejs.js'))[ 'ColorerNodejs' ] as typeof ColorerNodejs
+                const c                     = colorerClass.new()
+                const style                 = (clsName : string) => styles.get(clsName)(c)
+
+                console.log(
+`${ style('exception_icon').text(' ERROR ') } Browser project launched directly as Node.js script.
+Please use Siesta launcher instead and web url:
+  ${ style('accented').text('npx siesta http://web_path/to/your/project.js') }`
+                )
+
+                return
+            }
+
+            return super.launchStandalone()
         }
 
 

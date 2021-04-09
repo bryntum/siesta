@@ -27,6 +27,11 @@ export class ProjectNodejs extends Mixin(
         }
 
 
+        async getIsomorphicSelfInstance () : Promise<ProjectNodejs> {
+            return this
+        }
+
+
         getStandaloneLauncher () : LauncherNodejs {
             const launcher = this.launcherClass.new({
                 projectData             : this.asProjectSerializableData(),

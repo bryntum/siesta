@@ -68,7 +68,7 @@ export class Project extends Mixin(
         }
 
 
-        async getIsomorphicSelfInstance () {
+        async getIsomorphicSelfInstance () : Promise<Project> {
             const cls           = await this.getIsomorphicProjectClass()
 
             const config        = Object.assign({}, this)
