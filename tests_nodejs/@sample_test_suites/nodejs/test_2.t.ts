@@ -1,4 +1,4 @@
-import { it } from "../../index.js"
+import { it } from "../../../nodejs.js"
 
 it('Sample test', async t => {
     t.is(1, 1)

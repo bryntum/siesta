@@ -1,7 +1,7 @@
-import { Project } from "../../index.js"
+import { Project } from "../../../nodejs.js"
 
 const project = Project.new({
-    title                   : 'Isomorphic test suite'
+    title                   : 'Node.js test suite'
 })
 
 project.plan(
