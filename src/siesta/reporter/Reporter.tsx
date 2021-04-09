@@ -1,11 +1,13 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { Tree } from "../../jsx/Tree.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { relative } from "../../util/Path.js"
 import { Launch } from "../launcher/Launch.js"
+import { Launcher } from "../launcher/Launcher.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, SourcePoint, TestNodeResult, TestResult } from "../test/TestResult.js"
 import { Printer } from "./Printer.js"
@@ -23,16 +25,20 @@ export class Reporter extends Mixin(
     class Reporter extends base {
         launch              : Launch                    = undefined
 
+        get launcher () : Launcher {
+            return this.launch.launcher
+        }
+
         get projectData () : ProjectSerializableData {
             return this.launch.projectData
         }
 
         get detail () : ReporterDetailing {
-            return this.launch.launcher.detail
+            return this.launcher.detail
         }
 
         get sourceContext () : number {
-            return this.launch.launcher.sourceContext
+            return this.launcher.sourceContext
         }
 
 
@@ -57,10 +63,22 @@ export class Reporter extends Mixin(
             else if (result instanceof TestNodeResult) {
                 if (this.detail === 'assertion') return true
 
-                return this.detail === 'subtest' ? true : isTodo ? false : !result.passed
+                return this.detail === 'subtest' ? true : isTodo ? false : !result.passed || this.testNodeHasLogMessagesAboveTheLogLevel(result, this.launcher.logLevel)
+            }
+            else if (result instanceof LogMessage) {
+                return result.level >= this.launcher.logLevel
             } else {
+                // exception
                 return true
             }
+        }
+
+
+        testNodeHasLogMessagesAboveTheLogLevel (testNode : TestNodeResult, level : LogLevel) : boolean {
+            return CI(testNode.eachResultLeafOfClass(LogMessage))
+                .filter(logMessage => logMessage.level >= this.launch.launcher.logLevel)
+                .take(1)
+                .length > 0
         }
 
 
@@ -346,7 +364,7 @@ export class Reporter extends Mixin(
             text.appendChild(<div></div>)
 
             text.appendChild(<div class="summary">
-                { 'Test suite : ' }
+                { 'Test files : ' }
                 <span class="summary_tests_passed">{ this.filesPassed } passed, </span>
                 <span class={ this.filesFailed > 0 ? "summary_tests_failed" : '' }>{ this.filesFailed } failed, </span>
                 <span class="summary_tests_total">{ this.launch.projectPlanItemsToLaunch.length } total</span>
