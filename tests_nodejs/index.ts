@@ -21,6 +21,13 @@ project.plan(
             'xml_element_rendering.t.js'
         ]
     },
+    {
+        filename    : 'suite_launching',
+
+        items       : [
+            'suite_launching.t.js'
+        ]
+    },
 )
 
 project.start()
