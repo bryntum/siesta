@@ -4,7 +4,7 @@ import { Test } from "../../src/siesta/test/Test.js"
 import { Assertion } from "../../src/siesta/test/TestResult.js"
 
 export const verifyAllFailed = (todoTest : Test, topTest : Test) => {
-    CI(todoTest.eachAssertion()).forEach(assertion => {
+    CI(todoTest.eachResultLeafOfClass(Assertion)).forEach(assertion => {
 
         if (assertion.passed) {
             topTest.addResult(Assertion.new({

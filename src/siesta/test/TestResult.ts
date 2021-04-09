@@ -128,6 +128,8 @@ export type TestNodeState   = 'created' | 'running' | 'completed'
 // serializable leaf nodes
 export type TestResultLeaf  = Exception | LogMessage | Assertion | AssertionAsyncCreation
 
+export type TestResultLeafConstructor  = typeof Exception | typeof LogMessage | typeof Assertion | typeof AssertionAsyncCreation
+
 // non-serializable tree node - the serializable part is `descriptor`
 export type TestResultTree  = TestNodeResult
 
@@ -316,11 +318,11 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        * eachAssertion () : Generator<Assertion> {
+        * eachResultLeafOfClass<Cls extends TestResultLeafConstructor> (resultClass : Cls) : Generator<InstanceType<Cls>> {
             for (const result of this.resultLog) {
-                if (result instanceof Assertion) yield result
+                if (result instanceof resultClass) yield result as InstanceType<Cls>
 
-                if (result instanceof TestNodeResult) yield* result.eachAssertion()
+                if (result instanceof TestNodeResult) yield* result.eachResultLeafOfClass(resultClass)
             }
         }
     }
