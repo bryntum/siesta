@@ -1,12 +1,11 @@
-import { Channel } from "../../../rpc/channel/Channel.js"
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
+import { TextJSX } from "../../../jsx/TextJSX.js"
 import { local, remote } from "../../../rpc/port/Port.js"
 import { PortEvaluateChild, PortEvaluateParent } from "../../../rpc/port/PortEvaluate.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
-import { TextJSX } from "../../../jsx/TextJSX.js"
-import { TestDescriptor } from "../TestDescriptor.js"
 import { globalTestEnv, Test } from "../Test.js"
+import { TestDescriptor } from "../TestDescriptor.js"
 import { TestDescriptorBrowser } from "../TestDescriptorBrowser.js"
 import { TestDescriptorNodejs } from "../TestDescriptorNodejs.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
@@ -99,23 +98,5 @@ export class TestLauncherChild extends Mixin(
         }
 
         return TestLauncherChild
-    }
-) {}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export class ChannelTestLauncher extends Mixin(
-    [ Channel, Base ],
-    (base : ClassUnion<typeof Channel, typeof Base>) => {
-
-        class ChannelTestLauncher extends base {
-            parentPort              : TestLauncherParent                = undefined
-            parentPortClass         : typeof TestLauncherParent         = TestLauncherParent
-
-            childPortClassUrl       : string                            = import.meta.url
-            childPortClassSymbol    : string                            = 'TestLauncherChild'
-        }
-
-        return ChannelTestLauncher
     }
 ) {}

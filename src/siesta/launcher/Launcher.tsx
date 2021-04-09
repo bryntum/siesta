@@ -5,7 +5,6 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
-import { Channel } from "../../rpc/channel/Channel.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
@@ -348,11 +347,6 @@ export class Launcher extends Mixin(
             extractRes.values.forEach((value, option) => option.applyValue(this.projectData.projectPlan, value))
 
             return { extractResult : extractRes, errors : [] }
-        }
-
-
-        get targetContextChannelClass () : typeof Channel {
-            throw new Error("Abstract method called")
         }
 
 

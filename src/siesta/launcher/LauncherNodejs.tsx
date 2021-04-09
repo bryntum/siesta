@@ -5,8 +5,6 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { Channel } from "../../rpc/channel/Channel.js"
-import { ChannelNodeIpc } from "../../rpc/channel/ChannelNodeIpc.js"
 import { parse } from "../../serializable/Serializable.js"
 import { Environment } from "../common/Types.js"
 import { Context } from "../context/Context.js"
@@ -87,10 +85,6 @@ export class LauncherNodejs extends Mixin(
         projectDescriptorClass : typeof ProjectDescriptorNodejs   = ProjectDescriptorNodejs
         testDescriptorClass : typeof TestDescriptorNodejs   = TestDescriptorNodejs
 
-
-        get targetContextChannelClass () : typeof Channel {
-            return ChannelNodeIpc
-        }
 
 
         getMaxLen () : number {
