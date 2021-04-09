@@ -25,7 +25,7 @@ export class PortHandshakeParent extends Mixin(
     (base : ClassUnion<typeof Port>) => {
 
         class PortHandshakeParent extends base implements PortHandshake {
-            handshakeType           : HandshakeType = 'child_first'
+            handshakeType           : HandshakeType = 'parent_first'
             handshakeTimeout        : number        = 60000
 
             parentConnectionId      : number        = 0
@@ -67,7 +67,7 @@ export class PortHandshakeChild extends Mixin(
     (base : ClassUnion<typeof Port>) => {
 
         class PortHandshakeChild extends base implements PortHandshake {
-            handshakeType           : HandshakeType = 'child_first'
+            handshakeType           : HandshakeType = 'parent_first'
             handshakeTimeout        : number        = 60000
 
             parentConnectionId      : number        = 0
