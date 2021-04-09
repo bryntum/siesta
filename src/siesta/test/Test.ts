@@ -1,4 +1,3 @@
-import { ChannelSameContext } from "../../rpc/channel/ChannelSameContext.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
@@ -15,7 +14,7 @@ import { AssertionException } from "./assertion/AssertionException.js"
 import { AssertionGeneral } from "./assertion/AssertionGeneral.js"
 import { AssertionType } from "./assertion/AssertionType.js"
 import { Expectation } from "./Expectation.js"
-import { ChannelTestLauncher, TestLauncherChild } from "./port/TestLauncher.js"
+import { TestLauncherChild } from "./port/TestLauncher.js"
 import { TestReporterChild } from "./port/TestReporter.js"
 import { Spy, SpyFunction } from "./Spy.js"
 import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
@@ -506,29 +505,12 @@ export class Test extends Mixin(
                 projectData,
                 projectPlanItemsToLaunch    : projectPlan.leavesAxis(),
 
-                contextProviders            : [ ContextProviderSameContext.new({ launcher }) ],
-                targetContextChannelClass   : ChannelSameContext
+                contextProviders            : [ ContextProviderSameContext.new({ launcher }) ]
             })
 
             await launch.setup()
 
-            const channel           = launch.testLauncherChannelClass.new() as ChannelTestLauncher & ChannelSameContext
-
-            const setupPromise      = channel.setup()
-
-            const testLauncher      = channel.parentPort
-
-            const reporter          = testLauncher.reporter   = launch.reporter
-
-            await setupPromise
-
-            topTest.reporter        = channel.childPort as TestLauncherChild
-
-            reporter.onTestSuiteStart()
-
-            await topTest.start()
-
-            reporter.onTestSuiteFinish()
+            await launch.launchStandaloneSameContextTest(topTest)
         }
 
 

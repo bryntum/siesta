@@ -2,11 +2,11 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { Logger } from "../../logger/Logger.js"
-import { Channel } from "../../rpc/channel/Channel.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
-import { ChannelTestLauncher, TestLauncherParent } from "../test/port/TestLauncher.js"
+import { TestLauncherParent } from "../test/port/TestLauncher.js"
+import { Test } from "../test/Test.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 
@@ -98,8 +98,6 @@ export class Launch extends Mixin(
 
         reporter                    : Reporter              = undefined
 
-        targetContextChannelClass   : typeof Channel        = undefined
-
         contextProviders            : ContextProvider[]     = []
 
         type                        : 'project' | 'test'    = 'project'
@@ -107,24 +105,6 @@ export class Launch extends Mixin(
         mode                        : 'sequential' | 'parallel' = 'parallel'
 
         maxWorkers                  : number                    = 5
-
-
-        $testLauncherChannelClass : typeof ChannelTestLauncher  = undefined
-
-        get testLauncherChannelClass () : typeof ChannelTestLauncher {
-            if (this.$testLauncherChannelClass !== undefined) return this.$testLauncherChannelClass
-
-            return this.$testLauncherChannelClass = class ChannelTestLauncherImplementation extends Mixin(
-                [ ChannelTestLauncher, this.targetContextChannelClass ],
-                (base : ClassUnion<typeof ChannelTestLauncher, typeof Channel>) =>
-
-                class ChannelTestLauncherImplementation extends base {}
-            ) {}
-        }
-
-        get testLauncherChannelConfig () : Partial<ChannelTestLauncher> {
-            return {}
-        }
 
 
         get logger () : Logger {
@@ -196,12 +176,33 @@ export class Launch extends Mixin(
 
             await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
 
+            //---------------------
             try {
                 await testLauncher.launchTest(normalized)
             } finally {
                 await testLauncher.disconnect()
                 await context.destroy()
             }
+        }
+
+
+        async launchStandaloneSameContextTest (topTest : Test) {
+            this.logger.debug("Launching standalone test: ", topTest.descriptor.url)
+
+            const context           = await this.contextProviders[ 0 ].createContext()
+
+            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
+
+            await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
+
+            //---------------------
+            topTest.reporter        = await testLauncher.getSameContextChildLauncher()
+
+            this.reporter.onTestSuiteStart()
+
+            await topTest.start()
+
+            this.reporter.onTestSuiteFinish()
         }
 
 

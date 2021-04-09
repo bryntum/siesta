@@ -24,6 +24,8 @@ TestDescriptorBrowser
 //---------------------------------------------------------------------------------------------------------------------
 interface TestLauncher {
     launchTest (testDescriptor : TestDescriptor) : Promise<any>
+
+    getSameContextChildLauncher () : Promise<TestLauncherChild>
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -34,6 +36,9 @@ export class TestLauncherParent extends Mixin(
         class TestLauncherParent extends base implements TestLauncher {
             @remote()
             launchTest : (testDescriptor : TestDescriptor) => Promise<any>
+
+            @remote()
+            getSameContextChildLauncher : () => Promise<TestLauncherChild>
         }
 
         return TestLauncherParent
@@ -47,6 +52,12 @@ export class TestLauncherChild extends Mixin(
     (base : ClassUnion<typeof TestReporterChild, typeof PortEvaluateChild, typeof PortHandshakeChild, typeof Base>) => {
 
         class TestLauncherChild extends base implements TestLauncher {
+
+            @local()
+            async getSameContextChildLauncher () : Promise<TestLauncherChild> {
+                return this
+            }
+
 
             @local()
             async launchTest (testDescriptor : TestDescriptor) {

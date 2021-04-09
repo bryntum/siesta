@@ -431,9 +431,7 @@ export class Launcher extends Mixin(
 
                 maxWorkers                              : this.maxWorkers,
 
-                contextProviders                        : this.getSuitableContextProviders(this.projectData.environment),
-
-                targetContextChannelClass               : this.targetContextChannelClass
+                contextProviders                        : this.getSuitableContextProviders(this.projectData.environment)
             })
 
             await launch.start()
