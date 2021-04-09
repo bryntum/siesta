@@ -188,7 +188,7 @@ export class Launch extends Mixin(
         async launchProjectPlanItem (item : TestDescriptor) {
             const normalized        = item.flatten
 
-            this.logger.log("Launching project item: ", normalized.url)
+            this.logger.debug("Launching project item: ", normalized.url)
 
             const context           = await this.contextProviders[ 0 ].createContext()
 
