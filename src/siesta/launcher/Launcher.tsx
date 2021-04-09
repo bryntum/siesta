@@ -8,6 +8,7 @@ import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { Channel } from "../../rpc/channel/Channel.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
+import { isString } from "../../util/Typeguards.js"
 import { Environment } from "../common/Types.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
@@ -150,6 +151,8 @@ export class Launcher extends Mixin(
 
         @option({
             type        : 'string',
+            structure   : 'enum',
+            enumeration : [ 'info', 'debug', 'log', 'warn', 'error' ],
             group       : OptionsGroupFiltering,
             help        : <span>
                 This option defines the detail level of the output. By default only warnings and errors are printed.
@@ -319,6 +322,10 @@ export class Launcher extends Mixin(
 
             this.include    = this.include.map(pattern => new RegExp(pattern))
             this.exclude    = this.exclude.map(pattern => new RegExp(pattern))
+
+            // TODO cleanup, need "reviver" concept on option
+            // @ts-ignore
+            if (isString(this.logLevel)) this.logLevel = LogLevel[ this.logLevel ]
 
             return { extractResult : extractRes, errors : [] }
         }

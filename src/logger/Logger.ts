@@ -1,12 +1,13 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 
+// need to keep log levels as numbers for efficient comparison
 export enum LogLevel {
-    info    = 'info',
-    debug   = 'debug',
-    log     = 'log',
-    warn    = 'warn',
-    error   = 'error'
+    info,
+    debug,
+    log,
+    warn,
+    error
 }
 
 export type LogMethod = 'info' | 'debug' | 'log' | 'warn' | 'error'
