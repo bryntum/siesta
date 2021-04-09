@@ -37,6 +37,16 @@ it('Should be able to launch the isomorphic test file in Node.js directly', asyn
 
 
 //---------------------------------------------------------------------------------------------------------------------
+it('Should be able to launch the isomorphic project in browser via launcher', async t => {
+    const launchRes     = await runProjectViaLauncher(
+        `${ SIESTA_PACKAGE_ROOT_WEB_PATH }/tests_nodejs/@sample_test_suites/isomorphic/index.js`
+    )
+
+    await verifySampleProjectLaunch(t, launchRes)
+})
+
+
+//---------------------------------------------------------------------------------------------------------------------
 it('Should be able to launch the Node.js project in Node.js directly', async t => {
     const launchRes     = await runProjectDirectly(path.resolve(__dirname, '../@sample_test_suites/nodejs/index.js'))
 
