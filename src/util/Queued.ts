@@ -2,7 +2,7 @@ import { Base } from "../class/Base.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-class QueuedCall extends Base {
+export class QueuedCall extends Base {
     host            : any               = undefined
     prop            : string            = ''
 
@@ -12,6 +12,8 @@ class QueuedCall extends Base {
 
 
     finalize () {
+        this.host[ this.prop ] = undefined
+
         this.next?.activate()
 
         this.next   = undefined
@@ -62,7 +64,7 @@ export const queued = function (propName? : string) : MethodDecorator {
             if (currentCall === undefined) {
                 newCall.activate()
             } else
-                currentCall.last.next   = newCall
+                currentCall.last.next = newCall
 
             return promise
         }
