@@ -121,7 +121,7 @@ export class Port extends Mixin(
                 try {
                     connectionAttempts++
 
-                    this.logger?.debug(`Connection attempt: ${ connectionAttempts }`)
+                    this.logger?.info(`Connection attempt: ${ connectionAttempts }`)
 
                     await this.media.doConnect()
 
@@ -129,7 +129,7 @@ export class Port extends Mixin(
 
                     return
                 } catch (e) {
-                    this.logger?.debug(`Connection attempt ${ connectionAttempts } failed: ${ e.stack || e.message || e }`)
+                    this.logger?.info(`Connection attempt ${ connectionAttempts } failed: ${ e.stack || e.message || e }`)
 
                     await delay(this.connectionInterval)
                 }
