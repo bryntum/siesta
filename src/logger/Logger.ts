@@ -21,32 +21,32 @@ export class Logger extends Mixin(
         logLevel        : LogLevel = LogLevel.log
 
 
-        printLogMessage (method : LogMethod, ...message : string[]) {
+        printLogMessage (method : LogMethod, ...message : unknown[]) {
             // abstract logger is silent
         }
 
 
-        info (...message : string[]) {
+        info (...message : unknown[]) {
             if (this.logLevel <= LogLevel.info) this.printLogMessage('info', ...message)
         }
 
 
-        debug (...message : string[]) {
+        debug (...message : unknown[]) {
             if (this.logLevel <= LogLevel.debug) this.printLogMessage('debug', ...message)
         }
 
 
-        log (...message : string[]) {
+        log (...message : unknown[]) {
             if (this.logLevel <= LogLevel.log) this.printLogMessage('log', ...message)
         }
 
 
-        warn (...message : string[]) {
+        warn (...message : unknown[]) {
             if (this.logLevel <= LogLevel.warn) this.printLogMessage('warn', ...message)
         }
 
 
-        error (...message : string[]) {
+        error (...message : unknown[]) {
             if (this.logLevel <= LogLevel.error) this.printLogMessage('error', ...message)
         }
     }
