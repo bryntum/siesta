@@ -1,4 +1,3 @@
-import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { XmlRendererDifference } from "../../compare_deep/CompareDeepDiffRendering.js"
 import { TextBlock } from "../../jsx/TextBlock.js"
@@ -6,11 +5,11 @@ import { XmlElement } from "../../jsx/XmlElement.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class Printer extends Mixin(
-    [ XmlRendererDifference, Base ],
-    (base : ClassUnion<typeof XmlRendererDifference, typeof Base>) => {
+export class ConsoleXmlRenderer extends Mixin(
+    [ XmlRendererDifference ],
+    (base : ClassUnion<typeof XmlRendererDifference>) => {
 
-    class Printer extends base {
+    class ConsoleXmlRenderer extends base {
 
         print (str : string) {
             throw new Error("Abstract method")
@@ -32,6 +31,6 @@ export class Printer extends Mixin(
         }
     }
 
-    return Printer
+    return ConsoleXmlRenderer
 }) {}
 

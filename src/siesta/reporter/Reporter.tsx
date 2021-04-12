@@ -10,7 +10,7 @@ import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, SourcePoint, TestNodeResult, TestResult } from "../test/TestResult.js"
-import { Printer } from "./Printer.js"
+import { ConsoleXmlRenderer } from "./ConsoleXmlRenderer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -19,8 +19,8 @@ export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
-    [ Printer, Base ],
-    (base : ClassUnion<typeof Printer, typeof Base>) => {
+    [ ConsoleXmlRenderer, Base ],
+    (base : ClassUnion<typeof ConsoleXmlRenderer, typeof Base>) => {
 
     class Reporter extends base {
         launch              : Launch                    = undefined

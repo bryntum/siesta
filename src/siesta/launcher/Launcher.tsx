@@ -24,7 +24,7 @@ import {
     optionWarningTemplateByCode
 } from "../option/Option.js"
 import { ProjectDescriptor, ProjectSerializableData } from "../project/ProjectDescriptor.js"
-import { Printer } from "../reporter/Printer.js"
+import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Launch } from "./Launch.js"
@@ -110,31 +110,36 @@ export type PrepareOptionsResult = {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
-    [ HasOptions, Printer, LoggerConsole, Base ],
-    (base : ClassUnion<typeof HasOptions, typeof Printer, typeof LoggerConsole, typeof Base>) => {
+    [ HasOptions, ConsoleXmlRenderer, Base ],
+    (base : ClassUnion<typeof HasOptions, typeof ConsoleXmlRenderer, typeof Base>) => {
 
     class Launcher extends base {
-        logger              : Logger                        = LoggerConsole.new({ logLevel : LogLevel.warn })
+        projectData             : ProjectSerializableData   = undefined
 
-        inputArguments      : string[]                      = []
+        logger                  : Logger                    = LoggerConsole.new({ logLevel : LogLevel.warn })
 
-        optionsBag          : OptionsBag                    = undefined
+        //------------------
+        inputArguments          : string[]                  = []
 
+        optionsBag              : OptionsBag                = undefined
+
+        //------------------
         launchClass             : typeof Launch             = Launch
 
         projectDescriptorClass  : typeof ProjectDescriptor  = ProjectDescriptor
+
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
-        reporterClass       : typeof Reporter               = undefined
+        reporterClass           : typeof Reporter           = undefined
 
-        projectData         : ProjectSerializableData       = undefined
+        //------------------
+        setupDone               : boolean                   = false
+        setupPromise            : Promise<any>              = undefined
 
-        setupDone       : boolean                           = false
-        setupPromise    : Promise<any>                      = undefined
-
+        //------------------
         contextProviderConstructors : (typeof ContextProvider)[]    = []
 
-        contextProviders        : ContextProvider[]         = []
+        contextProviders            : ContextProvider[]             = []
 
         contextProviderSameContext  : ContextProviderSameContext    = undefined
 
