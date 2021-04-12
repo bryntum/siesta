@@ -16,13 +16,18 @@ export class ReporterNodejsTerminal extends Mixin(
     class ReporterNodejsTerminal extends base {
         spinner             : Spinner                   = randomSpinner()
 
-        spinnerInterval     : SetIntervalHandler            = undefined
+        spinnerInterval     : SetIntervalHandler        = undefined
 
         isPrintingFooter    : boolean                   = false
 
         footerLines     : number                        = 0
 
         spinnerChars    : number                        = 0
+
+        rl              : readline.Interface            = readline.createInterface({
+            input           : process.stdin,
+            output          : process.stdout
+        })
 
 
         progressBar () : XmlElement {
@@ -80,6 +85,8 @@ export class ReporterNodejsTerminal extends Mixin(
             process.stdout.write(showCursor)
 
             clearInterval(this.spinnerInterval)
+
+            this.rl.close()
         }
 
 
@@ -142,7 +149,17 @@ export class ReporterNodejsTerminal extends Mixin(
 
 
         printSpinner () {
-            if (this.spinnerChars > 0) process.stdout.write('\b'.repeat(this.spinnerChars))
+            if (this.spinnerChars > 0) {
+                process.stdout.write('\b'.repeat(this.spinnerChars))
+
+                readline.moveCursor(process.stdout, -Number.MAX_SAFE_INTEGER, -1, () => {})
+                readline.clearLine(process.stdout, 0, () => {})
+
+                this.write(this.testSuiteFooterTime())
+                readline.moveCursor(process.stdout, -Number.MAX_SAFE_INTEGER, 0, () => {})
+
+                readline.moveCursor(process.stdout, this.progressBarTotalLength + 1, 1, () => {})
+            }
 
             const spinnerText       = this.spinnerFrame()
 

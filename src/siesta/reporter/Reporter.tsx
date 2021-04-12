@@ -368,13 +368,18 @@ export class Reporter extends Mixin(
                 <span class="summary_tests_passed">{ this.filesPassed } passed, </span>
                 <span class={ this.filesFailed > 0 ? "summary_tests_failed" : '' }>{ this.filesFailed } failed, </span>
                 <span class="summary_tests_total">{ this.launch.projectPlanItemsToLaunch.length } total</span>
-                <div>
-                    { 'Time       : ' }
-                    { humanReadableDuration(Date.now() - this.startTime.getTime()) }
-                </div>
+                { this.testSuiteFooterTime() }
             </div>)
 
             return text
+        }
+
+
+        testSuiteFooterTime () : XmlElement {
+            return <div class="summary">
+                { 'Time       : ' }
+                { humanReadableDuration(Date.now() - this.startTime.getTime()) }
+            </div>
         }
         // endregion
     }
