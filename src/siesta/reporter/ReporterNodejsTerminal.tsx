@@ -105,10 +105,15 @@ export class ReporterNodejsTerminal extends Mixin(
 
 
         revertFooter () {
+            // after printing spinner cursor is on the same line, there's no new line after spinner
+            // so we clear this line first
+            if (this.footerLines > 0) readline.clearLine(process.stdout, 0, () => {})
+
+            // then clear the rest
             for (let i = 1; i <= this.footerLines; i++) {
-                readline.clearLine(process.stdout, 0, () => {})
-                // stick cursor at the beginning of the previous line
                 readline.moveCursor(process.stdout, -Number.MAX_SAFE_INTEGER, -1, () => {})
+
+                readline.clearLine(process.stdout, 0, () => {})
             }
 
             this.footerLines    = 0
