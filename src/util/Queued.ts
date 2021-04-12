@@ -48,6 +48,7 @@ export class QueuedCall extends Base {
     }
 }
 
+// XXX does not work with `super` calls! which makes it not so useful...
 
 export const queued = function (propName? : string) : MethodDecorator {
 
