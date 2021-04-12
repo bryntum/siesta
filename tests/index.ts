@@ -8,9 +8,10 @@ const project = Project.new({
 
 project.plan(
     {
-        filename       : 'uniqable',
+        filename       : 'util',
 
         items       : [
+            'queued.t.js',
             'uniqable.t.js',
         ]
     },
