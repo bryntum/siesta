@@ -551,6 +551,9 @@ export const compareDeepDiff = function (
     else if (type1 === 'Date') {
         return compareDateDeepDiff(v1 as Date, v2 as Date, options, state, convertingToDiff)
     }
+    else if (type1 === 'Error') {
+        return compareErrorDeepDiff(v1 as Error, v2 as Error, options, state, convertingToDiff)
+    }
     // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
     else {
         return DifferenceAtomic.new({
@@ -725,6 +728,41 @@ const compareObjectDeepDiff = function (
     const { common, onlyIn1, onlyIn2 }  = compareKeys(
         new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state, convertingToDiff
     )
+
+    difference.onlyIn2Size              = onlyIn2.size
+
+    for (let i = 0; i < common.length; i++) {
+        const key1      = common[ i ].el1
+        const key2      = common[ i ].el2
+
+        const diff      = compareDeepDiff(object1[ key1 ], object2[ key2 ], options, state, convertingToDiff)
+
+        difference.addComparison(key1, diff)
+    }
+
+    onlyIn1.forEach(key1 => difference.addComparison(key1, valueAsDifference(object1[ key1 ], 'value1', options, state)))
+    onlyIn2.forEach(key2 => difference.addComparison(key2, valueAsDifference(object2[ key2 ], 'value2', options, state)))
+
+    return difference
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+const compareErrorDeepDiff = function (
+    object1 : Error, object2 : Error,
+    options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
+)
+    : Difference
+{
+    const difference = DifferenceObject.new({ value1 : object1, value2 : object2 })
+
+    state.markVisited(object1, object2, difference, convertingToDiff)
+
+    const { common, onlyIn1, onlyIn2 }  = compareKeys(
+        new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state, convertingToDiff
+    )
+
+    common.push({ el1 : 'message', el2 : 'message', difference : null })
 
     difference.onlyIn2Size              = onlyIn2.size
 

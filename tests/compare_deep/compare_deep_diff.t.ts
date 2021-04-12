@@ -97,6 +97,18 @@ it('Deep compare of objects should work', async t => {
             { key : "c", difference : DifferenceAtomic.new({ value2 : 4 }) }
         ]
     }))
+
+
+    t.equal(compareDeepDiff(new Error('error1'), new Error('error2')), DifferenceObject.new({
+        same            : false,
+
+        value1          : new Error('error1'),
+        value2          : new Error('error2'),
+
+        comparisons     : [
+            { key : "message", difference : DifferenceAtomic.new({ value1 : 'error1', value2 : 'error2' }) },
+        ]
+    }))
 })
 
 
