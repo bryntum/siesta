@@ -140,6 +140,7 @@ export class Test extends Mixin(
 
         printLogMessage (method : LogMethod, ...message) {
             this.addResult(LogMessage.new({
+                type        : 'log',
                 level       : LogLevel[ method ],
                 message     : this.prepareLogMessage(...message)
             }))
