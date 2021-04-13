@@ -40,6 +40,7 @@ export class Hook<Payload extends unknown[] = []> extends Array<Listener<Payload
         const actualListener = (...payload : Payload) => {
             this.un(actualListener)
 
+            // return the value from listener as it might be a Promise
             return listener(...payload)
         }
 
@@ -55,6 +56,8 @@ export class Hook<Payload extends unknown[] = []> extends Array<Listener<Payload
 
 
     trigger (...payload : Payload) {
+        if (this.hooks.length === 0) return
+
         const listeners     = this.hooks.slice()
 
         for (let i = 0; i < listeners.length; ++i) {
@@ -64,6 +67,8 @@ export class Hook<Payload extends unknown[] = []> extends Array<Listener<Payload
 
 
     async triggerAsyncSequential (...payload : Payload) {
+        if (this.hooks.length === 0) return
+
         const listeners     = this.hooks.slice()
 
         for (let i = 0; i < listeners.length; ++i) {
@@ -73,6 +78,8 @@ export class Hook<Payload extends unknown[] = []> extends Array<Listener<Payload
 
 
     async triggerAsyncParallel (...payload : Payload) {
+        if (this.hooks.length === 0) return
+
         const listeners     = this.hooks.slice()
 
         await Promise.allSettled(listeners.map(listener => listener(...payload)))
