@@ -1,6 +1,8 @@
 import path from 'path'
 import { fileURLToPath } from "url"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ExecutionContextAttachable } from "../../context/ExecutionContext.js"
+import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
 import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
@@ -21,6 +23,9 @@ import { extractProjectInfo } from "./ProjectExtractor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+[ process.stdout, process.stderr ].forEach((stream : any) => stream._handle && stream._handle.setBlocking(true))
+
+//---------------------------------------------------------------------------------------------------------------------
 export const OptionsGroupBrowser  = OptionGroup.new({
     name        : 'Browser',
     weight      : 900
@@ -29,10 +34,11 @@ export const OptionsGroupBrowser  = OptionGroup.new({
 
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherNodejs extends Mixin(
-    [ Launcher ],
-    (base : ClassUnion<typeof Launcher>) => {
+    [ Launcher, ExecutionContextAttachable ],
+    (base : ClassUnion<typeof Launcher, typeof ExecutionContextAttachable>) => {
 
     class LauncherNodejs extends base {
+        executionContext        : ExecutionContextNode      = undefined
 
         @option({
             type        : 'string',
@@ -92,8 +98,8 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        print (str : string) {
-            process.stdout.write(str)
+        doPrint (str : string) {
+            this.executionContext.stdOutWriteOriginal.call(process.stdout, str)
         }
 
 
@@ -197,6 +203,24 @@ export class LauncherNodejs extends Mixin(
             // listeners, suppress that
             process.setMaxListeners(Number.MAX_SAFE_INTEGER)
 
+            const executionContext      = this.executionContext = ExecutionContextNode.new(/*{ overrideConsole : false }*/)
+
+            executionContext.setup()
+
+            executionContext.attach(this)
+
+            this.onConsoleHook.on((launcher, type, text) => {
+                this.print(text.join(' ') + '\n')
+            })
+
+            this.onOutputHook.on((launcher, type, text) => {
+                this.print(text)
+            })
+
+            this.onExceptionHook.on((launcher, type, exception : any) => {
+                this.print(String(exception?.stack || exception))
+            })
+
             await super.setup()
         }
 
@@ -271,3 +295,4 @@ export class LauncherNodejs extends Mixin(
 
     return LauncherNodejs
 }) {}
+

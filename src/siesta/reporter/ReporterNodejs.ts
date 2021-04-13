@@ -16,7 +16,7 @@ export class ReporterNodejs extends Mixin(
         }
 
 
-        print (str : string) {
+        doPrint (str : string) {
             this.launcher.print(str)
         }
 

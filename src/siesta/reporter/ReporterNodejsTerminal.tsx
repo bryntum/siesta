@@ -9,6 +9,11 @@ import { ReporterNodejs } from "./ReporterNodejs.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
 
 //---------------------------------------------------------------------------------------------------------------------
+type PrintingState  = {
+    hadPrintedFooter        : boolean
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 export class ReporterNodejsTerminal extends Mixin(
     [ ReporterNodejs ],
     (base : ClassUnion<typeof ReporterNodejs>) => {
@@ -18,11 +23,37 @@ export class ReporterNodejsTerminal extends Mixin(
 
         spinnerInterval     : SetIntervalHandler        = undefined
 
-        isPrintingFooter    : boolean                   = false
+        isPrintingFooter    : number                    = 0
+        isPrintingSpinner   : boolean                   = false
 
-        footerLines     : number                        = 0
+        footerLines         : number                    = 0
+        spinnerChars        : number                    = 0
 
-        spinnerChars    : number                        = 0
+
+        initialize (props? : Partial<ReporterNodejsTerminal>) {
+            super.initialize(props)
+
+            this.launcher.beforePrintHook.on((state : PrintingState) => {
+                if (this.isPrintingFooter || this.isPrintingSpinner) return
+
+                if (this.hasPrintedFooter) {
+                    this.revertFooter()
+
+                    state.hadPrintedFooter = true
+                }
+            })
+
+            this.launcher.afterPrintHook.on((state : PrintingState) => {
+                if (this.isPrintingFooter || this.isPrintingSpinner) return
+
+                if (state.hadPrintedFooter) this.printFooter()
+            })
+        }
+
+
+        get hasPrintedFooter () : boolean {
+            return this.footerLines > 0
+        }
 
 
         progressBar () : XmlElement {
@@ -45,10 +76,10 @@ export class ReporterNodejsTerminal extends Mixin(
         }
 
 
-        print (str : string) {
-            super.print(str)
+        doPrint (str : string) {
+            super.doPrint(str)
 
-            if (this.isPrintingFooter) {
+            if (this.isPrintingFooter && !this.isPrintingSpinner) {
                 this.footerLines += Array.from(str.matchAll(/\n/g)).length
             }
         }
@@ -105,6 +136,8 @@ export class ReporterNodejsTerminal extends Mixin(
 
 
         revertFooter () {
+            this.isPrintingFooter++
+
             // after printing spinner cursor is on the same line, there's no new line after spinner
             // so we clear this line first
             if (this.footerLines > 0) readline.clearLine(process.stdout, 0, () => {})
@@ -118,13 +151,15 @@ export class ReporterNodejsTerminal extends Mixin(
 
             this.footerLines    = 0
             this.spinnerChars   = 0
+
+            this.isPrintingFooter--
         }
 
 
         printFooter () {
-            this.revertFooter()
+            this.isPrintingFooter++
 
-            this.isPrintingFooter   = true
+            this.revertFooter()
 
             this.printSuiteFooter()
 
@@ -132,7 +167,7 @@ export class ReporterNodejsTerminal extends Mixin(
             this.print(' ')
             this.printSpinner()
 
-            this.isPrintingFooter   = false
+            this.isPrintingFooter--
         }
 
 
@@ -142,6 +177,8 @@ export class ReporterNodejsTerminal extends Mixin(
 
 
         printSpinner () {
+            this.isPrintingSpinner  = true
+
             if (this.spinnerChars > 0) {
                 process.stdout.write('\b'.repeat(this.spinnerChars))
 
@@ -149,8 +186,8 @@ export class ReporterNodejsTerminal extends Mixin(
                 readline.clearLine(process.stdout, 0, () => {})
 
                 this.write(this.testSuiteFooterTime())
-                readline.moveCursor(process.stdout, -Number.MAX_SAFE_INTEGER, 0, () => {})
 
+                readline.moveCursor(process.stdout, -Number.MAX_SAFE_INTEGER, 0, () => {})
                 readline.moveCursor(process.stdout, this.progressBarTotalLength + 1, 1, () => {})
             }
 
@@ -159,6 +196,8 @@ export class ReporterNodejsTerminal extends Mixin(
             this.print(spinnerText)
 
             this.spinnerChars       = spinnerText.length
+
+            this.isPrintingSpinner  = false
         }
 
 
