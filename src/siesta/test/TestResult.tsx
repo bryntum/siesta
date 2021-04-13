@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { OutputType } from "../../context/ExecutionContext.js"
+import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
@@ -33,6 +34,34 @@ export class LogMessage extends Mixin(
         level       : LogLevel      = LogLevel.log
 
         message     : XmlNode[]     = undefined
+
+
+        template (includeIcon : boolean = true) : XmlElement {
+            let tagText : string
+            let classSuffix : string
+
+            const logLevelName  = LogLevel[ this.level ]
+
+            if (this.type === 'log') {
+                tagText         = logLevelName.toUpperCase()
+                classSuffix     = logLevelName.toLowerCase()
+            }
+            else if (this.type === 'console') {
+                tagText         = `CONSOLE.${ logLevelName.toUpperCase() }`
+                classSuffix     = logLevelName.toLowerCase()
+            }
+            else {
+                tagText         = this.outputType === 'stdout' ? 'STD_OUT' : 'STD_ERR'
+                classSuffix     = this.outputType === 'stdout' ? 'log' : 'error'
+            }
+
+            return <div class="log_message">
+                { includeIcon ? [ <span class='log_message_icon'>ⓘ</span>, ' ' ] : null }
+                <span class={ `log_message_${ classSuffix }` }> { tagText } </span>
+                { ' ' }
+                { this.message }
+            </div>
+        }
     }
 ) {}
 

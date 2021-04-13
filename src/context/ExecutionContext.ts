@@ -44,7 +44,7 @@ export class ExecutionContext extends Base {
         const attachment    = lastElement(this.attachments)
 
         // strip the trailing newline, as it will cause an extra empty line in the output
-        attachment.onOutputHook.trigger(attachment, method, output.replace(/\n$/m, ''))
+        attachment.onOutputHook.trigger(attachment, method, output/*.replace(/\n$/m, '')*/)
     }
 
 

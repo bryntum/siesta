@@ -322,31 +322,8 @@ export class Reporter extends Mixin(
 
 
         logMessageTemplate (message : LogMessage) : XmlElement {
-            let tagText : string
-            let classSuffix : string
-
-            const logLevelName  = LogLevel[ message.level ]
-
-            if (message.type === 'log') {
-                tagText         = logLevelName.toUpperCase()
-                classSuffix     = logLevelName.toLowerCase()
-            }
-            else if (message.type === 'console') {
-                tagText         = `CONSOLE.${ logLevelName.toUpperCase() }`
-                classSuffix     = logLevelName.toLowerCase()
-            }
-            else {
-                tagText         = message.outputType === 'stdout' ? 'STD_OUT' : 'STD_ERR'
-                classSuffix     = message.outputType === 'stdout' ? 'log' : 'error'
-            }
-
-            return <div class="log_message">
-                <span class='log_message_icon'>ⓘ</span>
-                { ' ' }
-                <span class={ `log_message_${ classSuffix }` }> { tagText } </span>
-                { ' ' }
-                { message.message }
-            </div>
+            // template moved to `LogMessage` to be reused with the launcher
+            return message.template()
         }
 
 

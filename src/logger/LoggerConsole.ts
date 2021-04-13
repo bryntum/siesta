@@ -6,8 +6,8 @@ export class LoggerConsole extends Mixin(
     [ Logger ],
     (base : ClassUnion<typeof Logger>) =>
 
-    class Logger extends base {
-        printLogMessage (method : LogMethod, ...message : string[]) {
+    class LoggerConsole extends base {
+        printLogMessage (method : LogMethod, ...message : unknown[]) {
             console[ method ](...message)
         }
     }

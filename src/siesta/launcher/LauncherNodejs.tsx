@@ -7,7 +7,12 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
+import { XmlNode } from "../../jsx/XmlElement.js"
+import { LogLevel, LogMethod } from "../../logger/Logger.js"
+import { LoggerHookable } from "../../logger/LoggerHookable.js"
 import { parse } from "../../serializable/Serializable.js"
+import { SerializerXml } from "../../serializer/SerializerXml.js"
+import { isString } from "../../util/Typeguards.js"
 import { Environment } from "../common/Types.js"
 import { Context } from "../context/Context.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
@@ -18,6 +23,7 @@ import { ProjectDescriptorNodejs, ProjectSerializableData } from "../project/Pro
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
+import { LogMessage } from "../test/TestResult.js"
 import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary, PrepareOptionsResult } from "./Launcher.js"
 import { extractProjectInfo } from "./ProjectExtractor.js"
 
@@ -39,6 +45,8 @@ export class LauncherNodejs extends Mixin(
 
     class LauncherNodejs extends base {
         executionContext        : ExecutionContextNode      = undefined
+
+        logger                  : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
 
         @option({
             type        : 'string',
@@ -91,6 +99,27 @@ export class LauncherNodejs extends Mixin(
         projectDescriptorClass : typeof ProjectDescriptorNodejs   = ProjectDescriptorNodejs
         testDescriptorClass : typeof TestDescriptorNodejs   = TestDescriptorNodejs
 
+
+        initialize (props? : Partial<LauncherNodejs>) {
+            super.initialize(props)
+
+            this.logger.onLogMessageHook.on((method : LogMethod, message : unknown[]) => {
+                this.write(LogMessage.new({
+                    type        : 'log',
+                    level       : LogLevel[ method ],
+                    message     : this.prepareLogMessage(...message)
+                }).template(false))
+            })
+        }
+
+
+        // TODO duplicated code in Test
+        prepareLogMessage (...messages : unknown[]) : XmlNode[] {
+            // if (messages.length === 1)
+                return messages.map(message => isString(message) ? message : SerializerXml.serialize(message/*, this.descriptor.serializerConfig*/))
+            // else
+            //     return [ SerializerXml.serialize(messages/*, this.descriptor.serializerConfig*/) ]
+        }
 
 
         getMaxLen () : number {
@@ -203,23 +232,26 @@ export class LauncherNodejs extends Mixin(
             // listeners, suppress that
             process.setMaxListeners(Number.MAX_SAFE_INTEGER)
 
-            const executionContext      = this.executionContext = ExecutionContextNode.new(/*{ overrideConsole : false }*/)
+            const executionContext      = this.executionContext = ExecutionContextNode.new({
+                overrideConsole     : false,
+                overrideException   : false
+            })
 
             executionContext.setup()
 
             executionContext.attach(this)
 
-            this.onConsoleHook.on((launcher, type, text) => {
-                this.print(text.join(' ') + '\n')
-            })
+            // this.onConsoleHook.on((launcher, type, text) => {
+            //     this.print(text.join(' ') + '\n')
+            // })
 
             this.onOutputHook.on((launcher, type, text) => {
                 this.print(text)
             })
 
-            this.onExceptionHook.on((launcher, type, exception : any) => {
-                this.print(String(exception?.stack || exception))
-            })
+            // this.onExceptionHook.on((launcher, type, exception : any) => {
+            //     this.print(String(exception?.stack || exception))
+            // })
 
             await super.setup()
         }
