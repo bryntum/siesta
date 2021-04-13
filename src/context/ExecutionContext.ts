@@ -1,27 +1,74 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
+import { Hook } from "../hook/Hook.js"
+import { LogMethod } from "../logger/Logger.js"
+import { lastElement } from "../util/Helpers.js"
+
+//---------------------------------------------------------------------------------------------------------------------
+export type ExceptionType   = 'exception' | 'rejection'
+
+export type OutputType      = 'stdout' | 'stderr'
+
+//---------------------------------------------------------------------------------------------------------------------
+export class ExecutionContext extends Base {
+    attachments         : ExecutionContextAttachable[]         = []
+
+
+    attach (attachment : ExecutionContextAttachable) {
+        this.attachments.push(attachment)
+    }
+
+
+    detach (attachment : ExecutionContextAttachable) {
+        if (lastElement(this.attachments) !== attachment) throw new Error("Invalid execution context attachment state")
+
+        this.attachments.pop()
+    }
+
+
+    onException (exception : unknown, type : ExceptionType) {
+        const attachment    = lastElement(this.attachments)
+
+        attachment.onExceptionHook.trigger(attachment, type, exception)
+    }
+
+
+    onConsole (method : LogMethod, ...message : unknown[]) {
+        const attachment    = lastElement(this.attachments)
+
+        attachment.onConsoleHook.trigger(attachment, method, message)
+    }
+
+
+    onOutput (method : OutputType, output : string) {
+        const attachment    = lastElement(this.attachments)
+
+        // strip the trailing newline, as it will cause an extra empty line in the output
+        attachment.onOutputHook.trigger(attachment, method, output.replace(/\n$/m, ''))
+    }
+
+
+    setup () {
+        throw new Error("Abstract method")
+    }
+
+
+    destroy () {
+        throw new Error("Abstract method")
+    }
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class ExecutionContext extends Mixin(
-    [ Base ],
-    (base : ClassUnion<typeof Base>) =>
+export class ExecutionContextAttachable extends Mixin(
+    [],
+    (base : ClassUnion) =>
 
-    class ExecutionContext extends base {
-        // TODO the idea is to abstract the handling of "unhandled" exceptions/rejections
+    class ExecutionContextAttachable extends base {
+        onExceptionHook : Hook<[ this, ExceptionType, unknown ]>    = new Hook()
 
-        // attachedTo  : any       = undefined
-        //
-        //
-        // attach () {
-        //
-        // }
-        //
-        //
-        // detach () {
-        //
-        // }
-        // exceptionHook : Hook<[ this, unknown ]>     = undefined
-        // rejectionHook : Hook<[ this, unknown ]>     = undefined
+        onConsoleHook : Hook<[ this, LogMethod, unknown[] ]>        = new Hook()
+
+        onOutputHook : Hook<[ this, OutputType, string ]>           = new Hook()
     }
-) {}
+){}
