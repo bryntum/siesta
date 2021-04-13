@@ -1,4 +1,4 @@
-import { iit, it } from "../../index.js"
+import { iit, it } from "../../nodejs.js"
 import { compareDeepDiff, DifferenceReference } from "../../src/compare_deep/CompareDeepDiff.js"
 import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRendering.js"
 import { any, anyInstanceOf, anyNumberApprox, anyStringLike } from "../../src/compare_deep/FuzzyMatcherDiff.js"

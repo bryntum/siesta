@@ -1,5 +1,5 @@
 import chalk from "chalk"
-import { it } from "../../index.js"
+import { it } from "../../nodejs.js"
 import { ColorerNodejs } from "../../src/jsx/ColorerNodejs.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
 import { XmlRenderer } from "../../src/jsx/XmlRenderer.js"
