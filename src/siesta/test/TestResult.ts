@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { XmlElement } from "../../jsx/XmlElement.js"
+import { OutputType } from "../../context/ExecutionContext.js"
+import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { escapeRegExp } from "../../util/Helpers.js"
@@ -25,9 +26,13 @@ export class LogMessage extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class LogMessage extends base {
+        type        : 'log' | 'console' | 'output'  = 'log'
+
+        outputType  : OutputType    = undefined
+
         level       : LogLevel      = LogLevel.log
 
-        message     : string        = ''
+        message     : XmlNode[]     = undefined
     }
 ) {}
 
