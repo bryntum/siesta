@@ -1,8 +1,12 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ExecutionContext, ExecutionContextAttachable } from "../../context/ExecutionContext.js"
 import { Hook } from "../../hook/Hook.js"
+import { XmlNode } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
+import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { ArbitraryObject, ArbitraryObjectKey, isNodejs, prototypeValue } from "../../util/Helpers.js"
+import { isString } from "../../util/Typeguards.js"
 import { Environment } from "../common/Types.js"
 import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
 import { Launch } from "../launcher/Launch.js"
@@ -26,6 +30,7 @@ export class Test extends Mixin(
     [
         TestNodeResult,
         Logger,
+        ExecutionContextAttachable,
         AssertionAsync,
         AssertionCompare,
         AssertionException,
@@ -35,6 +40,7 @@ export class Test extends Mixin(
     (base : ClassUnion<
         typeof TestNodeResult,
         typeof Logger,
+        typeof ExecutionContextAttachable,
         typeof AssertionAsync,
         typeof AssertionCompare,
         typeof AssertionException,
@@ -48,6 +54,10 @@ export class Test extends Mixin(
 
         @prototypeValue(TestDescriptor)
         testDescriptorClass : typeof TestDescriptor
+
+        executionContextClass           : typeof ExecutionContext
+
+        executionContext                : ExecutionContext      = undefined
 
         // "upgrade" types from TreeNode
         parentNode          : Test
@@ -77,6 +87,19 @@ export class Test extends Mixin(
 
         get environment () : Environment {
             return this.descriptor.environment
+        }
+
+
+        $rootTest           : Test      = undefined
+
+        get rootTest () : Test {
+            if (this.$rootTest !== undefined) return this.$rootTest
+
+            let rootTest : Test       = this
+
+            while (rootTest.parentNode) rootTest    = rootTest.parentNode
+
+            return this.$rootTest = rootTest
         }
 
 
@@ -118,7 +141,7 @@ export class Test extends Mixin(
         printLogMessage (method : LogMethod, ...message) {
             this.addResult(LogMessage.new({
                 level       : LogLevel[ method ],
-                message     : [ ...message ].join(' ')
+                message     : this.prepareLogMessage(...message)
             }))
         }
 
@@ -209,11 +232,17 @@ export class Test extends Mixin(
             // start hook, test is marked as active in the reporter
             this.startHook.trigger(this)
 
-            if (this.isRoot) await this.setup()
+            if (this.isRoot) {
+                await this.setupRootTest()
+                await this.setup()
+            }
 
             await this.launch()
 
-            if (this.isRoot) await this.tearDown()
+            if (this.isRoot) {
+                await this.tearDown()
+                await this.tearDownRootTest()
+            }
 
             // finish hook, test is still marked as active in the reporter
             this.finishHook.trigger(this)
@@ -234,10 +263,42 @@ export class Test extends Mixin(
         }
 
 
+        prepareLogMessage (...messages : unknown[]) : XmlNode[] {
+            if (messages.length === 1)
+                return messages.map(message => isString(message) ? message : SerializerXml.serialize(message, this.descriptor.serializerConfig))
+            else
+                return [ SerializerXml.serialize(messages, this.descriptor.serializerConfig) ]
+        }
+
+
         // TODO
         // need to figure out if we need to wait until all reports (`this.reporter.onXXX`)
         // has been completed or not, before completing the method
         async launch () {
+            this.onExceptionHook.on((test, exception, type) => {
+                this.addResult(Exception.new({ exception }))
+            })
+
+            this.onConsoleHook.on((test, logMethod, messages) => {
+                this.addResult(LogMessage.new({
+                    type        : 'console',
+                    level       : LogLevel[ logMethod ],
+                    message     : this.prepareLogMessage(...messages)
+                }))
+            })
+
+            this.onOutputHook.on((test, outputType, message) => {
+                this.addResult(LogMessage.new({
+                    type        : 'output',
+                    level       : LogLevel.error,
+                    outputType,
+                    message     : this.prepareLogMessage(message)
+                }))
+            })
+
+
+            this.rootTest.executionContext.attach(this)
+
             const beforeHooks   = this.collectParents(true).flatMap(parent => parent.beforeEachHooks)
             const afterHooks    = this.collectParents().flatMap(parent => parent.afterEachHooks)
 
@@ -246,8 +307,6 @@ export class Test extends Mixin(
             try {
                 await this.code(this)
             } catch (exception) {
-                // console.log("TEST EXCEPTION", exception, "STACK", exception.stack)
-
                 this.addResult(Exception.new({ exception }))
             }
 
@@ -269,6 +328,15 @@ export class Test extends Mixin(
             }
 
             for (const hook of afterHooks) await hook(this)
+
+            this.rootTest.executionContext.detach(this)
+        }
+
+
+        async setupRootTest () {
+            this.executionContext               = this.executionContextClass.new()
+
+            this.executionContext.setup()
         }
 
 
@@ -278,6 +346,11 @@ export class Test extends Mixin(
 
 
         async tearDown () {
+        }
+
+
+        async tearDownRootTest () {
+            this.executionContext.destroy()
         }
 
 
@@ -472,6 +545,8 @@ export class Test extends Mixin(
             projectPlan.planItem(descriptor)
 
             const isomorphicTestClass       = await this.getIsomorphicTestClass()
+
+            topTest.executionContextClass   = isomorphicTestClass.prototype.executionContextClass
 
             const projectData   = ProjectSerializableData.new({
                 projectPlan,

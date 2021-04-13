@@ -1,5 +1,7 @@
 import path from "path"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ExecutionContext } from "../../context/ExecutionContext.js"
+import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
@@ -21,6 +23,9 @@ export class TestNodejs extends Mixin(
 
         @prototypeValue(TestDescriptorNodejs)
         testDescriptorClass     : typeof TestDescriptorNodejs
+
+        @prototypeValue(ExecutionContextNode)
+        executionContextClass   : typeof ExecutionContext
 
 
         static getSelfUrl () : string {

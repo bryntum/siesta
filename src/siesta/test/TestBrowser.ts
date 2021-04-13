@@ -1,4 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ExecutionContext } from "../../context/ExecutionContext.js"
+import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
@@ -22,6 +24,9 @@ export class TestBrowser extends Mixin(
 
         @prototypeValue(TestDescriptorBrowser)
         testDescriptorClass     : typeof TestDescriptorBrowser
+
+        @prototypeValue(ExecutionContextBrowser)
+        executionContextClass   : typeof ExecutionContext
 
 
         static async getIsomorphicTestClass () : Promise<typeof Test> {
