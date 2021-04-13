@@ -24,11 +24,6 @@ export class ReporterNodejsTerminal extends Mixin(
 
         spinnerChars    : number                        = 0
 
-        rl              : readline.Interface            = readline.createInterface({
-            input           : process.stdin,
-            output          : process.stdout
-        })
-
 
         progressBar () : XmlElement {
             const completedChars = Math.round(this.resultsCompleted.size / this.launch.projectPlanItemsToLaunch.length * this.progressBarTotalLength)
@@ -85,8 +80,6 @@ export class ReporterNodejsTerminal extends Mixin(
             process.stdout.write(showCursor)
 
             clearInterval(this.spinnerInterval)
-
-            this.rl.close()
         }
 
 
