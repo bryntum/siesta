@@ -185,10 +185,11 @@ export class ReporterNodejsTerminal extends Mixin(
                 readline.moveCursor(process.stdout, -Number.MAX_SAFE_INTEGER, -1, () => {})
                 readline.clearLine(process.stdout, 0, () => {})
 
+                // this will start a new line
                 this.write(this.testSuiteFooterTime())
 
-                readline.moveCursor(process.stdout, -Number.MAX_SAFE_INTEGER, 0, () => {})
-                readline.moveCursor(process.stdout, this.progressBarTotalLength + 1, 1, () => {})
+                // so we just need to move the cursor back to the spinner position to the right
+                readline.moveCursor(process.stdout, this.progressBarTotalLength + 1, 0, () => {})
             }
 
             const spinnerText       = this.spinnerFrame()
