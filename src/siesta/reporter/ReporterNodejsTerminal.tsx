@@ -124,14 +124,19 @@ export class ReporterNodejsTerminal extends Mixin(
         }
 
 
-        printFinished () : boolean {
+        printFinished () {
             this.revertFooter()
 
-            const allDone = super.printFinished()
+            super.printFinished()
 
-            !allDone && this.printFooter()
+            this.printFooter()
+        }
 
-            return allDone
+
+        finalizePrinting () {
+            this.revertFooter()
+
+            super.finalizePrinting()
         }
 
 

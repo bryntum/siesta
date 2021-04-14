@@ -1,5 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { Hook } from "../../hook/Hook.js"
 import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { Tree } from "../../jsx/Tree.js"
@@ -48,7 +49,7 @@ export class Reporter extends Mixin(
         resultsCompleted    : Set<TestNodeResult>       = new Set()
         resultsRunning      : Set<TestNodeResult>       = new Set()
 
-        resultsFinished     : Set<{ testNode : TestNodeResult, sources : string[] }>      = new Set()
+        resultsToPrint     : Set<{ testNode : TestNodeResult, sources : string[] }>      = new Set()
 
         startTime           : Date                      = undefined
         endTime             : Date                      = undefined
@@ -94,11 +95,11 @@ export class Reporter extends Mixin(
                 this.resultsRunning.delete(testNode)
 
                 if (testNode.passed) {
-                    this.resultsFinished.add({ testNode, sources : undefined })
+                    this.resultsToPrint.add({ testNode, sources : undefined })
                 } else {
                     const sources       = await this.fetchSources(testNode.descriptor.url)
 
-                    this.resultsFinished.add({ testNode, sources })
+                    this.resultsToPrint.add({ testNode, sources })
                 }
 
                 this.printFinished()
@@ -111,8 +112,10 @@ export class Reporter extends Mixin(
         }
 
 
-        printFinished () : boolean {
-            this.resultsFinished.forEach(({ testNode, sources }) => {
+        allPrintedHook : Hook       = new Hook()
+
+        printFinished () {
+            this.resultsToPrint.forEach(({ testNode, sources }) => {
                 this[ testNode.passed ? 'filesPassed' : 'filesFailed' ]++
 
                 this.resultsCompleted.add(testNode)
@@ -120,14 +123,9 @@ export class Reporter extends Mixin(
                 this.printTest(testNode, sources)
             })
 
-            this.resultsFinished.clear()
+            this.resultsToPrint.clear()
 
-            if (this.isCompleted()) {
-                this.printSuiteFooter()
-                return true
-            } else {
-                return false
-            }
+            this.allPrintedHook.trigger()
         }
 
 
@@ -168,8 +166,18 @@ export class Reporter extends Mixin(
 
         onTestSuiteFinish () {
             this.endTime        = new Date()
+
+            this.allPrintedHook.once(() => this.finalizePrinting())
+
+            // no `resultsToPrint` means all printing happened synchronously
+            // trigger the hook manually then
+            if (this.resultsToPrint.size === 0) this.allPrintedHook.trigger()
         }
 
+
+        finalizePrinting () {
+            this.printSuiteFooter()
+        }
 
         // region templates
 
