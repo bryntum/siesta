@@ -35,10 +35,15 @@ export class Queue extends Base {
     }
 
 
+    get isEmpty () : boolean {
+        return this.freeSlots.length === this.maxWorkers
+    }
+
+
     pullSingle () {
         if (this.freeSlots.length > 0) this.onFreeSlotAvailableHook.trigger(this)
 
-        if (this.freeSlots.length === this.maxWorkers) this.onCompletedHook.trigger(this)
+        if (this.isEmpty) this.onCompletedHook.trigger(this)
     }
 
 
@@ -48,7 +53,7 @@ export class Queue extends Base {
 
             this.onFreeSlotAvailableHook.trigger(this)
 
-            if (this.freeSlots.length === this.maxWorkers) {
+            if (this.isEmpty) {
                 this.onCompletedHook.trigger(this)
                 break
             }
