@@ -49,7 +49,7 @@ export class Reporter extends Mixin(
         resultsCompleted    : Set<TestNodeResult>       = new Set()
         resultsRunning      : Set<TestNodeResult>       = new Set()
 
-        resultsToPrint     : Set<{ testNode : TestNodeResult, sources : string[] }>      = new Set()
+        resultsToPrint      : Set<{ testNode : TestNodeResult, sources : string[] }>      = new Set()
 
         startTime           : Date                      = undefined
         endTime             : Date                      = undefined
@@ -93,13 +93,18 @@ export class Reporter extends Mixin(
                 if (!this.resultsRunning.has(testNode)) throw new Error("Test completed before starting")
 
                 this.resultsRunning.delete(testNode)
+                this.resultsCompleted.add(testNode)
 
                 if (testNode.passed) {
                     this.resultsToPrint.add({ testNode, sources : undefined })
                 } else {
-                    const sources       = await this.fetchSources(testNode.descriptor.url)
+                    const result        = { testNode, sources : undefined }
 
-                    this.resultsToPrint.add({ testNode, sources })
+                    // need to add the result to `resultsToPrint` synchronously
+                    this.resultsToPrint.add(result)
+
+                    // now we can do an async gap
+                    result.sources      = await this.fetchSources(testNode.descriptor.url)
                 }
 
                 this.printFinished()
@@ -118,14 +123,14 @@ export class Reporter extends Mixin(
             this.resultsToPrint.forEach(({ testNode, sources }) => {
                 this[ testNode.passed ? 'filesPassed' : 'filesFailed' ]++
 
-                this.resultsCompleted.add(testNode)
-
                 this.printTest(testNode, sources)
             })
 
             this.resultsToPrint.clear()
 
-            this.allPrintedHook.trigger()
+            // delay the hook, to allow the subclass method to fully complete
+            // before it
+            Promise.resolve().then(() => this.allPrintedHook.trigger())
         }
 
 
