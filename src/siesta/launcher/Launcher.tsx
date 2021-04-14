@@ -65,7 +65,7 @@ export enum ExitCodes {
     'UNHANDLED_EXCEPTION'   = 7,
 
     /**
-     * Dry run exit, for example after printing the helps screen or package version.
+     * Dry run exit, for example when no tests are matching the filtering criteria, or after printing the helps screen or package version.
      */
     'DRY_RUN'               = 8
 }
