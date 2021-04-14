@@ -113,7 +113,6 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        // TODO duplicated code in Test
         prepareLogMessage (...messages : unknown[]) : XmlNode[] {
             // if (messages.length === 1)
                 return messages.map(message => isString(message) ? message : SerializerXml.serialize(message/*, this.descriptor.serializerConfig*/))
