@@ -94,13 +94,13 @@ export class Launch extends Mixin(
         launcher                    : Launcher                  = undefined
         projectData                 : ProjectSerializableData   = undefined
 
-        projectPlanItemsToLaunch    : TestDescriptor[]      = []
+        projectPlanItemsToLaunch    : TestDescriptor[]          = []
 
-        reporter                    : Reporter              = undefined
+        reporter                    : Reporter                  = undefined
 
-        contextProviders            : ContextProvider[]     = []
+        contextProviders            : ContextProvider[]         = []
 
-        type                        : 'project' | 'test'    = 'project'
+        type                        : 'project' | 'test'        = 'project'
 
         mode                        : 'sequential' | 'parallel' = 'parallel'
 
@@ -135,14 +135,20 @@ export class Launch extends Mixin(
             const queue                 = Queue.new({ maxWorkers : this.maxWorkers })
 
             queue.onFreeSlotAvailableHook.on(() => {
-                if (projectPlanItems.length) queue.push(null, this.launchProjectPlanItem(projectPlanItems.shift()))
+                if (projectPlanItems.length) {
+                    const descriptor        = projectPlanItems.shift()
+
+                    queue.push(descriptor, this.launchProjectPlanItem(descriptor))
+                }
             })
 
             const completed             = new Promise<any>(resolve => queue.onCompletedHook.on(resolve))
 
             if (this.mode === 'parallel') {
-                queue.onSlotSettledHook.on((queue, id, result) => {
-                    if (result.status === 'rejected') throw result.reason
+                queue.onSlotSettledHook.on((queue, descriptor : TestDescriptor, result) => {
+                    if (result.status === 'rejected') {
+                        this.reportLaunchFailure(descriptor, result.reason)
+                    }
 
                     queue.pull()
                 })
@@ -150,8 +156,10 @@ export class Launch extends Mixin(
                 queue.pull()
             }
             else {
-                queue.onSlotSettledHook.on((queue, id, result) => {
-                    if (result.status === 'rejected') throw result.reason
+                queue.onSlotSettledHook.on((queue, descriptor : TestDescriptor, result) => {
+                    if (result.status === 'rejected') {
+                        this.reportLaunchFailure(descriptor, result.reason)
+                    }
 
                     queue.pullSingle()
                 })
@@ -165,6 +173,11 @@ export class Launch extends Mixin(
         }
 
 
+        reportLaunchFailure (descriptor : TestDescriptor, exception : any) {
+            this.logger.error(`Exception when running ${ descriptor.flatten.url }\n`, exception?.stack || exception)
+        }
+
+
         async launchProjectPlanItem (item : TestDescriptor) {
             const normalized        = item.flatten
 
@@ -174,10 +187,9 @@ export class Launch extends Mixin(
 
             const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
 
-            await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
-
             //---------------------
             try {
+                await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
                 await testLauncher.launchTest(normalized)
             } finally {
                 await testLauncher.disconnect()
