@@ -24,8 +24,8 @@ export class TestNodejs extends Mixin(
         @prototypeValue(TestDescriptorNodejs)
         testDescriptorClass     : typeof TestDescriptorNodejs
 
-        @prototypeValue(ExecutionContextNode)
-        executionContextClass   : typeof ExecutionContext
+        // @prototypeValue(ExecutionContextNode)
+        // executionContextClass   : typeof ExecutionContext
 
 
         static getSelfUrl () : string {
@@ -42,6 +42,11 @@ export class TestNodejs extends Mixin(
 
         static async getIsomorphicTestClass () : Promise<typeof Test> {
             return this
+        }
+
+
+        static async getExecutionContextClass () : Promise<typeof ExecutionContext> {
+            return ExecutionContextNode
         }
     }
 

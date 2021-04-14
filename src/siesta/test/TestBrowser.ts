@@ -25,12 +25,17 @@ export class TestBrowser extends Mixin(
         @prototypeValue(TestDescriptorBrowser)
         testDescriptorClass     : typeof TestDescriptorBrowser
 
-        @prototypeValue(ExecutionContextBrowser)
-        executionContextClass   : typeof ExecutionContext
+        // @prototypeValue(ExecutionContextBrowser)
+        // executionContextClass   : typeof ExecutionContext
 
 
         static async getIsomorphicTestClass () : Promise<typeof Test> {
             return this
+        }
+
+
+        static async getExecutionContextClass () : Promise<typeof ExecutionContext> {
+            return ExecutionContextBrowser
         }
 
 

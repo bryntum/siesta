@@ -55,7 +55,7 @@ export class Test extends Mixin(
         @prototypeValue(TestDescriptor)
         testDescriptorClass : typeof TestDescriptor
 
-        executionContextClass           : typeof ExecutionContext
+        // executionContextClass           : typeof ExecutionContext
 
         executionContext                : ExecutionContext      = undefined
 
@@ -335,7 +335,9 @@ export class Test extends Mixin(
 
 
         async setupRootTest () {
-            this.executionContext               = this.executionContextClass.new()
+            const isomorphicExecutionContextClass   = await (this.constructor as typeof Test).getExecutionContextClass()
+
+            this.executionContext                   = isomorphicExecutionContextClass.new()
 
             this.executionContext.setup()
         }
@@ -547,7 +549,7 @@ export class Test extends Mixin(
 
             const isomorphicTestClass       = await this.getIsomorphicTestClass()
 
-            topTest.executionContextClass   = isomorphicTestClass.prototype.executionContextClass
+            // topTest.executionContextClass   = isomorphicTestClass.prototype.executionContextClass
 
             const projectData   = ProjectSerializableData.new({
                 projectPlan,
@@ -595,6 +597,14 @@ export class Test extends Mixin(
                 return (await import('./TestNodejs.js')).TestNodejs
             else
                 return (await import('./TestBrowser.js')).TestBrowser
+        }
+
+
+        static async getExecutionContextClass () : Promise<typeof ExecutionContext> {
+            if (isNodejs())
+                return (await import('../../context/ExecutionContextNode.js')).ExecutionContextNode
+            else
+                return (await import('../../context/ExecutionContextBrowser.js')).ExecutionContextBrowser
         }
     }
 
