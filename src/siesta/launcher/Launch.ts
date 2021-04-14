@@ -107,8 +107,6 @@ export class Launch extends Mixin(
 
         type                        : 'project' | 'test'        = 'project'
 
-        mode                        : 'sequential' | 'parallel' = 'parallel'
-
         maxWorkers                  : number                    = 5
 
 
@@ -137,42 +135,30 @@ export class Launch extends Mixin(
 
             const projectPlanItems      = this.projectPlanItemsToLaunch.slice()
 
-            const queue                 = Queue.new({ maxWorkers : this.maxWorkers })
+            if (projectPlanItems.length > 0) {
+                const queue                 = Queue.new({ maxWorkers : this.maxWorkers })
+                const completed             = new Promise<any>(resolve => queue.onCompletedHook.on(resolve))
 
-            queue.onFreeSlotAvailableHook.on(() => {
-                if (projectPlanItems.length) {
-                    const descriptor        = projectPlanItems.shift()
+                queue.onFreeSlotAvailableHook.on(() => {
+                    if (projectPlanItems.length) {
+                        const descriptor        = projectPlanItems.shift()
 
-                    queue.push(descriptor, this.launchProjectPlanItem(descriptor))
-                }
-            })
-
-            const completed             = new Promise<any>(resolve => queue.onCompletedHook.on(resolve))
-
-            if (this.mode === 'parallel') {
-                queue.onSlotSettledHook.on((queue, descriptor : TestDescriptor, result) => {
-                    if (result.status === 'rejected') {
-                        this.reportLaunchFailure(descriptor, result.reason)
+                        queue.push(descriptor, this.launchProjectPlanItem(descriptor))
                     }
+                })
+
+                queue.onSlotSettledHook.on((queue, descriptor : TestDescriptor, result) => {
+                    if (result.status === 'rejected') this.reportLaunchFailure(descriptor, result.reason)
 
                     queue.pull()
                 })
 
                 queue.pull()
+
+                await completed
+            } else {
+                this.logger.error('No tests to run')
             }
-            else {
-                queue.onSlotSettledHook.on((queue, descriptor : TestDescriptor, result) => {
-                    if (result.status === 'rejected') {
-                        this.reportLaunchFailure(descriptor, result.reason)
-                    }
-
-                    queue.pullSingle()
-                })
-
-                queue.pullSingle()
-            }
-
-            await completed
 
             this.reporter.onTestSuiteFinish()
         }
