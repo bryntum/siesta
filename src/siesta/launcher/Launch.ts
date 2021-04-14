@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
+import { CI } from "../../iterator/Iterator.js"
 import { Logger } from "../../logger/Logger.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
@@ -109,6 +110,8 @@ export class Launch extends Mixin(
 
         maxWorkers                  : number                    = 5
 
+        exitCode                    : ExitCodes                 = undefined
+
 
         get logger () : Logger {
             return this.launcher.logger
@@ -161,6 +164,27 @@ export class Launch extends Mixin(
             }
 
             this.reporter.onTestSuiteFinish()
+
+            this.computeExitCode()
+        }
+
+
+        computeExitCode () {
+            const allFinalizedProperly  = this.reporter.resultsCompleted.size === this.projectPlanItemsToLaunch.length
+            const allPassed             = CI(this.reporter.resultsCompleted).every(testNode => testNode.passed)
+
+            if (this.projectPlanItemsToLaunch.length === 0) {
+                this.exitCode       = ExitCodes.DRY_RUN
+            }
+            else if (allFinalizedProperly && allPassed) {
+                this.exitCode       = ExitCodes.PASSED
+            }
+            else if (allFinalizedProperly) {
+                this.exitCode       = ExitCodes.FAILED
+            }
+            else {
+                this.exitCode       = ExitCodes.UNHANDLED_EXCEPTION
+            }
         }
 
 
@@ -206,12 +230,8 @@ export class Launch extends Mixin(
             await topTest.start()
 
             this.reporter.onTestSuiteFinish()
-        }
 
-
-        getExitCode () : ExitCodes {
-            // TODO
-            return ExitCodes.PASSED
+            this.computeExitCode()
         }
     }
 ) {}
