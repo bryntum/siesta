@@ -58,7 +58,7 @@ export class Queue extends Base {
     }
 
 
-    async push (id : unknown, promise : Promise<unknown>) {
+    async push (task : unknown, promise : Promise<unknown>) {
         if (this.freeSlots.length === 0) throw new Error("All slots are busy")
 
         const freeSlot          = this.freeSlots.pop()
@@ -77,9 +77,9 @@ export class Queue extends Base {
         this.freeSlots.push(freeSlot)
 
         if (thrown)
-            this.onSlotSettledHook.trigger(this, id, { status : 'rejected', reason })
+            this.onSlotSettledHook.trigger(this, task, { status : 'rejected', reason })
         else
-            this.onSlotSettledHook.trigger(this, id, { status : 'fulfilled', value })
+            this.onSlotSettledHook.trigger(this, task, { status : 'fulfilled', value })
     }
 }
 
