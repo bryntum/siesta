@@ -335,9 +335,9 @@ export class Test extends Mixin(
 
 
         async setupRootTest () {
-            const isomorphicExecutionContextClass   = await (this.constructor as typeof Test).getExecutionContextClass()
+            const executionContextClass     = await (this.constructor as typeof Test).getExecutionContextClass()
 
-            this.executionContext                   = isomorphicExecutionContextClass.new()
+            this.executionContext           = executionContextClass.new()
 
             this.executionContext.setup()
         }
