@@ -1,4 +1,4 @@
-import { it } from "../../nodejs.js"
+import { it } from "../../index.js"
 import { delay } from "../../src/util/Helpers.js"
 import { queued } from "../../src/util/Queued.js"
 
