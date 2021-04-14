@@ -41,7 +41,7 @@ export class PortHandshakeParent extends Mixin(
                 await super.connect()
 
                 if (this.handshakeType === 'child_first')
-                    await timeout(new Promise(resolve => this.onChildConnected = resolve), this.handshakeTimeout, "Handshake timeout")
+                    await timeout(new Promise(resolve => this.onChildConnected = resolve), this.handshakeTimeout, new Error('Handshake timeout'))
                 else
                     await this.handShakeFromParent(this.parentConnectionId)
             }
@@ -85,7 +85,7 @@ export class PortHandshakeChild extends Mixin(
                 if (this.handshakeType === 'child_first')
                     await this.handShakeFromChild(this.childConnectionId)
                 else
-                    await timeout(new Promise(resolve => this.onParentConnected = resolve), this.handshakeTimeout, "Handshake timeout")
+                    await timeout(new Promise(resolve => this.onParentConnected = resolve), this.handshakeTimeout, new Error('Handshake timeout'))
             }
 
 
