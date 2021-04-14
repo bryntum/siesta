@@ -549,8 +549,6 @@ export class Test extends Mixin(
 
             const isomorphicTestClass       = await this.getIsomorphicTestClass()
 
-            // topTest.executionContextClass   = isomorphicTestClass.prototype.executionContextClass
-
             const projectData   = ProjectSerializableData.new({
                 projectPlan,
                 siestaPackageRootUrl    : import.meta.url.replace(/src\/siesta\/test\/Test.js$/, ''),
