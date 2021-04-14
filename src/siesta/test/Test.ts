@@ -587,6 +587,8 @@ export class Test extends Mixin(
             await launch.setup()
 
             await launch.launchStandaloneSameContextTest(topTest)
+
+            launcher.setExitCode(launch.exitCode)
         }
 
 

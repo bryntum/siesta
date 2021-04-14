@@ -249,6 +249,10 @@ export class Launcher extends Mixin(
         }
 
 
+        setExitCode (code : ExitCodes) {
+        }
+
+
         get argv () : string [] {
             return this.optionsBag.argv
         }

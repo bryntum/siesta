@@ -2,6 +2,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { isNodejs } from "../../util/Helpers.js"
 import { Environment } from "../common/Types.js"
+import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
 import { styles } from "../reporter/styling/terminal.js"
@@ -43,7 +44,7 @@ export class ProjectBrowser extends Mixin(
         }
 
 
-        async launchStandalone () : Promise<Launcher> {
+        async launchStandalone () : Promise<Launch> {
             if (isNodejs()) {
                 const colorerClass          = (await import('../../jsx/ColorerNodejs.js'))[ 'ColorerNodejs' ] as typeof ColorerNodejs
                 const c                     = colorerClass.new()

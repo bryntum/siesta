@@ -301,6 +301,11 @@ export class LauncherNodejs extends Mixin(
         }
 
 
+        setExitCode (code : ExitCodes) {
+            process.exitCode    = process.exitCode ?? code
+        }
+
+
         static async run () {
             process.on('unhandledRejection', (reason, promise) => {
                 console.log('Unhandled promise rejection, reason:', reason)
@@ -315,12 +320,9 @@ export class LauncherNodejs extends Mixin(
 
             const launch        = await launcher.start()
 
-            await launcher.destroy()
+            launcher.setExitCode(launch.exitCode)
 
-            // we just set the `exitCode` property and not call `process.exit()` directly,
-            // because some output might not be processed yet
-            // slight risk of leaking some async cyclic process
-            process.exitCode    = process.exitCode ?? launch.getExitCode()
+            await launcher.destroy()
         }
     }
 

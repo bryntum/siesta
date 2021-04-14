@@ -3,6 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { stringify } from "../../serializable/Serializable.js"
 import { isNodejs } from "../../util/Helpers.js"
 import { Environment } from "../common/Types.js"
+import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/TestDescriptor.js"
 import { ProjectSerializableData, ProjectDescriptor } from "./ProjectDescriptor.js"
@@ -98,12 +99,14 @@ export class Project extends Mixin(
         }
 
 
-        async launchStandalone () : Promise<Launcher> {
+        async launchStandalone () : Promise<Launch> {
             const launcher  = this.getStandaloneLauncher()
 
-            await launcher.start()
+            const launch    = await launcher.start()
 
-            return launcher
+            launcher.setExitCode(launch.exitCode)
+
+            return launch
         }
 
 
