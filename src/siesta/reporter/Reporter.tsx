@@ -88,6 +88,8 @@ export class Reporter extends Mixin(
         }
 
 
+        pendingPrints   : number        = 0
+
         async onSubTestFinish (testNode : TestNodeResult) {
             if (testNode.isRoot) {
                 if (!this.resultsRunning.has(testNode)) throw new Error("Test completed before starting")
@@ -98,13 +100,15 @@ export class Reporter extends Mixin(
                 if (testNode.passed) {
                     this.resultsToPrint.add({ testNode, sources : undefined })
                 } else {
-                    const result        = { testNode, sources : undefined }
+                    this.pendingPrints++
 
-                    // need to add the result to `resultsToPrint` synchronously
-                    this.resultsToPrint.add(result)
+                    // this little async gap messes up the things and makes us
+                    // to use the `allPrintedHook` hook etc
+                    const sources      = await this.fetchSources(testNode.descriptor.url)
 
-                    // now we can do an async gap
-                    result.sources      = await this.fetchSources(testNode.descriptor.url)
+                    this.pendingPrints--
+
+                    this.resultsToPrint.add({ testNode, sources })
                 }
 
                 this.printFinished()
@@ -112,18 +116,18 @@ export class Reporter extends Mixin(
         }
 
 
-        printTest (testNode : TestNodeResult, sources : string[]) {
-            this.write(this.testNodeTemplateXml(testNode, this.isCompleted(), sources))
+        printTest (testNode : TestNodeResult, isLast : boolean, sources : string[]) {
+            this.write(this.testNodeTemplateXml(testNode, isLast, sources))
         }
 
 
         allPrintedHook : Hook       = new Hook()
 
         printFinished () {
-            this.resultsToPrint.forEach(({ testNode, sources }) => {
+            Array.from(this.resultsToPrint).forEach(({ testNode, sources }, index, array) => {
                 this[ testNode.passed ? 'filesPassed' : 'filesFailed' ]++
 
-                this.printTest(testNode, sources)
+                this.printTest(testNode, index === array.length - 1 && this.pendingPrints === 0 && this.isCompleted(), sources)
             })
 
             this.resultsToPrint.clear()
@@ -172,11 +176,11 @@ export class Reporter extends Mixin(
         onTestSuiteFinish () {
             this.endTime        = new Date()
 
-            this.allPrintedHook.once(() => this.finalizePrinting())
+            this.allPrintedHook.on(() => this.pendingPrints === 0 && this.finalizePrinting())
 
             // no `resultsToPrint` means all printing happened synchronously
             // trigger the hook manually then
-            if (this.resultsToPrint.size === 0) this.allPrintedHook.trigger()
+            if (this.pendingPrints === 0) this.allPrintedHook.trigger()
         }
 
 
