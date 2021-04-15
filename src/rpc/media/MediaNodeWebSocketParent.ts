@@ -9,7 +9,7 @@ export class MediaNodeWebSocketParent extends Mixin(
     (base : ClassUnion<typeof MediaSerializableJSON, typeof Base>) =>
 
     class MediaNodeWebSocketParent extends base {
-        socket                  : ws                     = undefined
+        socket                  : ws                            = undefined
 
         messageListener         : (...args : any[]) => void     = undefined
 
@@ -20,9 +20,11 @@ export class MediaNodeWebSocketParent extends Mixin(
 
 
         async doDisconnect () : Promise<any> {
-            this.socket.removeEventListener('message', this.messageListener)
+            if (this.socket) {
+                this.socket.removeEventListener('message', this.messageListener)
 
-            this.messageListener    = undefined
+                this.messageListener    = undefined
+            }
         }
 
 
