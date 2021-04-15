@@ -202,6 +202,9 @@ export class Launch extends Mixin(
             //---------------------
             try {
                 await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
+
+                this.logger.debug("Channel ready for: ", normalized.url)
+
                 await testLauncher.launchTest(normalized)
             } finally {
                 await testLauncher.disconnect()

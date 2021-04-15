@@ -13,10 +13,11 @@ import { LoggerHookable } from "../../logger/LoggerHookable.js"
 import { parse } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { isString } from "../../util/Typeguards.js"
-import { Environment, EnvironmentType } from "../common/Environment.js"
+import { EnvironmentType } from "../common/Environment.js"
 import { Context } from "../context/Context.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
+import { ContextProviderNodePlaywright } from "../context/context_provider/ContextProviderNodePlaywright.js"
 import { ContextProviderNodePuppeteer } from "../context/context_provider/ContextProviderNodePuppeteer.js"
 import { option, OptionGroup } from "../option/Option.js"
 import { ProjectDescriptorNodejs, ProjectSerializableData } from "../project/ProjectDescriptor.js"
@@ -89,7 +90,7 @@ export class LauncherNodejs extends Mixin(
         browserArg      : string[]              = []
 
         contextProviderConstructors : (typeof ContextProvider)[]    = [
-            ContextProviderNodePuppeteer, ContextProviderNodeChildProcess
+            ContextProviderNodePlaywright, ContextProviderNodePuppeteer, ContextProviderNodeChildProcess
         ]
 
 
