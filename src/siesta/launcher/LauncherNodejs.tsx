@@ -195,10 +195,10 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        onUnknownError (e : unknown) {
+        onUnknownError (e : any) {
             super.onUnknownError(e)
 
-            console.log('Unhandled exception:', e)
+            console.log('Unhandled exception:', e?.stack || e)
 
             process.exit(ExitCodes.UNHANDLED_EXCEPTION)
         }
