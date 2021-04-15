@@ -3,7 +3,7 @@ import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
-import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
+import { Launcher } from "../launcher/Launcher.js"
 import { styles } from "../reporter/styling/terminal.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
@@ -19,9 +19,6 @@ export class TestBrowser extends Mixin(
     >) => {
 
     class TestBrowser extends base {
-        @prototypeValue(LauncherBrowser)
-        launcherClass           : typeof LauncherBrowser
-
         @prototypeValue(TestDescriptorBrowser)
         testDescriptorClass     : typeof TestDescriptorBrowser
 
@@ -36,6 +33,11 @@ export class TestBrowser extends Mixin(
 
         static async getExecutionContextClass () : Promise<typeof ExecutionContext> {
             return ExecutionContextBrowser
+        }
+
+
+        static async getLauncherClass () : Promise<typeof Launcher> {
+            return (await import('../launcher/LauncherBrowser.js')).LauncherBrowser
         }
 
 

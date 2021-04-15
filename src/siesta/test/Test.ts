@@ -49,13 +49,8 @@ export class Test extends Mixin(
     >) => {
 
     class Test extends base {
-        // @prototypeValue(Launcher)
-        launcherClass       : typeof Launcher
-
         @prototypeValue(TestDescriptor)
         testDescriptorClass : typeof TestDescriptor
-
-        // executionContextClass           : typeof ExecutionContext
 
         executionContext                : ExecutionContext      = undefined
 
@@ -552,7 +547,7 @@ export class Test extends Mixin(
                 type                    : descriptor.type
             })
 
-            const launcher      = isomorphicTestClass.prototype.launcherClass.new({
+            const launcher      = (await this.getLauncherClass()).new({
                 projectData,
                 inputArguments          : isomorphicTestClass.getInputArguments()
             })
@@ -601,6 +596,14 @@ export class Test extends Mixin(
                 return (await import('../../context/ExecutionContextNode.js')).ExecutionContextNode
             else
                 return (await import('../../context/ExecutionContextBrowser.js')).ExecutionContextBrowser
+        }
+
+
+        static async getLauncherClass () : Promise<typeof Launcher> {
+            if (isNodejs())
+                return (await import('../launcher/LauncherNodejs.js')).LauncherNodejs
+            else
+                return (await import('../launcher/LauncherBrowser.js')).LauncherBrowser
         }
     }
 

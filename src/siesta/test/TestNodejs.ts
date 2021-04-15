@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
 import { prototypeValue } from "../../util/Helpers.js"
-import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
+import { Launcher } from "../launcher/Launcher.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorNodejs } from "./TestDescriptorNodejs.js"
 
@@ -18,9 +18,6 @@ export class TestNodejs extends Mixin(
     >) => {
 
     class TestNodejs extends base {
-        @prototypeValue(LauncherNodejs)
-        launcherClass           : typeof LauncherNodejs
-
         @prototypeValue(TestDescriptorNodejs)
         testDescriptorClass     : typeof TestDescriptorNodejs
 
@@ -47,6 +44,11 @@ export class TestNodejs extends Mixin(
 
         static async getExecutionContextClass () : Promise<typeof ExecutionContext> {
             return ExecutionContextNode
+        }
+
+
+        static async getLauncherClass () : Promise<typeof Launcher> {
+            return (await import('../launcher/LauncherNodejs.js')).LauncherNodejs
         }
     }
 
