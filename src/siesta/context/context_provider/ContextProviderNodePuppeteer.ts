@@ -66,6 +66,9 @@ export class ContextProviderNodePuppeteer extends Mixin(
                 headless                : this.launcher.headless,
                 ignoreHTTPSErrors       : true,
                 devtools                : !this.launcher.headless,
+                // TODO should enable `slowMo` for non-headless?
+                // at least provide an option to enable it
+                // slowMo                  : 250,
                 timeout                 : 60000
             })
         }
