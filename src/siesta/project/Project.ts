@@ -2,11 +2,11 @@ import { siestaPackageRootUrl } from "../../../index.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { stringify } from "../../serializable/Serializable.js"
 import { isNodejs } from "../../util/Helpers.js"
-import { Environment } from "../common/Types.js"
+import { Environment, EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/TestDescriptor.js"
-import { ProjectSerializableData, ProjectDescriptor } from "./ProjectDescriptor.js"
+import { ProjectDescriptor, ProjectSerializableData } from "./ProjectDescriptor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ export class Project extends Mixin(
     (base : ClassUnion<typeof ProjectDescriptor>) => {
 
     class Project extends base {
-        environment             : Environment               = 'isomorphic'
+        type                    : EnvironmentType           = 'isomorphic'
         siestaPackageRootUrl    : string                    = siestaPackageRootUrl
 
         launcherClass           : typeof Launcher           = undefined
@@ -112,8 +112,9 @@ export class Project extends Mixin(
 
         asProjectSerializableData () : ProjectSerializableData {
             return ProjectSerializableData.new({
+                environment             : Environment.detect(),
                 siestaPackageRootUrl    : this.siestaPackageRootUrl,
-                environment             : this.environment,
+                type                    : this.type,
                 projectPlan             : this.projectPlan,
                 options                 : ProjectDescriptor.new(this)
             })

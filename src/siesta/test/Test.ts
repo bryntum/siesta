@@ -7,7 +7,7 @@ import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { ArbitraryObject, ArbitraryObjectKey, isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
-import { Environment } from "../common/Types.js"
+import { Environment } from "../common/Environment.js"
 import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher, LauncherError } from "../launcher/Launcher.js"
@@ -83,11 +83,6 @@ export class Test extends Mixin(
         postFinishHook      : Hook<[ this ]>        = new Hook()
 
         spies               : Spy[]                 = []
-
-
-        get environment () : Environment {
-            return this.descriptor.environment
-        }
 
 
         $rootTest           : Test      = undefined
@@ -550,10 +545,11 @@ export class Test extends Mixin(
             const isomorphicTestClass       = await this.getIsomorphicTestClass()
 
             const projectData   = ProjectSerializableData.new({
+                environment             : Environment.detect(),
                 projectPlan,
                 siestaPackageRootUrl    : import.meta.url.replace(/src\/siesta\/test\/Test.js$/, ''),
                 // TODO should get the environment from `isomorphicTestClass` somehow instead of descriptor
-                environment             : descriptor.environment
+                type                    : descriptor.type
             })
 
             const launcher      = isomorphicTestClass.prototype.launcherClass.new({

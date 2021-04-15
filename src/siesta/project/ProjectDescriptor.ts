@@ -1,7 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { include, serializable, Serializable } from "../../serializable/Serializable.js"
-import { Environment } from "../common/Types.js"
+import { Environment, EnvironmentType } from "../common/Environment.js"
 import { HasOptions } from "../option/Option.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
@@ -63,6 +63,8 @@ export class ProjectSerializableData extends Mixin(
 
     class ProjectSerializableData extends base {
         environment             : Environment       = undefined
+
+        type                    : EnvironmentType   = undefined
         siestaPackageRootUrl    : string            = ''
 
         projectPlan     : TestDescriptor            = undefined

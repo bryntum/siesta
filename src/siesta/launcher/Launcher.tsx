@@ -8,7 +8,7 @@ import { LoggerConsole } from "../../logger/LoggerConsole.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
-import { Environment } from "../common/Types.js"
+import { EnvironmentType } from "../common/Environment.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
 import { ContextProviderTargetBrowser } from "../context/context_provider/ContextProviderTargetBrowser.js"
@@ -239,7 +239,7 @@ export class Launcher extends Mixin(
         }
 
 
-        getSuitableContextProviders (environment : Environment) : ContextProvider[] {
+        getSuitableContextProviders (environment : EnvironmentType) : ContextProvider[] {
             if (environment === 'browser')
                 return this.contextProviderBrowser
             else if (environment === 'nodejs')
@@ -434,7 +434,7 @@ export class Launcher extends Mixin(
 
                 maxWorkers                              : this.maxWorkers,
 
-                contextProviders                        : this.getSuitableContextProviders(this.projectData.environment)
+                contextProviders                        : this.getSuitableContextProviders(this.projectData.type)
             })
 
             await launch.start()

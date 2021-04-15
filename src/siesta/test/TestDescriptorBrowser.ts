@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
-import { Environment } from "../common/Types.js"
+import { EnvironmentType } from "../common/Environment.js"
 import { option } from "../option/Option.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
@@ -27,7 +27,7 @@ export class TestDescriptorBrowser extends Mixin(
     (base : ClassUnion<typeof TestDescriptor>) => {
 
     class TestDescriptorBrowser extends base {
-        environment             : Environment                   = 'browser'
+        type                : EnvironmentType           = 'browser'
 
         @option()
         preload             : PreloadDescriptor[]       = []

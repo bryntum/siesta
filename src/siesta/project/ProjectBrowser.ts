@@ -1,9 +1,8 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { isNodejs } from "../../util/Helpers.js"
-import { Environment } from "../common/Types.js"
+import { EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
-import { Launcher } from "../launcher/Launcher.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
 import { styles } from "../reporter/styling/terminal.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
@@ -17,7 +16,7 @@ export class ProjectBrowser extends Mixin(
     (base : ClassUnion<typeof Project, typeof ProjectDescriptorBrowser>) => {
 
     class ProjectBrowser extends base {
-        environment             : Environment                   = 'browser'
+        type                    : EnvironmentType               = 'browser'
 
         launcherClass           : typeof LauncherBrowser        = LauncherBrowser
         testDescriptorClass     : typeof TestDescriptorBrowser  = TestDescriptorBrowser

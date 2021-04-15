@@ -13,7 +13,7 @@ import { LoggerHookable } from "../../logger/LoggerHookable.js"
 import { parse } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { isString } from "../../util/Typeguards.js"
-import { Environment } from "../common/Types.js"
+import { Environment, EnvironmentType } from "../common/Environment.js"
 import { Context } from "../context/Context.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
@@ -131,12 +131,12 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        getEnvironmentByUrl (url : string) : Environment {
+        getEnvironmentByUrl (url : string) : EnvironmentType {
             return /^https?:/.test(url) ? 'browser' : 'nodejs'
         }
 
 
-        getSuitableContextProviders (environment : Environment) : ContextProvider[] {
+        getSuitableContextProviders (environment : EnvironmentType) : ContextProvider[] {
             if (environment === 'browser') {
                 return this.contextProviderBrowser
             }
