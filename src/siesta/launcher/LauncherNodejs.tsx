@@ -320,7 +320,7 @@ export class LauncherNodejs extends Mixin(
 
             const launch        = await launcher.start()
 
-            launcher.setExitCode(launch.exitCode)
+            launch && launcher.setExitCode(launch.exitCode)
 
             await launcher.destroy()
         }

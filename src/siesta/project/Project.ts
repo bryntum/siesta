@@ -5,6 +5,7 @@ import { isNodejs } from "../../util/Helpers.js"
 import { Environment, EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
+import { SiestaProjectExtraction } from "../launcher/ProjectExtractor.js"
 import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/TestDescriptor.js"
 import { ProjectDescriptor, ProjectSerializableData } from "./ProjectDescriptor.js"
 
@@ -27,6 +28,15 @@ export class Project extends Mixin(
         projectPlan             : TestDescriptor            = this.testDescriptorClass.new()
 
         planItemT               : ProjectPlanItemDescriptor<InstanceType<this[ 'testDescriptorClass' ]>>
+
+
+        initialize (props? : Partial<Project>) {
+            super.initialize(props)
+
+            const extraction = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
+
+            if (extraction) extraction.state   = 'project_created'
+        }
 
 
         plan (...args : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
@@ -59,9 +69,11 @@ export class Project extends Mixin(
         async start () {
             await this.setup()
 
-            const extraction = globalThis.__SIESTA_PROJECT_EXTRACTION__
+            const extraction = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
 
-            if (extraction?.resolve) {
+            if (extraction) {
+                extraction.state   = 'project_created'
+
                 extraction.resolve(this)
             } else {
                 await (await this.getIsomorphicSelfInstance()).launchStandalone()
@@ -104,7 +116,7 @@ export class Project extends Mixin(
 
             const launch    = await launcher.start()
 
-            launcher.setExitCode(launch.exitCode)
+            launch && launcher.setExitCode(launch.exitCode)
 
             return launch
         }
