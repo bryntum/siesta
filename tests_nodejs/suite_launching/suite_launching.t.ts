@@ -77,12 +77,11 @@ it('Should be able to launch the browser project in browser via launcher', async
     await verifySampleProjectLaunch(t, launchRes)
 })
 
-// TODO
 
-// it('Should be able to launch the browser test file in browser via launcher', async t => {
-//     const launchRes     = await runTestViaLauncher(
-//         `${ SIESTA_PACKAGE_ROOT_WEB_PATH }/tests_nodejs/@sample_test_suites/browser/test_1.t.js`
-//     )
-//
-//     await verifySampleTestLaunch(t, launchRes)
-// })
+it('Should be able to launch the browser test file in browser via launcher', async t => {
+    const launchRes     = await runTestViaLauncher(
+        `${ SIESTA_PACKAGE_ROOT_WEB_PATH }/tests_nodejs/@sample_test_suites/browser/test_1.t.js`
+    )
+
+    await verifySampleTestLaunch(t, launchRes)
+})
