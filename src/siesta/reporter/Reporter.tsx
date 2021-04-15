@@ -350,7 +350,7 @@ export class Reporter extends Mixin(
 
         testSuiteHeader () : XmlElement {
             return <div>
-                Launching { this.launch.type === 'project' ? 'test suite project' : 'test file' }:{ ' ' }
+                Launching { this.launch.projectData.launchType === 'project' ? 'test suite project' : 'test file' }:{ ' ' }
                 <span class="project_title">{ this.projectData.projectPlan.title }</span>{ ' ' }
                 in { this.launch.launcher.projectData.environment.name } { this.launch.launcher.projectData.environment.version }
                 <div></div>

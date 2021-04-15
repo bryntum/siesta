@@ -1,9 +1,11 @@
-import { Project } from "../project/Project.js"
-
 //---------------------------------------------------------------------------------------------------------------------
 type ProjectExtractionState  = 'extraction_requested' | 'project_created' | 'project_ready'
 
-export type SiestaProjectExtraction  = { state : ProjectExtractionState, resolve : (project : Project) => any }
+export type SiestaProjectExtraction  = {
+    projectUrl  : string,
+    state       : ProjectExtractionState,
+    resolve     : (projectData : string) => any
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 export const extractProjectInfo     = async (projectUrl : string) : Promise<string> => {
@@ -11,6 +13,7 @@ export const extractProjectInfo     = async (projectUrl : string) : Promise<stri
     Object.defineProperty(globalThis, '__SIESTA_PROJECT_EXTRACTION__', {
         enumerable      : false,
         value           : {
+            projectUrl,
             state       : 'extraction_requested',
             resolve     : undefined
         } as SiestaProjectExtraction
@@ -18,25 +21,25 @@ export const extractProjectInfo     = async (projectUrl : string) : Promise<stri
 
     const extraction    = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
 
-    const promise       = new Promise<Project>(resolve => extraction.resolve = resolve)
+    const promise       = new Promise<string>(resolve => extraction.resolve = resolve)
 
     try {
         await import(projectUrl)
     } catch (e) {
-        throw new Error('Exception importing project file - wrong path/URL?' + String.fromCharCode(0) + e.stack)
+        throw new Error('Exception when importing a project file - wrong path/URL?' + String.fromCharCode(0) + e.stack)
     }
 
     if (extraction.state === 'extraction_requested') {
         throw new Error('The project instance has not been created during importing of project file - wrong path/URL?')
     }
 
-    let project : Project
+    let projectData : string
 
     try {
-        project             = await promise
+        projectData     = await promise
     } catch (e) {
-        throw new Error('Exception while running the project file' + String.fromCharCode(0) + e.stack)
+        throw new Error('Exception when running a project file' + String.fromCharCode(0) + e.stack)
     }
 
-    return project.asProjectDataSerialized()
+    return projectData
 }

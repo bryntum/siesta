@@ -22,7 +22,7 @@ export class Project extends Mixin(
         launcherClass           : typeof Launcher           = undefined
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
-
+        launchType              : 'project' | 'test'        = 'project'
         title                   : string                    = ''
 
         projectPlan             : TestDescriptor            = this.testDescriptorClass.new()
@@ -72,9 +72,9 @@ export class Project extends Mixin(
             const extraction = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
 
             if (extraction) {
-                extraction.state   = 'project_created'
+                extraction.state   = 'project_ready'
 
-                extraction.resolve(this)
+                extraction.resolve(this.asProjectDataSerialized())
             } else {
                 await (await this.getIsomorphicSelfInstance()).launchStandalone()
             }
@@ -127,6 +127,7 @@ export class Project extends Mixin(
                 environment             : Environment.detect(),
                 siestaPackageRootUrl    : this.siestaPackageRootUrl,
                 type                    : this.type,
+                launchType              : this.launchType,
                 projectPlan             : this.projectPlan,
                 options                 : ProjectDescriptor.new(this)
             })

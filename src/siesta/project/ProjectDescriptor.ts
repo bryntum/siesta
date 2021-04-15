@@ -67,6 +67,8 @@ export class ProjectSerializableData extends Mixin(
         type                    : EnvironmentType   = undefined
         siestaPackageRootUrl    : string            = ''
 
+        launchType              : 'project' | 'test' = 'project'
+
         projectPlan     : TestDescriptor            = undefined
 
         options         : ProjectDescriptor         = ProjectDescriptor.new()

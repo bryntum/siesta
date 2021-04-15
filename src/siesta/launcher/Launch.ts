@@ -90,7 +90,6 @@ export class Queue extends Base {
 }
 
 
-
 //---------------------------------------------------------------------------------------------------------------------
 export class Launch extends Mixin(
     [ Base ],
@@ -105,8 +104,6 @@ export class Launch extends Mixin(
         reporter                    : Reporter                  = undefined
 
         contextProviders            : ContextProvider[]         = []
-
-        type                        : 'project' | 'test'        = 'project'
 
         maxWorkers                  : number                    = 5
 

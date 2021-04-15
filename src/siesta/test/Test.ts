@@ -11,6 +11,8 @@ import { Environment } from "../common/Environment.js"
 import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher, LauncherError } from "../launcher/Launcher.js"
+import { SiestaProjectExtraction } from "../launcher/ProjectExtractor.js"
+import { Project } from "../project/Project.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
@@ -52,7 +54,7 @@ export class Test extends Mixin(
         @prototypeValue(TestDescriptor)
         testDescriptorClass : typeof TestDescriptor
 
-        executionContext                : ExecutionContext      = undefined
+        executionContext    : ExecutionContext      = undefined
 
         // "upgrade" types from TreeNode
         parentNode          : Test
@@ -537,49 +539,67 @@ export class Test extends Mixin(
 
             projectPlan.planItem(descriptor)
 
-            const isomorphicTestClass       = await this.getIsomorphicTestClass()
+            if (isNodejs()) {
+                const isomorphicTestClass       = await this.getIsomorphicTestClass()
 
-            const projectData   = ProjectSerializableData.new({
-                environment             : Environment.detect(),
-                projectPlan,
-                siestaPackageRootUrl    : import.meta.url.replace(/src\/siesta\/test\/Test.js$/, ''),
-                // TODO should get the environment from `isomorphicTestClass` somehow instead of descriptor
-                type                    : descriptor.type
-            })
+                const projectData   = ProjectSerializableData.new({
+                    launchType              : 'test',
+                    environment             : Environment.detect(),
+                    projectPlan,
+                    siestaPackageRootUrl    : import.meta.url.replace(/src\/siesta\/test\/Test.js$/, ''),
+                    // TODO should get the environment from `isomorphicTestClass` somehow instead of descriptor
+                    type                    : descriptor.type
+                })
 
-            const launcher      = (await this.getLauncherClass()).new({
-                projectData,
-                inputArguments          : isomorphicTestClass.getInputArguments()
-            })
+                const launcher      = (await this.getLauncherClass()).new({
+                    projectData,
+                    inputArguments          : isomorphicTestClass.getInputArguments()
+                })
 
-            descriptor.url      = projectPlan.title = isomorphicTestClass.getSelfUrl()
+                descriptor.url      = projectPlan.title = isomorphicTestClass.getSelfUrl()
 
-            try {
-                await launcher.setup()
-            } catch (e) {
-                if (e instanceof LauncherError)
-                    return
-                else
-                    throw e
+                try {
+                    await launcher.setup()
+                } catch (e) {
+                    if (e instanceof LauncherError)
+                        return
+                    else
+                        throw e
+                }
+
+                // for standalone launch we use different test launch procedure, since we want to avoid deriving extra context
+                // we don't use `TestLauncher.launchTest()` method for example
+
+                const launch    = Launch.new({
+                    launcher,
+                    projectData,
+                    projectPlanItemsToLaunch    : projectPlan.leavesAxis(),
+
+                    contextProviders            : [ ContextProviderSameContext.new({ launcher }) ]
+                })
+
+                await launch.setup()
+
+                await launch.launchStandaloneSameContextTest(topTest)
+
+                launcher.setExitCode(launch.exitCode)
+            } else {
+                const extraction        = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
+
+                extraction.state        = 'project_created'
+
+                descriptor.url          = extraction.projectUrl
+
+                const projectClass      = await this.getProjectClass()
+
+                const project           = projectClass.new({
+                    title       : extraction.projectUrl,
+                    launchType  : 'test',
+                    projectPlan
+                })
+
+                await project.start()
             }
-
-            // for standalone launch we use different test launch procedure, since we want to avoid deriving extra context
-            // we don't use `TestLauncher.launchTest()` method for example
-
-            const launch    = Launch.new({
-                type                        : 'test',
-                launcher,
-                projectData,
-                projectPlanItemsToLaunch    : projectPlan.leavesAxis(),
-
-                contextProviders            : [ ContextProviderSameContext.new({ launcher }) ]
-            })
-
-            await launch.setup()
-
-            await launch.launchStandaloneSameContextTest(topTest)
-
-            launcher.setExitCode(launch.exitCode)
         }
 
 
@@ -604,6 +624,14 @@ export class Test extends Mixin(
                 return (await import('../launcher/LauncherNodejs.js')).LauncherNodejs
             else
                 return (await import('../launcher/LauncherBrowser.js')).LauncherBrowser
+        }
+
+
+        static async getProjectClass () : Promise<typeof Project> {
+            if (isNodejs())
+                return (await import('../project/ProjectNodejs.js')).ProjectNodejs
+            else
+                return (await import('../project/ProjectBrowser.js')).ProjectBrowser
         }
     }
 
