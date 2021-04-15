@@ -44,9 +44,7 @@ export class TestBrowser extends Mixin(
         // TODO refactor the whole launching infrastructure
         static async launchStandalone () {
             if (isNodejs()) {
-                // TODO actually implement standalone browser launching
-
-                const colorerClass          = (await import('../../jsx/ColorerNodejs.js'))[ 'ColorerNodejs' ] as typeof ColorerNodejs
+                const colorerClass          = (await import('../../jsx/ColorerNodejs.js')).ColorerNodejs
                 const c                     = colorerClass.new()
                 const style                 = (clsName : string) => styles.get(clsName)(c)
 
