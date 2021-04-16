@@ -308,8 +308,8 @@ export class LauncherNodejs extends Mixin(
 
 
         static async run () {
-            process.on('unhandledRejection', (reason, promise) => {
-                console.log('Unhandled promise rejection, reason:', reason)
+            process.on('unhandledRejection', (reason : any, promise) => {
+                console.log('Unhandled promise rejection, reason:', reason?.stack || reason)
 
                 process.exit(ExitCodes.UNHANDLED_EXCEPTION)
             })
