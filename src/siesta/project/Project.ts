@@ -2,6 +2,7 @@ import { siestaPackageRootUrl } from "../../../index.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { stringify } from "../../serializable/Serializable.js"
 import { isNodejs } from "../../util/Helpers.js"
+import { stripBasename } from "../../util/Path.js"
 import { Environment, EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
@@ -25,12 +26,29 @@ export class Project extends Mixin(
         launchType              : 'project' | 'test'        = 'project'
         title                   : string                    = ''
 
-        // the directory part of the project file url
-        baseUrl                 : string                    = '.'
-
-        projectPlan             : TestDescriptor            = undefined
+        projectPlan             : TestDescriptor            = this.testDescriptorClass.new()
 
         planItemT               : ProjectPlanItemDescriptor<InstanceType<this[ 'testDescriptorClass' ]>>
+
+        $baseUrl                : string                    = ''
+
+        // the directory part of the project file url
+        // it is either calculated based on the project extraction information
+        // or lazily calculated with `buildBaseUrl` method
+        get baseUrl () : string {
+            if (this.$baseUrl !== '') return this.$baseUrl
+
+            return this.$baseUrl    = this.buildBaseUrl()
+        }
+
+        set baseUrl (value : string) {
+            this.$baseUrl    = value
+        }
+
+
+        buildBaseUrl () : string {
+            throw new Error("Abstract method")
+        }
 
 
         initialize (props? : Partial<Project>) {
@@ -38,13 +56,14 @@ export class Project extends Mixin(
 
             // create root descriptor here, instead of in the initializer, to apply the `testDescriptorClass`
             // initializer of subclasses first
-            this.projectPlan        = this.testDescriptorClass.new()
+            // this.projectPlan            = this.testDescriptorClass.new()
 
-            const extraction = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
+            const extraction            = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
 
             if (extraction) {
-                extraction.state    = 'project_created'
-                this.baseUrl        = extraction.projectUrl
+                extraction.state        = 'project_created'
+                this.baseUrl            = stripBasename(extraction.projectUrl)
+                this.projectPlan.url    = this.baseUrl
             }
         }
 
@@ -58,18 +77,10 @@ export class Project extends Mixin(
 
 
         async setup () {
-            // if (!this.baseUrl) this.baseUrl = this.buildBaseUrl()
-
             Object.assign(this.projectPlan, this.testDescriptor, {
-                url     : '.',
                 title   : this.title
             })
         }
-
-
-        // buildBaseUrl () : string {
-        //     return '.'
-        // }
 
 
         buildInputArguments () : string[] {
