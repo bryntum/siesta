@@ -28,6 +28,13 @@ project.plan(
             'suite_launching.t.js'
         ]
     },
+    {
+        filename    : 'plan',
+
+        items       : [
+            'project_plan.t.js'
+        ]
+    },
 )
 
 project.start()
