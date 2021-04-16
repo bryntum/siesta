@@ -33,7 +33,7 @@ it('Should be able to plan individual files inside the project directory', async
     t.equal(
         extract(project.projectPlan),
         {
-            url         : undefined,
+            url         : project.baseUrl,
             filename    : '',
             children    : [
                 {
@@ -67,7 +67,7 @@ it('Should be able to plan individual files outside the project directory', asyn
     t.equal(
         extract(project.projectPlan),
         {
-            url         : undefined,
+            url         : project.baseUrl,
             filename    : '',
             children    : [
                 {
@@ -97,6 +97,37 @@ it('Should be able to plan individual files outside the project directory', asyn
                             ]
                         },
                     ]
+                }
+            ]
+        }
+    )
+})
+
+
+//---------------------------------------------------------------------------------------------------------------------
+it('Should plan the project file directory by default', async t => {
+
+    const project       = ProjectNodejs.new({
+        baseUrl     : path.resolve(__dirname, '../@sample_test_suites/nodejs/')
+    })
+
+    project.finalizePlan()
+
+    t.equal(
+        extract(project.projectPlan),
+        {
+            url         : project.baseUrl,
+            filename    : '',
+            children    : [
+                {
+                    url         : 'test_1.t.js',
+                    filename    : 'test_1.t.js',
+                    children    : undefined
+                },
+                {
+                    url         : 'test_2.t.js',
+                    filename    : 'test_2.t.js',
+                    children    : undefined
                 }
             ]
         }
