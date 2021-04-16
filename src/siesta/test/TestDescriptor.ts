@@ -7,6 +7,7 @@ import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { ArbitraryObject, cloneObject, objectEntriesDeep } from "../../util/Helpers.js"
+import { isAbsolute, joinUrls, stripDirname, stripTrailingSlash } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { HasOptions, option, OptionGroup } from "../option/Option.js"
@@ -45,6 +46,7 @@ export class TestDescriptor extends Mixin(
         // TODO support `fileName` alias?
         filename        : string                = ''
 
+        // relative to the project file
         url             : string
 
         @option({ defaultValue : [], group : OptionsGroupTestDescriptor })
@@ -79,7 +81,7 @@ export class TestDescriptor extends Mixin(
         initialize (props? : Partial<TestDescriptor>) {
             super.initialize(props)
 
-            if (this.url && !this.filename) this.filename = this.url.replace(/^.*\//, '')
+            if (this.url && !this.filename) this.filename = stripDirname(this.url)
         }
 
 
@@ -103,6 +105,19 @@ export class TestDescriptor extends Mixin(
         }
 
 
+        // absolute url
+        $urlAbs         : string        = undefined
+
+        get urlAbs () : string | null {
+            if (this.$urlAbs !== undefined) return this.$urlAbs
+
+            return this.$urlAbs = isAbsolute(this.url) ?
+                    this.url
+                :
+                    this.parentNode && this.parentNode.urlAbs ? joinUrls(this.parentNode?.urlAbs, this.url || this.filename) : null
+        }
+
+
         getOptionValueReducers () : { [ key in keyof this ]? : (name : keyof this, parentsAxis : this[]) => this[ typeof name ] } {
             return {
                 url     : (name : 'url', parentsAxis : this[]) : this[ typeof name ] => {
@@ -110,7 +125,9 @@ export class TestDescriptor extends Mixin(
 
                     CI(parentsAxis).forEach(desc => {
                         if (desc.url) {
-                            urlParts.push(desc.url.replace(/\/$/, '')); return false
+                            urlParts.push(stripTrailingSlash(desc.url))
+
+                            if (isAbsolute(desc.url)) return false
                         }
                         else {
                             urlParts.push(desc.filename)
@@ -154,6 +171,9 @@ export class TestDescriptor extends Mixin(
 
                 return res
             }
+
+            // force the `urlAbs` calculation
+            this.urlAbs
 
             objectEntriesDeep(this.$options).map(([ key, _ ]) => key).concat('url', 'config').forEach(key => {
                 const reducer       = reducers[ key ] || defaultReducer
