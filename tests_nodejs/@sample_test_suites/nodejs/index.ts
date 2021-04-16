@@ -4,10 +4,7 @@ const project = Project.new({
     title                   : 'Node.js test suite'
 })
 
-project.plan(
-    'test_1.t.js',
-    'test_2.t.js'
-)
+// Node.js project includes all `*.t.m?js` files from the project file directory
 
 project.start()
 
