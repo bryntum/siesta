@@ -56,15 +56,24 @@ export class TreeNode extends Mixin(
         }
 
 
-        forEachChildNode (func : (node : TreeNode) => any) : false | undefined {
+        forEachChildNode (func : (node : this[ 'childNodeT' ]) => any) : false | undefined {
             const childNodes      = this.childNodes
 
-            for (let i = 0; i < childNodes.length; i++)
-                if (func(childNodes[ i ]) === false) return false
+            if (childNodes)
+                for (let i = 0; i < childNodes.length; i++)
+                    if (func(childNodes[ i ]) === false) return false
         }
 
 
-        traverse (func : (node : TreeNode) => any, includeThis : boolean = true) : false | undefined {
+        *forEachChildNodeGen () : Generator<this[ 'childNodeT' ]> {
+            const childNodes      = this.childNodes
+
+            if (childNodes)
+                for (let i = 0; i < childNodes.length; i++) yield childNodes[ i ]
+        }
+
+
+        traverse (func : (node : this[ 'childNodeT' ]) => any, includeThis : boolean = true) : false | undefined {
             if (includeThis && func(this) === false) return false
 
             const childNodes      = this.childNodes
@@ -73,6 +82,16 @@ export class TreeNode extends Mixin(
                 for (let i = 0; i < childNodes.length; i++) {
                     if (childNodes[ i ].traverse(func, true) === false) return false
                 }
+        }
+
+
+        *traverseGen (includeThis : boolean = true) : Generator<this[ 'childNodeT' ]> {
+            if (includeThis) yield this
+
+            const childNodes      = this.childNodes
+
+            if (childNodes)
+                for (let i = 0; i < childNodes.length; i++) yield* childNodes[ i ].traverseGen(true)
         }
 
 
