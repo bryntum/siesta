@@ -38,6 +38,8 @@ export class ProjectNodejs extends Mixin(
 
             this.rootMostPath       = this.baseUrl
             this.rootMostDesc       = this.projectPlan
+
+            this.projectPlan.url    = this.baseUrl
         }
 
 
