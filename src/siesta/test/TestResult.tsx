@@ -343,7 +343,7 @@ export class TestNodeResult extends Mixin(
             const snoozeConfig      = new Date(this.descriptor.snooze)
             const snoozeDate        = isNaN(snoozeConfig.getTime()) ? undefined : snoozeConfig
 
-            return this.$isTodo = this.descriptor.isTodo || (snoozeDate && (snoozeDate > new Date()) || false)
+            return this.$isTodo = this.descriptor.isTodo || (snoozeDate && (snoozeDate > new Date()))
         }
 
         set isTodo (value : boolean) {
