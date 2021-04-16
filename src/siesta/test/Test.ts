@@ -584,6 +584,8 @@ export class Test extends Mixin(
 
                 launcher.setExitCode(launch.exitCode)
             } else {
+                // TODO refactor this, to not create extra context and do everything in the test context,
+                // as in Node.js case above
                 const extraction        = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
 
                 extraction.state        = 'project_created'

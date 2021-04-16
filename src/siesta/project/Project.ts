@@ -25,7 +25,10 @@ export class Project extends Mixin(
         launchType              : 'project' | 'test'        = 'project'
         title                   : string                    = ''
 
-        projectPlan             : TestDescriptor            = this.testDescriptorClass.new()
+        // the directory part of the project file url
+        baseUrl                 : string                    = '.'
+
+        projectPlan             : TestDescriptor            = undefined
 
         planItemT               : ProjectPlanItemDescriptor<InstanceType<this[ 'testDescriptorClass' ]>>
 
@@ -33,14 +36,22 @@ export class Project extends Mixin(
         initialize (props? : Partial<Project>) {
             super.initialize(props)
 
+            // create root descriptor here, instead of in the initializer, to apply the `testDescriptorClass`
+            // initializer of subclasses first
+            this.projectPlan        = this.testDescriptorClass.new()
+
             const extraction = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
 
-            if (extraction) extraction.state   = 'project_created'
+            if (extraction) {
+                extraction.state    = 'project_created'
+                this.baseUrl        = extraction.projectUrl
+            }
         }
 
 
-        plan (...args : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
-            const descriptors : this[ 'planItemT' ][]  = args.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el)) as any
+        // this fancy type supports different typization of the descriptors in the browser projects
+        plan (...items : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
+            const descriptors : this[ 'planItemT' ][]  = items.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el)) as any
 
             descriptors.forEach(item => this.projectPlan.planItem(this.testDescriptorClass.fromProjectPlanItemDescriptor(item)))
         }
