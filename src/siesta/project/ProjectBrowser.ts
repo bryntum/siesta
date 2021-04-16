@@ -1,6 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { isNodejs } from "../../util/Helpers.js"
+import { stripBasename } from "../../util/Path.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
@@ -22,14 +23,14 @@ export class ProjectBrowser extends Mixin(
         testDescriptorClass     : typeof TestDescriptorBrowser  = TestDescriptorBrowser
 
 
-        // buildBaseUrl () : string {
-        //     const url           = new URL(window.location.href)
-        //
-        //     url.hash            = ''
-        //     url.search          = ''
-        //
-        //     return url.href
-        // }
+        buildBaseUrl () : string {
+            const url           = new URL(window.location.href)
+
+            url.hash            = ''
+            url.search          = ''
+
+            return url.href
+        }
 
 
         buildInputArguments () : string[] {
@@ -74,7 +75,7 @@ Please use Siesta launcher instead and web url:
             url.hash            = ''
             url.search          = ''
 
-            launcher.projectData.projectPlan.url  = url.toString().replace(/\/[^/]*?$/, '')
+            launcher.projectData.projectPlan.url  = stripBasename(url.toString())
 
             return launcher
         }

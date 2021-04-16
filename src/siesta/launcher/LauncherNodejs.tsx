@@ -12,6 +12,7 @@ import { LogLevel, LogMethod } from "../../logger/Logger.js"
 import { LoggerHookable } from "../../logger/LoggerHookable.js"
 import { parse } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
+import { stripBasename } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { Context } from "../context/Context.js"
@@ -283,7 +284,7 @@ export class LauncherNodejs extends Mixin(
             }
 
             if (this.project) {
-                this.projectData.projectPlan.url   = this.project.replace(/\/[^/]*?$/, '')
+                this.projectData.projectPlan.url   = stripBasename(this.project)
             }
         }
 
