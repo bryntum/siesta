@@ -1,6 +1,9 @@
-import * as fs from "fs"
+import fs from "fs"
+import glob from "glob"
 import path from "path"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { stripBasename } from "../../util/Path.js"
+import { scanDir } from "../../util_nodejs/FileSystem.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
@@ -38,6 +41,11 @@ export class ProjectNodejs extends Mixin(
         }
 
 
+        buildBaseUrl () : string {
+            return stripBasename(process.argv[ 1 ])
+        }
+
+
         buildInputArguments () : string[] {
             return process.argv.slice(2)
         }
@@ -62,29 +70,23 @@ export class ProjectNodejs extends Mixin(
 
 
         finalizePlan () {
-            if (this.rootMostDesc !== this.projectPlan) this.projectPlan.planItem(this.rootMostDesc)
+            if (this.rootMostDesc !== this.projectPlan) {
+                this.projectPlan.planItem(this.rootMostDesc)
+            }
+            else {
+                if (this.projectPlan.isLeaf()) this.planDir(path.dirname(this.baseUrl))
+            }
         }
 
 
-        // planGlob (globPattern : string, descriptor? : Partial<TestDescriptor>) {
-        //     const files = glob.sync(globPattern, { cwd : this.baseDir, matchBase : true, ignore : '**/node_modules/**' })
-        //
-        //     files.forEach(file => this.planFile(file, descriptor))
-        // }
+        async start () {
+            this.finalizePlan()
+
+            await super.start()
+        }
 
 
-        // planDir (dir : string, descriptor? : Partial<TestDescriptor>) {
-        //     const dirname       = path.resolve(this.baseDir, dir)
-        //
-        //     const planGroup     = this.createPlanGroup(dirname, descriptor)
-        //
-        //     scanDir(dirname, (entry : fs.Dirent, filename : string) => {
-        //         if (/\.t\.m?js$/.test(filename)) this.planFile(filename)
-        //     })
-        // }
-
-
-        addToPlan (absolute : string, item? : this[ 'planItemT' ]) : TestDescriptor {
+        addToPlan (absolute : string, item? : Partial<TestDescriptor>) : TestDescriptor {
             const existingDescriptor    = this.descriptorsByAbsPath.get(absolute)
 
             if (existingDescriptor) {
@@ -139,14 +141,36 @@ export class ProjectNodejs extends Mixin(
         }
 
 
-        planFile (file : string, item? : this[ 'planItemT' ]) {
+        planFile (file : string, desc? : Partial<TestDescriptor>) {
             const absolute  = path.resolve(this.baseUrl, file)
 
             const stats     = fs.statSync(absolute)
 
             if (!stats.isFile()) throw new Error(`Not a file provided to \`planFile\`: ${ file }, base dir: ${ this.baseUrl }`)
 
-            this.addToPlan(absolute, item)
+            this.addToPlan(absolute, desc)
+        }
+
+
+        planDir (dir : string, desc? : Partial<TestDescriptor>) {
+            const absolute  = path.resolve(this.baseUrl, dir)
+
+            const stats     = fs.statSync(absolute)
+
+            if (!stats.isDirectory()) throw new Error(`Not a directory provided to \`planDir\`: ${ dir }, base dir: ${ this.baseUrl }`)
+
+            this.addToPlan(absolute, desc)
+
+            scanDir(absolute, (entry : fs.Dirent, filename : string) => {
+                if (/\.t\.m?js$/.test(filename)) this.addToPlan(filename)
+            })
+        }
+
+
+        planGlob (globPattern : string, desc? : Partial<TestDescriptor>) {
+            const files = glob.sync(globPattern, { cwd : this.baseUrl, matchBase : true, ignore : '**/node_modules/**' })
+
+            files.forEach(file => this.addToPlan(file, desc))
         }
     }
 ) {}
