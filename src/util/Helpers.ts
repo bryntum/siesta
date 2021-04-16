@@ -187,11 +187,7 @@ export const isNodejs = function () : boolean {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const saneSplit = function (str : string, split : string | RegExp) : string[] {
-    if (str === '') return []
-
-    return str.split(split)
-}
+export const saneSplit = (str : string, split : string | RegExp) : string[] => str === '' ? [] : str.split(split)
 
 
 // export const stripFirstNewLine = (str : TemplateStringsArray, ...insertions : string[]) : string =>
