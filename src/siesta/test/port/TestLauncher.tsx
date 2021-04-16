@@ -68,7 +68,7 @@ export class TestLauncherChild extends Mixin(
                 let topTest : Test
 
                 try {
-                    await import(testDescriptor.url)
+                    await import(testDescriptor.urlAbs)
                 } catch (e) {
                     // there might be no `topTest` if test file does not contain any calls
                     // to static `it` method of any test class
