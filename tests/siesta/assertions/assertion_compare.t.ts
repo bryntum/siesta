@@ -1,5 +1,5 @@
 import { it } from "../../../index.js"
-import { verifyAllFailed } from "../helpers.js"
+import { verifyAllFailed } from "../@helpers.js"
 
 //-------------------------------------------------------
 it('`true` assertion should work', async t => {

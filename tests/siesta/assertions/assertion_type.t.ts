@@ -1,5 +1,5 @@
 import { it } from "../../../index.js"
-import { verifyAllFailed } from "../helpers.js"
+import { verifyAllFailed } from "../@helpers.js"
 
 //-------------------------------------------------------
 it('`isBoolean/isNumber/...` assertion should work', async t => {

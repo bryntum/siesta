@@ -1,6 +1,6 @@
 import { it } from "../../../index.js"
 import { delay } from "../../../src/util/Helpers.js"
-import { verifyAllFailed } from "../helpers.js"
+import { verifyAllFailed } from "../@helpers.js"
 
 //-------------------------------------------------------
 it('`throws` assertion should work', async t => {
