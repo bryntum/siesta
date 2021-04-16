@@ -502,7 +502,7 @@ export class AssertionCompare extends Mixin(
 
 
         // backward compat
-        any<T extends [] | [ AnyConstructor ]> (...args : T) : [] extends T ? FuzzyMatcherAny : FuzzyMatcherInstance {
+        any<T extends [] | [ AnyConstructor ]> (...args : T) : T extends [] ? any : T extends [ AnyConstructor<infer I> ] ? I : never {
             // @ts-ignore
             return any(...args)
         }
