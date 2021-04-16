@@ -33,7 +33,7 @@ export class TestDescriptor extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof TreeNode, typeof Base>) => {
 
     class TestDescriptor extends base {
-        type            : EnvironmentType                   = 'isomorphic'
+        type            : EnvironmentType       = 'isomorphic'
 
         childNodeT      : TestDescriptor
         parentNode      : TestDescriptor
@@ -73,10 +73,33 @@ export class TestDescriptor extends Mixin(
         deepCompareConfig   : DeepCompareOptions                = undefined
 
 
+        childrenByName      : Map<string, TestDescriptor>       = new Map()
+
+
+        initialize (props? : Partial<TestDescriptor>) {
+            super.initialize(props)
+
+            if (this.url && !this.filename) this.filename = this.url.replace(/^.*\//, '')
+        }
+
+
         planItem (item : TestDescriptor) : TestDescriptor {
-            this.appendChild(item)
+            const existing  = this.childrenByName.get(item.filename)
+
+            if (existing) {
+                existing.merge(item)
+            } else {
+                this.appendChild(item)
+
+                this.childrenByName.set(item.filename, item)
+            }
 
             return item
+        }
+
+
+        merge (item : ProjectPlanItemDescriptor<this>) {
+            Object.assign(this, item)
         }
 
 
