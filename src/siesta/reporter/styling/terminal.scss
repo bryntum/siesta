@@ -34,6 +34,7 @@ $deccent: #264653;
 $accent: whitesmoke;
 
 $primary_pass_lighter: color.scale($primary_pass, $lightness: 25%);
+$primary_pass_lighter_lighter: color.scale($primary_pass, $lightness: 50%);
 $primary_pass_darker: color.scale($primary_pass, $lightness: -25%);
 
 $primary_fail_lighter: color.scale($primary_fail, $lightness: 25%);
@@ -231,5 +232,5 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 }
 
 .option_group_name {
-    color               : $primary_pass;
+    color               : $primary_pass_lighter_lighter;
 }
