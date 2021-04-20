@@ -185,6 +185,10 @@ export const isNodejs = function () : boolean {
         && typeof window === 'undefined'
 }
 
+export const isDeno = function () : boolean {
+    return globalThis.Deno !== undefined && Boolean(globalThis.Deno.build)
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export const saneSplit = (str : string, split : string | RegExp) : string[] => str === '' ? [] : str.split(split)

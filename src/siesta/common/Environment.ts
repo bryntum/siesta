@@ -1,9 +1,9 @@
 import { Base } from "../../class/Base.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
-import { isNodejs } from "../../util/Helpers.js"
+import { isDeno, isNodejs } from "../../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export type EnvironmentType = 'browser' | 'nodejs' | 'isomorphic'
+export type EnvironmentType = 'browser' | 'nodejs' | 'isomorphic' | 'deno'
 
 @serializable()
 export class Environment extends Serializable.mix(Base) {
@@ -13,6 +13,14 @@ export class Environment extends Serializable.mix(Base) {
 
     version     : string                = ''
 
+
+    detectDeno () : Partial<Environment> {
+        return {
+            type        : 'deno',
+            name        : 'Deno',
+            version     : globalThis.Deno.version
+        }
+    }
 
     detectNodejs () : Partial<Environment> {
         return {
@@ -70,7 +78,7 @@ export class Environment extends Serializable.mix(Base) {
     static detect<T extends typeof Environment> (this : T) : InstanceType<T> {
         const instance      = new this() as InstanceType<T>
 
-        instance.initialize(isNodejs() ? instance.detectNodejs() : instance.detectBrowser())
+        instance.initialize(isNodejs() ? instance.detectNodejs() : isDeno() ? instance.detectDeno() : instance.detectBrowser())
 
         return instance
     }
