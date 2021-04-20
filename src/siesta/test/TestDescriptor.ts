@@ -16,7 +16,8 @@ import { Test } from "./Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export const OptionsGroupTestDescriptor  = OptionGroup.new({
-    name        : 'Test descriptor',
+    name        : 'test',
+    title       : 'Test descriptor',
     weight      : 800
 })
 
@@ -49,10 +50,10 @@ export class TestDescriptor extends Mixin(
         // relative to the project file
         url             : string
 
-        @option({ defaultValue : [], group : OptionsGroupTestDescriptor })
+        @option({ defaultValue : () => [], group : OptionsGroupTestDescriptor })
         tags            : string[]
 
-        @option({ type : 'boolean', defaultValue : false, group : OptionsGroupTestDescriptor })
+        @option({ type : 'boolean', defaultValue : () => false, group : OptionsGroupTestDescriptor })
         isTodo          : boolean
 
         @option({ type : 'string', group : OptionsGroupTestDescriptor })
@@ -61,13 +62,13 @@ export class TestDescriptor extends Mixin(
         // @option()
         // isolation       : IsolationLevel
 
-        @option({ type : 'boolean', defaultValue : false, group : OptionsGroupTestDescriptor })
+        @option({ type : 'boolean', defaultValue : () => false, group : OptionsGroupTestDescriptor })
         failOnIit           : boolean
 
         // will be applied directly to test instance
         config          : ArbitraryObject
 
-        @option({ defaultValue : false, group : OptionsGroupTestDescriptor })
+        @option({ defaultValue : () => false, group : OptionsGroupTestDescriptor })
         autoCheckGlobals    : boolean
 
         serializerConfig    : Partial<SerializerXml>            = { maxBreadth : 10, maxDepth : 4 }

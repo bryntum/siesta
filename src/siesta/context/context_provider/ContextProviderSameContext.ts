@@ -19,6 +19,8 @@ export class ContextProviderSameContext extends Mixin(
         async doCreateContext () : Promise<InstanceType<this[ 'contextClass' ]>> {
             return this.contextClass.new() as InstanceType<this[ 'contextClass' ]>
         }
+
+        static providerName : string = 'samecontext'
     }
 
     return ContextProviderSameContext

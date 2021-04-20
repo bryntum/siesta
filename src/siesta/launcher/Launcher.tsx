@@ -74,6 +74,8 @@ export enum ExitCodes {
 //---------------------------------------------------------------------------------------------------------------------
 @serializable()
 export class LauncherError extends Serializable.mix(Base) {
+    message             : string        = undefined
+
     annotation          : XmlElement    = undefined
 
     exitCode            : ExitCodes     = undefined
@@ -81,17 +83,20 @@ export class LauncherError extends Serializable.mix(Base) {
 
 //---------------------------------------------------------------------------------------------------------------------
 export const OptionsGroupFiltering  = OptionGroup.new({
-    name        : 'Filtering',
+    name        : 'filter',
+    title       : 'Filtering',
     weight      : 100
 })
 
 export const OptionsGroupPrimary  = OptionGroup.new({
-    name        : 'Primary',
+    name        : 'launcher',
+    title       : 'Primary launcher options',
     weight      : 1000
 })
 
 export const OptionsGroupOutput  = OptionGroup.new({
-    name        : 'Output',
+    name        : 'output',
+    title       : 'Output',
     weight      : 900
 })
 
@@ -193,8 +198,10 @@ export class Launcher extends Mixin(
             structure   : 'enum',
             enumeration : [ 'file', 'subtest', 'assertion' ],
             group       : OptionsGroupOutput,
+            defaultValue : () => 'file',
             help        : <span>
-                The detail level of the text output.
+                The detail level of the text output. Only applied to the passed assertions, the failed assertion are always
+                included in the output.
             </span>
         })
         detail          : ReporterDetailing = 'file'
@@ -202,8 +209,9 @@ export class Launcher extends Mixin(
         @option({
             type        : 'number',
             group       : OptionsGroupOutput,
+            defaultValue : () => 5,
             help        : <span>
-                How many lines of source file to show for failed assertion
+                How many lines of source file to show for failed assertion.
             </span>
         })
         sourceContext   : number    = 5
@@ -284,6 +292,7 @@ export class Launcher extends Mixin(
 
         onLauncherError (e : LauncherError) {
             e.annotation && this.write(e.annotation)
+            e.message && this.logger.error(e.message)
         }
 
 
@@ -427,6 +436,12 @@ export class Launcher extends Mixin(
         async launch (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<Launch> {
             await this.performSetupOnce()
 
+            const contextProviders          = this.getSuitableContextProviders(this.projectData.type)
+
+            if (contextProviders.length === 0) throw LauncherError.new({
+                message     : 'No suitable context providers found. Check the `--provider` option'
+            })
+
             const launch    = this.launchClass.new({
                 launcher                                : this,
                 projectData                             : this.projectData,
@@ -434,7 +449,7 @@ export class Launcher extends Mixin(
 
                 maxWorkers                              : this.maxWorkers,
 
-                contextProviders                        : this.getSuitableContextProviders(this.projectData.type)
+                contextProviders
             })
 
             await launch.start()
@@ -469,11 +484,11 @@ export class Launcher extends Mixin(
 
                 {
                     groups.map(group => <div class="group">
-                        <span class="option_group_name">{ '\n' + group.name + ':\n' + '='.repeat(group.name.length + 1) }</span>
+                        <span class="option_group_name">{ '\n' + group.title + ':\n' + '='.repeat(group.title.length + 1) }</span>
 
                         {
                             optionsByGroup.get(group).map(option => <div class="option">
-                                <div class="option_name">{ '--' + option.name }</div>
+                                <div class="option_name">{ option.printableDeclaration }</div>
                                 <div class="indented">{ option.help }</div>
                                 <p></p>
                             </div>)

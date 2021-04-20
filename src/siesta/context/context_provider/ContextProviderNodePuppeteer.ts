@@ -2,6 +2,7 @@ import puppeteer from "puppeteer"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { LauncherNodejs } from "../../launcher/LauncherNodejs.js"
 import { ContextPuppeteer } from "../ContextPuppeteer.js"
+import { ContextProvider } from "./ContextProvider.js"
 import { ContextProviderTargetBrowser } from "./ContextProviderTargetBrowser.js"
 
 
@@ -54,6 +55,23 @@ export class ContextProviderNodePuppeteer extends Mixin(
         }
 
 
+        get productOption () : puppeteer.Product {
+            const requestedBrowser = this.launcher.browser
+
+            switch (this.launcher.browser) {
+                case 'chrome':
+                    return 'chrome'
+                case 'firefox':
+                    return 'firefox'
+                case 'edge':
+                case 'safari':
+                    throw new Error(
+                        `Unsupported browser '${ requestedBrowser }' for provider '${ (this.constructor as typeof ContextProvider).providerName }'`
+                    )
+            }
+        }
+
+
         async createBrowser () : Promise<puppeteer.Browser> {
             const args      = [
                 '--window-size=1280,1024',
@@ -63,6 +81,7 @@ export class ContextProviderNodePuppeteer extends Mixin(
 
             return await puppeteer.launch({
                 args,
+                product                 : this.productOption,
                 headless                : this.launcher.headless,
                 ignoreHTTPSErrors       : true,
                 devtools                : !this.launcher.headless,
@@ -72,6 +91,8 @@ export class ContextProviderNodePuppeteer extends Mixin(
                 timeout                 : 60000
             })
         }
+
+        static providerName : string = 'puppeteer'
     }
 
     return ContextProviderNodePuppeteer

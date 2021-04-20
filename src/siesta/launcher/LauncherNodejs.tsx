@@ -31,11 +31,12 @@ import { extractProjectInfo } from "./ProjectExtractor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-[ process.stdout, process.stderr ].forEach((stream : any) => stream._handle && stream._handle.setBlocking(true))
+[ process.stdout, process.stderr ].forEach((stream : any) => stream._handle?.setBlocking(true))
 
 //---------------------------------------------------------------------------------------------------------------------
 export const OptionsGroupBrowser  = OptionGroup.new({
-    name        : 'Browser',
+    name        : 'browser',
+    title       : 'Browser',
     weight      : 900
 })
 
@@ -50,11 +51,12 @@ export class LauncherNodejs extends Mixin(
 
         logger                  : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
 
+        // region options
         @option({
             type        : 'string',
             group       : OptionsGroupPrimary,
             help        : <span>
-                Project file url.
+                Project file url. Can be either a regular filesystem path, or http-based URL, or a `file://` url
             </span>
         })
         project             : string            = ''
@@ -62,6 +64,7 @@ export class LauncherNodejs extends Mixin(
         @option({
             type        : 'boolean',
             group       : OptionsGroupOutput,
+            defaultValue : () => false,
             help        : <div>
                 Whether to suppress the output coloring. Also suppresses the progress bar and spinner.
                 Automatically enforced if output stream is not a terminal.
@@ -73,11 +76,39 @@ export class LauncherNodejs extends Mixin(
         @option({
             type        : 'boolean',
             group       : OptionsGroupBrowser,
+            defaultValue : () => true,
             help        : <div>
-                Whether to launch browser in the headless mode. Enabled by default. Supported by Chrome, Firefox, Puppeteer.
+                Whether to launch browser in the headless mode. Enabled by default.
+                Supported by Chrome, Firefox with all providers, and for all browsers in Puppeteer and Playwright providers.
             </div>
         })
         headless        : boolean               = true
+
+
+        @option({
+            type        : 'string',
+            structure   : 'enum',
+            enumeration : [ 'nodejs', 'deno', 'playwright', 'puppeteer' ],
+            group       : OptionsGroupPrimary,
+            help        : <div>
+                The context provider to use to launch the tests. By default its `node` for the Node.js test suites,
+                and `playwright` for browser.
+            </div>
+        })
+        provider        : string                = undefined
+
+
+        @option({
+            type        : 'string',
+            structure   : 'enum',
+            enumeration : [ 'chrome', 'firefox', 'edge', 'safari' ],
+            group       : OptionsGroupBrowser,
+            defaultValue : () => 'chrome',
+            help        : <div>
+                The browser where the tests should be launched. This option is only used when launching browser-based projects.
+            </div>
+        })
+        browser        : string                 = 'chrome'
 
 
         @option({
@@ -89,6 +120,8 @@ export class LauncherNodejs extends Mixin(
             </div>
         })
         browserArg      : string[]              = []
+        // endregion
+
 
         contextProviderConstructors : (typeof ContextProvider)[]    = [
             ContextProviderNodePlaywright, ContextProviderNodePuppeteer, ContextProviderNodeChildProcess
@@ -140,7 +173,10 @@ export class LauncherNodejs extends Mixin(
 
         getSuitableContextProviders (environment : EnvironmentType) : ContextProvider[] {
             if (environment === 'browser') {
-                return this.contextProviderBrowser
+                const requestedProvider     = this.provider
+
+                return this.contextProviderBrowser.filter(provider =>
+                    !requestedProvider || (provider.constructor as typeof ContextProvider).providerName === requestedProvider)
             }
             else if (environment === 'nodejs') {
                 return this.contextProviderNode

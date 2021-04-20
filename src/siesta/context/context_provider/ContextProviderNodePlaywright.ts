@@ -17,7 +17,7 @@ export class ContextProviderNodePlaywright extends Mixin(
 
         contextClass            : typeof ContextPlaywright   = ContextPlaywright
 
-        launcher                : LauncherNodejs            = undefined
+        launcher                : LauncherNodejs    = undefined
 
         // `true` is a bit slower, seems more robust though
         separateBrowserForEveryPage : boolean       = true
@@ -54,14 +54,28 @@ export class ContextProviderNodePlaywright extends Mixin(
         }
 
 
+        get browserType () : playwright.BrowserType<any> {
+            switch (this.launcher.browser) {
+                case 'chrome':
+                    return playwright.chromium
+                case 'edge':
+                    return playwright.chromium
+                case 'firefox':
+                    return playwright.firefox
+                case 'safari':
+                    return playwright.webkit
+            }
+        }
+
+
         async createBrowser () : Promise<playwright.Browser> {
             const args      = [
-                '--window-size=1280,1024',
+                // '--window-size=1280,1024',
                 // prepend `--` if missing
                 ...this.launcher.browserArg.map(arg => arg.replace(/^(--)?/, '--'))
             ]
 
-            return await playwright.chromium.launch({
+            return await this.browserType.launch({
                 args,
                 headless                : this.launcher.headless,
                 devtools                : !this.launcher.headless,
@@ -71,6 +85,8 @@ export class ContextProviderNodePlaywright extends Mixin(
                 timeout                 : 60000
             })
         }
+
+        static providerName : string = 'playwright'
     }
 
     return ContextProviderNodePlaywright

@@ -35,6 +35,8 @@ export class ContextProviderNodeChildProcess extends Mixin(
 
             return this.contextClass.new({ childProcess }) as InstanceType<this[ 'contextClass' ]>
         }
+
+        static providerName : string = 'nodejs'
     }
 
     return ContextProviderNodeChildProcess

@@ -65,6 +65,8 @@ export class ContextProvider extends Mixin(
             throw new Error("Abstract method")
         }
 
+
+        static providerName : string = 'abstract'
     }
 
     return ContextProvider

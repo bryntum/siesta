@@ -13,6 +13,7 @@ export type OptionStructureType    = 'map' | 'array' | 'set' | 'atom' | 'enum'
 //---------------------------------------------------------------------------------------------------------------------
 export class OptionGroup extends Base {
     name            : string        = ''
+    title           : string        = ''
     weight          : number        = 100
 }
 
@@ -23,20 +24,57 @@ export class Option extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class Option extends base {
-        name        : string                = ''
+        name                : string                = ''
 
-        type        : OptionAtomType        = 'string'
+        type                : OptionAtomType        = 'string'
 
         // maps are supposed to always have string keys
-        structure   : OptionStructureType   = 'atom'
+        structure           : OptionStructureType   = 'atom'
 
-        enumeration : string[]              = []
+        enumeration         : string[]              = []
 
-        group       : OptionGroup           = undefined
+        group               : OptionGroup           = undefined
 
-        help        : XmlElement            = undefined
+        help                : XmlElement            = undefined
 
-        defaultValue    : unknown           = undefined
+        defaultValue        : () => unknown     = () => undefined
+
+        reviver             : (value : string) => unknown   = undefined
+
+
+        get printableDeclaration () : XmlElement {
+            return <span>--{ camelCaseToSnakeCase(this.name) } : <span class='secondary_pass'>{ this.printableType }</span> { this.printableDefaultValue }</span>
+        }
+
+
+        get printableType () : string {
+            if (this.structure === 'atom') {
+                return this.type
+            }
+            else if (this.structure === 'array') {
+                return this.type + '[]'
+            }
+            else if (this.structure === 'enum') {
+                return this.enumeration.map(member => "'" + member + "'").join(' | ')
+            }
+            else if (this.structure === 'set') {
+                return `Set<${ this.type }`
+            }
+            else if (this.structure === 'map') {
+                return `Map<string, ${ this.type }`
+            }
+        }
+
+
+        get printableDefaultValue () : string {
+            const defaultValue      = this.defaultValue()
+
+            return (defaultValue === undefined || defaultValue === null || this.type === 'string' && defaultValue === '')
+                ?
+                    ''
+                :
+                    '= ' + JSON.stringify(defaultValue)
+        }
 
 
         applyValue (target : HasOptions, value : unknown) {
@@ -244,7 +282,7 @@ export const option = (config? : Partial<Option>, optionCls : typeof Option = Op
         const option                    = optionCls.new(Object.assign({}, config, { name : propertyKey }))
 
         proto.$options[ propertyKey ]   = option
-        proto[ propertyKey ]            = option.defaultValue
+        proto[ propertyKey ]            = option.defaultValue()
     }
 }
 
@@ -432,3 +470,8 @@ export const optionErrorTemplateByCode = new Map<OptionsParseErrorCodes, (warnin
     // TODO
     [ OptionsParseErrorCodes.InvalidKeyValuePair, () => <div></div> ],
 ])
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const camelCaseToSnakeCase = (str : string) : string =>
+    str.replace(/([A-Z])/g, (match : string, p1 : string) => '_' + p1.toLowerCase())
