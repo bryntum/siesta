@@ -1,6 +1,6 @@
 import path from "path"
 import { fileURLToPath } from "url"
-import { it, ProjectNodejs } from "../../nodejs.js"
+import { iit, it, ProjectNodejs } from "../../nodejs.js"
 import { TestDescriptor } from "../../src/siesta/test/TestDescriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -127,6 +127,69 @@ it('Should plan the project file directory by default', async t => {
                 {
                     url         : 'test_2.t.js',
                     filename    : 'test_2.t.js',
+                    children    : undefined
+                }
+            ]
+        }
+    )
+})
+
+
+//---------------------------------------------------------------------------------------------------------------------
+it('Should be able to plan the glob pattern', async t => {
+
+    const project       = ProjectNodejs.new({
+        baseUrl     : path.resolve(__dirname, '../@sample_test_suites/nodejs/')
+    })
+
+    project.planGlob('*est_[0-9]*.t.js')
+
+    project.finalizePlan()
+
+    t.equal(
+        extract(project.projectPlan),
+        {
+            url         : project.baseUrl,
+            filename    : '',
+            children    : [
+                {
+                    url         : 'test_1.t.js',
+                    filename    : 'test_1.t.js',
+                    children    : undefined
+                },
+                {
+                    url         : 'test_2.t.js',
+                    filename    : 'test_2.t.js',
+                    children    : undefined
+                }
+            ]
+        }
+    )
+})
+
+
+//---------------------------------------------------------------------------------------------------------------------
+it('Should be able to exclude files by the glob pattern', async t => {
+
+    const project       = ProjectNodejs.new({
+        baseUrl     : path.resolve(__dirname, '../@sample_test_suites/nodejs/')
+    })
+
+    project.planGlob('*est_[0-9]*.t.js')
+
+    project.excludeGlob('*2*')
+
+    project.finalizePlan()
+
+    t.equal(
+        extract(project.projectPlan),
+        {
+            url         : project.baseUrl,
+            filename    : '',
+            children    : [
+                {
+                    url         : 'test_1.t.js',
+                    filename    : 'test_1.t.js',
                     children    : undefined
                 }
             ]

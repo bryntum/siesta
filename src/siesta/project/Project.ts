@@ -68,6 +68,10 @@ export class Project extends Mixin(
         }
 
 
+        include (...items : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
+            this.plan(...items)
+        }
+
         // this fancy type supports different typization of the descriptors in the browser projects
         plan (...items : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
             const descriptors : this[ 'planItemT' ][]  = items.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el)) as any

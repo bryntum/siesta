@@ -24,17 +24,17 @@ export class ProjectNodejs extends Mixin(
         testDescriptorClass     : typeof TestDescriptorNodejs   = TestDescriptorNodejs
 
         descriptorsByAbsPath        : Map<string, TestDescriptor>   = new Map()
-        descriptorsByAbsPathGroups  : Map<string, TestDescriptor>   = new Map()
 
         rootMostPath                : string                        = undefined
         rootMostDesc                : TestDescriptor                = undefined
+
+        hasPlan                     : boolean                       = false
 
 
         initialize (props? : Partial<ProjectNodejs>) {
             super.initialize(props)
 
             this.descriptorsByAbsPath.set(path.resolve(this.baseUrl), this.projectPlan)
-            this.descriptorsByAbsPathGroups.set(path.resolve(this.baseUrl), this.projectPlan)
 
             this.rootMostPath       = this.baseUrl
             this.rootMostDesc       = this.projectPlan
@@ -72,11 +72,14 @@ export class ProjectNodejs extends Mixin(
 
 
         finalizePlan () {
+            // append the "root most" descriptor (which is outside of the project dir)
+            // as a child to the root descriptor with the relative path like "../../something"
             if (this.rootMostDesc !== this.projectPlan) {
                 this.projectPlan.planItem(this.rootMostDesc)
             }
             else {
-                if (this.projectPlan.isLeaf()) this.planDir(path.dirname(this.baseUrl))
+                // if there were no calls to "plan*" methods, plan the whole project directory by default
+                if (!this.hasPlan) this.planDir(path.dirname(this.baseUrl))
             }
         }
 
@@ -85,6 +88,15 @@ export class ProjectNodejs extends Mixin(
             this.finalizePlan()
 
             await super.start()
+        }
+
+
+        removeFromPlan (absolute : string) {
+            const existingDescriptor    = this.descriptorsByAbsPath.get(absolute)
+
+            if (!existingDescriptor) return
+
+            existingDescriptor.parentNode.removeItem(existingDescriptor)
         }
 
 
@@ -108,7 +120,7 @@ export class ProjectNodejs extends Mixin(
 
                 const dirAbs        = path.dirname(absolute)
 
-                const existingDirDescriptor     = this.descriptorsByAbsPathGroups.get(dirAbs)
+                const existingDirDescriptor     = this.descriptorsByAbsPath.get(dirAbs)
 
                 if (existingDirDescriptor) {
                     existingDirDescriptor.planItem(descriptor)
@@ -123,7 +135,6 @@ export class ProjectNodejs extends Mixin(
                                 url : path.relative(this.baseUrl, this.rootMostPath), filename : path.basename(this.rootMostPath)
                             })
 
-                            this.descriptorsByAbsPathGroups.set(this.rootMostPath, this.rootMostDesc)
                             this.descriptorsByAbsPath.set(this.rootMostPath, this.rootMostDesc)
                         }
                         else
@@ -132,7 +143,6 @@ export class ProjectNodejs extends Mixin(
 
                     const dirDesc                   = this.addToPlan(dirAbs)
 
-                    this.descriptorsByAbsPathGroups.set(dirAbs, dirDesc)
                     this.descriptorsByAbsPath.set(dirAbs, dirDesc)
 
                     dirDesc.planItem(descriptor)
@@ -143,23 +153,50 @@ export class ProjectNodejs extends Mixin(
         }
 
 
+        plan (...items : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
+            this.hasPlan                = true
+
+            super.plan(...items)
+        }
+
+
         planFile (file : string, desc? : Partial<TestDescriptor>) {
+            this.hasPlan                = true
+
             const absolute  = path.resolve(this.baseUrl, file)
 
             const stats     = fs.statSync(absolute)
 
-            if (!stats.isFile()) throw new Error(`Not a file provided to \`planFile\`: ${ file }, base dir: ${ this.baseUrl }`)
+            if (!stats.isFile()) throw new Error(`Not a file provided to \`planFile\`: ${ file }, project dir: ${ this.baseUrl }`)
 
             this.addToPlan(absolute, desc)
         }
 
 
+        includeFile (file : string, desc? : Partial<TestDescriptor>) {
+            this.planFile(file, desc)
+        }
+
+
+        excludeFile (file : string) {
+            const absolute  = path.resolve(this.baseUrl, file)
+
+            const stats     = fs.statSync(absolute)
+
+            if (!stats.isFile()) throw new Error(`Not a file provided to \`excludeFile\`: ${ file }, project dir: ${ this.baseUrl }`)
+
+            this.removeFromPlan(absolute)
+        }
+
+
         planDir (dir : string, desc? : Partial<TestDescriptor>) {
+            this.hasPlan                = true
+
             const absolute  = path.resolve(this.baseUrl, dir)
 
             const stats     = fs.statSync(absolute)
 
-            if (!stats.isDirectory()) throw new Error(`Not a directory provided to \`planDir\`: ${ dir }, base dir: ${ this.baseUrl }`)
+            if (!stats.isDirectory()) throw new Error(`Not a directory provided to \`planDir\`: ${ dir }, project dir: ${ this.baseUrl }`)
 
             this.addToPlan(absolute, desc)
 
@@ -169,10 +206,40 @@ export class ProjectNodejs extends Mixin(
         }
 
 
+        includeDir (dir : string, desc? : Partial<TestDescriptor>) {
+            this.planDir(dir, desc)
+        }
+
+
+        excludeDir (dir : string) {
+            const absolute  = path.resolve(this.baseUrl, dir)
+
+            const stats     = fs.statSync(absolute)
+
+            if (!stats.isDirectory()) throw new Error(`Not a directory provided to \`planDir\`: ${ dir }, project dir: ${ this.baseUrl }`)
+
+            this.removeFromPlan(absolute)
+        }
+
+
         planGlob (globPattern : string, desc? : Partial<TestDescriptor>) {
-            const files = glob.sync(globPattern, { cwd : this.baseUrl, matchBase : true, ignore : '**/node_modules/**' })
+            this.hasPlan                = true
+
+            const files = glob.sync(globPattern, { cwd : this.baseUrl, absolute : true, matchBase : true, ignore : '**/node_modules/**' })
 
             files.forEach(file => this.addToPlan(file, desc))
+        }
+
+
+        includeGlob (globPattern : string, desc? : Partial<TestDescriptor>) {
+            this.planGlob(globPattern, desc)
+        }
+
+
+        excludeGlob (globPattern : string) {
+            const files = glob.sync(globPattern, { cwd : this.baseUrl, absolute : true, matchBase : true, ignore : '**/node_modules/**' })
+
+            files.forEach(file => this.removeFromPlan(file))
         }
     }
 ) {}

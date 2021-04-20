@@ -105,6 +105,19 @@ export class TestDescriptor extends Mixin(
         }
 
 
+        removeItem (item : TestDescriptor) {
+            const child     = this.childrenByName.get(item.filename)
+
+            if (child === item) {
+                this.childrenByName.delete(item.filename)
+
+                const index     = this.childNodes.indexOf(item)
+
+                this.childNodes.splice(index, 1)
+            }
+        }
+
+
         // absolute url
         $urlAbs         : string        = undefined
 
