@@ -1,5 +1,5 @@
 import fs from "fs"
-import glob from "glob"
+import fg from "fast-glob"
 import path from "path"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { stripBasename } from "../../util/Path.js"
@@ -225,7 +225,7 @@ export class ProjectNodejs extends Mixin(
         planGlob (globPattern : string, desc? : Partial<TestDescriptor>) {
             this.hasPlan                = true
 
-            const files = glob.sync(globPattern, { cwd : this.baseUrl, absolute : true, matchBase : true, ignore : '**/node_modules/**' })
+            const files = fg.sync(globPattern, { cwd : this.baseUrl, absolute : true, baseNameMatch : true, ignore : [ '**/node_modules/**' ] })
 
             files.forEach(file => this.addToPlan(file, desc))
         }
@@ -237,7 +237,7 @@ export class ProjectNodejs extends Mixin(
 
 
         excludeGlob (globPattern : string) {
-            const files = glob.sync(globPattern, { cwd : this.baseUrl, absolute : true, matchBase : true, ignore : '**/node_modules/**' })
+            const files = fg.sync(globPattern, { cwd : this.baseUrl, absolute : true, baseNameMatch : true, ignore : [ '**/node_modules/**' ] })
 
             files.forEach(file => this.removeFromPlan(file))
         }
