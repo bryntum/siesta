@@ -246,14 +246,21 @@ export class Launcher extends Mixin(
             return this.contextProviders.filter(provider => provider.supportsNodejs)
         }
 
+        get contextProviderDeno () : ContextProvider[] {
+            return this.contextProviders.filter(provider => provider.supportsDeno)
+        }
+
 
         getSuitableContextProviders (environment : EnvironmentType) : ContextProvider[] {
             if (environment === 'browser')
                 return this.contextProviderBrowser
             else if (environment === 'nodejs')
                 return this.contextProviderNode
+            else if (environment === 'deno')
+                return this.contextProviderDeno
             else
-                throw new Error("Should not be trying to find suitable providers for isomorphic case")
+                // for isomorphic code any provider is ok
+                return this.contextProviders
         }
 
 

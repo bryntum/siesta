@@ -5,7 +5,7 @@ import { Hook } from "../../hook/Hook.js"
 import { XmlNode } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
-import { ArbitraryObject, ArbitraryObjectKey, isNodejs, prototypeValue } from "../../util/Helpers.js"
+import { ArbitraryObject, ArbitraryObjectKey, isDeno, isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { Environment } from "../common/Environment.js"
 import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
@@ -624,6 +624,8 @@ export class Test extends Mixin(
         static async getLauncherClass () : Promise<typeof Launcher> {
             if (isNodejs())
                 return (await import('../launcher/LauncherNodejs.js')).LauncherNodejs
+            if (isDeno())
+                return (await import('../launcher/LauncherDeno.js')).LauncherDeno
             else
                 return (await import('../launcher/LauncherBrowser.js')).LauncherBrowser
         }
