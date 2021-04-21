@@ -195,11 +195,6 @@ export class LauncherNodejs extends Mixin(
                 this.colorerClass       = ColorerNoop
                 this.reporterClass      = ReporterNodejs
             }
-        }
-
-
-        async prepareLauncherOptions () : Promise<PrepareOptionsResult> {
-            const res               = await super.prepareLauncherOptions()
 
             const projectFileUrl    = this.project || this.argv[ 0 ]
 
@@ -221,8 +216,6 @@ export class LauncherNodejs extends Mixin(
             })
 
             if (!this.project) this.project = this.argv[ 0 ]
-
-            return res
         }
 
 
