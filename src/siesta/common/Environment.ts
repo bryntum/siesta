@@ -18,7 +18,7 @@ export class Environment extends Serializable.mix(Base) {
         return {
             type        : 'deno',
             name        : 'Deno',
-            version     : globalThis.Deno.version
+            version     : globalThis.Deno.version.deno
         }
     }
 
