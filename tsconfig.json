@@ -14,7 +14,8 @@
 
         "lib"                       : [
             "esnext",
-            "dom"
+            "dom",
+            "webworker"
         ],
 
         "module"                    : "esnext",
