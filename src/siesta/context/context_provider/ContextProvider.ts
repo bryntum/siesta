@@ -14,6 +14,7 @@ export class ContextProvider extends Mixin(
         local                   : boolean           = false
         supportsBrowser         : boolean           = false
         supportsNodejs          : boolean           = false
+        supportsDeno            : boolean           = false
 
         launcher                : Launcher          = undefined
 
