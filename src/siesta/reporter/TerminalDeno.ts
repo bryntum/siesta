@@ -18,12 +18,12 @@ export class TerminalDeno extends Terminal {
         if (dx > 0)
             goRight(dx)
         else if (dx < 0)
-            goLeft(dx)
+            goLeft(-dx)
 
         if (dy > 0)
             goDown(dy)
         else if (dy < 0)
-            goUp(dy)
+            goUp(-dy)
     }
 
 
