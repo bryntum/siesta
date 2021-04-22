@@ -13,25 +13,19 @@ export class ReporterDeno extends Mixin(
 
     class ReporterDeno extends base {
 
-        getMaxLen () : number {
-            return /*process.stdout.columns ?? */Number.MAX_SAFE_INTEGER
-        }
-
-
-        doPrint (str : string) {
-            this.launcher.print(str)
-        }
-
-
         async fetchSources (url : string) : Promise<string[]> {
-            if (/^http/.test(url)) {
-                const text  = await (await fetch(url)).text()
+            try {
+                if (/^http/.test(url)) {
+                    const text  = await (await fetch(url)).text()
 
-                return saneSplit(text, '\n')
-            } else {
-                const text  = await Deno.readTextFile(url)
+                    return saneSplit(text, '\n')
+                } else {
+                    const text  = await Deno.readTextFile(url)
 
-                return text ? saneSplit(text, '\n') : undefined
+                    return text ? saneSplit(text, '\n') : undefined
+                }
+            } catch (e) {
+                return undefined
             }
         }
     }

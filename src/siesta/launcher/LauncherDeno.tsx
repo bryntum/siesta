@@ -1,9 +1,9 @@
 // @ts-ignore
+import { encode } from "https://deno.land/std@0.83.0/encoding/utf8.ts"
+// @ts-ignore
 import { isatty } from "https://deno.land/std@0.94.0/node/tty.ts"
 // @ts-ignore
 import * as path from "https://deno.land/std@0.94.0/path/mod.ts"
-// @ts-ignore
-import { encode } from "https://deno.land/std@0.83.0/encoding/utf8.ts"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContextAttachable } from "../../context/ExecutionContext.js"
 import { Colorer } from "../../jsx/Colorer.js"
@@ -22,11 +22,12 @@ import { Context } from "../context/Context.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderDenoWorker } from "../context/context_provider/ContextProviderDenoWorker.js"
 import { option } from "../option/Option.js"
-import { ProjectDescriptor, ProjectSerializableData } from "../project/ProjectDescriptor.js"
+import { ProjectDescriptorDeno, ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ReporterDeno } from "../reporter/ReporterDeno.js"
-import { TestDescriptor } from "../test/TestDescriptor.js"
+import { ReporterDenoTerminal } from "../reporter/ReporterDenoTerminal.js"
+import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { LogMessage } from "../test/TestResult.js"
-import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary, PrepareOptionsResult } from "./Launcher.js"
+import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary } from "./Launcher.js"
 import { extractProjectInfo } from "./ProjectExtractor.js"
 
 
@@ -71,11 +72,11 @@ export class LauncherDeno extends Mixin(
         ]
 
 
-        reporterClass   : typeof ReporterDeno               = ReporterDeno
+        reporterClass   : typeof ReporterDeno               = ReporterDenoTerminal
         colorerClass    : typeof Colorer                    = ColorerDeno
 
-        projectDescriptorClass : typeof ProjectDescriptor   = ProjectDescriptor
-        testDescriptorClass : typeof TestDescriptor         = TestDescriptor
+        projectDescriptorClass : typeof ProjectDescriptorDeno   = ProjectDescriptorDeno
+        testDescriptorClass : typeof TestDescriptorDeno         = TestDescriptorDeno
 
 
         initialize (props? : Partial<LauncherDeno>) {
@@ -267,9 +268,9 @@ export class LauncherDeno extends Mixin(
             if (/^https?:/i.test(url)) {
                 return url
             }
-            // else if (/^file:/.test(url)) {
-            //     return path.resolve(fileURLToPath(url))
-            // }
+            else if (/^file:/.test(url)) {
+                return path.resolve(path.fromFileUrl(url))
+            }
             else {
                 // assume plain fs path here
                 return path.resolve(url)

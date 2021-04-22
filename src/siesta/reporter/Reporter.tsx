@@ -88,6 +88,11 @@ export class Reporter extends Mixin(
         }
 
 
+        doPrint (str : string) {
+            this.launcher.print(str)
+        }
+
+
         pendingPrints   : number        = 0
 
         async onSubTestFinish (testNode : TestNodeResult) {
