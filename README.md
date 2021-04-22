@@ -21,6 +21,11 @@ Installation
 npm install @bryntum/siesta --save 
 ```
 
+Github repo
+===========
+
+https://github.com/bryntum/siesta
+
 Connect
 =======
 
