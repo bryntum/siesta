@@ -6,6 +6,17 @@ it('Theming of the equality assertions', async t => {
 
     t.is({ abc : 'def' }, { ghi : 'jkl'})
 
-    t.equal({ arr : [ 1, 2, 3, 4 ], unexpected : 'Unexpected' }, { arr : [ 0, 2 ], expected : 'Expected' })
+    t.equal(
+        {
+            map : new Map([ [ { key1 : 'value1' }, 1 ] ]),
+            array : [ 'unequal', 2, 3, 4 ],
+            unexpected : 'unexpected'
+        },
+        {
+            map : new Map([ [ { key2 : 'value1' }, 1 ] ]),
+            array : [ 'UNEQUAL', 2 ],
+            expected : 'expected'
+        }
+    )
 })
 
