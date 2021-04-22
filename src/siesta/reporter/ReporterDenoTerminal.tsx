@@ -17,17 +17,20 @@ export class ReporterDenoTerminal extends Mixin(
     class ReporterDenoTerminal extends base {
         terminalClass       : typeof Terminal           = TerminalDeno
 
+        sigintIterator      : AsyncIterableIterator<any> & { dispose : Function }   = undefined
+        sigtermIterator     : AsyncIterableIterator<any> & { dispose : Function }   = undefined
+
 
         onTestSuiteStart () {
             super.onTestSuiteStart()
 
-            const sigint    = Deno.signal(Deno.Signal.SIGINT)
-            const sigterm   = Deno.signal(Deno.Signal.SIGTERM)
+            this.sigintIterator     = Deno.signal(Deno.Signal.SIGINT)
+            this.sigtermIterator    = Deno.signal(Deno.Signal.SIGTERM)
 
             ; (async () => {
-                for await (const _ of sigterm) {
-                    sigterm.dispose()
-                    sigint.dispose()
+                for await (const _ of this.sigtermIterator) {
+                    this.sigtermIterator.dispose()
+                    this.sigintIterator.dispose()
 
                     this.print('\n')
                     this.terminal.showCursor()
@@ -35,9 +38,9 @@ export class ReporterDenoTerminal extends Mixin(
                     Deno.exit(ExitCodes.UNHANDLED_EXCEPTION)
                 }
 
-                for await (const _ of sigint) {
-                    sigterm.dispose()
-                    sigint.dispose()
+                for await (const _ of this.sigintIterator) {
+                    this.sigtermIterator.dispose()
+                    this.sigintIterator.dispose()
 
                     this.print('\n')
                     this.terminal.showCursor()
@@ -45,6 +48,14 @@ export class ReporterDenoTerminal extends Mixin(
                     Deno.exit(ExitCodes.UNHANDLED_EXCEPTION)
                 }
             })()
+        }
+
+
+        onTestSuiteFinish () {
+            super.onTestSuiteFinish()
+
+            this.sigtermIterator.dispose()
+            this.sigintIterator.dispose()
         }
     }
 
