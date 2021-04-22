@@ -1,10 +1,13 @@
 // @ts-ignore
+import { isatty } from "https://deno.land/std@0.94.0/node/tty.ts"
+// @ts-ignore
 import * as path from "https://deno.land/std@0.94.0/path/mod.ts"
 // @ts-ignore
 import { encode } from "https://deno.land/std@0.83.0/encoding/utf8.ts"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContextAttachable } from "../../context/ExecutionContext.js"
 import { Colorer } from "../../jsx/Colorer.js"
+import { ColorerDeno } from "../../jsx/ColorerDeno.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlNode } from "../../jsx/XmlElement.js"
@@ -69,7 +72,7 @@ export class LauncherDeno extends Mixin(
 
 
         reporterClass   : typeof ReporterDeno               = ReporterDeno
-        colorerClass    : typeof Colorer                    = ColorerNoop
+        colorerClass    : typeof Colorer                    = ColorerDeno
 
         projectDescriptorClass : typeof ProjectDescriptor   = ProjectDescriptor
         testDescriptorClass : typeof TestDescriptor         = TestDescriptor
@@ -131,7 +134,7 @@ export class LauncherDeno extends Mixin(
         async onLauncherOptionsAvailable () {
             await super.onLauncherOptionsAvailable()
 
-            if (this.noColor /*|| !process.stdout.isTTY*/) {
+            if (this.noColor || !isatty(1)) {
                 this.colorerClass       = ColorerNoop
                 this.reporterClass      = ReporterDeno
             }
