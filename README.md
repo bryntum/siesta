@@ -21,6 +21,11 @@ Installation
 npm install @bryntum/siesta --save 
 ```
 
+Teaser video
+===========
+
+https://youtu.be/t9vCUGfaOHY
+
 Github repo
 ===========
 
