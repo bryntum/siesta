@@ -39,6 +39,8 @@ export class LauncherDeno extends Mixin(
         logger                  : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
 
         // region options
+        maxWorkers      : number            = 4
+
         @option({
             type        : 'string',
             group       : OptionsGroupPrimary,
