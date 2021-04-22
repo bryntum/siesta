@@ -1,7 +1,7 @@
 import { siestaPackageRootUrl } from "../../../index.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { stringify } from "../../serializable/Serializable.js"
-import { isNodejs } from "../../util/Helpers.js"
+import { isDeno, isNodejs } from "../../util/Helpers.js"
 import { stripBasename } from "../../util/Path.js"
 import { Environment, EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
@@ -121,6 +121,8 @@ export class Project extends Mixin(
         async getIsomorphicProjectClass () : Promise<typeof Project> {
             if (isNodejs())
                 return (await import('./ProjectNodejs.js')).ProjectNodejs
+            else if (isDeno())
+                return (await import('./ProjectDeno.js')).ProjectDeno
             else
                 return (await import('./ProjectBrowser.js')).ProjectBrowser
         }

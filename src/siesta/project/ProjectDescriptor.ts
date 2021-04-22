@@ -5,6 +5,7 @@ import { Environment, EnvironmentType } from "../common/Environment.js"
 import { HasOptions } from "../option/Option.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
+import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 
 
@@ -52,6 +53,20 @@ export class ProjectDescriptorNodejs extends Mixin(
     }
 
     return ProjectDescriptorNodejs
+}) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+@serializable({ mode : 'optIn' })
+export class ProjectDescriptorDeno extends Mixin(
+    [ ProjectDescriptor ],
+    (base : ClassUnion<typeof ProjectDescriptor>) => {
+
+    class ProjectDescriptorDeno extends base {
+        testDescriptor      : Partial<TestDescriptorDeno>
+    }
+
+    return ProjectDescriptorDeno
 }) {}
 
 

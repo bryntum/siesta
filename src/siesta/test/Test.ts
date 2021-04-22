@@ -539,7 +539,7 @@ export class Test extends Mixin(
 
             projectPlan.planItem(descriptor)
 
-            if (isNodejs()) {
+            if (isNodejs() || isDeno()) {
                 const isomorphicTestClass       = await this.getIsomorphicTestClass()
 
                 const projectData   = ProjectSerializableData.new({
@@ -608,6 +608,8 @@ export class Test extends Mixin(
         static async getIsomorphicTestClass () : Promise<typeof Test> {
             if (isNodejs())
                 return (await import('./TestNodejs.js')).TestNodejs
+            else if (isDeno())
+                return (await import('./TestDeno.js')).TestDeno
             else
                 return (await import('./TestBrowser.js')).TestBrowser
         }
@@ -616,6 +618,8 @@ export class Test extends Mixin(
         static async getExecutionContextClass () : Promise<typeof ExecutionContext> {
             if (isNodejs())
                 return (await import('../../context/ExecutionContextNode.js')).ExecutionContextNode
+            else if (isDeno())
+                return (await import('../../context/ExecutionContextDeno.js')).ExecutionContextDeno
             else
                 return (await import('../../context/ExecutionContextBrowser.js')).ExecutionContextBrowser
         }
@@ -624,7 +628,7 @@ export class Test extends Mixin(
         static async getLauncherClass () : Promise<typeof Launcher> {
             if (isNodejs())
                 return (await import('../launcher/LauncherNodejs.js')).LauncherNodejs
-            if (isDeno())
+            else if (isDeno())
                 return (await import('../launcher/LauncherDeno.js')).LauncherDeno
             else
                 return (await import('../launcher/LauncherBrowser.js')).LauncherBrowser
@@ -634,6 +638,8 @@ export class Test extends Mixin(
         static async getProjectClass () : Promise<typeof Project> {
             if (isNodejs())
                 return (await import('../project/ProjectNodejs.js')).ProjectNodejs
+            else if (isDeno())
+                return (await import('../project/ProjectDeno.js')).ProjectDeno
             else
                 return (await import('../project/ProjectBrowser.js')).ProjectBrowser
         }
