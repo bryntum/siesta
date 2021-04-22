@@ -4,11 +4,13 @@ Siesta
 Siesta is an ubiquitous, full-featured, open-source JavaScript/TypeScript testing tool, 
 developed at [Bryntum](https://www.bryntum.com/) for more than 10 years.
 
-Main features of the version 6:
+Version 6 is a complete rewrite, using a modern technologies stack and the decade of test driven development experience.
 
-- It can run the tests in browsers, Node.js and Deno, assuming the code being tested is isomorphic
+Main features:
+
+- It can run tests in browsers, Node.js and Deno, assuming that the code being tested is isomorphic
 - Supports parallel execution
-- Provides a precise deep diff for equality comparison
+- Provides accurate and well-formatted deep diff for equality assertion
 
 Siesta powers the test suites of all [Bryntum products](https://www.bryntum.com) and thousands clients. 
 
