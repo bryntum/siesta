@@ -31,7 +31,10 @@ $primary_pass: #2a9d8f;
 $deccent: #264653;
 
 // does not suite the white-background theme
-$accent: whitesmoke;
+$accent: #f5f5f5;
+
+$gray: #808080;
+$black: #000000;
 
 $primary_pass_lighter: color.scale($primary_pass, $lightness: 25%);
 $primary_pass_lighter_lighter: color.scale($primary_pass, $lightness: 50%);
@@ -54,7 +57,7 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 }
 
 .gray {
-    color   : gray;
+    color   : $gray;
 }
 
 .secondary_pass {
@@ -102,7 +105,7 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 }
 
 .test_file_url_dirname {
-    color   : gray;
+    color   : $gray;
 }
 
 .test_file_url_filename {
@@ -110,17 +113,17 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 }
 
 .test_file_pass {
-    color               : black;
+    color               : $black;
     background-color    : $primary_pass;
 }
 
 .test_file_fail {
-    color               : black;
+    color               : $black;
     background-color    : $primary_fail;
 }
 
 .test_file_runs {
-    color               : black;
+    color               : $black;
     background-color    : $secondary_pass;
 }
 
@@ -163,32 +166,32 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 
 .log_message_error {
     background-color : $primary_fail;
-    color: black;
+    color: $black;
 }
 
 .log_message_warn {
     background-color : $secondary_fail;
-    color: black;
+    color: $black;
 }
 
 .log_message_log {
     background-color : $secondary_pass;
-    color: black;
+    color: $black;
 }
 
 .log_message_debug {
     background-color : $primary_pass;
-    color: black;
+    color: $black;
 }
 
 .log_message_info {
     background-color : $deccent;
-    color: black;
+    color: $black;
 }
 
 .exception_icon {
     background-color : $primary_fail;
-    color: black;
+    color: $black;
 }
 
 
@@ -220,7 +223,7 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 
 
 .tree_line {
-    color : gray;
+    color : $gray;
 }
 
 .accented_value {
