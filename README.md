@@ -12,7 +12,7 @@ Main features:
 - Supports parallel execution
 - Provides accurate and well-formatted deep diff for equality assertion
 
-Siesta powers the test suites of all [Bryntum products](https://www.bryntum.com) and thousands clients. 
+Siesta powers the test suites of all [Bryntum products](https://www.bryntum.com) and thousands of our clients. 
 
 Installation
 =============
