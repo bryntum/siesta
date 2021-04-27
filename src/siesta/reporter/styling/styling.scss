@@ -24,13 +24,13 @@ Supported styles:
 @use "sass:color";
 
 // the primary palette
-$primary_fail: color.scale(#e76f51, $saturation: 100%) !default;
-$secondary_fail: color.scale(#f4a261, $saturation: 100%) !default;
-$secondary_pass: color.scale(#e9c46a, $saturation: 100%) !default;
-$primary_pass: color.scale(#2a9d8f, $saturation: 100%) !default;
+$primary_fail: color.scale(#e76f51, $saturation: 75%) !default;
+$secondary_fail: color.scale(#f4a261, $saturation: 75%) !default;
+$secondary_pass: color.scale(#e9c46a, $saturation: 75%) !default;
+$primary_pass: color.scale(#2a9d8f, $saturation: 75%) !default;
 // not used pretty much anywhere..
 // need to replace with some other color?
-$deccent: color.scale(#264653, $saturation: 100%) !default;
+$deccent: color.scale(#264653, $saturation: 75%) !default;
 
 // does not suite the white-background theme
 $accent: #f5f5f5 !default;
@@ -240,5 +240,5 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 }
 
 .option_group_name {
-    color: $primary_pass_lighter_lighter;
+    color: $primary_pass;
 }
