@@ -2,8 +2,9 @@ import { it } from "../../index.js"
 import { compareDeepDiff } from "../../src/compare_deep/CompareDeepDiff.js"
 import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRendering.js"
 import { TextBlock } from "../../src/jsx/TextBlock.js"
+import { styles } from "../../src/siesta/reporter/styling/theme_universal.js"
 
-const renderer      = XmlRendererDifference.new()
+const renderer      = XmlRendererDifference.new({ styles })
 
 it('Should limit the width of the diff streams #1', async t => {
     const difference0   = compareDeepDiff('0'.repeat(10), '1'.repeat(20))

@@ -3,10 +3,11 @@ import { compareDeepDiff, DifferenceReference } from "../../src/compare_deep/Com
 import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRendering.js"
 import { any, anyInstanceOf, anyNumberApprox, anyStringLike } from "../../src/compare_deep/FuzzyMatcherDiff.js"
 import { ColorerNodejs } from "../../src/jsx/ColorerNodejs.js"
+import { styles } from "../../src/siesta/reporter/styling/theme_universal.js"
 import { stripAnsiControlCharacters } from "../../src/util_nodejs/Terminal.js"
 
-const rendererPlain     = XmlRendererDifference.new()
-const rendererNodejs    = XmlRendererDifference.new({ colorerClass : ColorerNodejs })
+const rendererPlain     = XmlRendererDifference.new({ styles })
+const rendererNodejs    = XmlRendererDifference.new({ colorerClass : ColorerNodejs, styles })
 
 it('Should render the array diff correctly #1', async t => {
     const difference0   = compareDeepDiff([], [])

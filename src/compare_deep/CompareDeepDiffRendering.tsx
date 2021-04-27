@@ -10,7 +10,7 @@ import {
 import { TextBlock } from "../jsx/TextBlock.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../jsx/XmlElement.js"
-import { XmlRenderer, XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
+import { XmlRenderingDynamicContext } from "../jsx/XmlRenderer.js"
 import { serializable } from "../serializable/Serializable.js"
 import {
     Serialization,
@@ -24,7 +24,6 @@ import {
     SerializationSet,
     XmlRendererSerialization
 } from "../serializer/SerializerRendering.js"
-import { styles } from "../siesta/reporter/styling/terminal.js"
 import { isString } from "../util/Typeguards.js"
 import { stripAnsiControlCharacters } from "../util_nodejs/Terminal.js"
 import { DifferenceType } from "./CompareDeepDiff.js"
@@ -84,19 +83,19 @@ export class DifferenceTemplateElement extends XmlElement {
         const insideHetero  = CI(this.parentAxis()).some(el => el instanceof DifferenceTemplateHeterogeneous)
 
         if (context.currentStream === 'middle') {
-            output.colorizeMut(this.getAttribute('same') ? styles.get('gray')(renderer.c) : renderer.c.reset)
+            output.colorizeMut(this.getAttribute('same') ? renderer.styles.get('gray')(renderer.c) : renderer.c.reset)
         }
         else if (this.getAttribute('same')) {
-            output.colorizeMut(styles.get('gray')(renderer.c))
+            output.colorizeMut(renderer.styles.get('gray')(renderer.c))
         }
         else if (this.getAttribute('same') === false && this.getAttribute('type') === 'both') {
-            output.colorizeMut(styles.get('accented')(renderer.c))
+            output.colorizeMut(renderer.styles.get('accented')(renderer.c))
         }
         else if (this.getAttribute('type') === 'onlyIn1' && !insideHetero) {
-            output.colorizeMut(styles.get('primary_fail')(renderer.c))
+            output.colorizeMut(renderer.styles.get('primary_fail')(renderer.c))
         }
         else if (this.getAttribute('type') === 'onlyIn2' && !insideHetero) {
-            output.colorizeMut(styles.get('primary_pass')(renderer.c))
+            output.colorizeMut(renderer.styles.get('primary_pass')(renderer.c))
         }
     }
 
@@ -345,7 +344,7 @@ export class DifferenceTemplateAtomic extends Mixin(
 
         colorizeSelf (renderer : XmlRendererDifference, output : TextBlock, context : XmlRenderingDynamicContextDifference) {
             if (this.getAttribute('type') === 'both' && this.getAttribute('same') === false && context.currentStream !== 'middle') {
-                output.colorizeMut(styles.get('secondary_pass')(renderer.c))
+                output.colorizeMut(renderer.styles.get('secondary_pass')(renderer.c))
             } else
                 super.colorizeSelf(renderer, output, context)
         }
@@ -428,7 +427,7 @@ export class DifferenceTemplateHeterogeneous extends DifferenceTemplateStreamed 
 
     colorizeSelf (renderer : XmlRendererDifference, output : TextBlock, context : XmlRenderingDynamicContextDifference) {
         if (this.getAttribute('type') === 'both' && this.getAttribute('same') === false && context.currentStream !== 'middle') {
-            output.colorizeMut(styles.get('secondary_pass')(renderer.c))
+            output.colorizeMut(renderer.styles.get('secondary_pass')(renderer.c))
         } else
             super.colorizeSelf(renderer, output, context)
     }
