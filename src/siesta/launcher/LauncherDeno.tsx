@@ -10,25 +10,16 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerDeno } from "../../jsx/ColorerDeno.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { XmlNode } from "../../jsx/XmlElement.js"
-import { LogLevel, LogMethod } from "../../logger/Logger.js"
-import { LoggerHookable } from "../../logger/LoggerHookable.js"
-import { parse } from "../../serializable/Serializable.js"
-import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { stripBasename } from "../../util/Path.js"
-import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
-import { Context } from "../context/Context.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderDenoWorker } from "../context/context_provider/ContextProviderDenoWorker.js"
-import { option } from "../option/Option.js"
-import { ProjectDescriptorDeno, ProjectSerializableData } from "../project/ProjectDescriptor.js"
+import { ProjectDescriptorDeno } from "../project/ProjectDescriptor.js"
 import { ReporterDeno } from "../reporter/ReporterDeno.js"
 import { ReporterDenoTerminal } from "../reporter/ReporterDenoTerminal.js"
 import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
-import { LogMessage } from "../test/TestResult.js"
-import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary } from "./Launcher.js"
-import { extractProjectInfo } from "./ProjectExtractor.js"
+import { ExitCodes, Launcher, LauncherError } from "./Launcher.js"
+import { LauncherTerminal } from "./LauncherTerminal.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -36,34 +27,14 @@ declare const Deno : any
 
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherDeno extends Mixin(
-    [ Launcher, ExecutionContextAttachable ],
-    (base : ClassUnion<typeof Launcher, typeof ExecutionContextAttachable>) => {
+    [ Launcher, LauncherTerminal, ExecutionContextAttachable ],
+    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) => {
 
     class LauncherDeno extends base {
-        logger                  : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
-
         // region options
         maxWorkers      : number            = 4
 
-        @option({
-            type        : 'string',
-            group       : OptionsGroupPrimary,
-            help        : <span>
-                Project file url. Can be either a regular filesystem path, or http-based URL, or a `file://` url
-            </span>
-        })
-        project             : string            = ''
-
-        @option({
-            type        : 'boolean',
-            group       : OptionsGroupOutput,
-            defaultValue : () => false,
-            help        : <div>
-                Whether to suppress the output coloring. Also suppresses the progress bar and spinner.
-                Automatically enforced if output stream is not a terminal.
-            </div>
-        })
-        noColor         : boolean               = false
+        // region options
         // endregion
 
 
@@ -77,27 +48,6 @@ export class LauncherDeno extends Mixin(
 
         projectDescriptorClass : typeof ProjectDescriptorDeno   = ProjectDescriptorDeno
         testDescriptorClass : typeof TestDescriptorDeno         = TestDescriptorDeno
-
-
-        initialize (props? : Partial<LauncherDeno>) {
-            super.initialize(props)
-
-            this.logger.onLogMessageHook.on((method : LogMethod, message : unknown[]) => {
-                this.write(LogMessage.new({
-                    type        : 'log',
-                    level       : LogLevel[ method ],
-                    message     : this.prepareLogMessage(...message)
-                }).template(false))
-            })
-        }
-
-
-        prepareLogMessage (...messages : unknown[]) : XmlNode[] {
-            // if (messages.length === 1)
-                return messages.map(message => isString(message) ? message : SerializerXml.serialize(message/*, this.descriptor.serializerConfig*/))
-            // else
-            //     return [ SerializerXml.serialize(messages/*, this.descriptor.serializerConfig*/) ]
-        }
 
 
         getMaxLen () : number {
@@ -139,27 +89,6 @@ export class LauncherDeno extends Mixin(
                 this.colorerClass       = ColorerNoop
                 this.reporterClass      = ReporterDeno
             }
-
-            const projectFileUrl    = this.project || this.argv[ 0 ]
-
-            if (!projectFileUrl && !this.projectData) throw LauncherError.new({
-                exitCode        : ExitCodes.INCORRECT_ARGUMENTS,
-                annotation      : <div>
-                    <p><span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url </span></p>
-                    <div>
-                        You can specify the project file location with <span class="option_name">--project</span> option
-                        or by providing a positional argument:
-                        <p class="indented">
-                            npx siesta --project ./siesta.js
-                        </p>
-                        <p class="indented">
-                            npx siesta ./siesta.js
-                        </p>
-                    </div>
-                </div>
-            })
-
-            if (!this.project) this.project = this.argv[ 0 ]
         }
 
 
@@ -176,27 +105,6 @@ export class LauncherDeno extends Mixin(
             console.log('Unhandled exception:', e?.stack || e)
 
             Deno.exit(ExitCodes.UNHANDLED_EXCEPTION)
-        }
-
-
-        async extractProjectData (context : Context, projectUrl : string) : Promise<ProjectSerializableData> {
-            try {
-                return parse(await context.evaluateBasic(extractProjectInfo, projectUrl))
-            } catch (e) {
-                const [ message, stack ]    = e.message.split(String.fromCharCode(0))
-
-                throw LauncherError.new({
-                    annotation      : <div>
-                        <span class="log_message_error"> ERROR </span> <span class="accented">{ message }</span>
-                        <div>
-                            { stack }
-                        </div>
-                    </div>,
-                    exitCode        : ExitCodes.EXCEPTION_IN_PROJECT_FILE
-                })
-            } finally {
-                await context.destroy()
-            }
         }
 
 

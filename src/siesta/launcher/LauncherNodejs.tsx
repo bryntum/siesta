@@ -7,27 +7,19 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { XmlNode } from "../../jsx/XmlElement.js"
-import { LogLevel, LogMethod } from "../../logger/Logger.js"
-import { LoggerHookable } from "../../logger/LoggerHookable.js"
-import { parse } from "../../serializable/Serializable.js"
-import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { stripBasename } from "../../util/Path.js"
-import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
-import { Context } from "../context/Context.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
 import { ContextProviderNodePlaywright } from "../context/context_provider/ContextProviderNodePlaywright.js"
 import { ContextProviderNodePuppeteer } from "../context/context_provider/ContextProviderNodePuppeteer.js"
 import { option, OptionGroup } from "../option/Option.js"
-import { ProjectDescriptorNodejs, ProjectSerializableData } from "../project/ProjectDescriptor.js"
+import { ProjectDescriptorNodejs } from "../project/ProjectDescriptor.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
-import { LogMessage } from "../test/TestResult.js"
-import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary, PrepareOptionsResult } from "./Launcher.js"
-import { extractProjectInfo } from "./ProjectExtractor.js"
+import { ExitCodes, Launcher, LauncherError, OptionsGroupPrimary } from "./Launcher.js"
+import { LauncherTerminal } from "./LauncherTerminal.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -43,36 +35,13 @@ export const OptionsGroupBrowser  = OptionGroup.new({
 
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherNodejs extends Mixin(
-    [ Launcher, ExecutionContextAttachable ],
-    (base : ClassUnion<typeof Launcher, typeof ExecutionContextAttachable>) => {
+    [ Launcher, LauncherTerminal, ExecutionContextAttachable ],
+    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) => {
 
     class LauncherNodejs extends base {
         executionContext        : ExecutionContextNode      = undefined
 
-        logger                  : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
-
         // region options
-        @option({
-            type        : 'string',
-            group       : OptionsGroupPrimary,
-            help        : <span>
-                Project file url. Can be either a regular filesystem path, or http-based URL, or a `file://` url
-            </span>
-        })
-        project             : string            = ''
-
-        @option({
-            type        : 'boolean',
-            group       : OptionsGroupOutput,
-            defaultValue : () => false,
-            help        : <div>
-                Whether to suppress the output coloring. Also suppresses the progress bar and spinner.
-                Automatically enforced if output stream is not a terminal.
-            </div>
-        })
-        noColor         : boolean               = false
-
-
         @option({
             type        : 'boolean',
             group       : OptionsGroupBrowser,
@@ -135,27 +104,6 @@ export class LauncherNodejs extends Mixin(
         testDescriptorClass : typeof TestDescriptorNodejs   = TestDescriptorNodejs
 
 
-        initialize (props? : Partial<LauncherNodejs>) {
-            super.initialize(props)
-
-            this.logger.onLogMessageHook.on((method : LogMethod, message : unknown[]) => {
-                this.write(LogMessage.new({
-                    type        : 'log',
-                    level       : LogLevel[ method ],
-                    message     : this.prepareLogMessage(...message)
-                }).template(false))
-            })
-        }
-
-
-        prepareLogMessage (...messages : unknown[]) : XmlNode[] {
-            // if (messages.length === 1)
-                return messages.map(message => isString(message) ? message : SerializerXml.serialize(message/*, this.descriptor.serializerConfig*/))
-            // else
-            //     return [ SerializerXml.serialize(messages/*, this.descriptor.serializerConfig*/) ]
-        }
-
-
         getMaxLen () : number {
             return process.stdout.columns ?? Number.MAX_SAFE_INTEGER
         }
@@ -195,27 +143,6 @@ export class LauncherNodejs extends Mixin(
                 this.colorerClass       = ColorerNoop
                 this.reporterClass      = ReporterNodejs
             }
-
-            const projectFileUrl    = this.project || this.argv[ 0 ]
-
-            if (!projectFileUrl && !this.projectData) throw LauncherError.new({
-                exitCode        : ExitCodes.INCORRECT_ARGUMENTS,
-                annotation      : <div>
-                    <p><span class="log_message_error"> ERROR </span> <span class="accented">No argument for project file url </span></p>
-                    <div>
-                        You can specify the project file location with <span class="option_name">--project</span> option
-                        or by providing a positional argument:
-                        <p class="indented">
-                            npx siesta --project ./siesta.js
-                        </p>
-                        <p class="indented">
-                            npx siesta ./siesta.js
-                        </p>
-                    </div>
-                </div>
-            })
-
-            if (!this.project) this.project = this.argv[ 0 ]
         }
 
 
@@ -232,27 +159,6 @@ export class LauncherNodejs extends Mixin(
             console.log('Unhandled exception:', e?.stack || e)
 
             process.exit(ExitCodes.UNHANDLED_EXCEPTION)
-        }
-
-
-        async extractProjectData (context : Context, projectUrl : string) : Promise<ProjectSerializableData> {
-            try {
-                return parse(await context.evaluateBasic(extractProjectInfo, projectUrl))
-            } catch (e) {
-                const [ message, stack ]    = e.message.split(String.fromCharCode(0))
-
-                throw LauncherError.new({
-                    annotation      : <div>
-                        <span class="log_message_error"> ERROR </span> <span class="accented">{ message }</span>
-                        <div>
-                            { stack }
-                        </div>
-                    </div>,
-                    exitCode        : ExitCodes.EXCEPTION_IN_PROJECT_FILE
-                })
-            } finally {
-                await context.destroy()
-            }
         }
 
 
