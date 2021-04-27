@@ -5,7 +5,6 @@ import { stripBasename } from "../../util/Path.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
-import { styles } from "../reporter/styling/terminal.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Project } from "./Project.js"
 import { ProjectDescriptorBrowser } from "./ProjectDescriptor.js"
@@ -46,6 +45,7 @@ export class ProjectBrowser extends Mixin(
 
         async launchStandalone () : Promise<Launch> {
             if (isNodejs()) {
+                const styles                = (await import("../reporter/styling/theme_universal.js")).styles
                 const colorerClass          = (await import('../../jsx/ColorerNodejs.js'))[ 'ColorerNodejs' ] as typeof ColorerNodejs
                 const c                     = colorerClass.new()
                 const style                 = (clsName : string) => styles.get(clsName)(c)

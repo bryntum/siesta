@@ -1,10 +1,8 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
-import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
-import { styles } from "../reporter/styling/terminal.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
 
@@ -44,6 +42,7 @@ export class TestBrowser extends Mixin(
         // TODO refactor the whole launching infrastructure
         static async launchStandalone () {
             if (isNodejs()) {
+                const styles                = (await import("../reporter/styling/theme_universal.js")).styles
                 const colorerClass          = (await import('../../jsx/ColorerNodejs.js')).ColorerNodejs
                 const c                     = colorerClass.new()
                 const style                 = (clsName : string) => styles.get(clsName)(c)
