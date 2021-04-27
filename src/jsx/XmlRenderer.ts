@@ -1,6 +1,5 @@
 import { Base } from "../class/Base.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
-import { styles } from "../siesta/reporter/styling/terminal.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { Colorer, ColorerRule } from "./Colorer.js"
@@ -16,7 +15,7 @@ export class XmlRenderer extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class XmlRenderer extends base {
-        styles                  : Map<string, ColorerRule>  = styles
+        styles                  : Map<string, ColorerRule>  = new Map()
 
         indentLevel             : number        = 2
 
