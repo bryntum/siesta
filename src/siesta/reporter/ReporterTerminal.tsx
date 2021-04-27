@@ -1,7 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
-import { SetIntervalHandler } from "../../util/Helpers.js"
+import { MIN_SMI, SetIntervalHandler } from "../../util/Helpers.js"
 import { TestNodeResult } from "../test/TestResult.js"
 import { Reporter } from "./Reporter.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
@@ -154,7 +154,8 @@ export class ReporterTerminal extends Mixin(
 
             // then clear the rest
             for (let i = 1; i <= this.footerLines; i++) {
-                this.terminal.moveCursor(-Number.MAX_SAFE_INTEGER, -1)
+                // tried to use `-Number.MAX_SAFE_INTEGER` here, but that overflows in the JetBrains built-in terminal
+                this.terminal.moveCursor(MIN_SMI, -1)
 
                 this.terminal.clearLine('line')
             }
@@ -192,7 +193,7 @@ export class ReporterTerminal extends Mixin(
             if (this.spinnerChars > 0) {
                 this.print('\b'.repeat(this.spinnerChars))
 
-                this.terminal.moveCursor(-Number.MAX_SAFE_INTEGER, -1)
+                this.terminal.moveCursor(MIN_SMI, -1)
                 this.terminal.clearLine('line')
 
                 // this will start a new line
