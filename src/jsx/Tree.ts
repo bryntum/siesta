@@ -31,7 +31,9 @@ export class Tree extends Mixin(
             const isLastNode            = index === this.childNodes.length - 1
             const isLast                = isTopLevelLastNode !== undefined ? isLastNode && isTopLevelLastNode : isLastNode
 
-            output.indentAsTreeLeafMut(renderer.indentLevel, isLast, renderer.styles.get('tree_line')(renderer.c))
+            const treeLineStyling       = renderer.styles.get('tree_line') || (c => c)
+
+            output.indentAsTreeLeafMut(renderer.indentLevel, isLast, treeLineStyling(renderer.c))
 
             return output
         }
