@@ -4,12 +4,17 @@ import path from 'path'
 import sass from 'sass'
 import url from 'url'
 
+//---------------------------------------------------------------------------------------------------------------------
+const args          = process.argv.slice(2)
+const themeFilename = args[ 0 ]
+
+if (!themeFilename) throw new Error("Theme filename required as first positional argument")
 
 //---------------------------------------------------------------------------------------------------------------------
 const scriptDir     = path.dirname(url.fileURLToPath(import.meta.url))
 const stylingDir    = path.resolve(scriptDir, '../src/siesta/reporter/styling')
 
-const css           = sass.renderSync({ file : path.resolve(stylingDir, 'terminal.scss') })
+const css           = sass.renderSync({ file : path.resolve(stylingDir, themeFilename) })
 
 const stylesheet    = cssom.parse(css.css.toString())
 
@@ -50,7 +55,7 @@ for (const rule of stylesheet.cssRules) {
 
 //---------------------------------------------------------------------------------------------------------------------
 fs.writeFileSync(
-    path.resolve(stylingDir, 'terminal.ts'),
+    path.resolve(stylingDir, themeFilename.replace(/\.\w+$/, '.ts')),
     output.join('\n')
 )
 
@@ -64,7 +69,14 @@ function styleToColorer (styleName : string, styleValue : string) : string | und
             return colorToColorer(styleValue, true)
 
         case 'text-decoration':
-            return styleValue === 'underline' ? '.underline' : undefined
+            if (styleValue === 'underline') return '.underline'
+
+            return undefined
+
+        case 'font-weight':
+            if (styleValue === 'bold') return '.bold'
+
+            return undefined
     }
 
     return undefined
