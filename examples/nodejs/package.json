@@ -1,0 +1,15 @@
+{
+  "name": "awesome-nodejs-app",
+  "version": "1.0.0",
+  "description": "Awesome Node.js application, tested with Siesta",
+  "main": "index.js",
+  "module": "index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=12.21.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "siesta": "../../"
+  }
+}
