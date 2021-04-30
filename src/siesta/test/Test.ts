@@ -28,6 +28,25 @@ import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeRes
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * The test class for the isomorphic code. The instance of this class is passed as 1st argument to every *test function*,
+ * which is in turn a 2nd argument of every [[Test.it|it]] call:
+ *
+ * ```ts
+ * import { it } from "siesta/index.js"
+ *
+ * it('Isomorphic Siesta test', async (t : Test) => {
+ *     ...
+ * })
+ * ```
+ *
+ * Using various assertion methods of the test instance one can create a testing scenario.
+ *
+ * The configuration of the test class is extracted into separate class, called [[TestDescriptor]]. This is done to be able
+ * to transfer the configuration over the network (`TestDescriptor` is serializable, whereas `Test` is not). Each test class
+ * has the [[Test.testDescriptorClass|testDescriptorClass]] property, which should contain the constructor of the [[TestDescriptor]] class
+ * to use for configuration.
+ */
 export class Test extends Mixin(
     [
         TestNodeResult,
@@ -51,6 +70,10 @@ export class Test extends Mixin(
     >) => {
 
     class Test extends base {
+        /**
+         * The constructor of the [[TestDescriptor]] class (or its subclass), which represents the configuration object
+         * for the current test class.
+         */
         @prototypeValue(TestDescriptor)
         testDescriptorClass : typeof TestDescriptor
 
@@ -94,7 +117,25 @@ export class Test extends Mixin(
             return this.$rootTest = rootTest
         }
 
-
+        /**
+         *
+         * This method returns an "expectation" instance, which can be used to check various assertions about the passed value.
+         *
+         * Every expectation has a special property `not`, that contains another expectation, but with the negated meaning.
+         *
+         * For example:
+         *
+         * ```ts
+         * t.expect(1).toBe(1)
+         * t.expect(1).not.toBe(2)
+         *
+         * t.expect('Foo').toContain('oo')
+         * t.expect('Foo').not.toContain('bar')
+         * ```
+         * Please refer to the documentation of the [[Expectation]] class for the list of available methods.
+         *
+         * @param value
+         */
         expect (value : unknown) : Expectation {
             return Expectation.new({ value, t : this })
         }
@@ -157,6 +198,9 @@ export class Test extends Mixin(
         }
 
 
+        /**
+         * This method has the same functionality as [[it]], plus it sets the [[TestDescriptor.isTodo|isTodo]] config of the test descriptor to `true`.
+         */
         todo (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const test              = this.it(name, code)
 
@@ -166,6 +210,9 @@ export class Test extends Mixin(
         }
 
 
+        /**
+         * This is a no-op method, allowing you to quickly ignore some test sections - just add `x` ("exclude") to the section call.
+         */
         xit (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const cls       = this.constructor as typeof Test
 
@@ -175,7 +222,10 @@ export class Test extends Mixin(
             return test as this
         }
 
-
+        /**
+         * This is an "exclusive" version of the regular {@link it} test section. When such exclusive section is found,
+         * the other regular test sections at the same level will not be executed, only "exclusive" ones.
+         */
         iit (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const test          = this.it(name, code)
 
@@ -185,6 +235,31 @@ export class Test extends Mixin(
         }
 
 
+        /**
+         * This method creates a section in the test file, grouping assertions together. Such section is sometimes called "sub-test".
+         * Sub-tests can be nested arbitrarily.
+         *
+         * For the top-level section, the [["src/siesta/test/Test".it|it]] constant alias or <a href="#it-1">Test.it</a> static
+         * method should be used. These aliases can actually be used inside the test function as well, however
+         * it is recommended to use the method on the test instance.
+         *
+         * ```ts
+         * import { it, Test } from "siesta/nodejs.js"
+         *
+         * it('Test section', async (t : Test) => {
+         *     t.it('Nested section', async (t : Test) => {
+         *         ...
+         *     })
+         * })
+         *
+         * // The following two lines are identical
+         * it('Test section', async (t : Test) => { ... })
+         * Test.it('Test section', async (t : Test) => { ... })
+         * ```
+         *
+         * @param name The configuration descriptor for the test section
+         * @param code The test function. Can be asynchronous and return `Promise`.
+         */
         it (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
 
@@ -200,8 +275,18 @@ export class Test extends Mixin(
         }
 
 
+        /**
+         * An alias for [[it]]
+         */
         describe (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             return this.it(name, code)
+        }
+
+        /**
+         * An alias for [[iit]]
+         */
+        ddescribe (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
+            return this.iit(name, code)
         }
 
 
@@ -465,7 +550,12 @@ export class Test extends Mixin(
             return obj
         }
 
-
+        /**
+         * Alias for [[Test.iit]]. Should be used for top-level sub-tests only.
+         *
+         * @param name
+         * @param code
+         */
         static iit<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             const test          = this.it(name, code)
 
@@ -475,11 +565,22 @@ export class Test extends Mixin(
         }
 
 
+        /**
+         * Alias for [[Test.xit]]. Should be used for top-level sub-tests only.
+         *
+         * @param name
+         * @param code
+         */
         static xit<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             return this.new()
         }
 
-
+        /**
+         * Static alias for [[Test.it]]. Should be used for top-level sub-tests only. Can be useful if you create your own subclass of the test class.
+         *
+         * @param name
+         * @param code
+         */
         static it<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             if (!globalTestEnv.topTest) {
 
@@ -506,16 +607,25 @@ export class Test extends Mixin(
         }
 
 
+        /**
+         * Alias for [[Test.it]].
+         */
         static describe<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             return this.it(name, code)
         }
 
 
+        /**
+         * Alias for [[Test.iit]].
+         */
         static ddescribe<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             return this.iit(name, code)
         }
 
 
+        /**
+         * Alias for [[Test.xit]].
+         */
         static xdescribe<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             return this.xit(name, code)
         }
@@ -530,7 +640,6 @@ export class Test extends Mixin(
         }
 
 
-        // TODO refactor the whole launching infrastructure
         static async launchStandalone () {
             const topTest       = globalTestEnv.topTest
             const descriptor    = topTest.descriptor
@@ -688,7 +797,37 @@ export const createTestSectionConstructors = <T extends typeof Test>(testClass :
     }
 }
 
-export const { it, iit, xit, describe, ddescribe, xdescribe } = createTestSectionConstructors(Test)
+export const {
+    /**
+     * Alias for {@link Test.it | it} method.
+     */
+    it,
+
+    /**
+     * Alias for {@link Test.iit | iit} method.
+     */
+    iit,
+
+    /**
+     * Alias for {@link Test.xit | xit} method.
+     */
+    xit,
+
+    /**
+     * Alias for {@link Test.describe | describe} method.
+     */
+    describe,
+
+    /**
+     * Alias for {@link Test.ddescribe | ddescribe} method.
+     */
+    ddescribe,
+
+    /**
+     * Alias for {@link Test.xdescribe | xdescribe} method.
+     */
+    xdescribe
+} = createTestSectionConstructors(Test)
 
 
 //---------------------------------------------------------------------------------------------------------------------

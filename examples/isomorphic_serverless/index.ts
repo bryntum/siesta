@@ -11,8 +11,6 @@ project.plan(
     {
         filename    : 'basic',
 
-        tags        : [ 'basic' ],
-
         items       : [
             // {
             //     filename    : 'basic_test.t.js',
@@ -32,8 +30,6 @@ project.plan(
     },
     {
         filename    : 'advanced',
-
-        tags        : [ 'advanced' ],
 
         items       : [
             // 'advanced_test.t.js'

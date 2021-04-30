@@ -23,12 +23,18 @@ export const OptionsGroupTestDescriptor  = OptionGroup.new({
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// some properties in this class don't have an initializer, that intentional,
+// some properties in this class don't have an initializer, that is intentional,
 // because when "flattening" the descriptor and its parent descriptors,
 // we check `descriptor.hasOwnProperty('property')` to find out if there's an
 // explicitly provided value for that property
 // obviously with initializer, that check will always be `true`, which is not
-// what we want
+// what we want. Alternative would be to have separate flag for every config, like
+// "setByTheUser : boolean"
+/**
+ * This class represents the configuration properties of the [[Test]] class. It is serializable and can be transferred
+ * over the network. Some of the properties of this class are also "options" - can be specified in the command-line
+ * when launching the test suite.
+ */
 @serializable()
 export class TestDescriptor extends Mixin(
     [ Serializable, HasOptions, TreeNode, Base ],
@@ -40,23 +46,100 @@ export class TestDescriptor extends Mixin(
         childNodeT      : TestDescriptor
         parentNode      : TestDescriptor
 
-        // TODO should support `name` alias (primary and recommended should be `title` to avoid
-        // confusion with `filename`
+        /**
+         * The human-readable title of this test.
+         */
         title           : string                = ''
 
-        // TODO support `fileName` alias?
+        get name () : string {
+            return this.title
+        }
+
+        set name (value : string) {
+            this.title = value
+        }
+
+        /**
+         * The base name of the test file - not including the directory part. By convention,
+         * Siesta tests should have `*.t.js` extension.
+         *
+         * If descriptor represents a directory it should contain the base name of the directory.
+         *
+         * For example:
+         *
+         * ```ts
+         * project.plan(
+         *     {
+         *         filename : 'some_directory',
+         *
+         *         items    : [
+         *             { filename : 'test_1.t.js' }
+         *             // or just:
+         *             'test_2.t.js',
+         *         ]
+         *     }
+         * )
+         * ```
+         *
+         *
+         * Either this property or the [[url]] should be provided for the descriptor.
+         *
+         * This property is only used for the top-level tests, and it is ignored for the nested test sections.
+         */
         filename        : string                = ''
 
-        // relative to the project file
+        get fileName () : string {
+            return this.filename
+        }
+
+        set fileName (value : string) {
+            this.filename = value
+        }
+
+        /**
+         * The complete url for this test, **relative to the parent descriptor**.
+         *
+         * Either this property or the [[filename]] should be provided for the descriptor.
+         */
         url             : string
 
-        @option({ defaultValue : () => [], group : OptionsGroupTestDescriptor })
         tags            : string[]
 
-        @option({ type : 'boolean', defaultValue : () => false, group : OptionsGroupTestDescriptor })
+        /**
+         * Whether this test is "todo" or not. Todo tests are considered work in progress and expected to fail.
+         * The failed assertions in them are not reported. In opposite, the *passed* assertions from the todo
+         * tests are reported.
+         */
         isTodo          : boolean
 
-        @option({ type : 'string', group : OptionsGroupTestDescriptor })
+        /**
+         * Either a `Date` instance or a string, recognized by the [Date constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse).
+         *
+         * If this config is specified, and the test is running prior the specified date, the test will be switched to [[isTodo|todo]] mode.
+         *
+         * For example in the project file:
+         *
+         * ```ts
+         * project.plan(
+         *     {
+         *         filename    : 'some_test.t.js',
+         *         // choose the unsnooze date wisely
+         *         snooze      : '2021-12-25'
+         *     }
+         * )
+         * ```
+         *
+         * in the test file:
+         *
+         * ```ts
+         * it({
+         *     title  : 'Some test',
+         *     snooze : '2022-01-01'
+         * }, async t => {
+         *     ...
+         * })
+         * ```
+         */
         snooze          : string | Date
 
         // @option()
@@ -235,6 +318,12 @@ export class TestDescriptor extends Mixin(
     return TestDescriptor
 }) {}
 
+/**
+ * This type represent the 1st argument for the calls that create test sections, like [[Test.it]] and similar.
+ * The value can be either a string or a partial object of this test class descriptor.
+ *
+ * The string value corresponds to the `{ title : 'string_value' }` object.
+ */
 export type TestDescriptorArgument<T extends Test> = string | Partial<InstanceType<T[ 'testDescriptorClass' ]>>
 
 export type ProjectPlanItemDescriptor<T extends TestDescriptor> = string | (Partial<T> & { items? : ProjectPlanItemDescriptor<T>[] })

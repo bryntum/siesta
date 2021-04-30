@@ -11,6 +11,24 @@ import { Assertion } from "./TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+This class is the central point for writing assertions in the BDD style. Instances of this class can be generated with the
+{@link Test.expect|expect} method or with the [["src/siesta/test/Test".expect|expect]] alias.
+
+Then, a call of some method on the expectation instance will create a new assertion in the test.
+
+To negate any assertion, you can use a special property [[not]], that contains another expectation instance with the opposite meaning.
+
+For example:
+
+```ts
+t.expect(1).toBe(1)
+t.expect(1).not.toBe(2)
+
+t.expect('Foo').toContain('oo')
+t.expect('Foo').not.toContain('bar')
+```
+*/
 export class Expectation extends Base {
 
     value           : unknown           = undefined
@@ -29,15 +47,15 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion compares the value provided to the {@link Siesta.Test#expect expect} method with the `expectedValue` argument.
+     * This assertion compares the value provided to the {@link Test.expect|expect} method with the `expectedValue` argument.
      * Comparison is done with `===` operator, so it should be used **only with the primitives** - numbers, strings, booleans etc.
      * However, placeholders, generated with the `any*` family of methods are supported.
      *
      * To deeply compare `Date`, `Arrays` and JSON objects in general, use {@link #toEqual} method.
      *
-     * This method works correctly with the placeholders generated with {@link Siesta.Test#any any} method
+     * This method works correctly with the placeholders generated with the {@link any} method
      *
-     * @param {Primitive} expectedValue An expected value
+     * @param expectedValue An expected value
      */
     toBe (expectedValue : unknown) {
         this.t.assertEqualityInternal(
@@ -50,19 +68,22 @@ export class Expectation extends Base {
     }
 
 
+    /**
+     * An alias for [[toEqual]]
+     */
     toBeEqual (expectedValue : unknown) {
         this.t.assertStructuralEqualityInternal('expect(received).toBeEqual(expected)', this.isNot, this.value, expectedValue)
     }
 
 
     /**
-     * This assertion compares the value provided to the {@link Siesta.Test#expect expect} method with the `expectedValue` argument.
+     * This assertion compares the value provided to the {@link Test.expect|expect} method with the `expectedValue` argument.
      *
      * Comparison works for Date, Array, and JSON objects in general. It is performed "deeply".
      *
-     * This method works correctly with the placeholders generated with {@link Siesta.Test#any any} method
+     * This method works correctly with the placeholders generated with the {@link any} method
      *
-     * @param {Mixed} expectedValue An expected value
+     * @param expectedValue An expected value
      */
     toEqual (expectedValue : unknown) {
         this.t.assertStructuralEqualityInternal('expect(received).toEqual(expected)', this.isNot, this.value, expectedValue)
@@ -70,7 +91,7 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is `null`.
+     * This assertion passes, when value provided to the {@link Test.expect|expect} method is `null`.
      */
     toBeNull () {
         this.t.assertEqualToConstant('expect(received).toBeNull()', this.value === null, this.isNot, this.value, null)
@@ -78,7 +99,7 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is `NaN`.
+     * This assertion passes, when value provided to the {@link Test.expect|expect} method is `NaN`.
      */
     toBeNaN () {
         this.t.assertEqualToConstant('expect(received).toBeNaN()', Number.isNaN(this.value), this.isNot, this.value, NaN)
@@ -86,7 +107,7 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is not the `undefined` value.
+     * This assertion passes, when value provided to the {@link Test.expect|expect} method is not the `undefined` value.
      */
     toBeDefined () {
         this.t.assertDefinedInternal('expect(received).toBeDefined()', this.isNot, false, this.value)
@@ -94,7 +115,7 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is the `undefined` value.
+     * This assertion passes, when value provided to the {@link Test.expect|expect} method is the `undefined` value.
      */
     toBeUndefined () {
         this.t.assertDefinedInternal('expect(received).toBeUndefined()', this.isNot, true, this.value)
@@ -102,7 +123,7 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is "truthy" - evaluates to `true`.
+     * This assertion passes, when value provided to the {@link Test.expect|expect} method is "truthy" - evaluates to `true`.
      * For example - non empty strings, numbers except the 0, objects, arrays etc.
      */
     toBeTruthy () {
@@ -111,7 +132,7 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is "falsy" - evaluates to `false`.
+     * This assertion passes, when value provided to the {@link Test.expect|expect} method is "falsy" - evaluates to `false`.
      * For example - empty strings, number 0, `null`, `undefined`, etc.
      */
     toBeFalsy () {
@@ -120,9 +141,9 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when the string provided to the {@link Siesta.Test#expect expect} method matches the regular expression.
+     * This assertion passes, when the string provided to the {@link Test.expect|expect} method matches the regular expression.
      *
-     * @param {RegExp} regexp The regular expression to match the string against
+     * @param regexp The regular expression to match the string against
      */
     toMatch (regexp : RegExp) {
         this.t.assertMatchInternal('expect(received).toMatch(expected)', this.isNot, this.value as string, regexp)
@@ -132,10 +153,10 @@ export class Expectation extends Base {
     /**
      * This assertion passes in 2 cases:
      *
-     * 1) When the value provided to the {@link Siesta.Test#expect expect} method is a string, and it contains a passed substring.
-     * 2) When the value provided to the {@link Siesta.Test#expect expect} method is an array (or array-like), and it contains a passed element.
+     * 1) When the value provided to the {@link Test.expect|expect} method is a string, and it contains a passed substring.
+     * 2) When the value provided to the {@link Test.expect|expect} method is an array (or array-like), and it contains a passed element.
      *
-     * @param {String/Mixed} element The element of the array or a sub-string
+     * @param element The element of the array or a sub-string
      */
     toContain (element : unknown) {
         const value       = this.value
@@ -149,10 +170,10 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when the number provided to the {@link Siesta.Test#expect expect} method is less than the
+     * This assertion passes, when the number provided to the {@link Test.expect|expect} method is less than the
      * expected number.
      *
-     * @param {Number} expectedValue The number to compare with
+     * @param expectedValue The number to compare with
      */
     toBeLessThan (expectedValue : number) {
         this.t.assertCompareInternal('expect(received).toBeLessThan(expected)', false, ComparisonType.Greater, this.value, expectedValue)
@@ -160,10 +181,10 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when the number provided to the {@link Siesta.Test#expect expect} method is greater than the
+     * This assertion passes, when the number provided to the {@link Test.expect|expect} method is greater than the
      * expected number.
      *
-     * @param {Number} expectedValue The number to compare with
+     * @param expectedValue The number to compare with
      */
     toBeGreaterThan (expectedValue) {
         this.t.assertCompareInternal('expect(received).toBeGreaterThan(expected)', false, ComparisonType.Greater, this.value, expectedValue)
@@ -171,25 +192,25 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, when the number provided to the {@link Siesta.Test#expect expect} method is approximately equal
+     * This assertion passes, when the number provided to the {@link Test.expect|expect} method is approximately equal
      * the given number. The proximity can be defined as the `precision` argument
      *
-     * @param {Number} expectedValue The number to compare with
-     * @param {Number} [precision=2] The number of digits after dot (comma) that should be same in both numbers.
+     * @param expectedValue The number to compare with
+     * @param approx The number approximation
      */
-    toBeCloseTo (expectedValue : number, digits : Approximation = { digits : 2 }) {
+    toBeCloseTo (expectedValue : number, approx : Approximation = { digits : 2 }) {
         this.t.assertCompareApproxInternal(
             'expect(received).toBeCloseTo(expected)',
             this.isNot,
             this.value as number,
             expectedValue,
-            NumberApproximation.fromApproximation(digits)
+            NumberApproximation.fromApproximation(approx)
         )
     }
 
 
     /**
-     * This assertion passes when the function provided to the {@link Siesta.Test#expect expect} method, throws an exception
+     * This assertion passes when the function provided to the {@link Test.expect|expect} method, throws an exception
      * during its execution.
      *
      * t.expect(function(){
@@ -203,11 +224,11 @@ export class Expectation extends Base {
 
 
     /**
-     * This assertion passes, if a spy, provided to the {@link Siesta.Test#expect expect} method have been
+     * This assertion passes, if a spy, provided to the {@link Test.expect|expect} method have been
      * called expected number of times. The expected number of times can be provided as the 1st argument and by default
      * is 1.
      *
-     * One can also provide the function, spied on, to the {@link Siesta.Test#expect expect} method.
+     * One can also provide the function, spied on, to the {@link Test.expect|expect} method.
      *
      * Examples:
      *
@@ -260,10 +281,10 @@ t.expect(spy).toHaveBeenCalled('<=3');
 
 
     /**
-     * This assertion passes, if a spy, provided to the {@link Siesta.Test#expect expect} method have been
+     * This assertion passes, if a spy, provided to the {@link Test.expect|expect} method have been
      * called at least once with the specified arguments.
      *
-     * One can also provide the function, spied on, to the {@link Siesta.Test#expect expect} method.
+     * One can also provide the function, spied on, to the {@link Test.expect|expect} method.
      *
      * One can use placeholders, generated with the {@link Siesta.Test.BDD#any any} method to verify the arguments.
      *
@@ -283,9 +304,9 @@ t.expect(obj.process).toHaveBeenCalledWith('development', t.any(String));
      *
      * See also {@link #toHaveBeenCalled}
      *
-     * @param {Object} arg1 Argument to a call
-     * @param {Object} arg2 Argument to a call
-     * @param {Object} argN Argument to a call
+     * @param arg1 Argument to a call
+     * @param arg2 Argument to a call
+     * @param argN Argument to a call
      */
     toHaveBeenCalledWith (...args : unknown[]) {
         // @ts-ignore

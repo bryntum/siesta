@@ -10,8 +10,10 @@ rm -rf "docs"
 npx typedoc \
     --readme "README.md" \
     --includes 'src/guides' \
+    --media 'src/guides' \
     --out docs \
     --exclude 'tests/**/*' --exclude 'bin/**/*' --exclude 'examples/**/*' \
+    --exclude 'src/class/**/*' --exclude 'src/iterator/**/*' \
     --excludeNotDocumented --listInvalidSymbolLinks \
     --theme node_modules/typedoc-default-themes/bin/default/
 

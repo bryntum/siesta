@@ -1,6 +1,6 @@
-import { it } from "siesta/nodejs.js"
+import { it, Test } from "siesta/nodejs.js"
 
-it('Basic Siesta Node.js test', async t => {
+it('Basic Siesta Node.js test', async (t : Test) => {
     t.true(true, "That's true")
 
     t.true(false, "That's not true")
