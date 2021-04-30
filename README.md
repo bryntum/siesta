@@ -18,7 +18,7 @@ Installation
 =============
 
 ```
-npm install @bryntum/siesta --save 
+npm install @bryntum/siesta --save-dev
 ```
 
 Teaser video
