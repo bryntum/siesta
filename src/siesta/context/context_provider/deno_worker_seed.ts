@@ -1,4 +1,6 @@
 //---------------------------------------------------------------------------------------------------------------------
+type DedicatedWorkerGlobalScope = any
+
 declare const self : DedicatedWorkerGlobalScope
 
 // poor-man, zero-dep `evaluate` handler

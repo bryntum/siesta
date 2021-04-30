@@ -4,6 +4,17 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSerializableJSON } from "./MediaSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
+// this type is declared in TS definitions lib, called `webworker`:
+// {
+//     "compilerOptions" : {
+//         "lib"                       : [
+//            "webworker"
+//         ],
+// but it conflicts with the "dom" lib.. can't use both and can't declare
+// a lib for specific file
+
+type DedicatedWorkerGlobalScope = any
+
 declare const self : DedicatedWorkerGlobalScope
 
 //---------------------------------------------------------------------------------------------------------------------
