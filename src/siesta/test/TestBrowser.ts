@@ -8,6 +8,9 @@ import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Test class for code running in the browser environment.
+ */
 export class TestBrowser extends Mixin(
     [
         Test

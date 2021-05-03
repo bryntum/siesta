@@ -92,23 +92,39 @@ export class AssertionCompare extends Mixin(
             }))
         }
 
-
+        /**
+         * This assertion passes if provided value is "falsy" - `false`, `0`, `''` etc.
+         * @param value
+         * @param description
+         */
         false<V> (value : V, description : string = '') {
             this.assertTrueInternal('false(received)', false, true, value, description)
         }
 
-
+        /**
+         * This assertion passes if provided value is "truthy" - `true`, `1`, `'non_empty_string'` etc
+         * @param value
+         * @param description
+         */
         true<V> (value : V, description : string = '') {
             this.assertTrueInternal('true(received)', false, false, value, description)
         }
 
 
-        // backward compat
+        /**
+         * Backward compatibility alias for [[true]]
+         * @param value
+         * @param description
+         */
         ok<V> (value : V, description : string = '') {
             this.assertTrueInternal('ok(received)', false, false, value, description)
         }
 
-
+        /**
+         * Backward compatibility alias for [[false]]
+         * @param value
+         * @param description
+         */
         notOk<V> (value : V, description : string = '') {
             this.assertTrueInternal('notOk(received)', false, true, value, description)
         }
@@ -179,32 +195,6 @@ export class AssertionCompare extends Mixin(
         }
 
 
-        // assertStructuralEqualityInternal (
-        //     assertionName   : string,
-        //     negated         : boolean,
-        //     value1          : unknown,
-        //     value2          : unknown,
-        //     description     : string = ''
-        // ) {
-        //     const differences   = CI(compareDeepGen(value1, value2, this.descriptor.deepCompareConfig)).take(this.maxEqualityDifferences)
-        //     const passed        = negated ? differences.length > 0 : differences.length === 0
-        //
-        //     this.addResult(Assertion.new({
-        //         name            : negated ? this.negateExpectationName(assertionName) : assertionName,
-        //         passed,
-        //         description,
-        //
-        //         annotation  : passed ? undefined : negated ? NotEqualAnnotationTemplate.el({
-        //             value               : value2,
-        //             t                   : this
-        //         }) : DeepEqualAnnotationTemplate.el({
-        //             differences,
-        //             t                   : this
-        //         })
-        //     }))
-        // }
-
-
         assertStructuralEqualityInternal (
             assertionName   : string,
             negated         : boolean,
@@ -229,32 +219,63 @@ export class AssertionCompare extends Mixin(
         }
 
 
-        // eqDiff<V> (value1 : V, value2 : V, description : string = '') {
-        //     this.assertStructuralDiffEqualityInternal('eqDiff(received, expected)', false, value1, value2, description)
-        // }
-
-
-        eq<V> (value1 : V, value2 : V, description : string = '') {
-            this.assertStructuralEqualityInternal('eq(received, expected)', false, value1, value2, description)
+        /**
+         * A shorter alias for [[equal]]
+         */
+        eq<V> (received : V, expected : V, description : string = '') {
+            this.assertStructuralEqualityInternal('eq(received, expected)', false, received, expected, description)
         }
 
-
+        /**
+         * A shorter alias for [[notEqual]]
+         */
         ne<V> (value1 : V, value2 : V, description : string = '') {
             this.assertStructuralEqualityInternal('ne(received, expected)', false, value1, value2, description)
         }
 
 
-        equal<V> (value1 : V, value2 : V, description : string = '') {
-            this.assertStructuralEqualityInternal('equal(received, expected)', false, value1, value2, description)
+        /**
+         * This assertion passes if the received (left) and expected (right) values are "structurally" equal, the
+         * so called "deep" equality.
+         *
+         * `Map`, `Set` and other native JavaScript data types are supported. Currently these objects are compared
+         * by their content, any extra properties, set on them, will not be compared. We plan to support this
+         * use case if there will be a demand for it.
+         *
+         * Cyclic data structures are supported. Fuzzy matchers, like [[any]], [[anyNumberApprox]], etc are supported
+         * inside the `expected` data.
+         *
+         * @param received
+         * @param expected
+         * @param description
+         */
+        equal<V> (received : V, expected : V, description : string = '') {
+            this.assertStructuralEqualityInternal('equal(received, expected)', false, received, expected, description)
         }
 
 
+        /**
+         * This assertion passes if the received (left) and expected (right) values are "structurally" *not* equal, the
+         * so called "deep" inequality.
+         *
+         * See [[equal]] for details.
+         *
+         * @param value1
+         * @param value2
+         * @param description
+         */
         notEqual<V> (value1 : V, value2 : V, description : string = '') {
             this.assertStructuralEqualityInternal('notEqual(received, expected)', true, value1, value2, description)
         }
 
 
-        // backward compat
+        /**
+         * Backward compatible alias for [[equal]]
+         *
+         * @param value1
+         * @param value2
+         * @param description
+         */
         isDeeply<V> (value1 : V, value2 : V, description : string = '') {
             this.assertStructuralEqualityInternal('isDeeply(received, expected)', false, value1, value2, description)
         }
@@ -327,24 +348,45 @@ export class AssertionCompare extends Mixin(
             return isDate(value1) && isDate(value2) ? value1.getTime() === value2.getTime() : this.comparePrimitives(value1, value2)
         }
 
-
+        /**
+         * This assertion passes if the received and expected values are equal, as defined by the `===` operator.
+         *
+         * @param value1
+         * @param value2
+         * @param description
+         */
         isStrict<V> (value1 : V, value2 : V, description : string = '') {
             this.assertEqualityInternal('isStrict(received, expected)', value1 === value2, false, value1, value2, description)
         }
 
-
-        is<V> (value1 : V, value2 : V, description : string = '') {
+        /**
+         * This assertion passes if the received and expected values are equal, as defined by the `===` operator.
+         * In addition, the fuzzy matchers, like [[any]], [[anyNumberApprox]], etc are supported for the `expected` value.
+         *
+         * If you are looking for deep structural equality, check [[equal]].
+         *
+         * @param received
+         * @param expected
+         * @param description
+         */
+        is<V> (received : V, expected : V, description : string = '') {
             this.assertEqualityInternal(
                 'is(received, expected)',
-                this.comparePrimitivesIs(value1, value2),
+                this.comparePrimitivesIs(received, expected),
                 false,
-                value1,
-                value2,
+                received,
+                expected,
                 description
             )
         }
 
-
+        /**
+         * The negated version of [[is]].
+         *
+         * @param value1
+         * @param value2
+         * @param description
+         */
         isNot<V> (value1 : V, value2 : V, description : string = '') {
             this.assertEqualityInternal(
                 'isNot(received, expected)',
@@ -387,12 +429,27 @@ export class AssertionCompare extends Mixin(
             }))
         }
 
-
+        /**
+         * This assertion passes if the provided `iterable` contains the `element` value.
+         * The element comparison is performed deeply.
+         *
+         * @param iterable
+         * @param element
+         * @param description
+         */
         contain<V> (iterable : Iterable<V>, element : V, description : string = '') {
             this.assertIterableContainInternal('contain(received, element)', false, iterable, element)
         }
 
 
+        /**
+         * This assertion passes if the provided `iterable` does not contain the `element` value.
+         * The element comparison is performed deeply.
+         *
+         * @param iterable
+         * @param element
+         * @param description
+         */
         notContain<V> (iterable : Iterable<V>, element : V, description : string = '') {
             this.assertIterableContainInternal('notContain(received, element)', true, iterable, element)
         }
@@ -426,29 +483,72 @@ export class AssertionCompare extends Mixin(
             }))
         }
 
-
-        isGreater (value1 : unknown, value2 : unknown, description : string = '') {
-            this.assertCompareInternal('isGreater(received, expected)', false, ComparisonType.Greater, value1, value2)
+        /**
+         * This assertion passes if the received value is greater than expected, as defined by the `>` operator.
+         * It works for numbers, Dates and other values that overloads the `valueOf` method.
+         *
+         * @param received
+         * @param expected
+         * @param description
+         */
+        isGreater (received : unknown, expected : unknown, description : string = '') {
+            this.assertCompareInternal('isGreater(received, expected)', false, ComparisonType.Greater, received, expected)
         }
 
-        isGreaterOrEqual (value1 : unknown, value2 : unknown, description : string = '') {
-            this.assertCompareInternal('isGreaterOrEqual(received, expected)', false, ComparisonType.GreaterOrEqual, value1, value2)
+        /**
+         * This assertion passes if the received value is greater or equal than expected, as defined by the `>=` operator.
+         * It works for numbers, Dates and other values that overloads the `valueOf` method.
+         *
+         * @param received
+         * @param expected
+         * @param description
+         */
+        isGreaterOrEqual (received : unknown, expected : unknown, description : string = '') {
+            this.assertCompareInternal('isGreaterOrEqual(received, expected)', false, ComparisonType.GreaterOrEqual, received, expected)
         }
 
-        isGE (value1 : unknown, value2 : unknown, description : string = '') {
-            this.assertCompareInternal('isGE(received, expected)', false, ComparisonType.GreaterOrEqual, value1, value2)
+        /**
+         * Alias for [[isGreaterOrEqual]]
+         * @param received
+         * @param expected
+         * @param description
+         */
+        isGE (received : unknown, expected : unknown, description : string = '') {
+            this.assertCompareInternal('isGE(received, expected)', false, ComparisonType.GreaterOrEqual, received, expected)
         }
 
-        isLess (value1 : unknown, value2 : unknown, description : string = '') {
-            this.assertCompareInternal('isLess(received, expected)', false, ComparisonType.Less, value1, value2)
+        /**
+         * This assertion passes if the received value is less than expected, as defined by the `<` operator.
+         * It works for numbers, Dates and other values that overloads the `valueOf` method.
+         *
+         * @param received
+         * @param expected
+         * @param description
+         */
+        isLess (received : unknown, expected : unknown, description : string = '') {
+            this.assertCompareInternal('isLess(received, expected)', false, ComparisonType.Less, received, expected)
         }
 
-        isLessOrEqual (value1 : unknown, value2 : unknown, description : string = '') {
-            this.assertCompareInternal('isLessOrEqual(received, expected)', false, ComparisonType.LessOrEqual, value1, value2)
+        /**
+         * This assertion passes if the received value is less than expected, as defined by the `<=` operator.
+         * It works for numbers, Dates and other values that overloads the `valueOf` method.
+         *
+         * @param received
+         * @param expected
+         * @param description
+         */
+        isLessOrEqual (received : unknown, expected : unknown, description : string = '') {
+            this.assertCompareInternal('isLessOrEqual(received, expected)', false, ComparisonType.LessOrEqual, received, expected)
         }
 
-        isLE (value1 : unknown, value2 : unknown, description : string = '') {
-            this.assertCompareInternal('isLE(received, expected)', false, ComparisonType.LessOrEqual, value1, value2)
+        /**
+         * Alias for [[isLessOrEqual]]
+         * @param received
+         * @param expected
+         * @param description
+         */
+        isLE (received : unknown, expected : unknown, description : string = '') {
+            this.assertCompareInternal('isLE(received, expected)', false, ComparisonType.LessOrEqual, received, expected)
         }
         // endregion
 
@@ -481,15 +581,24 @@ export class AssertionCompare extends Mixin(
             }))
         }
 
-
-        isApprox (value1 : number, value2 : number, approx? : Approximation, description? : string) {
+        /**
+         * This assertion passes, if the received value is approximately equal to the expected.
+         * The notion of "approximate equality" is defined with the `approx` attribute,
+         * which is converted to the [[NumberApproximation]] with the [[NumberApproximation.fromApproximation]].
+         *
+         * @param received
+         * @param expected
+         * @param approx
+         * @param description
+         */
+        isApprox (received : number, expected : number, approx : Approximation = { percent : 5 }, description : string = '') {
             if (arguments.length === 2) {
-                approx              = NumberApproximation.new({ threshold : value1 * 0.05 })
+                approx              = NumberApproximation.new({ threshold : received * 0.05 })
             }
             else if (arguments.length === 3) {
                 if (isString(approx)) {
                     description     = approx
-                    approx          = NumberApproximation.new({ threshold : value1 * 0.05 })
+                    approx          = NumberApproximation.new({ threshold : received * 0.05 })
                 }
             }
 
@@ -497,20 +606,33 @@ export class AssertionCompare extends Mixin(
 
             const approximation = NumberApproximation.maybeNew(approx)
 
-            this.assertCompareApproxInternal('isApprox(received, expected)', false, value1, value2, approximation, description)
+            this.assertCompareApproxInternal('isApprox(received, expected)', false, received, expected, approximation, description)
         }
 
 
-        // backward compat
+        /**
+         * Backward compatibility method. Just bypasses to [[any]] to return a fuzzy matcher instance.
+         *
+         * @param args
+         */
         any<T extends [] | [ AnyConstructor ]> (...args : T) : T extends [] ? any : T extends [ AnyConstructor<infer I> ] ? I : never {
-            // @ts-ignore
             return any(...args)
         }
 
+        /**
+         * Backward compatibility method. Just bypasses to [[anyNumberApprox]] to return a fuzzy matcher instance.
+         *
+         * @param args
+         */
         anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : FuzzyMatcherNumberApproximation {
             return anyNumberApprox(value, approx)
         }
 
+        /**
+         * Backward compatibility method. Just bypasses to [[anyStringLike]] to return a fuzzy matcher instance.
+         *
+         * @param args
+         */
         anyStringLike (pattern : string | RegExp) : FuzzyMatcherString {
             return anyStringLike(pattern)
         }

@@ -13,6 +13,9 @@ declare const Deno
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Test class for code running in the [Deno](https://deno.land/) environment.
+ */
 export class TestDeno extends Mixin(
     [
         Test

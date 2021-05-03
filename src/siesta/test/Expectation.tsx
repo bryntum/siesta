@@ -49,9 +49,9 @@ export class Expectation extends Base {
     /**
      * This assertion compares the value provided to the {@link Test.expect|expect} method with the `expectedValue` argument.
      * Comparison is done with `===` operator, so it should be used **only with the primitives** - numbers, strings, booleans etc.
-     * However, placeholders, generated with the `any*` family of methods are supported.
+     * However, fuzzy matchers, generated with the [[any]] family of methods are supported.
      *
-     * To deeply compare `Date`, `Arrays` and JSON objects in general, use {@link #toEqual} method.
+     * To deeply compare objects, arrays, and JSON in general, use {@link #toEqual} method.
      *
      * This method works correctly with the placeholders generated with the {@link any} method
      *
@@ -79,7 +79,7 @@ export class Expectation extends Base {
     /**
      * This assertion compares the value provided to the {@link Test.expect|expect} method with the `expectedValue` argument.
      *
-     * Comparison works for Date, Array, and JSON objects in general. It is performed "deeply".
+     * Comparison works for objects, arrays, and JSON in general. It is performed "deeply". Cyclic structures are properly handled.
      *
      * This method works correctly with the placeholders generated with the {@link any} method
      *
@@ -213,10 +213,11 @@ export class Expectation extends Base {
      * This assertion passes when the function provided to the {@link Test.expect|expect} method, throws an exception
      * during its execution.
      *
+     * ```ts
      * t.expect(function(){
      *     throw "oopsie";
      * }).toThrow());
-     *
+     * ```
      */
     async toThrow (pattern? : string | RegExp) {
         return this.t.assertThrowInternal('expect(func).toThrow()', this.isNot, this.value as AnyFunction, this.t.getSourcePoint(), pattern)
@@ -231,22 +232,22 @@ export class Expectation extends Base {
      * One can also provide the function, spied on, to the {@link Test.expect|expect} method.
      *
      * Examples:
+     * ```ts
+     * const spy = t.spyOn(obj, 'process')
      *
-const spy = t.spyOn(obj, 'process')
-
-// call the method 2 times
-obj.process()
-obj.process()
-
-// following 2 calls are equivalent
-t.expect(spy).toHaveBeenCalled();
-t.expect(obj.process).toHaveBeenCalled();
-
-// one can also use exact number of calls or comparison operators
-t.expect(spy).toHaveBeenCalled(2);
-t.expect(spy).toHaveBeenCalled('>1');
-t.expect(spy).toHaveBeenCalled('<=3');
-
+     * // call the method 2 times
+     * obj.process()
+     * obj.process()
+     *
+     * // following 2 calls are equivalent
+     * t.expect(spy).toHaveBeenCalled();
+     * t.expect(obj.process).toHaveBeenCalled();
+     *
+     * // one can also use exact number of calls or comparison operators
+     * t.expect(spy).toHaveBeenCalled(2);
+     * t.expect(spy).toHaveBeenCalled('>1');
+     * t.expect(spy).toHaveBeenCalled('<=3');
+     * ```
      *
      * See also {@link #toHaveBeenCalledWith}
      *
@@ -289,18 +290,17 @@ t.expect(spy).toHaveBeenCalled('<=3');
      * One can use placeholders, generated with the {@link Siesta.Test.BDD#any any} method to verify the arguments.
      *
      * Example:
+     * ```ts
+     * const spy = t.spyOn(obj, 'process')
      *
-
-const spy = t.spyOn(obj, 'process')
-
-// call the method 2 times with different arguments
-obj.build('development', '1.0.0')
-obj.build('release', '1.0.1')
-
-t.expect(spy).toHaveBeenCalledWith('development', '1.0.0');
-// or
-t.expect(obj.process).toHaveBeenCalledWith('development', t.any(String));
-
+     * // call the method 2 times with different arguments
+     * obj.build('development', '1.0.0')
+     * obj.build('release', '1.0.1')
+     *
+     * t.expect(spy).toHaveBeenCalledWith('development', '1.0.0');
+     * // or
+     * t.expect(obj.process).toHaveBeenCalledWith('development', t.any(String));
+     * ```
      *
      * See also {@link #toHaveBeenCalled}
      *

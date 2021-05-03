@@ -21,6 +21,9 @@ export type PreloadDescriptor = string
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Test descriptor class for tests running in the browser environment.
+ */
 @serializable()
 export class TestDescriptorBrowser extends Mixin(
     [ TestDescriptor ],

@@ -236,8 +236,11 @@ export class Test extends Mixin(
 
 
         /**
-         * This method creates a section in the test file, grouping assertions together. Such section is sometimes called "sub-test".
+         * This method creates a section in the test file, grouping assertions together. Such sections are also sometimes called "sub-tests".
          * Sub-tests can be nested arbitrarily.
+         *
+         * The 1st argument for this method can be either a string or a configuration object for this test's [[TestDescriptor|descriptor]].
+         * The string value corresponds to `{ title : 'string_value' }`.
          *
          * For the top-level section, the [["src/siesta/test/Test".it|it]] constant alias or <a href="#it-1">Test.it</a> static
          * method should be used. These aliases can actually be used inside the test function as well, however
@@ -247,7 +250,7 @@ export class Test extends Mixin(
          * import { it, Test } from "siesta/nodejs.js"
          *
          * it('Test section', async (t : Test) => {
-         *     t.it('Nested section', async (t : Test) => {
+         *     t.it({ title : 'Nested section', isTodo : true }, async (t : Test) => {
          *         ...
          *     })
          * })

@@ -319,12 +319,22 @@ export class TestDescriptor extends Mixin(
 }) {}
 
 /**
- * This type represent the 1st argument for the calls that create test sections, like [[Test.it]] and similar.
- * The value can be either a string or a partial object of this test class descriptor.
+ * This type represents a special placeholder for the [[TestDescriptor]] value. It is used as the
+ * 1st argument for the calls that create test sections, like [[Test.it]] and similar.
+ *
+ * The value can be either a string or a partial configuration object of this test's descriptor.
  *
  * The string value corresponds to the `{ title : 'string_value' }` object.
  */
 export type TestDescriptorArgument<T extends Test> = string | Partial<InstanceType<T[ 'testDescriptorClass' ]>>
 
+/**
+ * This type represents a special placeholder for the [[TestDescriptor]] value. It is used as an argument
+ * for the various project planning calls, like [[Project.plan]] and similar.
+ *
+ * The value can be either a string or a partial configuration object of this test's descriptor.
+ *
+ * The string value corresponds to the `{ filename : 'string_value' }` object.
+ */
 export type ProjectPlanItemDescriptor<T extends TestDescriptor> = string | (Partial<T> & { items? : ProjectPlanItemDescriptor<T>[] })
 

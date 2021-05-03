@@ -36,47 +36,92 @@ export class FuzzyMatcher extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Class that represent the number approximation. It is basically a sum type (often cryptically called "discriminated union")
+ * with 3 options, determined by the property, set on the instance creation. See the [[percent]], [[threshold]] and [[digits]]
+ * below.
+ *
+ * The instances of this type are expected to be created with the static constructor method [[fromApproximation]].
+ */
 export class NumberApproximation extends Base {
+    /**
+     * The number of percents (0 <= x <= 100) on which the provided value may differ from the expected value.
+     */
     percent         : number        = undefined
 
+    /**
+     * The exact threshold number on which the provided value may differ from the expected value.
+     */
     threshold       : number        = undefined
 
+    /**
+     * The number of digits after the point, which should be identical in the received and expected values,
+     * to consider them equal.
+     */
     digits          : number        = undefined
 
 
-    getThreshold (value : number) : number {
+    getThreshold (expected : number) : number {
         if (this.threshold !== undefined) return this.threshold
 
-        if (this.percent !== undefined) return value * this.percent / 100
+        if (this.percent !== undefined) return expected * this.percent / 100
 
         if (this.digits !== undefined) return 9.999999999999999 * Math.pow(10, -this.digits - 1)
     }
 
 
-    equalApprox (v1 : number, v2 : number) : boolean {
-        const delta     = Math.abs(v1 - v2) - this.getThreshold(v1)
+    equalApprox (received : number, expected : number) : boolean {
+        const delta     = Math.abs(received - expected) - this.getThreshold(received)
 
         // strip the floating number artifacts (1.05 - 1 = 0.050000000000000044)
         return Number(delta.toPrecision(10)) <= 1e-10
     }
 
-
+    /**
+     * Static constructor, which converts a value of [[Approximation]] into [[NumberApproximation]].
+     * @param approx
+     */
     static fromApproximation <T extends typeof NumberApproximation> (this : T, approx : Approximation) : InstanceType<T> {
         return isNumber(approx) ? this.new({ threshold : approx } as Partial<InstanceType<T>>) : this.maybeNew(approx as Partial<InstanceType<T>>)
     }
 }
 
+/**
+ * A sum type for various way of specifying the number approximation. Can be either plain number or
+ * configuration object for [[NumberApproximation]] or [[NumberApproximation]] instance.
+ */
 export type Approximation   = number | Partial<NumberApproximation> | NumberApproximation
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * The instance of this fuzzy matcher will match any number, which is approximately equal to the [[value|expected value]],
+ * with the notion of "approximate equality" defined by the [[approx]] configuration property.
+ *
+ * This class is usually instantiated with the helper function [[anyNumberApprox]]
+ *
+ * For example:
+ *
+ * ```ts
+ *
+ * t.is(10.5, anyNumberApprox(10))
+ *
+ * t.is(10.1, anyNumberApprox(10, { percent : 1 }))
+ * ```
+ */
 export class FuzzyMatcherNumberApproximation extends Mixin(
     [ FuzzyMatcher ],
     (base : ClassUnion<typeof FuzzyMatcher>) =>
 
     class FuzzyMatcherNumberApproximation extends base {
+        /**
+         * Expected value to match with
+         */
         value       : number                = undefined
 
+        /**
+         * An approximation of the expected value.
+         */
         approx      : NumberApproximation   = NumberApproximation.new({ percent : 5 })
 
 
@@ -126,11 +171,34 @@ export class FuzzyMatcherNumberApproximation extends Mixin(
     }
 ){}
 
+/**
+ * Returns an instance of [[FuzzyMatcherNumberApproximation]], configured with the `value` and `approx` arguments.
+ *
+ * @param value
+ * @param approx
+ */
 export const anyNumberApprox = (value : number, approx : Approximation = { threshold : 0.05 * value }) : FuzzyMatcherNumberApproximation =>
     FuzzyMatcherNumberApproximation.new({ value, approx : NumberApproximation.fromApproximation(approx) })
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * The instance of this fuzzy matcher will match any number, which is in the interval between
+ * the [[min]]/[[max]] configuration properties. An [[inclusive]] flag defines if boundaries
+ * of that interval are matching.
+ *
+ * This class is usually instantiated with the helper function [[anyNumberBetween]]
+ *
+ * For example:
+ *
+ * ```ts
+ *
+ * t.is(5, anyNumberBetween(0, 10))
+ *
+ * // fail - not inclusive match
+ * t.is(0, anyNumberBetween(0, 1, false))
+ * ```
+ */
 export class FuzzyMatcherNumberBetween extends Mixin(
     [ FuzzyMatcher ],
     (base : ClassUnion<typeof FuzzyMatcher>) =>
@@ -180,17 +248,40 @@ export class FuzzyMatcherNumberBetween extends Mixin(
     }
 ){}
 
-
+/**
+ * Returns an instance of [[FuzzyMatcherNumberBetween]], configured with the `min`, `max` and `inclusive` arguments.
+ *
+ * @param min
+ * @param max
+ * @param inclusive
+ */
 export const anyNumberBetween = (min : number, max : number, inclusive : boolean = true) : FuzzyMatcherNumberBetween =>
     FuzzyMatcherNumberBetween.new({ min, max, inclusive })
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * The instance of this fuzzy matcher will match any string, matching the [[pattern]] configuration property.
+ *
+ * This class is usually instantiated with the helper function [[anyStringLike]]
+ *
+ * For example:
+ *
+ * ```ts
+ *
+ * t.is('woops', anyStringLike('ps'))
+ *
+ * t.is('boops', anyStringLike(/OOP/i))
+ * ```
+ */
 export class FuzzyMatcherString extends Mixin(
     [ FuzzyMatcher ],
     (base : ClassUnion<typeof FuzzyMatcher>) =>
 
     class FuzzyMatcherString extends base {
+        /**
+         * Either a string, which the matching strip should contain, or a `RegExp` instance, which the matching string should conform to.
+         */
         pattern     : string | RegExp       = ''
 
         toString () : string {
@@ -234,15 +325,41 @@ export class FuzzyMatcherString extends Mixin(
     }
 ){}
 
+/**
+ * This method returns an [[FuzzyMatcherString]] instance, configured with the `pattern` argument.
+ *
+ * See also [[any]], [[anyInstanceOf]], [[anyStringLike]], [[anyNumberApprox]], [[anyNumberBetween]]
+ *
+ * @param pattern
+ */
 export const anyStringLike = (pattern : string | RegExp) : FuzzyMatcherString => FuzzyMatcherString.new({ pattern })
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * The instance of this fuzzy matcher will match any instance of the class, specified with the [[cls]] configuration property.
+ *
+ * This class is usually instantiated with the helper functions [[any]] and [[anyInstanceOf]]
+ *
+ * For example:
+ *
+ * ```ts
+ *
+ * // pass
+ * t.is([ 1, 2, 3 ], any(Array), 'Array is "any array"')
+ *
+ * // fail
+ * t.is([ 1, 2, 3 ], any(Map), 'Array is "any map"')
+ * ```
+ */
 export class FuzzyMatcherInstance extends Mixin(
     [ FuzzyMatcher ],
     (base : ClassUnion<typeof FuzzyMatcher>) =>
 
     class FuzzyMatcherInstance extends base {
+        /**
+         * The constructor of the class to match the provided value.
+         */
         cls         : AnyConstructor    = Object
 
 
@@ -278,10 +395,27 @@ export class FuzzyMatcherInstance extends Mixin(
     }
 ){}
 
+/**
+ * Returns an instance of the [[FuzzyMatcherInstance]] configured with the `cls` argument
+ *
+ * @param cls
+ */
 export const anyInstanceOf = (cls : AnyConstructor) : FuzzyMatcherInstance => FuzzyMatcherInstance.new({ cls })
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * An instance of this matcher class will match anything.
+ *
+ * This class is usually instantiated with the helper function [[any]]
+ *
+ * For example:
+ * ```ts
+ * t.is([ 1, 2, 3 ], any(), 'Array matches `any()`')
+ *
+ * t.is(new Set(), any(), 'Set matches `any()`')
+ * ```
+ */
 export class FuzzyMatcherAny extends Mixin(
     [ FuzzyMatcher ],
     (base : ClassUnion<typeof FuzzyMatcher>) =>
@@ -320,6 +454,16 @@ export class FuzzyMatcherAny extends Mixin(
     }
 ){}
 
+/**
+ * This method returns a fuzzy matcher instance, which can be used in various comparison assertions.
+ *
+ * If it is called w/o arguments, it returns an instance of [[FuzzyMatcherAny]]. If it is called with
+ * single argument, it returns an instance of [[FuzzyMatcherInstance]].
+ *
+ * See also [[anyInstanceOf]], [[anyStringLike]], [[anyNumberApprox]], [[anyNumberBetween]]
+ *
+ * @param args
+ */
 export const any = <T extends [] | [ AnyConstructor ]>(...args : T)
     : T extends [] ? any : T extends [ AnyConstructor<infer I> ] ? I : never =>
     // @ts-ignore

@@ -5,40 +5,71 @@ import { Test } from "./Test.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Type for the individual call information. Contains the scope - [[object]], arguments - [[args]] and
+ * returned value - [[returnValue]].
+ */
 export type CallInfo = { object : unknown, args : unknown[], returnValue : unknown }
 
-
+/**
+ * Class that holds the log information about call history for the particular spy.
+ */
 export class CallsLog extends Base {
     spy         : Spy           = undefined
 
+    /**
+     * Returns `true` if spy was called at least once, `false` otherwise
+     */
     any () : boolean {
         return this.spy.callsLog.length > 0
     }
 
+    /**
+     * Returns the number of times this spy was called
+     */
     count () : number {
         return this.spy.callsLog.length
     }
 
-    argsFor (i) : unknown[] {
+    /**
+     * Accepts an index of the call (0-based) and return an array of arguments for that call.
+     * @param i
+     */
+    argsFor (i : number) : unknown[] {
         return this.spy.callsLog[ i ].args
     }
 
+    /**
+     * Returns an array, every element of which is in turn an array arguments, for every tracked spy call.
+     */
     allArgs () : unknown[][] {
         return this.spy.callsLog.map(call => call.args)
     }
 
+    /**
+     * Returns an array with [[CallInfo]] elements for every tracked spy call.
+     */
     all () : CallInfo[] {
         return this.spy.callsLog
     }
 
+    /**
+     * Returns the [[CallInfo]] structure for the most recent spy call.
+     */
     mostRecent () : CallInfo {
         return this.spy.callsLog[ this.spy.callsLog.length - 1 ]
     }
 
+    /**
+     * Returns the [[CallInfo]] structure for the first spy call.
+     */
     first () : CallInfo {
         return this.spy.callsLog[ 0 ]
     }
 
+    /**
+     * Clears all tracking information.
+     */
     reset () {
         this.spy.reset()
     }
@@ -48,13 +79,19 @@ export class CallsLog extends Base {
 //---------------------------------------------------------------------------------------------------------------------
 export type SpyFunction     = Function & { spy : Spy }
 
-export type SpyStrategy     = 'callThrough' | 'callFake' | 'returnValue' | 'throwError'
+export type SpyStrategy     = 'callThrough' | 'callFake' | 'stub' | 'returnValue' | 'throwError'
 
 /**
-This class implements a "spy" - function wrapper which tracks the calls to itself. Spy can be installed
+This class implements a "spy" - function wrapper which tracks its calls. Spy can be installed
 instead of a method in some object or can be used standalone.
 
-Note, that spies "belongs" to a test spec and once the spec is completed all spies that were installed during its execution
+Usually you don't use this class directly, but instead via the test helper methods: [[Test.spyOn|spyOn]],
+[[Tets.createSpy|createSpy]], [[Test.createSpyObj|createSpyObj]].
+
+Spy can "operate" in several modes, called "strategies". See [[callThrough]], [[callFake]], [[stub]], [[returnValue]], [[throwError]] below.
+Default one is [[callThrough]].
+
+Note, that spies "belongs" to a test and once the test is completed all, spies that were installed during its execution
 will be removed.
 */
 export class Spy extends Base {
@@ -75,36 +112,22 @@ export class Spy extends Base {
     callsLog                : CallInfo[]            = []
 
     /**
-     * @property {Object} calls This is an object property with several helper methods, related to the calls
-     * tracking information. It is assigned to the wrapper function of spy.
-     *
-     * @property {Function} calls.any Returns `true` if spy was called at least once, `false` otherwise
-     * @property {Function} calls.count Returns the number of times this spy was called
-     * @property {Function} calls.argsFor Accepts an number of the call (0-based) and return an array of arguments
-     * for that call.
-     * @property {Function} calls.allArgs Returns an array with the arguments for every tracked function call.
-     * Every element of the array is, in turn, an array of arguments.
-     * @property {Function} calls.all Returns an array with the context for every tracked function call.
-     * Every element of the array is an object of the following structure:
-
-{ object : this, args : [ 0, 1, 2 ], returnValue : undefined }
-
-     * @property {Function} calls.mostRecent Returns a context object of the most-recent tracked function call.
-     * @property {Function} calls.first Returns a context object of the first tracked function call.
-     * @property {Function} calls.reset Reset all tracking data.
-     *
+     * This property contains [[CallsLog]] instance, with several helper methods, related to the calls
+     * tracking information. It is available as the property of the spy object and also assigned to the spies wrapper function.
      *
      * Example:
-
-t.spyOn(obj, 'someMethod').callThrough()
-
-obj.someMethod(0, 1)
-obj.someMethod(1, 2)
-
-t.expect(obj.someMethod.calls.any()).toBe(true)
-t.expect(obj.someMethod.calls.count()).toBe(2)
-t.expect(obj.someMethod.calls.first()).toEqual({ object : obj, args : [ 0, 1 ], returnValue : undefined })
-
+     * ```ts
+     * const spy = t.spyOn(obj, 'someMethod').callThrough()
+     *
+     * obj.someMethod(0, 1)
+     * obj.someMethod(1, 2)
+     *
+     * // available both on spy and wrapper
+     * t.expect(spy.calls.any()).toBe(true)
+     * t.expect(obj.someMethod.calls.count()).toBe(2)
+     *
+     * t.expect(spy.calls.first()).toEqual({ object : obj, args : [ 0, 1 ], returnValue : undefined })
+     * ```
      */
     calls                   : CallsLog          = CallsLog.new({ spy : this })
 
@@ -115,15 +138,15 @@ t.expect(obj.someMethod.calls.first()).toEqual({ object : obj, args : [ 0, 1 ], 
      *
      * This property is also assigned to the wrapper function of spy.
      *
-
-t.spyOn(obj, 'someMethod').callThrough()
-
-// same thing as above
-t.spyOn(obj, 'someMethod').and.callThrough()
-
-// returns spy instance
-obj.someMethod.and
-
+     * ```ts
+     * t.spyOn(obj, 'someMethod').callThrough()
+     *
+     * // same thing as above
+     * t.spyOn(obj, 'someMethod').and.callThrough()
+     *
+     * // returns spy instance
+     * obj.someMethod.and
+     * ```
      */
     get and () : this {
         return this
@@ -224,7 +247,7 @@ obj.someMethod.and
     /**
      * This method makes the spy to return the value provided and not execute the original function.
      *
-     * @param {Object} value The value that will be returned from the spy.
+     * @param value The value that will be returned from the spy.
      */
     returnValue (value : unknown) : this {
         this.strategy       = 'returnValue'
@@ -240,7 +263,7 @@ obj.someMethod.and
      *
      * @param func The function to call instead of the original function
      */
-    callFake (func : Function) {
+    callFake (func : Function) : this {
         this.strategy   = 'callFake'
 
         this.fakeFunc   = func
@@ -252,11 +275,11 @@ obj.someMethod.and
     /**
      * This method makes the spy to throw the specified `error` value (instead of calling the original function).
      *
-     * @param {Object} error The error value to throw. If it is not an `Error` instance, it will be passed to `Error` constructor first.
+     * @param error The error value to throw. If it is not an `Error` instance, it will be passed to `Error` constructor first.
      *
-     * @return {Siesta.Test.BDD.Spy} This spy instance
+     * @return This spy instance
      */
-    throwError (error : unknown) {
+    throwError (error : unknown) : this {
         this.strategy       = 'throwError'
 
         this.throwErrorObj  = (error instanceof Error) ? error : new Error(error as any)

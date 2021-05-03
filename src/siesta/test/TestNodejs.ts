@@ -9,6 +9,9 @@ import { TestDescriptorNodejs } from "./TestDescriptorNodejs.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Test class for code running in the [Node.js](https://nodejs.org/) environment.
+ */
 export class TestNodejs extends Mixin(
     [
         Test

@@ -14,6 +14,9 @@ import { TestDescriptor } from "./TestDescriptor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Test descriptor class for tests running in the [Deno](https://deno.land/) environment.
+ */
 @serializable()
 export class TestDescriptorDeno extends Mixin(
     [ TestDescriptor ],
