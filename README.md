@@ -8,7 +8,7 @@ Version 6 is a complete rewrite, using a modern technology stack and the decade 
 
 Main features:
 
-- Running tests in multiple environments: browsers, Node.js and Deno, assuming that the code being tested is isomorphic
+- Running tests in multiple environments: browsers, Node.js and Deno
 - Supports parallel execution
 - Provides accurate and well-formatted deep diff for equality assertion
 
