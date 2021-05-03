@@ -37,23 +37,28 @@ export class Expectation extends Base {
 
     t               : Test              = undefined
 
-
+    /**
+     * Returns expectation with the opposite meaning. For example:
+     *
+     * ```ts
+     * t.expect(1).toBe(1)
+     * t.expect(1).not.toBe(2)
+     * ```
+     */
     get not () : Expectation {
         const cls       = this.constructor as typeof Expectation
 
         return cls.new({ value : this.value, isNot : !this.isNot, t : this.t })
     }
 
-
-
     /**
      * This assertion compares the value provided to the {@link Test.expect|expect} method with the `expectedValue` argument.
      * Comparison is done with `===` operator, so it should be used **only with the primitives** - numbers, strings, booleans etc.
      * However, fuzzy matchers, generated with the [[any]] family of methods are supported.
      *
-     * To deeply compare objects, arrays, and JSON in general, use {@link #toEqual} method.
+     * To deeply compare objects, arrays, and JSON in general, use {@link toEqual} method.
      *
-     * This method works correctly with the placeholders generated with the {@link any} method
+     * This method works correctly with the fuzzy matchers generated with the {@link any} method
      *
      * @param expectedValue An expected value
      */
@@ -81,7 +86,7 @@ export class Expectation extends Base {
      *
      * Comparison works for objects, arrays, and JSON in general. It is performed "deeply". Cyclic structures are properly handled.
      *
-     * This method works correctly with the placeholders generated with the {@link any} method
+     * This method works correctly with the fuzzy matchers generated with the {@link any} method
      *
      * @param expectedValue An expected value
      */
@@ -249,7 +254,7 @@ export class Expectation extends Base {
      * t.expect(spy).toHaveBeenCalled('<=3');
      * ```
      *
-     * See also {@link #toHaveBeenCalledWith}
+     * See also {@link toHaveBeenCalledWith}
      *
      * @param expectedNumber Expected number of calls. Can be either a number, specifying the exact
      * number of calls, or a string. In the latter case one should include a comparison operator in front of the number.
@@ -287,7 +292,7 @@ export class Expectation extends Base {
      *
      * One can also provide the function, spied on, to the {@link Test.expect|expect} method.
      *
-     * One can use placeholders, generated with the {@link Siesta.Test.BDD#any any} method to verify the arguments.
+     * One can use fuzzy matchers, generated with the {@link any} method to verify the arguments.
      *
      * Example:
      * ```ts
@@ -302,7 +307,7 @@ export class Expectation extends Base {
      * t.expect(obj.process).toHaveBeenCalledWith('development', t.any(String));
      * ```
      *
-     * See also {@link #toHaveBeenCalled}
+     * See also {@link toHaveBeenCalled}
      *
      * @param arg1 Argument to a call
      * @param arg2 Argument to a call

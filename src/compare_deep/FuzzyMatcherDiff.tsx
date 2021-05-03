@@ -174,6 +174,8 @@ export class FuzzyMatcherNumberApproximation extends Mixin(
 /**
  * Returns an instance of [[FuzzyMatcherNumberApproximation]], configured with the `value` and `approx` arguments.
  *
+ * See also [[any]], [[anyInstanceOf]], [[anyStringLike]], [[anyNumberBetween]]
+ *
  * @param value
  * @param approx
  */
@@ -190,9 +192,7 @@ export const anyNumberApprox = (value : number, approx : Approximation = { thres
  * This class is usually instantiated with the helper function [[anyNumberBetween]]
  *
  * For example:
- *
  * ```ts
- *
  * t.is(5, anyNumberBetween(0, 10))
  *
  * // fail - not inclusive match
@@ -204,9 +204,19 @@ export class FuzzyMatcherNumberBetween extends Mixin(
     (base : ClassUnion<typeof FuzzyMatcher>) =>
 
     class FuzzyMatcherNumberBetween extends base {
+        /**
+         * The mininmum of the matching interval.
+         */
         min         : number        = undefined
+
+        /**
+         * The maxinmum of the matching interval.
+         */
         max         : number        = undefined
 
+        /**
+         * Whether the boundaries of the interval are matching.
+         */
         inclusive   : boolean       = true
 
 
@@ -250,6 +260,8 @@ export class FuzzyMatcherNumberBetween extends Mixin(
 
 /**
  * Returns an instance of [[FuzzyMatcherNumberBetween]], configured with the `min`, `max` and `inclusive` arguments.
+ *
+ * See also [[any]], [[anyInstanceOf]], [[anyStringLike]], [[anyNumberApprox]]
  *
  * @param min
  * @param max
@@ -328,7 +340,7 @@ export class FuzzyMatcherString extends Mixin(
 /**
  * This method returns an [[FuzzyMatcherString]] instance, configured with the `pattern` argument.
  *
- * See also [[any]], [[anyInstanceOf]], [[anyStringLike]], [[anyNumberApprox]], [[anyNumberBetween]]
+ * See also [[any]], [[anyInstanceOf]], [[anyNumberApprox]], [[anyNumberBetween]]
  *
  * @param pattern
  */
@@ -397,6 +409,8 @@ export class FuzzyMatcherInstance extends Mixin(
 
 /**
  * Returns an instance of the [[FuzzyMatcherInstance]] configured with the `cls` argument
+ *
+ * See also [[any]], [[anyStringLike]], [[anyNumberApprox]], [[anyNumberBetween]]
  *
  * @param cls
  */

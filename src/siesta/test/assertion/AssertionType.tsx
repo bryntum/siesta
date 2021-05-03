@@ -64,7 +64,21 @@ export class AssertionType extends Mixin(
             }))
         }
 
-
+        /**
+         * This assertion passes if the received `value` is an instance of the `cls` class. It works for native built-in classes
+         * too.
+         *
+         * For example:
+         * ```ts
+         * t.isInstanceOf([ 1, 2, 3 ], Array)
+         *
+         * t.isInstanceOf(1, Number)
+         * ```
+         *
+         * @param value The recieved value
+         * @param cls The class constructor
+         * @param description
+         */
         isInstanceOf (value : unknown, cls : AnyConstructor, description : string = '') {
             this.assertInstanceOfInternal('isInstanceOf(received, cls)', false, value, cls, description)
         }
@@ -80,51 +94,111 @@ export class AssertionType extends Mixin(
         // eof backward compat
 
 
-
+        /**
+         * This assertion passes if the received `value` is a `Boolean`.
+         *
+         * @param value
+         * @param description
+         */
         isBoolean (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isBoolean(received)', false, value, Boolean, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `String`.
+         * @param value
+         * @param description
+         */
         isString (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isString(received)', false, value, String, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `Number`.
+         * @param value
+         * @param description
+         */
         isNumber (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isNumber(received)', false, value, Number, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `Object`.
+         * @param value
+         * @param description
+         */
         isObject (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isObject(received)', false, value, Object, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `Array`.
+         * @param value
+         * @param description
+         */
         isArray (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isArray(received)', false, value, Array, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `Date`.
+         * @param value
+         * @param description
+         */
         isDate (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isDate(received)', false, value, Date, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `RegExp`.
+         * @param value
+         * @param description
+         */
         isRegExp (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isRegExp(received)', false, value, RegExp, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `Function`.
+         * @param value
+         * @param description
+         */
         isFunction (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isFunction(received)', false, value, Function, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `Set`.
+         * @param value
+         * @param description
+         */
         isSet (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isSet(received)', false, value, Set, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `Map`.
+         * @param value
+         * @param description
+         */
         isMap (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isMap(received)', false, value, Map, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `WeakSet`.
+         * @param value
+         * @param description
+         */
         isWeakSet (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isWeakSet(received)', false, value, WeakSet, description)
         }
 
+        /**
+         * This assertion passes if the received `value` is a `WeakMap`.
+         * @param value
+         * @param description
+         */
         isWeakMap (value : unknown, description : string = '') {
             this.assertInstanceOfInternal('isWeakMap(received)', false, value, WeakMap, description)
         }

@@ -24,9 +24,6 @@ export class TestNodejs extends Mixin(
         @prototypeValue(TestDescriptorNodejs)
         testDescriptorClass     : typeof TestDescriptorNodejs
 
-        // @prototypeValue(ExecutionContextNode)
-        // executionContextClass   : typeof ExecutionContext
-
 
         static getSelfUrl () : string {
             const testUrl       = process.argv[ 1 ]

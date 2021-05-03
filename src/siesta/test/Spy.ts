@@ -6,10 +6,24 @@ import { Test } from "./Test.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 /**
- * Type for the individual call information. Contains the scope - [[object]], arguments - [[args]] and
- * returned value - [[returnValue]].
+ * Type for the individual call information.
  */
-export type CallInfo = { object : unknown, args : unknown[], returnValue : unknown }
+export type CallInfo = {
+    /**
+     * The scope of the call.
+     */
+    object : unknown,
+
+    /**
+     * The arguments of the call.
+     */
+    args : unknown[],
+
+    /**
+     * The value, returned by the call.
+     */
+    returnValue : unknown
+}
 
 /**
  * Class that holds the log information about call history for the particular spy.
@@ -86,7 +100,7 @@ This class implements a "spy" - function wrapper which tracks its calls. Spy can
 instead of a method in some object or can be used standalone.
 
 Usually you don't use this class directly, but instead via the test helper methods: [[Test.spyOn|spyOn]],
-[[Tets.createSpy|createSpy]], [[Test.createSpyObj|createSpyObj]].
+[[Test.createSpy|createSpy]], [[Test.createSpyObj|createSpyObj]].
 
 Spy can "operate" in several modes, called "strategies". See [[callThrough]], [[callFake]], [[stub]], [[returnValue]], [[throwError]] below.
 Default one is [[callThrough]].

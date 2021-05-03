@@ -145,14 +145,34 @@ export class TestDescriptor extends Mixin(
         // @option()
         // isolation       : IsolationLevel
 
-        @option({ type : 'boolean', defaultValue : () => false, group : OptionsGroupTestDescriptor })
-        failOnIit           : boolean
+        // @option({ type : 'boolean', defaultValue : () => false, group : OptionsGroupTestDescriptor })
+        // failOnIit           : boolean
 
         // will be applied directly to test instance
         config          : ArbitraryObject
 
-        @option({ defaultValue : () => false, group : OptionsGroupTestDescriptor })
-        autoCheckGlobals    : boolean
+        // @option({ defaultValue : () => false, group : OptionsGroupTestDescriptor })
+        // autoCheckGlobals    : boolean
+
+        /**
+         * A default timeout for various asynchronous actions, in milliseconds.
+         */
+        @option({ defaultValue : () => 15000, group : OptionsGroupTestDescriptor })
+        defaultTimeout      : number        = 15000
+
+        /**
+         * A default timeout for the [[Test.waitFor|waitFor]] assertion, in milliseconds.
+         * If not provided, the [[defaultTimeout]] will be used.
+         */
+        @option({ defaultValue : () => 15000, group : OptionsGroupTestDescriptor })
+        waitForTimeout      : number        = undefined
+
+        /**
+         * A default poll interval for the [[Test.waitFor|waitFor]] assertion, in milliseconds.
+         */
+        waitForPollInterval : number        = 50
+
+
 
         serializerConfig    : Partial<SerializerXml>            = { maxBreadth : 10, maxDepth : 4 }
         stringifierConfig   : Partial<XmlRendererDifference>    = { prettyPrint : true }
