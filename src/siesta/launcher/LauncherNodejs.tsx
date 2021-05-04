@@ -244,7 +244,7 @@ export class LauncherNodejs extends Mixin(
                         else if (stats.isFile()) {
                             if (/\.t\.m?js/.test(projectUrl)) {
                                 // test file name
-                                const project               = ProjectNodejs.new({ title : projectUrl, baseUrl : process.cwd() })
+                                const project               = ProjectNodejs.new({ title : projectUrl, launchType : 'test', baseUrl : process.cwd() })
 
                                 project.planFile(projectUrl)
 
