@@ -123,7 +123,7 @@ export const verifySampleProjectLaunch = async (t : Test, launchRes : LaunchResu
 export const verifySampleTestLaunch = async (t : Test, launchRes : LaunchResult) => {
     t.like(launchRes.stdout, `Launching test file:`)
 
-    t.like(launchRes.stdout, `PASS  test_1.t.js`)
+    t.like(launchRes.stdout, /PASS.*test_1\.t\.js/)
 
     t.like(launchRes.stdout, `Test files : 1 passed, 0 failed, 1 total`)
     t.like(launchRes.stderr, '')
