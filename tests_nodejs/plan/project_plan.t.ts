@@ -37,12 +37,12 @@ it('Should be able to plan individual files inside the project directory', async
             filename    : '',
             children    : [
                 {
-                    url         : 'test_1.t.js',
+                    url         : undefined,
                     filename    : 'test_1.t.js',
                     children    : undefined
                 },
                 {
-                    url         : 'test_2.t.js',
+                    url         : undefined,
                     filename    : 'test_2.t.js',
                     children    : undefined
                 }
@@ -71,26 +71,26 @@ it('Should be able to plan individual files outside the project directory', asyn
             filename    : '',
             children    : [
                 {
-                    url         : '..',
+                    url         : path.resolve(__dirname, '../@sample_test_suites/'),
                     filename    : '@sample_test_suites',
                     children    : [
                         {
-                            url         : '../isomorphic',
+                            url         : undefined,
                             filename    : 'isomorphic',
                             children    : [
                                 {
-                                    url         : '../isomorphic/test_1.t.js',
+                                    url         : undefined,
                                     filename    : 'test_1.t.js',
                                     children    : undefined
                                 }
                             ]
                         },
                         {
-                            url         : '../browser',
+                            url         : undefined,
                             filename    : 'browser',
                             children    : [
                                 {
-                                    url         : '../browser/test_2.t.js',
+                                    url         : undefined,
                                     filename    : 'test_2.t.js',
                                     children    : undefined
                                 }
@@ -120,12 +120,12 @@ it('Should plan the project file directory by default', async t => {
             filename    : '',
             children    : [
                 {
-                    url         : 'test_1.t.js',
+                    url         : undefined,
                     filename    : 'test_1.t.js',
                     children    : undefined
                 },
                 {
-                    url         : 'test_2.t.js',
+                    url         : undefined,
                     filename    : 'test_2.t.js',
                     children    : undefined
                 }
@@ -153,12 +153,12 @@ it('Should be able to plan the glob pattern', async t => {
             filename    : '',
             children    : [
                 {
-                    url         : 'test_1.t.js',
+                    url         : undefined,
                     filename    : 'test_1.t.js',
                     children    : undefined
                 },
                 {
-                    url         : 'test_2.t.js',
+                    url         : undefined,
                     filename    : 'test_2.t.js',
                     children    : undefined
                 }
@@ -188,7 +188,7 @@ it('Should be able to exclude files by the glob pattern', async t => {
             filename    : '',
             children    : [
                 {
-                    url         : 'test_1.t.js',
+                    url         : undefined,
                     filename    : 'test_1.t.js',
                     children    : undefined
                 }
