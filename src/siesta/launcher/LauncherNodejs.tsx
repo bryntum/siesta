@@ -1,5 +1,8 @@
+import fs from "fs"
+import glob from "glob"
 import path from 'path'
 import { fileURLToPath } from "url"
+import { ProjectNodejs } from "../../../nodejs.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContextAttachable } from "../../context/ExecutionContext.js"
 import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
@@ -199,27 +202,66 @@ export class LauncherNodejs extends Mixin(
             // `projectDescriptor` might be already provided
             // if project file is launched directly as node executable
             if (!this.projectData) {
-                const projectUrl            = this.project = this.prepareProjectFileUrl(this.project)
+                const projectUrl                = this.project
 
-                if (/^https?:/i.test(projectUrl)) {
-                    const contextProvider       = this.contextProviderBrowser[ 0 ]
+                debugger
 
-                    const context               = await contextProvider.createContext()
+                // what is passed as the 1st argument for the launcher?
+                if (glob.hasMagic(projectUrl)) {
+                    // glob for test files
+                    const project               = ProjectNodejs.new({ title : projectUrl, baseUrl : process.cwd() })
 
-                    await context.navigate(projectUrl)
+                    project.planGlob(projectUrl)
 
-                    this.projectData            = await this.extractProjectData(context, projectUrl)
-                } else {
-                    const contextProvider       = this.contextProviderSameContext
-
-                    const context               = await contextProvider.createContext()
-
-                    this.projectData            = await this.extractProjectData(context, projectUrl)
+                    this.projectData                    = project.asProjectSerializableData()
+                    this.projectData.projectPlan.url    = process.cwd()
                 }
-            }
+                else {
+                    // non-glob - either project file url (https: or file:) or test file name
 
-            if (this.project) {
-                this.projectData.projectPlan.url   = stripBasename(this.project)
+                    const projectUrl            = this.project = this.prepareProjectFileUrl(this.project)
+
+                    if (/^https?:/i.test(projectUrl)) {
+                        const contextProvider       = this.contextProviderBrowser[ 0 ]
+
+                        const context               = await contextProvider.createContext()
+
+                        await context.navigate(projectUrl)
+
+                        this.projectData                    = await this.extractProjectData(context, projectUrl)
+                        this.projectData.projectPlan.url    = stripBasename(this.project)
+                    } else {
+                        const stats     = fs.statSync(projectUrl)
+
+                        if (stats.isDirectory()) {
+                            const project               = ProjectNodejs.new({ title : projectUrl, baseUrl : process.cwd() })
+
+                            project.planDir(projectUrl)
+
+                            this.projectData                    = project.asProjectSerializableData()
+                            this.projectData.projectPlan.url    = process.cwd()
+                        }
+                        else if (stats.isFile()) {
+                            if (/\.t\.m?js/.test(projectUrl)) {
+                                // test file name
+                                const project               = ProjectNodejs.new({ title : projectUrl, baseUrl : process.cwd() })
+
+                                project.planFile(projectUrl)
+
+                                this.projectData                    = project.asProjectSerializableData()
+                                this.projectData.projectPlan.url    = process.cwd()
+                            } else {
+                                // finally - project file name
+                                const contextProvider       = this.contextProviderSameContext
+
+                                const context               = await contextProvider.createContext()
+
+                                this.projectData                    = await this.extractProjectData(context, projectUrl)
+                                this.projectData.projectPlan.url    = stripBasename(this.project)
+                            }
+                        }
+                    }
+                }
             }
         }
 

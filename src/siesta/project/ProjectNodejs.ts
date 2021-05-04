@@ -1,5 +1,5 @@
 import fs from "fs"
-import fg from "fast-glob"
+import glob from "glob"
 import path from "path"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { stripBasename } from "../../util/Path.js"
@@ -13,6 +13,9 @@ import { ProjectDescriptorNodejs } from "./ProjectDescriptor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Siesta project for [Node.js](https://nodejs.org/) code.
+ */
 export class ProjectNodejs extends Mixin(
     [ Project, ProjectDescriptorNodejs ],
     (base : ClassUnion<typeof Project, typeof ProjectDescriptorNodejs>) =>
@@ -113,7 +116,7 @@ export class ProjectNodejs extends Mixin(
                 const relative      = path.relative(this.baseUrl, absolute)
 
                 const descriptor    = this.testDescriptorClass.fromProjectPlanItemDescriptor(
-                    item ? Object.assign({}, item, { url : relative, filename : name }) : { url : relative, filename : name }
+                    item ? Object.assign({}, item, { filename : name }) : { filename : name }
                 )
 
                 this.descriptorsByAbsPath.set(absolute, descriptor)
@@ -132,7 +135,7 @@ export class ProjectNodejs extends Mixin(
                             this.rootMostPath       = path.resolve(this.rootMostPath, '..')
 
                             this.rootMostDesc       = this.testDescriptorClass.fromProjectPlanItemDescriptor({
-                                url : path.relative(this.baseUrl, this.rootMostPath), filename : path.basename(this.rootMostPath)
+                                url : this.rootMostPath, filename : path.basename(this.rootMostPath)
                             })
 
                             this.descriptorsByAbsPath.set(this.rootMostPath, this.rootMostDesc)
@@ -225,7 +228,7 @@ export class ProjectNodejs extends Mixin(
         planGlob (globPattern : string, desc? : Partial<TestDescriptor>) {
             this.hasPlan                = true
 
-            const files = fg.sync(globPattern, { cwd : this.baseUrl, absolute : true, baseNameMatch : true, ignore : [ '**/node_modules/**' ] })
+            const files = glob.sync(globPattern, { cwd : this.baseUrl, absolute : true, matchBase : true, ignore : [ '**/node_modules/**' ] })
 
             files.forEach(file => this.addToPlan(file, desc))
         }
@@ -237,7 +240,7 @@ export class ProjectNodejs extends Mixin(
 
 
         excludeGlob (globPattern : string) {
-            const files = fg.sync(globPattern, { cwd : this.baseUrl, absolute : true, baseNameMatch : true, ignore : [ '**/node_modules/**' ] })
+            const files = glob.sync(globPattern, { cwd : this.baseUrl, absolute : true, matchBase : true, ignore : [ '**/node_modules/**' ] })
 
             files.forEach(file => this.removeFromPlan(file))
         }

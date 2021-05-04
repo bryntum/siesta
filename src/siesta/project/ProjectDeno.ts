@@ -12,6 +12,9 @@ import { ProjectDescriptorDeno } from "./ProjectDescriptor.js"
 declare const Deno
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Siesta project for [Deno](https://deno.land/) code.
+ */
 export class ProjectDeno extends Mixin(
     [ Project, ProjectDescriptorDeno ],
     (base : ClassUnion<typeof Project, typeof ProjectDescriptorDeno>) =>

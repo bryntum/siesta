@@ -97,7 +97,9 @@ export class TestDescriptor extends Mixin(
         }
 
         /**
-         * The complete url for this test, **relative to the parent descriptor**.
+         * The complete url for this test, can be absolute or **relative to the parent descriptor**.
+         *
+         * For the top-level descriptors, `url` is **relative to the project file itself**.
          *
          * Either this property or the [[filename]] should be provided for the descriptor.
          */
@@ -110,6 +112,7 @@ export class TestDescriptor extends Mixin(
          * The failed assertions in them are not reported. In opposite, the *passed* assertions from the todo
          * tests are reported.
          */
+        @option({ defaultValue : () => false, group : OptionsGroupTestDescriptor })
         isTodo          : boolean
 
         /**
@@ -140,6 +143,7 @@ export class TestDescriptor extends Mixin(
          * })
          * ```
          */
+        @option({ defaultValue : () => undefined, group : OptionsGroupTestDescriptor })
         snooze          : string | Date
 
         // @option()
@@ -353,6 +357,7 @@ export type TestDescriptorArgument<T extends Test> = string | Partial<InstanceTy
  * for the various project planning calls, like [[Project.plan]] and similar.
  *
  * The value can be either a string or a partial configuration object of this test's descriptor.
+ * That object may have the `items` property, which is an array of "children" [[ProjectPlanItemDescriptor]] entries.
  *
  * The string value corresponds to the `{ filename : 'string_value' }` object.
  */

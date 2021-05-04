@@ -11,6 +11,9 @@ import { ProjectDescriptorBrowser } from "./ProjectDescriptor.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Siesta project for browser code.
+ */
 export class ProjectBrowser extends Mixin(
     [ Project, ProjectDescriptorBrowser ],
     (base : ClassUnion<typeof Project, typeof ProjectDescriptorBrowser>) => {

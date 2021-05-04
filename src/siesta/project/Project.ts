@@ -12,6 +12,9 @@ import { ProjectDescriptor, ProjectSerializableData } from "./ProjectDescriptor.
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Siesta project for isomorphic code.
+ */
 export class Project extends Mixin(
     [ ProjectDescriptor ],
     (base : ClassUnion<typeof ProjectDescriptor>) => {
@@ -21,6 +24,10 @@ export class Project extends Mixin(
         siestaPackageRootUrl    : string                    = siestaPackageRootUrl
 
         launcherClass           : typeof Launcher           = undefined
+
+        /**
+         * The constructor of [[TestDescriptor]] class or its subclass, to use in this project.
+         */
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
         launchType              : 'project' | 'test'        = 'project'
@@ -28,6 +35,9 @@ export class Project extends Mixin(
 
         projectPlan             : TestDescriptor            = this.testDescriptorClass.new()
 
+        /**
+         * The type of the argument for the [[plan]] method.
+         */
         planItemT               : ProjectPlanItemDescriptor<InstanceType<this[ 'testDescriptorClass' ]>>
 
         $baseUrl                : string                    = ''
@@ -73,6 +83,15 @@ export class Project extends Mixin(
         }
 
         // this fancy type supports different typization of the descriptors in the browser projects
+        /**
+         * Project plan is simply a tree of tests, available for running. The "parent" nodes of this tree
+         * usually corresponds to file system directories, and "leaf" nodes - to test files.
+         *
+         * This method adds a test [[TestDescriptor|descriptor]] to the project's plan. The descriptor
+         * is represented with the value of [[ProjectPlanItemDescriptor]] type.
+         *
+         * @param items
+         */
         plan (...items : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
             const descriptors : this[ 'planItemT' ][]  = items.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el)) as any
 

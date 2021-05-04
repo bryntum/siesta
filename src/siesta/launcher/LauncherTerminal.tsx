@@ -15,6 +15,7 @@ import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPri
 import { extractProjectInfo } from "./ProjectExtractor.js"
 
 // generic sever-side, cross Node/Deno functionality
+// DO NOT USE THE NODE.JS/NPM/DENO MODULES HERE
 
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherTerminal extends Mixin(

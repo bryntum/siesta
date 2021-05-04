@@ -33,7 +33,7 @@ export const stripTrailingSlash = (url : string) : string => url.replace(/\/$/, 
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const ensureTrailingSlash = (url : string) : string => url.replace(/\/$/, '/')
+export const ensureTrailingSlash = (url : string) : string => url.replace(/\/?$/, '/')
 
 
 //---------------------------------------------------------------------------------------------------------------------
