@@ -125,7 +125,9 @@ export class Project extends Mixin(
             }
         }
 
-
+        // TODO remove this mechanism completely? should be ok to actually use the
+        // isomorphic `Project` instance everywhere?
+        // should instead just have `getLauncherClass` method, as in Test
         async getIsomorphicSelfInstance () : Promise<Project> {
             const cls           = await this.getIsomorphicProjectClass()
 
