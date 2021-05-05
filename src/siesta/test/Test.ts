@@ -351,6 +351,12 @@ export class Test extends Mixin(
         }
 
 
+        $suppressOutputLogging       : boolean       = false
+
+        get suppressOutputLogging () : boolean {
+            return this.parentNode ? this.parentNode.suppressOutputLogging : this.$suppressOutputLogging
+        }
+
         // TODO
         // need to figure out if we need to wait until all reports (`this.reporter.onXXX`)
         // has been completed or not, before completing the method
@@ -367,8 +373,10 @@ export class Test extends Mixin(
                 }))
             })
 
-            this.onOutputHook.on((test, outputType, message) => {
-                this.addResult(LogMessage.new({
+            this.onOutputHook.on((test, outputType, message, originalWriteMethod, scope) => {
+                if (this.suppressOutputLogging)
+                    originalWriteMethod.call(scope, message)
+                else this.addResult(LogMessage.new({
                     type        : 'output',
                     level       : LogLevel.error,
                     outputType,
@@ -635,6 +643,7 @@ export class Test extends Mixin(
         }
 
 
+        // TODO these 2 methods should probably reside in the Launcher or in the separate abstraction
         static getSelfUrl () : string {
             throw new Error("Abstract method")
         }
@@ -668,6 +677,9 @@ export class Test extends Mixin(
                     projectData,
                     inputArguments          : isomorphicTestClass.getInputArguments()
                 })
+
+                launcher.beforePrintHook.on(() => topTest.$suppressOutputLogging = true)
+                launcher.afterPrintHook.on(() => topTest.$suppressOutputLogging = false)
 
                 descriptor.url      = projectPlan.title = isomorphicTestClass.getSelfUrl()
 
@@ -718,6 +730,7 @@ export class Test extends Mixin(
         }
 
 
+        // TODO remove this method, once the `getSelfUrl` and `getInputArgs` are moved to Launcher
         static async getIsomorphicTestClass () : Promise<typeof Test> {
             if (isNodejs())
                 return (await import('./TestNodejs.js')).TestNodejs
