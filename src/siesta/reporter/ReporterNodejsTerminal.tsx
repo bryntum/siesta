@@ -20,16 +20,20 @@ export class ReporterNodejsTerminal extends Mixin(
             super.onTestSuiteStart()
 
             process.on('SIGTERM', () => {
-                process.stdout.write('\n')
-                this.terminal.showCursor()
+                this.launcher.performPrint(() => {
+                    process.stdout.write('\n')
+                    this.terminal.showCursor()
+                })
             })
             process.on('SIGINT', () => {
-                process.stdout.write('\n')
-                this.terminal.showCursor()
+                this.launcher.performPrint(() => {
+                    process.stdout.write('\n')
+                    this.terminal.showCursor()
+                })
                 process.exit(ExitCodes.UNHANDLED_EXCEPTION)
             })
             process.on('exit', () => {
-                this.terminal.showCursor()
+                this.launcher.performPrint(() => this.terminal.showCursor())
             })
         }
     }
