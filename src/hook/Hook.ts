@@ -24,6 +24,13 @@ export type Disposer = () => any
 //---------------------------------------------------------------------------------------------------------------------
 export class Hook<Payload extends unknown[] = []> extends Array<Listener<Payload>> {
 
+    // when doing `this.slice()` we want the regular array, instead of the Hook instance
+    // (might have some logic in constructor)
+    static get [Symbol.species] () {
+        return Array
+    }
+
+
     get hooks () : Listener<Payload>[] {
         return this
     }
