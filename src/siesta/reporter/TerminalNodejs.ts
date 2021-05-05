@@ -1,4 +1,4 @@
-import * as readline from "readline"
+import readline from "readline"
 import { hideCursor, showCursor } from "../../util_nodejs/Terminal.js"
 import { Terminal } from "./Terminal.js"
 
