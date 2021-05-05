@@ -60,24 +60,24 @@ export class ExecutionContextDeno extends ExecutionContext {
 
         if (this.overrideOutput) {
             Deno.stdout.write = function (buffer : Uint8Array) {
-                me.onOutput('stdout', decode(buffer), Deno.stdout.constructor.prototype.write, Deno.stdout)
+                me.onOutput('stdout', decode(buffer), buffer, Deno.stdout.constructor.prototype.write, Deno.stdout)
 
-                return Deno.stdout.constructor.prototype.write.apply(this, arguments)
+                return Promise.resolve()
             }
             Deno.stderr.write = function (buffer : Uint8Array) {
-                me.onOutput('stderr', decode(buffer), Deno.stderr.constructor.prototype.write, Deno.stderr)
+                me.onOutput('stderr', decode(buffer), buffer, Deno.stderr.constructor.prototype.write, Deno.stderr)
 
-                return Deno.stderr.constructor.prototype.write.apply(this, arguments)
+                return Promise.resolve()
             }
             Deno.stdout.writeSync = function (buffer : Uint8Array) {
-                me.onOutput('stdout', decode(buffer), Deno.stdout.constructor.prototype.writeSync, Deno.stdout)
+                me.onOutput('stdout', decode(buffer), buffer, Deno.stdout.constructor.prototype.writeSync, Deno.stdout)
 
-                return Deno.stdout.constructor.prototype.writeSync.apply(this, arguments)
+                return true
             }
             Deno.stderr.writeSync = function (buffer : Uint8Array) {
-                me.onOutput('stderr', decode(buffer), Deno.stderr.constructor.prototype.writeSync, Deno.stderr)
+                me.onOutput('stderr', decode(buffer), buffer, Deno.stderr.constructor.prototype.writeSync, Deno.stderr)
 
-                return Deno.stderr.constructor.prototype.writeSync.apply(this, arguments)
+                return true
             }
         }
     }

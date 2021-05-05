@@ -40,11 +40,11 @@ export class ExecutionContext extends Base {
     }
 
 
-    onOutput (method : OutputType, output : string, originalWrite : (str : string) => any, scope : object) {
+    onOutput (method : OutputType, output : string, outputOriginal : string | Uint8Array, originalWrite : (str : string) => any, scope : object) {
         const attachment    = lastElement(this.attachments)
 
         // strip the trailing newline, as it will cause an extra empty line in the output
-        attachment.onOutputHook.trigger(attachment, method, output/*.replace(/\n$/m, '')*/, originalWrite, scope)
+        attachment.onOutputHook.trigger(attachment, method, output/*.replace(/\n$/m, '')*/, outputOriginal, originalWrite, scope)
     }
 
 
@@ -69,6 +69,6 @@ export class ExecutionContextAttachable extends Mixin(
 
         onConsoleHook : Hook<[ this, LogMethod, unknown[] ]>        = new Hook()
 
-        onOutputHook : Hook<[ this, OutputType, string, (str : string) => any, object ]>           = new Hook()
+        onOutputHook : Hook<[ this, OutputType, string, string | Uint8Array, (str : string | Uint8Array) => any, object ]>           = new Hook()
     }
 ){}
