@@ -12,20 +12,20 @@ export class TerminalNodejs extends Terminal {
 
 
     showCursor () {
-        process.stdout.write(showCursor)
+        this.launcher.performPrint(() => process.stdout.write(showCursor))
     }
 
     hideCursor () {
-        process.stdout.write(hideCursor)
+        this.launcher.performPrint(() => process.stdout.write(hideCursor))
     }
 
 
     moveCursor (dx : number, dy : number) {
-        readline.moveCursor(process.stdout, dx, dy, () => {})
+        this.launcher.performPrint(() => readline.moveCursor(process.stdout, dx, dy, () => {}))
     }
 
 
     clearLine (dir : 'left' | 'right' | 'line') {
-        readline.clearLine(process.stdout, dir === 'left' ? -1 : dir === 'right' ? 1 : 0, () => {})
+        this.launcher.performPrint(() => readline.clearLine(process.stdout, dir === 'left' ? -1 : dir === 'right' ? 1 : 0, () => {}))
     }
 }
