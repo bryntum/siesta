@@ -60,12 +60,12 @@ export class ExecutionContextNode extends ExecutionContext {
             this.stdErrWriteOriginal = process.stderr.write
 
             process.stdout.write = (buffer) => {
-                this.onOutput('stdout', buffer)
+                this.onOutput('stdout', buffer, this.stdOutWriteOriginal, process.stdout)
 
                 return true
             }
             process.stderr.write = (buffer) => {
-                this.onOutput('stderr', buffer)
+                this.onOutput('stderr', buffer, this.stdErrWriteOriginal, process.stdout)
 
                 return true
             }

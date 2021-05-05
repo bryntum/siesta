@@ -60,22 +60,22 @@ export class ExecutionContextDeno extends ExecutionContext {
 
         if (this.overrideOutput) {
             Deno.stdout.write = function (buffer : Uint8Array) {
-                me.onOutput('stdout', decode(buffer))
+                me.onOutput('stdout', decode(buffer), Deno.stdout.constructor.prototype.write, Deno.stdout)
 
                 return Deno.stdout.constructor.prototype.write.apply(this, arguments)
             }
             Deno.stderr.write = function (buffer : Uint8Array) {
-                me.onOutput('stderr', decode(buffer))
+                me.onOutput('stderr', decode(buffer), Deno.stderr.constructor.prototype.write, Deno.stderr)
 
                 return Deno.stderr.constructor.prototype.write.apply(this, arguments)
             }
             Deno.stdout.writeSync = function (buffer : Uint8Array) {
-                me.onOutput('stdout', decode(buffer))
+                me.onOutput('stdout', decode(buffer), Deno.stdout.constructor.prototype.writeSync, Deno.stdout)
 
                 return Deno.stdout.constructor.prototype.writeSync.apply(this, arguments)
             }
             Deno.stderr.writeSync = function (buffer : Uint8Array) {
-                me.onOutput('stderr', decode(buffer))
+                me.onOutput('stderr', decode(buffer), Deno.stderr.constructor.prototype.writeSync, Deno.stderr)
 
                 return Deno.stderr.constructor.prototype.writeSync.apply(this, arguments)
             }
