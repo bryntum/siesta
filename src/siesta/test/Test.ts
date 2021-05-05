@@ -373,9 +373,9 @@ export class Test extends Mixin(
                 }))
             })
 
-            this.onOutputHook.on((test, outputType, message, originalWriteMethod, scope) => {
+            this.onOutputHook.on((test, outputType, message, buffer, originalWriteMethod, scope) => {
                 if (this.suppressOutputLogging)
-                    originalWriteMethod.call(scope, message)
+                    originalWriteMethod.call(scope, buffer)
                 else this.addResult(LogMessage.new({
                     type        : 'output',
                     level       : LogLevel.error,
