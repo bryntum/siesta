@@ -7,7 +7,7 @@ it('Basic Siesta Node.js test', async (t : Test) => {
 })
 
 
-it('Deep equality should work', async t => {
+it('Deep equality should work', async (t : Test) => {
     t.equal([ 1, 2, 3 ], [ 3, 2, 1 ], "Arrays are deeply equal")
 
     t.expect(

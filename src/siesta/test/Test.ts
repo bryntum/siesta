@@ -235,18 +235,20 @@ export class Test extends Mixin(
 
 
         /**
-         * This method creates a section in the test file, grouping assertions together. Such sections are also sometimes called "sub-tests".
+         * This method creates a "parent" node in the test file, grouping assertions together. Such node is called "test section" or "sub-test".
          * Sub-tests can be nested arbitrarily.
          *
          * The 1st argument for this method can be either a string or a configuration object for this test's [[TestDescriptor|descriptor]].
          * The string value corresponds to `{ title : 'string_value' }`.
          *
-         * For the top-level section, the [["src/siesta/test/Test".it|it]] constant alias or <a href="#it-1">Test.it</a> static
+         * The configuration objects for nested test sections, "extends" the configuration objects of their parents.
+         *
+         * For the top-level section, the [["src/siesta/test/Test".it|it]] function or <a href="#it-1">it</a> static
          * method should be used. These aliases can actually be used inside the test function as well, however
          * it is recommended to use the method on the test instance.
          *
          * ```ts
-         * import { it, Test } from "siesta/nodejs.js"
+         * import { it, Test } from "siesta/index.js"
          *
          * it('Test section', async (t : Test) => {
          *     t.it({ title : 'Nested section', isTodo : true }, async (t : Test) => {
@@ -255,12 +257,12 @@ export class Test extends Mixin(
          * })
          *
          * // The following two lines are identical
-         * it('Test section', async (t : Test) => { ... })
-         * Test.it('Test section', async (t : Test) => { ... })
+         * it('Test section', async (t : Test) => { ... }) // `it` function
+         * Test.it('Test section', async (t : Test) => { ... }) // static `Test.it` method
          * ```
          *
          * @param name The configuration descriptor for the test section
-         * @param code The test function. Can be asynchronous and return `Promise`.
+         * @param code The test function. Can be `async` if needed or return `Promise`.
          */
         it (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
