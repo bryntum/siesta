@@ -88,7 +88,7 @@ export class Reporter extends Mixin(
         }
 
 
-        doPrint (str : string) {
+        print (str : string) {
             this.launcher.print(str)
         }
 

@@ -85,8 +85,8 @@ export class ReporterTerminal extends Mixin(
         }
 
 
-        doPrint (str : string) {
-            super.doPrint(str)
+        print (str : string) {
+            super.print(str)
 
             if (this.isPrintingFooter && !this.isPrintingSpinner) {
                 this.footerLines += Array.from(str.matchAll(/\n/g)).length
