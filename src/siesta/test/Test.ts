@@ -83,8 +83,6 @@ export class Test extends Mixin(
 
         code                : (t : this) => any     = t => {}
 
-        // ongoing             : Promise<any>      = undefined
-
         pendingSubTests     : Test[]                = []
 
         reporter            : TestReporterChild     = undefined
@@ -94,10 +92,12 @@ export class Test extends Mixin(
 
         isExclusive         : boolean               = false
 
+        // TODO probably need only one of these
         // not related to `before/afterEach` hooks, completely different thing
         preStartHook        : Hook<[ this ]>        = new Hook()
         startHook           : Hook<[ this ]>        = new Hook()
 
+        // TODO probably need only one of these
         finishHook          : Hook<[ this ]>        = new Hook()
         postFinishHook      : Hook<[ this ]>        = new Hook()
 
@@ -417,9 +417,28 @@ export class Test extends Mixin(
                 await subTest.start()
             }
 
+            await this.awaitAllDone()
+
             for (const hook of afterHooks) await hook(this)
 
             this.rootTest.executionContext.detach(this)
+        }
+
+
+        async awaitAllDone () {
+            do {
+                const ongoing       = this.ongoing
+
+                try {
+                    await this.ongoing
+                } catch (exception) {
+                    this.addResult(Exception.new({ exception }))
+                }
+
+                // `ongoing` promise instance did not change during its own `await` - means no new promises
+                // has been scheduled - we are done
+                if (ongoing === this.ongoing) break
+            } while (true)
         }
 
 

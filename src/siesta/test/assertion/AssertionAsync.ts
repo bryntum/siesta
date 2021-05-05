@@ -1,8 +1,9 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { serializable } from "../../../serializable/Serializable.js"
-import { delay, OrPromise } from "../../../util/Helpers.js"
+import { delay, OrPromise, SetTimeoutHandler } from "../../../util/Helpers.js"
 import { isFunction } from "../../../util/Typeguards.js"
-import { AssertionAsyncCreation, AssertionAsyncResolution, Exception, TestNodeResult } from "../TestResult.js"
+import { luid, LUID } from "../../common/LUID.js"
+import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception, SourcePoint, TestNodeResult } from "../TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -34,6 +35,13 @@ type WaitForArg<R> = {
     description?    : string
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+export type AsyncGapId = number
+
+type AsyncGapInfo       = {
+    handler         : SetTimeoutHandler,
+    finalize        : Function
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 export class AssertionAsync extends Mixin(
@@ -41,6 +49,9 @@ export class AssertionAsync extends Mixin(
     (base : ClassUnion<typeof TestNodeResult>) =>
 
     class AssertionAsync extends base {
+        // this promise should not reject, its only used to keep the test going
+        ongoing             : Promise<any>          = Promise.resolve()
+
 
         get defaultTimeout () : number {
             return this.descriptor.defaultTimeout
@@ -54,7 +65,98 @@ export class AssertionAsync extends Mixin(
         }
 
 
-        beginAsync () {
+        gaps : Map<LUID, AsyncGapInfo>      = new Map()
+
+        /**
+         * Normally, to test the asynchronous code, you just make your test function `async` and `await` on any asynchronous
+         * method call inside of it:
+         *
+         * ```javascript
+         * import { it } from "siesta/index.js"
+         * import { MyClass } from "my-lib"
+         *
+         * it('Testing asynchronous code should work', async t => {
+         *     const myClass       = new MyClass()
+         *
+         *     await myClass.asyncMethod('do something')
+         * })
+         * ```
+         *
+         * However, for example if code is using callbacks, you might not have a `Promise` instance to `await` for.
+         *
+         * In such case, use this method to indicate the beginning of the "asynchronous gap" in the code flow. Each gap should be finalized
+         * with the {@link endAsync} call within the `timeout` milliseconds, otherwise a failed assertion will be reported.
+         *
+         * The test will wait for all asynchronous gaps to complete before it will finalize.
+         *
+         * For example:
+         * ```javascript
+         * import { it } from "siesta/index.js"
+         * import { MyClass } from "my-lib"
+         *
+         * it('Testing asynchronous code should work', t => {
+         *     const myClass        = new MyClass()
+         *
+         *     // indicate async gap starts
+         *     const async          = t.beginAsync()
+         *
+         *     myClass.asyncMethodWithCallbacks('do something', () => {
+         *         // indicate async gap completes
+         *         t.endAsync(async)
+         *     })
+         * })
+         * ```
+         *
+         * @param {Number} time The maximum time (in ms) to wait until forcing the finalization of this async gap.
+         * Optional, default timeout is defined with [[TestDescriptor.defaultTimeout|defaultTimeout]] config option.
+         *
+         * @return The "gap id" opaque object, which should be passed to the {@link endAsync} call.
+         */
+        beginAsync (timeout : number = this.defaultTimeout) : AsyncGapId {
+            const gapId         = luid()
+            const sourcePoint   = this.getSourcePoint()
+
+            const ongoingPromise    = new Promise<void>(resolve => {
+
+                const handler       = setTimeout(() => {
+                    if (this.gaps.has(gapId)) {
+                        this.gaps.delete(gapId)
+
+                        this.addResult(Assertion.new({
+                            name            : 'beginAsync',
+                            sourcePoint,
+                            passed          : false,
+                            description     : `No matching 'endAsync' call within ${timeout}ms`
+                        }))
+
+                        resolve()
+                    }
+                }, timeout)
+
+                this.gaps.set(gapId, { handler, finalize : resolve })
+            })
+
+            this.ongoing        = this.ongoing.then(() => ongoingPromise)
+
+            return gapId
+        }
+
+
+        /**
+         * This method finalizes the "asynchronous gap" started with {@link beginAsync}.
+         *
+         * @param gapId The gap id to finalize (returned by the {@link beginAsync} method)
+         */
+        endAsync (gapId : AsyncGapId) {
+            const gapInfo       = this.gaps.get(gapId)
+
+            if (gapInfo !== undefined) {
+                clearTimeout(gapInfo.handler)
+
+                this.gaps.delete(gapId)
+
+                gapInfo.finalize()
+            }
         }
 
 

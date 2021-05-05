@@ -91,6 +91,7 @@ project.plan(
                 filename    : 'assertions',
 
                 items       : [
+                    'assertion_async.t.js',
                     'assertion_compare.t.js',
                     'assertion_exception.t.js',
                     'assertion_type.t.js',
