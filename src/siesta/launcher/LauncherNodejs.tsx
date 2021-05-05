@@ -195,7 +195,9 @@ export class LauncherNodejs extends Mixin(
             await super.setup()
         }
 
-
+        // TODO need to abstract the OS-specific parts of this method, like "globbing", "fs.statSync"
+        // and move this method to the LauncherTerminal, to share with Deno launcher, then remove
+        // this method in LauncherDeno
         async setupProjectData () {
             await super.setupProjectData()
 
@@ -203,8 +205,6 @@ export class LauncherNodejs extends Mixin(
             // if project file is launched directly as node executable
             if (!this.projectData) {
                 const projectUrl                = this.project
-
-                debugger
 
                 // what is passed as the 1st argument for the launcher?
                 if (glob.hasMagic(projectUrl)) {
