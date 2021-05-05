@@ -662,6 +662,16 @@ export class Test extends Mixin(
             projectPlan.planItem(descriptor)
 
             if (isNodejs() || isDeno()) {
+                // trying hard to not create an extra context for the standalone test launch case
+                // this is to aid the debugging ergonomics for developers (everything happens in the
+                // same context => easy "native" debugging)
+                //
+                // the biggest mess happens with the output logging - in the test context,
+                // we override the output to stdout/stderr and route it to the test log
+                // however, when both test and launcher are in the same context
+                // we should ignore the output to stdout, performed by launcher
+                // this is done using the `$suppressOutputLogging` flag on top test
+
                 const isomorphicTestClass       = await this.getIsomorphicTestClass()
 
                 const projectData   = ProjectSerializableData.new({
