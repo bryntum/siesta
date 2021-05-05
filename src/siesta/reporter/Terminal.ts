@@ -1,7 +1,11 @@
 import { Base } from "../../class/Base.js"
+import { Launcher } from "../launcher/Launcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Terminal extends Base {
+
+    launcher        : Launcher          = undefined
+
 
     getMaxLen () : number {
         return Number.MAX_SAFE_INTEGER

@@ -51,7 +51,7 @@ export class ReporterTerminal extends Mixin(
                 if (state.hadPrintedFooter) this.printFooter()
             })
 
-            this.terminal   = this.terminalClass.new()
+            this.terminal   = this.terminalClass.new({ launcher : this.launcher })
         }
 
 
