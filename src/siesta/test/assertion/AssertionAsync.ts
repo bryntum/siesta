@@ -100,7 +100,7 @@ export class AssertionAsync extends Mixin(
          *     // indicate async gap starts
          *     const async          = t.beginAsync()
          *
-         *     myClass.asyncMethodWithCallbacks('do something', () => {
+         *     myClass.asyncMethodWithCallback(() => {
          *         // indicate async gap completes
          *         t.endAsync(async)
          *     })

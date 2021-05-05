@@ -57,17 +57,36 @@ In the simplest form, when testing the asynchronous code, you can just make your
 
 ```javascript
 import { it } from "siesta/index.js"
-
 import { MyClass } from "my-lib"
 
-it('Testing asynchronous code should work', async t => {
+it('Testing promise-based asynchronous code', async t => {
     const myClass       = new MyClass()
     
     await myClass.asyncMethod('do something')
 })
 ```
 
-Sometimes you might need to 
+Sometimes, for example if code is using callbacks, you might not have the `Promise` instance to `await` for. In such case, use a pair of
+[[Test.beginAsync|beginAsync]]/[[Test.endAsync|endAsync]] calls to indicate the beginning/ending of the asynchronous "gap" in the code flow.
+Siesta will await for all [[Test.beginAsync|beginAsync]] calls to complete with the corresponding [[Test.endAsync|endAsync]], before finalizing the test.
+
+For example:
+```javascript
+import { it } from "siesta/index.js"
+import { MyClass } from "my-lib"
+
+it('Testing callbacks-based asynchronous code', t => {
+    const myClass        = new MyClass()
+
+    // indicate async gap starts
+    const async          = t.beginAsync()
+
+    myClass.asyncMethodWithCallback(() => {
+        // indicate async gap completes
+        t.endAsync(async)
+    })
+})
+```
 
 Exceptions
 ==========

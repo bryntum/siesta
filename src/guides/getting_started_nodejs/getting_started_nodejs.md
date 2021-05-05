@@ -17,7 +17,7 @@ npm install @bryntum/siesta --save-dev
 Common concepts
 ===============
 
-To familiarize yourself with the general Siesta concepts, which are common for all execution environments, please check [[SiestaCommonConceptsGuide|this guide]]. Right now, you only need to read the 1st section in it, to continue with this guide.
+To familiarize yourself with the general Siesta concepts, which are common for all execution environments, please check [[GettingStartedCommonGuide|this guide]]. 
 
 
 Launching individual tests
