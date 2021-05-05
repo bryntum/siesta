@@ -1,4 +1,4 @@
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { XmlRendererDifference } from "../../compare_deep/CompareDeepDiffRendering.js"
 import { Hook } from "../../hook/Hook.js"
 import { TextBlock } from "../../jsx/TextBlock.js"
@@ -23,11 +23,16 @@ export class ConsoleXmlRenderer extends Mixin(
 
 
         print (str : string) {
+            this.performPrint(() => this.doPrint(str))
+        }
+
+
+        performPrint (action : AnyFunction) {
             const state     = {}
 
             this.beforePrintHook.trigger(state)
 
-            this.doPrint(str)
+            action()
 
             this.afterPrintHook.trigger(state)
         }
