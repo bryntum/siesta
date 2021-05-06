@@ -32,6 +32,8 @@ $primary_pass: color.scale(#2a9d8f, $saturation: 75%) !default;
 // need to replace with some other color?
 $deccent: color.scale(#264653, $saturation: 75%) !default;
 
+$accent_new : #b345f1;
+
 // does not suite the white-background theme
 $accent: #f5f5f5 !default;
 
@@ -162,7 +164,7 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 }
 
 .assertion_description {
-    color: $accent
+    font-weight: bold;
 }
 
 
