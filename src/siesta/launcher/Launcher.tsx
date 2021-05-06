@@ -291,8 +291,8 @@ export class Launcher extends Mixin(
 
         getDescriptorsToLaunch () : TestDescriptor[] {
             return this.projectData.projectPlan.leavesAxis().filter(descriptor => {
-                return (this.include.length === 0 || this.include.some(pattern => pattern.test(descriptor.flatten.url)))
-                    && (this.exclude.length === 0 || !this.exclude.some(pattern => pattern.test(descriptor.flatten.url)))
+                return (this.include.length === 0 || this.include.some(pattern => pattern.test(descriptor.flatten.urlAbs)))
+                    && (this.exclude.length === 0 || !this.exclude.some(pattern => pattern.test(descriptor.flatten.urlAbs)))
             })
         }
 
