@@ -87,29 +87,34 @@ it('Testing callbacks-based asynchronous code', t => {
     })
 })
 ```
-
-Exceptions
-==========
-
-
-
+                  
 
 Tests configuration
 ===================
 
 The configuration object of the nested test section "extends" the configuration object of the parent section. 
 
-For example if parent section is marked as [[TestDescriptor.isTodo|"todo"]] the nested section will automatically become "todo" as well
+For example if parent section sets the [[TestDescriptor.defaultTimeout|defaultTimeout]] to a certain value, the nested section 
+will use that value too.
 
 ```javascript
 import { it } from "siesta/index.js"
 
-it('Test section', async t => {
+it({ title : 'Test section', defaultTimeout : 1000 }, async t => {
     t.it('Nested test section', async t => {
-        t.true(true, "That's true")
+        // will fail within 1s
+        await t.waitFor(() => false)
     })
 })
 ```
+
+Exceptions
+==========
+
+
+Console and stdout/stderr output
+================================
+
 
 Project
 ========

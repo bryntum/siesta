@@ -14,3 +14,15 @@ it('Should be able to flatten the descriptor options', t => {
     t.is(childDesc.flatten.isTodo, true, 'Should "inherit" the `isTodo` value from parent')
 })
 
+
+it({ title : 'Nested test descriptors should extend parent descriptor', defaultTimeout : 1000 }, t => {
+    t.is(t.descriptor.defaultTimeout, 1000)
+
+    t.it('Nesting level 1', t => {
+        t.is(t.descriptor.defaultTimeout, 1000)
+
+        t.it('Nesting level 2', t => {
+            t.is(t.descriptor.defaultTimeout, 1000)
+        })
+    })
+})

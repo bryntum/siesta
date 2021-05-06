@@ -6,7 +6,7 @@ import { CI } from "../../iterator/Iterator.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { TreeNode } from "../../tree/TreeNode.js"
-import { ArbitraryObject, cloneObject, objectEntriesDeep } from "../../util/Helpers.js"
+import { ArbitraryObject, cloneObject, objectEntriesDeep, prototypeValue } from "../../util/Helpers.js"
 import { isAbsolute, joinUrls, stripDirname, stripTrailingSlash } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
@@ -162,21 +162,22 @@ export class TestDescriptor extends Mixin(
          * A default timeout for various asynchronous actions, in milliseconds.
          */
         @option({ defaultValue : () => 15000, group : OptionsGroupTestDescriptor })
-        defaultTimeout      : number        = 15000
+        @prototypeValue(15000)
+        defaultTimeout      : number
 
         /**
          * A default timeout for the [[Test.waitFor|waitFor]] assertion, in milliseconds.
          * If not provided, the [[defaultTimeout]] will be used.
          */
         @option({ defaultValue : () => 15000, group : OptionsGroupTestDescriptor })
-        waitForTimeout      : number        = undefined
+        waitForTimeout      : number
 
         /**
          * A default poll interval for the [[Test.waitFor|waitFor]] assertion, in milliseconds.
          */
-        waitForPollInterval : number        = 50
-
-
+        @option({ defaultValue : () => 50, group : OptionsGroupTestDescriptor })
+        @prototypeValue(50)
+        waitForPollInterval : number
 
         serializerConfig    : Partial<SerializerXml>            = { maxBreadth : 10, maxDepth : 4 }
         stringifierConfig   : Partial<XmlRendererDifference>    = { prettyPrint : true }
@@ -235,7 +236,7 @@ export class TestDescriptor extends Mixin(
             return this.$urlAbs = isAbsolute(this.url) ?
                     this.url
                 :
-                    this.parentNode && this.parentNode.urlAbs ? joinUrls(this.parentNode?.urlAbs, this.url || this.filename) : null
+                    this.parentNode && this.parentNode.urlAbs ? joinUrls(this.parentNode.urlAbs, this.url || this.filename) : null
         }
 
 
@@ -277,7 +278,9 @@ export class TestDescriptor extends Mixin(
             const descriptor        = cloneObject(this)
             descriptor.parentNode   = undefined
 
-            if (!descriptor.url && !descriptor.filename) throw new Error("Descriptor needs to have either `filename` or `url` property defined")
+            // TODO seems we need to split the FileDescriptor and SectionDescriptor?..
+            // next line applies to the former only
+            // if (!descriptor.url && !descriptor.filename) throw new Error("Descriptor needs to have either `filename` or `url` property defined")
 
             const parentsAxis       = [ this, ...this.parentsAxis() ]
 

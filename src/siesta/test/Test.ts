@@ -5,7 +5,8 @@ import { Hook } from "../../hook/Hook.js"
 import { XmlNode } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
-import { ArbitraryObject, ArbitraryObjectKey, isDeno, isNodejs, prototypeValue } from "../../util/Helpers.js"
+import { ArbitraryObject, ArbitraryObjectKey, delay, isDeno, isNodejs, prototypeValue } from "../../util/Helpers.js"
+import { stripBasename, stripDirname } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { Environment } from "../common/Environment.js"
 import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
@@ -92,13 +93,13 @@ export class Test extends Mixin(
 
         isExclusive         : boolean               = false
 
-        // TODO probably need only one of these
         // not related to `before/afterEach` hooks, completely different thing
         preStartHook        : Hook<[ this ]>        = new Hook()
         startHook           : Hook<[ this ]>        = new Hook()
 
-        // TODO probably need only one of these
+        // can still add assertions in this hook
         finishHook          : Hook<[ this ]>        = new Hook()
+        // can _not_ add assertions in this hook
         postFinishHook      : Hook<[ this ]>        = new Hook()
 
         spies               : Spy[]                 = []
@@ -241,9 +242,25 @@ export class Test extends Mixin(
          * The 1st argument for this method can be either a string or a configuration object for this test's [[TestDescriptor|descriptor]].
          * The string value corresponds to `{ title : 'string_value' }`.
          *
-         * The configuration objects for nested test sections, "extends" the configuration objects of their parents.
+         * The configuration object of the nested test section "extends" the configuration object of the parent section.
          *
-         * For the top-level section, the [["src/siesta/test/Test".it|it]] function or <a href="#it-1">it</a> static
+         * For example if parent section sets the [[TestDescriptor.defaultTimeout|defaultTimeout]] to a certain value, the nested section
+         * will use that value too.
+         *
+         * ```javascript
+         * import { it } from "siesta/index.js"
+         *
+         * it({ title : 'Test section', defaultTimeout : 1000 }, async t => {
+         *     t.it('Nested test section', async t => {
+         *         // will fail within 1s
+         *         await t.waitFor(() => false)
+         *     })
+         * })
+         * ```
+         *
+         * See also [[iit]], [[xit]] methods to quickly isolate/exclude a test section.
+         *
+         * To create a top-level test section, the [["src/siesta/test/Test".it|it]] function or <a href="#it-1">it</a> static
          * method should be used. These aliases can actually be used inside the test function as well, however
          * it is recommended to use the method on the test instance.
          *
@@ -267,11 +284,20 @@ export class Test extends Mixin(
         it (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
             const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
 
-            if (this.isTodo) descriptor.isTodo  = true
+            // if (this.isTodo) descriptor.isTodo  = true
+
+            // TODO I promise to myself to clean this up
+            // mess
+            this.descriptor.planItem(descriptor)
+            const flatten   = descriptor.flatten
+            this.descriptor.removeItem(descriptor)
+            // need to turn the node into leaf again, after adding/removing child
+            this.descriptor.childNodes = undefined
+            // eof mess
 
             const cls       = this.constructor as typeof Test
 
-            const test      = cls.new({ descriptor, code, parentNode : this, reporter : this.reporter })
+            const test      = cls.new({ descriptor : flatten, code, parentNode : this, reporter : this.reporter })
 
             this.pendingSubTests.push(test)
 
@@ -680,9 +706,9 @@ export class Test extends Mixin(
 
             const projectPlan   = this.prototype.testDescriptorClass.new({ url : '.' })
 
-            projectPlan.planItem(descriptor)
-
             if (isNodejs() || isDeno()) {
+                projectPlan.planItem(descriptor)
+
                 // trying hard to not create an extra context for the standalone test launch case
                 // this is to aid the debugging ergonomics for developers (everything happens in the
                 // same context => easy "native" debugging)
@@ -713,6 +739,16 @@ export class Test extends Mixin(
                 launcher.afterPrintHook.on(() => topTest.$suppressOutputLogging = false)
 
                 descriptor.url      = projectPlan.title = isomorphicTestClass.getSelfUrl()
+
+                // TODO this is how it is supposed to be:
+                // const selfUrl           = isomorphicTestClass.getSelfUrl()
+                //
+                // projectPlan.title       = selfUrl
+                // projectPlan.url         = stripBasename(selfUrl)
+                // descriptor.filename     = stripDirname(selfUrl)
+                //
+                // projectPlan.planItem(descriptor)
+
 
                 try {
                     await launcher.setup()
@@ -746,7 +782,10 @@ export class Test extends Mixin(
 
                 extraction.state        = 'project_created'
 
-                descriptor.url          = extraction.projectUrl
+                projectPlan.url         = stripBasename(extraction.projectUrl)
+                descriptor.filename     = stripDirname(extraction.projectUrl)
+
+                projectPlan.planItem(descriptor)
 
                 const projectClass      = await this.getProjectClass()
 
