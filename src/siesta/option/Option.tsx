@@ -43,7 +43,7 @@ export class Option extends Mixin(
 
 
         get printableDeclaration () : XmlElement {
-            return <span>--{ camelCaseToSnakeCase(this.name) } : <span class='secondary_pass'>{ this.printableType }</span> { this.printableDefaultValue }</span>
+            return <span>--{ camelCaseToSnakeCase(this.name, '-') } : <span class='secondary_pass'>{ this.printableType }</span> { this.printableDefaultValue }</span>
         }
 
 
@@ -473,5 +473,5 @@ export const optionErrorTemplateByCode = new Map<OptionsParseErrorCodes, (warnin
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const camelCaseToSnakeCase = (str : string) : string =>
-    str.replace(/([A-Z])/g, (match : string, p1 : string) => '_' + p1.toLowerCase())
+export const camelCaseToSnakeCase = (str : string, snakeChar : string = '_') : string =>
+    str.replace(/([A-Z])/g, (match : string, p1 : string) => snakeChar + p1.toLowerCase())

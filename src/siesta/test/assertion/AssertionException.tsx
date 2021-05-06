@@ -161,9 +161,28 @@ export class AssertionException extends Mixin(
          * This assertion passes, if the provided function `func` throws an exception, which
          * stringifies to the `pattern`.
          *
-         * The provided function can be asynchronous
+         * ```javascript
+         * import { it } from "siesta/index.js"
          *
-         * @param func
+         * it('Test section', async t => {
+         *     t.throws(() => throw new Error("oops"), /oop/i, 'Correct exception thrown')
+         * })
+         * ```
+         * The `func` function may be `async` or return `Promise`. In such case, do not
+         * forget to `await` on the assertion method itself:
+         *
+         * ```javascript
+         * import { it } from "siesta/index.js"
+         *
+         * it('Test section', async t => {
+         *     await t.throws(async () => throw new Error("oops"), /oop/i, 'Correct exception thrown')
+         * })
+         * ```
+         *
+         * See also [[doesNotThrow]]
+         *
+         * @param func The function to call. May be `async` or return `Promise`. In such case, do not
+         * forget to `await` on the assertion method itself:
          * @param pattern
          * @param description
          */
@@ -172,6 +191,27 @@ export class AssertionException extends Mixin(
         }
 
         /**
+         * This assertion passes, if the provided function `func` does not throw any exceptions.
+         *
+         * ```javascript
+         * import { it } from "siesta/index.js"
+         *
+         * it('Test section', async t => {
+         *     t.doesNotThrow(() => {}, 'No exceptions thrown')
+         * })
+         * ```
+         * The `func` function may be `async` or return `Promise`. In such case, do not
+         * forget to `await` on the assertion method itself:
+         *
+         * ```javascript
+         * import { it } from "siesta/index.js"
+         *
+         * it('Test section', async t => {
+         *     await t.doesNotThrow(async () => {}, 'No exceptions thrown')
+         * })
+         * ```
+         *
+         * See also [[throws]]
          *
          * @param func
          * @param description
@@ -192,7 +232,7 @@ export class AssertionException extends Mixin(
         }
 
         /**
-         * Backward compatible alias for [[livesOk]]
+         * Backward compatible alias for [[doesNotThrow]]
          *
          * @param func
          * @param description

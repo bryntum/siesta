@@ -1,7 +1,9 @@
 Siesta common concepts
 ======================
 
-This guide contains the common concepts about testing JavaScript code with Siesta. It does not target any specific execution environment, like browser or Node.js, instead it assumes plain EcmaScript setup. 
+This guide contains the common basic concepts about Siesta tests. It does not target any specific execution environment, like browser or Node.js, instead it assumes plain EcmaScript setup.
+
+For additional, more advanced information, please refer to the [[SiestaTestAdvancedGuide|Siesta test advanced]] guide
 
 
 Tests and assertions
@@ -48,79 +50,6 @@ it('Creating assertions using BDD expectations syntax', async t => {
 ```
 
 For the full list of available expectations, please refer to the [[Expectation]] class documentation.
-
-
-Testing asynchronous code
-===================
-
-In the simplest form, when testing the asynchronous code, you can just make your test function `async` and use `await` where needed:
-
-```javascript
-import { it } from "siesta/index.js"
-import { MyClass } from "my-lib"
-
-it('Testing promise-based asynchronous code', async t => {
-    const myClass       = new MyClass()
-    
-    await myClass.asyncMethod('do something')
-})
-```
-
-Sometimes, for example if code is using callbacks, you might not have the `Promise` instance to `await` for. In such case, use a pair of
-[[Test.beginAsync|beginAsync]]/[[Test.endAsync|endAsync]] calls to indicate the beginning/ending of the asynchronous "gap" in the code flow.
-Siesta will await for all [[Test.beginAsync|beginAsync]] calls to complete with the corresponding [[Test.endAsync|endAsync]], before finalizing the test.
-
-For example:
-```javascript
-import { it } from "siesta/index.js"
-import { MyClass } from "my-lib"
-
-it('Testing callbacks-based asynchronous code', t => {
-    const myClass        = new MyClass()
-
-    // indicate async gap starts
-    const async          = t.beginAsync()
-
-    myClass.asyncMethodWithCallback(() => {
-        // indicate async gap completes
-        t.endAsync(async)
-    })
-})
-```
-                  
-
-Tests configuration
-===================
-
-The configuration object of the nested test section "extends" the configuration object of the parent section. 
-
-For example if parent section sets the [[TestDescriptor.defaultTimeout|defaultTimeout]] to a certain value, the nested section 
-will use that value too.
-
-```javascript
-import { it } from "siesta/index.js"
-
-it({ title : 'Test section', defaultTimeout : 1000 }, async t => {
-    t.it('Nested test section', async t => {
-        // will fail within 1s
-        await t.waitFor(() => false)
-    })
-})
-```
-
-Exceptions
-==========
-
-
-Console and stdout/stderr output
-================================
-
-
-Project
-========
-
-If you want to provide configuration for the whole test suite, you need to create a Siesta *project*.
-
 
 COPYRIGHT AND LICENSE
 =================
