@@ -23,6 +23,11 @@ export const extractProjectInfo     = async (projectUrl : string) : Promise<stri
 
     const promise       = new Promise<string>(resolve => extraction.resolve = resolve)
 
+    // TODO probably this `await` should be controlled by the additional option to the `extractProjectInfo`
+    // it allows the devtools on browser page to initialize the session
+    // thing is, during this initialization (takes ~1s) the `debugger` statement are ignored
+    // await new Promise(resolve => setTimeout(resolve, 1000))
+
     try {
         await import(projectUrl)
     } catch (e) {
