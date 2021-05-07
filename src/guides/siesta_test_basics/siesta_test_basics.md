@@ -3,8 +3,6 @@ Siesta common concepts
 
 This guide contains the common basic concepts about Siesta tests. It does not target any specific execution environment, like browser or Node.js, instead it assumes plain EcmaScript setup.
 
-For additional, more advanced information, please refer to the [[SiestaTestAdvancedGuide|Siesta test advanced]] guide
-
 
 Tests and assertions
 ====================
@@ -50,6 +48,15 @@ it('Creating assertions using BDD expectations syntax', async t => {
 ```
 
 For the full list of available expectations, please refer to the [[Expectation]] class documentation.
+
+
+Further reading
+===============
+
+If came here as part of the reading one of the `Getting started` guides, please continue reading there.
+
+Otherwise, for additional, more advanced information, please refer to the [[SiestaTestAdvancedGuide|Siesta test advanced]] guide.
+
 
 COPYRIGHT AND LICENSE
 =================

@@ -31,6 +31,10 @@ export class Project extends Mixin(
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
         launchType              : 'project' | 'test'        = 'project'
+
+        /**
+         * The human readable title for the whole test suite. Will be included in the output, when starting the test suite.
+         */
         title                   : string                    = ''
 
         projectPlan             : TestDescriptor            = this.testDescriptorClass.new()

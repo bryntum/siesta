@@ -162,25 +162,47 @@ export class ProjectNodejs extends Mixin(
             super.plan(...items)
         }
 
-
-        planFile (file : string, desc? : Partial<TestDescriptor>) {
+        /**
+         * This method adds a specific test file into the project plan. The file path is resolved relative to the project file.
+         * The intermediate entries for the directories, containing the file, will be created as well.
+         *
+         * The test descriptor, passed to this method will be assigned directly to the test file entry.
+         * This means any configuration properties in it will overwrite corresponding properties from the parent entries.
+         *
+         * See also [[planDir]], [[planGlob]]
+         *
+         * @param filePath
+         * @param desc
+         */
+        planFile (filePath : string, desc? : Partial<TestDescriptor>) {
             this.hasPlan                = true
 
-            const absolute  = path.resolve(this.baseUrl, file)
+            const absolute  = path.resolve(this.baseUrl, filePath)
 
             const stats     = fs.statSync(absolute)
 
-            if (!stats.isFile()) throw new Error(`Not a file provided to \`planFile\`: ${ file }, project dir: ${ this.baseUrl }`)
+            if (!stats.isFile()) throw new Error(`Not a file provided to \`planFile\`: ${ filePath }, project dir: ${ this.baseUrl }`)
 
             this.addToPlan(absolute, desc)
         }
 
-
+        /**
+         * An alias for [[planFile]]
+         *
+         * @param file
+         * @param desc
+         */
         includeFile (file : string, desc? : Partial<TestDescriptor>) {
             this.planFile(file, desc)
         }
 
-
+        /**
+         * This method excludes a specific file from the project plan. The file path is resolved relative to the project file.
+         *
+         * See also [[excludeDir]], [[excludeGlob]]
+         *
+         * @param file
+         */
         excludeFile (file : string) {
             const absolute  = path.resolve(this.baseUrl, file)
 
@@ -191,7 +213,19 @@ export class ProjectNodejs extends Mixin(
             this.removeFromPlan(absolute)
         }
 
-
+        /**
+         * This method adds all `*.t.m?js` test files in the `dir` directory into the project plan, recursively.
+         * The dir path is resolved relative to the project file.
+         *
+         * The test descriptor, passed to this method will be assigned to the directory entry.
+         * This means any configuration properties in it will be "inherited" by the individual test files.
+         * Test files may still define some configs explicitly, overwriting the "inherited" values.
+         *
+         * See also [[planFile]], [[planGlob]]
+         *
+         * @param dir
+         * @param desc
+         */
         planDir (dir : string, desc? : Partial<TestDescriptor>) {
             this.hasPlan                = true
 
@@ -208,12 +242,24 @@ export class ProjectNodejs extends Mixin(
             })
         }
 
-
+        /**
+         * An alias for [[planDir]]
+         *
+         * @param dir
+         * @param desc
+         */
         includeDir (dir : string, desc? : Partial<TestDescriptor>) {
             this.planDir(dir, desc)
         }
 
-
+        /**
+         * This method excludes all `*.t.m?js` test files in the `dir` directory from the project plan, recursively.
+         * The dir path is resolved relative to the project file.
+         *
+         * See also [[excludeFile]], [[excludeGlob]]
+         *
+         * @param dir
+         */
         excludeDir (dir : string) {
             const absolute  = path.resolve(this.baseUrl, dir)
 
@@ -225,6 +271,15 @@ export class ProjectNodejs extends Mixin(
         }
 
 
+        /**
+         * This method adds all files, matching the `globPattern` into the project plan.
+         * The glob matching happens in the project file directory.
+         *
+         * The test descriptor, passed to this method will be assigned directly to each matching test file entry.
+         * This means any configuration properties in it will overwrite ones from the parent plan entries.
+         *
+         * See also [[planFile]], [[planDir]]
+         */
         planGlob (globPattern : string, desc? : Partial<TestDescriptor>) {
             this.hasPlan                = true
 
@@ -233,12 +288,19 @@ export class ProjectNodejs extends Mixin(
             files.forEach(file => this.addToPlan(file, desc))
         }
 
-
+        /**
+         * An alias for [[planGlob]]
+         */
         includeGlob (globPattern : string, desc? : Partial<TestDescriptor>) {
             this.planGlob(globPattern, desc)
         }
 
-
+        /**
+         * This method excludes all files, matching the `globPattern` from the project plan.
+         * The glob matching happens in the project file directory.
+         *
+         * See also [[excludeFile]], [[excludeDir]]
+         */
         excludeGlob (globPattern : string) {
             const files = glob.sync(globPattern, { cwd : this.baseUrl, absolute : true, matchBase : true, ignore : [ '**/node_modules/**' ] })
 

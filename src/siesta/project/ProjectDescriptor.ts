@@ -20,6 +20,12 @@ export class ProjectDescriptor extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof Base>) => {
 
     class ProjectOptions extends base {
+        /**
+         * The top-level [[TestDescriptor]] instance from which the descriptors of all tests in the suite will "inherit".
+         *
+         * For example if the top-level descriptor contains certain value for the [[TestDescriptor.defaultTimeout|defaultTimeout]] config,
+         * then all tests will use that value, unless they explicitly override it.
+         */
         @include()
         testDescriptor      : Partial<TestDescriptor>           = undefined
     }
