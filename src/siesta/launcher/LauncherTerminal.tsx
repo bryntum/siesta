@@ -5,13 +5,16 @@ import { LogLevel, LogMethod } from "../../logger/Logger.js"
 import { LoggerHookable } from "../../logger/LoggerHookable.js"
 import { parse } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
+import { isDeno, isNodejs } from "../../util/Helpers.js"
+import { stripBasename } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { Context } from "../context/Context.js"
 import { option } from "../option/Option.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
+import { ProjectTerminal } from "../project/ProjectTerminal.js"
 import { LogMessage } from "../test/TestResult.js"
-import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput, OptionsGroupPrimary } from "./Launcher.js"
+import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput } from "./Launcher.js"
 import { extractProjectInfo } from "./ProjectExtractor.js"
 
 // generic sever-side, cross Node/Deno functionality
@@ -108,6 +111,87 @@ export class LauncherTerminal extends Mixin(
         }
 
 
+        async setupProjectData () {
+            await super.setupProjectData()
+
+            // `projectDescriptor` might be already provided
+            // if project file is launched directly as node executable
+            if (!this.projectData) {
+                const projectUrl                = this.project
+                const projectClass              = await this.getProjectClass()
+
+                // what is passed as the 1st argument for the launcher?
+                if (this.runtime.isGlob(projectUrl)) {
+                    // glob for test files
+                    const project               = projectClass.new({ title : projectUrl, baseUrl : this.runtime.cwd() })
+
+                    project.planGlob(projectUrl)
+
+                    this.projectData                    = project.asProjectSerializableData()
+                    this.projectData.projectPlan.url    = this.runtime.cwd()
+                }
+                else {
+                    // non-glob - either project file url (https: or file:) or test file name
+
+                    const projectUrl            = this.project = this.prepareProjectFileUrl(this.project)
+
+                    if (/^https?:/i.test(projectUrl)) {
+                        const contextProvider       = this.contextProviderBrowser[ 0 ]
+
+                        const context               = await contextProvider.createContext()
+
+                        await context.navigate(projectUrl)
+
+                        this.projectData                    = await this.extractProjectData(context, projectUrl)
+                        this.projectData.projectPlan.url    = stripBasename(this.project)
+                    } else {
+                        if (this.runtime.isDirectory(projectUrl)) {
+                            const project               = projectClass.new({ title : projectUrl, baseUrl : this.runtime.cwd() })
+
+                            project.planDir(projectUrl)
+
+                            this.projectData                    = project.asProjectSerializableData()
+                            this.projectData.projectPlan.url    = this.runtime.cwd()
+                        }
+                        else if (this.runtime.isFile(projectUrl)) {
+                            if (/\.t\.m?js/.test(projectUrl)) {
+                                // test file name
+                                const project                       = projectClass.new({ title : projectUrl, launchType : 'test', baseUrl : this.runtime.cwd() })
+
+                                project.planFile(projectUrl)
+
+                                this.projectData                    = project.asProjectSerializableData()
+                                this.projectData.projectPlan.url    = this.runtime.cwd()
+                            } else {
+                                // finally - project file name
+                                const contextProvider               = this.contextProviderSameContext
+
+                                const context                       = await contextProvider.createContext()
+
+                                this.projectData                    = await this.extractProjectData(context, projectUrl)
+                                this.projectData.projectPlan.url    = stripBasename(this.project)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        prepareProjectFileUrl (url : string) : string {
+            if (/^https?:/i.test(url)) {
+                return url
+            }
+            else if (/^file:/.test(url)) {
+                return this.runtime.pathResolve(this.runtime.fileURLToPath(url))
+            }
+            else {
+                // assume plain fs path here
+                return this.runtime.pathResolve(url)
+            }
+        }
+
+
         async extractProjectData (context : Context, projectUrl : string) : Promise<ProjectSerializableData> {
             try {
                 return parse(await context.evaluateBasic(extractProjectInfo, projectUrl))
@@ -131,6 +215,16 @@ export class LauncherTerminal extends Mixin(
 
         async setupTheme () {
             this.styles         = (await import(`../reporter/styling/theme_${ this.theme }.js`)).styles
+        }
+
+
+        async getProjectClass () : Promise<typeof ProjectTerminal> {
+            if (isNodejs())
+                return (await import('../project/ProjectNodejs.js')).ProjectNodejs
+            else if (isDeno())
+                return (await import('../project/ProjectDeno.js')).ProjectDeno
+            else
+                throw new Error("Should not reach this line")
         }
     }
 

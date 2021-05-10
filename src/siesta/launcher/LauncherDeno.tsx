@@ -8,13 +8,14 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerDeno } from "../../jsx/ColorerDeno.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { stripBasename } from "../../util/Path.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderDenoWorker } from "../context/context_provider/ContextProviderDenoWorker.js"
 import { ProjectDescriptorDeno } from "../project/ProjectDescriptor.js"
 import { ReporterDeno } from "../reporter/ReporterDeno.js"
 import { ReporterDenoTerminal } from "../reporter/ReporterDenoTerminal.js"
+import { Runtime } from "../runtime/Runtime.js"
+import { RuntimeDeno } from "../runtime/RuntimeDeno.js"
 import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { ExitCodes, Launcher, LauncherError } from "./Launcher.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
@@ -41,11 +42,13 @@ export class LauncherDeno extends Mixin(
         ]
 
 
-        reporterClass   : typeof ReporterDeno               = ReporterDenoTerminal
-        colorerClass    : typeof Colorer                    = ColorerDeno
+        reporterClass           : typeof ReporterDeno               = ReporterDenoTerminal
+        colorerClass            : typeof Colorer                    = ColorerDeno
 
-        projectDescriptorClass : typeof ProjectDescriptorDeno   = ProjectDescriptorDeno
-        testDescriptorClass : typeof TestDescriptorDeno         = TestDescriptorDeno
+        runtimeClass            : typeof Runtime                    = RuntimeDeno
+
+        projectDescriptorClass  : typeof ProjectDescriptorDeno      = ProjectDescriptorDeno
+        testDescriptorClass     : typeof TestDescriptorDeno         = TestDescriptorDeno
 
 
         getMaxLen () : number {
@@ -138,49 +141,15 @@ export class LauncherDeno extends Mixin(
 
 
         async setupProjectData () {
-            await super.setupProjectData()
-
-            // `projectDescriptor` might be already provided
-            // if project file is launched directly as node executable
             if (!this.projectData) {
                 const projectUrl            = this.project = this.prepareProjectFileUrl(this.project)
 
-                // if (/^https?:/i.test(projectUrl)) {
-                //     throw new Error("Not supported")
-                //
-                //     // const contextProvider       = this.contextProviderBrowser[ 0 ]
-                //     //
-                //     // const context               = await contextProvider.createContext()
-                //     //
-                //     // await context.navigate(projectUrl)
-                //     //
-                //     // this.projectData            = await this.extractProjectData(context, projectUrl)
-                // } else {
-                    const contextProvider       = this.contextProviderSameContext
-
-                    const context               = await contextProvider.createContext()
-
-                    this.projectData            = await this.extractProjectData(context, projectUrl)
-                // }
+                if (/^https?:/i.test(projectUrl)) {
+                    throw new Error("To run the tests in browser, please use Node.js launcher: `npx siesta PROJECT_URL`")
+                }
             }
 
-            if (this.project) {
-                this.projectData.projectPlan.url   = stripBasename(this.project)
-            }
-        }
-
-
-        prepareProjectFileUrl (url : string) : string {
-            if (/^https?:/i.test(url)) {
-                return url
-            }
-            else if (/^file:/.test(url)) {
-                return path.resolve(path.fromFileUrl(url))
-            }
-            else {
-                // assume plain fs path here
-                return path.resolve(url)
-            }
+            await super.setupProjectData()
         }
 
 

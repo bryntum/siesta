@@ -1,6 +1,7 @@
 import fs from "fs"
 import glob from "glob"
 import path from "path"
+import { fileURLToPath } from "url"
 import { scanDir } from "../../util_nodejs/FileSystem.js"
 import { Runtime } from "./Runtime.js"
 
@@ -50,5 +51,20 @@ export class RuntimeNodejs extends Runtime {
 
     expandGlobSync (globPattern : string, rootDir : string) : Iterable<string> {
         return glob.sync(globPattern, { cwd : rootDir, absolute : true, matchBase : true, ignore : [ '**/node_modules/**' ] })
+    }
+
+
+    isGlob (str : string) : boolean {
+        return glob.hasMagic(str)
+    }
+
+
+    fileURLToPath (url : string) : string {
+        return fileURLToPath(url)
+    }
+
+
+    cwd () : string {
+        return process.cwd()
     }
 }

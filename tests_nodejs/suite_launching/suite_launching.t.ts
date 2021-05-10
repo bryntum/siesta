@@ -69,6 +69,18 @@ it('Should be able to launch the isomorphic test file in Deno directly', async t
     await verifySampleTestLaunch(t, launchRes)
 })
 
+it('Should be able to launch the isomorphic test file in Deno via launcher', async t => {
+    const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/isomorphic/test_1.t.js'), {}, true)
+
+    await verifySampleTestLaunch(t, launchRes)
+})
+
+it('Should be able to launch the isomorphic test file in Deno via launcher with glob', async t => {
+    const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/isomo*/t*t_1.t.js'), {}, true)
+
+    await verifySampleTestLaunch(t, launchRes)
+})
+
 
 //---------------------------------------------------------------------------------------------------------------------
 it('Should be able to launch the isomorphic project in browser via launcher', async t => {

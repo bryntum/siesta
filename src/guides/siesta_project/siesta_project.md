@@ -110,9 +110,9 @@ Node.js:
 node tests/index.js
 ```
 
-Deno (note the `--allow-read --allow-env --unstable` flags are required):
+Deno (note the `--allow-read --allow-env --unstable` flags are required for permissions/WebWorker feature and `--quiet` is needed because the `check file` diagnostic):
 ```shell
-deno run --allow-read --allow-env --unstable tests/index.js
+deno run --allow-read --allow-env --unstable --quiet tests/index.js
 ```
 
 Or, one can use the Siesta launcher executable and pass the path/URL to the project file to it. This method works for all target environments:

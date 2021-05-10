@@ -1,8 +1,3 @@
-import fs from "fs"
-import glob from "glob"
-import path from 'path'
-import { fileURLToPath } from "url"
-import { ProjectNodejs } from "../../../nodejs.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContextAttachable } from "../../context/ExecutionContext.js"
 import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
@@ -10,7 +5,6 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { stripBasename } from "../../util/Path.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
@@ -20,6 +14,8 @@ import { option, OptionGroup } from "../option/Option.js"
 import { ProjectDescriptorNodejs } from "../project/ProjectDescriptor.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
+import { Runtime } from "../runtime/Runtime.js"
+import { RuntimeNodejs } from "../runtime/RuntimeNodejs.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { ExitCodes, Launcher, LauncherError, OptionsGroupPrimary } from "./Launcher.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
@@ -100,11 +96,13 @@ export class LauncherNodejs extends Mixin(
         ]
 
 
-        reporterClass   : typeof ReporterNodejs             = ReporterNodejsTerminal
-        colorerClass    : typeof Colorer                    = ColorerNodejs
+        reporterClass           : typeof ReporterNodejs             = ReporterNodejsTerminal
+        colorerClass            : typeof Colorer                    = ColorerNodejs
 
-        projectDescriptorClass : typeof ProjectDescriptorNodejs   = ProjectDescriptorNodejs
-        testDescriptorClass : typeof TestDescriptorNodejs   = TestDescriptorNodejs
+        runtimeClass            : typeof Runtime                    = RuntimeNodejs
+
+        projectDescriptorClass  : typeof ProjectDescriptorNodejs    = ProjectDescriptorNodejs
+        testDescriptorClass     : typeof TestDescriptorNodejs       = TestDescriptorNodejs
 
 
         getMaxLen () : number {
@@ -193,90 +191,6 @@ export class LauncherNodejs extends Mixin(
             // })
 
             await super.setup()
-        }
-
-        // TODO need to abstract the OS-specific parts of this method, like "globbing", "fs.statSync"
-        // and move this method to the LauncherTerminal, to share with Deno launcher, then remove
-        // this method in LauncherDeno
-        async setupProjectData () {
-            await super.setupProjectData()
-
-            // `projectDescriptor` might be already provided
-            // if project file is launched directly as node executable
-            if (!this.projectData) {
-                const projectUrl                = this.project
-
-                // what is passed as the 1st argument for the launcher?
-                if (glob.hasMagic(projectUrl)) {
-                    // glob for test files
-                    const project               = ProjectNodejs.new({ title : projectUrl, baseUrl : process.cwd() })
-
-                    project.planGlob(projectUrl)
-
-                    this.projectData                    = project.asProjectSerializableData()
-                    this.projectData.projectPlan.url    = process.cwd()
-                }
-                else {
-                    // non-glob - either project file url (https: or file:) or test file name
-
-                    const projectUrl            = this.project = this.prepareProjectFileUrl(this.project)
-
-                    if (/^https?:/i.test(projectUrl)) {
-                        const contextProvider       = this.contextProviderBrowser[ 0 ]
-
-                        const context               = await contextProvider.createContext()
-
-                        await context.navigate(projectUrl)
-
-                        this.projectData                    = await this.extractProjectData(context, projectUrl)
-                        this.projectData.projectPlan.url    = stripBasename(this.project)
-                    } else {
-                        const stats     = fs.statSync(projectUrl)
-
-                        if (stats.isDirectory()) {
-                            const project               = ProjectNodejs.new({ title : projectUrl, baseUrl : process.cwd() })
-
-                            project.planDir(projectUrl)
-
-                            this.projectData                    = project.asProjectSerializableData()
-                            this.projectData.projectPlan.url    = process.cwd()
-                        }
-                        else if (stats.isFile()) {
-                            if (/\.t\.m?js/.test(projectUrl)) {
-                                // test file name
-                                const project               = ProjectNodejs.new({ title : projectUrl, launchType : 'test', baseUrl : process.cwd() })
-
-                                project.planFile(projectUrl)
-
-                                this.projectData                    = project.asProjectSerializableData()
-                                this.projectData.projectPlan.url    = process.cwd()
-                            } else {
-                                // finally - project file name
-                                const contextProvider       = this.contextProviderSameContext
-
-                                const context               = await contextProvider.createContext()
-
-                                this.projectData                    = await this.extractProjectData(context, projectUrl)
-                                this.projectData.projectPlan.url    = stripBasename(this.project)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        prepareProjectFileUrl (url : string) : string {
-            if (/^https?:/i.test(url)) {
-                return url
-            }
-            else if (/^file:/.test(url)) {
-                return path.resolve(fileURLToPath(url))
-            }
-            else {
-                // assume plain fs path here
-                return path.resolve(url)
-            }
         }
 
 

@@ -1,4 +1,6 @@
 // @ts-ignore
+import glob from "glob"
+// @ts-ignore
 import * as path from "https://deno.land/std@0.94.0/path/mod.ts"
 // @ts-ignore
 import { expandGlobSync } from "https://deno.land/std@0.95.0/fs/mod.ts"
@@ -65,5 +67,20 @@ export class RuntimeDeno extends Runtime {
             globPattern,
             { root : rootDir, extended : true, globstar : true, exclude : [ '**/node_modules/**' ], includeDirs : false }
         )).map((entry : { path : string }) => entry.path)
+    }
+
+
+    isGlob (str : string) : boolean {
+        return path.isGlob(str)
+    }
+
+
+    fileURLToPath (url : string) : string {
+        return path.fromFileUrl(url)
+    }
+
+
+    cwd () : string {
+        return Deno.cwd()
     }
 }

@@ -26,6 +26,7 @@ import {
 import { ProjectDescriptor, ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
+import { HasRuntimeAccess } from "../runtime/Runtime.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Launch } from "./Launch.js"
 
@@ -115,8 +116,8 @@ export type PrepareOptionsResult = {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
-    [ HasOptions, ConsoleXmlRenderer, Base ],
-    (base : ClassUnion<typeof HasOptions, typeof ConsoleXmlRenderer, typeof Base>) => {
+    [ HasOptions, ConsoleXmlRenderer, HasRuntimeAccess, Base ],
+    (base : ClassUnion<typeof HasOptions, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess, typeof Base>) => {
 
     class Launcher extends base {
         projectData             : ProjectSerializableData   = undefined

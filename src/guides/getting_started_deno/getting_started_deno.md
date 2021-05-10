@@ -8,8 +8,10 @@ In this guide, we assume a setup, pointed toward running tests in [Deno](https:/
 Installation
 ============
 
+Note, that installer adds `--quiet` to the executable arguments. This is because the diagnostic messages breaks the dynamic output of the test reporter and there's no other way to intercept/suppress them.
+
 ```shell
-npm install @bryntum/siesta --save-dev
+deno install --name siesta --allow-read --allow-env --unstable --quiet https://deno.land/x/siesta/bin/siesta-deno.js
 ```
 
 Basics
@@ -20,7 +22,7 @@ To familiarize yourself with the basic Siesta concepts, which are common for all
 Importing API
 =============
 
-When targeting Deno environment for running tests, import the Siesta API from the `siesta/deno.js` entry file.
+When targeting Deno environment for running tests, import the Siesta API from the `https://deno.land/x/siesta/deno.js` entry file.
 
 
 Launching individual test
@@ -29,7 +31,7 @@ Launching individual test
 Let's assume we have the following Siesta test file, called `basic_test.t.js`.
 
 ```javascript
-import { it } from "siesta/deno.js"
+import { it } from "https://deno.land/x/siesta/deno.js"
 
 it('Basic Siesta test', async t => {
     t.true(true, "That's true")
@@ -62,17 +64,17 @@ You should see something like:
 Launching several tests
 ===============
 
-To launch several tests, you need to use the Siesta launcher. Siesta launcher is an executable file, called `siesta`. Usually to access it in your local package installation, you use the `npx` command, provided by the `npm` package manager: 
+To launch several tests, you need to use the Siesta launcher, installed at the "Installation" step above:
 
 ```shell
-npx siesta --help
+siesta --help
 ```
 
-To launch several tests, pass a matching glob pattern for them as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it. To resolve the glob pattern, Siesta uses the [glob](https://www.npmjs.com/package/glob) npm library, please refer to its documentation for details on globs resolution. 
+To launch several tests, pass a matching glob pattern for them as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it. To resolve the glob pattern, Siesta uses the [glob resolution](https://doc.deno.land/https/deno.land/std@0.95.0/path/glob.ts) from the Deno `std` library, please refer to its documentation for details. 
 
 Some examples:
 
-Launch all tests in `tests` directory:
+Launch all tests (`*.t.m?js` files) in `tests` directory:
 ```shell
 npx siesta tests
 ```

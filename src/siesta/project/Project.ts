@@ -7,7 +7,7 @@ import { Environment, EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { SiestaProjectExtraction } from "../launcher/ProjectExtractor.js"
-import { Runtime } from "../runtime/Runtime.js"
+import { HasRuntimeAccess } from "../runtime/Runtime.js"
 import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/TestDescriptor.js"
 import { ProjectDescriptor, ProjectSerializableData } from "./ProjectDescriptor.js"
 
@@ -17,14 +17,12 @@ import { ProjectDescriptor, ProjectSerializableData } from "./ProjectDescriptor.
  * Siesta project for isomorphic code.
  */
 export class Project extends Mixin(
-    [ ProjectDescriptor ],
-    (base : ClassUnion<typeof ProjectDescriptor>) => {
+    [ ProjectDescriptor, HasRuntimeAccess ],
+    (base : ClassUnion<typeof ProjectDescriptor, typeof HasRuntimeAccess>) => {
 
     class Project extends base {
         type                    : EnvironmentType           = 'isomorphic'
         siestaPackageRootUrl    : string                    = siestaPackageRootUrl
-
-        runtimeClass            : typeof Runtime            = Runtime
 
         launcherClass           : typeof Launcher           = undefined
 
@@ -62,15 +60,6 @@ export class Project extends Mixin(
 
         set baseUrl (value : string) {
             this.$baseUrl    = value
-        }
-
-
-        $runtime                : Runtime               = undefined
-
-        get runtime () : Runtime {
-            if (this.$runtime !== undefined) return this.$runtime
-
-            return this.$runtime    = this.runtimeClass.new()
         }
 
 
@@ -155,16 +144,6 @@ export class Project extends Mixin(
                 return (await import('../launcher/LauncherDeno.js')).LauncherDeno
             else
                 return (await import('../launcher/LauncherBrowser.js')).LauncherBrowser
-        }
-
-
-        async getRuntimeClass () : Promise<typeof Runtime> {
-            if (isNodejs())
-                return (await import('../runtime/RuntimeNodejs.js')).RuntimeNodejs
-            else if (isDeno())
-                return (await import('../runtime/RuntimeDeno.js')).RuntimeDeno
-            else
-                return (await import('../runtime/RuntimeBrowser.js')).RuntimeBrowser
         }
 
 
