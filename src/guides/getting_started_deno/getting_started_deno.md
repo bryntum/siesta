@@ -58,7 +58,7 @@ deno run --allow-read --allow-env tests/basic/basic_test.t.js
 ```
 
 You should see something like:
-![Launching test directly](media://getting_started_nodejs/getting_started_deno_1.jpg)
+![Launching test directly](media://getting_started_deno/getting_started_deno_1.jpg)
 
 
 Launching several tests

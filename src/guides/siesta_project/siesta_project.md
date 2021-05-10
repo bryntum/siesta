@@ -58,14 +58,16 @@ const project = Project.new({
 
 In this step, we create an instance of the [[ProjectNodejs]] class, which is exported as `Project` from the `siesta/node.js`. We do that using the static constructor method [[ProjectNodejs.new]], which accepts a single configuration object, with properties, corresponding to the class attributes.
 
-There are few configuration options for the project itself, like [[ProjectNodejs.title|title]] and a [[ProjectNodejs.testDescriptor|testDescriptor]] config, which contains the configuration object for the top-level [[TestDescriptor]] instance. All other tests in the test suite will "extend" this descriptor ("inherit" from it). For example if the top-level descriptor contains certain value for the [[TestDescriptor.defaultTimeout|defaultTimeout]] config, then all tests will use that value, unless they explicitly override it.
+For Deno, we should import from the `https://deno.land/x/siesta/deno.js` entry file.
+
+There are few configuration options for the project itself, like [[ProjectNodejs.title|title]] and a [[ProjectNodejs.testDescriptor|testDescriptor]] config, which contains the configuration object for the top-level [[TestDescriptor]] instance. All other tests in the test suite will "extend" this descriptor ("inherit" from it). For example, if the top-level descriptor contains certain value for the [[TestDescriptor.defaultTimeout|defaultTimeout]] config, then all tests will use that value, unless they explicitly override it.
 
 The project instance should be created synchronously in the top-level scope of the module.
 
 Creating the project execution plan
 -------------------------
 
-Project plan is a collection of tests to be run. It is structured as tree, usually reflecting the file system. The "parent" nodes in this tree corresponds to directories and "leaf" nodes - to test files.
+Project plan is a collection of tests to be run. It is structured as a tree, usually reflecting the file system. The "parent" nodes in this tree corresponds to directories and "leaf" nodes - to test files.
 
 Test files can be included into the plan with the following project methods: [[ProjectNodejs.planFile|planFile]], [[ProjectNodejs.planDir|planDir]], [[ProjectNodejs.planGlob|planGlob]]. **All paths, passed to those methods are resolved relative to the project file**.
 
@@ -91,6 +93,8 @@ project.planDir('.')
 
 The project planning step may happen asynchronously, ie you can call some asynchronous methods to decide what to include and with which the configuration.
 
+Note, that projects targeting browser environment don't have access to file system and thus, need to list all the test files manually, using the [[Project.plan]] method. We plan to remove this limitation in one of the future releases.
+
 Starting the project
 ------------
 
@@ -103,14 +107,14 @@ project.start()
 Launching the project
 =====================
 
-To launch the project, targeting Node.js and Deno environments, one can directly launch the project file itself, as regular JavaScript executable.
+To launch the project, targeting Node.js and Deno environments, one can directly launch the project file itself, as regular JavaScript executable:
 
-Node.js:
+For Node.js:
 ```shell
 node tests/index.js
 ```
 
-Deno (note the `--allow-read --allow-env --unstable` flags are required for permissions/WebWorker feature and `--quiet` is needed because the `check file` diagnostic):
+For Deno (note the `--allow-read --allow-env --unstable` flags are required for permissions/WebWorker feature and `--quiet` is needed because the `check file://` diagnostic messages [breaks the dynamic output formatting](https://github.com/denoland/deno/issues/10558)):
 ```shell
 deno run --allow-read --allow-env --unstable --quiet tests/index.js
 ```
@@ -127,11 +131,9 @@ Node.js, targeting browser:
 npx siesta http://localhost/my_project/tests/index.js 
 ```
 
-Deno, targeting Deno:
+Deno, targeting Deno (assuming using the installed executable):
 ```shell
-XXX should use Deno installable
-
-deno run --allow-read --allow-env --unstable --quiet tests/index.js
+siesta tests/index.js
 ```
 
 COPYRIGHT AND LICENSE

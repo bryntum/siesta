@@ -13,6 +13,7 @@ import {
 const __filename    = fileURLToPath(import.meta.url)
 const __dirname     = path.dirname(__filename)
 
+// TODO refactor this test to launch the individual cases in parallel
 
 //---------------------------------------------------------------------------------------------------------------------
 it('Should be able to launch the isomorphic project in Node.js directly', async t => {

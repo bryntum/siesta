@@ -64,7 +64,7 @@ npx siesta http://localhost/my_project/tests/basic_test.t.js --brower firefox
 ```
 
 You should see something like:
-![Launching test directly](media://getting_started_nodejs/getting_started_browser_1.jpg)
+![Launching test directly](media://getting_started_browser/getting_started_browser_1.jpg)
 
 
 Launching test suite
