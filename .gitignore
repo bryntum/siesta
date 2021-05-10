@@ -22,6 +22,8 @@
 /tests/**/*.js.map
 /tests_nodejs/**/*.js
 /tests_nodejs/**/*.js.map
+/tests_deno/**/*.js
+/tests_deno/**/*.js.map
 /scripts/**/*.js
 /scripts/**/*.js.map
 /examples/**/*.js

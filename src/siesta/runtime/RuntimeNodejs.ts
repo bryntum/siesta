@@ -41,10 +41,10 @@ export class RuntimeNodejs extends Runtime {
     }
 
 
-    scanDirSync (url : string, forEach : (fileName : string) => any) {
-        scanDir(url, (entry : fs.Dirent, fileName : string) => {
+    scanDirSync (dir : string, forEach : (fileName : string) => any, ignore : RegExp = /^node_modules$/) {
+        scanDir(dir, (entry : fs.Dirent, fileName : string) => {
             if (/\.t\.m?js$/.test(fileName)) forEach(fileName)
-        })
+        }, ignore)
     }
 
 

@@ -1,7 +1,8 @@
 // @ts-ignore
 import * as path from "https://deno.land/std@0.94.0/path/mod.ts"
 // @ts-ignore
-import * as fs from "https://deno.land/std@0.95.0/fs/expand_glob.ts"
+import { expandGlobSync } from "https://deno.land/std@0.95.0/fs/mod.ts"
+import { CI } from "../../iterator/Iterator.js"
 import { Runtime } from "./Runtime.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -41,17 +42,28 @@ export class RuntimeDeno extends Runtime {
     }
 
 
-    scanDirSync (url : string, forEach : (fileName : string) => any) {
-        for (const entry of fs.walkSync(url)) {
-            if (entry.isFile) forEach(entry.path)
+    scanDirSync (dir : string, forEach : (fileName : string) => any, ignore : RegExp = /^node_modules$/) {
+        const entries : { name : string, isDirectory : boolean, isFile : boolean }[]  = Array.from(Deno.readDirSync(dir))
+
+        entries.sort((entry1, entry2) => entry1.name < entry2.name ? -1 : entry1.name > entry2.name ? 1 : 0)
+
+        for (let i = 0; i < entries.length; i++) {
+            const entry     = entries[ i ]
+
+            if (entry.isDirectory && (!ignore || !ignore.test(entry.name))) {
+                if (this.scanDirSync(this.pathResolve(dir, entry.name), forEach) === false) return false
+            }
+            else if (entry.isFile) {
+                if (forEach(this.pathResolve(dir, entry.name)) === false) return false
+            }
         }
     }
 
 
     expandGlobSync (globPattern : string, rootDir : string) : Iterable<string> {
-        return fs.expandGlobSync(
+        return CI(expandGlobSync(
             globPattern,
             { root : rootDir, extended : true, globstar : true, exclude : [ '**/node_modules/**' ], includeDirs : false }
-        )
+        )).map((entry : { path : string }) => entry.path)
     }
 }

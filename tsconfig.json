@@ -35,6 +35,8 @@
         "tests/**/*.tsx",
         "tests_nodejs/**/*.ts",
         "tests_nodejs/**/*.tsx",
+        "tests_deno/**/*.ts",
+        "tests_deno/**/*.tsx",
         "benchmarks/**/*.ts",
         "examples/**/*.ts"
     ],
