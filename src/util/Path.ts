@@ -20,7 +20,7 @@ export const relative = (baseUrl : string, url : string) : string => {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-export const stripBasename = (url : string, keepTrailingSlash : boolean = true) : string =>
+export const stripBasename = (url : string, keepTrailingSlash : boolean = false) : string =>
     url.replace(/\/[^/]*?$/, keepTrailingSlash ? '/' : '')
 
 

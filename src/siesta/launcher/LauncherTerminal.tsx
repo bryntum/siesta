@@ -27,15 +27,6 @@ export class LauncherTerminal extends Mixin(
 
         // region options
         @option({
-            type        : 'string',
-            group       : OptionsGroupPrimary,
-            help        : <span>
-                Project file url. Can be either a regular filesystem path, or http-based URL, or a `file://` url
-            </span>
-        })
-        project             : string            = ''
-
-        @option({
             type        : 'boolean',
             group       : OptionsGroupOutput,
             defaultValue : () => false,

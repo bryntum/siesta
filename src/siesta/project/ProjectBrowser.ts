@@ -1,10 +1,10 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { isNodejs } from "../../util/Helpers.js"
-import { stripBasename } from "../../util/Path.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
+import { Runtime } from "../runtime/Runtime.js"
+import { RuntimeBrowser } from "../runtime/RuntimeBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Project } from "./Project.js"
 import { ProjectDescriptorBrowser } from "./ProjectDescriptor.js"
@@ -23,33 +23,13 @@ export class ProjectBrowser extends Mixin(
 
         launcherClass           : typeof LauncherBrowser        = LauncherBrowser
         testDescriptorClass     : typeof TestDescriptorBrowser  = TestDescriptorBrowser
-
-
-        buildBaseUrl () : string {
-            const url           = new URL(window.location.href)
-
-            url.hash            = ''
-            url.search          = ''
-
-            return url.href
-        }
-
-
-        buildInputArguments () : string[] {
-            // TODO should extract search params from location.href here
-            return []
-        }
-
-
-        async getIsomorphicSelfInstance () : Promise<ProjectBrowser> {
-            return this
-        }
+        runtimeClass            : typeof Runtime                = RuntimeBrowser
 
 
         async launchStandalone () : Promise<Launch> {
             if (isNodejs()) {
                 const styles                = (await import("../reporter/styling/theme_universal.js")).styles
-                const colorerClass          = (await import('../../jsx/ColorerNodejs.js'))[ 'ColorerNodejs' ] as typeof ColorerNodejs
+                const colorerClass          = (await import('../../jsx/ColorerNodejs.js')).ColorerNodejs
                 const c                     = colorerClass.new()
                 const style                 = (clsName : string) => styles.get(clsName)(c)
 
@@ -63,24 +43,6 @@ Please use Siesta launcher instead and web url:
             }
 
             return super.launchStandalone()
-        }
-
-
-        getStandaloneLauncher () : LauncherBrowser {
-            const launcher = this.launcherClass.new({
-                projectData             : this.asProjectSerializableData(),
-
-                inputArguments          : this.buildInputArguments()
-            })
-
-            const url           = new URL(window.location.href)
-
-            url.hash            = ''
-            url.search          = ''
-
-            launcher.projectData.projectPlan.url  = stripBasename(url.toString())
-
-            return launcher
         }
     }
 

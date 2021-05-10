@@ -27,8 +27,7 @@ it('Should be able to plan individual files inside the project directory', async
     // should normalize the path to be relative to the project file
     project.planFile('../nodejs/test_2.t.js')
 
-    project.finalizePlan()
-
+    await project.finalizePlan()
 
     t.equal(
         extract(project.projectPlan),
@@ -62,7 +61,7 @@ it('Should be able to plan individual files outside the project directory', asyn
     project.planFile('../isomorphic/test_1.t.js')
     project.planFile('../browser/test_2.t.js')
 
-    project.finalizePlan()
+    await project.finalizePlan()
 
     t.equal(
         extract(project.projectPlan),
@@ -111,7 +110,7 @@ it('Should plan the project file directory by default', async t => {
         baseUrl     : path.resolve(__dirname, '../@sample_test_suites/nodejs/')
     })
 
-    project.finalizePlan()
+    await project.finalizePlan()
 
     t.equal(
         extract(project.projectPlan),
@@ -144,7 +143,7 @@ it('Should be able to plan the glob pattern', async t => {
 
     project.planGlob('*est_[0-9]*.t.js')
 
-    project.finalizePlan()
+    await project.finalizePlan()
 
     t.equal(
         extract(project.projectPlan),
@@ -179,7 +178,7 @@ it('Should be able to exclude files by the glob pattern', async t => {
 
     project.excludeGlob('*2*')
 
-    project.finalizePlan()
+    await project.finalizePlan()
 
     t.equal(
         extract(project.projectPlan),

@@ -7,6 +7,7 @@ import { Environment, EnvironmentType } from "../common/Environment.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { SiestaProjectExtraction } from "../launcher/ProjectExtractor.js"
+import { Runtime } from "../runtime/Runtime.js"
 import { ProjectPlanItemDescriptor, TestDescriptor } from "../test/TestDescriptor.js"
 import { ProjectDescriptor, ProjectSerializableData } from "./ProjectDescriptor.js"
 
@@ -23,6 +24,8 @@ export class Project extends Mixin(
         type                    : EnvironmentType           = 'isomorphic'
         siestaPackageRootUrl    : string                    = siestaPackageRootUrl
 
+        runtimeClass            : typeof Runtime            = Runtime
+
         launcherClass           : typeof Launcher           = undefined
 
         /**
@@ -38,6 +41,8 @@ export class Project extends Mixin(
         title                   : string                    = ''
 
         projectPlan             : TestDescriptor            = this.testDescriptorClass.new()
+
+        hasPlan                 : boolean                   = false
 
         /**
          * The type of the argument for the [[plan]] method.
@@ -60,8 +65,17 @@ export class Project extends Mixin(
         }
 
 
+        $runtime                : Runtime               = undefined
+
+        get runtime () : Runtime {
+            if (this.$runtime !== undefined) return this.$runtime
+
+            return this.$runtime    = this.runtimeClass.new()
+        }
+
+
         buildBaseUrl () : string {
-            throw new Error("Abstract method")
+            return stripBasename(this.runtime.scriptUrl)
         }
 
 
@@ -77,7 +91,6 @@ export class Project extends Mixin(
             if (extraction) {
                 extraction.state        = 'project_created'
                 this.baseUrl            = stripBasename(extraction.projectUrl)
-                this.projectPlan.url    = this.baseUrl
             }
         }
 
@@ -97,21 +110,27 @@ export class Project extends Mixin(
          * @param items
          */
         plan (...items : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
+            this.hasPlan        = true
+
             const descriptors : this[ 'planItemT' ][]  = items.flat(Number.MAX_SAFE_INTEGER).filter(el => Boolean(el)) as any
 
             descriptors.forEach(item => this.projectPlan.planItem(this.testDescriptorClass.fromProjectPlanItemDescriptor(item)))
         }
 
 
-        async setup () {
-            Object.assign(this.projectPlan, this.testDescriptor, {
-                title   : this.title
-            })
+        async finalizePlan () {
+            this.runtimeClass       = await this.getRuntimeClass()
+
+            this.projectPlan.url    = this.baseUrl
         }
 
 
-        buildInputArguments () : string[] {
-            return []
+        async setup () {
+            await this.finalizePlan()
+
+            Object.assign(this.projectPlan, this.testDescriptor, {
+                title   : this.title
+            })
         }
 
 
@@ -125,39 +144,37 @@ export class Project extends Mixin(
 
                 extraction.resolve(this.asProjectDataSerialized())
             } else {
-                await (await this.getIsomorphicSelfInstance()).launchStandalone()
+                await this.launchStandalone()
             }
         }
 
-        // TODO remove this mechanism completely? should be ok to actually use the
-        // isomorphic `Project` instance everywhere?
-        // should instead just have `getLauncherClass` method, as in Test
-        async getIsomorphicSelfInstance () : Promise<Project> {
-            const cls           = await this.getIsomorphicProjectClass()
-
-            const config        = Object.assign({}, this)
-
-            delete config.launcherClass
-
-            return cls.new(config)
-        }
-
-
-        async getIsomorphicProjectClass () : Promise<typeof Project> {
+        async getLauncherClass () : Promise<typeof Launcher> {
             if (isNodejs())
-                return (await import('./ProjectNodejs.js')).ProjectNodejs
+                return (await import('../launcher/LauncherNodejs.js')).LauncherNodejs
             else if (isDeno())
-                return (await import('./ProjectDeno.js')).ProjectDeno
+                return (await import('../launcher/LauncherDeno.js')).LauncherDeno
             else
-                return (await import('./ProjectBrowser.js')).ProjectBrowser
+                return (await import('../launcher/LauncherBrowser.js')).LauncherBrowser
         }
 
 
-        getStandaloneLauncher () : Launcher {
-            const launcher = this.launcherClass.new({
+        async getRuntimeClass () : Promise<typeof Runtime> {
+            if (isNodejs())
+                return (await import('../runtime/RuntimeNodejs.js')).RuntimeNodejs
+            else if (isDeno())
+                return (await import('../runtime/RuntimeDeno.js')).RuntimeDeno
+            else
+                return (await import('../runtime/RuntimeBrowser.js')).RuntimeBrowser
+        }
+
+
+        async getStandaloneLauncher () : Promise<Launcher> {
+            const launcher = (await this.getLauncherClass()).new({
                 projectData             : this.asProjectSerializableData(),
 
-                inputArguments          : this.buildInputArguments()
+                inputArguments          : this.runtime.inputArguments,
+
+                project                 : this.runtime.scriptUrl
             })
 
             return launcher
@@ -165,7 +182,7 @@ export class Project extends Mixin(
 
 
         async launchStandalone () : Promise<Launch> {
-            const launcher  = this.getStandaloneLauncher()
+            const launcher  = await this.getStandaloneLauncher()
 
             const launch    = await launcher.start()
 
