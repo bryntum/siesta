@@ -30,6 +30,7 @@
 #/benchmarks/**/*.js.map
 /index.js
 /nodejs.js
+/deno.js
 /browser.js
 
 # docs

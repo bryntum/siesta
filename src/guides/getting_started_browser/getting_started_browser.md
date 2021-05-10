@@ -1,17 +1,23 @@
-Getting started with Siesta in Node.js environment
+Getting started with Siesta in browser environment
 ================================================
 
 Siesta is a stress-free JavaScript/TypeScript testing tool. It is ubiquitous - tests can be run in browsers, Node.js and Deno, on Linux, macOS and Windows.
 
-In this guide, we assume a setup, pointed toward running tests in Node.js. 
-
-For the setup, targeting browser environment, please refer to this guide <Getting started with Siesta in browser environment>.
+In this guide, we assume a setup, pointed toward running tests in browsers. 
 
 Installation
 ============
 
+Running tests in browsers is supported with the Node.js launcher, so Siesta should be installed via `npm` package manager:
+
 ```shell
 npm install @bryntum/siesta --save-dev
+```
+
+You should be able to run the Siesta launcher after installation using the `npx` command:
+
+```shell
+npx siesta --help
 ```
 
 Basics
@@ -19,14 +25,19 @@ Basics
 
 To familiarize yourself with the basic Siesta concepts, which are common for all execution environments, please check the [[SiestaTestBasicsGuide|Siesta test basics]] guide. 
 
+Importing API
+=============
+
+When targeting Deno environment for running tests, import the Siesta API from the `siesta/browser.js` entry file.
+
 
 Launching individual test
 ===============
 
-Let's assume we have the following Siesta test file, called `basic_test.t.js`.
+Let's assume we have the following Siesta test file, called `basic_test.t.js`, which is available on the web URL as `http://localhost/my_project/tests/basic_test.t.js`
 
 ```javascript
-import { it } from "siesta/nodejs.js"
+import { it } from "siesta/browser.js"
 
 it('Basic Siesta test', async t => {
     t.true(true, "That's true")
@@ -46,57 +57,30 @@ it('Deep equality should work', async t => {
 })
 ```
 
-We can launch it, as a regular Node.js script:
+We can launch it, by providing its url to the launcher. The `--browser` option defines in which browser to run the test. By default, its `chrome`.
 
 ```shell
-node tests/basic/basic_test.t.js
+npx siesta http://localhost/my_project/tests/basic_test.t.js --brower firefox
 ```
 
 You should see something like:
-![Launching test directly](media://getting_started_nodejs/getting_started_nodejs_1.jpg)
+![Launching test directly](media://getting_started_nodejs/getting_started_browser_1.jpg)
 
 
-Launching several tests
-===============
+Launching test suite
+====================
 
-To launch several tests, you need to use the Siesta launcher. Siesta launcher is an executable file, called `siesta`. Usually to access it in your local package installation, you use the `npx` command, provided by the `npm` package manager: 
-
-```shell
-npx siesta --help
-```
-
-To launch several tests, pass a matching glob pattern for them as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it. To resolve the glob pattern, Siesta uses the [glob](https://www.npmjs.com/package/glob) npm library, please refer to its documentation for details on globs resolution. 
-
-Some examples:
-
-Launch all tests in `tests` directory:
-```shell
-npx siesta tests
-```
-
-Launch all tests in `tests` directory, with custom extension:
-```shell
-npx siesta tests/**/*.test.js
-```
-
-Launch all tests in `tests` directory, which have characters `1` or `2` in their names:
-```shell
-npx siesta tests/**/*@(1|2)*.t.js
-```
+To launch the whole test suite, one need to create the [[SiestaProjectGuide|Siesta project]].
 
 
 Debugging
 =========
 
-You can debug a Siesta test as any other regular Node.js script. For that, place the `debugger` statement somewhere in the test code and then start the test with the `--inspect-brk` option. Note, that due to [this issue](https://github.com/nodejs/node/issues/25215), starting your test with just `--inspect` may result in your breakpoint being ignored. 
+To debug the browser test, launch it, with additional option `--headless=false`: 
 
-Then open the console in any Chrome tab and click the "Dedicated DevTools for Node.js" icon in the bottom-left.
-
-
-Further reading
-===============
-
-Configuring the test suite: [[SiestaProjectGuide|Siesta project]] guide
+```shell
+npx siesta http://localhost/my_project/tests/basic_test.t.js --brower firefox --headless=false
+```
 
 
 COPYRIGHT AND LICENSE

@@ -5,8 +5,6 @@ Siesta is a stress-free JavaScript/TypeScript testing tool. It is ubiquitous - t
 
 In this guide, we assume a setup, pointed toward running tests in Node.js. 
 
-For the setup, targeting browser environment, please refer to this guide <Getting started with Siesta in browser environment>.
-
 Installation
 ============
 
@@ -18,6 +16,12 @@ Basics
 ======
 
 To familiarize yourself with the basic Siesta concepts, which are common for all execution environments, please check the [[SiestaTestBasicsGuide|Siesta test basics]] guide. 
+
+
+Importing API
+=============
+
+When targeting Node.js environment for running tests, import the Siesta API from the `siesta/nodejs.js` entry file.
 
 
 Launching individual test

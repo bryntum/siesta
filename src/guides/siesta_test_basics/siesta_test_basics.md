@@ -49,6 +49,43 @@ it('Creating assertions using BDD expectations syntax', async t => {
 
 For the full list of available expectations, please refer to the [[Expectation]] class documentation.
 
+Exported API
+============
+
+Siesta supports 3 target environments for running tests - browsers, Node.js and Deno. The code, written for one environment very probably won't work in another and even throw an exception in it. Therefore, if your test suite target a specific environment, you need to import the Siesta API from the appropriate file.
+
+For browser environment, import the API from the `siesta/browser.js` entry file:
+```javascript
+import { it } from "siesta/browser.js"
+
+it('Browser test', async t => {
+})
+```
+
+For Node.js environment, import the API from the `siesta/nodejs.js` entry file:
+```javascript
+import { it } from "siesta/nodejs.js"
+
+it('Node.js test', async t => {
+})
+```
+
+For Deno environment, import the API from the `siesta/deno.js` entry file:
+```javascript
+import { it } from "siesta/deno.js"
+
+it('Deno test', async t => {
+})
+```
+
+Finally, if your code is "isomorphic" and does not use any "platform" features except the Ecma specification, use the `siesta/index.js` entry file. Such tests can be run in all 3 environments.
+```javascript
+import { it } from "siesta/deno.js"
+
+it('Isomorphic test', async t => {
+})
+```
+
 
 Further reading
 ===============

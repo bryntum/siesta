@@ -1,11 +1,9 @@
-Getting started with Siesta in Node.js environment
+Getting started with Siesta in Deno environment
 ================================================
 
 Siesta is a stress-free JavaScript/TypeScript testing tool. It is ubiquitous - tests can be run in browsers, Node.js and Deno, on Linux, macOS and Windows.
 
-In this guide, we assume a setup, pointed toward running tests in Node.js. 
-
-For the setup, targeting browser environment, please refer to this guide <Getting started with Siesta in browser environment>.
+In this guide, we assume a setup, pointed toward running tests in [Deno](https://deno.land/). 
 
 Installation
 ============
@@ -19,6 +17,11 @@ Basics
 
 To familiarize yourself with the basic Siesta concepts, which are common for all execution environments, please check the [[SiestaTestBasicsGuide|Siesta test basics]] guide. 
 
+Importing API
+=============
+
+When targeting Deno environment for running tests, import the Siesta API from the `siesta/deno.js` entry file.
+
 
 Launching individual test
 ===============
@@ -26,7 +29,7 @@ Launching individual test
 Let's assume we have the following Siesta test file, called `basic_test.t.js`.
 
 ```javascript
-import { it } from "siesta/nodejs.js"
+import { it } from "siesta/deno.js"
 
 it('Basic Siesta test', async t => {
     t.true(true, "That's true")
@@ -46,14 +49,14 @@ it('Deep equality should work', async t => {
 })
 ```
 
-We can launch it, as a regular Node.js script:
+We can launch it, as a regular Deno script with some additional permissions:
 
 ```shell
-node tests/basic/basic_test.t.js
+deno run --allow-read --allow-env tests/basic/basic_test.t.js
 ```
 
 You should see something like:
-![Launching test directly](media://getting_started_nodejs/getting_started_nodejs_1.jpg)
+![Launching test directly](media://getting_started_nodejs/getting_started_deno_1.jpg)
 
 
 Launching several tests
@@ -88,9 +91,9 @@ npx siesta tests/**/*@(1|2)*.t.js
 Debugging
 =========
 
-You can debug a Siesta test as any other regular Node.js script. For that, place the `debugger` statement somewhere in the test code and then start the test with the `--inspect-brk` option. Note, that due to [this issue](https://github.com/nodejs/node/issues/25215), starting your test with just `--inspect` may result in your breakpoint being ignored. 
+You can debug a Siesta test as any other regular Deno script. For that, place the `debugger` statement somewhere in the test code and then start the test with the `--inspect-brk` option. Note, that due to [this issue](https://github.com/nodejs/node/issues/25215), starting your test with just `--inspect` may result in your breakpoint being ignored. 
 
-Then open the console in any Chrome tab and click the "Dedicated DevTools for Node.js" icon in the bottom-left.
+Then open the console in any Chrome tab and click the "Dedicated DevTools" icon in the bottom-left.
 
 
 Further reading
