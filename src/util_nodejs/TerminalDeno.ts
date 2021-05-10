@@ -63,139 +63,139 @@ const COLUMN = "1G" // left?
 const HOME = "H"
 
 function write (str : string) {
-  Deno.stdout.writeSync(encode(str))
+    Deno.stdout.writeSync(encode(str))
 }
 
 function cursor (action : string) {
-  write(ESC + action)
+    write(ESC + action)
 }
 
 function save () {
-  write(SAVE)
+    write(SAVE)
 }
 
 function restore () {
-  write(RESTORE)
+    write(RESTORE)
 }
 
 function position () {
-  cursor(POSITION)
+    cursor(POSITION)
 }
 
 function hideCursor () {
-  cursor(HIDE)
+    cursor(HIDE)
 }
 
 function showCursor () {
-  cursor(SHOW)
+    cursor(SHOW)
 }
 
 function scrollUp () {
-  cursor(SCROLL_UP)
+    cursor(SCROLL_UP)
 }
 
 function scrollDown () {
-  cursor(SCROLL_DOWN)
+    cursor(SCROLL_DOWN)
 }
 
 function clearUp () {
-  cursor(CLEAR_UP)
+    cursor(CLEAR_UP)
 }
 
 function clearDown () {
-  cursor(CLEAR_DOWN)
+    cursor(CLEAR_DOWN)
 }
 
 function clearLeft () {
-  cursor(CLEAR_LEFT)
+    cursor(CLEAR_LEFT)
 }
 
 function clearRight () {
-  cursor(CLEAR_RIGHT)
+    cursor(CLEAR_RIGHT)
 }
 
 function clearLine () {
-  cursor(CLEAR_LINE)
+    cursor(CLEAR_LINE)
 }
 
 function clearScreen () {
-  cursor(CLEAR_SCREEN)
+    cursor(CLEAR_SCREEN)
 }
 
 function nextLine () {
-  cursor(NEXT_LINE)
+    cursor(NEXT_LINE)
 }
 
 function prevLine () {
-  cursor(PREV_LINE)
+    cursor(PREV_LINE)
 }
 
 function goHome () {
-  cursor(HOME)
+    cursor(HOME)
 }
 
 function goUp (y = 1) {
-  cursor(y + UP)
+    cursor(y + UP)
 }
 
 function goDown (y = 1) {
-  cursor(y + DOWN)
+    cursor(y + DOWN)
 }
 
 function goLeft (x = 1) {
-  cursor(x + LEFT)
+    cursor(x + LEFT)
 }
 
 function goRight (x = 1) {
-  cursor(x + RIGHT)
+    cursor(x + RIGHT)
 }
 
 function goTo (x : number, y : number) {
-  write(ESC + y + ";" + x + HOME)
+    write(ESC + y + ";" + x + HOME)
 }
 
 export {
-  CLEAR,
-  CLEAR_DOWN,
-  CLEAR_LEFT,
-  CLEAR_LINE,
-  CLEAR_RIGHT,
-  CLEAR_SCREEN,
-  CLEAR_UP,
-  clearDown,
-  clearLeft,
-  clearLine,
-  clearRight,
-  clearScreen,
-  clearUp,
-  COLUMN,
-  DOWN,
-  goDown,
-  goHome,
-  goLeft,
-  goRight,
-  goTo,
-  goUp,
-  HIDE,
-  hideCursor,
-  HOME,
-  LEFT,
-  NEXT_LINE,
-  nextLine,
-  POSITION,
-  position,
-  PREV_LINE,
-  prevLine,
-  RESTORE,
-  restore,
-  RIGHT,
-  SAVE,
-  save,
-  SCROLL_DOWN,
-  SCROLL_UP,
-  scrollDown,
-  scrollUp,
-  SHOW,
-  showCursor,
-  UP,
+    CLEAR,
+    CLEAR_DOWN,
+    CLEAR_LEFT,
+    CLEAR_LINE,
+    CLEAR_RIGHT,
+    CLEAR_SCREEN,
+    CLEAR_UP,
+    clearDown,
+    clearLeft,
+    clearLine,
+    clearRight,
+    clearScreen,
+    clearUp,
+    COLUMN,
+    DOWN,
+    goDown,
+    goHome,
+    goLeft,
+    goRight,
+    goTo,
+    goUp,
+    HIDE,
+    hideCursor,
+    HOME,
+    LEFT,
+    NEXT_LINE,
+    nextLine,
+    POSITION,
+    position,
+    PREV_LINE,
+    prevLine,
+    RESTORE,
+    restore,
+    RIGHT,
+    SAVE,
+    save,
+    SCROLL_DOWN,
+    SCROLL_UP,
+    scrollDown,
+    scrollUp,
+    SHOW,
+    showCursor,
+    UP,
 }
