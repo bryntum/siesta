@@ -5,6 +5,8 @@ Siesta is a stress-free JavaScript/TypeScript testing tool. It is ubiquitous - t
 
 In this guide, we assume a setup, pointed toward running tests in Node.js. 
 
+Siesta supports all maintained LTS releases of Node.js.
+
 Installation
 ============
 
@@ -69,7 +71,7 @@ To launch several tests, you need to use the Siesta launcher. Siesta launcher is
 npx siesta --help
 ```
 
-To launch several tests, pass a matching glob pattern for them as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it. To resolve the glob pattern, Siesta uses the [glob](https://www.npmjs.com/package/glob) npm library, please refer to its documentation for details on globs resolution. 
+To launch several tests, pass a matching glob pattern as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it. To resolve the glob pattern, Siesta uses the [glob](https://www.npmjs.com/package/glob) npm library, please refer to its documentation for details on globs resolution. 
 
 Some examples:
 

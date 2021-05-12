@@ -5,6 +5,8 @@ Siesta is a stress-free JavaScript/TypeScript testing tool. It is ubiquitous - t
 
 In this guide, we assume a setup, pointed toward running tests in [Deno](https://deno.land/). 
 
+Siesta supports the latest release of Deno.
+
 Installation
 ============
 
@@ -70,7 +72,7 @@ To launch several tests, you need to use the Siesta launcher, installed at the "
 siesta --help
 ```
 
-To launch several tests, pass a matching glob pattern for them as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it. To resolve the glob pattern, Siesta uses the [glob resolution](https://doc.deno.land/https/deno.land/std@0.95.0/path/glob.ts) from the Deno `std` library, please refer to its documentation for details. 
+To launch several tests, pass a matching glob pattern, as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it. To resolve the glob pattern, Siesta uses the [glob resolution](https://doc.deno.land/https/deno.land/std@0.95.0/path/glob.ts) from the Deno `std` library, please refer to its documentation for details. 
 
 Some examples:
 

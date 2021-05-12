@@ -26,7 +26,7 @@ Siesta can run the test in browsers, Node.js and Deno.
 
 Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Chromium Edge. IE and legacy Edge are not supported.
 
-Siesta supports all LTS releases of Node.js, starting from Node 12. 
+Siesta supports all maintained LTS releases of Node.js. 
 
 Siesta supports the latest release of Deno.
 
