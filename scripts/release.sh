@@ -7,5 +7,6 @@ set -e
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd "$DIR/.."
 
-# TODO change the guide URL in the
-# examples/nodejs/README.md
+# TODOs:
+# - change the guide URL in the examples/*/README.md
+# - exclude examples/*/node_modules from npm package
