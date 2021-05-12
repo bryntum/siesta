@@ -1,7 +1,7 @@
-Siesta sample test suite targeting Node.js 
+Siesta sample test suite targeting Deno 
 ==========================================
 
-This is an example of testing very simple Node.js package with Siesta.
+This is an example of testing very simple Deno package with Siesta.
 
 Package has the only module in `src/module.js`, tests are in `tests/`, Siesta project file is `tests/index.js`
 
@@ -13,7 +13,7 @@ Setting up
 Change the current working directory to the example:
 
 ```shell
-cd examples/nodejs
+cd examples/deno
 ```
 
 Complete the setup with `npm`:
@@ -25,10 +25,10 @@ npm install
 Launch
 ------
 
-We can launch the project file directly, as a Node.js executable:
+We can launch the project file directly, as a Deno executable:
 
 ```shell
-node tests/index.js
+deno --allow-read --allow-env --unstable --quiet tests/index.js
 ```
 
 Documentation

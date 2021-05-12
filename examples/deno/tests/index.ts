@@ -1,7 +1,7 @@
-import { Project } from "siesta/nodejs.js"
+import { Project } from "siesta/deno.js"
 
 const project = Project.new({
-    title                   : 'Awesome Node.js project test suite',
+    title                   : 'Awesome Deno project test suite',
 })
 
 project.start()

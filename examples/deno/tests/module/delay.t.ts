@@ -1,4 +1,4 @@
-import { it, Test } from "siesta/nodejs.js"
+import { it, Test } from "siesta/deno.js"
 import { delay } from "../../src/module.js"
 
 it('Using `delay` should work', async (t : Test) => {
