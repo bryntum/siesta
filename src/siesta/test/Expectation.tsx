@@ -181,7 +181,18 @@ export class Expectation extends Base {
      * @param expectedValue The number to compare with
      */
     toBeLessThan (expectedValue : number) {
-        this.t.assertCompareInternal('expect(received).toBeLessThan(expected)', false, ComparisonType.Greater, this.value, expectedValue)
+        this.t.assertCompareInternal('expect(received).toBeLessThan(expected)', false, ComparisonType.Less, this.value, expectedValue)
+    }
+
+
+    /**
+     * This assertion passes, when the number provided to the {@link Test.expect|expect} method is less or equal than the
+     * expected number.
+     *
+     * @param expectedValue The number to compare with
+     */
+    toBeLessOrEqualThan (expectedValue : number) {
+        this.t.assertCompareInternal('expect(received).toBeLessOrEqualThan(expected)', false, ComparisonType.LessOrEqual, this.value, expectedValue)
     }
 
 
@@ -193,6 +204,17 @@ export class Expectation extends Base {
      */
     toBeGreaterThan (expectedValue) {
         this.t.assertCompareInternal('expect(received).toBeGreaterThan(expected)', false, ComparisonType.Greater, this.value, expectedValue)
+    }
+
+
+    /**
+     * This assertion passes, when the number provided to the {@link Test.expect|expect} method is greater or equal than the
+     * expected number.
+     *
+     * @param expectedValue The number to compare with
+     */
+    toBeGreaterOrEqualThan (expectedValue) {
+        this.t.assertCompareInternal('expect(received).toBeGreaterOrEqualThan(expected)', false, ComparisonType.GreaterOrEqual, this.value, expectedValue)
     }
 
 
