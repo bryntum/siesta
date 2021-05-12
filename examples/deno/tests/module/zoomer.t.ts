@@ -1,4 +1,4 @@
-import { it, Test } from "siesta/deno.js"
+import { it, Test } from "../../../../deno.js"
 import { zoomer } from "../../src/module.js"
 
 it('Using `zoomer` should work', async (t : Test) => {

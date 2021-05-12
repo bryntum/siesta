@@ -1,4 +1,4 @@
-import { it, Test } from "siesta/deno.js"
+import { it, Test } from "../../../../deno.js"
 
 it('Basic Siesta Deno test', async (t : Test) => {
     t.true(true, "That's true")
