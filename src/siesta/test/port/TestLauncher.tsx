@@ -4,27 +4,24 @@ import { TextJSX } from "../../../jsx/TextJSX.js"
 import { local, remote } from "../../../rpc/port/Port.js"
 import { PortEvaluateChild, PortEvaluateParent } from "../../../rpc/port/PortEvaluate.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
+import { parse } from "../../../serializable/Serializable.js"
 import { globalTestEnv, Test } from "../Test.js"
-import { TestDescriptor } from "../TestDescriptor.js"
-import { TestDescriptorBrowser } from "../TestDescriptorBrowser.js"
-import { TestDescriptorDeno } from "../TestDescriptorDeno.js"
-import { TestDescriptorNodejs } from "../TestDescriptorNodejs.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
-//---------------------------------------------------------------------------------------------------------------------
-// make sure we actually import these class symbols (and not just types),
-// so that their `registerSerializableClass()` calls are made
-
-TestDescriptor
-// IMPORTANT the following classes are assumed to be isomorphic by themselves
-// (even that they represent the data for non-isomorphic classes)
-TestDescriptorNodejs
-TestDescriptorDeno
-TestDescriptorBrowser
+// //---------------------------------------------------------------------------------------------------------------------
+// // make sure we actually import these class symbols (and not just types),
+// // so that their `registerSerializableClass()` calls are made
+//
+// TestDescriptor
+// // IMPORTANT the following classes are assumed to be isomorphic by themselves
+// // (even that they represent the data for non-isomorphic classes)
+// TestDescriptorNodejs
+// TestDescriptorDeno
+// TestDescriptorBrowser
 
 //---------------------------------------------------------------------------------------------------------------------
 interface TestLauncher {
-    launchTest (testDescriptor : TestDescriptor) : Promise<any>
+    launchTest (url : string, testDescriptorStr : string) : Promise<any>
 
     getSameContextChildLauncher () : Promise<TestLauncherChild>
 }
@@ -36,7 +33,7 @@ export class TestLauncherParent extends Mixin(
 
         class TestLauncherParent extends base implements TestLauncher {
             @remote()
-            launchTest : (testDescriptor : TestDescriptor) => Promise<any>
+            launchTest : (url : string, testDescriptorStr : string) => Promise<any>
 
             @remote()
             getSameContextChildLauncher : () => Promise<TestLauncherChild>
@@ -61,21 +58,23 @@ export class TestLauncherChild extends Mixin(
 
 
             @local()
-            async launchTest (testDescriptor : TestDescriptor) {
+            async launchTest (url : string, testDescriptorStr : string) {
                 if (globalTestEnv.topTest) throw new Error("Test context is already running a test")
 
-                globalTestEnv.topTestDescriptor = testDescriptor
-                globalTestEnv.launcher          = this
+                globalTestEnv.topTestDescriptorStr  = testDescriptorStr
+                globalTestEnv.launcher              = this
 
                 let topTest : Test
 
                 try {
-                    await import(testDescriptor.urlAbs)
+                    await import(url)
                 } catch (e) {
+                    // TODO should account for possibility of `parse` throwing an error
+
                     // there might be no `topTest` if test file does not contain any calls
                     // to static `it` method of any test class
                     topTest = globalTestEnv.topTest || Test.new({
-                        descriptor      : testDescriptor,
+                        descriptor      : parse(testDescriptorStr),
                         reporter        : this
                     })
 
@@ -86,10 +85,12 @@ export class TestLauncherChild extends Mixin(
                     return
                 }
 
+                // TODO should account for possibility of `parse` throwing an error
+
                 // there might be no `topTest` if test file does not contain any calls
                 // to static `it` method of any test class
                 topTest = globalTestEnv.topTest || Test.new({
-                    descriptor      : testDescriptor,
+                    descriptor      : parse(testDescriptorStr),
                     reporter        : this
                 })
 

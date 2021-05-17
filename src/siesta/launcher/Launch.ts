@@ -3,12 +3,16 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { CI } from "../../iterator/Iterator.js"
 import { Logger } from "../../logger/Logger.js"
+import { stringify } from "../../serializable/Serializable.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestLauncherParent } from "../test/port/TestLauncher.js"
 import { Test } from "../test/Test.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
+import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
+import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
+import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -108,6 +112,19 @@ export class Launch extends Mixin(
         maxWorkers                  : number                    = 5
 
         exitCode                    : ExitCodes                 = undefined
+
+        // make sure we actually import these class symbols (and not just types),
+        // so that their `registerSerializableClass()` calls are made
+        // this is so that TestLauncher interface to work correctly, since it is serializing the
+        // test descriptor in it's methods arguments
+        descriptorClassesToImport   : (typeof TestDescriptor)[] = [
+            TestDescriptor,
+            // IMPORTANT the following classes are assumed to be isomorphic by themselves
+            // (even that they represent the data for non-isomorphic classes)
+            TestDescriptorNodejs,
+            TestDescriptorDeno,
+            TestDescriptorBrowser
+        ]
 
 
         get logger () : Logger {
@@ -209,7 +226,7 @@ export class Launch extends Mixin(
 
                 this.logger.debug("Channel ready for: ", normalized.url)
 
-                await testLauncher.launchTest(normalized)
+                await testLauncher.launchTest(normalized.urlAbs, stringify(normalized))
             } finally {
                 await testLauncher.disconnect()
                 await context.destroy()

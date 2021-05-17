@@ -4,6 +4,7 @@ import { ExecutionContext, ExecutionContextAttachable } from "../../context/Exec
 import { Hook } from "../../hook/Hook.js"
 import { XmlNode } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
+import { parse } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { ArbitraryObject, ArbitraryObjectKey, delay, isDeno, isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { stripBasename, stripDirname } from "../../util/Path.js"
@@ -643,10 +644,10 @@ export class Test extends Mixin(
         static it<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
             if (!globalTestEnv.topTest) {
 
-                if (globalTestEnv.topTestDescriptor) {
+                if (globalTestEnv.hasPendingTest) {
                     // launched from the outside, by the Launcher
                     globalTestEnv.topTest   = this.new({
-                        descriptor      : globalTestEnv.topTestDescriptor,
+                        descriptor      : parse(globalTestEnv.topTestDescriptorStr),
                         // TS can't figure out types compatibility
                         reporter        : globalTestEnv.launcher as TestReporterChild
                     } as Partial<InstanceType<T>>)
@@ -847,23 +848,28 @@ export class Test extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class GlobalTestEnvironment extends Base {
-    launcher            : TestLauncherChild = undefined
+    launcher                : TestLauncherChild = undefined
 
     // the test instance, representing the whole current test file
     // not directly accessible by user, but every global `it/describe` section
     // is created as child node of it
-    topTest             : Test              = undefined
+    topTest                 : Test              = undefined
 
-    topTestDescriptor   : TestDescriptor    = undefined
+    topTestDescriptorStr    : string            = undefined
 
-    currentTest         : Test              = undefined
+    currentTest             : Test              = undefined
+
+
+    get hasPendingTest () : boolean {
+        return Boolean(this.topTestDescriptorStr)
+    }
 
 
     clear () {
-        this.launcher           = undefined
-        this.topTest            = undefined
-        this.topTestDescriptor  = undefined
-        this.currentTest        = undefined
+        this.launcher               = undefined
+        this.topTest                = undefined
+        this.topTestDescriptorStr   = undefined
+        this.currentTest            = undefined
     }
 }
 
