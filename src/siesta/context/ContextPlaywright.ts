@@ -78,6 +78,8 @@ export class ContextPlaywright extends Mixin(
             parentMedia.socket          = await awaitConnection
 
             await parentPort.connect()
+
+            this.provider.launcher.logger.debug('Context after connect')
         }
     }
 ) {}
