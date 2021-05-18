@@ -27,6 +27,7 @@ export class ContextPlaywright extends Mixin(
         async evaluateBasic <A extends unknown[], R extends unknown> (func : (...args : A) => R, ...args : A) : Promise<UnwrapPromise<R>> {
             const wrapper   = globalThis.eval(`(args) => (${ func.toString() })(...args)`)
 
+
             // @ts-ignore
             return this.page.evaluate(wrapper, args)
         }
@@ -63,12 +64,16 @@ export class ContextPlaywright extends Mixin(
 
             const awaitConnection       = new Promise<ws>(resolve => this.onConnectionHook.once((self, socket) => resolve(socket)))
 
+            this.provider.launcher.logger.debug('Context before seed')
+
             await this.seedChildPort(
                 relativeChildPortModuleUrl,
                 relativeChildPortClassSymbol,
                 { handshakeType : 'parent_first' },
                 { wsHost : '127.0.0.1', wsPort : this.wsPort }
             )
+
+            this.provider.launcher.logger.debug('Context after seed')
 
             parentMedia.socket          = await awaitConnection
 
