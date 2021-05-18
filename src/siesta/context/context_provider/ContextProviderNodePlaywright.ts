@@ -40,9 +40,15 @@ export class ContextProviderNodePlaywright extends Mixin(
 
 
         async doCreateContext () : Promise<InstanceType<this[ 'contextClass' ]>> {
+            this.launcher.logger.debug('Context requested')
+
             const browser           = this.separateBrowserForEveryPage ? await this.createBrowser() : await this.getPrimaryBrowser()
 
+            this.launcher.logger.debug('Context has browser')
+
             const page              = await browser.newPage({ ignoreHTTPSErrors : true })
+
+            this.launcher.logger.debug('Context has page')
 
             // TODO route the console messages to logger
             // page.on('console', msg => {
