@@ -44,6 +44,60 @@ Deno environment:
 deno XXX
 ```
 
+Build statuses
+==============
+
+<table>
+<tr>
+    <th align="left">Build</th>
+    <th><img width="50" src="https://bryntum.com/temp/browserlogos/safari_256x256.png" alt="Node.js"/></th>
+    <th><img width="50" src="https://bryntum.com/temp/browserlogos/safari_256x256.png" alt="Deno"/></th>
+    <th><img width="50" src="https://bryntum.com/temp/browserlogos/chrome_256x256.png" alt="Chrome"/></th>
+    <th><img width="50" src="https://bryntum.com/temp/browserlogos/firefox_256x256.png" alt="Firefox"/></th>
+    <th><img width="50" src="https://bryntum.com/temp/browserlogos/safari_256x256.png" alt="Safari"/></th>
+</tr>
+<tr>
+    <td nowrap style="white-space: nowrap">Siesta isomorphic</td>
+    <td style="text-align:center"><img alt="Node.js build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Siesta6isomorphicTargetNodeJs)/statusIcon.svg"/></td>
+    <td style="text-align:center"><img alt="Deno build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Siesta6isomorphicTargetDeno)/statusIcon.svg"/></td>
+    <td style="text-align:center"><img alt="Chrome build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Isomorphic_Siesta6isomorphicTargetChrome)/statusIcon.svg"/></td>
+    <td style="text-align:center"><img alt="Firefox build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Isomorphic_Siesta6isomorphicTargetFirefox)/statusIcon.svg"/></td>
+    <td style="text-align:center"><img alt="Safari build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Isomorphic_Siesta6isomorphicTargetSafari)/statusIcon.svg"/></td>
+</tr>
+<tr>
+    <td nowrap style="white-space: nowrap">Siesta Node.js 12</td>
+    <td style="text-align:center"><img alt="Node.js 12 build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Siesta6NodeJsSpecificTargetNodeJs)/statusIcon.svg"/></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+</tr>
+<tr>
+    <td nowrap style="white-space: nowrap">Siesta Node.js 14</td>
+    <td style="text-align:center"><img alt="Node.js 14 build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_NodeJsSpecific_Siesta6NodeJsSpecificTargetNodeJs14)/statusIcon.svg"/></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+</tr>
+<tr>
+    <td nowrap style="white-space: nowrap">Siesta Node.js 16</td>
+    <td style="text-align:center"><img alt="Node.js 16 build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_NodeJsSpecific_Siesta6NodeJsSpecificTargetNodeJs16)/statusIcon.svg"/></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+</tr>
+<tr>
+    <td nowrap style="white-space: nowrap">Siesta Deno</td>
+    <td style="background-color: #eee"></td>
+    <td style="text-align:center"><img alt="Deno build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Siesta6DenoSpecificTargetDeno)/statusIcon.svg"/></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+</tr>
+</table>
+
 
 Documentation
 =============
