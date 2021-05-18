@@ -50,8 +50,8 @@ Build statuses
 <table>
 <tr>
     <th align="left">Build</th>
-    <th><img width="50" src="https://bryntum.com/temp/browserlogos/safari_256x256.png" alt="Node.js"/></th>
-    <th><img width="50" src="https://bryntum.com/temp/browserlogos/safari_256x256.png" alt="Deno"/></th>
+    <th><img width="50" src="https://bryntum.com/site-images/nodejs.png" alt="Node.js"/></th>
+    <th><img width="50" src="https://bryntum.com/site-images/deno.png" alt="Deno"/></th>
     <th><img width="50" src="https://bryntum.com/temp/browserlogos/chrome_256x256.png" alt="Chrome"/></th>
     <th><img width="50" src="https://bryntum.com/temp/browserlogos/firefox_256x256.png" alt="Firefox"/></th>
     <th><img width="50" src="https://bryntum.com/temp/browserlogos/safari_256x256.png" alt="Safari"/></th>
