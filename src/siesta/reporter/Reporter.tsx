@@ -428,7 +428,7 @@ export const humanReadableDuration = (milliSeconds : number) : string => {
 
                 return `${ hours }h ${ minutes % 60 }m`
             } else {
-                return `${ minutes }m ${ seconds % 60 }s`
+                return `${ minutes }m ${ Math.round(seconds) % 60 }s`
             }
         } else {
             return `${ seconds }s`
