@@ -178,8 +178,8 @@ it('`is/isNot` assertion should work', async t => {
 
     t.is(NaN, NaN)
 
-    const date1     = new Date("2020-1-1")
-    const date2     = new Date("2020-1-1")
+    const date1     = new Date(2020, 1, 1)
+    const date2     = new Date(2020, 1, 1)
 
     t.is(date1, date2)
 
@@ -198,8 +198,8 @@ it('`is/isNot` assertion should work', async t => {
 
     t.isNot(NaN, 10)
 
-    const date11    = new Date("2020-1-1")
-    const date22    = new Date("2020-1-2")
+    const date11    = new Date(2020, 1, 1)
+    const date22    = new Date(2020, 1, 2)
 
     t.isNot(date11, date22)
 
@@ -218,8 +218,8 @@ it('`is/isNot` assertion should work', async t => {
 
         t.isNot(NaN, NaN)
 
-        const date1     = new Date("2020-1-1")
-        const date2     = new Date("2020-1-1")
+        const date1     = new Date(2020, 1, 1)
+        const date2     = new Date(2020, 1, 1)
 
         t.isNot(date1, date2)
 
@@ -238,8 +238,8 @@ it('`is/isNot` assertion should work', async t => {
 
         t.is(NaN, 10)
 
-        const date11    = new Date("2020-1-1")
-        const date22    = new Date("2020-1-2")
+        const date11    = new Date(2020, 1, 1)
+        const date22    = new Date(2020, 1, 2)
 
         t.is(date11, date22)
 
@@ -257,8 +257,8 @@ it('`isGreater/isLess` assertion should work', async t => {
 
     t.isGreater(true, false)
 
-    const date1     = new Date("2020-1-2")
-    const date2     = new Date("2020-1-1")
+    const date1     = new Date(2020, 1, 2)
+    const date2     = new Date(2020, 1, 1)
 
     t.isGreater(date1, date2)
 
@@ -301,8 +301,8 @@ it('`isGreater/isLess` assertion should work', async t => {
 
         t.isLess(true, false)
 
-        const date11     = new Date("2020-1-2")
-        const date22     = new Date("2020-1-1")
+        const date11     = new Date(2020, 1, 2)
+        const date22     = new Date(2020, 1, 1)
 
         t.isLess(date11, date22)
 
