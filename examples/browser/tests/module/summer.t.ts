@@ -1,4 +1,4 @@
-import { it, Test } from "siesta/browser.js"
+import { it, Test } from "../../../../index.js"
 import { summer } from "../../src/module.js"
 
 it('Using `summer` should work', async (t : Test) => {

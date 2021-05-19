@@ -1,4 +1,4 @@
-import { it, Test } from "siesta/browser.js"
+import { it, Test } from "../../../../index.js"
 import { zoomer } from "../../src/module.js"
 
 it('Using `zoomer` should work', async (t : Test) => {

@@ -1,7 +1,7 @@
-Siesta sample test suite targeting all environments (isomorphic code) 
-====================================================================
+Siesta sample test suite targeting browser environment 
+======================================================
 
-This is an example of testing isomorphic code with Siesta. It is structured as Node.js package for convenience, however the code is assumed to be generic EcmaScript.
+This is an example of testing browser code with Siesta. It is structured as Node.js package for convenience. Currently this example does not assume any transpilation and just contains the isomorphic code.
 
 Package has the only module in `src/module.js`, tests are in `tests/`, Siesta project file is `tests/index.js`
 
@@ -25,25 +25,16 @@ npm install
 Launch
 ------
 
-This test suite can be launched in all 3 supported target environments: Node.js, Deno and browsers!
-
-Targeting Node.js, we can launch the project file directly, as a Node.js executable:
+We need a local webserver, which will be serving this example. Any webserver will work. Let's say the Siesta package is available via url: `http://localhost/siesta` . Then we can launch this example, by using Node.js launcher:
 
 ```shell
-node tests/index.js
+npx siesta http://localhost/siesta/examples/browser/tests/index.js --browser chrome
 ```
 
-Targeting Deno, we can also launch the project file directly, as a Deno executable:
+By default tests are launched in Chrome, supported browsers are also: `firefox`, `safari` and `edge` (currently same as `chrome`).
 
-```shell
-deno --allow-read --allow-env --unstable --quiet tests/index.js
-```
+Note, that `npm` version 6 can sometimes [skip the creation](https://github.com/npm/cli/issues/2147) of `./node_modules/.bin` folder, and because of this, the `npx siesta` command may fail. Solution is to use the latest `npm` or launch the Siesta executable directly, as `node ./node_modules/siesta/bin/siesta.js`
 
-Targeting browsers, we need a local webserver, which will be serving this example. Any webserver will work. Let's say the Siesta package is available via url: `http://localhost/siesta` . Then we can launch this example, by using Node.js launcher:
-
-```shell
-npx siesta http://localhost/siesta/examples/isomorphic/tests/index.js
-```
 
 Documentation
 -------------
