@@ -3,24 +3,9 @@ Siesta sample test suite targeting Deno
 
 This is an example of testing very simple Deno package with Siesta.
 
-Package has the only module in `src/module.js`, tests are in `tests/`, Siesta project file is `tests/index.js`
+Package has the only module in `src/module.ts`, tests are in `tests/`, Siesta project file is `tests/index.ts`
 
 Note, this test suite contains intentional failures to demonstrate the failing assertions.
-
-Setting up
-----------
-
-Change the current working directory to the example:
-
-```shell
-cd examples/deno
-```
-
-Complete the setup with `npm`:
-
-```shell
-npm install
-```
 
 Launch
 ------
