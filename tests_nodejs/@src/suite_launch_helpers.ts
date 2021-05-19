@@ -18,7 +18,7 @@ export const runProjectDirectly = async (projectUrl : string, options : object =
             inDeno ? 'deno' : 'node',
             inDeno
                 ?
-                    [ 'run', '--allow-read', '--allow-env', '--unstable', '--quiet', projectUrl, ...stringifyOptions(options), '--no-color' ]
+                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--quiet', projectUrl, ...stringifyOptions(options), '--no-color' ]
                 :
                     [ projectUrl, ...stringifyOptions(options), '--no-color' ],
             {
@@ -41,7 +41,7 @@ export const runProjectViaLauncher = async (projectUrl : string, options : objec
             inDeno ? 'deno' : 'node',
             inDeno
                 ?
-                    [ 'run', '--allow-read', '--allow-env', '--unstable', '--quiet', `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta-deno.js`, projectUrl, ...stringifyOptions(options), '--no-color' ]
+                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--quiet', `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta-deno.js`, projectUrl, ...stringifyOptions(options), '--no-color' ]
                 :
                     [ `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta.js`, projectUrl, ...stringifyOptions(options), '--no-color' ],
             {
