@@ -2,7 +2,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { MIN_SMI, SetIntervalHandler } from "../../util/Helpers.js"
-import { TestNodeResult } from "../test/TestResult.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Reporter } from "./Reporter.js"
 import { randomSpinner, Spinner } from "./Spinner.js"
 import { Terminal } from "./Terminal.js"
@@ -119,14 +119,24 @@ export class ReporterTerminal extends Mixin(
         }
 
 
-        onSubTestStart (testNode : TestNodeResult) {
-            if (testNode.isRoot) this.revertFooter()
+        onBeforeTestLaunch (desc : TestDescriptor) {
+            this.revertFooter()
 
-            super.onSubTestStart(testNode)
+            super.onBeforeTestLaunch(desc)
 
             // to update the "RUNS" section
-            if (testNode.isRoot) this.printFooter()
+            this.printFooter()
         }
+
+
+        // onSubTestStart (testNode : TestNodeResult) {
+        //     if (testNode.isRoot) this.revertFooter()
+        //
+        //     super.onSubTestStart(testNode)
+        //
+        //     // to update the "RUNS" section
+        //     if (testNode.isRoot) this.printFooter()
+        // }
 
 
         printFinished () {

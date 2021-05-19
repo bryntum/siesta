@@ -211,10 +211,17 @@ export class Launch extends Mixin(
         }
 
 
+        beforeTestLaunch (desc : TestDescriptor) {
+            this.reporter.onBeforeTestLaunch(desc)
+        }
+
+
         async launchProjectPlanItem (item : TestDescriptor) {
             const normalized        = item.flatten
 
             this.logger.debug("Launching project item: ", normalized.url)
+
+            this.beforeTestLaunch(normalized)
 
             const context           = await this.contextProviders[ 0 ].createContext()
 
@@ -237,6 +244,10 @@ export class Launch extends Mixin(
         async launchStandaloneSameContextTest (topTest : Test) {
             this.logger.debug("Launching standalone test: ", topTest.descriptor.url)
 
+            this.reporter.onTestSuiteStart()
+
+            this.beforeTestLaunch(topTest.descriptor)
+
             const context           = await this.contextProviders[ 0 ].createContext()
 
             const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
@@ -245,8 +256,6 @@ export class Launch extends Mixin(
 
             //---------------------
             topTest.reporter        = await testLauncher.getSameContextChildLauncher()
-
-            this.reporter.onTestSuiteStart()
 
             await topTest.start()
 

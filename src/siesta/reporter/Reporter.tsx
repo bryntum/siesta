@@ -7,9 +7,11 @@ import { Tree } from "../../jsx/Tree.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { relative } from "../../util/Path.js"
+import { LUID, luid } from "../common/LUID.js"
 import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, SourcePoint, TestNodeResult, TestResult } from "../test/TestResult.js"
 import { ConsoleXmlRenderer } from "./ConsoleXmlRenderer.js"
 
@@ -47,7 +49,8 @@ export class Reporter extends Mixin(
         filesFailed         : number                    = 0
 
         resultsCompleted    : Set<TestNodeResult>       = new Set()
-        resultsRunning      : Set<TestNodeResult>       = new Set()
+        resultsRunningMap   : Map<LUID, TestDescriptor> = new Map()
+
 
         resultsToPrint      : Set<{ testNode : TestNodeResult, sources : string[] }>      = new Set()
 
@@ -83,8 +86,15 @@ export class Reporter extends Mixin(
         }
 
 
+        onBeforeTestLaunch (desc : TestDescriptor) {
+            desc.remoteId       = luid()
+
+            this.resultsRunningMap.set(desc.remoteId, desc)
+        }
+
+
         onSubTestStart (testNode : TestNodeResult) {
-            if (testNode.isRoot) this.resultsRunning.add(testNode)
+            // if (testNode.isRoot) this.resultsRunning.add(testNode)
         }
 
 
@@ -97,9 +107,12 @@ export class Reporter extends Mixin(
 
         async onSubTestFinish (testNode : TestNodeResult) {
             if (testNode.isRoot) {
-                if (!this.resultsRunning.has(testNode)) throw new Error("Test completed before starting")
+                const runningDescId = testNode.descriptor.remoteId
+                const runningDesc   = this.resultsRunningMap.get(runningDescId)
 
-                this.resultsRunning.delete(testNode)
+                if (!runningDesc) throw new Error("Test completed before starting")
+
+                this.resultsRunningMap.delete(runningDescId)
                 this.resultsCompleted.add(testNode)
 
                 if (testNode.passed) {
@@ -199,7 +212,7 @@ export class Reporter extends Mixin(
             let node : XmlElement       = <Tree isTopLevelLastNode={ isTopLevelLastNode }></Tree>
 
             if (testNode.isRoot) {
-                node.appendChild(this.testNodeState(testNode), ' ', this.testNodeUrlTemplate(testNode))
+                node.appendChild(this.testNodeState(testNode), ' ', this.testNodeUrlTemplate(testNode.descriptor))
             } else {
                 node.appendChild(
                     this.testNodeState(testNode),
@@ -264,18 +277,13 @@ export class Reporter extends Mixin(
         }
 
 
-        testFileRunning (testNode : TestNodeResult) : XmlElement {
+        testFileRunning () : XmlElement {
             return <div class="test_file_runs"> RUNS </div>
         }
 
 
-        testNodeUrl (testNode : TestNodeResult) : string {
-            return relative(this.projectData.projectPlan.url, testNode.descriptor.url)
-        }
-
-
-        testNodeUrlTemplate (testNode : TestNodeResult) : XmlElement {
-            const rel       = this.testNodeUrl(testNode)
+        testNodeUrlTemplate (desc : TestDescriptor) : XmlElement {
+            const rel       = relative(this.projectData.projectPlan.url, desc.url)
             const match     = /(.*\/)?([^\/]+)/.exec(rel)
 
             return <span>
@@ -370,13 +378,13 @@ export class Reporter extends Mixin(
         testSuiteFooter () : XmlElement {
             let text : XmlElement       = <div></div>
 
-            if (this.resultsRunning.size > 0 && this.resultsCompleted.size > 0) text.appendChild(<div></div>)
+            if (this.resultsRunningMap.size > 0 && this.resultsCompleted.size > 0) text.appendChild(<div></div>)
 
-            this.resultsRunning.forEach(testNodeResult => {
+            this.resultsRunningMap.forEach(testDesc => {
                 text.appendChild(
-                    this.testFileRunning(testNodeResult),
+                    this.testFileRunning(),
                     ' ',
-                    this.testNodeUrlTemplate(testNodeResult)
+                    this.testNodeUrlTemplate(testDesc)
                 )
             })
 
