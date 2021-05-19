@@ -1,5 +1,5 @@
-import { it, Test } from "../../../../deno.js"
-import { summer } from "../../src/module.js"
+import { it, Test } from "../../siesta_deno.ts"
+import { summer } from "../../src/module.ts"
 
 it('Using `summer` should work', async (t : Test) => {
     t.is(await summer(1, 1), 2, "Correct summer result #1")

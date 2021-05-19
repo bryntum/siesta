@@ -1,5 +1,5 @@
-import { it, Test } from "../../../../deno.js"
-import { delay } from "../../src/module.js"
+import { it, Test } from "../../siesta_deno.ts"
+import { delay } from "../../src/module.ts"
 
 it('Using `delay` should work', async (t : Test) => {
     const start     = Date.now()
