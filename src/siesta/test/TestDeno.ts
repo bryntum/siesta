@@ -6,6 +6,7 @@ import { ExecutionContextDeno } from "../../context/ExecutionContextDeno.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
+import { TestBrowser } from "./TestBrowser.js"
 import { TestDescriptorDeno } from "./TestDescriptorDeno.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -65,4 +66,34 @@ export class TestDeno extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const { it, iit, xit, describe, ddescribe, xdescribe } = createTestSectionConstructors(TestDeno)
+export const {
+    /**
+     * Alias for {@link TestDeno.it | it} method.
+     */
+    it,
+
+    /**
+     * Alias for {@link TestDeno.iit | iit} method.
+     */
+    iit,
+
+    /**
+     * Alias for {@link TestDeno.xit | xit} method.
+     */
+    xit,
+
+    /**
+     * Alias for {@link TestDeno.describe | describe} method.
+     */
+    describe,
+
+    /**
+     * Alias for {@link TestDeno.ddescribe | ddescribe} method.
+     */
+    ddescribe,
+
+    /**
+     * Alias for {@link TestDeno.xdescribe | xdescribe} method.
+     */
+    xdescribe
+} = createTestSectionConstructors(TestDeno)

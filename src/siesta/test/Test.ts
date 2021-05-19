@@ -142,11 +142,80 @@ export class Test extends Mixin(
         }
 
 
+        /**
+         * This method allows you to execute some "setup" code hook before every "it" section of the current test.
+         * It is usually used to restore some global state to the predefined value.
+         *
+         * `it` sections can be nested, and hooks can be added at every level.
+         * `beforeEach` hooks are executed starting from the outer-most one level.
+         *
+         * The 1st argument of the hook function is always the test instance being launched.
+         *
+         * If the hook function is `async` Siesta will `await` until it completes.
+         *
+         * This method can be called several times, providing several hook functions to execute.
+         *
+         * ```javascript
+         * import { it, beforeEach } from "siesta/index.js"
+         *
+         * let sum
+
+         * beforeEach(() => sum = 0)
+         *
+         * it('Test section #1', async t => {
+         *     sum++
+         *     t.equal(sum, 1)
+         * })
+         *
+         * it('Test section #2', async t => {
+         *     sum++
+         *     t.equal(sum, 1)
+         * })
+         * ```
+         *
+         * @param code
+         */
         beforeEach (code : (t : this) => any) {
             this.beforeEachHooks.push(code)
         }
 
 
+        /**
+         * This method allows you to execute some "cleanup" code hook after every "it" section of the current test.
+         * It is usually used to clear some global resource, used by the tests. Sometimes it is actually more convenient,
+         * instead of clearing the resource in the `afterEach` do that in the `beforeEach`, after checking that resource
+         * has been allocated. In this way, if you'll be debugging some individual test section, the resource will still be
+         * available after the test completion.
+         *
+         * `it` sections can be nested, and hooks can be added at every level.
+         * `afterEach` hooks are executed starting from the inner-most one level.
+         *
+         * The 1st argument of the hook function is always the test instance being launched.
+         *
+         * If the hook function is `async` Siesta will `await` until it completes.
+         *
+         * This method can be called several times, providing several hook functions to execute.
+         *
+         * ```javascript
+         * import { it, beforeEach } from "siesta/index.js"
+         *
+         * let file
+         * beforeEach(() => file = OPEN_FILE())
+         * afterEach(() => CLOSE_FILE(file))
+         *
+         * it('Test section #1', async t => {
+         *     sum++
+         *     t.equal(sum, 1)
+         * })
+         *
+         * it('Test section #2', async t => {
+         *     sum++
+         *     t.equal(sum, 1)
+         * })
+         * ```
+         *
+         * @param code
+         */
         afterEach (code : (t : this) => any) {
             this.afterEachHooks.push(code)
         }
@@ -924,12 +993,18 @@ export const {
 
 
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * Alias for {@link Test.beforeEach | beforeEach} method.
+ */
 export const beforeEach = (code : (t : Test) => any) => {
     if (!globalTestEnv.currentTest) throw new Error("Global `beforeEach` call used outside of the scope of any test")
 
     globalTestEnv.currentTest.beforeEach(code)
 }
 
+/**
+ * Alias for {@link Test.afterEach | afterEach} method.
+ */
 export const afterEach = (code : (t : Test) => any) => {
     if (!globalTestEnv.currentTest) throw new Error("Global `afterEach` call used outside of the scope of any test")
 

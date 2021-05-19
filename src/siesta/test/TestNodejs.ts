@@ -5,6 +5,7 @@ import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
+import { TestDeno } from "./TestDeno.js"
 import { TestDescriptorNodejs } from "./TestDescriptorNodejs.js"
 
 
@@ -58,4 +59,34 @@ export class TestNodejs extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const { it, iit, xit, describe, ddescribe, xdescribe } = createTestSectionConstructors(TestNodejs)
+export const {
+    /**
+     * Alias for {@link TestNodejs.it | it} method.
+     */
+    it,
+
+    /**
+     * Alias for {@link TestNodejs.iit | iit} method.
+     */
+    iit,
+
+    /**
+     * Alias for {@link TestNodejs.xit | xit} method.
+     */
+    xit,
+
+    /**
+     * Alias for {@link TestNodejs.describe | describe} method.
+     */
+    describe,
+
+    /**
+     * Alias for {@link TestNodejs.ddescribe | ddescribe} method.
+     */
+    ddescribe,
+
+    /**
+     * Alias for {@link TestNodejs.xdescribe | xdescribe} method.
+     */
+    xdescribe
+} = createTestSectionConstructors(TestNodejs)

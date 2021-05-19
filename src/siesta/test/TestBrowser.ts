@@ -68,4 +68,34 @@ Please use Siesta launcher instead and web url:
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const { it, iit, xit, describe, ddescribe, xdescribe } = createTestSectionConstructors(TestBrowser)
+export const {
+    /**
+     * Alias for {@link TestBrowser.it | it} method.
+     */
+    it,
+
+    /**
+     * Alias for {@link TestBrowser.iit | iit} method.
+     */
+    iit,
+
+    /**
+     * Alias for {@link TestBrowser.xit | xit} method.
+     */
+    xit,
+
+    /**
+     * Alias for {@link TestBrowser.describe | describe} method.
+     */
+    describe,
+
+    /**
+     * Alias for {@link TestBrowser.ddescribe | ddescribe} method.
+     */
+    ddescribe,
+
+    /**
+     * Alias for {@link TestBrowser.xdescribe | xdescribe} method.
+     */
+    xdescribe
+} = createTestSectionConstructors(TestBrowser)
