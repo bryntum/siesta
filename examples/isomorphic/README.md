@@ -36,14 +36,19 @@ node tests/index.js
 Targeting Deno, we can also launch the project file directly, as a Deno executable:
 
 ```shell
-deno --allow-read --allow-env --unstable --quiet tests/index.js
+deno run --allow-net --allow-read --allow-env --unstable --quiet --no-check tests/index.js
 ```
 
-Targeting browsers, we need a local webserver, which will be serving this example. Any webserver will work. Let's say the Siesta package is available via url: `http://localhost/siesta` . Then we can launch this example, by using Node.js launcher:
+Targeting browsers, we need a local webserver, which will be serving this example. Any webserver will work. Let's say the Siesta package is available via url: `http://localhost/siesta` . Then we can launch this example, by pointing Node.js launcher to the project file url:
 
 ```shell
-npx siesta http://localhost/siesta/examples/isomorphic/tests/index.js
+npx siesta http://localhost/siesta/examples/isomorphic/tests/index.js --browser chrome
 ```
+
+By default tests are launched in Chrome, supported browsers are also: `firefox`, `safari` and `edge` (currently same as `chrome`).
+
+Note, that `npm` version 6 can sometimes [skip the creation](https://github.com/npm/cli/issues/2147) of `./node_modules/.bin` folder, and because of this, the `npx siesta` command may fail. Solution is to use the latest `npm` or launch the Siesta executable directly, as `node ./node_modules/siesta/bin/siesta.js`
+
 
 Documentation
 -------------
@@ -51,8 +56,8 @@ Documentation
 If you are just starting with Siesta, please consult this guide:
 
 [[GettingStartedNodejsGuide|Getting started with Siesta in Node.js environment]]
-[[GettingStartedNodejsGuide|Getting started with Siesta in Node.js environment]]
-[[GettingStartedNodejsGuide|Getting started with Siesta in Node.js environment]]
+[[GettingStartedNodejsGuide|Getting started with Siesta in Deno environment]]
+[[GettingStartedNodejsGuide|Getting started with Siesta in browser environment]]
 
 
 Github repo
