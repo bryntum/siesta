@@ -28,19 +28,19 @@
         "nodejs.ts",
         "browser.ts",
         "bin/**/*.ts",
+        "build/**/*.ts",
         "src/**/*.ts",
         "src/**/*.tsx",
-        "scripts/**/*.ts",
         "tests/**/*.ts",
         "tests/**/*.tsx",
         "tests_nodejs/**/*.ts",
         "tests_nodejs/**/*.tsx",
         "tests_deno/**/*.ts",
         "tests_deno/**/*.tsx",
-        "benchmarks/**/*.ts",
         "examples/**/*.ts"
     ],
 
     "exclude" : [
+        "examples/deno"
     ]
 }

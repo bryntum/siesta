@@ -10,3 +10,4 @@ cd "$DIR/.."
 # TODOs:
 # - change the guide URL in the examples/*/README.md
 # - exclude examples/*/node_modules from npm package
+# - clear the *.js files from Deno example (they are gets compiled by IDE)
