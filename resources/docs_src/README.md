@@ -126,7 +126,7 @@ Please report any found bugs in the [issues tracker](https://github.com/bryntum/
 
 Ask questions in the [forum](https://bryntum.com/forum/viewforum.php?f=20)
 
-Chat live at [Discord](https://discord.gg/jErxFxY)
+Chat live at [Discord](https://discord.gg/6mwJZGnwbq)
 
 Follow the [development blog](https://www.bryntum.com/blog/)
 

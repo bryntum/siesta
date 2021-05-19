@@ -28,7 +28,7 @@ Launch
 We can launch the project file directly, as a Deno executable:
 
 ```shell
-deno --allow-read --allow-env --unstable --quiet tests/index.js
+deno run --allow-read --allow-env --allow-net --unstable --quiet --no-check tests/index.ts
 ```
 
 Documentation
@@ -36,7 +36,7 @@ Documentation
 
 If you are just starting with Siesta, please consult this guide:
 
-[[GettingStartedNodejsGuide|Getting started with Siesta in Node.js environment]]
+[[GettingStartedDenoGuide|Getting started with Siesta in Deno environment]]
 
 
 Github repo
@@ -54,7 +54,7 @@ Please report any found bugs in the [issues tracker](https://github.com/bryntum/
 
 Ask questions in the [forum](https://bryntum.com/forum/viewforum.php?f=20)
 
-Chat live at [Discord](https://discord.gg/jErxFxY)
+Chat live at [Discord](https://discord.gg/6mwJZGnwbq)
 
 Follow the [development blog](https://www.bryntum.com/blog/)
 
