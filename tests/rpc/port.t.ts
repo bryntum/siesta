@@ -87,6 +87,7 @@ it('Should handle exceptions in remote calls', async t => {
 
         t.fail("Should not reach here")
     } catch (e) {
-        t.like(e + '', "exception")
+        // `Error` in Firefox, `exception` elsewhere
+        t.like(e + '', /exception|Error/)
     }
 })
