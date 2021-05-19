@@ -46,6 +46,11 @@ export class TreeNode extends Mixin(
         }
 
 
+        turnIntoParent () {
+            if (!this.childNodes) this.childNodes = []
+        }
+
+
         isRootNode () : boolean {
             return !Boolean(this.parentNode)
         }

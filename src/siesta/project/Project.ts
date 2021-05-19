@@ -81,6 +81,10 @@ export class Project extends Mixin(
                 extraction.state        = 'project_created'
                 this.baseUrl            = stripBasename(extraction.projectUrl)
             }
+
+            // turn the root descriptor into parent, so that it's `leavesAxis` method
+            // returns empty array
+            this.projectPlan.turnIntoParent()
         }
 
 
