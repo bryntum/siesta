@@ -282,6 +282,12 @@ export class Reporter extends Mixin(
         }
 
 
+        // used in Plus
+        testNodeUrl (testNode : TestNodeResult) : string {
+            return relative(this.projectData.projectPlan.url, testNode.descriptor.url)
+        }
+
+
         testNodeUrlTemplate (desc : TestDescriptor) : XmlElement {
             const rel       = relative(this.projectData.projectPlan.url, desc.url)
             const match     = /(.*\/)?([^\/]+)/.exec(rel)
