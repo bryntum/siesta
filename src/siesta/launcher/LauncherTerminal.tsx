@@ -220,9 +220,9 @@ export class LauncherTerminal extends Mixin(
 
         async getProjectClass () : Promise<typeof ProjectTerminal> {
             if (isNodejs())
-                return (await import('../project/ProjectNodejs.js')).ProjectNodejs
+                return (await import('' + '../project/ProjectNodejs.js')).ProjectNodejs
             else if (isDeno())
-                return (await import('../project/ProjectDeno.js')).ProjectDeno
+                return (await import('' + '../project/ProjectDeno.js')).ProjectDeno
             else
                 throw new Error("Should not reach this line")
         }

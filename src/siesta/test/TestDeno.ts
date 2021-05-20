@@ -56,7 +56,7 @@ export class TestDeno extends Mixin(
 
 
         static async getLauncherClass () : Promise<typeof Launcher> {
-            return (await import('../launcher/LauncherDeno.js')).LauncherDeno
+            return (await import('' + '../launcher/LauncherDeno.js')).LauncherDeno
         }
     }
 
