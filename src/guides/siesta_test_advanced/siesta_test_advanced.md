@@ -35,11 +35,11 @@ it('Testing callbacks-based asynchronous code', t => {
 
     // indicate async gap starts, test will remain active till
     // `endAsync()` call (but no longer than defatul timeout)
-    const async          = t.beginAsync()
+    const gap           = t.beginAsync()
 
     myClass.asyncMethodWithCallback(() => {
         // indicate async gap completes
-        t.endAsync(async)
+        t.endAsync(gap)
     })
 })
 ```
@@ -103,7 +103,7 @@ it('Test section 1', async t => {
 it('Test section 1', async t => {
     // promise outside of the test function code flow
     new Promise((resolve, reject) => {
-        setTimeout(() => reject(), 3000)
+        setTimeout(reject, 3000)
     })
 })
 ```
@@ -133,7 +133,7 @@ and routes them into the test log.
 Project
 ========
 
-If you want to provide configuration for the whole test suite, you need to create a Siesta *project*.
+If you want to provide configuration for the whole test suite, you need to create a [[SiestaProjectGuide|Siesta project]].
 
 
 COPYRIGHT AND LICENSE

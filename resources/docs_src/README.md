@@ -6,7 +6,7 @@ Siesta
 ======
 
 Siesta is a stress-free, ubiquitous, open-source JavaScript/TypeScript testing tool, 
-developed at [Bryntum](https://www.bryntum.com/) for more than 10 years.
+developed at [Bryntum](https://www.bryntum.com/) starting from the 2009.
 
 Version 6 is a complete rewrite, using a modern technology stack and the decade of test driven development experience.
 
@@ -24,7 +24,7 @@ Supported target environments
 
 Siesta can run the test in browsers, Node.js and Deno. 
 
-Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Chromium Edge. IE and legacy Edge are not supported.
+Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Edge Chromium. IE and legacy Edge are not supported.
 
 Siesta supports all maintained LTS releases of Node.js. 
 
@@ -41,7 +41,7 @@ npm install @bryntum/siesta --save-dev
 
 Deno environment:
 ```shell
-deno XXX
+deno install --name siesta --allow-read --allow-env --allow-net --unstable --no-check --quiet https://deno.land/x/siesta/bin/siesta-deno.js
 ```
 
 Build statuses

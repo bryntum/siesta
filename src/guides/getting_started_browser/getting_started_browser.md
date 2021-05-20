@@ -29,10 +29,11 @@ Basics
 
 To familiarize yourself with the basic Siesta concepts, which are common for all execution environments, please check the [[SiestaTestBasicsGuide|Siesta test basics]] guide. 
 
+
 Additional details
 ==================
 
-Siesta runs the browser tests right in the browser. This means, your test file is imported directly on the web page, and it has full access to the page. There's no need to use the asynchronous `evaluate` command as commonly seen in tools like Playwright, Puppeteer and Selenium. 
+Siesta runs the browser tests right on the browser page. This means, your test file has full access to the page and Web API. There's no need to use the asynchronous `evaluate` command as commonly seen in tools like Playwright, Puppeteer and Selenium. 
 
 Such architecture means that test script can create and manipulate arbitrary DOM, using the regular Web API. For example, test can render some Web component and then check that its DOM object is properly created with the `document.querySelector()` call.
 
@@ -48,11 +49,11 @@ When targeting browser environment for running tests, import the Siesta API from
 
 
 Launching individual test
-===============
+=========================
 
 Currently, Siesta does not perform any code transpilation to enable the support for the bare-word import identifiers, like: `import { it } from "siesta/browser.js"`
 
-It is assumed, that you use the [import maps](https://github.com/WICG/import-maps).
+It is assumed, that you use some build tool or a web server, that provides such transpilation. We can recommend [Snowpack](https://www.snowpack.dev/) as a modern alternative to Webpack. 
 
 Let's assume we have the following Siesta test file, called `basic_test.t.js`, which is available on the web URL as `http://localhost/my_project/tests/basic_test.t.js`. 
 

@@ -10,16 +10,17 @@ Siesta supports the latest release of Deno.
 Installation
 ============
 
-Note, that installer adds `--quiet` to the executable arguments. This is because the diagnostic messages breaks the dynamic output of the test reporter and there's no other way to intercept/suppress them.
+Note, that installer adds `--quiet` to the executable arguments. This is because the diagnostic messages [breaks the dynamic output of the test reporter]((https://github.com/denoland/deno/issues/10558)) and there's no other way to intercept/suppress them. The `--no-check` option is recommended for speed.
 
 ```shell
-deno install --name siesta --allow-read --allow-env --unstable --quiet https://deno.land/x/siesta/bin/siesta-deno.js
+deno install --name siesta --allow-read --allow-env --unstable --no-check --quiet https://deno.land/x/siesta/bin/siesta-deno.js
 ```
 
 Basics
 ======
 
 To familiarize yourself with the basic Siesta concepts, which are common for all execution environments, please check the [[SiestaTestBasicsGuide|Siesta test basics]] guide. 
+
 
 Importing API
 =============
@@ -56,7 +57,7 @@ it('Deep equality should work', async t => {
 We can launch it, as a regular Deno script with some additional permissions:
 
 ```shell
-deno run --allow-read --allow-env tests/basic/basic_test.t.js
+deno run --allow-read --allow-env --allow-net tests/basic/basic_test.t.js
 ```
 
 You should see something like:
@@ -72,7 +73,7 @@ To launch several tests, you need to use the Siesta launcher, installed at the "
 siesta --help
 ```
 
-To launch several tests, pass a matching glob pattern, as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it. To resolve the glob pattern, Siesta uses the [glob resolution](https://doc.deno.land/https/deno.land/std@0.95.0/path/glob.ts) from the Deno `std` library, please refer to its documentation for details. 
+To launch several tests, pass a matching glob pattern, as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it, recursively. To resolve the glob pattern, Siesta uses the [glob resolution](https://doc.deno.land/https/deno.land/std@0.95.0/path/glob.ts) from the Deno `std` library, please refer to its documentation for details. 
 
 Some examples:
 
@@ -96,6 +97,14 @@ Debugging
 =========
 
 You can debug a Siesta test as any other regular Deno script. For that, place the `debugger` statement somewhere in the test code and then start the test with the `--inspect-brk` option. Note, that due to [this issue](https://github.com/nodejs/node/issues/25215), starting your test with just `--inspect` may result in your breakpoint being ignored. 
+
+You need to place the `--inspect-brk` option after the `deno` executable, before the test file - otherwise it will be passed to the script, instead of the `node`.
+
+For example, for the test above:
+
+```shell
+deno run --inspect-brk --allow-read --allow-env --allow-net tests/basic/basic_test.t.js
+```
 
 Then open the console in any Chrome tab and click the "Dedicated DevTools" icon in the bottom-left.
 

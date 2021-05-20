@@ -91,7 +91,7 @@ If none of the planning methods have been called, Siesta will include all tests 
 project.planDir('.')
 ```
 
-The project planning step may happen asynchronously, ie you can call some asynchronous methods to decide what to include and with which the configuration.
+The project planning step may happen asynchronously, ie you can call some asynchronous methods to decide what to include and with which configuration.
 
 Note, that projects targeting browser environment don't have access to file system and thus, need to list all the test files manually, using the [[Project.plan]] method. We plan to remove this limitation in one of the future releases.
 
@@ -114,27 +114,36 @@ For Node.js:
 node tests/index.js
 ```
 
-For Deno (note the `--allow-read --allow-env --unstable` flags are required for permissions/WebWorker feature and `--quiet` is needed because the `check file://` diagnostic messages [breaks the dynamic output formatting](https://github.com/denoland/deno/issues/10558)):
+For Deno (note the `--allow-read --allow-env --allow-net --unstable` flags are required for permissions/WebWorker feature and `--quiet` is needed because the `check file://` diagnostic messages [breaks the dynamic output formatting](https://github.com/denoland/deno/issues/10558)), we also recommend to use `--no-check` for speed:
 ```shell
-deno run --allow-read --allow-env --unstable --quiet tests/index.js
+deno run --allow-read --allow-env --allow-net --unstable --quiet --no-check tests/index.js
 ```
 
-Or, one can use the Siesta launcher executable and pass the path/URL to the project file to it. This method works for all target environments:
+One can also use the Siesta launcher executable and pass the path/URL to the project file to it. This method works for all target environments:
 
 Node.js, targeting Node.js:
 ```shell
 npx siesta tests/index.js
 ```
 
+Deno, targeting Deno (assuming using the installed executable):
+```shell
+siesta tests/index.js
+```
+
+Targeting browsers is supported only for the Node.js launcher. The url of the project should start with `http:/https:` - this is what triggers execution in browser.
+
 Node.js, targeting browser:
 ```shell
 npx siesta http://localhost/my_project/tests/index.js 
 ```
 
-Deno, targeting Deno (assuming using the installed executable):
+By default, tests are launched in Chrome. The `--browser` config specifies the browser to use, supported values are: `chrome`, `firefox`, `edge` (currently equals to `chrome`) and `safari` (uses webkit target of Playwright).
+
 ```shell
-siesta tests/index.js
+npx siesta http://localhost/my_project/tests/index.js --browser firefox 
 ```
+
 
 COPYRIGHT AND LICENSE
 =================

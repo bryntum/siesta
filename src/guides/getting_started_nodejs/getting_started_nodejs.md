@@ -71,7 +71,7 @@ To launch several tests, you need to use the Siesta launcher. Siesta launcher is
 npx siesta --help
 ```
 
-To launch several tests, pass a matching glob pattern as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it. To resolve the glob pattern, Siesta uses the [glob](https://www.npmjs.com/package/glob) npm library, please refer to its documentation for details on globs resolution. 
+To launch several tests, pass a matching glob pattern as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it, recursively. To resolve the glob pattern, Siesta uses the [glob](https://www.npmjs.com/package/glob) npm library, please refer to its documentation for details on globs resolution. 
 
 Some examples:
 
@@ -94,7 +94,15 @@ npx siesta tests/**/*@(1|2)*.t.js
 Debugging
 =========
 
-You can debug a Siesta test as any other regular Node.js script. For that, place the `debugger` statement somewhere in the test code and then start the test with the `--inspect-brk` option. Note, that due to [this issue](https://github.com/nodejs/node/issues/25215), starting your test with just `--inspect` may result in your breakpoint being ignored. 
+You can debug a Siesta test as any other regular Node.js script. For that, place the `debugger` statement somewhere in the test code and then start the test with the `--inspect-brk` option. Note, that due to [this issue](https://github.com/nodejs/node/issues/25215), starting your test with just `--inspect` may result in your breakpoint being ignored.
+
+You need to place the `--inspect-brk` option right after the `node` executable, before the test file - otherwise it will be passed to the script, instead of the `node`.
+
+For example, for the test above:
+
+```shell
+node --inspect-brk tests/basic/basic_test.t.js
+```
 
 Then open the console in any Chrome tab and click the "Dedicated DevTools for Node.js" icon in the bottom-left.
 
