@@ -9,6 +9,8 @@
     "node": ">=12.21.0"
   },
   "devDependencies": {
-    "siesta": "../../"
+    "@web/dev-server": "^0.1.17",
+    "siesta": "../../",
+    "snowpack": "^3.4.0"
   }
 }
