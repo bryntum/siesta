@@ -13,6 +13,8 @@ Launch
 We can launch the project file directly, as a Deno executable:
 
 ```shell
+cd examples/deno
+
 deno run --allow-read --allow-env --allow-net --unstable --quiet --no-check tests/index.ts
 ```
 
