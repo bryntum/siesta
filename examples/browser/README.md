@@ -31,6 +31,8 @@ First we launch the Vite dev server in some shell:
 npx vite
 ```
 
+Note, that Vite does not need any configuration to serve files for this project!
+
 Then, in another shell, we launch the test suite itself:
 
 ```shell
