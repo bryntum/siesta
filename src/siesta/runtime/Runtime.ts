@@ -84,9 +84,9 @@ export class HasRuntimeAccess extends Mixin(
 
         async getRuntimeClass () : Promise<typeof Runtime> {
             if (isNodejs())
-                return (await import(''.concat('./RuntimeNodejs.js'))).RuntimeNodejs
+                return (await import(/* @vite-ignore */''.concat('./RuntimeNodejs.js'))).RuntimeNodejs
             else if (isDeno())
-                return (await import(''.concat('./RuntimeDeno.js'))).RuntimeDeno
+                return (await import(/* @vite-ignore */''.concat('./RuntimeDeno.js'))).RuntimeDeno
             else
                 return (await import('./RuntimeBrowser.js')).RuntimeBrowser
         }

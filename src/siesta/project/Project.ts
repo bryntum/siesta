@@ -143,9 +143,9 @@ export class Project extends Mixin(
 
         async getLauncherClass () : Promise<typeof Launcher> {
             if (isNodejs())
-                return (await import(''.concat('../launcher/LauncherNodejs.js'))).LauncherNodejs
+                return (await import(/* @vite-ignore */''.concat('../launcher/LauncherNodejs.js'))).LauncherNodejs
             else if (isDeno())
-                return (await import(''.concat('../launcher/LauncherDeno.js'))).LauncherDeno
+                return (await import(/* @vite-ignore */''.concat('../launcher/LauncherDeno.js'))).LauncherDeno
             else
                 return (await import('../launcher/LauncherBrowser.js')).LauncherBrowser
         }

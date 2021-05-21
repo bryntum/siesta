@@ -1,4 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectDescriptorBrowser } from "../project/ProjectDescriptor.js"
 import { ReporterBrowser } from "../reporter/ReporterBrowser.js"
 import { Runtime } from "../runtime/Runtime.js"
@@ -19,6 +20,8 @@ export class LauncherBrowser extends Mixin(
         testDescriptorClass     : typeof TestDescriptorBrowser      = TestDescriptorBrowser
         runtimeClass            : typeof Runtime                    = RuntimeBrowser
 
+        contextProviderConstructors : (typeof ContextProvider)[]    = [
+        ]
 
         print (str : string) {
             console.log(str)

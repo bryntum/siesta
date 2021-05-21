@@ -75,7 +75,7 @@ const seedChildPort = async (
 )
     : Promise<Port | undefined>  =>
 {
-    const [ modulePort, moduleMedia ]   = await Promise.all([ import(portModuleUrl), import(mediaModuleUrl) ])
+    const [ modulePort, moduleMedia ]   = await Promise.all([ import(/* @vite-ignore */portModuleUrl), import(/* @vite-ignore */mediaModuleUrl) ])
 
     const media     = new moduleMedia[ mediaClassSymbol ]
     Object.assign(media, mediaConfig)

@@ -29,7 +29,7 @@ export const extractProjectInfo     = async (projectUrl : string) : Promise<stri
     // await new Promise(resolve => setTimeout(resolve, 1000))
 
     try {
-        await import(projectUrl)
+        await import(/* @vite-ignore */projectUrl)
     } catch (e) {
         throw new Error('Exception when importing a project file - wrong path/URL?' + String.fromCharCode(0) + e.stack)
     }

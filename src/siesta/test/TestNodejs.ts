@@ -49,7 +49,7 @@ export class TestNodejs extends Mixin(
 
 
         static async getLauncherClass () : Promise<typeof Launcher> {
-            return (await import(''.concat('../launcher/LauncherNodejs.js'))).LauncherNodejs
+            return (await import(/* @vite-ignore */''.concat('../launcher/LauncherNodejs.js'))).LauncherNodejs
         }
     }
 

@@ -67,7 +67,7 @@ export class TestLauncherChild extends Mixin(
                 let topTest : Test
 
                 try {
-                    await import(url)
+                    await import(/* @vite-ignore */url)
                 } catch (e) {
                     // TODO should account for possibility of `parse` throwing an error
 
