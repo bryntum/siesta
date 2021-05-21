@@ -233,11 +233,17 @@ export class Launch extends Mixin(
 
                 this.logger.debug("Channel ready for: ", normalized.url)
 
-                await testLauncher.launchTest(normalized.urlAbs, stringify(normalized))
+                await testLauncher.launchTest(normalized.urlAbs, stringify(normalized), this.getTestLaunchDelay())
             } finally {
                 await testLauncher.disconnect()
                 await context.destroy()
             }
+        }
+
+
+        getTestLaunchDelay () : number {
+            // no launch by default
+            return 0
         }
 
 

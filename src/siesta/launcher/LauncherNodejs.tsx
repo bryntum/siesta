@@ -17,8 +17,10 @@ import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeNodejs } from "../runtime/RuntimeNodejs.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
+import { Launch } from "./Launch.js"
 import { ExitCodes, Launcher, LauncherError, OptionsGroupPrimary } from "./Launcher.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
+import { LaunchNodejs } from "./LaunchNodejs.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -38,6 +40,8 @@ export class LauncherNodejs extends Mixin(
     (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) => {
 
     class LauncherNodejs extends base {
+        launchClass             : typeof Launch             = LaunchNodejs
+
         executionContext        : ExecutionContextNode      = undefined
 
         // region options
