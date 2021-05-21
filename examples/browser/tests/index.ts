@@ -1,4 +1,4 @@
-import { Project } from "../../../index.js"
+import { Project } from "siesta/index.js"
 
 const project = Project.new({
     title                   : 'Awesome isomorphic project test suite',
