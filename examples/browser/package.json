@@ -2,15 +2,13 @@
   "name": "awesome-isomorphic-app",
   "version": "1.0.0",
   "description": "Awesome isomorphic application, tested with Siesta",
-  "main": "index.js",
-  "module": "index.js",
   "type": "module",
   "engines": {
     "node": ">=12.21.0"
   },
   "devDependencies": {
-    "@web/dev-server": "^0.1.17",
+    "@jsenv/node-module-import-map": "^13.4.3",
     "siesta": "../../",
-    "snowpack": "^3.4.0"
+    "vite": "^2.3.3"
   }
 }

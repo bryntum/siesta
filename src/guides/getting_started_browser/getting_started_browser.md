@@ -48,12 +48,18 @@ Importing API
 When targeting browser environment for running tests, import the Siesta API from the `siesta/browser.js` entry file.
 
 
+Support for the bare import specifiers
+=================================
+
+Siesta itself is "transpilation" process agnostic. This means some extra transpilation steps are needed to enable the support for the bare-word import identifiers, like: `import { it } from "siesta/browser.js"`
+
+It is assumed, that you use some build tool or a web server, that provides such transpilation. We can recommend [Vite](https://vitejs.dev/) as a modern and very fast alternative to Webpack. 
+
+
+
 Launching individual test
 =========================
 
-Currently, Siesta does not perform any code transpilation to enable the support for the bare-word import identifiers, like: `import { it } from "siesta/browser.js"`
-
-It is assumed, that you use some build tool or a web server, that provides such transpilation. We can recommend [Snowpack](https://www.snowpack.dev/) as a modern alternative to Webpack. 
 
 Let's assume we have the following Siesta test file, called `basic_test.t.js`, which is available on the web URL as `http://localhost/my_project/tests/basic_test.t.js`. 
 

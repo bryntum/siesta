@@ -30,7 +30,7 @@ const project = Project.new({
     }
 })
 
-// STEP 2
+// STEP 2 - default behaviour
 project.planDir('.')
 
 // STEP 3
@@ -64,7 +64,7 @@ There are few configuration options for the project itself, like [[ProjectNodejs
 
 The project instance should be created synchronously in the top-level scope of the module.
 
-Creating the project execution plan
+Creating the project execution plan, Node.js/Deno environment
 -------------------------
 
 Project plan is a collection of tests to be run. It is structured as a tree, usually reflecting the file system. The "parent" nodes in this tree corresponds to directories and "leaf" nodes - to test files.
@@ -93,7 +93,10 @@ project.planDir('.')
 
 The project planning step may happen asynchronously, ie you can call some asynchronous methods to decide what to include and with which configuration.
 
-Note, that projects targeting browser environment don't have access to file system and thus, need to list all the test files manually, using the [[Project.plan]] method. We plan to remove this limitation in one of the future releases.
+Creating the project execution plan, browser environment
+-------------------------
+
+Currently, Siesta projects, targeting browser environment, don't have access to file system and thus, need to list all the test files manually, using the [[Project.plan]] method. This is because Siesta supports running the browser suite entirely in browser, w/o involving any OS process. We plan to remove this limitation in one of the future releases, by introducing special kind of browser projects, that can be launched via launcher only. 
 
 Starting the project
 ------------
