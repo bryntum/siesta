@@ -7,7 +7,6 @@
     "node": ">=12.21.0"
   },
   "devDependencies": {
-    "@jsenv/node-module-import-map": "^13.4.3",
     "siesta": "../../",
     "vite": "^2.3.3"
   }
