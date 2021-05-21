@@ -5,7 +5,7 @@ import { isDeno, isNodejs } from "../../util/Helpers.js"
 //---------------------------------------------------------------------------------------------------------------------
 export type EnvironmentType = 'browser' | 'nodejs' | 'isomorphic' | 'deno'
 
-@serializable()
+@serializable({ id : 'Environment' })
 export class Environment extends Serializable.mix(Base) {
     type        : EnvironmentType       = 'isomorphic'
 

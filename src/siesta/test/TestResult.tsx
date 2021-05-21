@@ -21,7 +21,7 @@ export class Result extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'LogMessage' })
 export class LogMessage extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
@@ -67,7 +67,7 @@ export class LogMessage extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'Exception' })
 export class Exception extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
@@ -91,7 +91,7 @@ export class Exception extends Mixin(
 export type SourcePoint = { line : number, char : number }
 
 
-@serializable()
+@serializable({ id : 'Assertion' })
 export class Assertion extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
@@ -119,7 +119,7 @@ export class Assertion extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'AssertionAsyncCreation' })
 export class AssertionAsyncCreation extends Mixin(
     [ Assertion, Serializable, Result ],
     (base : ClassUnion<typeof Assertion, typeof Serializable, typeof Result>) => {
@@ -139,7 +139,7 @@ export class AssertionAsyncCreation extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'AssertionAsyncResolution' })
 export class AssertionAsyncResolution extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) => {

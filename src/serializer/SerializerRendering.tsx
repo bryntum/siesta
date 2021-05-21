@@ -36,7 +36,7 @@ export class XmlRendererSerialization extends Mixin(
 export type SerializationChildNode = XmlElement
 
 
-@serializable()
+@serializable({ id : 'Serialization' })
 export class Serialization extends XmlElement {
     tagName         : 'serialization'           = 'serialization'
 
@@ -170,7 +170,7 @@ export class SerializationComposite extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'SerializationArray' })
 export class SerializationArray extends Mixin(
     [ SerializationComposite ],
     (base : ClassUnion<typeof SerializationComposite>) =>
@@ -224,7 +224,7 @@ export class SerializationArray extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'SerializationObject' })
 export class SerializationObject extends Mixin(
     [ SerializationComposite ],
     (base : ClassUnion<typeof SerializationComposite>) =>
@@ -294,7 +294,7 @@ export class SerializationObject extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'SerializationObjectEntry' })
 export class SerializationObjectEntry extends Mixin(
     [ XmlElement ],
     (base : ClassUnion<typeof XmlElement>) =>
@@ -338,7 +338,7 @@ export class SerializationObjectEntry extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'SerializationSet' })
 export class SerializationSet extends Mixin(
     [ SerializationComposite ],
     (base : ClassUnion<typeof SerializationComposite>) =>
@@ -397,7 +397,7 @@ export class SerializationSet extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'SerializationMap' })
 export class SerializationMap extends Mixin(
     [ SerializationComposite ],
     (base : ClassUnion<typeof SerializationComposite>) =>
@@ -459,7 +459,7 @@ export class SerializationMap extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'SerializationMapEntry' })
 export class SerializationMapEntry extends Mixin(
     [ XmlElement ],
     (base : ClassUnion<typeof XmlElement>) =>
@@ -502,7 +502,7 @@ export class SerializationMapEntry extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'SerializationOutOfDepth' })
 export class SerializationOutOfDepth extends Mixin(
     [ SerializationReferenceable ],
     (base : ClassUnion<typeof SerializationReferenceable>) =>
@@ -527,7 +527,7 @@ export class SerializationOutOfDepth extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'SerializationReference' })
 export class SerializationReference extends Mixin(
     [ XmlElement ],
     (base : ClassUnion<typeof XmlElement>) =>

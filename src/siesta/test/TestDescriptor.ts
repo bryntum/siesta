@@ -36,7 +36,7 @@ export const OptionsGroupTestDescriptor  = OptionGroup.new({
  * over the network. Some of the properties of this class are also "options" - can be specified in the command-line
  * when launching the test suite.
  */
-@serializable()
+@serializable({ id : 'TestDescriptor' })
 export class TestDescriptor extends Mixin(
     [ Serializable, HasOptions, TreeNode, Base ],
     (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof TreeNode, typeof Base>) => {

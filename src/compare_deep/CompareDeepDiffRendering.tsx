@@ -127,7 +127,7 @@ export class DifferenceTemplateReferenceable extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateStreamed' })
 export class DifferenceTemplateStreamed extends DifferenceTemplateElement {
 
     renderSelfLeft (
@@ -313,7 +313,7 @@ export class DifferenceTemplateComposite extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateAtomic' })
 export class DifferenceTemplateAtomic extends Mixin(
     [ DifferenceTemplateStreamed ],
     (base : ClassUnion<typeof DifferenceTemplateStreamed>) =>
@@ -354,7 +354,7 @@ export class DifferenceTemplateAtomic extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateReferenceableAtomic' })
 export class DifferenceTemplateReferenceableAtomic extends Mixin(
     [ DifferenceTemplateReferenceable, DifferenceTemplateAtomic ],
     (base : ClassUnion<typeof DifferenceTemplateReferenceable, typeof DifferenceTemplateAtomic>) =>
@@ -366,7 +366,7 @@ export class DifferenceTemplateReferenceableAtomic extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateReference' })
 export class DifferenceTemplateReference extends DifferenceTemplateStreamed {
     props   : DifferenceTemplateElement[ 'props' ] & {
         refId1?          : number
@@ -394,7 +394,7 @@ export class DifferenceTemplateReference extends DifferenceTemplateStreamed {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateHeterogeneous' })
 export class DifferenceTemplateHeterogeneous extends DifferenceTemplateStreamed {
     tagName         : 'difference_template_heterogeneous'           = 'difference_template_heterogeneous'
 
@@ -435,7 +435,7 @@ export class DifferenceTemplateHeterogeneous extends DifferenceTemplateStreamed 
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateRoot' })
 export class DifferenceTemplateRoot extends DifferenceTemplateElement {
     tagName         : 'difference_template_root'           = 'difference_template_root'
 
@@ -554,7 +554,7 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateArray' })
 export class DifferenceTemplateArray extends Mixin(
     [ SerializationArray, DifferenceTemplateComposite ],
     (base : ClassUnion<typeof SerializationArray, typeof DifferenceTemplateComposite>) =>
@@ -594,7 +594,7 @@ export class DifferenceTemplateArray extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateArrayEntry' })
 export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
     props           : DifferenceTemplateElement[ 'props' ] & {
         index?       : number
@@ -619,7 +619,7 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateObject' })
 export class DifferenceTemplateObject extends Mixin(
     // note, that `SerializationObject` and `DifferenceTemplateComposite` are not ordered
     // (the order of their application is not defined)
@@ -657,7 +657,7 @@ export class DifferenceTemplateObject extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateObjectEntry' })
 export class DifferenceTemplateObjectEntry extends Mixin(
     [ SerializationObjectEntry, DifferenceTemplateElement ],
     (base : ClassUnion<typeof SerializationObjectEntry, typeof DifferenceTemplateElement>) =>
@@ -690,7 +690,7 @@ export class DifferenceTemplateObjectEntry extends Mixin(
 ){}
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateSet' })
 export class DifferenceTemplateSet extends Mixin(
     [ SerializationSet, DifferenceTemplateComposite ],
     (base : ClassUnion<typeof SerializationSet, typeof DifferenceTemplateComposite>) =>
@@ -720,7 +720,7 @@ export class DifferenceTemplateSet extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateSetEntry' })
 export class DifferenceTemplateSetEntry extends DifferenceTemplateElement {
     tagName         : string                = 'difference_template_set_entry'
 
@@ -742,7 +742,7 @@ export class DifferenceTemplateSetEntry extends DifferenceTemplateElement {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateMap' })
 export class DifferenceTemplateMap extends Mixin(
     [ SerializationMap, DifferenceTemplateComposite ],
     (base : ClassUnion<typeof SerializationMap, typeof DifferenceTemplateComposite>) =>
@@ -772,7 +772,7 @@ export class DifferenceTemplateMap extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'DifferenceTemplateMapEntry' })
 export class DifferenceTemplateMapEntry extends Mixin(
     [ SerializationMapEntry, DifferenceTemplateElement ],
     (base : ClassUnion<typeof SerializationMapEntry, typeof DifferenceTemplateElement>) =>

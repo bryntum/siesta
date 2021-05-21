@@ -12,7 +12,7 @@ export type XmlNode = string | XmlElement
 
 // TODO extend the TreeNode ? TreeNode needs to handle the heterogeneous child list then
 
-@serializable()
+@serializable({ id : 'XmlElement' })
 export class XmlElement extends Mixin(
     [ Serializable, Base ],
     (base : ClassUnion<typeof Serializable, typeof Base>) => {

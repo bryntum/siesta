@@ -279,7 +279,7 @@ export class AssertionAsync extends Mixin(
 
 // experiment - separate class per assertion
 
-@serializable()
+@serializable({ id : 'AssertionWaitFor' })
 export class AssertionWaitFor extends AssertionAsyncCreation {
     name            : string        = 'waitFor'
 

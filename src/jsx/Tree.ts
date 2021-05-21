@@ -7,7 +7,7 @@ import { XmlRenderer } from "./XmlRenderer.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'Tree' })
 export class Tree extends Mixin(
     [ XmlElement ],
     (base : ClassUnion<typeof XmlElement>) =>

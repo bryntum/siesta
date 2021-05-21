@@ -73,7 +73,7 @@ export enum ExitCodes {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'LauncherError' })
 export class LauncherError extends Serializable.mix(Base) {
     message             : string        = undefined
 

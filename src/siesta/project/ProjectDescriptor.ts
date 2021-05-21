@@ -14,7 +14,7 @@ import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 // we have a creation of `ProjectOptions` instance from the `Project` instance
 // (which contains extra properties which all will be applied to the `ProjectOptions` instance,
 // because of the way `Base` `initialize` method works)
-@serializable({ mode : 'optIn' })
+@serializable({ id : 'ProjectDescriptor', mode : 'optIn' })
 export class ProjectDescriptor extends Mixin(
     [ Serializable, HasOptions, Base ],
     (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof Base>) => {
@@ -35,7 +35,7 @@ export class ProjectDescriptor extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable({ mode : 'optIn' })
+@serializable({ id : 'ProjectDescriptorBrowser', mode : 'optIn' })
 export class ProjectDescriptorBrowser extends Mixin(
     [ ProjectDescriptor ],
     (base : ClassUnion<typeof ProjectDescriptor>) => {
@@ -49,7 +49,7 @@ export class ProjectDescriptorBrowser extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable({ mode : 'optIn' })
+@serializable({ id : 'ProjectDescriptorNodejs', mode : 'optIn' })
 export class ProjectDescriptorNodejs extends Mixin(
     [ ProjectDescriptor ],
     (base : ClassUnion<typeof ProjectDescriptor>) => {
@@ -63,7 +63,7 @@ export class ProjectDescriptorNodejs extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable({ mode : 'optIn' })
+@serializable({ id : 'ProjectDescriptorDeno', mode : 'optIn' })
 export class ProjectDescriptorDeno extends Mixin(
     [ ProjectDescriptor ],
     (base : ClassUnion<typeof ProjectDescriptor>) => {
@@ -77,7 +77,7 @@ export class ProjectDescriptorDeno extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-@serializable()
+@serializable({ id : 'ProjectSerializableData' })
 export class ProjectSerializableData extends Mixin(
     [ Serializable, Base ],
     (base : ClassUnion<typeof Serializable, typeof Base>) => {
