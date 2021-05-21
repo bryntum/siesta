@@ -52,8 +52,8 @@ export class ContextPlaywright extends Mixin(
 
         async setupChannel (parentPort : PortHandshakeParent, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
             await Promise.all([
-                await this.startWebSocketServer(),
-                await this.navigate(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/landing.html')
+                this.startWebSocketServer(),
+                this.navigate(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/landing.html')
             ])
 
             const parentMedia           = new this.parentMediaClass()
