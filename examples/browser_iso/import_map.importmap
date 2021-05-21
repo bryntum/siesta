@@ -1,0 +1,5 @@
+{
+    "imports": {
+        "siesta/" : "./node_modules/siesta/"
+    }
+}

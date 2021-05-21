@@ -1,0 +1,13 @@
+{
+  "name": "awesome-isomorphic-app",
+  "version": "1.0.0",
+  "description": "Awesome isomorphic application, tested with Siesta",
+  "type": "module",
+  "engines": {
+    "node": ">=12.21.0"
+  },
+  "devDependencies": {
+    "siesta": "../../",
+    "vite": "^2.3.3"
+  }
+}
