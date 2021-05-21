@@ -51,17 +51,34 @@ When targeting browser environment for running tests, import the Siesta API from
 Support for the bare import specifiers
 =================================
 
-Siesta itself is "transpilation" process agnostic. This means some extra transpilation steps are needed to enable the support for the bare-word import identifiers, like: `import { it } from "siesta/browser.js"`
+Siesta itself is "transpilation" process agnostic and assumes native EcmaScript setup. However, Ecma spec does not define the behavior for the "bare import specifiers", like `import { it } from "siesta/browser.js"`. The proposed solution for it, [import maps](https://github.com/WICG/import-maps) is only [partially](https://github.com/WICG/import-maps/issues/235) supported in Chrome. 
 
-It is assumed, that you use some build tool or a web server, that provides such transpilation. We can recommend [Vite](https://vitejs.dev/) as a modern and very fast alternative to Webpack. 
+This means that the bundler-free development is still the shiny future (not so far hopefully) and in the meantime, an extra transpilation step / development web server is needed. We recommend [Vite](https://vitejs.dev/) for this purpose, as a modern and very fast alternative to Webpack.
 
+With Vite, all you need is to list your test files as entries in the `vite.config.js`. See the `examples/browser` directory for example:
 
+```javascript
+/**
+ * @type { import('vite').UserConfig }
+ */
+const config = {
+    optimizeDeps    : {
+        entries     : [
+            './tests/index.js',
+            './tests/**/*.t.js'
+        ]
+    }
+}
+
+export default config
+```
+
+Once you have this config in place, you can launch the development web server with: `npx vite`
 
 Launching individual test
 =========================
 
-
-Let's assume we have the following Siesta test file, called `basic_test.t.js`, which is available on the web URL as `http://localhost/my_project/tests/basic_test.t.js`. 
+Let's assume we have the following Siesta test file, called `basic_test.t.js`, which is available on the web URL as `http://localhost:3000/tests/basic_test.t.js`. We assume Vite server running. 
 
 ```javascript
 import { it } from "siesta/browser.js"
@@ -87,7 +104,7 @@ it('Deep equality should work', async t => {
 We can launch it, by providing its url to the launcher. The `--browser` option defines in which browser to run the test. By default, its `chrome`.
 
 ```shell
-npx siesta http://localhost/my_project/tests/basic_test.t.js --brower firefox
+npx siesta http://localhost:3000/my_project/tests/basic_test.t.js --brower firefox
 ```
 
 You should see something like:
@@ -99,6 +116,8 @@ Launching test suite
 
 To launch the whole test suite, one need to create the [[SiestaProjectGuide|Siesta project]].
 
+Note, that currently, browser projects do not have the access to the file system and need to list all the test files manually, using the [[Project.plan]] method. This is to support the use case, of running the project fully in the browser, without relying on any OS process, which is convenient for debugging. In the future, we plan improve this.
+
 
 Debugging
 =========
@@ -109,6 +128,7 @@ To debug the browser test, launch it, with additional option `--headless=false`:
 npx siesta http://localhost/my_project/tests/basic_test.t.js --brower firefox --headless=false
 ```
 
+Launcher will start the browser with the dev tools opened. 
 
 COPYRIGHT AND LICENSE
 =================
