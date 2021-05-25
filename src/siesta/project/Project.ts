@@ -94,7 +94,7 @@ export class Project extends Mixin(
 
         // this fancy type supports different typization of the descriptors in the browser projects
         /**
-         * Project plan is simply a tree of tests, available for running. The "parent" nodes of this tree
+         * Project plan is a set of tests to be launched. It is organized as "tree" data structure. The "parent" nodes of this tree
          * usually corresponds to file system directories, and "leaf" nodes - to test files.
          *
          * This method adds a test [[TestDescriptor|descriptor]] to the project's plan. The descriptor
