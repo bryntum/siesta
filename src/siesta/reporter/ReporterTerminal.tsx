@@ -129,16 +129,6 @@ export class ReporterTerminal extends Mixin(
         }
 
 
-        // onSubTestStart (testNode : TestNodeResult) {
-        //     if (testNode.isRoot) this.revertFooter()
-        //
-        //     super.onSubTestStart(testNode)
-        //
-        //     // to update the "RUNS" section
-        //     if (testNode.isRoot) this.printFooter()
-        // }
-
-
         printFinished () {
             this.revertFooter()
 

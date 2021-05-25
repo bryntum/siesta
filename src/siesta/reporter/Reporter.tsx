@@ -94,7 +94,6 @@ export class Reporter extends Mixin(
 
 
         onSubTestStart (testNode : TestNodeResult) {
-            // if (testNode.isRoot) this.resultsRunning.add(testNode)
         }
 
 
