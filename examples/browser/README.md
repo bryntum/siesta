@@ -16,10 +16,12 @@ Change the current working directory to the example:
 cd examples/browser
 ```
 
-Complete the setup with `npm`:
+Complete the setup:
 
 ```shell
 npm install
+
+npx tsc
 ```
 
 Launch
@@ -39,7 +41,7 @@ Then, in another shell, we launch the test suite itself:
 npx siesta http://localhost:3000/tests/index.js --browser chrome
 ```
 
-By default tests are launched in Chrome, supported browsers are also: `firefox`, `safari` and `edge` (currently same as `chrome`).
+By default, tests are launched in Chrome, supported browsers are also: `firefox`, `safari` and `edge` (currently same as `chrome`).
 
 We can also launch the individual test:
 
