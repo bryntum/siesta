@@ -88,8 +88,8 @@ const seedChildPort = async (
 
     if (!importer) throw new Error(`No global import map after executing seeding code`)
 
-    const portModuleImporter            = importer.getSymbolImporter(portModuleUrl)
-    const mediaModuleImporter           = importer.getSymbolImporter(mediaModuleUrl)
+    const portModuleImporter            = importer.getImporter(portModuleUrl)
+    const mediaModuleImporter           = importer.getImporter(mediaModuleUrl)
 
     if (!portModuleImporter) throw new Error(`Unknown module url : ${ portModuleUrl }`)
     if (!mediaModuleImporter) throw new Error(`Unknown module url : ${ mediaModuleUrl }`)
