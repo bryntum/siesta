@@ -43,7 +43,7 @@ export class LauncherTerminal extends Mixin(
         @option({
             type        : 'string',
             structure   : 'enum',
-            enumeration : [ 'dark', 'light', 'universal' ],
+            enumeration : [ 'dark', 'light', 'universal', 'accessible' ],
             defaultValue : () => 'universal',
             group       : OptionsGroupOutput,
             help        : <span>
