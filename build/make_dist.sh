@@ -6,10 +6,10 @@ set -e
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 . "$DIR"/util.sh
 
-if [[ $(git_repo_has_changes "$DIR/..") == 'true' ]]; then
-    echo ">>Repository has changes, aborting making distribution"
-    exit 1
-fi
+#if [[ $(git_repo_has_changes "$DIR/..") == 'true' ]]; then
+#    echo ">>Repository has changes, aborting making distribution"
+#    exit 1
+#fi
 
 DIST="$DIR/../DIST"
 
@@ -24,7 +24,7 @@ cd "$DIST"
 
 git checkout HEAD
 
-rm -rf "$DIST/.git" "$DIST/benchmarks" "$DIST/build/make_dist.sh"
+rm -rf "$DIST/.git" "$DIST/build/make_dist.sh"
 
 ln -s "$DIR/../node_modules" "node_modules"
 )
