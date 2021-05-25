@@ -390,13 +390,13 @@ export class Test extends Mixin(
         }
 
 
-        failOnExceptionDuringImport (exception : unknown) {
-            this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
-
-            this.addResult(Exception.new({ exception }))
-
-            this.reporter.onSubTestFinish(this.localId)
-        }
+        // failOnExceptionDuringImport (exception : unknown) {
+        //     this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
+        //
+        //     this.addResult(Exception.new({ exception }))
+        //
+        //     this.reporter.onSubTestFinish(this.localId)
+        // }
 
 
         async start () {
@@ -924,7 +924,7 @@ export class GlobalTestEnvironment extends Base {
     // is created as child node of it
     topTest                 : Test              = undefined
 
-    topTestDescriptorStr    : string            = undefined
+    topTestDescriptorStr    : string            = globalThis.__SIESTA_GLOBAL_TEST_DESC_STR__
 
     currentTest             : Test              = undefined
 
@@ -943,6 +943,12 @@ export class GlobalTestEnvironment extends Base {
 }
 
 export const globalTestEnv : GlobalTestEnvironment = GlobalTestEnvironment.new()
+
+Object.defineProperty(globalThis, '__SIESTA_GLOBAL_TEST_ENV__', {
+    enumerable      : false,
+    value           : globalTestEnv
+})
+
 
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -53,7 +53,7 @@ export class ContextPuppeteer extends Mixin(
         async setupChannel (parentPort : PortHandshakeParent, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
             await Promise.all([
                 this.startWebSocketServer(),
-                this.navigate(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/landing.html')
+                // this.navigate(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/landing.html')
             ])
 
             const parentMedia           = new this.parentMediaClass()

@@ -3,16 +3,18 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { CI } from "../../iterator/Iterator.js"
 import { Logger } from "../../logger/Logger.js"
+import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
 import { stringify } from "../../serializable/Serializable.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
-import { TestLauncherParent } from "../test/port/TestLauncher.js"
+import { TestLauncherChild, TestLauncherParent } from "../test/port/TestLauncher.js"
 import { Test } from "../test/Test.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
+import { Exception, TestNodeResult } from "../test/TestResult.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -225,15 +227,46 @@ export class Launch extends Mixin(
 
             const context           = await this.contextProviders[ 0 ].createContext()
 
-            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
+            let preLaunchRes : boolean
+
+            const stringifiedDesc   = stringify(normalized)
 
             //---------------------
+            try {
+                preLaunchRes        = await context.preLaunchTest(normalized.urlAbs, stringifiedDesc, this.getTestLaunchDelay())
+            } catch (e) {
+                const testNode      = TestNodeResult.new({ descriptor : normalized })
+
+                this.reporter.onSubTestStart(testNode)
+                testNode.addResult(Exception.new({ exception : e }))
+                this.reporter.onSubTestFinish(testNode)
+
+                await context.destroy()
+
+                return
+            }
+
+            // no global importer available - test file is probably empty, or does not import any Siesta code
+            // test will be reported as passed
+            if (!preLaunchRes) {
+                const testNode      = TestNodeResult.new({ descriptor : normalized })
+
+                this.reporter.onSubTestStart(testNode)
+                this.reporter.onSubTestFinish(testNode)
+
+                await context.destroy()
+
+                return
+            }
+
+            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
+
             try {
                 await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
 
                 this.logger.debug("Channel ready for: ", normalized.url)
 
-                await testLauncher.launchTest(normalized.urlAbs, stringify(normalized), this.getTestLaunchDelay())
+                await testLauncher.launchTest(stringifiedDesc)
             } finally {
                 await testLauncher.disconnect()
                 await context.destroy()
@@ -254,14 +287,23 @@ export class Launch extends Mixin(
 
             this.beforeTestLaunch(topTest.descriptor)
 
-            const context           = await this.contextProviders[ 0 ].createContext()
+            const testLauncher          = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
+            const testLauncherChild     = TestLauncherChild.new()
 
-            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
+            const parentMedia           = new MediaSameContext()
+            const childMedia            = new MediaSameContext()
 
-            await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
+            parentMedia.targetMedia     = childMedia
+            childMedia.targetMedia      = parentMedia
+
+            testLauncher.media          = parentMedia
+            testLauncherChild.media     = childMedia
+
+            testLauncherChild.connect()
+            await testLauncher.connect()
 
             //---------------------
-            topTest.reporter        = await testLauncher.getSameContextChildLauncher()
+            topTest.reporter            = testLauncherChild
 
             await topTest.start()
 

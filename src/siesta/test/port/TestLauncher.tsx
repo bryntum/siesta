@@ -5,7 +5,6 @@ import { local, remote } from "../../../rpc/port/Port.js"
 import { PortEvaluateChild, PortEvaluateParent } from "../../../rpc/port/PortEvaluate.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
 import { parse } from "../../../serializable/Serializable.js"
-import { delay } from "../../../util/Helpers.js"
 import { globalTestEnv, Test } from "../Test.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
@@ -22,7 +21,7 @@ import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 interface TestLauncher {
-    launchTest (url : string, testDescriptorStr : string, delayStart? : number) : Promise<any>
+    launchTest (testDescriptorStr : string) : Promise<any>
 
     getSameContextChildLauncher () : Promise<TestLauncherChild>
 }
@@ -34,7 +33,7 @@ export class TestLauncherParent extends Mixin(
 
         class TestLauncherParent extends base implements TestLauncher {
             @remote()
-            launchTest : (url : string, testDescriptorStr : string, delayStart? : number) => Promise<any>
+            launchTest : (testDescriptorStr : string) => Promise<any>
 
             @remote()
             getSameContextChildLauncher : () => Promise<TestLauncherChild>
@@ -59,43 +58,14 @@ export class TestLauncherChild extends Mixin(
 
 
             @local()
-            async launchTest (url : string, testDescriptorStr : string, delayStart : number = 0) {
-                if (globalTestEnv.topTest) throw new Error("Test context is already running a test")
-
-                globalTestEnv.topTestDescriptorStr  = testDescriptorStr
-                globalTestEnv.launcher              = this
-
-                let topTest : Test
-
-                if (delayStart > 0) await delay(delayStart)
-
-                try {
-                    await import(/* @vite-ignore */url)
-                } catch (e) {
-                    // TODO should account for possibility of `parse` throwing an error
-
-                    // there might be no `topTest` if test file does not contain any calls
-                    // to static `it` method of any test class
-                    topTest = globalTestEnv.topTest || Test.new({
-                        descriptor      : parse(testDescriptorStr),
-                        reporter        : this
-                    })
-
-                    topTest.failOnExceptionDuringImport(e)
-
-                    globalTestEnv.clear()
-
-                    return
-                }
-
-                // TODO should account for possibility of `parse` throwing an error
-
+            async launchTest (testDescriptorStr : string) {
                 // there might be no `topTest` if test file does not contain any calls
                 // to static `it` method of any test class
-                topTest = globalTestEnv.topTest || Test.new({
-                    descriptor      : parse(testDescriptorStr),
-                    reporter        : this
+                const topTest = globalTestEnv.topTest || Test.new({
+                    descriptor      : parse(testDescriptorStr)
                 })
+
+                topTest.reporter    = this
 
                 await topTest.start()
 

@@ -1,9 +1,11 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ImporterMap } from "../../importer/Importer.js"
 import { Media } from "../../rpc/media/Media.js"
 import { Port } from "../../rpc/port/Port.js"
 import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
+import { preLaunchTest } from "../test/port/LaunchTest.js"
 import { ContextProvider } from "./context_provider/ContextProvider.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -35,8 +37,17 @@ export class Context extends Mixin(
         }
 
 
+        // this class was supposed to be generic facility to establish arbitrary Port connection
+        // however it turns more and more into specialized test connection
+        // perhaps the generic part can be extracted later
+        // the main problem is making the code bundler-friendly, which means - no arbitrary dynamic import
         async setupChannel (parentPort : PortHandshakeParent, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
             throw new Error("Abstract method")
+        }
+
+
+        async preLaunchTest (url : string, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
+            return await this.evaluateBasic(preLaunchTest, url, testDescriptorStr, delayStart)
         }
 
 
@@ -47,13 +58,11 @@ export class Context extends Mixin(
         )
             : Promise<Port | undefined>
         {
-            const siestaPackageRoot = this.provider.launcher.projectData.siestaPackageRootUrl
-
             return await this.evaluateBasic(
                 seedChildPort,
-                siestaPackageRoot + relativePortModuleUrl,
+                relativePortModuleUrl,
                 relativePortClassSymbol,
-                siestaPackageRoot + this.relativeChildMediaModuleUrl,
+                this.relativeChildMediaModuleUrl,
                 this.relativeChildMediaClassSymbol,
                 portConfig,
                 mediaConfig,
@@ -75,7 +84,17 @@ const seedChildPort = async (
 )
     : Promise<Port | undefined>  =>
 {
-    const [ modulePort, moduleMedia ]   = await Promise.all([ import(/* @vite-ignore */portModuleUrl), import(/* @vite-ignore */mediaModuleUrl) ])
+    const importer                      = globalThis.__SIESTA_IMPORTER__ as ImporterMap
+
+    if (!importer) throw new Error(`No global import map after executing seeding code`)
+
+    const portModuleImporter            = importer.getSymbolImporter(portModuleUrl)
+    const mediaModuleImporter           = importer.getSymbolImporter(mediaModuleUrl)
+
+    if (!portModuleImporter) throw new Error(`Unknown module url : ${ portModuleUrl }`)
+    if (!mediaModuleImporter) throw new Error(`Unknown module url : ${ mediaModuleUrl }`)
+
+    const [ modulePort, moduleMedia ]   = await Promise.all([ portModuleImporter(), mediaModuleImporter() ])
 
     const media     = new moduleMedia[ mediaClassSymbol ]
     Object.assign(media, mediaConfig)
