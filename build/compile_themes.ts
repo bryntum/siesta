@@ -58,6 +58,7 @@ export const compileTheme = (themeFilename : string) => {
 compileTheme('theme_dark.scss')
 compileTheme('theme_light.scss')
 compileTheme('theme_universal.scss')
+compileTheme('theme_accessible.scss')
 
 //---------------------------------------------------------------------------------------------------------------------
 function styleToColorer (styleName : string, styleValue : string) : string | undefined {
