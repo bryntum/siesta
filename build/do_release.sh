@@ -11,22 +11,7 @@ set -e
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 . "$DIR"/util.sh
 
-#if [[ $(git_repo_has_changes "$DIR/..") == 'true' ]]; then
-#    echo ">>Repository has changes, aborting release"
-#    exit 1
-#fi
-
-DIST="$DIR/../DIST"
-
-"$DIR"/make_dist.sh
-
-cd $DIST
-
-# the following code is executed on the "distribution" copy
-#---------------------------------------------------------------------------------
-
-# prepare the dist
-build/build.sh
+cd "$DIR/.."
 
 build/run_tests.sh
 

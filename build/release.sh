@@ -28,8 +28,6 @@ cd $DIST
 # prepare the dist
 build/build.sh
 
-build/run_tests.sh
+# restart point inside the dist
+build/do_release.sh
 
-echo "PUBLISHING"
-
-#build/publish.sh
