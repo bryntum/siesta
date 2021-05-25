@@ -18,12 +18,16 @@ DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 DIST="$DIR/../DIST"
 
+echo ">>Starting release, preparing the clean distribution"
+
 "$DIR"/make_dist.sh
 
 cd $DIST
 
 # the following code is executed on the "distribution" copy
 #---------------------------------------------------------------------------------
+
+echo ">>Building the distribution"
 
 # prepare the dist
 build/build.sh

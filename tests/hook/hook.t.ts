@@ -70,6 +70,4 @@ it('Listening to hook should work', t => {
     arr.push(12)
 
     t.is(counter, 1)
-
-    t.fail('fail')
 })

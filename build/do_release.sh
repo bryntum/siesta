@@ -13,8 +13,10 @@ DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 cd "$DIR/.."
 
+echo ">>Running pre-release tests"
+
 build/run_tests.sh
 
-echo "PUBLISHING"
+echo ">>Starting the publication"
 
-#build/publish.sh
+build/publish.sh
