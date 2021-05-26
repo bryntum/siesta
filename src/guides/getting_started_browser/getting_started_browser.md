@@ -124,7 +124,7 @@ Note, that currently, browser projects do not have the access to the file system
 Debugging
 =========
 
-To debug the browser test, launch it, with additional option `--headless=false`: 
+To debug the browser test, place a `debugger` statement in it, then launch it as an individual test, with additional option `--headless=false`: 
 
 ```shell
 npx siesta http://localhost/my_project/tests/basic_test.t.js --brower firefox --headless=false
