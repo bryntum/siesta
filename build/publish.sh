@@ -33,7 +33,12 @@ node -e "require('./scripts/changelog.cjs').updateVersionAndStartNew()"
 git add CHANGELOG.md
 git commit -m "Updated changelog"
 
-git push
+VERSION=$(node -e "console.log(require('./package.json').version)")
+TAG="v$VERSION"
+
+git tag -a -m "version $VERSION" "$TAG"
+
+git push --tags
 
 # the trailing dot is required
 "$DIR"/publish_docs.sh "$DIST/docs/."
