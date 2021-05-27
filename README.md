@@ -12,7 +12,7 @@ Version 6 is a complete rewrite, using a modern technology stack and the decade 
 
 Main features:
 
-- One test tool to run them all. Siesta can run the tests in browsers, Node.js and Deno environments.
+- One test tool to run them all. Siesta can run tests in browsers, Node.js and Deno environments.
 - Supports parallel execution
 - Provides accurate and well-formatted deep diff for equality assertion
 
