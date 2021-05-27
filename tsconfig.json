@@ -42,6 +42,7 @@
 
     "exclude" : [
         "examples/deno",
+        "examples/nodejs",
         "examples/browser"
     ]
 }
