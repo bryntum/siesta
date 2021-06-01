@@ -35,7 +35,7 @@
     "node-fetch": "^3.0.0-beta.9",
     "playwright": "^1.11.0",
     "puppeteer": "^9.1.1",
-    "ws": "^7.4.4"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@types/cssom": "^0.4.1",
