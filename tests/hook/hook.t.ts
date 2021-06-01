@@ -5,7 +5,7 @@ import { Hook } from "../../src/hook/Hook.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ManagedArray<Element> extends Mixin(
     [ Array ],
-    <Element>(base : AnyConstructor<Array<Element>, typeof Array>) => {
+    <Element>(base : AnyConstructor<Array<Element>, typeof Array>) =>
 
     class ManagedArray extends base {
         Element                 : Element
@@ -36,9 +36,7 @@ export class ManagedArray<Element> extends Mixin(
             return super.pop()
         }
     }
-
-    return ManagedArray
-}){}
+){}
 
 export interface ManagedArray<Element> {
     Element : Element
