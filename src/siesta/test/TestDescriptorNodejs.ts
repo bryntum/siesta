@@ -20,12 +20,10 @@ import { TestDescriptor } from "./TestDescriptor.js"
 @serializable({ id : 'TestDescriptorNodejs' })
 export class TestDescriptorNodejs extends Mixin(
     [ TestDescriptor ],
-    (base : ClassUnion<typeof TestDescriptor>) => {
+    (base : ClassUnion<typeof TestDescriptor>) => 
 
     class TestDescriptorNodejs extends base {
         type            : EnvironmentType               = 'nodejs'
     }
-
-    return TestDescriptorNodejs
-}){}
+){}
 

@@ -49,7 +49,7 @@
     "tslint": "^6.1.3",
     "typedoc": "git://github.com/bryntum/typedoc.git#custom",
     "typedoc-default-themes": "git://github.com/bryntum/typedoc-default-themes.git",
-    "typescript": "^4.2.3"
+    "typescript": "../../TypeScript"
   },
   "snowpack": {
     "installOptions": {

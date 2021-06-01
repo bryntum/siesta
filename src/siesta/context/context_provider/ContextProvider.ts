@@ -8,7 +8,7 @@ import { Context } from "../Context.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProvider extends Mixin(
     [ Base ],
-    (base : ClassUnion<typeof Base>) => {
+    (base : ClassUnion<typeof Base>) => 
 
     class ContextProvider extends base {
         local                   : boolean           = false
@@ -69,7 +69,5 @@ export class ContextProvider extends Mixin(
 
         static providerName : string = 'abstract'
     }
-
-    return ContextProvider
-}) {}
+) {}
 

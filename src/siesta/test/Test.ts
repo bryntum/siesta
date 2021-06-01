@@ -68,7 +68,7 @@ export class Test extends Mixin(
         typeof AssertionException,
         typeof AssertionGeneral,
         typeof AssertionType
-    >) => {
+    >) => 
 
     class Test extends base {
         /**
@@ -910,9 +910,7 @@ export class Test extends Mixin(
                 return (await import('../project/ProjectBrowser.js')).ProjectBrowser
         }
     }
-
-    return Test
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -17,7 +17,7 @@ import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 @serializable({ id : 'ProjectDescriptor', mode : 'optIn' })
 export class ProjectDescriptor extends Mixin(
     [ Serializable, HasOptions, Base ],
-    (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof Base>) => {
+    (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof Base>) => 
 
     class ProjectOptions extends base {
         /**
@@ -29,58 +29,50 @@ export class ProjectDescriptor extends Mixin(
         @include()
         testDescriptor      : Partial<TestDescriptor>           = undefined
     }
-
-    return ProjectOptions
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ id : 'ProjectDescriptorBrowser', mode : 'optIn' })
 export class ProjectDescriptorBrowser extends Mixin(
     [ ProjectDescriptor ],
-    (base : ClassUnion<typeof ProjectDescriptor>) => {
+    (base : ClassUnion<typeof ProjectDescriptor>) => 
 
     class ProjectDescriptorBrowser extends base {
         testDescriptor      : Partial<TestDescriptorBrowser>
     }
-
-    return ProjectDescriptorBrowser
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ id : 'ProjectDescriptorNodejs', mode : 'optIn' })
 export class ProjectDescriptorNodejs extends Mixin(
     [ ProjectDescriptor ],
-    (base : ClassUnion<typeof ProjectDescriptor>) => {
+    (base : ClassUnion<typeof ProjectDescriptor>) => 
 
     class ProjectDescriptorNodejs extends base {
         testDescriptor      : Partial<TestDescriptorNodejs>
     }
-
-    return ProjectDescriptorNodejs
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ id : 'ProjectDescriptorDeno', mode : 'optIn' })
 export class ProjectDescriptorDeno extends Mixin(
     [ ProjectDescriptor ],
-    (base : ClassUnion<typeof ProjectDescriptor>) => {
+    (base : ClassUnion<typeof ProjectDescriptor>) => 
 
     class ProjectDescriptorDeno extends base {
         testDescriptor      : Partial<TestDescriptorDeno>
     }
-
-    return ProjectDescriptorDeno
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ id : 'ProjectSerializableData' })
 export class ProjectSerializableData extends Mixin(
     [ Serializable, Base ],
-    (base : ClassUnion<typeof Serializable, typeof Base>) => {
+    (base : ClassUnion<typeof Serializable, typeof Base>) => 
 
     class ProjectSerializableData extends base {
         environment             : Environment       = undefined
@@ -94,6 +86,4 @@ export class ProjectSerializableData extends Mixin(
 
         options         : ProjectDescriptor         = ProjectDescriptor.new()
     }
-
-    return ProjectSerializableData
-}) {}
+) {}

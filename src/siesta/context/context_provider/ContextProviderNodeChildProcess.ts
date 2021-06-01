@@ -7,7 +7,7 @@ import { ContextProvider } from "./ContextProvider.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProviderNodeChildProcess extends Mixin(
     [ ContextProvider ],
-    (base : ClassUnion<typeof ContextProvider>) => {
+    (base : ClassUnion<typeof ContextProvider>) => 
 
     class ContextProviderNodeChildProcess extends base {
         local                   : boolean           = true
@@ -38,9 +38,7 @@ export class ContextProviderNodeChildProcess extends Mixin(
 
         static providerName : string = 'nodejs'
     }
-
-    return ContextProviderNodeChildProcess
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------

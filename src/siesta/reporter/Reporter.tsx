@@ -23,7 +23,7 @@ export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
     [ ConsoleXmlRenderer, Base ],
-    (base : ClassUnion<typeof ConsoleXmlRenderer, typeof Base>) => {
+    (base : ClassUnion<typeof ConsoleXmlRenderer, typeof Base>) => 
 
     class Reporter extends base {
         launch              : Launch                    = undefined
@@ -415,9 +415,7 @@ export class Reporter extends Mixin(
         }
         // endregion
     }
-
-    return Reporter
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------

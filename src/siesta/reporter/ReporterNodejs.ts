@@ -7,7 +7,7 @@ import { Reporter } from "./Reporter.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterNodejs extends Mixin(
     [ Reporter ],
-    (base : ClassUnion<typeof Reporter>) => {
+    (base : ClassUnion<typeof Reporter>) => 
 
     class ReporterNodejs extends base {
 
@@ -28,6 +28,4 @@ export class ReporterNodejs extends Mixin(
             }
         }
     }
-
-    return ReporterNodejs
-}) {}
+) {}

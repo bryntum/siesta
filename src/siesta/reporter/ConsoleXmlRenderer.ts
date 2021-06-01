@@ -9,7 +9,7 @@ import { ArbitraryObject } from "../../util/Helpers.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ConsoleXmlRenderer extends Mixin(
     [ XmlRendererDifference ],
-    (base : ClassUnion<typeof XmlRendererDifference>) => {
+    (base : ClassUnion<typeof XmlRendererDifference>) => 
 
     class ConsoleXmlRenderer extends base {
 
@@ -52,7 +52,5 @@ export class ConsoleXmlRenderer extends Mixin(
             this.printLn(this.render(el, TextBlock.new({ maxLen : this.getMaxLen() })))
         }
     }
-
-    return ConsoleXmlRenderer
-}) {}
+) {}
 

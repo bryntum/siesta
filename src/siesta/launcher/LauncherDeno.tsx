@@ -27,7 +27,7 @@ declare const Deno : any
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherDeno extends Mixin(
     [ Launcher, LauncherTerminal, ExecutionContextAttachable ],
-    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) => {
+    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) => 
 
     class LauncherDeno extends base {
         // region options
@@ -178,7 +178,5 @@ export class LauncherDeno extends Mixin(
             Deno.exit(launch.exitCode)
         }
     }
-
-    return LauncherDeno
-}) {}
+) {}
 

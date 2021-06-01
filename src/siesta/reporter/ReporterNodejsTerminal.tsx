@@ -10,7 +10,7 @@ import { TerminalNodejs } from "./TerminalNodejs.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterNodejsTerminal extends Mixin(
     [ ReporterTerminal, ReporterNodejs ],
-    (base : ClassUnion<typeof ReporterTerminal, typeof ReporterNodejs>) => {
+    (base : ClassUnion<typeof ReporterTerminal, typeof ReporterNodejs>) => 
 
     class ReporterNodejsTerminal extends base {
         terminalClass       : typeof Terminal           = TerminalNodejs
@@ -37,6 +37,4 @@ export class ReporterNodejsTerminal extends Mixin(
             })
         }
     }
-
-    return ReporterNodejsTerminal
-}) {}
+) {}

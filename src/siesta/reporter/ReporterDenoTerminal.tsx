@@ -12,7 +12,7 @@ declare const Deno : any
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterDenoTerminal extends Mixin(
     [ ReporterTerminal, ReporterDeno ],
-    (base : ClassUnion<typeof ReporterTerminal, typeof ReporterDeno>) => {
+    (base : ClassUnion<typeof ReporterTerminal, typeof ReporterDeno>) => 
 
     class ReporterDenoTerminal extends base {
         terminalClass       : typeof Terminal           = TerminalDeno
@@ -58,6 +58,4 @@ export class ReporterDenoTerminal extends Mixin(
             this.sigintIterator.dispose()
         }
     }
-
-    return ReporterDenoTerminal
-}) {}
+) {}

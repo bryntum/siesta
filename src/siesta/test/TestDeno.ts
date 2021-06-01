@@ -23,7 +23,7 @@ export class TestDeno extends Mixin(
     ],
     (base : ClassUnion<
         typeof Test
-    >) => {
+    >) => 
 
     class TestDeno extends base {
         @prototypeValue(TestDescriptorDeno)
@@ -60,9 +60,7 @@ export class TestDeno extends Mixin(
         }
     }
 
-    return TestDeno
-
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------

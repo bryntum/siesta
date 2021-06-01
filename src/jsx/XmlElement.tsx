@@ -15,7 +15,7 @@ export type XmlNode = string | XmlElement
 @serializable({ id : 'XmlElement' })
 export class XmlElement extends Mixin(
     [ Serializable, Base ],
-    (base : ClassUnion<typeof Serializable, typeof Base>) => {
+    (base : ClassUnion<typeof Serializable, typeof Base>) =>
 
     class XmlElement extends base {
         props           : { class? : string }
@@ -274,9 +274,7 @@ export class XmlElement extends Mixin(
         ) {
         }
     }
-
-    return XmlElement
-}){}
+){}
 
 //---------------------------------------------------------------------------------------------------------------------
 const escapeTable = {

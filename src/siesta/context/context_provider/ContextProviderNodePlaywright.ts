@@ -8,7 +8,7 @@ import { ContextProviderTargetBrowser } from "./ContextProviderTargetBrowser.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProviderNodePlaywright extends Mixin(
     [ ContextProviderTargetBrowser ],
-    (base : ClassUnion<typeof ContextProviderTargetBrowser>) => {
+    (base : ClassUnion<typeof ContextProviderTargetBrowser>) => 
 
     class ContextProviderNodePlaywright extends base {
         local                   : boolean           = true
@@ -94,6 +94,4 @@ export class ContextProviderNodePlaywright extends Mixin(
 
         static providerName : string = 'playwright'
     }
-
-    return ContextProviderNodePlaywright
-}) {}
+) {}

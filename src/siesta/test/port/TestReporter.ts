@@ -33,7 +33,7 @@ interface TestReporter {
 //---------------------------------------------------------------------------------------------------------------------
 export class TestReporterParent extends Mixin(
     [ Port ],
-    (base : ClassUnion<typeof Port>) => {
+    (base : ClassUnion<typeof Port>) => 
 
         class TestReporterParent extends base implements TestReporter {
 
@@ -111,16 +111,14 @@ export class TestReporterParent extends Mixin(
                 this.reporter.onAssertionFinish(this.currentTestNodeResult, assertion)
             }
         }
-
-        return TestReporterParent
-    }
+    
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestReporterChild extends Mixin(
     [ Port ],
-    (base : ClassUnion<typeof Port>) => {
+    (base : ClassUnion<typeof Port>) => 
 
         class TestReporterChild extends base implements TestReporter {
             @remote()
@@ -135,9 +133,7 @@ export class TestReporterChild extends Mixin(
             @remote()
             onAssertionFinish : (testNodeId : LUID, assertion : AssertionAsyncResolution) => Promise<any>
         }
-
-        return TestReporterChild
-    }
+    
 ) {}
 
 

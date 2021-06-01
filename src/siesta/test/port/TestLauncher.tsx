@@ -23,38 +23,36 @@ import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 interface TestLauncher {
     launchTest (testDescriptorStr : string) : Promise<any>
 
-    getSameContextChildLauncher () : Promise<TestLauncherChild>
+    // getSameContextChildLauncher () : Promise<TestLauncherChild>
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherParent extends Mixin(
     [ TestReporterParent, PortEvaluateParent, PortHandshakeParent, Base ],
-    (base : ClassUnion<typeof TestReporterParent, typeof PortEvaluateParent, typeof PortHandshakeParent, typeof Base>) => {
+    (base : ClassUnion<typeof TestReporterParent, typeof PortEvaluateParent, typeof PortHandshakeParent, typeof Base>) =>
 
         class TestLauncherParent extends base implements TestLauncher {
             @remote()
             launchTest : (testDescriptorStr : string) => Promise<any>
 
-            @remote()
-            getSameContextChildLauncher : () => Promise<TestLauncherChild>
+            // @remote()
+            // getSameContextChildLauncher : () => Promise<TestLauncherChild>
         }
 
-        return TestLauncherParent
-    }
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherChild extends Mixin(
     [ TestReporterChild, PortEvaluateChild, PortHandshakeChild, Base ],
-    (base : ClassUnion<typeof TestReporterChild, typeof PortEvaluateChild, typeof PortHandshakeChild, typeof Base>) => {
+    (base : ClassUnion<typeof TestReporterChild, typeof PortEvaluateChild, typeof PortHandshakeChild, typeof Base>) =>
 
         class TestLauncherChild extends base implements TestLauncher {
 
-            @local()
-            async getSameContextChildLauncher () : Promise<TestLauncherChild> {
-                return this
-            }
+            // @local()
+            // async getSameContextChildLauncher () : Promise<TestLauncherChild> {
+            //     // return this
+            // }
 
 
             @local()
@@ -73,6 +71,4 @@ export class TestLauncherChild extends Mixin(
             }
         }
 
-        return TestLauncherChild
-    }
 ) {}

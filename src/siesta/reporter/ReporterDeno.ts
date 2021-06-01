@@ -9,7 +9,7 @@ declare const Deno : any
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterDeno extends Mixin(
     [ Reporter ],
-    (base : ClassUnion<typeof Reporter>) => {
+    (base : ClassUnion<typeof Reporter>) => 
 
     class ReporterDeno extends base {
 
@@ -29,6 +29,4 @@ export class ReporterDeno extends Mixin(
             }
         }
     }
-
-    return ReporterDeno
-}) {}
+) {}

@@ -17,7 +17,7 @@ export class TestBrowser extends Mixin(
     ],
     (base : ClassUnion<
         typeof Test
-    >) => {
+    >) => 
 
     class TestBrowser extends base {
         @prototypeValue(TestDescriptorBrowser)
@@ -62,9 +62,7 @@ Please use Siesta launcher instead and web url:
         }
     }
 
-    return TestBrowser
-
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------

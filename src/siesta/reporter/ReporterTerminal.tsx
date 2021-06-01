@@ -15,7 +15,7 @@ type PrintingState  = {
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterTerminal extends Mixin(
     [ Reporter ],
-    (base : ClassUnion<typeof Reporter>) => {
+    (base : ClassUnion<typeof Reporter>) => 
 
     class ReporterTerminal extends base {
         spinner             : Spinner                   = randomSpinner()
@@ -219,6 +219,4 @@ export class ReporterTerminal extends Mixin(
             this.spinner.tick()
         }
     }
-
-    return ReporterTerminal
-}) {}
+) {}

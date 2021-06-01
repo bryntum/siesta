@@ -22,7 +22,7 @@ interface PortHandshake {
 //---------------------------------------------------------------------------------------------------------------------
 export class PortHandshakeParent extends Mixin(
     [ Port ],
-    (base : ClassUnion<typeof Port>) => {
+    (base : ClassUnion<typeof Port>) =>
 
         class PortHandshakeParent extends base implements PortHandshake {
             handshakeType           : HandshakeType = 'parent_first'
@@ -56,15 +56,13 @@ export class PortHandshakeParent extends Mixin(
             }
         }
 
-        return PortHandshakeParent
-    }
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class PortHandshakeChild extends Mixin(
     [ Port ],
-    (base : ClassUnion<typeof Port>) => {
+    (base : ClassUnion<typeof Port>) =>
 
         class PortHandshakeChild extends base implements PortHandshake {
             handshakeType           : HandshakeType = 'parent_first'
@@ -98,7 +96,5 @@ export class PortHandshakeChild extends Mixin(
             }
         }
 
-        return PortHandshakeChild
-    }
 ) {}
 

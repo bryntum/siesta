@@ -11,7 +11,7 @@ interface PortEvaluate {
 //---------------------------------------------------------------------------------------------------------------------
 export class PortEvaluateParent extends Mixin(
     [ Port ],
-    (base : ClassUnion<typeof Port>) => {
+    (base : ClassUnion<typeof Port>) =>
 
         class PortEvaluateParent extends base implements PortEvaluate {
 
@@ -23,16 +23,13 @@ export class PortEvaluateParent extends Mixin(
                 return await this.doEvaluate(func.toString(), args) as Promise<UnwrapPromise<R>>
             }
         }
-
-        return PortEvaluateParent
-    }
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class PortEvaluateChild extends Mixin(
     [ Port ],
-    (base : ClassUnion<typeof Port>) => {
+    (base : ClassUnion<typeof Port>) =>
 
         class PortEvaluateChild extends base implements PortEvaluate {
 
@@ -43,8 +40,5 @@ export class PortEvaluateChild extends Mixin(
                 return await func(...args)
             }
         }
-
-        return PortEvaluateChild
-    }
 ) {}
 

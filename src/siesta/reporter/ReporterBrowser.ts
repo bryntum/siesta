@@ -5,7 +5,7 @@ import { Reporter } from "./Reporter.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterBrowser extends Mixin(
     [ Reporter ],
-    (base : ClassUnion<typeof Reporter>) => {
+    (base : ClassUnion<typeof Reporter>) => 
 
     class ReporterBrowser extends base {
 
@@ -20,6 +20,4 @@ export class ReporterBrowser extends Mixin(
             return saneSplit(text, '\n')
         }
     }
-
-    return ReporterBrowser
-}) {}
+) {}

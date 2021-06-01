@@ -117,7 +117,7 @@ export type PrepareOptionsResult = {
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
     [ HasOptions, ConsoleXmlRenderer, HasRuntimeAccess, Base ],
-    (base : ClassUnion<typeof HasOptions, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess, typeof Base>) => {
+    (base : ClassUnion<typeof HasOptions, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess, typeof Base>) => 
 
     class Launcher extends base {
         projectData             : ProjectSerializableData   = undefined
@@ -515,6 +515,4 @@ export class Launcher extends Mixin(
             </div>
         }
     }
-
-    return Launcher
-}) {}
+) {}

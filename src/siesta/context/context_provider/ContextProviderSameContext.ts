@@ -6,7 +6,7 @@ import { ContextProvider } from "./ContextProvider.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProviderSameContext extends Mixin(
     [ ContextProvider ],
-    (base : ClassUnion<typeof ContextProvider>) => {
+    (base : ClassUnion<typeof ContextProvider>) => 
 
     class ContextProviderSameContext extends base {
         local                   : boolean           = true
@@ -22,6 +22,4 @@ export class ContextProviderSameContext extends Mixin(
 
         static providerName : string = 'samecontext'
     }
-
-    return ContextProviderSameContext
-}) {}
+) {}

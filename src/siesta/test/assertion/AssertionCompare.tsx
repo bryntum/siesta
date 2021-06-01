@@ -616,6 +616,7 @@ export class AssertionCompare extends Mixin(
          * @param args
          */
         any<T extends [] | [ AnyConstructor ]> (...args : T) : T extends [] ? any : T extends [ AnyConstructor<infer I> ] ? I : never {
+            // @ts-ignore
             return any(...args)
         }
 

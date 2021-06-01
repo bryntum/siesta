@@ -18,7 +18,7 @@ import { ProjectDescriptor, ProjectSerializableData } from "./ProjectDescriptor.
  */
 export class Project extends Mixin(
     [ ProjectDescriptor, HasRuntimeAccess ],
-    (base : ClassUnion<typeof ProjectDescriptor, typeof HasRuntimeAccess>) => {
+    (base : ClassUnion<typeof ProjectDescriptor, typeof HasRuntimeAccess>) => 
 
     class Project extends base {
         type                    : EnvironmentType           = 'isomorphic'
@@ -191,6 +191,4 @@ export class Project extends Mixin(
             return stringify(this.asProjectSerializableData())
         }
     }
-
-    return Project
-}) {}
+) {}

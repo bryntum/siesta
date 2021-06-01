@@ -122,7 +122,7 @@ export class Assertion extends Mixin(
 @serializable({ id : 'AssertionAsyncCreation' })
 export class AssertionAsyncCreation extends Mixin(
     [ Assertion, Serializable, Result ],
-    (base : ClassUnion<typeof Assertion, typeof Serializable, typeof Result>) => {
+    (base : ClassUnion<typeof Assertion, typeof Serializable, typeof Result>) => 
 
     class AssertionAsyncCreation extends base {
         resolution      : AssertionAsyncResolution  = undefined
@@ -134,15 +134,14 @@ export class AssertionAsyncCreation extends Mixin(
         set passed (value : boolean) {
         }
     }
-    return AssertionAsyncCreation
-}) {}
+) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ id : 'AssertionAsyncResolution' })
 export class AssertionAsyncResolution extends Mixin(
     [ Serializable, Result ],
-    (base : ClassUnion<typeof Serializable, typeof Result>) => {
+    (base : ClassUnion<typeof Serializable, typeof Result>) => 
 
     class AssertionAsyncResolution extends base {
         creationId      : LUID              = undefined
@@ -151,8 +150,7 @@ export class AssertionAsyncResolution extends Mixin(
 
         timeoutHappened : boolean           = false
     }
-    return AssertionAsyncResolution
-}) {}
+) {}
 
 
 
@@ -172,7 +170,7 @@ export type TestResult      = TestResultLeaf | TestResultTree
 
 export class TestNodeResult extends Mixin(
     [ Result ],
-    (base : ClassUnion<typeof Result>) => {
+    (base : ClassUnion<typeof Result>) => 
 
     class TestNodeResult extends base {
         // TODO should probably have separate flag for assertions??
@@ -360,6 +358,4 @@ export class TestNodeResult extends Mixin(
             }
         }
     }
-
-    return TestNodeResult
-}) {}
+) {}

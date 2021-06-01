@@ -16,7 +16,7 @@ import { ProjectDescriptorBrowser } from "./ProjectDescriptor.js"
  */
 export class ProjectBrowser extends Mixin(
     [ Project, ProjectDescriptorBrowser ],
-    (base : ClassUnion<typeof Project, typeof ProjectDescriptorBrowser>) => {
+    (base : ClassUnion<typeof Project, typeof ProjectDescriptorBrowser>) => 
 
     class ProjectBrowser extends base {
         type                    : EnvironmentType               = 'browser'
@@ -45,6 +45,4 @@ Please use Siesta launcher instead and web url:
             return super.launchStandalone()
         }
     }
-
-    return ProjectBrowser
-}) {}
+) {}

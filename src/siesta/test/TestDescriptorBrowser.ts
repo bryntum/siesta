@@ -27,7 +27,7 @@ export type PreloadDescriptor = string
 @serializable({ id : 'TestDescriptorBrowser' })
 export class TestDescriptorBrowser extends Mixin(
     [ TestDescriptor ],
-    (base : ClassUnion<typeof TestDescriptor>) => {
+    (base : ClassUnion<typeof TestDescriptor>) => 
 
     class TestDescriptorBrowser extends base {
         type                : EnvironmentType           = 'browser'
@@ -41,7 +41,5 @@ export class TestDescriptorBrowser extends Mixin(
         @option()
         pageUrl             : string                    = ''
     }
-
-    return TestDescriptorBrowser
-}){}
+){}
 

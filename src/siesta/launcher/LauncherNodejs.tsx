@@ -37,7 +37,7 @@ export const OptionsGroupBrowser  = OptionGroup.new({
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherNodejs extends Mixin(
     [ Launcher, LauncherTerminal, ExecutionContextAttachable ],
-    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) => {
+    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) => 
 
     class LauncherNodejs extends base {
         launchClass             : typeof Launch             = LaunchNodejs
@@ -222,7 +222,5 @@ export class LauncherNodejs extends Mixin(
             await launcher.destroy()
         }
     }
-
-    return LauncherNodejs
-}) {}
+) {}
 

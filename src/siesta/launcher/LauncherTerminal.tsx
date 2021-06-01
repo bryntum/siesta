@@ -23,7 +23,7 @@ import { extractProjectInfo } from "./ProjectExtractor.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherTerminal extends Mixin(
     [ Launcher ],
-    (base : ClassUnion<typeof Launcher>) => {
+    (base : ClassUnion<typeof Launcher>) => 
 
     class LauncherTerminal extends base {
         logger                  : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
@@ -227,6 +227,4 @@ export class LauncherTerminal extends Mixin(
                 throw new Error("Should not reach this line")
         }
     }
-
-    return LauncherTerminal
-}) {}
+) {}

@@ -9,7 +9,7 @@ import { ContextProviderTargetBrowser } from "./ContextProviderTargetBrowser.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProviderNodePuppeteer extends Mixin(
     [ ContextProviderTargetBrowser ],
-    (base : ClassUnion<typeof ContextProviderTargetBrowser>) => {
+    (base : ClassUnion<typeof ContextProviderTargetBrowser>) => 
 
     class ContextProviderNodePuppeteer extends base {
         local                   : boolean           = true
@@ -94,6 +94,4 @@ export class ContextProviderNodePuppeteer extends Mixin(
 
         static providerName : string = 'puppeteer'
     }
-
-    return ContextProviderNodePuppeteer
-}) {}
+) {}

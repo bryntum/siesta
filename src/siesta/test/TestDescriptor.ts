@@ -39,7 +39,7 @@ export const OptionsGroupTestDescriptor  = OptionGroup.new({
 @serializable({ id : 'TestDescriptor' })
 export class TestDescriptor extends Mixin(
     [ Serializable, HasOptions, TreeNode, Base ],
-    (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof TreeNode, typeof Base>) => {
+    (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof TreeNode, typeof Base>) => 
 
     class TestDescriptor extends base {
         remoteId        : LUID                  = undefined
@@ -344,9 +344,7 @@ export class TestDescriptor extends Mixin(
             }
         }
     }
-
-    return TestDescriptor
-}) {}
+) {}
 
 /**
  * This type represents a special placeholder for the [[TestDescriptor]] value. It is used as the
