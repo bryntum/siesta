@@ -9,30 +9,26 @@ import { DeepCompareOptions, DeepCompareState, Difference, DifferenceAtomic, Dif
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class FuzzyMatcher extends Mixin(
-    [ Base ],
-    (base : ClassUnion<typeof Base>) =>
+export class FuzzyMatcher extends Base {
 
-    class FuzzyMatcher extends base {
-
-        toString () : string {
-            throw new Error("Abstract method")
-        }
-
-
-        [ serializationVisitSymbol ] (visitor : Visitor, depth : number) : this {
-            throw new Error("Abstract method")
-        }
-
-
-        equalsToDiff (
-            v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
-            convertingToDiff    : 'value1' | 'value2' | undefined = undefined
-        ) : Difference {
-            throw new Error("Abstract method")
-        }
+    toString () : string {
+        throw new Error("Abstract method")
     }
-){}
+
+
+    [ serializationVisitSymbol ] (visitor : Visitor, depth : number) : this {
+        throw new Error("Abstract method")
+    }
+
+
+    equalsToDiff (
+        v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
+        convertingToDiff    : 'value1' | 'value2' | undefined = undefined
+    ) : Difference {
+        throw new Error("Abstract method")
+    }
+}
+
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -109,67 +105,62 @@ export type Approximation   = number | Partial<NumberApproximation> | NumberAppr
  * t.is(10.1, anyNumberApprox(10, { percent : 1 }))
  * ```
  */
-export class FuzzyMatcherNumberApproximation extends Mixin(
-    [ FuzzyMatcher ],
-    (base : ClassUnion<typeof FuzzyMatcher>) =>
+export class FuzzyMatcherNumberApproximation extends FuzzyMatcher {
+    /**
+     * Expected value to match with
+     */
+    value       : number                = undefined
 
-    class FuzzyMatcherNumberApproximation extends base {
-        /**
-         * Expected value to match with
-         */
-        value       : number                = undefined
-
-        /**
-         * An approximation of the expected value.
-         */
-        approx      : NumberApproximation   = NumberApproximation.new({ percent : 5 })
+    /**
+     * An approximation of the expected value.
+     */
+    approx      : NumberApproximation   = NumberApproximation.new({ percent : 5 })
 
 
-        toString () : string {
-            if (this.approx.threshold !== undefined) {
-                return `${ this.value }±${ this.approx.getThreshold(this.value) }`
-            }
-            else if (this.approx.percent !== undefined) {
-                return `${ this.value }±${ this.approx.percent }%`
-            }
-            else if (this.approx.digits !== undefined) {
-                const parts     = String(this.value).split('.')
-
-                if (parts.length < 2) parts.push('0'.repeat(this.approx.digits))
-
-                return `${ parts[ 0 ] }.${ parts[ 1 ].substr(0, this.approx.digits) }${ parts[ 1 ].length - this.approx.digits > 0 ? 'x'.repeat(parts[ 1 ].length - this.approx.digits) : '' }`
-            }
+    toString () : string {
+        if (this.approx.threshold !== undefined) {
+            return `${ this.value }±${ this.approx.getThreshold(this.value) }`
         }
-
-
-        [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-            visitor.write(<number>{ this }</number>)
-
-            return this
+        else if (this.approx.percent !== undefined) {
+            return `${ this.value }±${ this.approx.percent }%`
         }
+        else if (this.approx.digits !== undefined) {
+            const parts     = String(this.value).split('.')
 
+            if (parts.length < 2) parts.push('0'.repeat(this.approx.digits))
 
-        equalsToDiff (
-            v : number, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
-            convertingToDiff    : 'value1' | 'value2' | undefined = undefined
-        ) : Difference {
-            const v1        = flipped ? v : this
-            const v2        = flipped ? this : v
-
-            const type1     = flipped ? typeOf(v) : 'Number'
-            const type2     = flipped ? 'Number' : typeOf(v)
-
-            if (type1 !== type2)
-                return DifferenceHeterogeneous.new({
-                    value1 : valueAsDifference(v1, 'value1', options, state),
-                    value2 : valueAsDifference(v2, 'value2', options, state)
-                })
-            else {
-                return DifferenceAtomic.new({ value1 : v1, value2 : v2, same : this.approx.equalApprox(v, this.value) })
-            }
+            return `${ parts[ 0 ] }.${ parts[ 1 ].substr(0, this.approx.digits) }${ parts[ 1 ].length - this.approx.digits > 0 ? 'x'.repeat(parts[ 1 ].length - this.approx.digits) : '' }`
         }
     }
-){}
+
+
+    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
+        visitor.write(<number>{ this }</number>)
+
+        return this
+    }
+
+
+    equalsToDiff (
+        v : number, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
+        convertingToDiff    : 'value1' | 'value2' | undefined = undefined
+    ) : Difference {
+        const v1        = flipped ? v : this
+        const v2        = flipped ? this : v
+
+        const type1     = flipped ? typeOf(v) : 'Number'
+        const type2     = flipped ? 'Number' : typeOf(v)
+
+        if (type1 !== type2)
+            return DifferenceHeterogeneous.new({
+                value1 : valueAsDifference(v1, 'value1', options, state),
+                value2 : valueAsDifference(v2, 'value2', options, state)
+            })
+        else {
+            return DifferenceAtomic.new({ value1 : v1, value2 : v2, same : this.approx.equalApprox(v, this.value) })
+        }
+    }
+}
 
 /**
  * Returns an instance of [[FuzzyMatcherNumberApproximation]], configured with the `value` and `approx` arguments.
@@ -199,64 +190,59 @@ export const anyNumberApprox = (value : number, approx : Approximation = { thres
  * t.is(0, anyNumberBetween(0, 1, false))
  * ```
  */
-export class FuzzyMatcherNumberBetween extends Mixin(
-    [ FuzzyMatcher ],
-    (base : ClassUnion<typeof FuzzyMatcher>) =>
+export class FuzzyMatcherNumberBetween extends FuzzyMatcher {
+    /**
+     * The mininmum of the matching interval.
+     */
+    min         : number        = undefined
 
-    class FuzzyMatcherNumberBetween extends base {
-        /**
-         * The mininmum of the matching interval.
-         */
-        min         : number        = undefined
+    /**
+     * The maxinmum of the matching interval.
+     */
+    max         : number        = undefined
 
-        /**
-         * The maxinmum of the matching interval.
-         */
-        max         : number        = undefined
-
-        /**
-         * Whether the boundaries of the interval are matching.
-         */
-        inclusive   : boolean       = true
+    /**
+     * Whether the boundaries of the interval are matching.
+     */
+    inclusive   : boolean       = true
 
 
-        toString () : string {
-            const relation      = this.inclusive ? '≤' : '<'
+    toString () : string {
+        const relation      = this.inclusive ? '≤' : '<'
 
-            return `${ this.min } ${ relation } x ${ relation } ${ this.max }`
-        }
-
-
-        [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-            visitor.write(<number>{ this }</number>)
-
-            return this
-        }
+        return `${ this.min } ${ relation } x ${ relation } ${ this.max }`
+    }
 
 
-        equalsToDiff (
-            v : number, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
-            convertingToDiff    : 'value1' | 'value2' | undefined = undefined
-        ) : Difference {
-            const v1        = flipped ? v : this
-            const v2        = flipped ? this : v
+    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
+        visitor.write(<number>{ this }</number>)
 
-            const type1     = flipped ? typeOf(v) : 'Number'
-            const type2     = flipped ? 'Number' : typeOf(v)
+        return this
+    }
 
-            if (type1 !== type2)
-                return DifferenceHeterogeneous.new({
-                    value1 : valueAsDifference(v1, 'value1', options, state),
-                    value2 : valueAsDifference(v2, 'value2', options, state)
-                })
-            else {
-                const relation  = (num1 : number, num2 : number) => this.inclusive ? num1 <= num2 : num1 < num2
 
-                return DifferenceAtomic.new({ value1 : v1, value2 : v2, same : relation(this.min, v) && relation(v, this.max) })
-            }
+    equalsToDiff (
+        v : number, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
+        convertingToDiff    : 'value1' | 'value2' | undefined = undefined
+    ) : Difference {
+        const v1        = flipped ? v : this
+        const v2        = flipped ? this : v
+
+        const type1     = flipped ? typeOf(v) : 'Number'
+        const type2     = flipped ? 'Number' : typeOf(v)
+
+        if (type1 !== type2)
+            return DifferenceHeterogeneous.new({
+                value1 : valueAsDifference(v1, 'value1', options, state),
+                value2 : valueAsDifference(v2, 'value2', options, state)
+            })
+        else {
+            const relation  = (num1 : number, num2 : number) => this.inclusive ? num1 <= num2 : num1 < num2
+
+            return DifferenceAtomic.new({ value1 : v1, value2 : v2, same : relation(this.min, v) && relation(v, this.max) })
         }
     }
-){}
+}
 
 /**
  * Returns an instance of [[FuzzyMatcherNumberBetween]], configured with the `min`, `max` and `inclusive` arguments.
@@ -286,56 +272,51 @@ export const anyNumberBetween = (min : number, max : number, inclusive : boolean
  * t.is('boops', anyStringLike(/OOP/i))
  * ```
  */
-export class FuzzyMatcherString extends Mixin(
-    [ FuzzyMatcher ],
-    (base : ClassUnion<typeof FuzzyMatcher>) =>
+export class FuzzyMatcherString extends FuzzyMatcher {
+    /**
+     * Either a string, which the matching strip should contain, or a `RegExp` instance, which the matching string should conform to.
+     */
+    pattern     : string | RegExp       = ''
 
-    class FuzzyMatcherString extends base {
-        /**
-         * Either a string, which the matching strip should contain, or a `RegExp` instance, which the matching string should conform to.
-         */
-        pattern     : string | RegExp       = ''
-
-        toString () : string {
-            if (isRegExp(this.pattern))
-                return `any string matching ${ this.pattern }`
-            else
-                return `any string containing "${ this.pattern }"`
-        }
+    toString () : string {
+        if (isRegExp(this.pattern))
+            return `any string matching ${ this.pattern }`
+        else
+            return `any string containing "${ this.pattern }"`
+    }
 
 
-        [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-            visitor.write(<special>{ this }</special>)
+    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
+        visitor.write(<special>{ this }</special>)
 
-            return this
-        }
+        return this
+    }
 
 
-        equalsToDiff (
-            v : string, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
-            convertingToDiff    : 'value1' | 'value2' | undefined = undefined
-        ) : Difference {
-            const v1        = flipped ? v : this
-            const v2        = flipped ? this : v
+    equalsToDiff (
+        v : string, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
+        convertingToDiff    : 'value1' | 'value2' | undefined = undefined
+    ) : Difference {
+        const v1        = flipped ? v : this
+        const v2        = flipped ? this : v
 
-            const type1     = flipped ? typeOf(v) : 'String'
-            const type2     = flipped ? 'String' : typeOf(v)
+        const type1     = flipped ? typeOf(v) : 'String'
+        const type2     = flipped ? 'String' : typeOf(v)
 
-            if (type1 !== type2)
-                return DifferenceHeterogeneous.new({
-                    value1 : valueAsDifference(v1, 'value1', options, state),
-                    value2 : valueAsDifference(v2, 'value2', options, state)
-                })
-            else {
-                return DifferenceAtomic.new({
-                    value1  : v1,
-                    value2  : v2,
-                    same    : isRegExp(this.pattern) ? this.pattern.test(v) : String(v).indexOf(this.pattern) !== -1
-                })
-            }
+        if (type1 !== type2)
+            return DifferenceHeterogeneous.new({
+                value1 : valueAsDifference(v1, 'value1', options, state),
+                value2 : valueAsDifference(v2, 'value2', options, state)
+            })
+        else {
+            return DifferenceAtomic.new({
+                value1  : v1,
+                value2  : v2,
+                same    : isRegExp(this.pattern) ? this.pattern.test(v) : String(v).indexOf(this.pattern) !== -1
+            })
         }
     }
-){}
+}
 
 /**
  * This method returns an [[FuzzyMatcherString]] instance, configured with the `pattern` argument.
@@ -364,48 +345,43 @@ export const anyStringLike = (pattern : string | RegExp) : FuzzyMatcherString =>
  * t.is([ 1, 2, 3 ], any(Map), 'Array is "any map"')
  * ```
  */
-export class FuzzyMatcherInstance extends Mixin(
-    [ FuzzyMatcher ],
-    (base : ClassUnion<typeof FuzzyMatcher>) =>
-
-    class FuzzyMatcherInstance extends base {
-        /**
-         * The constructor of the class to match the provided value.
-         */
-        cls         : AnyConstructor    = Object
+export class FuzzyMatcherInstance extends FuzzyMatcher {
+    /**
+     * The constructor of the class to match the provided value.
+     */
+    cls         : AnyConstructor    = Object
 
 
-        toString () : string {
-            return `any [${ this.cls.name }]`
-        }
-
-
-        [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-            visitor.write(<special>{ this }</special>)
-
-            return this
-        }
-
-
-        equalsToDiff (
-            v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
-            convertingToDiff    : 'value1' | 'value2' | undefined = undefined
-        ) : Difference {
-            const selfAtomicDifference = DifferenceAtomic.new({
-                [ flipped ? 'value2' : 'value1' ] : this
-            })
-
-            return DifferenceHeterogeneous.new({
-                // the 1st part of `||` handles the case of primitives,
-                // like `1 instanceof Number === false`, but `Object.getPrototypeOf(1) === Number.prototype` - true
-                same        : Object.getPrototypeOf(v) === this.cls.prototype || (v instanceof this.cls),
-
-                value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfAtomicDifference,
-                value2      : flipped ? selfAtomicDifference : valueAsDifference(v, 'value2', options, state)
-            })
-        }
+    toString () : string {
+        return `any [${ this.cls.name }]`
     }
-){}
+
+
+    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
+        visitor.write(<special>{ this }</special>)
+
+        return this
+    }
+
+
+    equalsToDiff (
+        v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
+        convertingToDiff    : 'value1' | 'value2' | undefined = undefined
+    ) : Difference {
+        const selfAtomicDifference = DifferenceAtomic.new({
+            [ flipped ? 'value2' : 'value1' ] : this
+        })
+
+        return DifferenceHeterogeneous.new({
+            // the 1st part of `||` handles the case of primitives,
+            // like `1 instanceof Number === false`, but `Object.getPrototypeOf(1) === Number.prototype` - true
+            same        : Object.getPrototypeOf(v) === this.cls.prototype || (v instanceof this.cls),
+
+            value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfAtomicDifference,
+            value2      : flipped ? selfAtomicDifference : valueAsDifference(v, 'value2', options, state)
+        })
+    }
+}
 
 /**
  * Returns an instance of the [[FuzzyMatcherInstance]] configured with the `cls` argument
@@ -430,43 +406,38 @@ export const anyInstanceOf = (cls : AnyConstructor) : FuzzyMatcherInstance => Fu
  * t.is(new Set(), any(), 'Set matches `any()`')
  * ```
  */
-export class FuzzyMatcherAny extends Mixin(
-    [ FuzzyMatcher ],
-    (base : ClassUnion<typeof FuzzyMatcher>) =>
-
-    class FuzzyMatcherAny extends base {
-        cls         : AnyConstructor    = Object
+export class FuzzyMatcherAny extends FuzzyMatcher {
+    cls         : AnyConstructor    = Object
 
 
-        toString () : string {
-            return `any`
-        }
-
-
-        [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-            visitor.write(<special>{ this }</special>)
-
-            return this
-        }
-
-
-        equalsToDiff (
-            v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
-            convertingToDiff    : 'value1' | 'value2' | undefined = undefined
-        ) : Difference {
-            const selfAtomicDifference = DifferenceAtomic.new({
-                [ flipped ? 'value2' : 'value1' ] : this
-            })
-
-            return DifferenceHeterogeneous.new({
-                same        : true,
-
-                value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfAtomicDifference,
-                value2      : flipped ? selfAtomicDifference : valueAsDifference(v, 'value2', options, state)
-            })
-        }
+    toString () : string {
+        return `any`
     }
-){}
+
+
+    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
+        visitor.write(<special>{ this }</special>)
+
+        return this
+    }
+
+
+    equalsToDiff (
+        v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
+        convertingToDiff    : 'value1' | 'value2' | undefined = undefined
+    ) : Difference {
+        const selfAtomicDifference = DifferenceAtomic.new({
+            [ flipped ? 'value2' : 'value1' ] : this
+        })
+
+        return DifferenceHeterogeneous.new({
+            same        : true,
+
+            value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfAtomicDifference,
+            value2      : flipped ? selfAtomicDifference : valueAsDifference(v, 'value2', options, state)
+        })
+    }
+}
 
 /**
  * This method returns a fuzzy matcher instance, which can be used in various comparison assertions.
