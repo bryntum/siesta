@@ -1,13 +1,13 @@
 import { it } from "../../index.js"
 import { Base } from "../../src/class/Base.js"
-import { AnyConstructor, ClassUnion, Mixin, ZeroBaseClass } from "../../src/class/Mixin.js"
+import { AnyConstructor, ClassUnion, Mixin, MixinCustom, ZeroBaseClass } from "../../src/class/Mixin.js"
 
 it('Repeating creation with the same requirements should not call mixin functions and use cache', t => {
     let count1 = 0
     let count2 = 0
     let count3 = 0
 
-    class SomeMixin1 extends Mixin(
+    class SomeMixin1 extends MixinCustom(
         [ Base ],
         (base : ClassUnion<typeof Base>) => {
             count1++
@@ -20,7 +20,7 @@ it('Repeating creation with the same requirements should not call mixin function
         }
     ){}
 
-    class SomeMixin2 extends Mixin(
+    class SomeMixin2 extends MixinCustom(
         [ Base ],
         (base : ClassUnion<typeof Base>) => {
             count2++
@@ -33,7 +33,7 @@ it('Repeating creation with the same requirements should not call mixin function
         }
     ){}
 
-    class SomeMixin3 extends Mixin(
+    class SomeMixin3 extends MixinCustom(
         [ Base ],
         (base : ClassUnion<typeof Base>) => {
             count3++
@@ -51,7 +51,7 @@ it('Repeating creation with the same requirements should not call mixin function
     //-----------------------
     count1 = count2 = count3 = 0
 
-    class SomeMixin12 extends Mixin(
+    class SomeMixin12 extends MixinCustom(
         [ SomeMixin2, SomeMixin1 ],
         (base : ClassUnion<typeof SomeMixin2, typeof SomeMixin1>) =>
 
@@ -65,7 +65,7 @@ it('Repeating creation with the same requirements should not call mixin function
     //-----------------------
     count1 = count2 = count3 = 0
 
-    class SomeMixin123 extends Mixin(
+    class SomeMixin123 extends MixinCustom(
         [ SomeMixin3, SomeMixin2, SomeMixin1 ],
         (base : ClassUnion<typeof SomeMixin2, typeof SomeMixin1, typeof SomeMixin3>) =>
 
@@ -79,7 +79,7 @@ it('Repeating creation with the same requirements should not call mixin function
     //-----------------------
     count1 = count2 = count3 = 0
 
-    class SomeMixin123_2 extends Mixin(
+    class SomeMixin123_2 extends MixinCustom(
         [ SomeMixin3, SomeMixin2, SomeMixin1 ],
         (base : ClassUnion<typeof SomeMixin2, typeof SomeMixin1, typeof SomeMixin3>) =>
 
@@ -96,7 +96,7 @@ it('Repeating creation with different base class should call mixin functions', t
     let count1 = 0
     let count2 = 0
 
-    class SomeMixin1 extends Mixin(
+    class SomeMixin1 extends MixinCustom(
         [],
         (base : ClassUnion<AnyConstructor>) => {
             count1++
@@ -109,7 +109,7 @@ it('Repeating creation with different base class should call mixin functions', t
         }
     ){}
 
-    class SomeMixin2 extends Mixin(
+    class SomeMixin2 extends MixinCustom(
         [],
         (base : ClassUnion<AnyConstructor>) => {
             count2++
@@ -127,7 +127,7 @@ it('Repeating creation with different base class should call mixin functions', t
     //-----------------------
     count1 = count2 = 0
 
-    class SomeMixin12 extends Mixin(
+    class SomeMixin12 extends MixinCustom(
         [ SomeMixin2, SomeMixin1 ],
         (base : ClassUnion<typeof SomeMixin2, typeof SomeMixin1>) =>
 
@@ -141,7 +141,7 @@ it('Repeating creation with different base class should call mixin functions', t
     //-----------------------
     count1 = count2 = 0
 
-    class SomeMixin12_2 extends Mixin(
+    class SomeMixin12_2 extends MixinCustom(
         [ SomeMixin2, SomeMixin1 ],
         (base : ClassUnion<typeof SomeMixin2, typeof SomeMixin1>) =>
 
@@ -155,7 +155,7 @@ it('Repeating creation with different base class should call mixin functions', t
     //-----------------------
     count1 = count2 = 0
 
-    class SomeMixin12_3 extends Mixin(
+    class SomeMixin12_3 extends MixinCustom(
         [ SomeMixin2, SomeMixin1, Base ],
         (base : ClassUnion<typeof SomeMixin2, typeof SomeMixin1, typeof Base>) =>
 
@@ -169,7 +169,7 @@ it('Repeating creation with different base class should call mixin functions', t
     //-----------------------
     count1 = count2 = 0
 
-    class SomeMixin12_4 extends Mixin(
+    class SomeMixin12_4 extends MixinCustom(
         [ SomeMixin2, SomeMixin1, Base ],
         (base : ClassUnion<typeof SomeMixin2, typeof SomeMixin1, typeof Base>) =>
 
@@ -188,7 +188,7 @@ it('Should be possible to use `derive` over the non-mixin class, inheriting from
     let count2 = 0
     let count3 = 0
 
-    class SomeMixin1 extends Mixin(
+    class SomeMixin1 extends MixinCustom(
         [],
         (base : ClassUnion<AnyConstructor>) => {
             count1++
@@ -201,7 +201,7 @@ it('Should be possible to use `derive` over the non-mixin class, inheriting from
         }
     ){}
 
-    class SomeMixin2 extends Mixin(
+    class SomeMixin2 extends MixinCustom(
         [ SomeMixin1 ],
         (base : ClassUnion<typeof SomeMixin1>) => {
             count2++
@@ -214,7 +214,7 @@ it('Should be possible to use `derive` over the non-mixin class, inheriting from
         }
     ){}
 
-    class SomeMixin3 extends Mixin(
+    class SomeMixin3 extends MixinCustom(
         [ SomeMixin1, SomeMixin2 ],
         (base : ClassUnion<typeof SomeMixin1, typeof SomeMixin2>) => {
             count3++
@@ -266,7 +266,7 @@ it('Should be possible to use `derive` over the non-mixin class, inheriting from
     let count3 = 0
     let count4 = 0
 
-    class SomeMixin1 extends Mixin(
+    class SomeMixin1 extends MixinCustom(
         [],
         (base : ClassUnion<AnyConstructor>) => {
             count1++
@@ -279,7 +279,7 @@ it('Should be possible to use `derive` over the non-mixin class, inheriting from
         }
     ){}
 
-    class SomeMixin2 extends Mixin(
+    class SomeMixin2 extends MixinCustom(
         [ SomeMixin1 ],
         (base : ClassUnion<typeof SomeMixin1>) => {
             count2++
@@ -292,7 +292,7 @@ it('Should be possible to use `derive` over the non-mixin class, inheriting from
         }
     ){}
 
-    class SomeMixin3 extends Mixin(
+    class SomeMixin3 extends MixinCustom(
         [ SomeMixin1, SomeMixin2 ],
         (base : ClassUnion<typeof SomeMixin1, typeof SomeMixin2>) => {
             count3++
@@ -305,7 +305,7 @@ it('Should be possible to use `derive` over the non-mixin class, inheriting from
         }
     ){}
 
-    class SomeMixin4 extends Mixin(
+    class SomeMixin4 extends MixinCustom(
         [ SomeMixin3, SomeMixin2 ],
         (base : ClassUnion<typeof SomeMixin3, typeof SomeMixin2>) => {
             count4++

@@ -1,9 +1,9 @@
 import { it } from "../../index.js"
 import { Base } from "../../src/class/Base.js"
-import { AnyConstructor, ClassUnion, isInstanceOf, Mixin } from "../../src/class/Mixin.js"
+import { AnyConstructor, ClassUnion, isInstanceOf, Mixin, MixinCustom } from "../../src/class/Mixin.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class SomeMixin1 extends Mixin(
+export class SomeMixin1 extends MixinCustom(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
 
@@ -22,7 +22,7 @@ SomeMixin1.s1
 SomeMixin1.new
 
 //---------------------------------------------------------------------------------------------------------------------
-export class SomeMixin2 extends Mixin(
+export class SomeMixin2 extends MixinCustom(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
 
@@ -42,7 +42,7 @@ SomeMixin2.new
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class SomeMixin3 extends Mixin(
+export class SomeMixin3 extends MixinCustom(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
 
@@ -62,7 +62,7 @@ SomeMixin3.new
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class SomeMixin12 extends Mixin(
+export class SomeMixin12 extends MixinCustom(
     [ SomeMixin1, SomeMixin2 ],
     (base : ClassUnion<typeof SomeMixin1, typeof SomeMixin2>) =>
 
@@ -89,7 +89,7 @@ SomeMixin12.new
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class SomeMixin23 extends Mixin(
+export class SomeMixin23 extends MixinCustom(
     [ SomeMixin2, SomeMixin3 ],
     (base : ClassUnion<typeof SomeMixin2, typeof SomeMixin3>) =>
 
@@ -116,7 +116,7 @@ SomeMixin23.new
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class SomeMixin13 extends Mixin(
+export class SomeMixin13 extends MixinCustom(
     [ SomeMixin1, SomeMixin3 ],
     (base : ClassUnion<typeof SomeMixin1, typeof SomeMixin3>) =>
 
@@ -145,7 +145,7 @@ SomeMixin13.new
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class SomeMixin123_1 extends Mixin(
+export class SomeMixin123_1 extends MixinCustom(
     [ SomeMixin12, SomeMixin3 ],
     (base : ClassUnion<typeof SomeMixin12, typeof SomeMixin3>) =>
 
@@ -160,7 +160,7 @@ SomeMixin123_1.s3
 SomeMixin123_1.new
 
 //---------------------------------------------------------------------------------------------------------------------
-export class SomeMixin123_2 extends Mixin(
+export class SomeMixin123_2 extends MixinCustom(
     [ SomeMixin13, SomeMixin2 ],
     (base : ClassUnion<typeof SomeMixin13, typeof SomeMixin2>) => base
 ){}
@@ -197,7 +197,7 @@ SomeMixin123_4.new
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class M1 extends Mixin(
+export class M1 extends MixinCustom(
     [],
     (base : AnyConstructor) =>
 
@@ -207,7 +207,7 @@ export class M1 extends Mixin(
 ){}
 
 //---------------------------------------------------------------------------------------------------------------------
-export class M2 extends Mixin(
+export class M2 extends MixinCustom(
     [ M1 ],
     (base : AnyConstructor<M1, typeof M1>) =>
 
@@ -217,7 +217,7 @@ export class M2 extends Mixin(
 ){}
 
 //---------------------------------------------------------------------------------------------------------------------
-export class M3 extends Mixin(
+export class M3 extends MixinCustom(
     [ M2 ],
     (base : AnyConstructor<M2, typeof M2>) =>
 
@@ -387,7 +387,7 @@ it('Should choose the super-most base class from requirements ', t => {
         myProp      : string    = 'myProp'
     }
 
-    class SomeMixin1 extends Mixin(
+    class SomeMixin1 extends MixinCustom(
         [ Base ],
         (base : ClassUnion<typeof Base>) =>
 
@@ -396,7 +396,7 @@ it('Should choose the super-most base class from requirements ', t => {
         }
     ){}
 
-    class SomeMixin2 extends Mixin(
+    class SomeMixin2 extends MixinCustom(
         [ SomeMixin1, MyClass ],
         (base : ClassUnion<typeof SomeMixin1 & typeof MyClass>) =>
 
@@ -408,7 +408,7 @@ it('Should choose the super-most base class from requirements ', t => {
     //-------------------------------------------------------------------------------
     // in this mixin, the SomeMixin1 requirement first sets the base class to Base
     // but later the SomeMixin2, "upgrades" it to MyClass
-    class SomeMixin3 extends Mixin(
+    class SomeMixin3 extends MixinCustom(
         [ SomeMixin1, SomeMixin2 ],
         (base : ClassUnion<typeof SomeMixin1 & typeof SomeMixin2>) =>
 
@@ -430,7 +430,7 @@ it('Should choose the super-most base class from requirements ', t => {
     //-------------------------------------------------------------------------------
     // in this mixin, we have `Base` as base class,
     // but the SomeMixin2, "upgrades" it to MyClass
-    class SomeMixin4 extends Mixin(
+    class SomeMixin4 extends MixinCustom(
         [ SomeMixin1, SomeMixin2, Base ],
         (base : ClassUnion<typeof SomeMixin1 & typeof SomeMixin2>) =>
 
@@ -457,7 +457,7 @@ it('Should throw when trying to construct a mixin from contradicting base classe
         myProp      : string    = 'myProp'
     }
 
-    class SomeMixin1 extends Mixin(
+    class SomeMixin1 extends MixinCustom(
         [ Base ],
         (base : ClassUnion<typeof Base>) =>
 
@@ -466,7 +466,7 @@ it('Should throw when trying to construct a mixin from contradicting base classe
         }
     ){}
 
-    class SomeMixin2 extends Mixin(
+    class SomeMixin2 extends MixinCustom(
         [ MyClass ],
         (base : ClassUnion<typeof MyClass>) =>
 
@@ -476,7 +476,7 @@ it('Should throw when trying to construct a mixin from contradicting base classe
     ){}
 
     t.throwsOk(() => {
-        class SomeMixin3 extends Mixin(
+        class SomeMixin3 extends MixinCustom(
             [ SomeMixin1, SomeMixin2 ],
             (base : ClassUnion<typeof SomeMixin1 & typeof SomeMixin2>) =>
 
@@ -489,7 +489,7 @@ it('Should throw when trying to construct a mixin from contradicting base classe
 
 
 it('`isInstanceOf` should work with plain subclasses', t => {
-    class Some1 extends Mixin(
+    class Some1 extends MixinCustom(
         [ Base ],
         (base : ClassUnion<typeof Base>) =>
 
@@ -509,7 +509,7 @@ it('`isInstanceOf` should work with plain subclasses', t => {
 
 
 it('Should throw exception when plain class extended from mixin is used as a non-last requirement', t => {
-    class Some1 extends Mixin(
+    class Some1 extends MixinCustom(
         [ Base ],
         (base : ClassUnion<typeof Base>) =>
 
@@ -523,7 +523,7 @@ it('Should throw exception when plain class extended from mixin is used as a non
     }
 
     t.throwsOk(() => {
-        class Some3 extends Mixin(
+        class Some3 extends MixinCustom(
             [ Some2, Some1 ],
             (base : ClassUnion<typeof Some2, typeof Some1>) =>
 

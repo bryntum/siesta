@@ -312,34 +312,32 @@ export type ClassUnion<
 // custom version of Omit<T> that preserves the "new"-ability of the given type
 type Omit2<T, K extends keyof any> = T extends AnyConstructorRaw<infer I> ? Pick<T, Exclude<keyof T, K>> & (new (...args : any[]) => I) : never
 
+export interface StaticPartOfMixinConstructor<M, T extends AnyFunction<M>> {
+    mix?        : Parameters<T> extends [ infer Base ] ?
+        Base extends AnyConstructorRaw ?
+            M extends AnyConstructorRaw<infer MI, infer MS> ?
+                <TT extends Base>(base : TT) => TT extends AnyConstructorRaw<infer BI, infer BS> ? AnyConstructorRaw<BI & MI, BS & MS> : never
+            : never
+        : never
+    : never,
 
-type MixinClassConstructor<T> =
-    T extends AnyFunction<infer M> ?
-        Omit2<M, 'mix' | 'derive'> & {
-
-            mix?        :
-                Parameters<T> extends [ infer Base ] ?
-                    Base extends AnyConstructorRaw ?
-                        M extends AnyConstructorRaw<infer MI, infer MS> ?
-                            <TT extends Base>(base : TT) => TT extends AnyConstructorRaw<infer BI, infer BS> ? AnyConstructorRaw<BI & MI, BS & MS> : never
-                        : never
-                    : never
-                : never
-
-            derive? :
-                Parameters<T> extends [ infer Base ] ?
-                    Base extends AnyConstructorRaw<infer I, infer S> ?
-                        M extends AnyConstructorRaw<infer MI, infer MS> ?
-                            <TT extends AnyConstructorRaw>(base : TT) => TT extends AnyConstructorRaw<infer BI, infer BS> ? AnyConstructorRaw<BI & I & MI, BS & S & MS> : never
-                        : never
-                    : never
-                : never
-        }
+    derive?     : Parameters<T> extends [ infer Base ] ?
+        Base extends AnyConstructorRaw<infer I, infer S> ?
+            M extends AnyConstructorRaw<infer MI, infer MS> ?
+                <TT extends AnyConstructorRaw>(base : TT) => TT extends AnyConstructorRaw<infer BI, infer BS> ? AnyConstructorRaw<BI & I & MI, BS & S & MS> : never
+            : never
+        : never
     : never
-
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 // region type helpers
+type MixinClassConstructor<T> =
+    T extends AnyFunction<infer M> ?
+        M
+    : never
+
+
 type MixinHelperFuncAny = <T>(required : AnyConstructor[], arg : T) =>
     T extends AnyFunction ?
         MixinClassConstructor<T>
@@ -462,6 +460,143 @@ type MixinHelperFunc10 = <A1 extends AnyConstructor, A2 extends AnyConstructor, 
             Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7> & InstanceType<A8> & InstanceType<A9> & InstanceType<A10>, A1 & A2 & A3 & A4 & A5 & A6 & A7 & A8 & A9 & A10> ?
                 InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7> & InstanceType<A8> & InstanceType<A9> & InstanceType<A10> extends InstanceType<Base> ?
                     MixinClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+// endregion
+
+
+//---------------------------------------------------------------------------------------------------------------------
+// region type helpers for custom mixins
+type MixinCustomClassConstructor<T> =
+    T extends AnyFunction<infer M> ?
+        // this variant provides the correct types for the static properties `mix` and `derive`
+        // however, it makes the declaration types x10 bigger, plus they contain errors
+        Omit2<M, 'mix' | 'derive'> & StaticPartOfMixinConstructor<M, T>
+    : never
+
+type MixinCustomHelperFuncAny = <T>(required : AnyConstructor[], arg : T) =>
+    T extends AnyFunction ?
+        MixinCustomClassConstructor<T>
+    : never
+
+type MixinCustomHelperFunc0 = <T>(required : [], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<object> ?
+                object extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc1 = <A1 extends AnyConstructor, T>(required : [ A1 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1>, A1> ?
+                InstanceType<A1> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc2 = <A1 extends AnyConstructor, A2 extends AnyConstructor, T>(required : [ A1, A2 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2>, A1 & A2> ?
+                InstanceType<A1> & InstanceType<A2> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc3 = <A1 extends AnyConstructor, A2 extends AnyConstructor, A3 extends AnyConstructor, T>(required : [ A1, A2, A3 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2> & InstanceType<A3>, A1 & A2 & A3> ?
+                InstanceType<A1> & InstanceType<A2> & InstanceType<A3> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc4 = <A1 extends AnyConstructor, A2 extends AnyConstructor, A3 extends AnyConstructor, A4 extends AnyConstructor, T>(required : [ A1, A2, A3, A4 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4>, A1 & A2 & A3 & A4> ?
+                InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc5 = <A1 extends AnyConstructor, A2 extends AnyConstructor, A3 extends AnyConstructor, A4 extends AnyConstructor, A5 extends AnyConstructor, T>(required : [ A1, A2, A3, A4, A5 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5>, A1 & A2 & A3 & A4 & A5> ?
+                InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc6 = <A1 extends AnyConstructor, A2 extends AnyConstructor, A3 extends AnyConstructor, A4 extends AnyConstructor, A5 extends AnyConstructor, A6 extends AnyConstructor, T>(required : [ A1, A2, A3, A4, A5, A6 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6>, A1 & A2 & A3 & A4 & A5 & A6> ?
+                InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc7 = <A1 extends AnyConstructor, A2 extends AnyConstructor, A3 extends AnyConstructor, A4 extends AnyConstructor, A5 extends AnyConstructor, A6 extends AnyConstructor, A7 extends AnyConstructor, T>(required : [ A1, A2, A3, A4, A5, A6, A7 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7>, A1 & A2 & A3 & A4 & A5 & A6 & A7> ?
+                InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc8 = <A1 extends AnyConstructor, A2 extends AnyConstructor, A3 extends AnyConstructor, A4 extends AnyConstructor, A5 extends AnyConstructor, A6 extends AnyConstructor, A7 extends AnyConstructor, A8 extends AnyConstructor, T>(required : [ A1, A2, A3, A4, A5, A6, A7, A8 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7> & InstanceType<A8>, A1 & A2 & A3 & A4 & A5 & A6 & A7 & A8> ?
+                InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7> & InstanceType<A8> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc9 = <A1 extends AnyConstructor, A2 extends AnyConstructor, A3 extends AnyConstructor, A4 extends AnyConstructor, A5 extends AnyConstructor, A6 extends AnyConstructor, A7 extends AnyConstructor, A8 extends AnyConstructor, A9 extends AnyConstructor, T>(required : [ A1, A2, A3, A4, A5, A6, A7, A8, A9 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7> & InstanceType<A8> & InstanceType<A9>, A1 & A2 & A3 & A4 & A5 & A6 & A7 & A8 & A9> ?
+                InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7> & InstanceType<A8> & InstanceType<A9> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
+                : never
+            : never
+        : never
+    : never
+
+type MixinCustomHelperFunc10 = <A1 extends AnyConstructor, A2 extends AnyConstructor, A3 extends AnyConstructor, A4 extends AnyConstructor, A5 extends AnyConstructor, A6 extends AnyConstructor, A7 extends AnyConstructor, A8 extends AnyConstructor, A9 extends AnyConstructor, A10 extends AnyConstructor, T>(required : [ A1, A2, A3, A4, A5, A6, A7, A8, A9, A10 ], arg : T) =>
+    T extends AnyFunction ?
+        Parameters<T> extends [ infer Base ] ?
+            Base extends AnyConstructor<InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7> & InstanceType<A8> & InstanceType<A9> & InstanceType<A10>, A1 & A2 & A3 & A4 & A5 & A6 & A7 & A8 & A9 & A10> ?
+                InstanceType<A1> & InstanceType<A2> & InstanceType<A3> & InstanceType<A4> & InstanceType<A5> & InstanceType<A6> & InstanceType<A7> & InstanceType<A8> & InstanceType<A9> & InstanceType<A10> extends InstanceType<Base> ?
+                    MixinCustomClassConstructor<T>
                 : never
             : never
         : never
@@ -832,4 +967,5 @@ export const Mixin : MixinHelperFunc0 & MixinHelperFunc1 & MixinHelperFunc2 & Mi
 export const MixinAny : MixinHelperFuncAny = mixin as any
 
 
-export type PrototypeOf<A> = A
+export const MixinCustom : MixinCustomHelperFunc0 & MixinCustomHelperFunc1 & MixinCustomHelperFunc2 & MixinCustomHelperFunc3 & MixinCustomHelperFunc4 & MixinCustomHelperFunc5 & MixinCustomHelperFunc6 & MixinCustomHelperFunc7 & MixinCustomHelperFunc8 & MixinCustomHelperFunc9 & MixinCustomHelperFunc10 = mixin as any
+export const MixinCustomAny : MixinCustomHelperFuncAny = mixin as any
