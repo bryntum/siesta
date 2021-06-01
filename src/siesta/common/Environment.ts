@@ -1,12 +1,22 @@
 import { Base } from "../../class/Base.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { isDeno, isNodejs } from "../../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type EnvironmentType = 'browser' | 'nodejs' | 'isomorphic' | 'deno'
 
+class EnvironmentPre extends Mixin(
+    [ Serializable, Base ],
+    (base : ClassUnion<typeof Serializable, typeof Base>) =>
+
+    class EnvironmentPre extends base {
+    }
+){}
+
+
 @serializable({ id : 'Environment' })
-export class Environment extends Serializable.mix(Base) {
+export class Environment extends EnvironmentPre {
     type        : EnvironmentType       = 'isomorphic'
 
     name        : string                = ''
