@@ -74,13 +74,18 @@ export enum ExitCodes {
 
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ id : 'LauncherError' })
-export class LauncherError extends Serializable.mix(Base) {
-    message             : string        = undefined
+export class LauncherError extends Mixin(
+    [ Serializable, Base ],
+    (base : ClassUnion<typeof Serializable, typeof Base>) =>
 
-    annotation          : XmlElement    = undefined
+    class LauncherError extends base {
+        message             : string        = undefined
 
-    exitCode            : ExitCodes     = undefined
-}
+        annotation          : XmlElement    = undefined
+
+        exitCode            : ExitCodes     = undefined
+    }
+) {}
 
 //---------------------------------------------------------------------------------------------------------------------
 export const OptionsGroupFiltering  = OptionGroup.new({
@@ -117,7 +122,7 @@ export type PrepareOptionsResult = {
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
     [ HasOptions, ConsoleXmlRenderer, HasRuntimeAccess, Base ],
-    (base : ClassUnion<typeof HasOptions, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess, typeof Base>) => 
+    (base : ClassUnion<typeof HasOptions, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess, typeof Base>) =>
 
     class Launcher extends base {
         projectData             : ProjectSerializableData   = undefined
