@@ -11,6 +11,8 @@ cd "$DIR/.."
 rm -rf "docs"
 
 # generate docs
+#node --inspect-brk ./node_modules/.bin/typedoc \
+
 npx typedoc \
     --readme "resources/docs_src/README.md" \
     --includes 'src/guides' \
