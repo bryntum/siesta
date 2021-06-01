@@ -174,11 +174,14 @@ export class Serializable extends Mixin(
             return json
         }
 
-        // does not call actual constructor for a purpose - class "revivification"
+        // 1. does not call actual constructor for a purpose - class "revivification"
         // supposed to be pure
         // also when this method is called the cyclic references are not resolved yet
-        static fromJSON<T extends typeof Serializable> (this : T, json : object) : InstanceType<T> {
-            const instance  = Object.create(this.prototype)
+        // 2. the better type:
+        //      static fromJSON<T extends typeof Serializable> (this : T, json : object) : InstanceType<T>
+        // breaks the declaration files generation
+        static fromJSON (json : object) : Serializable {
+            const instance : Serializable = Object.create(this.prototype)
 
             for (const [ key, value ] of Object.entries(json)) {
                 if (key !== '$class') instance[ key ] = value
