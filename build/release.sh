@@ -27,7 +27,7 @@ cd $DIST
 echo ">>Building the distribution"
 
 # prepare the dist for release
-build/build.sh -r
+build/build.sh -r -d
 
 
 # restart point inside the dist

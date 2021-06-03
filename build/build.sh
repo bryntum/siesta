@@ -8,24 +8,30 @@ shopt -s globstar extglob
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd "$DIR/.."
 
-release=""
+release="false"
+docs="false"
 
-while getopts "r" opt; do
+while getopts "rd" opt; do
     case "$opt" in
-        r)  release="-d"
+        r)  release="true"
+            ;;
+        d)  docs="true"
             ;;
     esac
 done
 
 npx tsc $release
 
-if [[ $release == '-d' ]]; then
+if [[ $docs == 'true' ]]; then
     build/build_docs.sh
+fi
 
+
+if [[ $release == 'true' ]]; then
     GLOBIGNORE=@(examples|node_modules)/**
 
-    for filename_ts in **/!(*.d).ts; do
-        regexp="(.*)\.ts"
+    for filename_ts in **/!(*.d).ts?(x); do
+        regexp="(.*)\.tsx?"
 
         if [[ $filename_ts =~ $regexp ]]; then
             filename_js="${BASH_REMATCH[1]}.js"
@@ -36,7 +42,7 @@ if [[ $release == '-d' ]]; then
     done
 
     # delete the TypeScript sources, we provide *.d.ts files instead
-    rm **/!(*.d).ts
+    rm **/!(*.d).ts?(x)
 
     unset GLOBIGNORE
 fi
