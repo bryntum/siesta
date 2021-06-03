@@ -31,22 +31,8 @@ import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeRes
 
 //---------------------------------------------------------------------------------------------------------------------
 /**
- * The test class for the isomorphic code. The instances of this class are usually created with the [[Test.it|it]] call:
- *
- * ```ts
- * import { it } from "siesta/index.js"
- *
- * it('Isomorphic Siesta test', async (t : Test) => {
- *     ...
- * })
- * ```
- *
- * Using various assertion methods of the test instance one can create a testing scenario.
- *
- * The configuration of the test class is extracted into separate class, called [[TestDescriptor]]. This is done to be able
- * to transfer the configuration over the network (`TestDescriptor` is serializable, whereas `Test` is not). Each test class
- * has the [[Test.testDescriptorClass|testDescriptorClass]] property, which should contain the constructor of the [[TestDescriptor]] class
- * to use for configuration.
+ * Utility class, it is needed only because only a subset of regular TypeScript features is supported when declaration files
+ * emit is enabled.
  */
 class TestPre extends Mixin(
     [
@@ -75,6 +61,24 @@ class TestPre extends Mixin(
 ){}
 
 
+/**
+ * The test class for the isomorphic code. The instances of this class are usually created with the [[Test.it|it]] call:
+ *
+ * ```ts
+ * import { it } from "siesta/index.js"
+ *
+ * it('Isomorphic Siesta test', async (t : Test) => {
+ *     ...
+ * })
+ * ```
+ *
+ * Using various assertion methods of the test instance one can create a testing scenario.
+ *
+ * The configuration of the test class is extracted into separate class, called [[TestDescriptor]]. This is done to be able
+ * to transfer the configuration over the network (`TestDescriptor` is serializable, whereas `Test` is not). Each test class
+ * has the [[Test.testDescriptorClass|testDescriptorClass]] property, which should contain the constructor of the [[TestDescriptor]] class
+ * to use for configuration.
+ */
 export class Test extends TestPre {
     /**
      * The constructor of the [[TestDescriptor]] class (or its subclass), which represents the configuration object
