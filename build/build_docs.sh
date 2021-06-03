@@ -13,6 +13,8 @@ rm -rf "docs"
 # generate docs
 #node --inspect-brk ./node_modules/.bin/typedoc \
 
+echo ">> Starting docs generation with typedoc"
+
 npx typedoc \
     --readme "resources/docs_src/README.md" \
     --includes 'src/guides' \

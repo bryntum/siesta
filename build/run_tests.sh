@@ -33,7 +33,7 @@ fi
 
 # run Deno-specific suite in Deno
 (
-    deno run -A --no-check --unstable bin/siesta-deno.js ./tests_deno/index.js || (echo ">>Deno specific test suite failed, target Deno" && false)
+    deno run -A --no-check --quiet --unstable bin/siesta-deno.js ./tests_deno/index.js || (echo ">>Deno specific test suite failed, target Deno" && false)
 ) & P4=$!
 
 wait $P3

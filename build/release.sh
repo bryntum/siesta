@@ -7,18 +7,15 @@
 
 # exit if any of command has failed
 set -e
+# enable ** in globs
+shopt -s globstar extglob
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 . "$DIR"/util.sh
 
-#if [[ $(git_repo_has_changes "$DIR/..") == 'true' ]]; then
-#    echo ">>Repository has changes, aborting release"
-#    exit 1
-#fi
-
 DIST="$DIR/../DIST"
 
-echo ">>Starting release, preparing the clean distribution"
+echo ">> Starting release"
 
 "$DIR"/make_dist.sh
 
@@ -29,8 +26,9 @@ cd $DIST
 
 echo ">>Building the distribution"
 
-# prepare the dist
-build/build.sh
+# prepare the dist for release
+build/build.sh -r
+
 
 # restart point inside the dist
 build/do_release.sh

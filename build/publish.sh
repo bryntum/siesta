@@ -6,8 +6,6 @@ set -e
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd "$DIR/.."
 
-scripts/build_docs.sh
-
 if [[ -z "$V" ]]; then
     V="patch"
 fi
@@ -17,7 +15,7 @@ npm version $V
 
 node -e "require('./scripts/changelog.cjs').updateVersion()"
 
-echo "" > .npmignore
+echo "/build" > .npmignore
 
 npm publish --access public
 

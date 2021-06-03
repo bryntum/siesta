@@ -6,12 +6,11 @@ set -e
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 . "$DIR"/util.sh
 
-#if [[ $(git_repo_has_changes "$DIR/..") == 'true' ]]; then
-#    echo ">>Repository has changes, aborting making distribution"
-#    exit 1
-#fi
+exit_if_git_repo_has_changes "$DIR/.."
 
 DIST="$DIR/../DIST"
+
+echo ">> Making clean checkout in $DIST"
 
 rm -rf "$DIST"
 
