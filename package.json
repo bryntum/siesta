@@ -19,6 +19,7 @@
   "bugs": "https://github.com/bryntum/siesta/issues",
   "repository": "git@github.com:bryntum/siesta.git",
   "keywords": [
+    "stress-free",
     "javascript",
     "typescript",
     "testing",
