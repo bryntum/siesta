@@ -30,10 +30,6 @@ import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeRes
 
 
 //---------------------------------------------------------------------------------------------------------------------
-/**
- * Utility class, it is needed only because only a subset of regular TypeScript features is supported when declaration files
- * emit is enabled.
- */
 class TestPre extends Mixin(
     [
         TestNodeResult,
@@ -56,7 +52,8 @@ class TestPre extends Mixin(
         typeof AssertionType
     >) =>
 
-    class TestPre extends base {
+    // when using the un-exported mixin class, the internal class need to have different name
+    class TestPreInternal extends base {
     }
 ){}
 

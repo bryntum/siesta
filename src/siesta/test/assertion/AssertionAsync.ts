@@ -8,9 +8,9 @@ import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception,
 
 //---------------------------------------------------------------------------------------------------------------------
 /**
- * An argument for the `waitFor` test class method, denoting the "waiting"
+ * An argument for the [[Test.waitFor|waitFor]] test class method, denoting the "waiting"
  */
-type WaitForArg<R> = {
+export type WaitForArg<R> = {
     /**
      * A condition checker function. Can be `async`. Should return some "truthy" value, indicating the condition has been met.
      * This value will be returned from the [[Test.waitFor|waitFor]] assertion itself.
