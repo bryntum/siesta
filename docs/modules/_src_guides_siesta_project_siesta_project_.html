@@ -1,0 +1,249 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>&quot;src/guides/siesta_project/siesta_project&quot; | @bryntum/siesta</title>
+	<meta name="description" content="Documentation for @bryntum/siesta">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@bryntum/siesta</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="_src_guides_siesta_project_siesta_project_.html">&quot;src/guides/siesta_project/siesta_project&quot;</a>
+				</li>
+			</ul>
+			<h1>Module &quot;src/guides/siesta_project/siesta_project&quot;</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="_src_guides_siesta_project_siesta_project_.html#siestaprojectguide" class="tsd-kind-icon">Siesta<wbr>Project<wbr>Guide</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="siestaprojectguide" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> Siesta<wbr>Project<wbr>Guide</h3>
+					<div class="tsd-signature tsd-kind-icon">Siesta<wbr>Project<wbr>Guide<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">""</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in src/guides/siesta_project/siesta_project.ts:4</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<a href="#siesta-project" id="siesta-project" style="color: inherit; text-decoration: none;">
+								<h1>Siesta project</h1>
+							</a>
+							<p>As you might already know from the other guides, individual Siesta test files can be launched directly as JavaScript executable files, and Siesta can launch a group of tests, matching a glob, or directory of tests. This might be enough for simple projects. For more complex projects one may need to fine-tune the configuration options for the whole test suite, or may be for the group of test in it. Of course one can always do that inside the individual test files, however repeating the same code is tiresome and violates the DRY principle. That is why, for such configuration needs, one can create Siesta project.</p>
+							<p>Siesta project is a regular JavaScript file. It does not have any convention for its name or extension. It is usually placed in the root of the <code>tests</code> directory. At Bryntum, we often call the project file <code>index.js</code></p>
+							<p>Essentially, project file is simply a configuration file for the test suite. Having it in the form of JavaScript, instead of JSON, has an advantage, that one can perform the configuration <em>dynamically</em>, using all expression power of the language. For example, project can perform some feature testing and based on its results, decide to skip certain group of tests, or tweak the configuration.</p>
+							<p>What makes it possible, is that project file is always run in the same target environment as the test suite itself. For example, your test suite is targeting a browser environment. If you will launch the project file from the command line, it will still be executed in the chosen browser, and the dynamic configuration will happen in the same environment. </p>
+							<p>Project file should perform 3 main actions:</p>
+							<ol>
+								<li>Create and configure the instance of the <a href="../classes/_src_siesta_project_project_.project.html">Project</a> class and the global <a href="../classes/_src_siesta_project_project_.project.html#testdescriptor">testDescriptor</a></li>
+								<li>Create the project execution <em>plan</em></li>
+								<li>Start the project</li>
+							</ol>
+							<p>A simple project file for Node.js test suite may look like this:</p>
+							<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { Project } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;siesta/nodejs.js&quot;</span>
+
+<span class="hljs-comment">// STEP 1</span>
+<span class="hljs-keyword">const</span> project = Project.new({
+    <span class="hljs-comment">// config option of the project instance</span>
+    <span class="hljs-attr">title</span>                   : <span class="hljs-string">&#x27;Awesome Node.js project test suite&#x27;</span>,
+
+    <span class="hljs-comment">// global &quot;test descriptor&quot;, all other tests in the suite &quot;extends&quot; it</span>
+    <span class="hljs-attr">testDescriptor</span>          : {
+        <span class="hljs-attr">defaultTimeout</span>          : <span class="hljs-number">30000</span>
+    }
+})
+
+<span class="hljs-comment">// STEP 2 - default behaviour</span>
+project.planDir(<span class="hljs-string">&#x27;.&#x27;</span>)
+
+<span class="hljs-comment">// STEP 3</span>
+project.start()</code></pre>
+							<p>More about every step below.</p>
+							<a href="#creating-and-configuring-the-project-instance" id="creating-and-configuring-the-project-instance" style="color: inherit; text-decoration: none;">
+								<h2>Creating and configuring the project instance</h2>
+							</a>
+							<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { Project } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;siesta/nodejs.js&quot;</span>
+
+<span class="hljs-comment">// STEP 1</span>
+<span class="hljs-keyword">const</span> project = Project.new({
+    <span class="hljs-comment">// config option of the project instance</span>
+    <span class="hljs-attr">title</span>                   : <span class="hljs-string">&#x27;Awesome Node.js project test suite&#x27;</span>,
+
+    <span class="hljs-comment">// global &quot;test descriptor&quot;, all other tests in the suite &quot;extends&quot; it</span>
+    <span class="hljs-attr">testDescriptor</span>          : {
+        <span class="hljs-attr">defaultTimeout</span>          : <span class="hljs-number">30000</span>
+    }
+})</code></pre>
+							<p>In this step, we create an instance of the <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html">ProjectNodejs</a> class, which is exported as <code>Project</code> from the <code>siesta/node.js</code>. We do that using the static constructor method <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#new">ProjectNodejs.new</a>, which accepts a single configuration object, with properties, corresponding to the class attributes.</p>
+							<p>For Deno, we should import from the <code>https://deno.land/x/siesta/deno.js</code> entry file.</p>
+							<p>There are few configuration options for the project itself, like <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#title">title</a> and a <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#testdescriptor">testDescriptor</a> config, which contains the configuration object for the top-level <a href="../classes/_src_siesta_test_testdescriptor_.testdescriptor.html">TestDescriptor</a> instance. All other tests in the test suite will &quot;extend&quot; this descriptor (&quot;inherit&quot; from it). For example, if the top-level descriptor contains certain value for the <a href="../classes/_src_siesta_test_testdescriptor_.testdescriptor.html#defaulttimeout">defaultTimeout</a> config, then all tests will use that value, unless they explicitly override it.</p>
+							<p>The project instance should be created synchronously in the top-level scope of the module.</p>
+							<a href="#creating-the-project-execution-plan-nodejsdeno-environment" id="creating-the-project-execution-plan-nodejsdeno-environment" style="color: inherit; text-decoration: none;">
+								<h2>Creating the project execution plan, Node.js/Deno environment</h2>
+							</a>
+							<p>Project plan is a collection of tests to be run. It is structured as a tree, usually reflecting the file system. The &quot;parent&quot; nodes in this tree corresponds to directories and &quot;leaf&quot; nodes - to test files.</p>
+							<p>Test files can be included into the plan with the following project methods: <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#planfile">planFile</a>, <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#plandir">planDir</a>, <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#planglob">planGlob</a>. <strong>All paths, passed to those methods are resolved relative to the project file</strong>.</p>
+							<p>Test files can be excluded from the plan with the following project methods: <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#excludefile">excludeFile</a>, <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#excludedir">excludeDir</a>, <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#excludeglob">excludeGlob</a>. </p>
+							<p>Note, that the abovementioned methods works as &quot;imperative instruction&quot; instead of as &quot;declaration rules&quot;. This is the most flexible approach, but it may produce unexpected results if you will think of these methods as &quot;declaration rules&quot;. For example if you added a directory into the plan, excluded some file from it and then added a glob-matching group of tests, which includes that file - that file will be included again, despite the <code>excludeFile</code> call. The solution in this case is simply to run the <a href="../classes/_src_siesta_project_projectnodejs_.projectnodejs.html#excludefile">excludeFile</a> method last, after adding everything.</p>
+							<pre><code class="language-javascript"><span class="hljs-comment">// include the directory</span>
+project.planDir(<span class="hljs-string">&#x27;tests/featureX&#x27;</span>)
+<span class="hljs-comment">// exclude some file from it</span>
+project.excludeFile(<span class="hljs-string">&#x27;tests/featureX/testY.t.js&#x27;</span>)
+<span class="hljs-comment">// include all tests matching glob - this will include the `tests/featureX/testY.t.js` file again,</span>
+<span class="hljs-comment">// despite the `excludeFile` call above</span>
+project.planGlob(<span class="hljs-string">&#x27;tests/feature*/**/*.t.js&#x27;</span>)</code></pre>
+							<p>If none of the planning methods have been called, Siesta will include all tests files in the project file directory, which is equivalent of:</p>
+							<pre><code class="language-javascript">project.planDir(<span class="hljs-string">&#x27;.&#x27;</span>)</code></pre>
+							<p>The project planning step may happen asynchronously, ie you can call some asynchronous methods to decide what to include and with which configuration.</p>
+							<a href="#creating-the-project-execution-plan-browser-environment" id="creating-the-project-execution-plan-browser-environment" style="color: inherit; text-decoration: none;">
+								<h2>Creating the project execution plan, browser environment</h2>
+							</a>
+							<p>Currently, Siesta projects, targeting browser environment, don&#39;t have access to file system and thus, need to list all the test files manually, using the <a href="../classes/_src_siesta_project_project_.project.html#plan">Project.plan</a> method. This is because Siesta supports running the browser suite entirely in browser, w/o involving any OS process. We plan to remove this limitation in one of the future releases, by introducing special kind of browser projects, that can be launched via launcher only. </p>
+							<a href="#starting-the-project" id="starting-the-project" style="color: inherit; text-decoration: none;">
+								<h2>Starting the project</h2>
+							</a>
+							<p>As simple as:</p>
+							<pre><code class="language-javascript">project.start()</code></pre>
+							<a href="#launching-the-project" id="launching-the-project" style="color: inherit; text-decoration: none;">
+								<h1>Launching the project</h1>
+							</a>
+							<p>To launch the project, targeting Node.js and Deno environments, one can directly launch the project file itself, as regular JavaScript executable:</p>
+							<p>For Node.js:</p>
+							<pre><code class="language-shell">node tests/index.js</code></pre>
+							<p>For Deno (note the <code>--allow-read --allow-env --allow-net --unstable</code> flags are required for permissions/WebWorker feature and <code>--quiet</code> is needed because the <code>check file://</code> diagnostic messages <a href="https://github.com/denoland/deno/issues/10558">breaks the dynamic output formatting</a>), we also recommend to use <code>--no-check</code> for speed:</p>
+							<pre><code class="language-shell">deno run --allow-read --allow-env --allow-net --unstable --quiet --no-check tests/index.js</code></pre>
+							<p>One can also use the Siesta launcher executable and pass the path/URL to the project file to it. This method works for all target environments:</p>
+							<p>Node.js, targeting Node.js:</p>
+							<pre><code class="language-shell">npx siesta tests/index.js</code></pre>
+							<p>Deno, targeting Deno (assuming using the installed executable):</p>
+							<pre><code class="language-shell">siesta tests/index.js</code></pre>
+							<p>Targeting browsers is supported only for the Node.js launcher. The url of the project should start with <code>http:/https:</code> - this is what triggers execution in browser.</p>
+							<p>Node.js, targeting browser:</p>
+							<pre><code class="language-shell">npx siesta http://localhost/my_project/tests/index.js </code></pre>
+							<p>By default, tests are launched in Chrome. The <code>--browser</code> config specifies the browser to use, supported values are: <code>chrome</code>, <code>firefox</code>, <code>edge</code> (currently equals to <code>chrome</code>) and <code>safari</code> (uses webkit target of Playwright).</p>
+							<pre><code class="language-shell">npx siesta http://localhost/my_project/tests/index.js --browser firefox </code></pre>
+							<a href="#copyright-and-license" id="copyright-and-license" style="color: inherit; text-decoration: none;">
+								<h1>COPYRIGHT AND LICENSE</h1>
+							</a>
+							<p>MIT License</p>
+							<p>Copyright (c) 2009-2021 Bryntum, Nickolay Platonov</p>
+						</div>
+					</div>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="_src_guides_siesta_project_siesta_project_.html">&quot;src/guides/siesta_<wbr>project/siesta_<wbr>project&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="_src_guides_siesta_project_siesta_project_.html#siestaprojectguide" class="tsd-kind-icon">Siesta<wbr>Project<wbr>Guide</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

@@ -1,0 +1,1012 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Expectation | @bryntum/siesta</title>
+	<meta name="description" content="Documentation for @bryntum/siesta">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@bryntum/siesta</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/_src_siesta_test_expectation_.html">&quot;src/siesta/test/Expectation&quot;</a>
+				</li>
+				<li>
+					<a href="_src_siesta_test_expectation_.expectation.html">Expectation</a>
+				</li>
+			</ul>
+			<h1>Class Expectation</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>This class is the central point for writing assertions in the BDD style. Instances of this class can be generated with the
+						<a href="_src_siesta_test_test_.test.html#expect">expect</a> method or with the <a href="../modules/_src_siesta_test_test_.html#expect">expect</a> alias.</p>
+					</div>
+					<p>Then, a call of some method on the expectation instance will create a new assertion in the test.</p>
+					<p>To negate any assertion, you can use a special property <a href="_src_siesta_test_expectation_.expectation.html#not">not</a>, that contains another expectation instance with the opposite meaning.</p>
+					<p>For example:</p>
+					<pre><code class="language-ts">t.expect(<span class="hljs-number">1</span>).toBe(<span class="hljs-number">1</span>)
+t.expect(<span class="hljs-number">1</span>).not.toBe(<span class="hljs-number">2</span>)
+
+t.expect(<span class="hljs-string">&#x27;Foo&#x27;</span>).toContain(<span class="hljs-string">&#x27;oo&#x27;</span>)
+t.expect(<span class="hljs-string">&#x27;Foo&#x27;</span>).not.toContain(<span class="hljs-string">&#x27;bar&#x27;</span>)</code></pre>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<a href="_src_class_base_.base.html" class="tsd-signature-type">Base</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">Expectation</span>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Accessors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#not" class="tsd-kind-icon">not</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited"><a href="_src_siesta_test_expectation_.expectation.html#initialize" class="tsd-kind-icon">initialize</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobe" class="tsd-kind-icon">to<wbr>Be</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobecloseto" class="tsd-kind-icon">to<wbr>BeClose<wbr>To</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobedefined" class="tsd-kind-icon">to<wbr>BeDefined</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobeequal" class="tsd-kind-icon">to<wbr>BeEqual</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobefalsy" class="tsd-kind-icon">to<wbr>BeFalsy</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobegreaterorequalthan" class="tsd-kind-icon">to<wbr>BeGreater<wbr>OrEqual<wbr>Than</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobegreaterthan" class="tsd-kind-icon">to<wbr>BeGreater<wbr>Than</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobelessorequalthan" class="tsd-kind-icon">to<wbr>BeLess<wbr>OrEqual<wbr>Than</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobelessthan" class="tsd-kind-icon">to<wbr>BeLess<wbr>Than</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobenan" class="tsd-kind-icon">to<wbr>BeNaN</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobenull" class="tsd-kind-icon">to<wbr>BeNull</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobetruthy" class="tsd-kind-icon">to<wbr>BeTruthy</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tobeundefined" class="tsd-kind-icon">to<wbr>BeUndefined</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tocontain" class="tsd-kind-icon">to<wbr>Contain</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#toequal" class="tsd-kind-icon">to<wbr>Equal</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tohavebeencalled" class="tsd-kind-icon">to<wbr>Have<wbr>Been<wbr>Called</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tohavebeencalledwith" class="tsd-kind-icon">to<wbr>Have<wbr>Been<wbr>Called<wbr>With</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tomatch" class="tsd-kind-icon">to<wbr>Match</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_src_siesta_test_expectation_.expectation.html#tothrow" class="tsd-kind-icon">to<wbr>Throw</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static"><a href="_src_siesta_test_expectation_.expectation.html#maybenew" class="tsd-kind-icon">maybe<wbr>New</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static"><a href="_src_siesta_test_expectation_.expectation.html#new" class="tsd-kind-icon">new</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Accessors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="not" class="tsd-anchor"></a>
+					<h3>not</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> not<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_src_siesta_test_expectation_.expectation.html" class="tsd-signature-type">Expectation</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:48</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns expectation with the opposite meaning. For example:</p>
+								</div>
+								<pre><code class="language-ts">t.expect(<span class="hljs-number">1</span>).toBe(<span class="hljs-number">1</span>)
+t.expect(<span class="hljs-number">1</span>).not.toBe(<span class="hljs-number">2</span>)</code></pre>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_src_siesta_test_expectation_.expectation.html" class="tsd-signature-type">Expectation</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
+					<a name="initialize" class="tsd-anchor"></a>
+					<h3>initialize</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">initialize&lt;T&gt;<span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_src_class_base_.base.html">Base</a>.<a href="_src_class_base_.base.html#initialize">initialize</a></p>
+								<ul>
+									<li>Defined in src/class/Base.ts:15</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This method applies its 1st argument (if any) to the current instance using <code>Object.assign()</code>.</p>
+								</div>
+								<p>Supposed to be overridden in the subclasses to customize the instance creation process.</p>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="_src_class_base_.base.html" class="tsd-signature-type">Base</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> props: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobe" class="tsd-anchor"></a>
+					<h3>to<wbr>Be</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Be<span class="tsd-signature-symbol">(</span>expectedValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:65</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion compares the value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method with the <code>expectedValue</code> argument.
+										Comparison is done with <code>===</code> operator, so it should be used <strong>only with the primitives</strong> - numbers, strings, booleans etc.
+									However, fuzzy matchers, generated with the <a href="../modules/_src_compare_deep_fuzzymatcherdiff_.html#any">any</a> family of methods are supported.</p>
+								</div>
+								<p>To deeply compare objects, arrays, and JSON in general, use <a href="_src_siesta_test_expectation_.expectation.html#toequal">toEqual</a> method.</p>
+								<p>This method works correctly with the fuzzy matchers generated with the <a href="../modules/_src_compare_deep_fuzzymatcherdiff_.html#any">any</a> method</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>expectedValue: <span class="tsd-signature-type">unknown</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An expected value</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobecloseto" class="tsd-anchor"></a>
+					<h3>to<wbr>BeClose<wbr>To</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeClose<wbr>To<span class="tsd-signature-symbol">(</span>expectedValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, approx<span class="tsd-signature-symbol">?: </span><a href="../modules/_src_compare_deep_fuzzymatcherdiff_.html#approximation" class="tsd-signature-type">Approximation</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:228</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when the number provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is approximately equal
+									the given number. The proximity can be defined as the <code>precision</code> argument</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>expectedValue: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The number to compare with</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> approx: <a href="../modules/_src_compare_deep_fuzzymatcherdiff_.html#approximation" class="tsd-signature-type">Approximation</a><span class="tsd-signature-symbol"> = { digits : 2 }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The number approximation</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobedefined" class="tsd-anchor"></a>
+					<h3>to<wbr>BeDefined</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeDefined<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:117</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is not the <code>undefined</code> value.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobeequal" class="tsd-anchor"></a>
+					<h3>to<wbr>BeEqual</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeEqual<span class="tsd-signature-symbol">(</span>expectedValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:79</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>An alias for <a href="_src_siesta_test_expectation_.expectation.html#toequal">toEqual</a></p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>expectedValue: <span class="tsd-signature-type">unknown</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobefalsy" class="tsd-anchor"></a>
+					<h3>to<wbr>BeFalsy</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeFalsy<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:143</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is &quot;falsy&quot; - evaluates to <code>false</code>.
+									For example - empty strings, number 0, <code>null</code>, <code>undefined</code>, etc.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobegreaterorequalthan" class="tsd-anchor"></a>
+					<h3>to<wbr>BeGreater<wbr>OrEqual<wbr>Than</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeGreater<wbr>OrEqual<wbr>Than<span class="tsd-signature-symbol">(</span>expectedValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:216</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when the number provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is greater or equal than the
+									expected number.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>expectedValue: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The number to compare with</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobegreaterthan" class="tsd-anchor"></a>
+					<h3>to<wbr>BeGreater<wbr>Than</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeGreater<wbr>Than<span class="tsd-signature-symbol">(</span>expectedValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:205</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when the number provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is greater than the
+									expected number.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>expectedValue: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The number to compare with</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobelessorequalthan" class="tsd-anchor"></a>
+					<h3>to<wbr>BeLess<wbr>OrEqual<wbr>Than</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeLess<wbr>OrEqual<wbr>Than<span class="tsd-signature-symbol">(</span>expectedValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:194</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when the number provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is less or equal than the
+									expected number.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>expectedValue: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The number to compare with</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobelessthan" class="tsd-anchor"></a>
+					<h3>to<wbr>BeLess<wbr>Than</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeLess<wbr>Than<span class="tsd-signature-symbol">(</span>expectedValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:183</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when the number provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is less than the
+									expected number.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>expectedValue: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The number to compare with</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobenan" class="tsd-anchor"></a>
+					<h3>to<wbr>BeNaN</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeNaN<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:109</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is <code>NaN</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobenull" class="tsd-anchor"></a>
+					<h3>to<wbr>BeNull</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeNull<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:101</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is <code>null</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobetruthy" class="tsd-anchor"></a>
+					<h3>to<wbr>BeTruthy</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeTruthy<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:134</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is &quot;truthy&quot; - evaluates to <code>true</code>.
+									For example - non empty strings, numbers except the 0, objects, arrays etc.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobeundefined" class="tsd-anchor"></a>
+					<h3>to<wbr>BeUndefined</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>BeUndefined<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:125</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is the <code>undefined</code> value.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tocontain" class="tsd-anchor"></a>
+					<h3>to<wbr>Contain</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Contain<span class="tsd-signature-symbol">(</span>element<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:166</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes in 2 cases:</p>
+								</div>
+								<p>1) When the value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is a string, and it contains a passed substring.
+								2) When the value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method is an array (or array-like), and it contains a passed element.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>element: <span class="tsd-signature-type">unknown</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The element of the array or a sub-string</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="toequal" class="tsd-anchor"></a>
+					<h3>to<wbr>Equal</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Equal<span class="tsd-signature-symbol">(</span>expectedValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:93</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion compares the value provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method with the <code>expectedValue</code> argument.</p>
+								</div>
+								<p>Comparison works for objects, arrays, and JSON in general. It is performed &quot;deeply&quot;. Cyclic structures are properly handled.</p>
+								<p>This method works correctly with the fuzzy matchers generated with the <a href="../modules/_src_compare_deep_fuzzymatcherdiff_.html#any">any</a> method</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>expectedValue: <span class="tsd-signature-type">unknown</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An expected value</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tohavebeencalled" class="tsd-anchor"></a>
+					<h3>to<wbr>Have<wbr>Been<wbr>Called</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Have<wbr>Been<wbr>Called<span class="tsd-signature-symbol">(</span>expectedNumber<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:285</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, if a spy, provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method have been
+										called expected number of times. The expected number of times can be provided as the 1st argument and by default
+									is 1.</p>
+								</div>
+								<p>One can also provide the function, spied on, to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method.</p>
+								<p>Examples:</p>
+								<pre><code class="language-ts"><span class="hljs-keyword">const</span> spy = t.spyOn(obj, <span class="hljs-string">&#x27;process&#x27;</span>)
+
+<span class="hljs-comment">// call the method 2 times</span>
+obj.process()
+obj.process()
+
+<span class="hljs-comment">// following 2 calls are equivalent</span>
+t.expect(spy).toHaveBeenCalled();
+t.expect(obj.process).toHaveBeenCalled();
+
+<span class="hljs-comment">// one can also use exact number of calls or comparison operators</span>
+t.expect(spy).toHaveBeenCalled(<span class="hljs-number">2</span>);
+t.expect(spy).toHaveBeenCalled(<span class="hljs-string">&#x27;&gt;1&#x27;</span>);
+t.expect(spy).toHaveBeenCalled(<span class="hljs-string">&#x27;&lt;=3&#x27;</span>);</code></pre>
+								<p>See also <a href="_src_siesta_test_expectation_.expectation.html#tohavebeencalledwith">toHaveBeenCalledWith</a></p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> expectedNumber: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;&gt;&#x3D;1&quot;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Expected number of calls. Can be either a number, specifying the exact
+										number of calls, or a string. In the latter case one should include a comparison operator in front of the number.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tohavebeencalledwith" class="tsd-anchor"></a>
+					<h3>to<wbr>Have<wbr>Been<wbr>Called<wbr>With</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Have<wbr>Been<wbr>Called<wbr>With<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:338</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, if a spy, provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method have been
+									called at least once with the specified arguments.</p>
+								</div>
+								<p>One can also provide the function, spied on, to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method.</p>
+								<p>One can use fuzzy matchers, generated with the <a href="../modules/_src_compare_deep_fuzzymatcherdiff_.html#any">any</a> method to verify the arguments.</p>
+								<p>Example:</p>
+								<pre><code class="language-ts"><span class="hljs-keyword">const</span> spy = t.spyOn(obj, <span class="hljs-string">&#x27;process&#x27;</span>)
+
+<span class="hljs-comment">// call the method 2 times with different arguments</span>
+obj.build(<span class="hljs-string">&#x27;development&#x27;</span>, <span class="hljs-string">&#x27;1.0.0&#x27;</span>)
+obj.build(<span class="hljs-string">&#x27;release&#x27;</span>, <span class="hljs-string">&#x27;1.0.1&#x27;</span>)
+
+t.expect(spy).toHaveBeenCalledWith(<span class="hljs-string">&#x27;development&#x27;</span>, <span class="hljs-string">&#x27;1.0.0&#x27;</span>);
+<span class="hljs-comment">// or</span>
+t.expect(obj.process).toHaveBeenCalledWith(<span class="hljs-string">&#x27;development&#x27;</span>, t.any(<span class="hljs-built_in">String</span>));</code></pre>
+								<p>See also <a href="_src_siesta_test_expectation_.expectation.html#tohavebeencalled">toHaveBeenCalled</a></p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tomatch" class="tsd-anchor"></a>
+					<h3>to<wbr>Match</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Match<span class="tsd-signature-symbol">(</span>regexp<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RegExp</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:153</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes, when the string provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method matches the regular expression.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>regexp: <span class="tsd-signature-type">RegExp</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The regular expression to match the string against</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tothrow" class="tsd-anchor"></a>
+					<h3>to<wbr>Throw</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Throw<span class="tsd-signature-symbol">(</span>pattern<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">RegExp</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/siesta/test/Expectation.tsx:249</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This assertion passes when the function provided to the <a href="_src_siesta_test_test_.test.html#expect">expect</a> method, throws an exception
+									during its execution.</p>
+								</div>
+								<pre><code class="language-ts">t.expect(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+    <span class="hljs-keyword">throw</span> <span class="hljs-string">&quot;oopsie&quot;</span>;
+}).toThrow());</code></pre>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> pattern: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">RegExp</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
+					<a name="maybenew" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> maybe<wbr>New</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">maybe<wbr>New&lt;T&gt;<span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, props<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_src_class_base_.base.html">Base</a>.<a href="_src_class_base_.base.html#maybenew">maybeNew</a></p>
+								<ul>
+									<li>Defined in src/class/Base.ts:60</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This is a type-safe static constructor method, accepting a single argument. If that argument is already an instance
+									of this class - it is returned right away, otherwise the <a href="_src_siesta_test_expectation_.expectation.html#new">new</a> constructor is used for instantiation.</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><a href="_src_class_base_.base.html" class="tsd-signature-type">Base</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>this: <span class="tsd-signature-type">T</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> props: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
+					<a name="new" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> new</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">new&lt;T&gt;<span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, props<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_src_class_base_.base.html">Base</a>.<a href="_src_class_base_.base.html#new">new</a></p>
+								<ul>
+									<li>Defined in src/class/Base.ts:46</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This is a type-safe static constructor method, accepting a single argument, with the object, corresponding to the
+									class properties. It will generate a compilation error, if unknown property is provided.</p>
+								</div>
+								<p>For example:</p>
+								<pre><code class="language-ts"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Base</span> </span>{
+    <span class="hljs-attr">prop</span>     : <span class="hljs-built_in">string</span>
+}
+
+<span class="hljs-keyword">const</span> instance : MyClass = MyClass.new({ <span class="hljs-attr">prop</span> : <span class="hljs-string">&#x27;prop&#x27;</span>, <span class="hljs-attr">wrong</span> : <span class="hljs-number">11</span> })</code></pre>
+								<p>will produce:</p>
+								<pre><code class="language-plaintext">TS2345: Argument of type &#x27;{ prop: string; wrong: number; }&#x27; is not assignable to parameter of type &#x27;Partial&lt;MyClass&gt;&#x27;.
+Object literal may only specify known properties, and &#x27;wrong&#x27; does not exist in type &#x27;Partial&lt;MyClass&gt;&#x27;</code></pre>
+								<p>The only thing this constructor does is create an instance and call the <a href="_src_siesta_test_expectation_.expectation.html#initialize">initialize</a> method on it, forwarding
+								the first argument. The customization of instance is supposed to be performed in that method.</p>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><a href="_src_class_base_.base.html" class="tsd-signature-type">Base</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>this: <span class="tsd-signature-type">T</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> props: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/_src_siesta_test_expectation_.html">&quot;src/siesta/test/<wbr>Expectation&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-module">
+						<a href="_src_siesta_test_expectation_.expectation.html" class="tsd-kind-icon">Expectation</a>
+						<ul>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#not" class="tsd-kind-icon">not</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited">
+								<a href="_src_siesta_test_expectation_.expectation.html#initialize" class="tsd-kind-icon">initialize</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobe" class="tsd-kind-icon">to<wbr>Be</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobecloseto" class="tsd-kind-icon">to<wbr>BeClose<wbr>To</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobedefined" class="tsd-kind-icon">to<wbr>BeDefined</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobeequal" class="tsd-kind-icon">to<wbr>BeEqual</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobefalsy" class="tsd-kind-icon">to<wbr>BeFalsy</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobegreaterorequalthan" class="tsd-kind-icon">to<wbr>BeGreater<wbr>OrEqual<wbr>Than</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobegreaterthan" class="tsd-kind-icon">to<wbr>BeGreater<wbr>Than</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobelessorequalthan" class="tsd-kind-icon">to<wbr>BeLess<wbr>OrEqual<wbr>Than</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobelessthan" class="tsd-kind-icon">to<wbr>BeLess<wbr>Than</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobenan" class="tsd-kind-icon">to<wbr>BeNaN</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobenull" class="tsd-kind-icon">to<wbr>BeNull</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobetruthy" class="tsd-kind-icon">to<wbr>BeTruthy</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tobeundefined" class="tsd-kind-icon">to<wbr>BeUndefined</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tocontain" class="tsd-kind-icon">to<wbr>Contain</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#toequal" class="tsd-kind-icon">to<wbr>Equal</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tohavebeencalled" class="tsd-kind-icon">to<wbr>Have<wbr>Been<wbr>Called</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tohavebeencalledwith" class="tsd-kind-icon">to<wbr>Have<wbr>Been<wbr>Called<wbr>With</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tomatch" class="tsd-kind-icon">to<wbr>Match</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_src_siesta_test_expectation_.expectation.html#tothrow" class="tsd-kind-icon">to<wbr>Throw</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
+								<a href="_src_siesta_test_expectation_.expectation.html#maybenew" class="tsd-kind-icon">maybe<wbr>New</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-static">
+								<a href="_src_siesta_test_expectation_.expectation.html#new" class="tsd-kind-icon">new</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

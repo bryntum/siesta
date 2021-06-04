@@ -1,0 +1,240 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>&quot;src/guides/getting_started_browser/getting_started_browser&quot; | @bryntum/siesta</title>
+	<meta name="description" content="Documentation for @bryntum/siesta">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@bryntum/siesta</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="_src_guides_getting_started_browser_getting_started_browser_.html">&quot;src/guides/getting_started_browser/getting_started_browser&quot;</a>
+				</li>
+			</ul>
+			<h1>Module &quot;src/guides/getting_started_browser/getting_started_browser&quot;</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="_src_guides_getting_started_browser_getting_started_browser_.html#gettingstartedbrowserguide" class="tsd-kind-icon">Getting<wbr>Started<wbr>Browser<wbr>Guide</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="gettingstartedbrowserguide" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> Getting<wbr>Started<wbr>Browser<wbr>Guide</h3>
+					<div class="tsd-signature tsd-kind-icon">Getting<wbr>Started<wbr>Browser<wbr>Guide<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">""</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in src/guides/getting_started_browser/getting_started_browser.ts:4</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<a href="#getting-started-with-siesta-in-browser-environment" id="getting-started-with-siesta-in-browser-environment" style="color: inherit; text-decoration: none;">
+								<h1>Getting started with Siesta in browser environment</h1>
+							</a>
+							<p>Siesta is a stress-free JavaScript/TypeScript testing tool. It is ubiquitous - tests can be run in browsers, Node.js and Deno, on Linux, macOS and Windows.</p>
+							<p>In this guide, we assume a setup, pointed toward running tests in browsers.</p>
+							<p>Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Chromium Edge. IE and legacy Edge are not supported.</p>
+							<p>Currently, targeting browser environment in Siesta is work in progress. You can run tests in browsers just fine, however Siesta does not support yet the Web-specific functionality, like simulating the user actions. We&#39;ll be adding this functionality in the future releases. </p>
+							<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+								<h1>Installation</h1>
+							</a>
+							<p>Running tests in browsers is supported with the Node.js launcher only, so Siesta should be installed via <code>npm</code> package manager:</p>
+							<pre><code class="language-shell">npm install @bryntum/siesta --save-dev</code></pre>
+							<p>You should be able to run the Siesta launcher after installation, using the <code>npx</code> command:</p>
+							<pre><code class="language-shell">npx siesta --help</code></pre>
+							<a href="#basics" id="basics" style="color: inherit; text-decoration: none;">
+								<h1>Basics</h1>
+							</a>
+							<p>To familiarize yourself with the basic Siesta concepts, which are common for all execution environments, please check the <a href="_src_guides_siesta_test_basics_siesta_test_basics_.html#siestatestbasicsguide">Siesta test basics</a> guide. </p>
+							<a href="#additional-details" id="additional-details" style="color: inherit; text-decoration: none;">
+								<h1>Additional details</h1>
+							</a>
+							<p>Siesta runs the browser tests right on the browser page. This means, your test file has full access to the page and Web API. There&#39;s no need to use the asynchronous <code>evaluate</code> command as commonly seen in tools like Playwright, Puppeteer and Selenium. </p>
+							<p>Such architecture means that test script can create and manipulate arbitrary DOM, using the regular Web API. For example, test can render some Web component and then check that its DOM object is properly created with the <code>document.querySelector()</code> call.</p>
+							<p>However, test script will not survive the page redirect or reload. You should avoid doing that. In the future release we will allow running the script in the side iframe, which will survive the redirects of the testing page.</p>
+							<p>If you need to test the page redirects, then instead <a href="_src_guides_getting_started_nodejs_getting_started_nodejs_.html#gettingstartednodejsguide">write your tests as Node.js scripts</a> and use the &quot;classic&quot; Puppeteer or Playwright API to create the page instance and <code>evalulate</code> command of those libraries. In the future releases, we&#39;ll provide an unified API for both on-page and out-of-page testing scenarios.</p>
+							<a href="#importing-api" id="importing-api" style="color: inherit; text-decoration: none;">
+								<h1>Importing API</h1>
+							</a>
+							<p>When targeting browser environment for running tests, import the Siesta API from the <code>siesta/browser.js</code> entry file.</p>
+							<a href="#support-for-the-bare-import-specifiers" id="support-for-the-bare-import-specifiers" style="color: inherit; text-decoration: none;">
+								<h1>Support for the bare import specifiers</h1>
+							</a>
+							<p>Siesta itself is &quot;transpilation&quot; process agnostic and assumes native EcmaScript setup. However, Ecma spec does not define the behavior for the &quot;bare import specifiers&quot;, like <code>import { it } from &quot;siesta/browser.js&quot;</code>. The proposed solution for it, <a href="https://github.com/WICG/import-maps">import maps</a> is only <a href="https://github.com/WICG/import-maps/issues/235">partially</a> supported in Chrome. </p>
+							<p>This means that the bundler-free development is still the shiny future (not so far hopefully) and in the meantime, an extra transpilation step / development web server is needed. We recommend <a href="https://vitejs.dev/">Vite</a> for this purpose, as a modern and very fast alternative to Webpack.</p>
+							<p>The example we made for a test suite targeting browsers, works with Vite with zero configuration. Yes, no Vite config is needed! This is kind of impressive, comparing how much hassle it can be with configuring the other bundling tools. See the <code>examples/browser</code>.</p>
+							<p>That example is very simple, it is possible that more complex apps will require certain configuration. It should no more than specifying the test files as entry points:</p>
+							<pre><code class="language-javascript"><span class="hljs-comment">/**
+ * <span class="hljs-doctag">@type <span class="hljs-type">{ import(&#x27;vite&#x27;).UserConfig }</span></span>
+ */</span>
+<span class="hljs-keyword">const</span> config = {
+    <span class="hljs-attr">optimizeDeps</span>    : {
+        <span class="hljs-attr">entries</span>     : [
+            <span class="hljs-string">&#x27;./tests/index.js&#x27;</span>,
+            <span class="hljs-string">&#x27;./tests/**/*.t.js&#x27;</span>
+        ]
+    }
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> config</code></pre>
+							<p>Once you have this config in place, you can launch the development web server with: <code>npx vite</code></p>
+							<a href="#launching-individual-test" id="launching-individual-test" style="color: inherit; text-decoration: none;">
+								<h1>Launching individual test</h1>
+							</a>
+							<p>Let&#39;s assume we have the following Siesta test file, called <code>basic_test.t.js</code>, which is available on the web URL as <code>http://localhost:3000/tests/basic_test.t.js</code>. We assume Vite server running. </p>
+							<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { it } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;siesta/browser.js&quot;</span>
+
+it(<span class="hljs-string">&#x27;Basic Siesta test&#x27;</span>, <span class="hljs-keyword">async</span> t =&gt; {
+    t.true(<span class="hljs-literal">true</span>, <span class="hljs-string">&quot;That&#x27;s true&quot;</span>)
+
+    t.true(<span class="hljs-literal">false</span>, <span class="hljs-string">&quot;That&#x27;s not true&quot;</span>)
+})
+
+
+it(<span class="hljs-string">&#x27;Deep equality should work&#x27;</span>, <span class="hljs-keyword">async</span> t =&gt; {
+    t.equal([ <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span> ], [ <span class="hljs-number">3</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span> ], <span class="hljs-string">&quot;Arrays are deeply equal&quot;</span>)
+
+    t.expect(
+        { <span class="hljs-attr">receivedKey</span> : <span class="hljs-string">&#x27;receivedValue&#x27;</span>, <span class="hljs-attr">commonKey</span> : <span class="hljs-string">&#x27;commonValue&#x27;</span> }
+    ).toEqual(
+        { <span class="hljs-attr">expectedKey</span> : <span class="hljs-string">&#x27;expectedValue&#x27;</span>, <span class="hljs-attr">commonKey</span> : <span class="hljs-string">&#x27;commonValue&#x27;</span> }
+    )
+})</code></pre>
+							<p>We can launch it, by providing its url to the launcher. The <code>--browser</code> option defines in which browser to run the test. By default, its <code>chrome</code>.</p>
+							<pre><code class="language-shell">npx siesta http://localhost:3000/my_project/tests/basic_test.t.js --brower firefox</code></pre>
+							<p>You should see something like:
+							<img src="../media/getting_started_browser/getting_started_browser_1.jpg" alt="Launching test directly"></p>
+							<a href="#launching-test-suite" id="launching-test-suite" style="color: inherit; text-decoration: none;">
+								<h1>Launching test suite</h1>
+							</a>
+							<p>To launch the whole test suite, one need to create the <a href="_src_guides_siesta_project_siesta_project_.html#siestaprojectguide">Siesta project</a>.</p>
+							<p>Note, that currently, browser projects do not have the access to the file system and need to list all the test files manually, using the <a href="../classes/_src_siesta_project_project_.project.html#plan">Project.plan</a> method. This is to support the use case, of running the project fully in the browser, without relying on any OS process, which is convenient for debugging. In the future, we plan improve this.</p>
+							<a href="#debugging" id="debugging" style="color: inherit; text-decoration: none;">
+								<h1>Debugging</h1>
+							</a>
+							<p>To debug the browser test, place a <code>debugger</code> statement in it, then launch it as an individual test, with additional option <code>--headless=false</code>: </p>
+							<pre><code class="language-shell">npx siesta http://localhost/my_project/tests/basic_test.t.js --brower firefox --headless=false</code></pre>
+							<p>Launcher will start the browser with the dev tools opened. </p>
+							<a href="#copyright-and-license" id="copyright-and-license" style="color: inherit; text-decoration: none;">
+								<h1>COPYRIGHT AND LICENSE</h1>
+							</a>
+							<p>MIT License</p>
+							<p>Copyright (c) 2009-2021 Bryntum, Nickolay Platonov</p>
+						</div>
+					</div>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="_src_guides_getting_started_browser_getting_started_browser_.html">&quot;src/guides/getting_<wbr>started_<wbr>browser/getting_<wbr>started_<wbr>browser&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="_src_guides_getting_started_browser_getting_started_browser_.html#gettingstartedbrowserguide" class="tsd-kind-icon">Getting<wbr>Started<wbr>Browser<wbr>Guide</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>&quot;src/guides/getting_started_deno/getting_started_deno&quot; | @bryntum/siesta</title>
+	<meta name="description" content="Documentation for @bryntum/siesta">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@bryntum/siesta</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="_src_guides_getting_started_deno_getting_started_deno_.html">&quot;src/guides/getting_started_deno/getting_started_deno&quot;</a>
+				</li>
+			</ul>
+			<h1>Module &quot;src/guides/getting_started_deno/getting_started_deno&quot;</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="_src_guides_getting_started_deno_getting_started_deno_.html#gettingstarteddenoguide" class="tsd-kind-icon">Getting<wbr>Started<wbr>Deno<wbr>Guide</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="gettingstarteddenoguide" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> Getting<wbr>Started<wbr>Deno<wbr>Guide</h3>
+					<div class="tsd-signature tsd-kind-icon">Getting<wbr>Started<wbr>Deno<wbr>Guide<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">""</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in src/guides/getting_started_deno/getting_started_deno.ts:4</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<a href="#getting-started-with-siesta-in-deno-environment" id="getting-started-with-siesta-in-deno-environment" style="color: inherit; text-decoration: none;">
+								<h1>Getting started with Siesta in Deno environment</h1>
+							</a>
+							<p>Siesta is a stress-free JavaScript/TypeScript testing tool. It is ubiquitous - tests can be run in browsers, Node.js and Deno, on Linux, macOS and Windows.</p>
+							<p>In this guide, we assume a setup, pointed toward running tests in <a href="https://deno.land/">Deno</a>. </p>
+							<p>Siesta supports the latest release of Deno.</p>
+							<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+								<h1>Installation</h1>
+							</a>
+							<p>Note, that installer adds <code>--quiet</code> to the executable arguments. This is because the diagnostic messages <a href="(https://github.com/denoland/deno/issues/10558)">breaks the dynamic output of the test reporter</a> and there&#39;s no other way to intercept/suppress them. The <code>--no-check</code> option is recommended for speed.</p>
+							<pre><code class="language-shell">deno install --name siesta --allow-read --allow-env --unstable --no-check --quiet https://deno.land/x/siesta/bin/siesta-deno.js</code></pre>
+							<a href="#basics" id="basics" style="color: inherit; text-decoration: none;">
+								<h1>Basics</h1>
+							</a>
+							<p>To familiarize yourself with the basic Siesta concepts, which are common for all execution environments, please check the <a href="_src_guides_siesta_test_basics_siesta_test_basics_.html#siestatestbasicsguide">Siesta test basics</a> guide. </p>
+							<a href="#importing-api" id="importing-api" style="color: inherit; text-decoration: none;">
+								<h1>Importing API</h1>
+							</a>
+							<p>When targeting Deno environment for running tests, import the Siesta API from the <code>https://deno.land/x/siesta/deno.js</code> entry file.</p>
+							<a href="#launching-individual-test" id="launching-individual-test" style="color: inherit; text-decoration: none;">
+								<h1>Launching individual test</h1>
+							</a>
+							<p>Let&#39;s assume we have the following Siesta test file, called <code>basic_test.t.js</code>.</p>
+							<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { it } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;https://deno.land/x/siesta/deno.js&quot;</span>
+
+it(<span class="hljs-string">&#x27;Basic Siesta test&#x27;</span>, <span class="hljs-keyword">async</span> t =&gt; {
+    t.true(<span class="hljs-literal">true</span>, <span class="hljs-string">&quot;That&#x27;s true&quot;</span>)
+
+    t.true(<span class="hljs-literal">false</span>, <span class="hljs-string">&quot;That&#x27;s not true&quot;</span>)
+})
+
+
+it(<span class="hljs-string">&#x27;Deep equality should work&#x27;</span>, <span class="hljs-keyword">async</span> t =&gt; {
+    t.equal([ <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span> ], [ <span class="hljs-number">3</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span> ], <span class="hljs-string">&quot;Arrays are deeply equal&quot;</span>)
+
+    t.expect(
+        { <span class="hljs-attr">receivedKey</span> : <span class="hljs-string">&#x27;receivedValue&#x27;</span>, <span class="hljs-attr">commonKey</span> : <span class="hljs-string">&#x27;commonValue&#x27;</span> }
+    ).toEqual(
+        { <span class="hljs-attr">expectedKey</span> : <span class="hljs-string">&#x27;expectedValue&#x27;</span>, <span class="hljs-attr">commonKey</span> : <span class="hljs-string">&#x27;commonValue&#x27;</span> }
+    )
+})</code></pre>
+							<p>We can launch it, as a regular Deno script with some additional permissions:</p>
+							<pre><code class="language-shell">deno run --allow-read --allow-env --allow-net tests/basic/basic_test.t.js</code></pre>
+							<p>You should see something like:
+							<img src="../media/getting_started_deno/getting_started_deno_1.jpg" alt="Launching test directly"></p>
+							<a href="#launching-several-tests" id="launching-several-tests" style="color: inherit; text-decoration: none;">
+								<h1>Launching several tests</h1>
+							</a>
+							<p>To launch several tests, you need to use the Siesta launcher, installed at the &quot;Installation&quot; step above:</p>
+							<pre><code class="language-shell">siesta --help</code></pre>
+							<p>To launch several tests, pass a matching glob pattern, as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all <code>*.t.m?js</code> files in it, recursively. To resolve the glob pattern, Siesta uses the <a href="https://doc.deno.land/https/deno.land/std@0.95.0/path/glob.ts">glob resolution</a> from the Deno <code>std</code> library, please refer to its documentation for details. </p>
+							<p>Some examples:</p>
+							<p>Launch all tests (<code>*.t.m?js</code> files) in <code>tests</code> directory:</p>
+							<pre><code class="language-shell">npx siesta tests</code></pre>
+							<p>Launch all tests in <code>tests</code> directory, with custom extension:</p>
+							<pre><code class="language-shell">npx siesta tests/**/*.test.js</code></pre>
+							<p>Launch all tests in <code>tests</code> directory, which have characters <code>1</code> or <code>2</code> in their names:</p>
+							<pre><code class="language-shell">npx siesta tests/**/*@(1|2)*.t.js</code></pre>
+							<a href="#debugging" id="debugging" style="color: inherit; text-decoration: none;">
+								<h1>Debugging</h1>
+							</a>
+							<p>You can debug a Siesta test as any other regular Deno script. For that, place the <code>debugger</code> statement somewhere in the test code and then start the test with the <code>--inspect-brk</code> option. Note, that due to <a href="https://github.com/nodejs/node/issues/25215">this issue</a>, starting your test with just <code>--inspect</code> may result in your breakpoint being ignored. </p>
+							<p>You need to place the <code>--inspect-brk</code> option after the <code>deno</code> executable, before the test file - otherwise it will be passed to the script, instead of the <code>node</code>.</p>
+							<p>For example, for the test above:</p>
+							<pre><code class="language-shell">deno run --inspect-brk --allow-read --allow-env --allow-net tests/basic/basic_test.t.js</code></pre>
+							<p>Then open the console in any Chrome tab and click the &quot;Dedicated DevTools&quot; icon in the bottom-left.</p>
+							<a href="#further-reading" id="further-reading" style="color: inherit; text-decoration: none;">
+								<h1>Further reading</h1>
+							</a>
+							<p>Configuring the test suite: <a href="_src_guides_siesta_project_siesta_project_.html#siestaprojectguide">Siesta project</a> guide</p>
+							<a href="#copyright-and-license" id="copyright-and-license" style="color: inherit; text-decoration: none;">
+								<h1>COPYRIGHT AND LICENSE</h1>
+							</a>
+							<p>MIT License</p>
+							<p>Copyright (c) 2009-2021 Bryntum, Nickolay Platonov</p>
+						</div>
+					</div>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="_src_guides_getting_started_deno_getting_started_deno_.html">&quot;src/guides/getting_<wbr>started_<wbr>deno/getting_<wbr>started_<wbr>deno&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="_src_guides_getting_started_deno_getting_started_deno_.html#gettingstarteddenoguide" class="tsd-kind-icon">Getting<wbr>Started<wbr>Deno<wbr>Guide</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
