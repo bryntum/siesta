@@ -8,12 +8,12 @@ shopt -s globstar extglob
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd "$DIR/.."
 
-release="false"
-docs="false"
+release=""
+docs=""
 
 while getopts "rd" opt; do
     case "$opt" in
-        r)  release="true"
+        r)  release="-d"
             ;;
         d)  docs="true"
             ;;
