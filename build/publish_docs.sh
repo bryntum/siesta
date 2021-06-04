@@ -4,7 +4,7 @@
 set -e
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-DOCS="$( cd "$( dirname "$1" )" && pwd )"
+DOCS="$1"
 
 if [[ -z $DOCS ]]; then
     echo ">> No path to docs given"

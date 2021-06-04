@@ -13,6 +13,12 @@ shopt -s globstar extglob
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 . "$DIR"/util.sh
 
+if [[ -z "$V" ]]; then
+    echo ">> No value for V env variable"
+    exit 1
+fi
+
+
 DIST="$DIR/../DIST"
 
 echo ">> Starting release"

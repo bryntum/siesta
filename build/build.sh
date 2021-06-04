@@ -22,12 +22,12 @@ done
 
 npx tsc $release
 
-if [[ $docs == 'true' ]]; then
+if [[ -n $docs ]]; then
     build/build_docs.sh
 fi
 
 
-if [[ $release == 'true' ]]; then
+if [[ -n $release ]]; then
     GLOBIGNORE=@(examples|node_modules)/**
 
     for filename_ts in **/!(*.d).ts?(x); do

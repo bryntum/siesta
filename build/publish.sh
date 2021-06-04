@@ -7,7 +7,8 @@ DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd "$DIR/.."
 
 if [[ -z "$V" ]]; then
-    V="patch"
+    echo ">> No value for V env variable"
+    exit 1
 fi
 
 # bump version in distribution - won't be reflected in main repo, since "make_dist" removes the ".git"
@@ -17,7 +18,7 @@ node -e "require('./build/changelog.cjs').updateVersion()"
 
 echo "/build" > .npmignore
 
-npm publish --access public
+npm publish --dry-run --access public
 
 #---------------------------------------------------------------------------------
 # post-publish steps, the following code is executed on the main repo
@@ -31,7 +32,6 @@ node -e "require('./build/changelog.cjs').updateVersionAndStartNew()"
 git add CHANGELOG.md
 git commit -m "Updated changelog"
 
-git push --tags
+git push origin HEAD --tags
 
-# the trailing dot is required
-build/publish_docs.sh "$DIST/docs/."
+build/publish_docs.sh "$DIST/docs"
