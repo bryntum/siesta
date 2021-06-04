@@ -28,7 +28,8 @@ fi
 
 
 if [[ -n $release ]]; then
-    GLOBIGNORE=@(examples|node_modules)/**
+    # we don't need to add type references for files in `bin/`
+    GLOBIGNORE=@(examples|node_modules|bin)/**
 
     for filename_ts in **/!(*.d).ts?(x); do
         regexp="(.*)\.tsx?"
@@ -40,6 +41,9 @@ if [[ -n $release ]]; then
             awk -i inplace -v FILENAME_TYPES="$filename_types" 'BEGINFILE{printf "/// <reference types=\"./%s\" />\n",FILENAME_TYPES}{print}' $filename_js
         fi
     done
+
+    # we need to remove the *.ts files everywhere, including the `bin/`
+    GLOBIGNORE=@(examples|node_modules)/**
 
     # delete the TypeScript sources, we provide *.d.ts files instead
     rm **/!(*.d).ts?(x)
