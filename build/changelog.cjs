@@ -23,7 +23,7 @@ const updateVersion = () => {
 const updateVersionAndStartNew = () => {
     let changelog = fs.readFileSync('CHANGELOG.md', 'utf8')
 
-    changelog = changelog.replace(/\{\{ \$NEXT \}\}/m, `{{ $NEXT }}\n\n${versionStr}`)
+    changelog = changelog.replace(/^(.*?)\{\{ \$NEXT \}\}/m, `$1{{ $NEXT }}\n\n$1${ versionStr }`)
 
     fs.writeFileSync('CHANGELOG.md', changelog, 'utf8')
 }

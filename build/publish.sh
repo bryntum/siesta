@@ -34,4 +34,4 @@ git commit -m "Updated changelog"
 
 git push origin HEAD --tags
 
-build/publish_docs.sh "$DIST/docs"
+build/publish_docs.sh "$DIR/../docs"
