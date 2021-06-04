@@ -1,6 +1,6 @@
 {
   "name": "@bryntum/siesta",
-  "version": "6.0.0-alpha-4",
+  "version": "6.0.0-alpha-5",
   "description": "Next generation JavaScript/TypeScript testing and benchmarking tool",
   "main": "index.js",
   "module": "index.js",
