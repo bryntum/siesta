@@ -21,7 +21,7 @@ npm publish --access public
 
 #---------------------------------------------------------------------------------
 # post-publish steps, the following code is executed on the main repo
-cd "$DIR/.."
+cd "$DIR/../.."
 
 # bump version in main repo
 npm version $V
@@ -34,4 +34,4 @@ git commit -m "Updated changelog"
 git push --tags
 
 # the trailing dot is required
-"$DIR"/publish_docs.sh "$DIST/docs/."
+build/publish_docs.sh "$DIST/docs/."
