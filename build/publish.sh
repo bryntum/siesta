@@ -12,7 +12,7 @@ if [[ -z "$V" ]]; then
 fi
 
 # bump version in distribution - won't be reflected in main repo, since "make_dist" removes the ".git"
-npm version $V
+NEW_VERSION=$(npm version $V)
 
 node -e "require('./build/changelog.cjs').updateVersion()"
 
@@ -24,13 +24,15 @@ npm publish --dry-run --access public
 # post-publish steps, the following code is executed on the main repo
 cd "$DIR/../.."
 
-# bump version in main repo
-npm version $V
-
-node -e "require('./build/changelog.cjs').updateVersionAndStartNew()"
+# update the changlelog first, so that the tag, created with `npm version`
+# will point to completely correct distribution
+node -e "require('./build/changelog.cjs').updateVersionAndStartNew('$NEW_VERSION')"
 
 git add CHANGELOG.md
 git commit -m "Updated changelog"
+
+# bump version in main repo
+npm version $V
 
 git push origin HEAD --tags
 

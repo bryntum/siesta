@@ -28,6 +28,8 @@ rm -rf "$DIST_DOCS/docs"
 
 cp -r "$DOCS" "$DIST_DOCS/docs"
 
+git add -A || true
+
 git commit -a -m "Docs updated" || true
 
 git push

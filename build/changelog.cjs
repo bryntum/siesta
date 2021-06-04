@@ -20,10 +20,10 @@ const updateVersion = () => {
 }
 
 
-const updateVersionAndStartNew = () => {
+const updateVersionAndStartNew = (newVersion) => {
     let changelog = fs.readFileSync('CHANGELOG.md', 'utf8')
 
-    changelog = changelog.replace(/^(.*?)\{\{ \$NEXT \}\}/m, `$1{{ $NEXT }}\n\n$1${ versionStr }`)
+    changelog = changelog.replace(/^(.*?)\{\{ \$NEXT \}\}/m, `$1{{ $NEXT }}\n\n$1${ newVersion || versionStr }`)
 
     fs.writeFileSync('CHANGELOG.md', changelog, 'utf8')
 }
