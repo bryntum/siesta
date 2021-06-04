@@ -14,7 +14,7 @@ fi
 # bump version in distribution - won't be reflected in main repo, since "make_dist" removes the ".git"
 NEW_VERSION=$(npm version $V)
 
-node -e "require('./build/changelog.cjs').updateVersion()"
+NEW_VERSION_TIME=$(node -e "require('./build/changelog.cjs').updateVersion()")
 
 echo "/build" > .npmignore
 
@@ -26,7 +26,7 @@ cd "$DIR/../.."
 
 # update the changlelog first, so that the tag, created with `npm version`
 # will point to completely correct distribution
-node -e "require('./build/changelog.cjs').updateVersionAndStartNew('$NEW_VERSION')"
+node -e "require('./build/changelog.cjs').updateVersionAndStartNew('$NEW_VERSION', $NEW_VERSION_TIME)"
 
 git add CHANGELOG.md
 git commit -m "Updated changelog"
