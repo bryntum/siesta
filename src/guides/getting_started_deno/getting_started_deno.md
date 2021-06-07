@@ -10,7 +10,7 @@ Siesta supports the latest release of Deno.
 Installation
 ============
 
-Note, that installer adds `--quiet` to the executable arguments. This is because the diagnostic messages [breaks the dynamic output of the test reporter]((https://github.com/denoland/deno/issues/10558)) and there's no other way to intercept/suppress them. The `--no-check` option is recommended for speed.
+Installer adds `--quiet` to the executable arguments. This is because the diagnostic messages [breaks the dynamic output of the test reporter](https://github.com/denoland/deno/issues/10558) and there's no other way to intercept/suppress them. The `--no-check` option is recommended for speed, `--unstable` is required for WebWorker feature.
 
 ```shell
 deno install --name siesta --allow-read --allow-env --unstable --no-check --quiet https://deno.land/x/siesta/bin/siesta-deno.js
@@ -79,17 +79,17 @@ Some examples:
 
 Launch all tests (`*.t.m?js` files) in `tests` directory:
 ```shell
-npx siesta tests
+siesta tests
 ```
 
 Launch all tests in `tests` directory, with custom extension:
 ```shell
-npx siesta tests/**/*.test.js
+siesta tests/**/*.test.js
 ```
 
 Launch all tests in `tests` directory, which have characters `1` or `2` in their names:
 ```shell
-npx siesta tests/**/*@(1|2)*.t.js
+siesta tests/**/*@(1|2)*.t.js
 ```
 
 
