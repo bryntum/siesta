@@ -9,9 +9,10 @@ import { ColorerDeno } from "../../jsx/ColorerDeno.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { EnvironmentType } from "../common/Environment.js"
+import { Context } from "../context/Context.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderDenoWorker } from "../context/context_provider/ContextProviderDenoWorker.js"
-import { ProjectDescriptorDeno } from "../project/ProjectDescriptor.js"
+import { ProjectDescriptorDeno, ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ReporterDeno } from "../reporter/ReporterDeno.js"
 import { ReporterDenoTerminal } from "../reporter/ReporterDenoTerminal.js"
 import { Runtime } from "../runtime/Runtime.js"
@@ -153,21 +154,11 @@ export class LauncherDeno extends Mixin(
         }
 
 
-        // Deno needs to resolve the project url to `file://`, because it might be served from the online repository,
-        // which resides on different domain, so that `/home/user/...` url is resolved to `https://jsdelivr.com/home/user/...`
-        prepareProjectFileUrl (url : string) : string {
-            if (/^https?:/i.test(url)) {
-                return url
-            }
-            else if (/^file:/.test(url)) {
-                return 'file://' + this.runtime.pathResolve(this.runtime.fileURLToPath(url))
-            }
-            else {
-                // assume plain fs path here
-                return 'file://' + this.runtime.pathResolve(url)
-            }
+        async extractProjectData (context : Context, projectUrl : string) : Promise<ProjectSerializableData> {
+            // Deno needs to resolve the project url to `file://`, because it might be served from the online repository,
+            // which resides on different domain, so that `/home/user/...` url is resolved to `https://jsdelivr.com/home/user/...`
+            return super.extractProjectData(context, 'file://' + projectUrl)
         }
-
 
         setExitCode (code : ExitCodes) {
             // process.exitCode    = process.exitCode ?? code
