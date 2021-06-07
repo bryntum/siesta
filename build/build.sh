@@ -36,7 +36,7 @@ if [[ -n $release ]]; then
 
         if [[ $filename_ts =~ $regexp ]]; then
             filename_js="${BASH_REMATCH[1]}.js"
-            filename_types="${BASH_REMATCH[1]}.d.ts"
+            filename_types=$(basename "${BASH_REMATCH[1]}.d.ts")
 
             awk -i inplace -v FILENAME_TYPES="$filename_types" 'BEGINFILE{printf "/// <reference types=\"./%s\" />\n",FILENAME_TYPES}{print}' $filename_js
         fi
