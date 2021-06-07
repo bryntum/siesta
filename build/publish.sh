@@ -18,7 +18,7 @@ NEW_VERSION_TIME=$(node -e "require('./build/changelog.cjs').updateVersion()")
 
 echo "/build" > .npmignore
 
-npm publish --dry-run --access public
+npm publish --access public
 
 #---------------------------------------------------------------------------------
 # post-publish steps, the following code is executed on the main repo
