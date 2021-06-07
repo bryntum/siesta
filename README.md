@@ -104,11 +104,11 @@ Documentation
 
 Please start reading from one the following guides, corresponding to the environment, in which you'd like to run the tests:
 
-[[GettingStartedNodejsGuide|Getting started with Siesta in Node.js environment]]
+[Getting started with Siesta in Node.js environment](https://bryntum.github.io/siesta/docs/modules/_src_guides_getting_started_nodejs_getting_started_nodejs_.html#gettingstartednodejsguide)
 
-[[GettingStartedDenoGuide|Getting started with Siesta in Deno environment]]
+[Getting started with Siesta in Deno environment](https://bryntum.github.io/siesta/docs/modules/_src_guides_getting_started_deno_getting_started_deno_.html#gettingstarteddenoguide)
 
-[[GettingStartedBrowserGuide|Getting started with Siesta in browser environment]]
+[Getting started with Siesta in browser environment](https://bryntum.github.io/siesta/docs/modules/_src_guides_getting_started_browser_getting_started_browser_.html#gettingstartedbrowserguide)
 
 
 Github repo
