@@ -2,10 +2,10 @@ git_repo_has_changes() (
     (
         cd "$1"
 
-        if git diff-index --quiet HEAD --; then
-            echo 'false'
-        else
+        if [[ `git status --porcelain` ]]; then
             echo 'true'
+        else
+            echo 'false'
         fi
     )
 )
