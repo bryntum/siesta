@@ -23,7 +23,7 @@ import { extractProjectInfo } from "./ProjectExtractor.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherTerminal extends Mixin(
     [ Launcher ],
-    (base : ClassUnion<typeof Launcher>) => 
+    (base : ClassUnion<typeof Launcher>) =>
 
     class LauncherTerminal extends base {
         logger                  : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
@@ -164,17 +164,24 @@ export class LauncherTerminal extends Mixin(
                                 this.projectData.projectPlan.url    = this.runtime.cwd()
                             } else {
                                 // finally - project file name
-                                const contextProvider               = this.contextProviderSameContext
-
-                                const context                       = await contextProvider.createContext()
-
-                                this.projectData                    = await this.extractProjectData(context, projectUrl)
-                                this.projectData.projectPlan.url    = stripBasename(this.project)
+                                await this.setupProjectDataFromProjectFile(projectUrl)
                             }
                         }
                     }
                 }
             }
+        }
+
+        // for Node.js it generally fine (and most performant) to use same-context context
+        // this is based on assumption, that both project and launcher shares the same set of Siesta files
+        // Deno overrides this method, to always create a separate context for project
+        async setupProjectDataFromProjectFile (projectUrl : string) {
+            const contextProvider               = this.contextProviderSameContext
+
+            const context                       = await contextProvider.createContext()
+
+            this.projectData                    = await this.extractProjectData(context, projectUrl)
+            this.projectData.projectPlan.url    = stripBasename(this.project)
         }
 
 

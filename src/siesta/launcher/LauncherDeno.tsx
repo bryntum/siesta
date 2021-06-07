@@ -8,6 +8,7 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerDeno } from "../../jsx/ColorerDeno.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
+import { stripBasename } from "../../util/Path.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { Context } from "../context/Context.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
@@ -159,6 +160,18 @@ export class LauncherDeno extends Mixin(
             // which resides on different domain, so that `/home/user/...` url is resolved to `https://jsdelivr.com/home/user/...`
             return super.extractProjectData(context, 'file://' + projectUrl)
         }
+
+        // for Deno, we create a proper separate context for project file, plus
+        // setup the project plan root as `file://` url
+        async setupProjectDataFromProjectFile (projectUrl : string) {
+            const contextProvider               = this.contextProviders[ 0 ]
+
+            const context                       = await contextProvider.createContext()
+
+            this.projectData                    = await this.extractProjectData(context, projectUrl)
+            this.projectData.projectPlan.url    = 'file://' + stripBasename(this.project)
+        }
+
 
         setExitCode (code : ExitCodes) {
             // process.exitCode    = process.exitCode ?? code
