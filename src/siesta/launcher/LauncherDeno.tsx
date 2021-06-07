@@ -27,7 +27,7 @@ declare const Deno : any
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherDeno extends Mixin(
     [ Launcher, LauncherTerminal, ExecutionContextAttachable ],
-    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) => 
+    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) =>
 
     class LauncherDeno extends base {
         // region options
@@ -150,6 +150,22 @@ export class LauncherDeno extends Mixin(
             }
 
             await super.setupProjectData()
+        }
+
+
+        // Deno needs to resolve the project url to `file://`, because it might be served from the online repository,
+        // which resides on different domain, so that `/home/user/...` url is resolved to `https://jsdelivr.com/home/user/...`
+        prepareProjectFileUrl (url : string) : string {
+            if (/^https?:/i.test(url)) {
+                return url
+            }
+            else if (/^file:/.test(url)) {
+                return 'file://' + this.runtime.pathResolve(this.runtime.fileURLToPath(url))
+            }
+            else {
+                // assume plain fs path here
+                return 'file://' + this.runtime.pathResolve(url)
+            }
         }
 
 
