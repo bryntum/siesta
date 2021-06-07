@@ -128,7 +128,7 @@ export class LauncherTerminal extends Mixin(
                     project.planGlob(projectUrl)
 
                     this.projectData                    = project.asProjectSerializableData()
-                    this.projectData.projectPlan.url    = this.runtime.cwd()
+                    this.projectData.projectPlan.url    = this.prepareProjectPlanRoot(this.runtime.cwd())
                 }
                 else {
                     // non-glob - either project file url (https: or file:) or test file name
@@ -151,7 +151,7 @@ export class LauncherTerminal extends Mixin(
                             project.planDir(projectUrl)
 
                             this.projectData                    = project.asProjectSerializableData()
-                            this.projectData.projectPlan.url    = this.runtime.cwd()
+                            this.projectData.projectPlan.url    = this.prepareProjectPlanRoot(this.runtime.cwd())
                         }
                         else if (this.runtime.isFile(projectUrl)) {
                             if (/\.t\.m?js/.test(projectUrl)) {
@@ -172,6 +172,12 @@ export class LauncherTerminal extends Mixin(
             }
         }
 
+
+        prepareProjectPlanRoot (dirName : string) : string {
+            return dirName
+        }
+
+
         // for Node.js it generally fine (and most performant) to use same-context context
         // this is based on assumption, that both project and launcher shares the same set of Siesta files
         // Deno overrides this method, to always create a separate context for project
@@ -181,7 +187,7 @@ export class LauncherTerminal extends Mixin(
             const context                       = await contextProvider.createContext()
 
             this.projectData                    = await this.extractProjectData(context, projectUrl)
-            this.projectData.projectPlan.url    = stripBasename(this.project)
+            this.projectData.projectPlan.url    = this.prepareProjectPlanRoot(stripBasename(this.project))
         }
 
 

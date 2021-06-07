@@ -161,15 +161,20 @@ export class LauncherDeno extends Mixin(
             return super.extractProjectData(context, 'file://' + projectUrl)
         }
 
-        // for Deno, we create a proper separate context for project file, plus
+
         // setup the project plan root as `file://` url
+        prepareProjectPlanRoot (dirName : string) : string {
+            return 'file://' + dirName
+        }
+
+        // for Deno, we create a proper separate context for project file
         async setupProjectDataFromProjectFile (projectUrl : string) {
             const contextProvider               = this.contextProviders[ 0 ]
 
             const context                       = await contextProvider.createContext()
 
             this.projectData                    = await this.extractProjectData(context, projectUrl)
-            this.projectData.projectPlan.url    = 'file://' + stripBasename(this.project)
+            this.projectData.projectPlan.url    = this.prepareProjectPlanRoot(stripBasename(this.project))
         }
 
 
