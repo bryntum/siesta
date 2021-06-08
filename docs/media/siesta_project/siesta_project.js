@@ -1,4 +1,4 @@
-/// <reference types="./docs/media/siesta_project/siesta_project.d.ts" />
+/// <reference types="./please_fix_10879.d.ts" />
 /**
  * [[include:siesta_project/siesta_project.md]]
  */

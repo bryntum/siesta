@@ -1,4 +1,4 @@
-/// <reference types="./docs/media/siesta_test_basics/siesta_test_basics.d.ts" />
+/// <reference types="./please_fix_10879.d.ts" />
 /**
  * [[include:siesta_test_basics/siesta_test_basics.md]]
  */

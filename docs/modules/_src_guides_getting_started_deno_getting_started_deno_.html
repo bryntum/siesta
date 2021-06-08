@@ -101,8 +101,8 @@
 							<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
 								<h1>Installation</h1>
 							</a>
-							<p>Note, that installer adds <code>--quiet</code> to the executable arguments. This is because the diagnostic messages <a href="(https://github.com/denoland/deno/issues/10558)">breaks the dynamic output of the test reporter</a> and there&#39;s no other way to intercept/suppress them. The <code>--no-check</code> option is recommended for speed.</p>
-							<pre><code class="language-shell">deno install --name siesta --allow-read --allow-env --unstable --no-check --quiet https://deno.land/x/siesta/bin/siesta-deno.js</code></pre>
+							<p>Installer adds <code>--quiet</code> to the executable arguments. This is because the diagnostic messages <a href="https://github.com/denoland/deno/issues/10558">breaks the dynamic output of the test reporter</a> and there&#39;s no other way to intercept/suppress them. The <code>--no-check</code> option is recommended for speed, <code>--unstable</code> is required for WebWorker feature.</p>
+							<pre><code class="language-shell">deno install -n siesta -A -q --unstable --no-check https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/bin/siesta-deno.js</code></pre>
 							<a href="#basics" id="basics" style="color: inherit; text-decoration: none;">
 								<h1>Basics</h1>
 							</a>
@@ -110,12 +110,12 @@
 							<a href="#importing-api" id="importing-api" style="color: inherit; text-decoration: none;">
 								<h1>Importing API</h1>
 							</a>
-							<p>When targeting Deno environment for running tests, import the Siesta API from the <code>https://deno.land/x/siesta/deno.js</code> entry file.</p>
+							<p>When targeting Deno environment for running tests, import the Siesta API from the <code>https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/deno.js</code> entry file.</p>
 							<a href="#launching-individual-test" id="launching-individual-test" style="color: inherit; text-decoration: none;">
 								<h1>Launching individual test</h1>
 							</a>
 							<p>Let&#39;s assume we have the following Siesta test file, called <code>basic_test.t.js</code>.</p>
-							<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { it } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;https://deno.land/x/siesta/deno.js&quot;</span>
+							<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { it } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/deno.js&quot;</span>
 
 it(<span class="hljs-string">&#x27;Basic Siesta test&#x27;</span>, <span class="hljs-keyword">async</span> t =&gt; {
     t.true(<span class="hljs-literal">true</span>, <span class="hljs-string">&quot;That&#x27;s true&quot;</span>)
@@ -145,11 +145,11 @@ it(<span class="hljs-string">&#x27;Deep equality should work&#x27;</span>, <span
 							<p>To launch several tests, pass a matching glob pattern, as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all <code>*.t.m?js</code> files in it, recursively. To resolve the glob pattern, Siesta uses the <a href="https://doc.deno.land/https/deno.land/std@0.95.0/path/glob.ts">glob resolution</a> from the Deno <code>std</code> library, please refer to its documentation for details. </p>
 							<p>Some examples:</p>
 							<p>Launch all tests (<code>*.t.m?js</code> files) in <code>tests</code> directory:</p>
-							<pre><code class="language-shell">npx siesta tests</code></pre>
+							<pre><code class="language-shell">siesta tests</code></pre>
 							<p>Launch all tests in <code>tests</code> directory, with custom extension:</p>
-							<pre><code class="language-shell">npx siesta tests/**/*.test.js</code></pre>
+							<pre><code class="language-shell">siesta tests/**/*.test.js</code></pre>
 							<p>Launch all tests in <code>tests</code> directory, which have characters <code>1</code> or <code>2</code> in their names:</p>
-							<pre><code class="language-shell">npx siesta tests/**/*@(1|2)*.t.js</code></pre>
+							<pre><code class="language-shell">siesta tests/**/*@(1|2)*.t.js</code></pre>
 							<a href="#debugging" id="debugging" style="color: inherit; text-decoration: none;">
 								<h1>Debugging</h1>
 							</a>
