@@ -41,7 +41,7 @@ npm install @bryntum/siesta --save-dev
 
 Deno environment:
 ```shell
-deno install -n siesta -A --unstable --no-check --quiet https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/bin/siesta-deno.js
+deno install -n siesta -A -q --unstable --no-check https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/bin/siesta-deno.js
 ```
 
 Build statuses

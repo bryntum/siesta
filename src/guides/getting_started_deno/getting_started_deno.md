@@ -13,7 +13,7 @@ Installation
 Installer adds `--quiet` to the executable arguments. This is because the diagnostic messages [breaks the dynamic output of the test reporter](https://github.com/denoland/deno/issues/10558) and there's no other way to intercept/suppress them. The `--no-check` option is recommended for speed, `--unstable` is required for WebWorker feature.
 
 ```shell
-deno install --name siesta --allow-read --allow-env --unstable --no-check --quiet https://deno.land/x/siesta/bin/siesta-deno.js
+deno install -n siesta -A -q --unstable --no-check https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/bin/siesta-deno.js
 ```
 
 Basics
@@ -25,7 +25,7 @@ To familiarize yourself with the basic Siesta concepts, which are common for all
 Importing API
 =============
 
-When targeting Deno environment for running tests, import the Siesta API from the `https://deno.land/x/siesta/deno.js` entry file.
+When targeting Deno environment for running tests, import the Siesta API from the `https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/deno.js` entry file.
 
 
 Launching individual test
@@ -34,7 +34,7 @@ Launching individual test
 Let's assume we have the following Siesta test file, called `basic_test.t.js`.
 
 ```javascript
-import { it } from "https://deno.land/x/siesta/deno.js"
+import { it } from "https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/deno.js"
 
 it('Basic Siesta test', async t => {
     t.true(true, "That's true")

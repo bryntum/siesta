@@ -58,7 +58,7 @@ const project = Project.new({
 
 In this step, we create an instance of the [[ProjectNodejs]] class, which is exported as `Project` from the `siesta/node.js`. We do that using the static constructor method [[ProjectNodejs.new]], which accepts a single configuration object, with properties, corresponding to the class attributes.
 
-For Deno, we should import from the `https://deno.land/x/siesta/deno.js` entry file.
+For Deno, we should import from the `https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/deno.js` entry file.
 
 There are few configuration options for the project itself, like [[ProjectNodejs.title|title]] and a [[ProjectNodejs.testDescriptor|testDescriptor]] config, which contains the configuration object for the top-level [[TestDescriptor]] instance. All other tests in the test suite will "extend" this descriptor ("inherit" from it). For example, if the top-level descriptor contains certain value for the [[TestDescriptor.defaultTimeout|defaultTimeout]] config, then all tests will use that value, unless they explicitly override it.
 
