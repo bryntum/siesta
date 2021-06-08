@@ -39,7 +39,8 @@ if [[ -n $embed_references ]]; then
 
         if [[ $filename_ts =~ $regexp ]]; then
             filename_js="${BASH_REMATCH[1]}.js"
-            filename_types=$(basename "${BASH_REMATCH[1]}.d.ts")
+#            filename_types=$(basename "${BASH_REMATCH[1]}.d.ts")
+            filename_types="please_fix_10879.d.ts"
 
             awk -i inplace -v FILENAME_TYPES="$filename_types" 'BEGINFILE{printf "/// <reference types=\"./%s\" />\n",FILENAME_TYPES}{print}' $filename_js
         fi
