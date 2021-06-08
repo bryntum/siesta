@@ -23,6 +23,8 @@ while getopts "rde" opt; do
     esac
 done
 
+echo ">> Building the distribution"
+
 npx tsc $release
 
 if [[ -n $docs ]]; then
@@ -31,6 +33,8 @@ fi
 
 
 if [[ -n $embed_references ]]; then
+    echo ">> Embedding reference to declaration types for Deno"
+
     # we don't need to add type references for files in `bin/`
     GLOBIGNORE=@(examples|node_modules|bin)/**
 
@@ -50,6 +54,8 @@ if [[ -n $embed_references ]]; then
 fi
 
 if [[ -n $release ]]; then
+    echo ">> Removing TypeScript sources"
+
     # we need to remove the *.ts files everywhere, including the `bin/`
     GLOBIGNORE=@(examples|node_modules)/**
 

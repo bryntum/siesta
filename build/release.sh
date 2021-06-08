@@ -30,8 +30,6 @@ cd $DIST
 # the following code is executed on the "distribution" copy
 #---------------------------------------------------------------------------------
 
-echo ">>Building the distribution"
-
 # prepare the dist for release
 build/build.sh -r -d -e
 
