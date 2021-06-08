@@ -1,9 +1,9 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { serializable } from "../../../serializable/Serializable.js"
+import { Serializable, serializable } from "../../../serializable/Serializable.js"
 import { delay, OrPromise, SetTimeoutHandler } from "../../../util/Helpers.js"
 import { isFunction } from "../../../util/Typeguards.js"
 import { luid, LUID } from "../../common/LUID.js"
-import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception, SourcePoint, TestNodeResult } from "../TestResult.js"
+import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception, Result, SourcePoint, TestNodeResult } from "../TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -279,12 +279,19 @@ export class AssertionAsync extends Mixin(
 
 // experiment - separate class per assertion
 
+// we use the final class as Mixin class, (even that a simple plain class would be enough)
+// for the purpose of declaration files generation
+
 @serializable({ id : 'AssertionWaitFor' })
-export class AssertionWaitFor extends AssertionAsyncCreation {
-    name            : string        = 'waitFor'
+export class AssertionWaitFor extends Mixin(
+    [ AssertionAsyncCreation ],
+    (base : ClassUnion<typeof AssertionAsyncCreation>) =>
 
+    class AssertionWaitFor extends base {
+        name            : string        = 'waitFor'
 
-    get passed () : boolean {
-        return this.resolution.passed
+        get passed () : boolean {
+            return this.resolution.passed
+        }
     }
-}
+) {}
