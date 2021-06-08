@@ -24,7 +24,7 @@ npm publish --access public
 # post-publish steps, the following code is executed on the main repo
 cd "$DIR/../.."
 
-# update the changlelog first, so that the tag, created with `npm version`
+# update the changelog first, so that the tag, created with `npm version`
 # will point to completely correct distribution
 node -e "require('./build/changelog.cjs').updateVersionAndStartNew('$NEW_VERSION', $NEW_VERSION_TIME)"
 

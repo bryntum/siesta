@@ -22,6 +22,9 @@ git worktree add "$DIST_DOCS" gh-pages
 
 cd $DIST_DOCS
 
+# the following happens inside the docs checkout dir
+#------------------------------------
+
 git pull
 
 rm -rf "$DIST_DOCS/docs"

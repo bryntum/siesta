@@ -6,9 +6,25 @@ set -e
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 . "$DIR"/util.sh
 
-exit_if_git_repo_has_changes "$DIR/.."
+ignore_changes=""
+name="DIST"
 
-DIST="$DIR/../DIST"
+while getopts "in:" opt; do
+    case "$opt" in
+        n)  name="$OPTARG"
+            ;;
+        i)  ignore_changes="true"
+            ;;
+    esac
+done
+
+if [[ -z $ignore_changes ]]; then
+    exit_if_git_repo_has_changes "$DIR/.."
+fi
+
+#--------------------------------------------------------------
+
+DIST="$DIR/../$name"
 
 echo ">> Making clean checkout in $DIST"
 

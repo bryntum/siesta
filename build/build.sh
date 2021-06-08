@@ -10,12 +10,15 @@ cd "$DIR/.."
 
 release=""
 docs=""
+embed_references=""
 
-while getopts "rd" opt; do
+while getopts "rde" opt; do
     case "$opt" in
         r)  release="-d"
             ;;
         d)  docs="true"
+            ;;
+        e)  embed_references="true"
             ;;
     esac
 done
@@ -27,7 +30,7 @@ if [[ -n $docs ]]; then
 fi
 
 
-if [[ -n $release ]]; then
+if [[ -n $embed_references ]]; then
     # we don't need to add type references for files in `bin/`
     GLOBIGNORE=@(examples|node_modules|bin)/**
 
@@ -42,6 +45,10 @@ if [[ -n $release ]]; then
         fi
     done
 
+    unset GLOBIGNORE
+fi
+
+if [[ -n $release ]]; then
     # we need to remove the *.ts files everywhere, including the `bin/`
     GLOBIGNORE=@(examples|node_modules)/**
 
