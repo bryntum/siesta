@@ -23,7 +23,8 @@
     "javascript",
     "typescript",
     "testing",
-    "benchmarking"
+    "benchmarking",
+    "tool"
   ],
   "author": "Nickolay Platonov, Bryntum",
   "license": "MIT",
