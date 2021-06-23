@@ -52,7 +52,8 @@
     "typedoc": "git://github.com/bryntum/typedoc.git#custom",
     "typedoc-default-themes": "git://github.com/bryntum/typedoc-default-themes.git",
     "typescript": "git://github.com/bryntum/TypeScript.git#feat/7342",
-    "chronograph-jsx": "../../../typescript/chronograph-jsx"
+    "@bryntum/chronograph": "../../../typescript/chronograph",
+    "@web/dev-server": "^0.1.17"
   },
   "snowpack": {
     "installOptions": {

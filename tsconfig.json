@@ -37,7 +37,8 @@
         "tests_nodejs/**/*.tsx",
         "tests_deno/**/*.ts",
         "tests_deno/**/*.tsx",
-        "examples/**/*.ts"
+        "examples/**/*.ts",
+        "examples/**/*.tsx"
     ],
 
     "exclude" : [

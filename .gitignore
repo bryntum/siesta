@@ -19,6 +19,7 @@
 /bin/**/*.js.map
 /bin/**/*.d.ts
 /src/**/*.js
+/src/**/*.jsx
 /src/**/*.js.map
 /src/**/*.d.ts
 /tests/**/*.js
@@ -31,6 +32,7 @@
 /tests_deno/**/*.js.map
 /tests_deno/**/*.d.ts
 /examples/**/*.js
+/examples/**/*.jsx
 /examples/**/*.js.map
 /examples/**/*.d.ts
 /index.js
