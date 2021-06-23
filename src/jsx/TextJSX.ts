@@ -52,7 +52,7 @@ export namespace TextJSX {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-declare global {
+export declare namespace TextJSX {
     namespace JSX {
         type Element        = XmlElement
 
