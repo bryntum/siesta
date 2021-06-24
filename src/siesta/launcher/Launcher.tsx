@@ -506,7 +506,7 @@ export class Launcher extends Mixin(
 
                 {
                     groups.map(group => <div class="group">
-                        <span class="option_group_name">{ '\n' + group.title + ':\n' + '='.repeat(group.title.length + 1) }</span>
+                        <span class="option_group_name">{ '\n' + group.title + ':\n' + '━'.repeat(group.title.length + 1) }</span>
 
                         {
                             optionsByGroup.get(group).map(option => <div class="option">
