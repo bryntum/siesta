@@ -243,4 +243,5 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%);
 
 .option_group_name {
     color: $primary_pass;
+    font-weight: bold;
 }

@@ -5,8 +5,9 @@ import sass from 'sass'
 import url from 'url'
 
 //---------------------------------------------------------------------------------------------------------------------
-const scriptDir     = path.dirname(url.fileURLToPath(import.meta.url))
-const stylingDir    = path.resolve(scriptDir, '../src/siesta/reporter/styling')
+const scriptDir             = path.dirname(url.fileURLToPath(import.meta.url))
+const stylingDir            = path.resolve(scriptDir, '../resources/styling/terminal')
+const typescriptOutputDir   = path.resolve(scriptDir, '../src/siesta/reporter/styling')
 
 export const compileTheme = (themeFilename : string) => {
     const css           = sass.renderSync({ file : path.resolve(stylingDir, themeFilename) })
@@ -50,7 +51,7 @@ export const compileTheme = (themeFilename : string) => {
 
     //--------------------------
     fs.writeFileSync(
-        path.resolve(stylingDir, themeFilename.replace(/\.\w+$/, '.ts')),
+        path.resolve(typescriptOutputDir, themeFilename.replace(/\.\w+$/, '.ts')),
         output.join('\n')
     )
 }
