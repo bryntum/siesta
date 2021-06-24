@@ -1,8 +1,8 @@
 import { CalculationFunction, CalculationModeSync } from '@bryntum/chronograph/src/chrono2/CalculationMode.js'
 import { BoxUnbound } from '@bryntum/chronograph/src/chrono2/data/Box.js'
 import { CalculableBox, CalculableBoxUnbound } from '@bryntum/chronograph/src/chrono2/data/CalculableBox.js'
-import { AnyFunction } from "../../../class/Mixin.js"
-import { isArray, isNumber, isString, isSyncFunction } from "../../../util/Typeguards.js"
+import { AnyFunction } from "../class/Mixin.js"
+import { isArray, isNumber, isString, isSyncFunction } from "../util/Typeguards.js"
 import { Component } from "./WebComponent.js"
 
 

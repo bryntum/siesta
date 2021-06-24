@@ -2,8 +2,8 @@
 
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { ChronoGraphJSX } from "./util/ChronoGraphJSX.js"
-import { Component } from "./util/WebComponent.js"
+import { ChronoGraphJSX } from "../../chronograph-jsx/ChronoGraphJSX.js"
+import { Component } from "../../chronograph-jsx/WebComponent.js"
 
 
 ChronoGraphJSX
@@ -19,8 +19,8 @@ export class Dashboard extends Mixin(
 
 
         async start () {
-            // if (document.readyState !== 'complete')
-            //     await new Promise(resolve => window.addEventListener('load', resolve))
+            if (document.readyState !== 'complete')
+                await new Promise(resolve => window.addEventListener('load', resolve))
 
             document.body.appendChild(this.el)
         }
