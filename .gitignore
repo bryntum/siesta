@@ -48,6 +48,9 @@
 /browser.js.map
 /browser.d.ts
 
+/resources/styling/**/*.css
+/resources/styling/**/*.css.map
+
 # docs
 /docs
 
