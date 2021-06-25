@@ -4,6 +4,8 @@
 
         "noImplicitThis"            : true,
         "strictBindCallApply"       : true,
+        // https://github.com/microsoft/TypeScript/issues/29872#issuecomment-868535962
+        "strictPropertyInitialization" : false,
 
         "jsx"                       : "react",
         "jsxFactory"                : "TextJSX.createElement",
