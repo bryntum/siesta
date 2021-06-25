@@ -81,6 +81,8 @@ export class Atom<V> extends Mixin(
 
         immutable           : Quark<V>
 
+        equality            : (v1 : V, v2 : V) => boolean
+
 
         read () : V {
             const reactiveContext   = this.reactiveContext
@@ -99,6 +101,7 @@ export interface AtomI<V> extends CombinedOwnerAndImmutable, QuarkI<V> {
     reactiveContext         : ReactiveContext
     immutable               : QuarkI<V>
     owner                   : AtomI<V>
+    equality                : (v1 : V, v2 : V) => boolean
 }
 
 type AtomConsistency<V> = AtomI<V> extends Atom<V> ? Atom<V> extends AtomI<V> ? true : false : false

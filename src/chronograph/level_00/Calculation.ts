@@ -1,3 +1,4 @@
+import { AtomState } from "../../../../../../typescript/chronograph/src/chrono2/atom/Atom.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Quark } from "./Atom.js"
 import { Immutable, Owner } from "./Immutable.js"
@@ -10,8 +11,37 @@ export class CalculationQuark<V> extends Mixin(
 
     class CalculationQuark<V> extends base {
         incoming            : Quark<unknown>[]          = undefined
+
+
+        getIncomingDeep () : Quark<unknown>[] {
+            // let box : this = this
+            //
+            // while (box) {
+            //     // as an edge case, atom may compute its value w/o external dependencies all of the sudden
+            //     // in such case `$incoming` will be empty
+            //     if (box.incoming !== undefined || box.value !== undefined) return box.$incoming
+            //
+            //     box     = box.previous
+            // }
+
+            return undefined
+        }
+
     }
 )<V>{}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+// Benchmarking has shown that there's no difference when using numbers
+// v8 optimizes comparison of immutable strings to pointer comparison I guess
+export enum CalculationState {
+    Empty           = 'Empty',
+    UpToDate        = 'UpToDate',
+    PossiblyStale   = 'PossiblyStale',
+    Stale           = 'Stale',
+    CheckingDeps    = 'CheckingDeps',
+    Calculating     = 'Calculating'
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -34,7 +64,7 @@ export class Calculation<V> extends Mixin(
 
         iterationResult     : IteratorResult<any, V>        = undefined
 
-        state
+        state               : CalculationState              = CalculationState.Empty
 
 
         isCalculationStarted ()     : boolean {
@@ -63,8 +93,13 @@ export class Calculation<V> extends Mixin(
         }
 
 
-        cleanupCalculation () {
+        resetCalculation () {
             this.iterationResult    = undefined
+        }
+
+
+        call () {
+            if (this.state === CalculationState.UpToDate) return
         }
     }
 )<V>{}

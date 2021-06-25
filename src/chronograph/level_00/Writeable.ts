@@ -9,8 +9,6 @@ export class Writeable<V> extends Mixin(
     class Writeable<V> extends base {
         immutable   : Quark<V>
 
-        equality    : (v1 : V, v2 : V) => boolean
-
 
         write (value : V) {
             if (value === undefined) value = null
