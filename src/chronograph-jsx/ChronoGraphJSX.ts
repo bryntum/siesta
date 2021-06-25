@@ -54,9 +54,11 @@ export class ElementReactivity extends CalculableBox {
                     persistent  : true,
                     lazy        : false,
                     calculation : () => {
-                        this.setAttribute(name, this.resolveAttributeSource(source))
+                        return this.resolveAttributeSource(source)
                     }
                 })
+
+                box.onCommitValueOptimistic = (value) => this.setAttribute(name, value)
                 // globalGraph.addAtom(box)
 
                 boxes.push(box)
@@ -92,8 +94,10 @@ export class ElementReactivity extends CalculableBox {
                 }
             })
 
-            reconcileChildNodes(element, childNodes)
+            return childNodes
         }
+
+        reactivity.onCommitValueOptimistic = (childNodes : ReactiveNode[]) => reconcileChildNodes(element, childNodes)
 
         return reactivity
     }
@@ -275,7 +279,7 @@ export declare namespace ChronoGraphJSX {
 
 // Slightly modified version of: https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/reconcile.js
 export function reconcileChildNodes (parentNode : Element, newNodes : Node[]) {
-    const prevNodes     = parentNode.childNodes
+    const prevNodes     = Array.from(parentNode.childNodes)
 
     const bLength       = newNodes.length
 
