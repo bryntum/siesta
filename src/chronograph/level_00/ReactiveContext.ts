@@ -13,16 +13,20 @@ export class ReactiveContext extends Mixin(
 
 
         bindAtomClass<C extends typeof Atom> (atomClass : C) : C {
-            const graph     = this
+            const graph         = this
+            const className     = atomClass.name || 'Anonymous'
 
-            // @ts-ignore
-            const klass     = class extends atomClass {
-                get reactiveContext () : ReactiveContext {
-                    return graph
+            // this trick will assign the same name of the class to the subclass
+            const classHolder   = {
+                // @ts-ignore
+                [ className ] : class extends atomClass {
+                    get reactiveContext () : ReactiveContext {
+                        return graph
+                    }
                 }
             }
 
-            return klass
+            return classHolder[ className ]
         }
     }
 ) {}

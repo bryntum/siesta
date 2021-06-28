@@ -52,6 +52,7 @@ export interface BoxI<V> extends AtomI<V>, Writeable<V> {
     immutable               : BoxQuarkI<V>
     owner                   : BoxI<V>
     value                   : V
+    equality                : (v1 : V, v2 : V) => boolean
 
     addOutgoing (to : CalculationQuark<unknown>)
     read () : V

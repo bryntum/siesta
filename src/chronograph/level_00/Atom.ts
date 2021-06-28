@@ -106,5 +106,9 @@ export interface AtomI<V> extends CombinedOwnerAndImmutable, QuarkI<V> {
 
 type AtomConsistency<V> = AtomI<V> extends Atom<V> ? Atom<V> extends AtomI<V> ? true : false : false
 
-const atomConsistency : AtomConsistency<unknown> = true
+type Check<A extends true>  = A
+
+type Check2 = Check<AtomConsistency<unknown>>
+
+// const atomConsistency : AtomConsistency<unknown> = true
 //endregion
