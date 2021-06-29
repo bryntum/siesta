@@ -227,7 +227,7 @@ export class Test extends TestPre {
     }
 
 
-    addResult (result : TestResult) : TestResult {
+    addResult<T extends TestResult> (result : T) : T {
         if ((result instanceof Assertion) && result.sourcePoint === undefined) result.sourcePoint = this.getSourcePoint()
 
         super.addResult(result)

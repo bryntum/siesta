@@ -122,7 +122,7 @@ export class Assertion extends Mixin(
 @serializable({ id : 'AssertionAsyncCreation' })
 export class AssertionAsyncCreation extends Mixin(
     [ Assertion, Serializable, Result ],
-    (base : ClassUnion<typeof Assertion, typeof Serializable, typeof Result>) => 
+    (base : ClassUnion<typeof Assertion, typeof Serializable, typeof Result>) =>
 
     class AssertionAsyncCreation extends base {
         resolution      : AssertionAsyncResolution  = undefined
@@ -141,10 +141,10 @@ export class AssertionAsyncCreation extends Mixin(
 @serializable({ id : 'AssertionAsyncResolution' })
 export class AssertionAsyncResolution extends Mixin(
     [ Serializable, Result ],
-    (base : ClassUnion<typeof Serializable, typeof Result>) => 
+    (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class AssertionAsyncResolution extends base {
-        creationId      : LUID              = undefined
+        creation        : AssertionAsyncCreation = undefined
 
         passed          : boolean           = true
 
@@ -170,7 +170,7 @@ export type TestResult      = TestResultLeaf | TestResultTree
 
 export class TestNodeResult extends Mixin(
     [ Result ],
-    (base : ClassUnion<typeof Result>) => 
+    (base : ClassUnion<typeof Result>) =>
 
     class TestNodeResult extends base {
         // TODO should probably have separate flag for assertions??
@@ -184,8 +184,6 @@ export class TestNodeResult extends Mixin(
         parentNode      : TestNodeResult    = undefined
 
         resultLog       : TestResult[]      = []
-
-        resultMap       : Map<LUID, TestResult> = new Map()
 
 
         get url () : string {
@@ -238,7 +236,7 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        addResult (result : TestResult) : TestResult {
+        addResult<T extends TestResult> (result : T) : T {
             if (this.frozen) throw new Error("Adding result after test finalization")
 
             // clear the `$childNodes` cache
@@ -247,7 +245,6 @@ export class TestNodeResult extends Mixin(
             this.$passed    = undefined
 
             this.resultLog.push(result)
-            this.resultMap.set(result.localId, result)
 
             return result
         }
@@ -256,11 +253,7 @@ export class TestNodeResult extends Mixin(
         addAsyncResolution (resolution : AssertionAsyncResolution) : AssertionAsyncResolution {
             if (this.frozen) throw new Error("Adding async resolution after test finalization")
 
-            if (!this.resultMap.has(resolution.creationId)) throw new Error("Result to update does not exists")
-
-            const creation  = this.resultMap.get(resolution.creationId) as AssertionAsyncCreation
-
-            creation.resolution = resolution
+            resolution.creation.resolution = resolution
 
             return resolution
         }

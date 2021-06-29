@@ -220,14 +220,14 @@ export class AssertionAsync extends Mixin(
             if (res.conditionIsMet) {
 
                 this.addAsyncResolution(AssertionAsyncResolution.new({
-                    creationId  : creation.localId,
+                    creation    : creation,
                     passed      : true
                 }))
 
                 return res.result
             } else {
                 this.addAsyncResolution(AssertionAsyncResolution.new({
-                    creationId      : creation.localId,
+                    creation        : creation,
                     passed          : false,
                     timeoutHappened : res.exception === undefined
                 }))
