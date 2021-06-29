@@ -1,15 +1,13 @@
 import { it } from "../../index.js"
 import { Base } from "../../src/class/Base.js"
 import { ClassUnion, Mixin } from "../../src/class/Mixin.js"
-import { Collapser, Expander, parse, serializable, Serializable, setReferenceIdSource, stringify } from "../../src/serializable/Serializable.js"
+import { Collapser, Expander, parse, serializable, Serializable, stringify } from "../../src/serializable/Serializable.js"
 
 it('Should be able to collapse cyclic structures', async t => {
     const a             = { a : undefined }
     a.a                 = a
 
     //---------------------
-    setReferenceIdSource(0)
-
     t.isDeeply(
         Collapser.new().collapse(a),
         {
@@ -19,8 +17,6 @@ it('Should be able to collapse cyclic structures', async t => {
     )
 
     //---------------------
-    setReferenceIdSource(0)
-
     const b             = []
     b.push(b)
 

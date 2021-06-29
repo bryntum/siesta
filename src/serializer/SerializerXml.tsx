@@ -50,15 +50,6 @@ export class SerializerXml extends SerializerXmlPre {
     internalVisitSymbol     : symbol            = serializationVisitSymbol
 
 
-    beforeVisit (value : unknown, depth : number) {
-        this.beforeVisitEl  = value
-
-        this.visited.set(value, value)
-
-        return value
-    }
-
-
     write (el : XmlElement) {
         if (!this.currentElement) {
             this.currentElement = this.result = el
@@ -111,6 +102,13 @@ export class SerializerXml extends SerializerXmlPre {
 
             this.write(<SerializationReference refId={ refCount }></SerializationReference>)
         }
+    }
+
+
+    visitNotVisited (value : unknown, depth : number) {
+        this.beforeVisitEl  = value
+
+        super.visitNotVisited(value, depth)
     }
 
 

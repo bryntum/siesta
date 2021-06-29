@@ -56,7 +56,8 @@ project.plan(
         filename    : 'serializable',
 
         items       : [
-            'serializable.t.js'
+            'serializable.t.js',
+            'serializable_scoped.t.js'
         ]
     },
     {

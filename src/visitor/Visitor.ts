@@ -4,6 +4,7 @@ import { ArbitraryObjectKey, isAtomicValue, typeOf, uppercaseFirst } from "../ut
 //---------------------------------------------------------------------------------------------------------------------
 export const visitorVisitSymbol = Symbol('internalVisitSymbol')
 
+export const PreVisit = Symbol('PreVisit')
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Visitor extends Mixin(
@@ -12,21 +13,24 @@ export class Visitor extends Mixin(
 
     class Visitor extends base {
 
-        maxDepth        : number                    = Number.MAX_SAFE_INTEGER
+        maxDepth                : number                    = Number.MAX_SAFE_INTEGER
 
-        visited         : Map<unknown, unknown>     = new Map()
+        visited                 : Map<unknown, unknown>     = new Map()
 
-        internalVisitSymbol     : symbol            = visitorVisitSymbol
+        internalVisitSymbol     : symbol                    = visitorVisitSymbol
 
 
-        beforeVisit (value : unknown, depth : number) : unknown {
-            this.visited.set(value, value)
-
-            return value
+        isVisited (value : unknown) : boolean {
+            return this.visited.has(value)
         }
 
 
-        afterVisit (value : unknown, depth : number, visitResult : unknown) : unknown {
+        markPreVisited (value : unknown) {
+            this.visited.set(value, PreVisit)
+        }
+
+
+        markPostVisited (value : unknown, depth : number, visitResult : unknown) : unknown {
             this.visited.set(value, visitResult)
 
             return visitResult
@@ -40,7 +44,7 @@ export class Visitor extends Mixin(
             else if (isAtomicValue(value)) {
                 return this.visitAtomicValueEntry(value, depth + 1)
             }
-            else if (this.visited.has(value)) {
+            else if (this.isVisited(value)) {
                 return this.visitAlreadyVisited(value, depth + 1)
             } else {
                 return this.visitNotVisited(value, depth + 1)
@@ -73,20 +77,20 @@ export class Visitor extends Mixin(
 
 
         visitNotVisited (value : unknown, depth : number) {
-            const newValue                  = this.beforeVisit(value, depth)
+            this.markPreVisited(value)
 
-            if (newValue[ this.internalVisitSymbol ]) {
-                const visitResult               = newValue[ this.internalVisitSymbol ](this, depth)
+            if (value[ this.internalVisitSymbol ]) {
+                const visitResult               = value[ this.internalVisitSymbol ](this, depth)
 
-                return this.afterVisit(newValue, depth, visitResult)
+                return this.markPostVisited(value, depth, visitResult)
             } else {
-                const specificVisitorMethod     = `visit${ uppercaseFirst(typeOf(newValue)) }`
+                const specificVisitorMethod     = `visit${ uppercaseFirst(typeOf(value)) }`
 
                 const visitMethod               = this[ specificVisitorMethod ] || this.visitObject
 
-                const visitResult               = visitMethod.call(this, newValue, depth)
+                const visitResult               = visitMethod.call(this, value, depth)
 
-                return this.afterVisit(newValue, depth, visitResult)
+                return this.markPostVisited(value, depth, visitResult)
             }
         }
 

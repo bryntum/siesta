@@ -1,37 +1,10 @@
 import { Base } from "../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
-import { Visitor, Mapper, Mutator } from "../visitor/Visitor.js"
+import { Visitor, Mapper, Mutator, PreVisit } from "../visitor/Visitor.js"
 import { ArbitraryObject } from "../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type JsonReferenceId = number
-
-let referenceIdSource : JsonReferenceId        = 0
-
-export const setReferenceIdSource = (value : JsonReferenceId) => referenceIdSource = value
-
-//---------------------------------------------------------------------------------------------------------------------
-class CollapserPhase1 extends Mixin(
-    [ Visitor, Base ],
-    (base : ClassUnion<typeof Visitor, typeof Base>) =>
-
-    class CollapserPhase1 extends base {
-        cyclicPoint             : Set<unknown>              = new Set()
-
-
-        afterVisit (value : unknown, depth : number, visitResult : unknown) : unknown {
-            return super.afterVisit(value, depth, referenceIdSource++)
-        }
-
-
-        visitAlreadyVisited (value : unknown, depth : number) {
-            this.cyclicPoint.add(value)
-
-            return value
-        }
-    }
-) {}
-
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Collapser extends Mixin(
@@ -39,31 +12,34 @@ export class Collapser extends Mixin(
     (base : ClassUnion<typeof Mapper, typeof Base>) =>
 
     class Collapser extends base {
-        collapser1              : CollapserPhase1           = CollapserPhase1.new()
+        layer                   : SerializationLayer        = SerializationLayer.new()
 
 
-        afterVisit (value : unknown, depth : number, visitResult : unknown) : unknown {
-            super.afterVisit(value, depth, visitResult)
+        isVisited (value : unknown) : boolean {
+            return this.layer.hasObject(value)
+        }
 
+
+        markPreVisited (value : unknown) {
+            this.layer.registerObject(value)
+        }
+
+
+        markPostVisited (value : unknown, depth : number, visitResult : unknown) : unknown {
             const nativeSerializationEntry  = nativeSerializableClassesByConstructor.get(visitResult.constructor)
 
             const res = nativeSerializationEntry ? nativeSerializationEntry.toJSON(visitResult as object) : visitResult
 
-            return this.collapser1.cyclicPoint.has(value) ?
-                { $refId : this.collapser1.visited.get(value), value : res }
-                    :
-                res
+            return { $refId : this.layer.refIdOf(value), value : res }
         }
 
 
         visitAlreadyVisited (value : unknown, depth : number) {
-            return { $ref : this.collapser1.visited.get(value) }
+            return { $ref : this.layer.refIdOf(value) }
         }
 
 
         collapse (value : unknown) : unknown {
-            this.collapser1.visit(value)
-
             return this.visit(value)
         }
     }
@@ -76,20 +52,20 @@ class ExpanderPhase1 extends Mixin(
     (base : ClassUnion<typeof Mapper, typeof Base>) =>
 
     class ExpanderPhase1 extends base {
-        cyclicPoints            : Map<JsonReferenceId, unknown> = new Map()
+        layer                   : SerializationLayer        = SerializationLayer.new()
 
 
-        afterVisit (value : unknown, depth : number, visitResult : any) : unknown {
+        markPostVisited (value : unknown, depth : number, visitResult : any) : unknown {
             let resolved        = visitResult
 
             if (resolved)
                 if (resolved.$refId !== undefined) {
-                    this.cyclicPoints.set(resolved.$refId, resolved.value)
+                    this.layer.registerObject(resolved.value, resolved.$refId)
 
                     resolved    = resolved.value
                 }
 
-            return super.afterVisit(value, depth, resolved)
+            return super.markPostVisited(value, depth, resolved)
         }
     }
 ) {}
@@ -103,21 +79,25 @@ export class Expander extends Mixin(
     class Expander extends base {
         expander1               : ExpanderPhase1        = ExpanderPhase1.new()
 
+        layer                   : SerializationLayer    = SerializationLayer.new()
 
-        afterVisit (value : unknown, depth : number, visitResult : any) : unknown {
+
+        markPostVisited (value : unknown, depth : number, visitResult : any) : unknown {
             let resolved        = visitResult
 
             if (resolved)
                 if (resolved.$ref !== undefined) {
-                    resolved    = this.expander1.cyclicPoints.get(resolved.$ref)
+                    resolved    = this.expander1.layer.objectOf(resolved.$ref)
                 }
 
-            return super.afterVisit(value, depth, resolved)
+            return super.markPostVisited(value, depth, resolved)
         }
 
 
         expand (value : unknown) : unknown {
-            const expanded  = this.expander1.visit(value)
+            this.expander1.layer    = this.layer
+
+            const expanded          = this.expander1.visit(value)
 
             this.visit(expanded)
 
@@ -125,6 +105,97 @@ export class Expander extends Mixin(
         }
     }
 ) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class SerializationLayer extends Base {
+    previous            : this                          = undefined
+
+    refIdSource         : JsonReferenceId               = 0
+
+    objectToRefId       : Map<unknown, JsonReferenceId> = new Map()
+
+    refIdToObject       : Map<JsonReferenceId, unknown> = new Map()
+
+
+    hasObject (object : unknown) : boolean {
+        return this.objectToRefId.has(object) || (this.previous ? this.previous.hasObject(object) : false)
+    }
+
+
+    registerObject (object : unknown, id? : JsonReferenceId) {
+        if (id === undefined) id = this.refIdSource++
+
+        this.objectToRefId.set(object, id)
+        this.refIdToObject.set(id, object)
+    }
+
+
+    refIdOf (object : unknown) : JsonReferenceId {
+        let layer       = this
+
+        while (layer) {
+            const refId = layer.objectToRefId.get(object)
+
+            if (refId !== undefined) return refId
+
+            layer       = layer.previous
+        }
+
+        return undefined
+    }
+
+
+    objectOf (refId : JsonReferenceId) : unknown {
+        let layer       = this
+
+        while (layer) {
+            const object = layer.refIdToObject.get(refId)
+
+            if (object !== undefined) return object
+
+            layer       = layer.previous
+        }
+
+        return undefined
+    }
+
+
+    derive () : SerializationLayer {
+        return SerializationLayer.new({ previous : this, refIdSource : this.refIdSource })
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class SerializationScope extends Base {
+    currentLayer        : SerializationLayer        = SerializationLayer.new()
+
+
+    stringify (value : any, space? : string | number) : string {
+        const collapser     = Collapser.new({ layer : this.currentLayer.derive() })
+
+        const decycled      = collapser.collapse(value)
+
+        this.currentLayer   = collapser.layer
+
+        return JSON.stringify(decycled, null, space)
+    }
+
+
+    parse (text : string) : any {
+        const decycled      = JSON.parse(text, reviver)
+
+        const expander      = Expander.new({ layer : this.currentLayer.derive() })
+
+        const parsed        = expander.expand(decycled)
+
+        this.currentLayer   = expander.layer
+
+        return parsed
+    }
+}
+
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -217,12 +288,12 @@ export const lookupSerializableClass = (id : string) : typeof Serializable => {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-type NativeSerializationEntry = { toJSON : (native : object) => object, fromJSON : (json : object) => object }
+type NativeSerializationEntry<T extends object> = { toJSON : (native : object) => T, fromJSON : (json : T) => object }
 
-const nativeSerializableClassesByConstructor    = new Map<Function, NativeSerializationEntry>()
-const nativeSerializableClassesById             = new Map<string, NativeSerializationEntry>()
+const nativeSerializableClassesByConstructor    = new Map<Function, NativeSerializationEntry<object>>()
+const nativeSerializableClassesById             = new Map<string, NativeSerializationEntry<object>>()
 
-const registerNativeSerializableClass = (cls : Function, entry : NativeSerializationEntry) => {
+const registerNativeSerializableClass = <T extends object>(cls : Function, entry : NativeSerializationEntry<T>) => {
     nativeSerializableClassesByConstructor.set(cls, entry)
     nativeSerializableClassesById.set(cls.name, entry)
 }
@@ -308,7 +379,7 @@ registerNativeSerializableClass(Map, {
             entries     : Array.from(map.entries())
         }
     },
-    fromJSON : (data : any) => {
+    fromJSON : data => {
         return new Map(data.entries)
     }
 })
@@ -320,7 +391,7 @@ registerNativeSerializableClass(Set, {
             entries     : Array.from(set)
         }
     },
-    fromJSON : (data : any) => {
+    fromJSON : data => {
         return new Set(data.entries)
     }
 })
@@ -333,7 +404,7 @@ registerNativeSerializableClass(Date, {
             time        : date.getTime()
         }
     },
-    fromJSON : (data : any) => {
+    fromJSON : data => {
         return new Date(data.time)
     }
 })
@@ -352,7 +423,7 @@ errorClasses.forEach(cls =>
                 name        : error.name
             })
         },
-        fromJSON : (data : any) => {
+        fromJSON : data => {
             const error     = Object.create(cls.prototype)
 
             Object.assign(error, data)
