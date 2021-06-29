@@ -1,12 +1,12 @@
 import ws from 'ws'
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaSerializableJSON } from "./MediaSerializable.js"
+import { MediaSerializableJSONScoped } from "./MediaSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class MediaNodeWebSocketParent extends Mixin(
-    [ MediaSerializableJSON, Base ],
-    (base : ClassUnion<typeof MediaSerializableJSON, typeof Base>) =>
+    [ MediaSerializableJSONScoped, Base ],
+    (base : ClassUnion<typeof MediaSerializableJSONScoped, typeof Base>) =>
 
     class MediaNodeWebSocketParent extends base {
         socket                  : ws                            = undefined

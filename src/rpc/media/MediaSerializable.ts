@@ -1,5 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { parse, stringify } from "../../serializable/Serializable.js"
+import { parse, SerializationScope, stringify } from "../../serializable/Serializable.js"
 import { EnvelopCall, EnvelopResult } from "../port/Port.js"
 import { Media } from "./Media.js"
 
@@ -22,6 +22,32 @@ export class MediaSerializableJSON extends Mixin(
 
         envelopToMessage (envelop : EnvelopCall | EnvelopResult) : string {
             return stringify(envelop)
+        }
+    }
+){}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class MediaSerializableJSONScoped extends Mixin(
+    [ Media ],
+    (base : ClassUnion<typeof Media>) =>
+
+    class MediaSerializableJSON extends base {
+        scope           : SerializationScope        = SerializationScope.new()
+
+
+        messageToEnvelop (message : string) : EnvelopCall | EnvelopResult | undefined {
+            const obj : any      = this.scope.parse(message)
+
+            if (obj.inResponseOf !== undefined)
+                return EnvelopResult.new(obj)
+            else
+                return EnvelopCall.new(obj)
+        }
+
+
+        envelopToMessage (envelop : EnvelopCall | EnvelopResult) : string {
+            return this.scope.stringify(envelop)
         }
     }
 ){}

@@ -49,7 +49,8 @@ project.plan(
         filename    : 'rpc',
 
         items       : [
-            'port.t.js'
+            'port.t.js',
+            'port_scoped.t.js'
         ]
     },
     {
