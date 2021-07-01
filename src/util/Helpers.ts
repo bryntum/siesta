@@ -61,8 +61,14 @@ export type ArbitraryObject<T = unknown>     =  { [ key in ArbitraryObjectKey ] 
 // and `SetTimeoutHandler` becomes `NodeJS.Timeout`
 // in addition a `/// reference types="node"` directive is added
 // so that user of the package receives dependency on `@types/node`
-export interface SetTimeoutHandler extends ReturnType<typeof setTimeout> {}
-export interface SetIntervalHandler extends ReturnType<typeof setInterval> {}
+// export interface SetTimeoutHandler extends ReturnType<typeof setTimeout> {}
+// export interface SetIntervalHandler extends ReturnType<typeof setInterval> {}
+
+// the trick above actually did not work, fall back to `any`
+
+export type SetTimeoutHandler   = any
+export type SetIntervalHandler  = any
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export const isSubclassOf = (baseclass : AnyConstructor, superclass : AnyConstructor) : boolean => {

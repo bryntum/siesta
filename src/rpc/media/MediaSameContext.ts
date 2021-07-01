@@ -1,4 +1,3 @@
-import { Serializable } from "child_process"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSerializablePlain } from "./MediaSerializable.js"
 
@@ -19,7 +18,7 @@ export class MediaSameContext extends Mixin(
         }
 
 
-        sendMessage (message : Serializable) {
+        sendMessage (message : any) {
             this.targetMedia.receiveMessage(message)
         }
     }
