@@ -109,8 +109,6 @@ export class Expander extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class SerializationLayer extends Base {
-    previous            : this                          = undefined
-
     refIdSource         : JsonReferenceId               = 0
 
     objectToRefId       : Map<unknown, JsonReferenceId> = new Map()
@@ -119,7 +117,7 @@ export class SerializationLayer extends Base {
 
 
     hasObject (object : unknown) : boolean {
-        return this.objectToRefId.has(object) || (this.previous ? this.previous.hasObject(object) : false)
+        return this.objectToRefId.has(object)
     }
 
 
@@ -132,37 +130,12 @@ export class SerializationLayer extends Base {
 
 
     refIdOf (object : unknown) : JsonReferenceId {
-        let layer       = this
-
-        while (layer) {
-            const refId = layer.objectToRefId.get(object)
-
-            if (refId !== undefined) return refId
-
-            layer       = layer.previous
-        }
-
-        return undefined
+        return this.objectToRefId.get(object)
     }
 
 
     objectOf (refId : JsonReferenceId) : unknown {
-        let layer       = this
-
-        while (layer) {
-            const object = layer.refIdToObject.get(refId)
-
-            if (object !== undefined) return object
-
-            layer       = layer.previous
-        }
-
-        return undefined
-    }
-
-
-    derive () : SerializationLayer {
-        return SerializationLayer.new({ previous : this, refIdSource : this.refIdSource })
+        return this.refIdToObject.get(refId)
     }
 }
 
@@ -173,11 +146,9 @@ export class SerializationScope extends Base {
 
 
     stringify (value : any, space? : string | number) : string {
-        const collapser     = Collapser.new({ layer : this.currentLayer.derive() })
+        const collapser     = Collapser.new({ layer : this.currentLayer/*.derive()*/ })
 
         const decycled      = collapser.collapse(value)
-
-        this.currentLayer   = collapser.layer
 
         return JSON.stringify(decycled, null, space)
     }
@@ -186,11 +157,9 @@ export class SerializationScope extends Base {
     parse (text : string) : any {
         const decycled      = JSON.parse(text, reviver)
 
-        const expander      = Expander.new({ layer : this.currentLayer.derive() })
+        const expander      = Expander.new({ layer : this.currentLayer/*.derive()*/ })
 
         const parsed        = expander.expand(decycled)
-
-        this.currentLayer   = expander.layer
 
         return parsed
     }

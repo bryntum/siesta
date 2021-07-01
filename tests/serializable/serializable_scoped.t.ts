@@ -22,7 +22,7 @@ it('Should be able to collapse with layer', async t => {
 
     //---------------------
     const b             = [ a, {} ]
-    const collapser2    = Collapser.new({ layer : collapser1.layer.derive() })
+    const collapser2    = Collapser.new({ layer : collapser1.layer })
 
     t.isDeeply(
         collapser2.collapse(b),
@@ -40,7 +40,7 @@ it('Should be able to collapse with layer', async t => {
 
     //---------------------
     const c             = [ a, b ]
-    const collapser3    = Collapser.new({ layer : collapser2.layer.derive() })
+    const collapser3    = Collapser.new({ layer : collapser2.layer })
 
     t.isDeeply(
         collapser3.collapse(c),
@@ -63,12 +63,12 @@ it('Should be able to expand with layer', async t => {
 
     //---------------------
     const v2            = [ v1, {} ]
-    const collapser2    = Collapser.new({ layer : collapser1.layer.derive() })
+    const collapser2    = Collapser.new({ layer : collapser1.layer })
     const collapsed2    = collapser2.collapse(v2)
 
     //---------------------
     const v3            = [ v1, v2 ]
-    const collapser3    = Collapser.new({ layer : collapser2.layer.derive() })
+    const collapser3    = Collapser.new({ layer : collapser2.layer })
     const collapsed3    = collapser3.collapse(v3)
 
 
