@@ -32,28 +32,33 @@
     "node": ">=12.21.0"
   },
   "dependencies": {
+    "chained-iterator": "^0.0.2",
     "chalk": "^4.1.0",
     "glob": "^7.1.6",
     "node-fetch": "^3.0.0-beta.9",
     "playwright": "^1.11.0",
     "puppeteer": "^10.0.0",
-    "ws": "^7.4.4"
+    "ws": "^7.4.4",
+    "typescript-mixin-class": "^0.0.1",
+    "typescript-serializable-mixin": "^0.0.1"
+  },
+  "peerDependencies": {
   },
   "devDependencies": {
+    "@bryntum/chronograph": "../../../typescript/chronograph",
     "@types/cssom": "^0.4.1",
     "@types/glob": "^7.1.3",
     "@types/node": "^14.14.10",
     "@types/sass": "^1.16.0",
     "@types/ws": "^7.4.1",
+    "@web/dev-server": "^0.1.17",
     "cssom": "^0.4.4",
     "sass": "^1.32.11",
     "snowpack": "^2.17.1",
     "tslint": "^6.1.3",
     "typedoc": "git://github.com/bryntum/typedoc.git#custom",
     "typedoc-default-themes": "git://github.com/bryntum/typedoc-default-themes.git",
-    "typescript": "git://github.com/bryntum/TypeScript.git#feat/7342",
-    "@bryntum/chronograph": "../../../typescript/chronograph",
-    "@web/dev-server": "^0.1.17"
+    "typescript": "git://github.com/bryntum/TypeScript.git#feat/7342"
   },
   "snowpack": {
     "installOptions": {
