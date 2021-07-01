@@ -2,6 +2,8 @@
 
 ## {{ $NEXT }}
 
+## 6.0.0-alpha-3        2021-07-01 15:41
+
 #### FEATURES / ENHANCEMENTS
 
 - Removed the hidden dependency on the `@types/node`
