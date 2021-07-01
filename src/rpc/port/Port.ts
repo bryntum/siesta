@@ -1,7 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
-import { delay, MIN_SMI, SetTimeoutHandler } from "../../util/Helpers.js"
+import { delay, MIN_SMI, SetTimeoutHandler2 } from "../../util/Helpers.js"
 import { Media } from "../media/Media.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ export class Port extends Mixin(
         connectionTimeout       : number        = 10000
         connectionInterval      : number        = 500
 
-        awaitingResponse        : Map<EnvelopId, [ Function, Function, EnvelopCall, SetTimeoutHandler ]> = new Map()
+        awaitingResponse        : Map<EnvelopId, [ Function, Function, EnvelopCall, SetTimeoutHandler2 ]> = new Map()
 
 
         get logger () : Logger {
@@ -212,7 +212,7 @@ export class Port extends Mixin(
             if (!this.connected) throw new Error("Not connected to media")
 
             return new Promise((resolve, reject) => {
-                let timeoutHandler : SetTimeoutHandler  = null
+                let timeoutHandler : SetTimeoutHandler2  = null
 
                 if (message.timeout > 0) {
                     timeoutHandler = setTimeout(() => {

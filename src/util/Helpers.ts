@@ -57,6 +57,9 @@ export type ArbitraryObject<T = unknown>     =  { [ key in ArbitraryObjectKey ] 
 export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
 export type SetIntervalHandler  = ReturnType<typeof setInterval>
 
+export interface SetTimeoutHandler2 extends ReturnType<typeof setTimeout> {
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export const isSubclassOf = (baseclass : AnyConstructor, superclass : AnyConstructor) : boolean => {
