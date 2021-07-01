@@ -31,34 +31,11 @@ project.plan(
         ]
     },
     {
-        filename       : 'chained_iterator',
-
-        items       : [
-            'chained_iterator.t.js',
-        ]
-    },
-    {
-        filename       : 'class',
-
-        items       : [
-            'mixin.t.js',
-            'mixin_caching.t.js'
-        ]
-    },
-    {
         filename    : 'rpc',
 
         items       : [
             'port.t.js',
             'port_scoped.t.js'
-        ]
-    },
-    {
-        filename    : 'serializable',
-
-        items       : [
-            'serializable.t.js',
-            'serializable_scoped.t.js'
         ]
     },
     {
