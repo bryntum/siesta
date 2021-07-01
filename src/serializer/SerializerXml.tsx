@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
-import { Visitor } from "../visitor/Visitor.js"
+import { Visitor } from "typescript-serializable-mixin"
 import {
     Serialization,
     SerializationArray,

@@ -4,7 +4,7 @@ import { TextJSX } from "../jsx/TextJSX.js"
 import { serializationVisitSymbol, SerializerXml } from "../serializer/SerializerXml.js"
 import { typeOf } from "../util/Helpers.js"
 import { isNumber, isRegExp } from "../util/Typeguards.js"
-import { Visitor } from "../visitor/Visitor.js"
+import { Visitor } from "typescript-serializable-mixin"
 import { DeepCompareOptions, DeepCompareState, Difference, DifferenceAtomic, DifferenceHeterogeneous, valueAsDifference } from "./CompareDeepDiff.js"
 
 
