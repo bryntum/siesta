@@ -54,12 +54,15 @@ export type ArbitraryObject<T = unknown>     =  { [ key in ArbitraryObjectKey ] 
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
-export type SetIntervalHandler  = ReturnType<typeof setInterval>
-
-export interface SetTimeoutHandler2 extends ReturnType<typeof setTimeout> {
-}
-
+// the reason of this fancy typing instead of plain:
+//     export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
+//     export type SetIntervalHandler  = ReturnType<typeof setInterval>
+// is that when generating declaration files, the type are inlined
+// and `SetTimeoutHandler` becomes `NodeJS.Timeout`
+// in addition a `/// reference types="node"` directive is added
+// so that user of the package receives dependency on `@types/node`
+export interface SetTimeoutHandler extends ReturnType<typeof setTimeout> {}
+export interface SetIntervalHandler extends ReturnType<typeof setInterval> {}
 
 //---------------------------------------------------------------------------------------------------------------------
 export const isSubclassOf = (baseclass : AnyConstructor, superclass : AnyConstructor) : boolean => {
