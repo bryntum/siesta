@@ -141,12 +141,14 @@ export class SerializationLayer extends Base {
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// TODO this class seems to be unnecessary - all it does it providing the `SerializationLayer`
+// to the `parse/stringify` - can be removed and new argument for `parse/stringify` added (`layer`)
 export class SerializationScope extends Base {
     currentLayer        : SerializationLayer        = SerializationLayer.new()
 
 
     stringify (value : any, space? : string | number) : string {
-        const collapser     = Collapser.new({ layer : this.currentLayer/*.derive()*/ })
+        const collapser     = Collapser.new({ layer : this.currentLayer })
 
         const decycled      = collapser.collapse(value)
 
@@ -157,7 +159,7 @@ export class SerializationScope extends Base {
     parse (text : string) : any {
         const decycled      = JSON.parse(text, reviver)
 
-        const expander      = Expander.new({ layer : this.currentLayer/*.derive()*/ })
+        const expander      = Expander.new({ layer : this.currentLayer })
 
         const parsed        = expander.expand(decycled)
 
