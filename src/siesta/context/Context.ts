@@ -74,7 +74,7 @@ export class Context extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-const seedChildPort = async (
+export const seedChildPort = async (
     portModuleUrl   : string, portClassSymbol : string,
     mediaModuleUrl  : string, mediaClassSymbol : string,
     portConfig      : object,

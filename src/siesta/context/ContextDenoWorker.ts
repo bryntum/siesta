@@ -32,6 +32,8 @@ export class ContextDenoWorker extends Mixin(
                         else
                             reject(event.data.result)
                     }
+
+                    this.worker.removeEventListener('message', listener)
                 })
             })
 

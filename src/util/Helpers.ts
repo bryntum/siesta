@@ -54,8 +54,20 @@ export type ArbitraryObject<T = unknown>     =  { [ key in ArbitraryObjectKey ] 
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
-export type SetIntervalHandler  = ReturnType<typeof setInterval>
+// the reason of this fancy typing instead of plain:
+//     export type SetTimeoutHandler   = ReturnType<typeof setTimeout>
+//     export type SetIntervalHandler  = ReturnType<typeof setInterval>
+// is that when generating declaration files, the type are inlined
+// and `SetTimeoutHandler` becomes `NodeJS.Timeout`
+// in addition a `/// reference types="node"` directive is added
+// so that user of the package receives dependency on `@types/node`
+// export interface SetTimeoutHandler extends ReturnType<typeof setTimeout> {}
+// export interface SetIntervalHandler extends ReturnType<typeof setInterval> {}
+
+// the trick above actually did not work, fall back to `any`
+
+export type SetTimeoutHandler   = any
+export type SetIntervalHandler  = any
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -138,6 +150,21 @@ export const timeout = <T>(promise : Promise<T>, timeout : number, error : Error
 
             if (!promiseSettled) reject(error)
         }, timeout)
+    })
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const awaitDomReady = async () : Promise<void> => {
+    if (document.readyState === 'complete') return
+
+    return new Promise<void>(resolve => {
+        let listener
+
+        window.addEventListener('load', listener = () => {
+            window.removeEventListener('load', listener)
+            resolve()
+        })
     })
 }
 
