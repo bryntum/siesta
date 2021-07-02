@@ -155,6 +155,21 @@ export const timeout = <T>(promise : Promise<T>, timeout : number, error : Error
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export const awaitDomReady = async () : Promise<void> => {
+    if (document.readyState === 'complete') return
+
+    return new Promise<void>(resolve => {
+        let listener
+
+        window.addEventListener('load', listener = () => {
+            window.removeEventListener('load', listener)
+            resolve()
+        })
+    })
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 // TODO review whats the difference with native `String.matchAll()` and possibly remove, not supported everywhere?
 export const matchAll = function* (regexp : RegExp, testStr : string) : Generator<string[]> {
     let match : string[]

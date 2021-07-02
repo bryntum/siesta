@@ -37,7 +37,7 @@ export const OptionsGroupBrowser  = OptionGroup.new({
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherNodejs extends Mixin(
     [ Launcher, LauncherTerminal, ExecutionContextAttachable ],
-    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) => 
+    (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) =>
 
     class LauncherNodejs extends base {
         launchClass             : typeof Launch             = LaunchNodejs
@@ -63,8 +63,8 @@ export class LauncherNodejs extends Mixin(
             enumeration : [ 'nodejs', 'deno', 'playwright', 'puppeteer' ],
             group       : OptionsGroupPrimary,
             help        : <div>
-                The context provider to use to launch the tests. By default its `node` for the Node.js test suites,
-                and `playwright` for browser.
+                The context provider to use to launch the tests. By default its `nodejs` for the Node.js test suites,
+                `deno` for Deno test suites, and `playwright` for browser.
             </div>
         })
         provider        : string                = undefined
