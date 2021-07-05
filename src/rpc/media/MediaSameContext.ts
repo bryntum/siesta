@@ -42,7 +42,7 @@ export class MediaSameContextScoped extends Mixin(
         }
 
 
-        sendMessage (message : Serializable) {
+        sendMessage (message : any) {
             this.targetMedia.receiveMessage(message)
         }
     }
