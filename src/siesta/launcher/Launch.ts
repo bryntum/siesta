@@ -103,7 +103,10 @@ export class Launch extends Mixin(
 
     class Launch extends base {
         launcher                    : Launcher                  = undefined
-        projectData                 : ProjectSerializableData   = undefined
+
+        get projectData () : ProjectSerializableData {
+            return this.launcher.projectData
+        }
 
         projectPlanItemsToLaunch    : TestDescriptor[]          = []
 

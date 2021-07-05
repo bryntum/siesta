@@ -466,11 +466,9 @@ export class Launcher extends Mixin(
 
             const launch    = this.launchClass.new({
                 launcher                                : this,
-                projectData                             : this.projectData,
-                projectPlanItemsToLaunch,
-
                 maxWorkers                              : this.maxWorkers,
 
+                projectPlanItemsToLaunch,
                 contextProviders
             })
 
