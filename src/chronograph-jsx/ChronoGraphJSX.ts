@@ -16,8 +16,14 @@ export class ElementReactivity extends CalculableBox {
     setAttribute (name : string, value : string) {
         if (value == null)
             this.element.removeAttribute(name)
-        else
-            this.element.setAttribute(name, value)
+        else {
+            // this.element.setAttribute(name, value)
+
+            if (name === 'class')
+                this.element.className = value
+            else
+                this.element[ name ] = value
+        }
     }
 
 
