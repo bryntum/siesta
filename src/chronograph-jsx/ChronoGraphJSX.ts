@@ -196,7 +196,13 @@ export class NodesListReactivity extends CalculableBox<Node[]> {
 export type AttributeSource =
     | string
     | (() => string)
-    | CalculableBoxUnbound<AttributeSource>
+    | BoxUnbound<AttributeSource>
+
+
+export type PropertySource<V> =
+    | V
+    | (() => V)
+    | BoxUnbound<V>
 
 export type ElementSource =
     | Node
@@ -206,7 +212,7 @@ export type ElementSource =
     | null
     | undefined
     | (() => ElementSource)
-    | CalculableBoxUnbound<ElementSource>
+    | BoxUnbound<ElementSource>
     | ElementSource[]
 
 
