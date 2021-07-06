@@ -118,7 +118,7 @@ export interface ReactiveNode extends Node {
 export class NodesListReactivity extends CalculableBox<Node[]> {
     lazy                : boolean                               = false
 
-    normalizedSources   : (Node | CalculableBoxUnbound<ElementSource>)[]       = undefined
+    normalizedSources   : (Node | BoxUnbound<ElementSource>)[]       = undefined
 
 
     $calculation        : CalculationFunction<Node[], CalculationModeSync> =
@@ -150,7 +150,7 @@ export class NodesListReactivity extends CalculableBox<Node[]> {
     }
 
 
-    normalizeElementSource (source : ElementSource) : (Node | CalculableBoxUnbound<ElementSource>)[] {
+    normalizeElementSource (source : ElementSource) : (Node | BoxUnbound<ElementSource>)[] {
         if (source instanceof Node) {
             return [ source ]
         }
