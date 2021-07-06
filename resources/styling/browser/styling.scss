@@ -8,4 +8,20 @@ html {
 body {
     width: 100%;
     height: 100%;
+
+    font-family: monospace;
+}
+
+tree, leaf {
+    display: block;
+}
+
+tree > leaf {
+    margin-left: 2ch;
+}
+
+
+.test_file_pass, .test_file_fail {
+    padding-left: 1ch;
+    padding-right: 1ch;
 }
