@@ -840,7 +840,6 @@ export class Test extends TestPre {
 
             const launch    = Launch.new({
                 launcher,
-                projectData,
                 projectPlanItemsToLaunch    : projectPlan.leavesAxis(),
 
                 contextProviders            : [ ContextProviderSameContext.new({ launcher }) ]
