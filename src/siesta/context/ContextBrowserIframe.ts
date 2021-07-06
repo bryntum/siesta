@@ -22,17 +22,13 @@ export class ContextBrowserIframe extends Mixin(
 
         async evaluateBasic <A extends unknown[], R extends unknown> (func : (...args : A) => R, ...args : A) : Promise<UnwrapPromise<R>> {
             // for some reason TypeScript does not have `eval` on `Window`
-            const page                  = this.iframe.contentWindow as Window & { eval : (string) => any }
+            const page              = this.iframe.contentWindow as Window & { eval : (string) => any }
 
-            try {
-                const res               = await page.eval(`(${ func.toString() })(...${ JSON.stringify(args) })`)
+            // TODO detect cross-origin iframe and throw some meaningful error
 
-                return res
-            } catch (e) {
-                // exception here probably means iframe is cross-domain
-                // TODO in such case it is supposed to opt-in somehow for communicating with test suite
-                debugger
-            }
+            const res               = await page.eval(`(${ func.toString() })(...${ JSON.stringify(args) })`)
+
+            return res
         }
 
 
