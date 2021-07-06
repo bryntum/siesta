@@ -392,7 +392,7 @@ export class TestNodeResultReactive extends Mixin(
         }
 
 
-        @field({ atomCls : ReactiveArray })
+        @field({ lazy : false, atomCls : ReactiveArray })
         override resultLog       : TestResult[]      = []
 
         get resultLogReactive () : ReactiveArray<TestResult> {
