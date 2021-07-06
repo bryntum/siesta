@@ -12,7 +12,17 @@ import { Launch } from "../launcher/Launch.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { Assertion, AssertionAsyncResolution, Exception, LogMessage, Result, SourcePoint, TestNodeResult, TestResult } from "../test/TestResult.js"
+import {
+    Assertion,
+    AssertionAsyncResolution,
+    Exception,
+    LogMessage,
+    Result,
+    SourcePoint,
+    TestNodeResult,
+    TestNodeResultReactive,
+    TestResult
+} from "../test/TestResult.js"
 import { ConsoleXmlRenderer } from "./ConsoleXmlRenderer.js"
 
 
@@ -23,7 +33,7 @@ export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 //---------------------------------------------------------------------------------------------------------------------
 export class Reporter extends Mixin(
     [ ConsoleXmlRenderer, Base ],
-    (base : ClassUnion<typeof ConsoleXmlRenderer, typeof Base>) => 
+    (base : ClassUnion<typeof ConsoleXmlRenderer, typeof Base>) =>
 
     class Reporter extends base {
         launch              : Launch                    = undefined
@@ -52,7 +62,7 @@ export class Reporter extends Mixin(
         resultsRunningMap   : Map<LUID, TestDescriptor> = new Map()
 
 
-        resultsToPrint      : Set<{ testNode : TestNodeResult, sources : string[] }>      = new Set()
+        resultsToPrint      : Set<{ testNode : TestNodeResultReactive, sources : string[] }>      = new Set()
 
         startTime           : Date                      = undefined
         endTime             : Date                      = undefined
@@ -104,7 +114,7 @@ export class Reporter extends Mixin(
 
         pendingPrints   : number        = 0
 
-        async onSubTestFinish (testNode : TestNodeResult) {
+        async onSubTestFinish (testNode : TestNodeResultReactive) {
             if (testNode.isRoot) {
                 const runningDescId = testNode.descriptor.remoteId
                 const runningDesc   = this.resultsRunningMap.get(runningDescId)
@@ -133,7 +143,7 @@ export class Reporter extends Mixin(
         }
 
 
-        printTest (testNode : TestNodeResult, isLast : boolean, sources : string[]) {
+        printTest (testNode : TestNodeResultReactive, isLast : boolean, sources : string[]) {
             this.write(this.testNodeTemplateXml(testNode, isLast, sources))
         }
 
@@ -207,7 +217,7 @@ export class Reporter extends Mixin(
 
         // region templates
 
-        testNodeTemplateXml (testNode : TestNodeResult, isTopLevelLastNode : boolean | undefined = undefined, sources : string[]) : XmlElement {
+        testNodeTemplateXml (testNode : TestNodeResultReactive, isTopLevelLastNode : boolean | undefined = undefined, sources : string[]) : XmlElement {
             let node : XmlElement       = <Tree isTopLevelLastNode={ isTopLevelLastNode }></Tree>
 
             if (testNode.isRoot) {
@@ -230,7 +240,7 @@ export class Reporter extends Mixin(
                         ?
                             this.assertionTemplate(result, testNode, sources)
                         :
-                            (result instanceof TestNodeResult)
+                            (result instanceof TestNodeResultReactive)
                                 ?
                                     this.testNodeTemplateXml(result, undefined, sources)
                                 :

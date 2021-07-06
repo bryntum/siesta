@@ -14,7 +14,7 @@ import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
-import { Exception, TestNodeResult } from "../test/TestResult.js"
+import { Exception, TestNodeResultReactive } from "../test/TestResult.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -238,7 +238,7 @@ export class Launch extends Mixin(
             try {
                 preLaunchRes        = await context.preLaunchTest(normalized.urlAbs, stringifiedDesc, this.getTestLaunchDelay())
             } catch (e) {
-                const testNode      = TestNodeResult.new({ descriptor : normalized })
+                const testNode      = TestNodeResultReactive.new({ descriptor : normalized })
 
                 this.reporter.onSubTestStart(testNode)
                 testNode.addResult(Exception.new({ exception : e }))
@@ -252,7 +252,7 @@ export class Launch extends Mixin(
             // no global importer available - test file is probably empty, or does not import any Siesta code
             // test will be reported as passed
             if (!preLaunchRes) {
-                const testNode      = TestNodeResult.new({ descriptor : normalized })
+                const testNode      = TestNodeResultReactive.new({ descriptor : normalized })
 
                 this.reporter.onSubTestStart(testNode)
                 this.reporter.onSubTestFinish(testNode)

@@ -1,3 +1,9 @@
+import { ReactiveArray } from "@bryntum/chronograph/src/chrono2/data/Array.js"
+import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
+import { FieldBox } from "@bryntum/chronograph/src/replica2/Atom.js"
+import { calculate, Entity, field } from "@bryntum/chronograph/src/replica2/Entity.js"
+import { Field } from "@bryntum/chronograph/src/schema2/Field.js"
+import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { OutputType } from "../../context/ExecutionContext.js"
@@ -6,7 +12,7 @@ import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { escapeRegExp } from "../../util/Helpers.js"
-import { LUID, luid } from "../common/LUID.js"
+import { luid } from "../common/LUID.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -167,7 +173,6 @@ export type TestResultTree  = TestNodeResult
 
 export type TestResult      = TestResultLeaf | TestResultTree
 
-
 export class TestNodeResult extends Mixin(
     [ Result ],
     (base : ClassUnion<typeof Result>) =>
@@ -244,9 +249,14 @@ export class TestNodeResult extends Mixin(
 
             this.$passed    = undefined
 
-            this.resultLog.push(result)
+            this.doAddResult(result)
 
             return result
+        }
+
+
+        doAddResult<T extends TestResult> (result : T) {
+            this.resultLog.push(result)
         }
 
 
@@ -352,3 +362,88 @@ export class TestNodeResult extends Mixin(
         }
     }
 ) {}
+
+
+@entity()
+export class TestNodeResultReactive extends Mixin(
+    [ TestNodeResult, Entity ],
+    (base : ClassUnion<typeof TestNodeResult, typeof Entity>) =>
+
+    class TestNodeResultReactive extends base {
+        override parentNode      : TestNodeResultReactive    = undefined
+
+        @field()
+        // @ts-ignore
+        passed          : boolean
+
+        @calculate('passed')
+        calculatePassed () : boolean {
+            let passed      = true
+
+            this.resultLogReactive.readValues().forEach(result => {
+                if ((result instanceof Exception) && !this.isTodo) passed = false
+
+                if ((result instanceof Assertion) && !result.passed && !this.isTodo) passed = false
+
+                if ((result instanceof TestNodeResult) && !result.passed && !this.isTodo) passed = false
+            })
+
+            return passed
+        }
+
+
+        @field({ atomCls : ReactiveArray })
+        override resultLog       : TestResult[]      = []
+
+        get resultLogReactive () : ReactiveArray<TestResult> {
+            return this.$.resultLog as ReactiveArray<TestResult>
+        }
+
+
+        override initialize (...args : unknown[]) {
+            super.initialize(...args)
+
+            globalGraph.addAtoms([ this.$.resultLog, this.$.passed ])
+        }
+
+
+        override doAddResult<T extends TestResult> (result : T) {
+            this.resultLogReactive.push(result)
+        }
+
+
+        static createPropertyAccessorsFor (field : Field) {
+            if (!field.atomCls || !(field.atomCls.prototype instanceof ReactiveArray)) {
+                super.createPropertyAccessorsFor(field)
+
+                return
+            }
+
+            const propertyKey   = field.name
+            const target        = this.prototype
+
+            Object.defineProperty(target, propertyKey, {
+                get     : function (this : Entity) : any {
+                    const fieldAtom : ReactiveArray<unknown> = this.$[ propertyKey ]
+
+                    return fieldAtom.sync ? fieldAtom.readValues() : fieldAtom.readAsync()
+                },
+
+                set     : function (this : Entity, value : any) {
+                    const atom = this.$[ propertyKey ] as FieldBox
+
+                    // magical effect warning:
+                    // `field.write` is populated only after 1st access to `this.$`
+                    field.write
+                        ?
+                            field.write.call(this, atom, value)
+                        :
+                            atom.write(value)
+                }
+            })
+        }
+    }
+){}
+
+globalGraph.autoCommit      = true
+globalGraph.historyLimit    = 0

@@ -1,11 +1,19 @@
-import { Port, local, remote } from "../../../rpc/port/Port.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { XmlElement } from "../../../jsx/XmlElement.js"
+import { local, Port, remote } from "../../../rpc/port/Port.js"
+import { LUID } from "../../common/LUID.js"
 import { Reporter } from "../../reporter/Reporter.js"
 import { AssertionWaitFor } from "../assertion/AssertionAsync.js"
 import { TestDescriptor } from "../TestDescriptor.js"
-import { LUID } from "../../common/LUID.js"
-import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResultLeaf } from "../TestResult.js"
+import {
+    Assertion,
+    AssertionAsyncCreation,
+    AssertionAsyncResolution,
+    Exception,
+    LogMessage,
+    TestNodeResultReactive,
+    TestResultLeaf
+} from "../TestResult.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 // make sure we actually import these class symbols (and not just types),
@@ -33,13 +41,13 @@ interface TestReporter {
 //---------------------------------------------------------------------------------------------------------------------
 export class TestReporterParent extends Mixin(
     [ Port ],
-    (base : ClassUnion<typeof Port>) => 
+    (base : ClassUnion<typeof Port>) =>
 
         class TestReporterParent extends base implements TestReporter {
 
-            reporter                    : Reporter              = undefined
+            reporter                    : Reporter                  = undefined
 
-            currentTestNodeResult       : TestNodeResult        = undefined
+            currentTestNodeResult       : TestNodeResultReactive    = undefined
 
 
             @local()
@@ -49,7 +57,7 @@ export class TestReporterParent extends Mixin(
                         throw new Error("Parent test node internal id mismatch")
                     }
 
-                    const newNode       = TestNodeResult.new({
+                    const newNode       = TestNodeResultReactive.new({
                         localId         : testNodeId,
                         descriptor      : descriptor,
                         state           : 'running',
@@ -61,7 +69,7 @@ export class TestReporterParent extends Mixin(
 
                     this.currentTestNodeResult  = newNode
                 } else {
-                    const newNode       = TestNodeResult.new({
+                    const newNode       = TestNodeResultReactive.new({
                         localId         : testNodeId,
                         descriptor      : descriptor,
                         state           : 'running',
@@ -111,14 +119,14 @@ export class TestReporterParent extends Mixin(
                 this.reporter.onAssertionFinish(this.currentTestNodeResult, assertion)
             }
         }
-    
+
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestReporterChild extends Mixin(
     [ Port ],
-    (base : ClassUnion<typeof Port>) => 
+    (base : ClassUnion<typeof Port>) =>
 
         class TestReporterChild extends base implements TestReporter {
             @remote()
@@ -133,7 +141,7 @@ export class TestReporterChild extends Mixin(
             @remote()
             onAssertionFinish : (testNodeId : LUID, assertion : AssertionAsyncResolution) => Promise<any>
         }
-    
+
 ) {}
 
 
