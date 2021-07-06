@@ -1,13 +1,13 @@
 /** @jsx ChronoGraphJSX.createElement */
 /** @jsxFrag ChronoGraphJSX.FragmentSymbol */
 
-import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
+import { ReactiveArray } from "@bryntum/chronograph/src/chrono2/data/Array.js"
 import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
+import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
-import { MappedReactiveArrayAtom, ReactiveArrayAtom } from "@bryntum/chronograph/src/chrono2/data/Array.js"
 import { ChronoGraphJSX, ElementSource, NodesListReactivity } from "../../src/chronograph-jsx/ChronoGraphJSX.js"
-import { tag, WebComponent, Component } from "../../src/chronograph-jsx/WebComponent.js"
+import { Component, tag, WebComponent } from "../../src/chronograph-jsx/WebComponent.js"
 
 ChronoGraphJSX
 
@@ -37,7 +37,7 @@ const condition = window.condition = Box.new(true)
 // @ts-ignore
 const numbers = window.numbers = new Array(10).fill(null).map((el, index) => Box.new(String(index)))
 // @ts-ignore
-const numbers2 = window.numbers2 = ReactiveArrayAtom.new<number>()
+const numbers2 = window.numbers2 = ReactiveArray.new<number>()
 
 globalGraph.addAtom(numbers2)
 
