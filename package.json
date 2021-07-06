@@ -38,20 +38,20 @@
     "node-fetch": "^3.0.0-beta.9",
     "playwright": "^1.11.0",
     "puppeteer": "^10.0.0",
-    "ws": "^7.4.4",
     "typescript-mixin-class": "^0.0.1",
-    "typescript-serializable-mixin": "^0.0.1"
+    "typescript-serializable-mixin": "file:../../../typescript/typescript-serializable-mixin/typescript-serializable-mixin-0.0.1.tgz",
+    "ws": "^7.4.4"
   },
-  "peerDependencies": {
-  },
+  "peerDependencies": {},
   "devDependencies": {
-    "@bryntum/chronograph": "../../../typescript/chronograph",
+    "@bryntum/chronograph": "file:../../../typescript/chronograph/bryntum-chronograph-2.0.1.tgz",
     "@types/cssom": "^0.4.1",
     "@types/glob": "^7.1.3",
     "@types/node": "^14.14.10",
     "@types/sass": "^1.16.0",
     "@types/ws": "^7.4.1",
     "@web/dev-server": "^0.1.17",
+    "bulma": "^0.9.3",
     "cssom": "^0.4.4",
     "sass": "^1.32.11",
     "snowpack": "^2.17.1",
