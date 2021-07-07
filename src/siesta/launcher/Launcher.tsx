@@ -288,12 +288,12 @@ export class Launcher extends Mixin(
         }
 
 
-        async start () : Promise<Launch> {
+        async start () : Promise<void> {
             try {
                 // need to await for setup, because `projectDescriptor` might not be available yet
                 await this.performSetupOnce()
 
-                return await this.launch(this.getDescriptorsToLaunch())
+                await this.doStart()
             } catch (e) {
                 if (e instanceof LauncherError) {
                     this.onLauncherError(e)
@@ -301,6 +301,13 @@ export class Launcher extends Mixin(
                     this.onUnknownError(e)
                 }
             }
+        }
+
+
+        async doStart () {
+            const launch    = await this.launch(this.getDescriptorsToLaunch())
+
+            this.setExitCode(launch.exitCode)
         }
 
 
