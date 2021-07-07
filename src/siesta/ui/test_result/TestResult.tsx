@@ -12,7 +12,7 @@ import { Launch } from "../../launcher/Launch.js"
 import { ProjectSerializableData } from "../../project/ProjectDescriptor.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { Assertion, Exception, LogMessage, TestNodeResult, TestNodeResultReactive, TestResult } from "../../test/TestResult.js"
-import { Tree } from "../components/Tree.js"
+import { TreeComponent } from "../components/TreeComponent.js"
 
 ChronoGraphJSX
 
@@ -66,7 +66,7 @@ export class TestNodeResultComponent extends Mixin(
                     }</leaf>
             )
 
-            return <Tree>
+            return <TreeComponent>
                 {
                     testNode.isRoot ?
                         [ testNodeState(testNode), ' ', testNodeUrlTemplate(testNode.descriptor, this.launch.projectData) ]
@@ -78,7 +78,7 @@ export class TestNodeResultComponent extends Mixin(
                         ]
                 }
                 { children }
-            </Tree>
+            </TreeComponent>
         }
     }
 ) {}
