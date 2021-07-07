@@ -1,0 +1,11 @@
+tree, leaf {
+    display: block;
+}
+
+tree > leaf {
+    margin-left: var(--leaf-offset, 1.5rem);
+}
+
+leaf > tree {
+    margin-left: -1.5rem;
+}
