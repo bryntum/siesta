@@ -51,6 +51,10 @@
 /resources/styling/**/*.css
 /resources/styling/**/*.css.map
 
+/src/**/*.css
+/src/**/*.css.map
+
+
 # docs
 /docs
 
