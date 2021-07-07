@@ -16,7 +16,7 @@ import { ProjectDescriptorBrowser } from "./ProjectDescriptor.js"
  */
 export class ProjectBrowser extends Mixin(
     [ Project, ProjectDescriptorBrowser ],
-    (base : ClassUnion<typeof Project, typeof ProjectDescriptorBrowser>) => 
+    (base : ClassUnion<typeof Project, typeof ProjectDescriptorBrowser>) =>
 
     class ProjectBrowser extends base {
         type                    : EnvironmentType               = 'browser'
@@ -25,8 +25,9 @@ export class ProjectBrowser extends Mixin(
         testDescriptorClass     : typeof TestDescriptorBrowser  = TestDescriptorBrowser
         runtimeClass            : typeof Runtime                = RuntimeBrowser
 
+        ui                      : boolean                       = true
 
-        async launchStandalone () : Promise<Launch> {
+        override async launchStandalone () {
             if (isNodejs()) {
                 const styles                = (await import("../reporter/styling/theme_universal.js")).styles
                 const colorerClass          = (await import('../../jsx/ColorerNodejs.js')).ColorerNodejs

@@ -18,7 +18,7 @@ import { ProjectDescriptor, ProjectSerializableData } from "./ProjectDescriptor.
  */
 export class Project extends Mixin(
     [ ProjectDescriptor, HasRuntimeAccess ],
-    (base : ClassUnion<typeof ProjectDescriptor, typeof HasRuntimeAccess>) => 
+    (base : ClassUnion<typeof ProjectDescriptor, typeof HasRuntimeAccess>) =>
 
     class Project extends base {
         type                    : EnvironmentType           = 'isomorphic'
@@ -141,7 +141,7 @@ export class Project extends Mixin(
             }
         }
 
-        async getLauncherClass () : Promise<typeof Launcher> {
+        async getLauncherClass () : Promise<this[ 'launcherClass' ]> {
             if (isNodejs())
                 return (await import(/* @vite-ignore */''.concat('../launcher/LauncherNodejs.js'))).LauncherNodejs
             else if (isDeno())
@@ -151,27 +151,23 @@ export class Project extends Mixin(
         }
 
 
-        async getStandaloneLauncher () : Promise<Launcher> {
+        async getStandaloneLauncher () : Promise<InstanceType<this[ 'launcherClass' ]>> {
             const launcher = (await this.getLauncherClass()).new({
                 projectData             : this.asProjectSerializableData(),
 
                 inputArguments          : this.runtime.inputArguments,
 
                 project                 : this.runtime.scriptUrl
-            })
+            } as InstanceType<this[ 'launcherClass' ]>)
 
             return launcher
         }
 
 
-        async launchStandalone () : Promise<Launch> {
+        async launchStandalone () {
             const launcher  = await this.getStandaloneLauncher()
 
-            const launch    = await launcher.start()
-
-            launch && launcher.setExitCode(launch.exitCode)
-
-            return launch
+            await launcher.start()
         }
 
 
