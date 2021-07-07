@@ -214,10 +214,7 @@ export class LauncherNodejs extends Mixin(
                 inputArguments      : process.argv.slice(2)
             })
 
-
-            const launch        = await launcher.start()
-
-            launch && launcher.setExitCode(launch.exitCode)
+            await launcher.start()
 
             await launcher.destroy()
         }

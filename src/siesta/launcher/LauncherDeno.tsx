@@ -32,6 +32,8 @@ export class LauncherDeno extends Mixin(
     (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) =>
 
     class LauncherDeno extends base {
+        exitCode                    : ExitCodes                 = undefined
+
         // region options
         maxWorkers      : number            = 4
 
@@ -179,7 +181,7 @@ export class LauncherDeno extends Mixin(
 
 
         setExitCode (code : ExitCodes) {
-            // process.exitCode    = process.exitCode ?? code
+            this.exitCode   = code
         }
 
 
@@ -194,13 +196,10 @@ export class LauncherDeno extends Mixin(
                 inputArguments      : Deno.args
             })
 
-            const launch        = await launcher.start()
-
-            // launch && launcher.setExitCode(launch.exitCode)
-
+            await launcher.start()
             await launcher.destroy()
 
-            Deno.exit(launch.exitCode)
+            Deno.exit(launcher.exitCode)
         }
     }
 ) {}
