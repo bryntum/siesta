@@ -6,6 +6,7 @@ import { ReporterBrowser } from "../reporter/ReporterBrowser.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeBrowser } from "../runtime/RuntimeBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
+import { Dashboard } from "../ui/Dashboard.js"
 import { Launcher } from "./Launcher.js"
 
 
@@ -21,12 +22,28 @@ export class LauncherBrowser extends Mixin(
         testDescriptorClass     : typeof TestDescriptorBrowser      = TestDescriptorBrowser
         runtimeClass            : typeof Runtime                    = RuntimeBrowser
 
+        ui                      : boolean                           = true
+
+        dashboard               : Dashboard                         = undefined
+
+
         contextProviderConstructors : (typeof ContextProvider)[]    = [
             ContextProviderBrowserIframe
         ]
 
         print (str : string) {
             console.log(str)
+        }
+
+
+        async doStart () {
+            if (this.ui) {
+                this.dashboard = Dashboard.new({ launcher : this })
+
+                await this.dashboard.start()
+            } else {
+                await super.doStart()
+            }
         }
     }
 ) {}
