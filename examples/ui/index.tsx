@@ -109,7 +109,7 @@ export class Counter2 extends Mixin(
     (base : ClassUnion<typeof Component>) => {
 
         class Counter2 extends base {
-            props       : { counter : number }
+            props       : Component[ 'props' ] & { counter : number }
 
             @field()
             counter     : number            = 0
