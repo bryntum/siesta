@@ -1,0 +1,10 @@
+.siesta-project-plan {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+
+.siesta-project-plan tree, .siesta-project-plan leaf {
+    overflow-x: auto;
+    text-overflow: ellipsis;
+}

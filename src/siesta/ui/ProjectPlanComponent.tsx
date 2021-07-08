@@ -24,7 +24,7 @@ export class ProjectPlanComponent extends Mixin(
 
 
         render () : Element {
-            return <div class="is-flex is-align-items-stretch is-flex-direction-column" style="height: 100%; overflow-y:scroll">
+            return <div class="siesta-project-plan is-flex is-align-items-stretch is-flex-direction-column" style="height: 100%; overflow-y:scroll">
                 <div style="height: 1.5em">Project plan</div>
                 <div style="flex : 1">
                     <TestDescriptorComponent testDescriptor={ this.projectData.projectPlan }></TestDescriptorComponent>
