@@ -1,7 +1,7 @@
 import { BoxUnbound } from '@bryntum/chronograph/src/chrono2/data/Box.js'
 import { CalculableBox } from "@bryntum/chronograph/src/chrono2/data/CalculableBox.js"
 import { isArray, isFunction, isNumber, isString, isSyncFunction } from "../util/Typeguards.js"
-import { ElementReactivity, ReactiveElement } from "./ElementReactivity.js"
+import { ElementReactivity, ReactiveElement, ReactiveNode } from "./ElementReactivity.js"
 import { Component } from "./Component.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -191,6 +191,13 @@ export const applyStaticProperties = (element : Element, categorizedProperties :
     )
 }
 
+export const applyStaticChildren = (element : Element, children : ReactiveNode[]) => {
+    children.forEach(child => {
+        if (child.reactivity) child.reactivity.effect.read()
+    })
+
+    element.append(...children)
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 export type ElementSource =
@@ -293,7 +300,7 @@ export namespace ChronoGraphJSX {
             if (categorizedProperties.reactiveCounter === 0 && !normalizedChildren.hasReactivity) {
                 applyStaticProperties(element, categorizedProperties)
 
-                element.append(...normalizedChildren.normalized as Node[])
+                applyStaticChildren(element, normalizedChildren.normalized as ReactiveNode[])
             }
             else {
                 ElementReactivity.fromJSX(element, categorizedProperties, normalizedChildren)

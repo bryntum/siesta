@@ -60,9 +60,9 @@ export class TestDescriptorComponent extends Component {
                 }
             </TreeComponent>
         } else {
-            return <leaf>
+            return <span>
                 { testDescriptor.filename }
-            </leaf>
+            </span>
         }
     }
 }

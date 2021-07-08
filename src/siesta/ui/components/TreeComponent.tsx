@@ -40,7 +40,7 @@ export class TreeComponent extends Mixin(
                     () => this.collapsible
                         ?
                             <span onclick={ () => this.toggle() } class="icon">
-                                <i class={ () => `${ this.state === 'expanded' ? 'fas fa-angle-down' : 'fas fa-angle-right' }` }></i>
+                                <i class={ () => this.state === 'expanded' ? 'fas fa-angle-down' : 'fas fa-angle-right' }></i>
                             </span>
                         :
                             null
@@ -49,7 +49,7 @@ export class TreeComponent extends Mixin(
                     () => this.iconCls
                         ?
                             <span class="icon">
-                                <i class={ () => `${ this.state === 'expanded' ? this.iconCls[ 0 ] : this.iconCls[ 1 ] }` }></i>
+                                <i class={ () => this.state === 'expanded' ? this.iconCls[ 0 ] : this.iconCls[ 1 ] }></i>
                             </span>
                         :
                             null

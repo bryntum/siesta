@@ -122,7 +122,7 @@ export class Counter2 extends Mixin(
 
 
             render () : Element {
-                return <p>{ this.$.counter }{ () => this.children }</p>
+                return <p class={ () => this.counter > 105 ? "more" : 'less' }>{ this.$.counter }{ () => this.children }</p>
             }
         }
 

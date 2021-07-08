@@ -83,7 +83,7 @@ export class ElementReactivity extends Mixin(
             categorizedProperties.styleProperties.forEach(([ key, source ]) => this.addStyleProperty(key, source))
 
             if (categorizedProperties.classAttribute) this.addClassAttributeSource(categorizedProperties.classAttribute)
-            if (categorizedProperties.styleAttribute) this.addClassAttributeSource(categorizedProperties.styleAttribute)
+            if (categorizedProperties.styleAttribute) this.addStyleAttributeSource(categorizedProperties.styleAttribute)
         }
 
 
@@ -208,7 +208,7 @@ export class ElementReactivity extends Mixin(
                 lazy        : false,
 
                 calculation : () => {
-                    if (reactiveProperties) reactiveProperties.forEach(box => box && box.read())
+                    reactiveProperties.forEach(box => box && box.read())
 
                     if (this.reactiveChildren) {
                         const children  = resolveElementSource(this.reactiveChildren)
