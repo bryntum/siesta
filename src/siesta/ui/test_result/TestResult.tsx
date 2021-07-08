@@ -4,7 +4,7 @@ import { ReactiveArray } from "@bryntum/chronograph/src/chrono2/data/Array"
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema"
 import { ChronoGraphJSX, ElementSource, PropertySource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
-import { Component } from "../../../chronograph-jsx/WebComponent.js"
+import { Component } from "../../../chronograph-jsx/Component.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { LogLevel } from "../../../logger/Logger.js"
 import { relative } from "../../../util/Path.js"
@@ -23,7 +23,7 @@ export class TestNodeResultComponent extends Mixin(
     (base : ClassUnion<typeof Component>) =>
 
     class TestNodeResultComponent extends base {
-        props       : {
+        props       : Component[ 'props' ] & {
             testNode    : PropertySource<TestNodeResultReactive>
             launch      : Launch
         }
@@ -92,7 +92,7 @@ export class AssertionComponent extends Mixin(
     (base : ClassUnion<typeof Component>) =>
 
     class AssertionComponent extends base {
-        props           : {
+        props           : Component[ 'props' ] & {
             testNode        : TestNodeResultReactive
             assertion       : Assertion
         }
@@ -135,7 +135,7 @@ export class LogMessageComponent extends Mixin(
     (base : ClassUnion<typeof Component>) =>
 
     class LogMessageComponent extends base {
-        props           : {
+        props           : Component[ 'props' ] & {
             logMessage          : LogMessage
         }
 
@@ -181,7 +181,7 @@ export class ExceptionComponent extends Mixin(
     (base : ClassUnion<typeof Component>) =>
 
     class ExceptionComponent extends base {
-        props           : {
+        props           : Component[ 'props' ] & {
             exception       : Exception
         }
 

@@ -45,5 +45,10 @@ export class LauncherBrowser extends Mixin(
                 await super.doStart()
             }
         }
+
+
+        onUnknownError (e : unknown) {
+            throw e
+        }
     }
 ) {}

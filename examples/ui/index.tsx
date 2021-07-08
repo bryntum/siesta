@@ -6,8 +6,8 @@ import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
-import { ChronoGraphJSX, ElementSource, NodesListReactivity } from "../../src/chronograph-jsx/ChronoGraphJSX.js"
-import { Component, tag, WebComponent } from "../../src/chronograph-jsx/WebComponent.js"
+import { ChronoGraphJSX } from "../../src/chronograph-jsx/ChronoGraphJSX.js"
+import { Component } from "../../src/chronograph-jsx/Component.js"
 
 ChronoGraphJSX
 
@@ -59,49 +59,49 @@ const numbersMapped2 = window.numbersMapped2 = numbersMapped.map(el => <div>mapp
 // </div>
 
 
-@tag('c-counter')
-export class Counter extends Mixin(
-    [ WebComponent, HTMLElement ],
-    (base : ClassUnion<typeof WebComponent, typeof HTMLElement>) => {
-
-        class Counter extends base {
-
-            constructor () {
-                super()
-
-                // @ts-ignore
-                this.enterGraph(globalGraph)
-
-                const children      = NodesListReactivity.from(this.render())
-
-                const shadowRoot    = this.attachShadow({ mode : 'open' })
-
-                shadowRoot.append(...children.read())
-
-                // setInterval(() => this.counter++, 1000)
-            }
-
-            @field()
-            counter     : number            = 0
-
-            render () : ElementSource {
-                return <div class={ () => 'prefix_' + classBox.read() }>
-                    {/*Div content*/}
-                    {/*<p>{ this.$.counter }</p>*/}
-                    {/*{ fragment }*/}
-                    {/*{ () => condition.read() ? <div>Condition true</div> : <div>Condition false</div> }*/}
-
-                    {/*{ () => numbers.map(number => <div>{ number }</div>) }*/}
-                    { numbers2 }
-                    { numbersMapped }
-                    { numbersMapped2 }
-                </div>
-            }
-        }
-
-        return Counter
-    }
-) {}
+// @tag('c-counter')
+// export class Counter extends Mixin(
+//     [ WebComponent, HTMLElement ],
+//     (base : ClassUnion<typeof WebComponent, typeof HTMLElement>) => {
+//
+//         class Counter extends base {
+//
+//             constructor () {
+//                 super()
+//
+//                 // @ts-ignore
+//                 this.enterGraph(globalGraph)
+//
+//                 const children      = NodesListReactivity.from(this.render())
+//
+//                 const shadowRoot    = this.attachShadow({ mode : 'open' })
+//
+//                 shadowRoot.append(...children.read())
+//
+//                 // setInterval(() => this.counter++, 1000)
+//             }
+//
+//             @field()
+//             counter     : number            = 0
+//
+//             render () : ElementSource {
+//                 return <div class={ () => 'prefix_' + classBox.read() }>
+//                     {/*Div content*/}
+//                     {/*<p>{ this.$.counter }</p>*/}
+//                     {/*{ fragment }*/}
+//                     {/*{ () => condition.read() ? <div>Condition true</div> : <div>Condition false</div> }*/}
+//
+//                     {/*{ () => numbers.map(number => <div>{ number }</div>) }*/}
+//                     { numbers2 }
+//                     { numbersMapped }
+//                     { numbersMapped2 }
+//                 </div>
+//             }
+//         }
+//
+//         return Counter
+//     }
+// ) {}
 
 
 export class Counter2 extends Mixin(
@@ -131,6 +131,6 @@ export class Counter2 extends Mixin(
 ) {}
 
 
-document.body.appendChild(<c-counter></c-counter>)
+// document.body.appendChild(<c-counter></c-counter>)
 
-// document.body.appendChild(<Counter2 counter={ 100 }>Some text</Counter2>)
+document.body.appendChild(<Counter2 counter={ 100 }>Some text</Counter2>)

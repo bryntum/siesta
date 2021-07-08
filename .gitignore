@@ -25,6 +25,9 @@
 /tests/**/*.js
 /tests/**/*.js.map
 /tests/**/*.d.ts
+/tests_browser/**/*.js
+/tests_browser/**/*.js.map
+/tests_browser/**/*.d.ts
 /tests_nodejs/**/*.js
 /tests_nodejs/**/*.js.map
 /tests_nodejs/**/*.d.ts

@@ -3,7 +3,7 @@
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { ChronoGraphJSX } from "../../../chronograph-jsx/ChronoGraphJSX.js"
-import { Component } from "../../../chronograph-jsx/WebComponent.js"
+import { Component } from "../../../chronograph-jsx/Component.js"
 
 ChronoGraphJSX
 

@@ -1,7 +1,7 @@
 /** @jsx ChronoGraphJSX.createElement */
 
 import { ChronoGraphJSX } from "../../chronograph-jsx/ChronoGraphJSX.js"
-import { Component } from "../../chronograph-jsx/WebComponent.js"
+import { Component } from "../../chronograph-jsx/Component.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"

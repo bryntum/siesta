@@ -35,6 +35,8 @@
         "src/**/*.tsx",
         "tests/**/*.ts",
         "tests/**/*.tsx",
+        "tests_browser/**/*.ts",
+        "tests_browser/**/*.tsx",
         "tests_nodejs/**/*.ts",
         "tests_nodejs/**/*.tsx",
         "tests_deno/**/*.ts",

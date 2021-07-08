@@ -447,3 +447,6 @@ export class TestNodeResultReactive extends Mixin(
 
 globalGraph.autoCommit      = true
 globalGraph.historyLimit    = 0
+
+// @ts-ignore
+window.globalGraph = globalGraph
