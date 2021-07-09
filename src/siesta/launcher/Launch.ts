@@ -278,7 +278,7 @@ export class Launch extends Mixin(
 
 
         getTestLaunchDelay () : number {
-            // no launch by default
+            // no delay by default
             return 0
         }
 
