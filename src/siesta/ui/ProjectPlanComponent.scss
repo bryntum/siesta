@@ -1,10 +1,17 @@
-.siesta-project-plan {
-    overflow-x: auto;
+.project-plan {
+    overflow-x: hidden;
+    overflow-y: auto;
     white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 
-.siesta-project-plan tree, .siesta-project-plan leaf {
-    overflow-x: auto;
+.project-plan tree {
+    overflow-x: hidden;
     text-overflow: ellipsis;
+}
+
+
+.project-plan-test:hover {
+    color:  red;
 }

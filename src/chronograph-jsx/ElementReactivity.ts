@@ -12,6 +12,7 @@ import {
     resolvePropertySource,
     setProperty
 } from "./ChronoGraphJSX.js"
+import { Component } from "./Component.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -261,13 +262,16 @@ export class ElementReactivity extends Mixin(
 
 
 export interface ReactiveNode extends Node {
-    reactivity?      : ElementReactivity
+    reactivity?     : ElementReactivity
 }
 
 export interface ReactiveElement extends Element {
-    reactivity?      : ElementReactivity
+    reactivity?     : ElementReactivity
 }
 
+export interface ComponentElement<C extends Component> extends ReactiveElement {
+    comp            : C
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 // Slightly modified version of: https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/reconcile.js

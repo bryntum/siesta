@@ -24,7 +24,7 @@ export class ProjectPlanComponent extends Mixin(
 
 
         render () : Element {
-            return <div class="siesta-project-plan is-flex is-align-items-stretch is-flex-direction-column" style="height: 100%; overflow-y:scroll">
+            return <div class="project-plan is-flex is-align-items-stretch is-flex-direction-column" style="height: 100%; overflow-y:scroll">
                 <div style="height: 1.5em">Project plan</div>
                 <div style="flex : 1">
                     <TestDescriptorComponent testDescriptor={ this.projectData.projectPlan }></TestDescriptorComponent>
@@ -52,7 +52,7 @@ export class TestDescriptorComponent extends Component {
                 state       = "expanded"
                 iconCls     = { [ 'far fa-folder-open', 'far fa-folder' ] }
             >
-                <span>{ testDescriptor.title || testDescriptor.filename }</span>
+                <span class="project-plan-folder">{ testDescriptor.title || testDescriptor.filename }</span>
                 {
                     testDescriptor.childNodes.map(childNode =>
                         <leaf><TestDescriptorComponent testDescriptor={ childNode }></TestDescriptorComponent></leaf>
@@ -60,7 +60,7 @@ export class TestDescriptorComponent extends Component {
                 }
             </TreeComponent>
         } else {
-            return <span>
+            return <span class="project-plan-test">
                 { testDescriptor.filename }
             </span>
         }

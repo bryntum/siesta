@@ -50,6 +50,9 @@ export class Component extends Mixin(
             else
                 reactivity.effect
 
+            // @ts-ignore
+            el.comp                     = this
+
             return el
         }
 
