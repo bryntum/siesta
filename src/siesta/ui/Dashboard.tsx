@@ -56,7 +56,10 @@ export class Dashboard extends Mixin(
                                         ></TestNodeResultComponent>
                                     :
                                         <div class="is-flex is-justify-content-center is-align-items-center" style="height:100%">
-                                            <div>No results yet for { this.currentTest.filename }</div>
+                                            <div style="text-align:center">
+                                                <div>No results yet for { this.currentTest.filename }</div>
+                                                <div>Double click the test to launch it</div>
+                                            </div>
                                         </div>
                             :
                                 <div class="is-flex is-justify-content-center is-align-items-center" style="height:100%">

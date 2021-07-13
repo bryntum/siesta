@@ -53,7 +53,7 @@ export class TestDescriptorComponent extends Component {
                 iconCls     = { [ 'far fa-folder-open', 'far fa-folder' ] }
                 class       = "project-plan-folder"
             >
-                <span>{ testDescriptor.title || testDescriptor.filename }</span>
+                <input type="checkbox"/><span>{ testDescriptor.title || testDescriptor.filename }</span>
                 {
                     testDescriptor.childNodes.map(childNode =>
                         <leaf><TestDescriptorComponent testDescriptor={ childNode }></TestDescriptorComponent></leaf>
