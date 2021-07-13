@@ -37,30 +37,58 @@ export class Dashboard extends Mixin(
         render () : Element {
             const dispatcher        = this.launcher.dispatcher
 
-            return <div ondblclick={ e => this.onDoubleClick(e) } class="is-flex is-align-items-stretch" style="height : 100%;">
+            return <div
+                onmousedown = { e => this.onMouseDown(e) }
+                onclick     = { e => this.onClick(e) }
+                ondblclick  = { e => this.onDoubleClick(e) }
+                class       = "is-flex is-align-items-stretch" style="height: 100%;"
+            >
                 <ProjectPlanComponent style="width: 300px" projectData={ this.launcher.projectData }></ProjectPlanComponent>
-                <div style="flex : 1">
-                    Test details
+                <div style="flex: 1; overflow-y: auto">
                     {
                         () => this.currentTest && dispatcher.results.get(this.currentTest).mostRecentResult
                             ? <TestNodeResultComponent
                                 testNode={ dispatcher.results.get(this.currentTest).mostRecentResult }
                                 dispatcher={ this.launcher.dispatcher }
                             ></TestNodeResultComponent>
-                            : <span>{ this.currentTest && this.currentTest.filename }</span>
+                            : undefined
                     }
                 </div>
             </div>
         }
 
 
+        getTestDescriptorComponentFromMouseEvent (e : MouseEvent) : TestDescriptorComponent | undefined {
+            const testPlanItem : ComponentElement<TestDescriptorComponent> = (e.target as Element).closest('.project-plan-test, .project-plan-folder')
+
+            return testPlanItem ? testPlanItem.comp : undefined
+        }
+
+
+        onMouseDown (e : MouseEvent) {
+            const comp      = this.getTestDescriptorComponentFromMouseEvent(e)
+
+            // prevent the text selection on double click only (still works for mouse drag)
+            if (comp && e.detail > 1) e.preventDefault()
+        }
+
+
+        onClick (e : MouseEvent) {
+            const comp      = this.getTestDescriptorComponentFromMouseEvent(e)
+
+            if (comp) {
+                this.currentTest    = comp.testDescriptor
+            }
+        }
+
+
         onDoubleClick (e : MouseEvent) {
-            const testPlanItem : ComponentElement<TestDescriptorComponent> = (e.target as Element).closest('.project-plan-test')
+            const comp      = this.getTestDescriptorComponentFromMouseEvent(e)
 
-            if (testPlanItem) {
-                this.currentTest    = testPlanItem.comp.testDescriptor
+            if (comp) {
+                this.currentTest    = comp.testDescriptor
 
-                this.launcher.launchContinuously([ testPlanItem.comp.testDescriptor ])
+                this.launcher.launchContinuously(comp.testDescriptor.leavesAxis())
             }
         }
     }

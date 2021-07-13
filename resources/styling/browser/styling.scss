@@ -23,3 +23,14 @@ body {
 }
 
 
+::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e5e5e5;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff;
+}

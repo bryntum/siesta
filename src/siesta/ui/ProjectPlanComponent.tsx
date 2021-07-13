@@ -51,8 +51,9 @@ export class TestDescriptorComponent extends Component {
                 collapsible = { Boolean(testDescriptor.parentNode) }
                 state       = "expanded"
                 iconCls     = { [ 'far fa-folder-open', 'far fa-folder' ] }
+                class       = "project-plan-folder"
             >
-                <span class="project-plan-folder">{ testDescriptor.title || testDescriptor.filename }</span>
+                <span>{ testDescriptor.title || testDescriptor.filename }</span>
                 {
                     testDescriptor.childNodes.map(childNode =>
                         <leaf><TestDescriptorComponent testDescriptor={ childNode }></TestDescriptorComponent></leaf>
