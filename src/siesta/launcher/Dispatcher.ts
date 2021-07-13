@@ -1,9 +1,9 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { CI } from "../../iterator/Iterator.js"
 import { Logger } from "../../logger/Logger.js"
 import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
 import { stringify } from "../../serializable/Serializable.js"
+import { luid, LUID } from "../common/LUID.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
@@ -34,7 +34,8 @@ export class Dispatcher extends Mixin(
             presence    : Set<TestDescriptor>
         }                                                       = { order : [], presence : new Set() }
 
-        results         : Map<TestDescriptor, TestLaunchInfo>   = new Map()
+        results                     : Map<TestDescriptor, TestLaunchInfo>   = new Map()
+        localRemoteDescMap          : Map<LUID, TestDescriptor> = new Map()
 
         projectPlanItemsToLaunch    : TestDescriptor[]          = []
 
@@ -74,7 +75,12 @@ export class Dispatcher extends Mixin(
             })
 
             this.launcher.projectData.projectPlan.leavesAxis().forEach(
-                descriptor => this.results.set(descriptor, TestLaunchInfo.new({ descriptor }))
+                descriptor => {
+                    descriptor.remoteId     = luid()
+
+                    this.localRemoteDescMap.set(descriptor.remoteId, descriptor)
+                    this.results.set(descriptor, TestLaunchInfo.new({ descriptor }))
+                }
             )
         }
 
@@ -128,53 +134,6 @@ export class Dispatcher extends Mixin(
 
             return desc
         }
-
-
-        // async start () {
-        //     await this.setup()
-        //
-        //     await this.launch()
-        // }
-        //
-        //
-        // async setup () {
-        // }
-
-
-        // async launch () {
-        //     this.reporter.onTestSuiteStart()
-        //
-        //     const projectPlanItems      = this.projectPlanItemsToLaunch.slice()
-        //
-        //     if (projectPlanItems.length > 0) {
-        //         const queue                 = Queue.new({ maxWorkers : this.maxWorkers })
-        //         const completed             = new Promise<any>(resolve => queue.onCompletedHook.on(resolve))
-        //
-        //         queue.onFreeSlotAvailableHook.on(() => {
-        //             if (projectPlanItems.length) {
-        //                 const descriptor        = projectPlanItems.shift()
-        //
-        //                 queue.push(descriptor, this.launchProjectPlanItem(descriptor))
-        //             }
-        //         })
-        //
-        //         queue.onSlotSettledHook.on((queue, descriptor : TestDescriptor, result) => {
-        //             if (result.status === 'rejected') this.reportLaunchFailure(descriptor, result.reason)
-        //
-        //             queue.pull()
-        //         })
-        //
-        //         queue.pull()
-        //
-        //         await completed
-        //     } else {
-        //         this.logger.error('No tests to run')
-        //     }
-        //
-        //     this.reporter.onTestSuiteFinish()
-        //
-        //     this.computeExitCode()
-        // }
 
 
         reportLaunchFailure (descriptor : TestDescriptor, exception : any) {

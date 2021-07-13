@@ -37,7 +37,7 @@ export class Reporter extends Mixin(
 
     class Reporter extends base {
         launcher            : Launcher                  = undefined
-        
+
         get dispatcher () : Dispatcher {
             return this.launcher.dispatcher
         }
@@ -97,8 +97,6 @@ export class Reporter extends Mixin(
 
 
         onBeforeTestLaunch (desc : TestDescriptor) {
-            desc.remoteId       = luid()
-
             this.resultsRunningMap.set(desc.remoteId, desc)
         }
 
