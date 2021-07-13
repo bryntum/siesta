@@ -208,6 +208,10 @@ export class ElementReactivity extends Mixin(
             this.$effect = CalculableBox.new<Node[]>({
                 lazy        : false,
 
+                // HACK, in theory should not trigger the `commitValueOptimisticHook` on the same value
+                // this is to avoid recalculating parent effects
+                equality    : () => true,
+
                 calculation : () => {
                     reactiveProperties.forEach(box => box && box.read())
 

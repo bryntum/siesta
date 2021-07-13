@@ -1,7 +1,7 @@
 import { BoxUnbound } from '@bryntum/chronograph/src/chrono2/data/Box.js'
 import { CalculableBox } from "@bryntum/chronograph/src/chrono2/data/CalculableBox.js"
 import { isArray, isFunction, isNumber, isString, isSyncFunction } from "../util/Typeguards.js"
-import { ElementReactivity, ReactiveElement, ReactiveNode } from "./ElementReactivity.js"
+import { ComponentElement, ElementReactivity, ReactiveElement, ReactiveNode } from "./ElementReactivity.js"
 import { Component } from "./Component.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -278,6 +278,10 @@ export const resolveElementSource = (source : ElementSource, result : Node[] = [
     return result
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+export const querySelector = <C extends Component>(el : Element, selector : string) : ComponentElement<C> => {
+    return el.querySelector(selector)
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 export namespace ChronoGraphJSX {
