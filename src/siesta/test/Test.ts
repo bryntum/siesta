@@ -6,12 +6,11 @@ import { XmlNode } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { parse } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
-import { ArbitraryObject, ArbitraryObjectKey, delay, isDeno, isNodejs, prototypeValue } from "../../util/Helpers.js"
+import { ArbitraryObject, ArbitraryObjectKey, isDeno, isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { stripBasename, stripDirname } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { Environment } from "../common/Environment.js"
 import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
-import { Launch } from "../launcher/Launch.js"
 import { Launcher, LauncherError } from "../launcher/Launcher.js"
 import { SiestaProjectExtraction } from "../launcher/ProjectExtractor.js"
 import { Project } from "../project/Project.js"
@@ -837,19 +836,11 @@ export class Test extends TestPre {
 
             // for standalone launch we use different test launch procedure, since we want to avoid deriving extra context
             // we don't use `TestLauncher.launchTest()` method for example
+            const dispatcher            = launcher.dispatcher
 
-            const launch    = Launch.new({
-                launcher,
-                projectPlanItemsToLaunch    : projectPlan.leavesAxis(),
+            await dispatcher.launchStandaloneSameContextTest(topTest)
 
-                contextProviders            : [ ContextProviderSameContext.new({ launcher }) ]
-            })
-
-            await launch.setup()
-
-            await launch.launchStandaloneSameContextTest(topTest)
-
-            launcher.setExitCode(launch.exitCode)
+            launcher.setExitCode(launcher.computeExitCode())
         } else {
             // TODO refactor this, to not create extra context and do everything in the test context,
             // as in Node.js case above

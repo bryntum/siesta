@@ -8,7 +8,7 @@ import { XmlElement } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { relative } from "../../util/Path.js"
 import { LUID, luid } from "../common/LUID.js"
-import { Launch } from "../launcher/Launch.js"
+import { Dispatcher } from "../launcher/Dispatcher.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
@@ -36,14 +36,14 @@ export class Reporter extends Mixin(
     (base : ClassUnion<typeof ConsoleXmlRenderer, typeof Base>) =>
 
     class Reporter extends base {
-        launch              : Launch                    = undefined
-
-        get launcher () : Launcher {
-            return this.launch.launcher
+        launcher            : Launcher                  = undefined
+        
+        get dispatcher () : Dispatcher {
+            return this.launcher.dispatcher
         }
 
         get projectData () : ProjectSerializableData {
-            return this.launch.projectData
+            return this.launcher.projectData
         }
 
         get detail () : ReporterDetailing {
@@ -90,7 +90,7 @@ export class Reporter extends Mixin(
 
         testNodeHasLogMessagesAboveTheLogLevel (testNode : TestNodeResult, level : LogLevel) : boolean {
             return CI(testNode.eachResultLeafOfClass(LogMessage))
-                .filter(logMessage => logMessage.level >= this.launch.launcher.logLevel)
+                .filter(logMessage => logMessage.level >= this.launcher.logLevel)
                 .take(1)
                 .length > 0
         }
@@ -171,7 +171,7 @@ export class Reporter extends Mixin(
 
 
         isCompleted () : boolean {
-            return this.resultsCompleted.size === this.launch.projectPlanItemsToLaunch.length
+            return this.resultsCompleted.size === this.dispatcher.projectPlanItemsToLaunch.length
         }
 
 
@@ -382,9 +382,9 @@ export class Reporter extends Mixin(
 
         testSuiteHeader () : XmlElement {
             return <div>
-                Launching { this.launch.projectData.launchType === 'project' ? 'test suite project' : 'test file' }:{ ' ' }
+                Launching { this.projectData.launchType === 'project' ? 'test suite project' : 'test file' }:{ ' ' }
                 <span class="project_title">{ this.projectData.projectPlan.title }</span>{ ' ' }
-                in { this.launch.launcher.projectData.environment.name } { this.launch.launcher.projectData.environment.version }
+                in { this.projectData.environment.name } { this.projectData.environment.version }
                 <div></div>
             </div>
         }
@@ -409,7 +409,7 @@ export class Reporter extends Mixin(
                 { 'Test files : ' }
                 <span class="summary_tests_passed">{ this.filesPassed } passed, </span>
                 <span class={ this.filesFailed > 0 ? "summary_tests_failed" : '' }>{ this.filesFailed } failed, </span>
-                <span class="summary_tests_total">{ this.launch.projectPlanItemsToLaunch.length } total</span>
+                <span class="summary_tests_total">{ this.dispatcher.projectPlanItemsToLaunch.length } total</span>
                 { this.testSuiteFooterTime() }
             </div>)
 

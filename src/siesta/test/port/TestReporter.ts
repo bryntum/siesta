@@ -47,6 +47,8 @@ export class TestReporterParent extends Mixin(
 
             reporter                    : Reporter                  = undefined
 
+            rootTestNodeResult          : TestNodeResultReactive    = undefined
+
             currentTestNodeResult       : TestNodeResultReactive    = undefined
 
 
@@ -75,7 +77,12 @@ export class TestReporterParent extends Mixin(
                         state           : 'running',
                     })
 
-                    this.currentTestNodeResult  = newNode
+                    this.currentTestNodeResult  = this.rootTestNodeResult = newNode
+
+                    // // feels a bit ugly
+                    // const localDescriptor   = this.reporter.resultsRunningMap.get(descriptor.remoteId)
+                    //
+                    // this.reporter.launcher.dispatcher.results.get(localDescriptor).mostRecentResult = newNode
                 }
 
                 this.reporter.onSubTestStart(this.currentTestNodeResult)

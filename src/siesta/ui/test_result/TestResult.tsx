@@ -5,10 +5,11 @@ import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema"
 import { ChronoGraphJSX, ElementSource, PropertySource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
+import { ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { LogLevel } from "../../../logger/Logger.js"
 import { relative } from "../../../util/Path.js"
-import { Launch } from "../../launcher/Launch.js"
+import { Dispatcher } from "../../launcher/Dispatcher.js"
 import { ProjectSerializableData } from "../../project/ProjectDescriptor.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { Assertion, Exception, LogMessage, TestNodeResult, TestNodeResultReactive, TestResult } from "../../test/TestResult.js"
@@ -24,20 +25,15 @@ export class TestNodeResultComponent extends Mixin(
 
     class TestNodeResultComponent extends base {
         props       : Component[ 'props' ] & {
-            testNode    : PropertySource<TestNodeResultReactive>
-            launch      : Launch
+            testNode        : PropertySource<TestNodeResultReactive>
+            dispatcher      : Dispatcher
         }
 
         testNode    : TestNodeResultReactive        = undefined
-        launch      : Launch                        = undefined
+        dispatcher  : Dispatcher                    = undefined
 
 
-        onClick (e : Event) {
-            console.log("Button clicked")
-        }
-
-
-        render () : Element {
+        render () : ReactiveElement {
             // const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result, testNode.isTodo))
 
             const Self      = this.constructor as typeof TestNodeResultComponent
@@ -48,7 +44,7 @@ export class TestNodeResultComponent extends Mixin(
                     <leaf>{
                         (result instanceof TestNodeResultReactive)
                             ?
-                                <Self launch={ this.launch } testNode={ result }></Self>
+                                <Self dispatcher={ this.dispatcher } testNode={ result }></Self>
                             :
                                 (result instanceof Assertion)
                                     ?
@@ -69,12 +65,12 @@ export class TestNodeResultComponent extends Mixin(
             return <TreeComponent>
                 {
                     testNode.isRoot ?
-                        [ testNodeState(testNode), ' ', testNodeUrlTemplate(testNode.descriptor, this.launch.projectData) ]
+                        [ testNodeState(testNode), ' ', testNodeUrlTemplate(testNode.descriptor, this.dispatcher.projectData) ]
                         :
                         [
                             testNodeState(testNode), ' ',
                             testNode.isTodo ? <span class="accented">[todo] </span> : '',
-                            <span class={ this.launch.reporter.detail === 'assertion' ? 'underline' : '' }>{ testNode.descriptor.title }</span>,
+                            <span class={ this.dispatcher.reporter.detail === 'assertion' ? 'underline' : '' }>{ testNode.descriptor.title }</span>,
                         ]
                 }
                 { children }

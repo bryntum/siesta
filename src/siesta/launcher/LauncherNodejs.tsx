@@ -17,10 +17,10 @@ import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeNodejs } from "../runtime/RuntimeNodejs.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
-import { Launch } from "./Launch.js"
+import { Dispatcher } from "./Dispatcher.js"
 import { ExitCodes, Launcher, LauncherError, OptionsGroupPrimary } from "./Launcher.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
-import { LaunchNodejs } from "./LaunchNodejs.js"
+import { DispatcherNodejs } from "./DispatcherNodejs.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ export class LauncherNodejs extends Mixin(
     (base : ClassUnion<typeof Launcher, typeof LauncherTerminal, typeof ExecutionContextAttachable>) =>
 
     class LauncherNodejs extends base {
-        launchClass             : typeof Launch             = LaunchNodejs
+        dispatcherClass         : typeof Dispatcher         = DispatcherNodejs
 
         executionContext        : ExecutionContextNode      = undefined
 
@@ -131,7 +131,7 @@ export class LauncherNodejs extends Mixin(
                 return this.contextProviderBrowser.filter(provider =>
                     !requestedProvider || (provider.constructor as typeof ContextProvider).providerName === requestedProvider)
             }
-            else if (environment === 'nodejs') {
+            else if (environment === 'nodejs' || environment === 'isomorphic') {
                 return this.contextProviderNode
             }
             else if (this.project) {

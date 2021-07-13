@@ -28,7 +28,7 @@ import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { HasRuntimeAccess } from "../runtime/Runtime.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { Launch } from "./Launch.js"
+import { Dispatcher } from "./Dispatcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -135,13 +135,18 @@ export class Launcher extends Mixin(
         optionsBag              : OptionsBag                = undefined
 
         //------------------
-        launchClass             : typeof Launch             = Launch
+        dispatcherClass         : typeof Dispatcher         = Dispatcher
 
         projectDescriptorClass  : typeof ProjectDescriptor  = ProjectDescriptor
 
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
         reporterClass           : typeof Reporter           = undefined
+
+        //------------------
+        dispatcher              : Dispatcher                = undefined
+
+        reporter                : Reporter                  = undefined
 
         //------------------
         setupDone               : boolean                   = false
@@ -305,9 +310,30 @@ export class Launcher extends Mixin(
 
 
         async doStart () {
-            const launch    = await this.launch(this.getDescriptorsToLaunch())
+            await this.launchOnce(this.getDescriptorsToLaunch())
 
-            this.setExitCode(launch.exitCode)
+            this.setExitCode(this.computeExitCode())
+        }
+
+
+        computeExitCode () : ExitCodes {
+            const projectPlanItemsToLaunch  = this.dispatcher.projectPlanItemsToLaunch
+
+            const allFinalizedProperly  = this.reporter.resultsCompleted.size === projectPlanItemsToLaunch.length
+            const allPassed             = CI(this.reporter.resultsCompleted).every(testNode => testNode.passed)
+
+            if (projectPlanItemsToLaunch.length === 0) {
+                return ExitCodes.DRY_RUN
+            }
+            else if (allFinalizedProperly && allPassed) {
+                return ExitCodes.PASSED
+            }
+            else if (allFinalizedProperly) {
+                return ExitCodes.FAILED
+            }
+            else {
+                return ExitCodes.UNHANDLED_EXCEPTION
+            }
         }
 
 
@@ -450,6 +476,24 @@ export class Launcher extends Mixin(
             warnings.forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
 
             if (errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
+
+            //-----------------------
+            const contextProviders          = this.getSuitableContextProviders(this.projectData.type)
+
+            if (contextProviders.length === 0) throw LauncherError.new({
+                message     : 'No suitable context providers found. Check the `--provider` option'
+            })
+
+            this.dispatcher         = this.dispatcherClass.new({
+                launcher        : this,
+                contextProviders
+            })
+
+            this.reporter       = this.reporterClass.new({
+                launcher        : this,
+                colorerClass    : this.colorerClass,
+                styles          : this.styles
+            })
         }
 
 
@@ -462,26 +506,29 @@ export class Launcher extends Mixin(
         }
 
 
-        async launch (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<Launch> {
+        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) {
             await this.performSetupOnce()
 
-            const contextProviders          = this.getSuitableContextProviders(this.projectData.type)
+            projectPlanItemsToLaunch.forEach(desc => this.dispatcher.addPendingTest(desc))
+        }
 
-            if (contextProviders.length === 0) throw LauncherError.new({
-                message     : 'No suitable context providers found. Check the `--provider` option'
-            })
 
-            const launch    = this.launchClass.new({
-                launcher                                : this,
-                maxWorkers                              : this.maxWorkers,
+        async launchOnce (projectPlanItemsToLaunch : TestDescriptor[]) {
+            await this.performSetupOnce()
 
-                projectPlanItemsToLaunch,
-                contextProviders
-            })
+            this.reporter.onTestSuiteStart()
 
-            await launch.start()
+            if (projectPlanItemsToLaunch.length) {
+                const completed             = new Promise<any>(resolve => this.dispatcher.runningQueue.onCompletedHook.on(resolve))
 
-            return launch
+                this.dispatcher.addRunOnceBatch(projectPlanItemsToLaunch)
+
+                await completed
+            } else {
+                this.logger.error('No tests to run')
+            }
+
+            this.reporter.onTestSuiteFinish()
         }
 
 

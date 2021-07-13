@@ -15,7 +15,7 @@ type PrintingState  = {
 //---------------------------------------------------------------------------------------------------------------------
 export class ReporterTerminal extends Mixin(
     [ Reporter ],
-    (base : ClassUnion<typeof Reporter>) => 
+    (base : ClassUnion<typeof Reporter>) =>
 
     class ReporterTerminal extends base {
         spinner             : Spinner                   = randomSpinner()
@@ -66,7 +66,7 @@ export class ReporterTerminal extends Mixin(
 
 
         progressBar () : XmlElement {
-            const completedChars = Math.round(this.resultsCompleted.size / this.launch.projectPlanItemsToLaunch.length * this.progressBarTotalLength)
+            const completedChars = Math.round(this.resultsCompleted.size / this.dispatcher.projectPlanItemsToLaunch.length * this.progressBarTotalLength)
 
             return <span>
                 <span class={ this.filesFailed > 0 ? 'progress_bar_completed_failed' : 'progress_bar_completed_passed' }>{ ' '.repeat(completedChars) }</span>

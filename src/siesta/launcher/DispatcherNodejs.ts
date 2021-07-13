@@ -1,13 +1,13 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { Launch } from "./Launch.js"
+import { Dispatcher } from "./Dispatcher.js"
 import { LauncherNodejs } from "./LauncherNodejs.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export class LaunchNodejs extends Mixin(
-    [ Launch ],
-    (base : ClassUnion<typeof Launch>) =>
+export class DispatcherNodejs extends Mixin(
+    [ Dispatcher ],
+    (base : ClassUnion<typeof Dispatcher>) =>
 
-    class LaunchNodejs extends base {
+    class DispatcherNodejs extends base {
         launcher                    : LauncherNodejs        = undefined
 
 
