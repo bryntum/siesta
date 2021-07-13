@@ -46,49 +46,59 @@ export class Dashboard extends Mixin(
                 <ProjectPlanComponent style="width: 300px" projectData={ this.launcher.projectData }></ProjectPlanComponent>
                 <div style="flex: 1; overflow-y: auto">
                     {
-                        () => this.currentTest && dispatcher.results.get(this.currentTest).mostRecentResult
-                            ? <TestNodeResultComponent
-                                testNode={ dispatcher.results.get(this.currentTest).mostRecentResult }
-                                dispatcher={ this.launcher.dispatcher }
-                            ></TestNodeResultComponent>
-                            : undefined
+                        () => this.currentTest
+                            ?
+                                dispatcher.results.get(this.currentTest).mostRecentResult
+                                    ?
+                                        <TestNodeResultComponent
+                                            testNode={ dispatcher.results.get(this.currentTest).mostRecentResult }
+                                            dispatcher={ this.launcher.dispatcher }
+                                        ></TestNodeResultComponent>
+                                    :
+                                        <div class="is-flex is-justify-content-center is-align-items-center" style="height:100%">
+                                            <div>No results yet for { this.currentTest.filename }</div>
+                                        </div>
+                            :
+                                <div class="is-flex is-justify-content-center is-align-items-center" style="height:100%">
+                                    <div>No test selected</div>
+                                </div>
                     }
                 </div>
             </div>
         }
 
 
-        getTestDescriptorComponentFromMouseEvent (e : MouseEvent) : TestDescriptorComponent | undefined {
+        getTestDescriptorComponentFromMouseEvent (e : MouseEvent) : TestDescriptor {
             const testPlanItem : ComponentElement<TestDescriptorComponent> = (e.target as Element).closest('.project-plan-test, .project-plan-folder')
 
-            return testPlanItem ? testPlanItem.comp : undefined
+            return testPlanItem ? testPlanItem.comp.testDescriptor : undefined
         }
 
 
         onMouseDown (e : MouseEvent) {
-            const comp      = this.getTestDescriptorComponentFromMouseEvent(e)
+            const desc      = this.getTestDescriptorComponentFromMouseEvent(e)
 
             // prevent the text selection on double click only (still works for mouse drag)
-            if (comp && e.detail > 1) e.preventDefault()
+            if (desc && e.detail > 1) e.preventDefault()
         }
 
 
         onClick (e : MouseEvent) {
-            const comp      = this.getTestDescriptorComponentFromMouseEvent(e)
+            const desc      = this.getTestDescriptorComponentFromMouseEvent(e)
 
-            if (comp) {
-                this.currentTest    = comp.testDescriptor
+            if (desc && desc.isLeaf()) {
+                this.currentTest    = desc
             }
         }
 
 
         onDoubleClick (e : MouseEvent) {
-            const comp      = this.getTestDescriptorComponentFromMouseEvent(e)
+            const desc      = this.getTestDescriptorComponentFromMouseEvent(e)
 
-            if (comp) {
-                this.currentTest    = comp.testDescriptor
+            if (desc) {
+                if (desc.isLeaf()) this.currentTest    = desc
 
-                this.launcher.launchContinuously(comp.testDescriptor.leavesAxis())
+                this.launcher.launchContinuously(desc.leavesAxis())
             }
         }
     }

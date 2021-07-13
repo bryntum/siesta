@@ -6,6 +6,9 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestNodeResultReactive } from "../test/TestResult.js"
 
+//---------------------------------------------------------------------------------------------------------------------
+export type TestLaunchState         = 'passed' | 'failed' | 'exception' | 'noinfo' | 'pending'
+export type TestFolderLaunchState   = 'passed' | 'failed' | 'noinfo' | 'pending'
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLaunchInfo extends Mixin(
@@ -17,6 +20,8 @@ export class TestLaunchInfo extends Mixin(
 
         @field()
         mostRecentResult    : TestNodeResultReactive    = undefined
+
+        state               : ''
 
 
         initialize (props? : Partial<TestLaunchInfo>) {

@@ -257,7 +257,7 @@ export class ElementReactivity extends Mixin(
                 element.append(...normalizedChildren.normalized as Node[])
             }
 
-            reactivity.effect
+            // reactivity.effect
 
             return reactivity
         }

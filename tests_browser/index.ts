@@ -11,7 +11,8 @@ project.plan(
         filename       : 'chronograph_jsx',
 
         items       : [
-            'chronograph_jsx.t.js'
+            'plain_jsx.t.js',
+            'component.t.js'
         ]
     }
 )

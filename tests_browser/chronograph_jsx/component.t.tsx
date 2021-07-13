@@ -2,7 +2,7 @@
 
 import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
-import { it } from "../../index.js"
+import { iit, it } from "../../browser.js"
 import { ChronoGraphJSX, querySelector } from "../../src/chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../src/chronograph-jsx/Component.js"
 import { ReactiveElement } from "../../src/chronograph-jsx/ElementReactivity.js"
