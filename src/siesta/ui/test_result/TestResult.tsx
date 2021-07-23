@@ -62,7 +62,7 @@ export class TestNodeResultComponent extends Mixin(
                     }</leaf>
             )
 
-            return <TreeComponent>
+            return <TreeComponent state={ this.testNode.passed && this.testNode.parentNode ? 'collapsed' : 'expanded' }>
                 {
                     testNode.isRoot ?
                         [ testNodeState(testNode), ' ', testNodeUrlTemplate(testNode.descriptor, this.dispatcher.projectData) ]
