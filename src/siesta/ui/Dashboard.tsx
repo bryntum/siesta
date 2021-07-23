@@ -1,7 +1,7 @@
 /** @jsx ChronoGraphJSX.createElement */
 
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
-import { ChronoGraphJSX } from "../../chronograph-jsx/ChronoGraphJSX.js"
+import { ChronoGraphJSX, ElementSource } from "../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../chronograph-jsx/Component.js"
 import { ComponentElement } from "../../chronograph-jsx/ElementReactivity.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
@@ -58,14 +58,23 @@ export class Dashboard extends Mixin(
                                         <div class="is-flex is-justify-content-center is-align-items-center" style="height:100%">
                                             <div style="text-align:center">
                                                 <div>No results yet for { this.currentTest.filename }</div>
-                                                <div>Double click the test to launch it</div>
+                                                <div>Double click a test to launch it</div>
                                             </div>
                                         </div>
                             :
-                                <div class="is-flex is-justify-content-center is-align-items-center" style="height:100%">
-                                    <div>No test selected</div>
-                                </div>
+                                this.noSelectionContent()
                     }
+                </div>
+            </div>
+        }
+
+
+        noSelectionContent () : ElementSource {
+            return <div class="s-dashboard-no-selection is-flex is-justify-content-center is-align-items-center" style="height:100%">
+                <div>
+                    <div>No test selected</div>
+                    <div>Click a test to select it</div>
+                    <div>Double click a test to launch it</div>
                 </div>
             </div>
         }

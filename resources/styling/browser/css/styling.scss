@@ -1,9 +1,10 @@
-@use '../terminal/styling.scss';
+@use '../../terminal/styling.scss';
 
-@use '../../../node_modules/bulma/bulma.sass';
+@use '../../../../node_modules/bulma/bulma.sass';
 
-@use '../../../src/siesta/ui/components/TreeComponent.scss';
-@use '../../../src/siesta/ui/ProjectPlanComponent.scss';
+@use '../../../../src/siesta/ui/components/TreeComponent.scss';
+@use '../../../../src/siesta/ui/ProjectPlanComponent.scss';
+@use '../../../../src/siesta/ui/Dashboard.scss';
 
 html {
     width: 100%;
