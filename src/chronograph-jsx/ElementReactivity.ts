@@ -133,12 +133,14 @@ export class ElementReactivity extends Mixin(
         }
 
 
-        getClassActivatorBoxes () : BoxUnbound<boolean>[] {
-            if (!this.classActivators) return []
+        $classActivatorBoxes : BoxUnbound<boolean>[]        = undefined
+
+        get classActivatorBoxes () : BoxUnbound<boolean>[] {
+            if (this.$classActivatorBoxes !== undefined) return this.$classActivatorBoxes
 
             const reactive : BoxUnbound<boolean>[]      = []
 
-            Object.entries(this.classActivators).forEach(([ prop, source ]) => {
+            Object.entries(this.classActivators || []).forEach(([ prop, source ]) => {
                 if (!isReactive(source)) {
                     setProperty(this.el, prop, source)
                 }
@@ -159,16 +161,18 @@ export class ElementReactivity extends Mixin(
                 }
             })
 
-            return reactive
+            return this.$classActivatorBoxes = reactive
         }
 
 
-        getStylePropertiesBoxes () : BoxUnbound<string>[] {
-            if (!this.styleProperties) return []
+        $stylePropertiesBoxes : BoxUnbound<string>[]        = undefined
+
+        get stylePropertiesBoxes () : BoxUnbound<string>[] {
+            if (this.$stylePropertiesBoxes !== undefined) return this.$stylePropertiesBoxes
 
             const reactive : BoxUnbound<string>[]      = []
 
-            Object.entries(this.styleProperties).forEach(([ prop, source ]) => {
+            Object.entries(this.styleProperties || []).forEach(([ prop, source ]) => {
                 if (!isReactive(source)) {
                     setProperty(this.el, prop, source)
                 }
@@ -189,7 +193,7 @@ export class ElementReactivity extends Mixin(
                 }
             })
 
-            return reactive
+            return this.$stylePropertiesBoxes = reactive
         }
 
 
@@ -198,22 +202,24 @@ export class ElementReactivity extends Mixin(
         get effect () : CalculableBox<Node[]> {
             if (this.$effect !== undefined) return this.$effect
 
-            let reactiveProperties : BoxUnbound<unknown>[]  = [
-                this.classAttributeBox,
-                this.styleAttributeBox,
-                ...this.getClassActivatorBoxes(),
-                ...this.getStylePropertiesBoxes()
-            ]
-
             this.$effect = CalculableBox.new<Node[]>({
+                // TODO
+                // should be lazy, only the top element's reactivity should be strict, reading from the children's
+                // reactivities
                 lazy        : false,
 
+                // TODO
                 // HACK, in theory should not trigger the `commitValueOptimisticHook` on the same value
                 // this is to avoid recalculating parent effects
                 equality    : () => true,
 
                 calculation : () => {
-                    reactiveProperties.forEach(box => box && box.read())
+                    [
+                        this.classAttributeBox,
+                        this.styleAttributeBox,
+                        ...this.classActivatorBoxes,
+                        ...this.stylePropertiesBoxes
+                    ].forEach(box => box && box.read())
 
                     if (this.reactiveChildren) {
                         const children  = resolveElementSource(this.reactiveChildren)
@@ -251,13 +257,17 @@ export class ElementReactivity extends Mixin(
 
             reactivity.adoptReactiveProperties(categorizedProperties)
 
+            categorizedProperties.otherProperties.forEach(
+                ([ propertyName, value ]) => setProperty(element, propertyName, value)
+            )
+
             if (normalizedChildren.hasReactivity) {
                 reactivity.reactiveChildren = normalizedChildren.normalized
             } else {
                 element.append(...normalizedChildren.normalized as Node[])
             }
 
-            // reactivity.effect
+            reactivity.effect
 
             return reactivity
         }
@@ -273,7 +283,15 @@ export interface ReactiveElement extends Element {
     reactivity?     : ElementReactivity
 }
 
+export interface ReactiveHTMLElement extends HTMLElement {
+    reactivity?     : ElementReactivity
+}
+
 export interface ComponentElement<C extends Component> extends ReactiveElement {
+    comp            : C
+}
+
+export interface ComponentHTMLElement<C extends Component> extends ReactiveHTMLElement {
     comp            : C
 }
 

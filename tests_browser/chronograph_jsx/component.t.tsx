@@ -1,5 +1,6 @@
 /** @jsx ChronoGraphJSX.createElement */
 
+import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { iit, it } from "../../browser.js"
@@ -19,9 +20,10 @@ it('Should re-render the minimal subtree', async t => {
         render () : ReactiveElement {
             return <div class="comp1">
                 {
-                    () => (counter1++, this.state1 >= 0
-                        ? <Comp2 state2={ 0 }></Comp2>
-                        : undefined)
+                    () => (
+                        counter1++,
+                        this.state1 >= 0 ? <Comp2 state2={ 0 }></Comp2> : undefined
+                    )
                 }
             </div>
         }
@@ -84,4 +86,43 @@ it('Should merge the `class` config', async t => {
     globalGraph.commit()
 
     t.is(comp1.el.className, 'comp1 extra')
+})
+
+
+it('Should merge the class activators', async t => {
+
+    class Comp1 extends Component {
+        @field()
+        clsClass        : boolean        = true
+
+        render () : ReactiveElement {
+            return <div class="comp1" class:cls={ this.$.clsClass }></div>
+        }
+    }
+
+    const boxCls    = Box.new(true)
+
+    // @ts-ignore
+    const comp1     = Comp1.new({ 'class:cls' : boxCls })
+
+    document.body.appendChild(comp1.el)
+
+    globalGraph.commit()
+
+    t.is(comp1.el.className, 'comp1 cls')
+
+    //---------------------
+    boxCls.write(false)
+
+    globalGraph.commit()
+
+    t.is(comp1.el.className, 'comp1', 'Activator from config should overwrite the inner activator')
+
+    //---------------------
+    boxCls.write(true)
+    comp1.clsClass  = false
+
+    globalGraph.commit()
+
+    t.is(comp1.el.className, 'comp1 cls', 'Activator from config should overwrite the inner activator #2')
 })

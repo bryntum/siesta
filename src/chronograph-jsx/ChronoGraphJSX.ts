@@ -279,9 +279,7 @@ export const resolveElementSource = (source : ElementSource, result : Node[] = [
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-export const querySelector = <C extends Component>(el : Element, selector : string) : ComponentElement<C> => {
-    return el.querySelector(selector)
-}
+export const querySelector = <C extends Component>(el : Element, selector : string) : ComponentElement<C> => el.querySelector(selector)
 
 //---------------------------------------------------------------------------------------------------------------------
 export namespace ChronoGraphJSX {

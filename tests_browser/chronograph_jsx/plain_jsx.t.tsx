@@ -1,87 +1,220 @@
 /** @jsx ChronoGraphJSX.createElement */
 
+import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
-import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
-import { iit, it } from "../../browser.js"
-import { ChronoGraphJSX, querySelector } from "../../src/chronograph-jsx/ChronoGraphJSX.js"
-import { Component } from "../../src/chronograph-jsx/Component.js"
-import { ReactiveElement } from "../../src/chronograph-jsx/ElementReactivity.js"
+import { it, iit } from "../../browser.js"
+import { ChronoGraphJSX } from "../../src/chronograph-jsx/ChronoGraphJSX.js"
+import { ReactiveHTMLElement } from "../../src/chronograph-jsx/ElementReactivity.js"
 
 ChronoGraphJSX
 
-it('Should re-render the minimal subtree', async t => {
-    let counter1 = 0
+it('Should render the plain JSX element', async t => {
+    const onclick   = t.createSpy()
 
-    class Comp1 extends Component {
-        @field()
-        state1          : number        = 0
+    const el        = <div id="some_id" class="cls" style="width: 100px" onclick={ onclick }></div> as HTMLElement
 
-        render () : ReactiveElement {
-            return <div class="comp1">
-                {
-                    () => (counter1++, this.state1 >= 0
-                        ? <Comp2 state2={ 0 }></Comp2>
-                        : undefined)
-                }
-            </div>
-        }
-    }
-
-    let counter2 = 0
-
-    class Comp2 extends Component {
-        props           : Component[ 'props' ] & { state2 : number }
-
-        @field()
-        state2          : number        = 0
-
-        render () : ReactiveElement {
-            return <div class="comp2">{ () => (counter2++, this.state2) }</div>
-        }
-    }
-
-    const comp1     = Comp1.new()
-
-    document.body.appendChild(comp1.el)
+    document.body.appendChild(el)
 
     globalGraph.commit()
 
-    const comp2     = querySelector<Comp2>(comp1.el, '.comp2').comp
+    t.is(el.id, 'some_id')
+    t.is(el.className, 'cls')
+    t.is(el.style.width, '100px')
 
-    t.is(counter1, 1)
-    t.is(counter2, 1)
+    el.click()
 
-    //------------
-    comp2.state2    = 1
-
-    globalGraph.commit()
-
-    t.is(counter1, 1)
-    t.is(counter2, 2)
+    t.expect(onclick).toHaveBeenCalled(1)
 })
 
 
-it('Should merge the `class` config', async t => {
-    let counter1 = 0
+it('Should render the reactive JSX element', async t => {
+    let boxCounter      = 0
+    let styleCounter    = 0
 
-    class Comp1 extends Component {
-        @field()
-        state1          : number        = 0
+    const boxCls    = Box.new('cls')
+    const boxWidth  = Box.new(10)
 
-        render () : ReactiveElement {
-            return <div class="comp1">
-                {
-                    () => this.state1
-                }
-            </div>
-        }
-    }
+    const el        = <div class={ () => (boxCounter++, boxCls.read()) } style={ () => (styleCounter++, `width: ${ boxWidth.read() }px`) }></div> as ReactiveHTMLElement
 
-    const comp1     = Comp1.new({ class : "extra" })
-
-    document.body.appendChild(comp1.el)
+    document.body.appendChild(el)
 
     globalGraph.commit()
 
-    t.is(comp1.el.className, 'comp1 extra')
+    t.is(el.className, 'cls')
+    t.is(el.style.width, '10px')
+
+    t.is(boxCounter, 1)
+    t.is(styleCounter, 1)
+
+    //-------------------
+    boxCls.write('cls2')
+
+    globalGraph.commit()
+
+    t.is(el.className, 'cls2')
+    t.is(el.style.width, '10px')
+
+    t.is(boxCounter, 2)
+    t.is(styleCounter, 1)
+
+    //-------------------
+    boxWidth.write(100)
+
+    globalGraph.commit()
+
+    t.is(el.className, 'cls2')
+    t.is(el.style.width, '100px')
+
+    t.is(boxCounter, 2)
+    t.is(styleCounter, 2)
+})
+
+
+it('Should render the plain JSX element with reactive children correctly', async t => {
+    let boxCounter      = 0
+    let styleCounter    = 0
+
+    const boxCls    = Box.new('cls')
+    const boxWidth  = Box.new(10)
+
+    const wrapper   = <div>
+        <div>
+            <div id="nested_reactive" class={ () => (boxCounter++, boxCls.read()) } style={ () => (styleCounter++, `width: ${ boxWidth.read() }px`) }></div>
+        </div>
+    </div>
+
+    document.body.appendChild(wrapper)
+
+    const el        = document.getElementById("nested_reactive")
+
+    globalGraph.commit()
+
+    t.is(el.className, 'cls')
+    t.is(el.style.width, '10px')
+
+    t.is(boxCounter, 1)
+    t.is(styleCounter, 1)
+
+    //-------------------
+    boxCls.write('cls2')
+
+    globalGraph.commit()
+
+    t.is(el.className, 'cls2')
+    t.is(el.style.width, '10px')
+
+    t.is(boxCounter, 2)
+    t.is(styleCounter, 1)
+
+    //-------------------
+    boxWidth.write(100)
+
+    globalGraph.commit()
+
+    t.is(el.className, 'cls2')
+    t.is(el.style.width, '100px')
+
+    t.is(boxCounter, 2)
+    t.is(styleCounter, 2)
+})
+
+
+it('Should support the reactive class activators', async t => {
+    const boxCls    = Box.new(true)
+
+    const el   = <div class="static_cls" class:cls={ boxCls }></div>
+
+    document.body.appendChild(el)
+
+    globalGraph.commit()
+
+    t.is(el.className, 'static_cls cls')
+
+    //-------------------
+    boxCls.write(false)
+
+    globalGraph.commit()
+
+    t.is(el.className, 'static_cls')
+})
+
+
+it('Should correctly merge reactive class property and reactive class activators', async t => {
+    const classAttributeBox = Box.new('cls')
+    const activatorBoxCls   = Box.new(true)
+
+    const el   = <div class={ classAttributeBox } class:cls={ activatorBoxCls }></div>
+
+    document.body.appendChild(el)
+
+    globalGraph.commit()
+
+    t.is(el.className, 'cls')
+
+    //-------------------
+    activatorBoxCls.write(false)
+
+    globalGraph.commit()
+
+    t.is(el.className, '')
+
+    //-------------------
+    classAttributeBox.write('cls new')
+
+    globalGraph.commit()
+
+    t.is(el.className, 'new')
+})
+
+
+it('Should support the reactive individual style properties', async t => {
+    const boxWidth  = Box.new('10px')
+
+    const el        = <div style="height: 10px" style:width={ boxWidth }></div> as ReactiveHTMLElement
+
+    document.body.appendChild(el)
+
+    globalGraph.commit()
+
+    t.is(el.style.width, '10px')
+    t.is(el.style.height, '10px')
+
+    //-------------------
+    boxWidth.write('100px')
+
+    globalGraph.commit()
+
+    t.is(el.style.width, '100px')
+    t.is(el.style.height, '10px')
+})
+
+
+it('Should correctly merge reactive style property and reactive individual style properties', async t => {
+    const styleAttributeBox     = Box.new('height: 10px')
+    const widthPropertyBox      = Box.new('10px')
+
+    const el        = <div style={ styleAttributeBox } style:width={ widthPropertyBox }></div> as ReactiveHTMLElement
+
+    document.body.appendChild(el)
+
+    globalGraph.commit()
+
+    t.is(el.style.width, '10px')
+    t.is(el.style.height, '10px')
+
+    //-------------------
+    styleAttributeBox.write('height: 100px')
+
+    globalGraph.commit()
+
+    t.is(el.style.width, '10px')
+    t.is(el.style.height, '100px')
+
+    //-------------------
+    styleAttributeBox.write('width: 1px')
+
+    globalGraph.commit()
+
+    t.is(el.style.width, '10px', 'Individual style property overwrites the "style" attribute')
+    t.is(el.style.height, '')
 })
