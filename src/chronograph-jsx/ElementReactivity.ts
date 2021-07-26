@@ -225,6 +225,7 @@ export class ElementReactivity extends Mixin(
                         const children  = resolveElementSource(this.reactiveChildren)
 
                         children.forEach((childNode : ReactiveNode) => {
+                            // TODO this should be done "deep"
                             if (childNode.reactivity) childNode.reactivity.effect.read()
                         })
 

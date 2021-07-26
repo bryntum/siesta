@@ -1,8 +1,8 @@
 import { BoxUnbound } from '@bryntum/chronograph/src/chrono2/data/Box.js'
-import { CalculableBox } from "@bryntum/chronograph/src/chrono2/data/CalculableBox.js"
+import { XmlElement } from "../jsx/XmlElement.js"
 import { isArray, isFunction, isNumber, isString, isSyncFunction } from "../util/Typeguards.js"
-import { ComponentElement, ElementReactivity, ReactiveElement, ReactiveNode } from "./ElementReactivity.js"
 import { Component } from "./Component.js"
+import { ComponentElement, ElementReactivity, ReactiveElement, ReactiveNode } from "./ElementReactivity.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type Listener = (event : Event) => any
@@ -201,6 +201,7 @@ export const applyStaticChildren = (element : Element, children : ReactiveNode[]
 
 //---------------------------------------------------------------------------------------------------------------------
 export type ElementSource =
+    | XmlElement
     | Node
     | string
     | number
@@ -245,8 +246,13 @@ export const normalizeElementSource = (
 
         result.hasReactivity = true
     }
+    else if (source instanceof XmlElement) {
+        normalized.push(convertXmlElement(source))
+    }
     else {
         const check : never = source
+
+        throw new Error("Unknown JSX element source")
     }
 
     return result
@@ -268,6 +274,9 @@ export const resolveElementSource = (source : ElementSource, result : Node[] = [
     else if (isArray(source)) {
         source.forEach(source => resolveElementSource(source, result))
     }
+    else if (source instanceof XmlElement) {
+        result.push(convertXmlElement(source))
+    }
     else if (isSyncFunction(source)) {
         resolveElementSource(source(), result)
     }
@@ -276,6 +285,21 @@ export const resolveElementSource = (source : ElementSource, result : Node[] = [
     }
 
     return result
+}
+
+
+export const convertXmlElement = (source : XmlElement) : Element => {
+    const el        = document.createElement(source.tagName)
+
+    Object.entries(source.$attributes || {}).forEach(
+        ([ key, value ]) => setProperty(el, key, value)
+    )
+
+    el.append(...Array.from(source.childNodes).map(childNode =>
+        isString(childNode) ? document.createTextNode(childNode) : convertXmlElement(childNode)
+    ))
+
+    return el
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -323,6 +347,9 @@ export namespace ChronoGraphJSX {
             const component     = tagName.new(Object.assign({}, attributes, { children }))
 
             return component.el
+        }
+        else {
+            throw new Error("Unknown JSX source")
         }
     }
 }

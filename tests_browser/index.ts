@@ -1,4 +1,4 @@
-import { Project } from "../index.js"
+import { Project } from "../browser.js"
 
 const project = Project.new({
     title                   : 'Siesta 6 browser test suite',
@@ -12,7 +12,8 @@ project.plan(
 
         items       : [
             'plain_jsx.t.js',
-            'component.t.js'
+            'component.t.js',
+            'test.t.js'
         ]
     }
 )

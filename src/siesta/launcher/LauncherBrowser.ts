@@ -1,4 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { EnvironmentType } from "../common/Environment.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderBrowserIframe } from "../context/context_provider/ContextProviderBrowserIframe.js"
 import { ProjectDescriptorBrowser } from "../project/ProjectDescriptor.js"
@@ -49,6 +50,26 @@ export class LauncherBrowser extends Mixin(
 
         onUnknownError (e : unknown) {
             throw e
+        }
+
+
+        async setup () {
+            this.styles         = (await import(`../reporter/styling/theme_universal.js`)).styles
+
+            await super.setup()
+        }
+
+
+        getSuitableContextProviders (environment : EnvironmentType) : ContextProvider[] {
+            if (environment === 'browser')
+                return this.contextProviders
+            else if (environment === 'nodejs')
+                return []
+            else if (environment === 'deno')
+                return []
+            else
+                // for isomorphic code any provider is ok
+                return this.contextProviders
         }
     }
 ) {}

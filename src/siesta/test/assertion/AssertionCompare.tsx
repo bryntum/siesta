@@ -697,7 +697,7 @@ export class GotExpectTemplate extends AnnotationTemplate {
 
 
     toXmlElement () : XmlElement {
-        return <div class="indented got_expected">
+        return <div class="got_expected">
             { this.description || false }
             {
                 this.hasOwnProperty('got') && <div class='got'>

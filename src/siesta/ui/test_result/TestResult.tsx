@@ -1,8 +1,8 @@
 /** @jsx ChronoGraphJSX.createElement */
 
-import { ReactiveArray } from "@bryntum/chronograph/src/chrono2/data/Array"
+import { ReactiveArray } from "@bryntum/chronograph/src/chrono2/data/Array.js"
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
-import { entity } from "@bryntum/chronograph/src/schema2/Schema"
+import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { ChronoGraphJSX, ElementSource, PropertySource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
 import { ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
@@ -48,7 +48,7 @@ export class TestNodeResultComponent extends Mixin(
                             :
                                 (result instanceof Assertion)
                                     ?
-                                        <AssertionComponent testNode={ testNode } assertion={ result }></AssertionComponent>
+                                        <AssertionComponent dispatcher={ this.dispatcher } testNode={ testNode } assertion={ result }></AssertionComponent>
                                     :
                                     (result instanceof LogMessage)
                                         ?
@@ -91,10 +91,13 @@ export class AssertionComponent extends Mixin(
         props           : Component[ 'props' ] & {
             testNode        : TestNodeResultReactive
             assertion       : Assertion
+            dispatcher      : Dispatcher
         }
 
         assertion       : Assertion                 = undefined
         testNode        : TestNodeResultReactive    = undefined
+
+        dispatcher      : Dispatcher                = undefined
 
 
         render () : Element {
@@ -116,7 +119,11 @@ export class AssertionComponent extends Mixin(
                 <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
                 { assertion.sourcePoint && !shouldShowSourceContext ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
                 {/*{ !passed && canShowSourceContext && shouldShowSourceContext ? this.sourcePointTemplate(assertion.sourcePoint, sources) : false }*/}
-                {/*{ passed ? false : assertion.annotation }*/}
+                {
+                    !passed && assertion.annotation
+                        ? <pre class='assertion_annotation'>{ this.dispatcher.launcher.render(assertion.annotation) }</pre>
+                        : null
+                }
             </div>
         }
     }

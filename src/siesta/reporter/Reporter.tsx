@@ -90,7 +90,7 @@ export class Reporter extends Mixin(
 
         testNodeHasLogMessagesAboveTheLogLevel (testNode : TestNodeResult, level : LogLevel) : boolean {
             return CI(testNode.eachResultLeafOfClass(LogMessage))
-                .filter(logMessage => logMessage.level >= this.launcher.logLevel)
+                .filter(logMessage => logMessage.level >= level)
                 .take(1)
                 .length > 0
         }
