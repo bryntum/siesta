@@ -3,6 +3,7 @@
     overflow-y: auto;
     white-space: nowrap;
     text-overflow: ellipsis;
+    position: relative;
 }
 
 
@@ -13,5 +14,18 @@
 
 
 .project-plan-test:hover {
-    color:  red;
+    color: red;
+}
+
+.project-plan-test.is-selected::before {
+    background-color: #00b89c;
+    content: '\00a0';
+
+    display: block;
+    position: absolute;
+    z-index: -1;
+
+    width: 100%;
+    left: 0;
+    pointer-events: none;
 }

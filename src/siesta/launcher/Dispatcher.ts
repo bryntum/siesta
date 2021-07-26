@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
 import { stringify } from "../../serializable/Serializable.js"
-import { luid, LUID } from "../common/LUID.js"
+import { LUID } from "../common/LUID.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
@@ -16,7 +16,7 @@ import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { Exception, TestNodeResultReactive } from "../test/TestResult.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 import { Queue } from "./Queue.js"
-import { TestLaunchInfo } from "./TestLaunchInfo.js"
+import { TestGroupLaunchInfo, TestLaunchInfo } from "./TestLaunchInfo.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -34,6 +34,9 @@ export class Dispatcher extends Mixin(
             presence    : Set<TestDescriptor>
         }                                                       = { order : [], presence : new Set() }
 
+        projectPlanLaunchInfo       : TestGroupLaunchInfo       = undefined
+
+        resultsGroups               : Map<TestDescriptor, TestGroupLaunchInfo>   = new Map()
         results                     : Map<TestDescriptor, TestLaunchInfo>   = new Map()
         localRemoteDescMap          : Map<LUID, TestDescriptor> = new Map()
 
@@ -74,14 +77,10 @@ export class Dispatcher extends Mixin(
                 queue.pull()
             })
 
-            this.launcher.projectData.projectPlan.leavesAxis().forEach(
-                descriptor => {
-                    descriptor.remoteId     = luid()
-
-                    this.localRemoteDescMap.set(descriptor.remoteId, descriptor)
-                    this.results.set(descriptor, TestLaunchInfo.new({ descriptor }))
-                }
-            )
+            this.projectPlanLaunchInfo  = TestGroupLaunchInfo.new({
+                descriptor  : this.launcher.projectData.projectPlan,
+                dispatcher  : this
+            })
         }
 
 
@@ -119,6 +118,8 @@ export class Dispatcher extends Mixin(
 
             if (pendingQueue.presence.has(desc)) return
 
+            this.results.get(desc).launchState      = 'pending'
+
             pendingQueue.order.push(desc)
             pendingQueue.presence.add(desc)
 
@@ -153,6 +154,10 @@ export class Dispatcher extends Mixin(
 
             this.beforeTestLaunch(normalized)
 
+            const launchInfo        = this.results.get(item)
+
+            launchInfo.launchState  = 'started'
+
             const context           = await this.contextProviders[ 0 ].createContext()
 
             let preLaunchRes : boolean
@@ -169,6 +174,8 @@ export class Dispatcher extends Mixin(
                 testNode.addResult(Exception.new({ exception : e }))
                 this.reporter.onSubTestFinish(testNode)
 
+                launchInfo.launchState  = 'completed'
+
                 await context.destroy()
 
                 return
@@ -182,12 +189,14 @@ export class Dispatcher extends Mixin(
                 this.reporter.onSubTestStart(testNode)
                 this.reporter.onSubTestFinish(testNode)
 
+                launchInfo.launchState  = 'completed'
+
                 await context.destroy()
 
                 return
             }
 
-            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
+            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter, launchInfo })
 
             try {
                 await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
@@ -195,6 +204,8 @@ export class Dispatcher extends Mixin(
                 this.logger.debug("Channel ready for: ", normalized.url)
 
                 await testLauncher.launchTest(stringifiedDesc)
+
+                launchInfo.launchState  = 'completed'
             } finally {
                 await testLauncher.disconnect()
                 await context.destroy()

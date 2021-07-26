@@ -2,6 +2,7 @@ import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { XmlElement } from "../../../jsx/XmlElement.js"
 import { local, Port, remote } from "../../../rpc/port/Port.js"
 import { LUID } from "../../common/LUID.js"
+import { TestLaunchInfo } from "../../launcher/TestLaunchInfo.js"
 import { Reporter } from "../../reporter/Reporter.js"
 import { AssertionWaitFor } from "../assertion/AssertionAsync.js"
 import { TestDescriptor } from "../TestDescriptor.js"
@@ -51,6 +52,8 @@ export class TestReporterParent extends Mixin(
 
             currentTestNodeResult       : TestNodeResultReactive    = undefined
 
+            launchInfo                  : TestLaunchInfo            = undefined
+
 
             @local()
             async onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) {
@@ -77,12 +80,10 @@ export class TestReporterParent extends Mixin(
                         state           : 'running',
                     })
 
-                    this.currentTestNodeResult  = this.rootTestNodeResult = newNode
+                    this.currentTestNodeResult          = this.rootTestNodeResult = newNode
 
-                    // // feels a bit ugly
-                    const dispatcher        = this.reporter.launcher.dispatcher
-                    const localDescriptor   = dispatcher.localRemoteDescMap.get(descriptor.remoteId)
-                    dispatcher.results.get(localDescriptor).mostRecentResult = newNode
+                    this.launchInfo.mostRecentResult    = newNode
+                    this.launchInfo.launchState         = 'running'
                 }
 
                 this.reporter.onSubTestStart(this.currentTestNodeResult)

@@ -2,11 +2,13 @@ import { ReactiveArray } from "@bryntum/chronograph/src/chrono2/data/Array.js"
 import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
 import { FieldBox } from "@bryntum/chronograph/src/replica2/Atom.js"
 import { calculate, Entity, field } from "@bryntum/chronograph/src/replica2/Entity.js"
+import { Replica } from "@bryntum/chronograph/src/replica2/Replica.js"
 import { Field } from "@bryntum/chronograph/src/schema2/Field.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { OutputType } from "../../context/ExecutionContext.js"
+import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
@@ -380,12 +382,12 @@ export class TestNodeResultReactive extends Mixin(
         calculatePassed () : boolean {
             let passed      = true
 
-            this.resultLogReactive.readValues().forEach(result => {
-                if ((result instanceof Exception) && !this.isTodo) passed = false
+            CI(this.resultLogReactive.readValues()).forEach(result => {
+                if ((result instanceof Exception) && !this.isTodo) { passed = false; return false }
 
-                if ((result instanceof Assertion) && !result.passed && !this.isTodo) passed = false
+                if ((result instanceof Assertion) && !result.passed && !this.isTodo) { passed = false; return false }
 
-                if ((result instanceof TestNodeResult) && !result.passed && !this.isTodo) passed = false
+                if ((result instanceof TestNodeResult) && !result.passed && !this.isTodo) { passed = false; return false }
             })
 
             return passed
@@ -403,7 +405,7 @@ export class TestNodeResultReactive extends Mixin(
         override initialize (...args : unknown[]) {
             super.initialize(...args)
 
-            globalGraph.addAtoms([ this.$.resultLog, this.$.passed ])
+            this.enterGraph(globalGraph as Replica)
         }
 
 

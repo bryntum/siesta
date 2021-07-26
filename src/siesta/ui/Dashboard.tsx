@@ -1,5 +1,6 @@
 /** @jsx ChronoGraphJSX.createElement */
 
+import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { ChronoGraphJSX, ElementSource } from "../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../chronograph-jsx/Component.js"
@@ -43,7 +44,13 @@ export class Dashboard extends Mixin(
                 ondblclick  = { e => this.onDoubleClick(e) }
                 class       = "is-flex is-align-items-stretch" style="height: 100%;"
             >
-                <ProjectPlanComponent style="width: 300px" projectData={ this.launcher.projectData }></ProjectPlanComponent>
+                <ProjectPlanComponent
+                    dispatcher      = { this.launcher.dispatcher }
+                    selectedTestBox = { this.$.currentTest as Box<TestDescriptor> }
+                    style           = "width: 300px"
+                    projectData     = { this.launcher.projectData }
+                >
+                </ProjectPlanComponent>
                 <div style="flex: 1; overflow-y: auto">
                     {
                         () => this.currentTest
@@ -108,8 +115,6 @@ export class Dashboard extends Mixin(
             const desc      = this.getTestDescriptorComponentFromMouseEvent(e)
 
             if (desc) {
-                if (desc.isLeaf()) this.currentTest    = desc
-
                 this.launcher.launchContinuously(desc.leavesAxis())
             }
         }

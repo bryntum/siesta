@@ -17,6 +17,7 @@ export class TreeComponent extends Mixin(
             state?          : TreeComponent[ 'state' ]
             iconCls?        : TreeComponent[ 'iconCls' ]
             collapsible?    : TreeComponent[ 'collapsible' ]
+            iconClsSource?  : TreeComponent[ 'iconClsSource' ]
         }
 
         @field()
@@ -27,6 +28,8 @@ export class TreeComponent extends Mixin(
 
         @field()
         iconCls         : [ string, string ]            = undefined
+
+        iconClsSource   : () => [ string, string ]      = undefined
 
 
         toggle () {
@@ -40,19 +43,23 @@ export class TreeComponent extends Mixin(
                     () => this.collapsible
                         ?
                             <span onclick={ () => this.toggle() } class="icon">
-                                <i class={ () => this.state === 'expanded' ? 'fas fa-angle-down' : 'fas fa-angle-right' }></i>
+                                <i class={ () => this.state === 'expanded' ? 'fas fa-caret-down' : 'fas fa-caret-right' }></i>
                             </span>
                         :
                             null
                 }
                 {
-                    () => this.iconCls
-                        ?
-                            <span class="icon">
-                                <i class={ () => this.state === 'expanded' ? this.iconCls[ 0 ] : this.iconCls[ 1 ] }></i>
-                            </span>
-                        :
-                            null
+                    () => {
+                        const iconCls   = this.iconClsSource?.() || this.iconCls
+
+                        return iconCls
+                            ?
+                                <span class="icon">
+                                    <i class={ () => this.state === 'expanded' ? iconCls[ 0 ] : iconCls[ 1 ] }></i>
+                                </span>
+                            :
+                                null
+                    }
                 }
                 { () => this.state === 'expanded' ? this.children : this.children[ 0 ] }
             </tree>
