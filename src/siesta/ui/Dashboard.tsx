@@ -82,6 +82,7 @@ export class Dashboard extends Mixin(
                     <div>No test selected</div>
                     <div>Click a test to select it</div>
                     <div>Double click a test to launch it</div>
+                    <div>Double click a folder to launch all tests in it</div>
                 </div>
             </div>
         }
@@ -92,6 +93,7 @@ export class Dashboard extends Mixin(
                 <div style="text-align:center">
                     <div>No results yet for { this.currentTest.filename }</div>
                     <div>Double click a test to launch it</div>
+                    <div>Double click a folder to launch all tests in it</div>
                 </div>
             </div>
         }
