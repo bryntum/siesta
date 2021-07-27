@@ -10,9 +10,9 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { awaitDomReady } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
+import { Splitter } from "./components/Splitter.js"
 import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComponent.js"
 import { TestNodeResultComponent } from "./test_result/TestResult.js"
-
 
 ChronoGraphJSX
 
@@ -47,10 +47,11 @@ export class Dashboard extends Mixin(
                 <ProjectPlanComponent
                     dispatcher      = { this.launcher.dispatcher }
                     selectedTestBox = { this.$.currentTest as Box<TestDescriptor> }
-                    style           = "width: 300px"
+                    style           = "min-width: 100px; width: 300px"
                     projectData     = { this.launcher.projectData }
                 >
                 </ProjectPlanComponent>
+                <Splitter mode="horizontal" style="width: 8px"></Splitter>
                 <div style="flex: 1; overflow-y: auto">
                     {
                         () => {
