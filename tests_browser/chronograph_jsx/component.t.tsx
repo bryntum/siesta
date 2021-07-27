@@ -64,18 +64,9 @@ it('Should re-render the minimal subtree', async t => {
 
 
 it('Should merge the `class` config', async t => {
-    let counter1 = 0
-
     class Comp1 extends Component {
-        @field()
-        state1          : number        = 0
-
         render () : ReactiveElement {
-            return <div class="comp1">
-                {
-                    () => this.state1
-                }
-            </div>
+            return <div class="comp1"></div>
         }
     }
 
@@ -86,6 +77,23 @@ it('Should merge the `class` config', async t => {
     globalGraph.commit()
 
     t.is(comp1.el.className, 'comp1 extra')
+})
+
+
+it('Should merge the `class` config #2', async t => {
+    class Comp1 extends Component {
+        render () : ReactiveElement {
+            return <div class="comp1"></div>
+        }
+    }
+
+    document.body.appendChild(<div id="class_merge_2">
+        <Comp1 class="extra"></Comp1>
+    </div>)
+
+    globalGraph.commit()
+
+    t.is(document.getElementById('class_merge_2').firstElementChild.className, 'comp1 extra')
 })
 
 

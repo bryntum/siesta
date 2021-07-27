@@ -45,9 +45,14 @@ export class Component extends Mixin(
 
             reactivity.adoptReactiveProperties(categorizedProperties)
 
-            if (plainElement)
-                reactivity.$effect      = super.effect
-            else
+            if (plainElement) {
+                const existingClasses   = Array.from(el.classList)
+                existingClasses.reverse()
+
+                existingClasses.forEach(cls => reactivity.addClassAttributeSource(cls, true))
+
+                reactivity.$effect = super.effect
+            } else
                 reactivity.effect
 
             // @ts-ignore
