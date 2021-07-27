@@ -87,7 +87,7 @@ export class TestDescriptorComponent extends Component {
                     () => {
                         switch (launchInfo.viewState) {
                             case 'noinfo':
-                                return <span class="icon"><i class='far fa-clipboard'></i></span>
+                                return <span class="icon"><i class='far fa-file'></i></span>
                             case 'pending':
                                 return <span class="icon"><i class='far fa-hourglass'></i></span>
                             case 'started':

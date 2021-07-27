@@ -320,47 +320,9 @@ export class Reporter extends Mixin(
                 <span class="assertion_name">{ assertion.name }</span>
                 <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
                 { assertion.sourcePoint && !shouldShowSourceContext ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
-                { !passed && canShowSourceContext && shouldShowSourceContext ? this.sourcePointTemplate(assertion.sourcePoint, sources) : false }
+                { !passed && canShowSourceContext && shouldShowSourceContext ? [ <div></div>, sourcePointTemplate(assertion.sourcePoint, sources, this.sourceContext) ] : false }
                 { passed ? false : assertion.annotation }
             </div>
-        }
-
-
-        lineNumberTemplate (isHighlighted : boolean, line : string) : XmlElement {
-            return <span>
-                <span class="primary_fail">{ isHighlighted ? '➤' : ' ' }</span>
-                <span class={ isHighlighted ? 'accented' : 'gray' }> { line } | </span>
-            </span>
-        }
-
-
-        sourcePointTemplate ({ line, char } : SourcePoint, sources : string[]) : XmlElement {
-            const template              = <div class="source_point"><div></div></div>
-
-            const firstToShow           = Math.max(1, Math.round(line - this.sourceContext / 2))
-            const lastToShow            = Math.min(sources.length, Math.round(line + this.sourceContext / 2))
-
-            const lastToShowLen         = String(lastToShow).length
-
-            for (let i = firstToShow; i < lastToShow; i++) {
-                const isHighlighted     = i === line
-                const lineStr           = String(i)
-                const lenDelta          = lastToShowLen - lineStr.length
-
-                template.appendChild(<div>
-                    { this.lineNumberTemplate(isHighlighted, ' '.repeat(lenDelta) + lineStr) }
-                    <span class={ isHighlighted ? "accented" : "gray" }>{ sources[ i - 1 ] }</span>
-                </div>)
-
-                if (isHighlighted) template.appendChild(<div>
-                    <span class="gray"> { ' '.repeat(lastToShowLen + 1) } | </span>
-                    <span class="primary_fail">{ ' '.repeat(char - 1) + '^' }</span>
-                </div>)
-            }
-
-            template.appendChild(<div></div>)
-
-            return template
         }
 
 
@@ -448,3 +410,45 @@ export const humanReadableDuration = (milliSeconds : number) : string => {
         return `${ milliSeconds }ms`
     }
 }
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const lineNumberTemplate = (isHighlighted : boolean, line : string) : XmlElement => {
+    return <span>
+        <span class="primary_fail">{ isHighlighted ? '➤' : ' ' }</span>
+        <span class={ isHighlighted ? 'accented' : 'gray' }> { line } | </span>
+    </span>
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const sourcePointTemplate = ({ line, char } : SourcePoint, sources : string[], sourceContext : number) : XmlElement => {
+    const template              = <div class="source_point"></div>
+
+    const firstToShow           = Math.max(1, Math.round(line - sourceContext / 2))
+    const lastToShow            = Math.min(sources.length, Math.round(line + sourceContext / 2))
+
+    const lastToShowLen         = String(lastToShow).length
+
+    for (let i = firstToShow; i < lastToShow; i++) {
+        const isHighlighted     = i === line
+        const lineStr           = String(i)
+        const lenDelta          = lastToShowLen - lineStr.length
+
+        template.appendChild(<div>
+            { lineNumberTemplate(isHighlighted, ' '.repeat(lenDelta) + lineStr) }
+            <span class={ isHighlighted ? "accented" : "gray" }>{ sources[ i - 1 ] }</span>
+        </div>)
+
+        if (isHighlighted) template.appendChild(<div>
+            <span class="gray"> { ' '.repeat(lastToShowLen + 1) } | </span>
+            <span class="primary_fail">{ ' '.repeat(char - 1) + '^' }</span>
+        </div>)
+    }
+
+    template.appendChild(<div></div>)
+
+    return template
+}
+
+

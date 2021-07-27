@@ -101,6 +101,11 @@ export class Dispatcher extends Mixin(
         }
 
 
+        getTestLaunchInfo (desc : TestDescriptor) : TestLaunchInfo {
+            return this.results.get(desc)
+        }
+
+
         isCompleted () : boolean {
             return this.pendingQueue.order.length === 0 && this.runningQueue.isEmpty
         }
@@ -118,7 +123,7 @@ export class Dispatcher extends Mixin(
 
             if (pendingQueue.presence.has(desc)) return
 
-            this.results.get(desc).launchState      = 'pending'
+            this.getTestLaunchInfo(desc).schedulePendingTestLaunch()
 
             pendingQueue.order.push(desc)
             pendingQueue.presence.add(desc)

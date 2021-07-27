@@ -41,6 +41,11 @@ export class TestLaunchInfo extends Mixin(
         @field()
         launchState         : LaunchState               = 'noinfo'
 
+        @field()
+        testSources         : string[]                  = undefined
+
+        testSourcesLoading  : boolean                   = false
+
 
         initialize (props? : Partial<TestLaunchInfo>) {
             super.initialize(props)
@@ -53,6 +58,20 @@ export class TestLaunchInfo extends Mixin(
 
             this.dispatcher.results.set(descriptor, this)
             this.dispatcher.localRemoteDescMap.set(descriptor.remoteId, descriptor)
+        }
+
+
+        async schedulePendingTestLaunch () {
+            this.launchState        = 'pending'
+
+            if (!this.testSourcesLoading) {
+                this.testSourcesLoading = true
+
+                try {
+                    this.testSources    = await this.dispatcher.reporter.fetchSources(this.descriptor.urlAbs)
+                } catch (e) {
+                }
+            }
         }
 
 

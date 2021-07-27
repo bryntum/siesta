@@ -10,7 +10,9 @@ import { TextJSX } from "../../../jsx/TextJSX.js"
 import { LogLevel } from "../../../logger/Logger.js"
 import { relative } from "../../../util/Path.js"
 import { Dispatcher } from "../../launcher/Dispatcher.js"
+import { TestLaunchInfo } from "../../launcher/TestLaunchInfo.js"
 import { ProjectSerializableData } from "../../project/ProjectDescriptor.js"
+import { sourcePointTemplate } from "../../reporter/Reporter.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { Assertion, Exception, LogMessage, TestNodeResult, TestNodeResultReactive, TestResult } from "../../test/TestResult.js"
 import { TreeComponent } from "../components/TreeComponent.js"
@@ -27,8 +29,10 @@ export class TestNodeResultComponent extends Mixin(
         props       : Component[ 'props' ] & {
             testNode        : PropertySource<TestNodeResultReactive>
             dispatcher      : Dispatcher
+            launchInfo      : TestLaunchInfo
         }
 
+        launchInfo  : TestLaunchInfo                = undefined
         testNode    : TestNodeResultReactive        = undefined
         dispatcher  : Dispatcher                    = undefined
 
@@ -44,11 +48,11 @@ export class TestNodeResultComponent extends Mixin(
                     <leaf>{
                         (result instanceof TestNodeResultReactive)
                             ?
-                                <Self dispatcher={ this.dispatcher } testNode={ result }></Self>
+                                <Self dispatcher={ this.dispatcher } launchInfo={ this.launchInfo } testNode={ result }></Self>
                             :
                                 (result instanceof Assertion)
                                     ?
-                                        <AssertionComponent dispatcher={ this.dispatcher } testNode={ testNode } assertion={ result }></AssertionComponent>
+                                        <AssertionComponent dispatcher={ this.dispatcher } launchInfo={ this.launchInfo } testNode={ testNode } assertion={ result }></AssertionComponent>
                                     :
                                     (result instanceof LogMessage)
                                         ?
@@ -92,17 +96,19 @@ export class AssertionComponent extends Mixin(
             testNode        : TestNodeResultReactive
             assertion       : Assertion
             dispatcher      : Dispatcher
+            launchInfo      : TestLaunchInfo
         }
 
         assertion       : Assertion                 = undefined
         testNode        : TestNodeResultReactive    = undefined
-
         dispatcher      : Dispatcher                = undefined
+        launchInfo      : TestLaunchInfo            = undefined
 
 
         render () : Element {
-            const testNode  = this.testNode
-            const assertion = this.assertion
+            const testNode      = this.testNode
+            const assertion     = this.assertion
+            const launcher      = this.dispatcher.launcher
 
             const cls   = testNode.isTodo ?
                 assertion.passed ? 'assertion_icon_pass_todo' : 'assertion_icon_pass'
@@ -110,18 +116,29 @@ export class AssertionComponent extends Mixin(
                 assertion.passed ? 'assertion_icon_pass' : 'assertion_icon_fail'
 
             const passed                    = assertion.passed || testNode.isTodo
-            const canShowSourceContext      = false//sources && assertion.sourcePoint
-            const shouldShowSourceContext   = false//this.sourceContext > 0
+            const canShowSourceContext      = assertion.sourcePoint
+
+            const sourceContext             = launcher.sourceContext
+            const shouldShowSourceContext   = sourceContext > 0
 
             return <div class="assertion">
                 <span class={`assertion_icon ${ cls }`}>{ assertion.passed ? '✔' : '✘' }</span>{ ' ' }
                 <span class="assertion_name">{ assertion.name }</span>
                 <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
                 { assertion.sourcePoint && !shouldShowSourceContext ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
-                {/*{ !passed && canShowSourceContext && shouldShowSourceContext ? this.sourcePointTemplate(assertion.sourcePoint, sources) : false }*/}
+                {
+                    () => !passed && canShowSourceContext && this.launchInfo.testSources && shouldShowSourceContext
+                        ?
+                            <pre class='assertion_annotation'>
+                                { launcher.render(sourcePointTemplate(assertion.sourcePoint, this.launchInfo.testSources, sourceContext)) }
+                            </pre>
+                        :
+                            // sources loading spinner
+                            null
+                }
                 {
                     !passed && assertion.annotation
-                        ? <pre class='assertion_annotation'>{ this.dispatcher.launcher.render(assertion.annotation) }</pre>
+                        ? <pre class='assertion_annotation'>{ launcher.render(assertion.annotation) }</pre>
                         : null
                 }
             </div>

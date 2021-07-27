@@ -53,23 +53,22 @@ export class Dashboard extends Mixin(
                 </ProjectPlanComponent>
                 <div style="flex: 1; overflow-y: auto">
                     {
-                        () => this.currentTest
-                            ?
-                                dispatcher.results.get(this.currentTest).mostRecentResult
+                        () => {
+                            if (!this.currentTest) return this.noSelectionContent()
+
+                            const launchInfo            = dispatcher.getTestLaunchInfo(this.currentTest)
+                            const mostRecentResult      = launchInfo.mostRecentResult
+
+                            return mostRecentResult
                                     ?
                                         <TestNodeResultComponent
-                                            testNode={ dispatcher.results.get(this.currentTest).mostRecentResult }
-                                            dispatcher={ this.launcher.dispatcher }
+                                            testNode={ mostRecentResult }
+                                            dispatcher={ dispatcher }
+                                            launchInfo={ launchInfo }
                                         ></TestNodeResultComponent>
                                     :
-                                        <div class="is-flex is-justify-content-center is-align-items-center" style="height:100%">
-                                            <div style="text-align:center">
-                                                <div>No results yet for { this.currentTest.filename }</div>
-                                                <div>Double click a test to launch it</div>
-                                            </div>
-                                        </div>
-                            :
-                                this.noSelectionContent()
+                                        this.noResultsContent()
+                        }
                     }
                 </div>
             </div>
@@ -81,6 +80,16 @@ export class Dashboard extends Mixin(
                 <div>
                     <div>No test selected</div>
                     <div>Click a test to select it</div>
+                    <div>Double click a test to launch it</div>
+                </div>
+            </div>
+        }
+
+
+        noResultsContent () : ElementSource {
+            return <div class="is-flex is-justify-content-center is-align-items-center" style="height:100%">
+                <div style="text-align:center">
+                    <div>No results yet for { this.currentTest.filename }</div>
                     <div>Double click a test to launch it</div>
                 </div>
             </div>
