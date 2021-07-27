@@ -44,8 +44,6 @@ export class TestLaunchInfo extends Mixin(
         @field()
         testSources         : string[]                  = undefined
 
-        testSourcesLoading  : boolean                   = false
-
 
         initialize (props? : Partial<TestLaunchInfo>) {
             super.initialize(props)
@@ -64,13 +62,9 @@ export class TestLaunchInfo extends Mixin(
         async schedulePendingTestLaunch () {
             this.launchState        = 'pending'
 
-            if (!this.testSourcesLoading) {
-                this.testSourcesLoading = true
-
-                try {
-                    this.testSources    = await this.dispatcher.reporter.fetchSources(this.descriptor.urlAbs)
-                } catch (e) {
-                }
+            try {
+                this.testSources    = await this.dispatcher.reporter.fetchSources(this.descriptor.urlAbs)
+            } catch (e) {
             }
         }
 
