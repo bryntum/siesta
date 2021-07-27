@@ -134,3 +134,23 @@ it('Should merge the class activators', async t => {
 
     t.is(comp1.el.className, 'comp1 cls', 'Activator from config should overwrite the inner activator #2')
 })
+
+
+it('Should merge the `style` config', async t => {
+    class Comp1 extends Component {
+        render () : ReactiveElement {
+            return <div style="width: 10px"></div>
+        }
+    }
+
+    const comp1     = Comp1.new({ style : "height: 10px" })
+
+    const el        = comp1.el as HTMLElement
+
+    document.body.appendChild(el)
+
+    globalGraph.commit()
+
+    t.is(el.style.width, '10px')
+    t.is(el.style.height, '10px')
+})

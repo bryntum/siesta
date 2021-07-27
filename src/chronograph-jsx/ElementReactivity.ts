@@ -60,10 +60,13 @@ export class ElementReactivity extends Mixin(
         }
 
 
-        addStyleAttributeSource (source : PropertySourceNormalized<string>) {
+        addStyleAttributeSource (source : PropertySourceNormalized<string>, toBeginning : boolean = false) {
             if (!this.styleAttributeSources) this.styleAttributeSources = []
 
-            this.styleAttributeSources.push(source)
+            if (toBeginning)
+                this.styleAttributeSources.unshift(source)
+            else
+                this.styleAttributeSources.push(source)
         }
 
 

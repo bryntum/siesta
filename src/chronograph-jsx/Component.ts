@@ -51,6 +51,8 @@ export class Component extends Mixin(
 
                 existingClasses.forEach(cls => reactivity.addClassAttributeSource(cls, true))
 
+                reactivity.addStyleAttributeSource(el.getAttribute('style'), true)
+
                 reactivity.$effect = super.effect
             } else
                 reactivity.effect
