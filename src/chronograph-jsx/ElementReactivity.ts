@@ -2,6 +2,7 @@ import { BoxUnbound } from '@bryntum/chronograph/src/chrono2/data/Box.js'
 import { CalculableBox } from '@bryntum/chronograph/src/chrono2/data/CalculableBox.js'
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import {
+    addEventListener,
     ElementSourceNormalizationResult,
     ElementSourceNormalized,
     isReactive,
@@ -49,10 +50,13 @@ export class ElementReactivity extends Mixin(
         }
 
 
-        addClassAttributeSource (source : PropertySourceNormalized<string>) {
+        addClassAttributeSource (source : PropertySourceNormalized<string>, toBeginning : boolean = false) {
             if (!this.classAttributeSources) this.classAttributeSources = []
 
-            this.classAttributeSources.push(source)
+            if (toBeginning)
+                this.classAttributeSources.unshift(source)
+            else
+                this.classAttributeSources.push(source)
         }
 
 
@@ -237,6 +241,8 @@ export class ElementReactivity extends Mixin(
             if (this.reactiveChildren) this.$effect.commitValueOptimisticHook.on(
                 (self, newValue, oldValue) => reconcileChildNodes(this.el, newValue)
             )
+
+            this.eventListeners && this.eventListeners.forEach(entry => addEventListener(this.el, entry[ 0 ], entry[ 1 ]))
 
             return this.$effect
         }

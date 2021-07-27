@@ -28,13 +28,19 @@ it('Should render the plain JSX element', async t => {
 
 
 it('Should render the reactive JSX element', async t => {
+    const onclick   = t.createSpy()
+
     let boxCounter      = 0
     let styleCounter    = 0
 
     const boxCls    = Box.new('cls')
     const boxWidth  = Box.new(10)
 
-    const el        = <div class={ () => (boxCounter++, boxCls.read()) } style={ () => (styleCounter++, `width: ${ boxWidth.read() }px`) }></div> as ReactiveHTMLElement
+    const el        = <div
+        onclick = { onclick }
+        class   = { () => (boxCounter++, boxCls.read()) }
+        style   = { () => (styleCounter++, `width: ${ boxWidth.read() }px`) }
+    ></div> as ReactiveHTMLElement
 
     document.body.appendChild(el)
 
@@ -45,6 +51,11 @@ it('Should render the reactive JSX element', async t => {
 
     t.is(boxCounter, 1)
     t.is(styleCounter, 1)
+
+    //-------------------
+    el.click()
+
+    t.expect(onclick).toHaveBeenCalled(1)
 
     //-------------------
     boxCls.write('cls2')
