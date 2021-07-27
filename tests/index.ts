@@ -13,6 +13,7 @@ project.plan(
         items       : [
             'queued.t.js',
             'uniqable.t.js',
+            'better_promise.t.js'
         ]
     },
     {
