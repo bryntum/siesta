@@ -94,13 +94,13 @@ export class TestDescriptorComponent extends Component {
                             case 'started':
                                 return <i class='far fa-clock'></i>
                             case 'running':
-                                return <i class='fas fa-bolt'></i>
+                                return <i class='fas fa-running'></i>
                             case 'exception':
                                 return <i class='fas fa-spider'></i>
                             case 'passed':
-                                return <i class='fas fa-check'></i>
+                                return <i class='far fa-check-circle'></i>
                             case 'failed':
-                                return <i class='fas fa-times'></i>
+                                return <i class='far fa-times-circle'></i>
                         }
                     }
                 }</span>
@@ -120,13 +120,13 @@ export class TestDescriptorComponent extends Component {
             return [ 'far fa-hourglass', 'far fa-hourglass' ]
         }
         else if (launchInfo.viewState === 'running') {
-            return [ 'fas fa-bolt', 'fas fa-bolt' ]
+            return [ 'fas fa-running', 'fas fa-running' ]
         }
         else if (launchInfo.viewState === 'passed') {
-            return [ 'fas fa-check', 'fas fa-check' ]
+            return [ 'fas fa-check-double', 'fas fa-check-double' ]
         }
         else if (launchInfo.viewState === 'failed') {
-            return [ 'fas fa-times', 'fas fa-times' ]
+            return [ 'far fa-times-circle', 'far fa-times-circle' ]
         }
     }
 }
