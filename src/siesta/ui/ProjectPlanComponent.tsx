@@ -36,6 +36,7 @@ export class ProjectPlanComponent extends Mixin(
                 <div style="flex : 1">
                     <TestDescriptorComponent dispatcher={ this.dispatcher } selectedTestBox={ this.selectedTestBox } testDescriptor={ this.projectData.projectPlan }></TestDescriptorComponent>
                 </div>
+                { this.children }
             </div>
         }
     }

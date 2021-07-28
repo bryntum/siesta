@@ -42,7 +42,7 @@ export class Dashboard extends Mixin(
                 onmousedown = { e => this.onMouseDown(e) }
                 onclick     = { e => this.onClick(e) }
                 ondblclick  = { e => this.onDoubleClick(e) }
-                class       = "is-flex is-align-items-stretch" style="height: 100%;"
+                class       = 'is-flex is-align-items-stretch' style='height: 100%;'
             >
                 <ProjectPlanComponent
                     dispatcher      = { this.launcher.dispatcher }
@@ -50,6 +50,16 @@ export class Dashboard extends Mixin(
                     style           = "min-width: 100px; width: 300px"
                     projectData     = { this.launcher.projectData }
                 >
+                    <div class='project-plan-bbar is-flex field has-addons'>
+                        <span class="icon icon-play-checked is-large" onclick={ () => this.runChecked() }>
+                            <i class="fas fa-2x fa-play"></i>
+                            <span class="icon is-small"><i class="fas fa-check"></i></span>
+                        </span>
+                        <span class="icon icon-play-all is-large" onclick={ () => this.runAll() }>
+                            <i class="fas fa-2x fa-play"></i>
+                            <span class="icon is-large"><i class="fas fa-2x fa-play"></i></span>
+                        </span>
+                    </div>
                 </ProjectPlanComponent>
                 <Splitter mode="horizontal" style="width: 8px"></Splitter>
                 <div style="flex: 1; overflow-y: auto">
@@ -61,14 +71,14 @@ export class Dashboard extends Mixin(
                             const mostRecentResult      = launchInfo.mostRecentResult
 
                             return mostRecentResult
-                                    ?
-                                        <TestNodeResultComponent
-                                            testNode={ mostRecentResult }
-                                            dispatcher={ dispatcher }
-                                            launchInfo={ launchInfo }
-                                        ></TestNodeResultComponent>
-                                    :
-                                        this.noResultsContent()
+                                ?
+                                    <TestNodeResultComponent
+                                        testNode={ mostRecentResult }
+                                        dispatcher={ dispatcher }
+                                        launchInfo={ launchInfo }
+                                    ></TestNodeResultComponent>
+                                :
+                                    this.noResultsContent()
                         }
                     }
                 </div>
@@ -129,6 +139,28 @@ export class Dashboard extends Mixin(
             if (desc) {
                 this.launcher.launchContinuously(desc.leavesAxis())
             }
+        }
+
+
+        runChecked () {
+            const dispatcher        = this.launcher.dispatcher
+
+            const toLaunch          = Array.from(
+                dispatcher.projectPlanLaunchInfo.descriptor
+                    .leavesAxis()
+                    .map(desc => dispatcher.getTestLaunchInfo(desc))
+                    .filter(info => info.checked)
+                    .map(info => info.descriptor)
+            )
+
+            this.launcher.launchContinuously(toLaunch)
+        }
+
+
+        runAll () {
+            const dispatcher        = this.launcher.dispatcher
+
+            this.launcher.launchContinuously(dispatcher.projectPlanLaunchInfo.descriptor.leavesAxis())
         }
     }
 ) {}

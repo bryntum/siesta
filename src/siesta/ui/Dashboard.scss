@@ -1,3 +1,34 @@
+@use '../../../resources/styling/common/_colors.scss' as *;
+
 .s-dashboard-no-selection {
     text-align: center;
+}
+
+
+.project-plan-bbar {
+    background-color: $deccent_lighter_2;
+}
+
+.project-plan-bbar .icon:hover {
+    color: $deccent_lighter_3;
+}
+
+
+.icon-play-checked {
+    position: relative;
+}
+
+.icon-play-checked .icon {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.icon-play-all {
+    position: relative;
+}
+
+.icon-play-all .icon {
+    position: absolute;
+    left: 1rem;
 }
