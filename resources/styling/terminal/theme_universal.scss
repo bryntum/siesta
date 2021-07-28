@@ -1,4 +1,11 @@
-@use './styling.scss';
-//with (
-//    $black  : #808080
-//);
+@use "sass:color";
+
+@use '../common/_colors.scss' as * with (
+    $primary_fail: color.scale(#e76f51, $saturation: 75%),
+    $secondary_fail: color.scale(#f4a261, $saturation: 75%),
+    $secondary_pass: color.scale(#e9c46a, $saturation: 75%),
+    $primary_pass: color.scale(#2a9d8f, $saturation: 75%),
+    $deccent: color.scale(#264653, $saturation: 75%),
+);
+
+@use '_styling.scss';

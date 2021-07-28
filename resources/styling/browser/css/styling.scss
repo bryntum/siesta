@@ -1,57 +1,22 @@
-@use '../../terminal/styling.scss';
-
-@use '../../../../node_modules/bulma/bulma.sass';
+@use './reset.scss';
 
 @use '../../../../src/siesta/ui/components/TreeComponent.scss';
 @use '../../../../src/siesta/ui/components/Splitter.scss';
 @use '../../../../src/siesta/ui/ProjectPlanComponent.scss';
 @use '../../../../src/siesta/ui/Dashboard.scss';
 
-html {
-    width: 100%;
-    height: 100%;
-}
-
-body {
-    width: 100%;
-    height: 100%;
-
-    margin: 0;
-}
 
 .test_file_pass, .test_file_fail {
     padding-left: 1ch;
     padding-right: 1ch;
 }
 
-// region scrollbar
-::-webkit-scrollbar {
-    width: 0.5rem;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #e5e5e5;
-}
-
-::-webkit-scrollbar-track {
-    background: #fff;
-}
-// endregion
-
-
 .indented {
     margin-left: 1rem
 }
 
-// region scrollbar
 pre {
     padding : 0;
     font-family: "JetBrains Mono", monospace, serif;
     margin-top: 1em;
 }
-
-@font-face {
-    font-family: "JetBrains Mono";
-    src: url(../fonts/webfonts/JetBrainsMono-Light.woff2);
-}
-// endregion

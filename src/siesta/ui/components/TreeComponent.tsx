@@ -54,7 +54,7 @@ export class TreeComponent extends Mixin(
 
                         return iconCls
                             ?
-                                <span class="icon">
+                                <span class="icon title-icon">
                                     <i class={ () => this.state === 'expanded' ? iconCls[ 0 ] : iconCls[ 1 ] }></i>
                                 </span>
                             :

@@ -1,0 +1,39 @@
+@use '../../../../node_modules/bulma/bulma.sass';
+
+@use '../../common/_colors.scss' as *;
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+
+    color: $deccent;
+
+    font-weight: 100;
+}
+
+// region scrollbar
+::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e5e5e5;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff;
+}
+// endregion
+
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url(../fonts/webfonts/JetBrainsMono-Light.woff2);
+}

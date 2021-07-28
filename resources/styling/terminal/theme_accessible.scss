@@ -1,8 +1,5 @@
-@use './styling.scss' with (
-    $primary_fail: #e76f51,
-    $secondary_fail: #f4a261,
-    $secondary_pass: #e9c46a,
-    $primary_pass: #2a9d8f,
-    $deccent: #264653,
-    $accent: #f5f5f5,
-);
+@use "sass:color";
+
+@use '../common/_colors.scss' as *;
+
+@use '_styling.scss';

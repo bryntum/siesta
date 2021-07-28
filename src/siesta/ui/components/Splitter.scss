@@ -1,5 +1,7 @@
+@use '../../../../resources/styling/common/_colors.scss' as *;
+
 .splitter {
-    background-color: aliceblue;
+    background-color: $deccent_lighter_2;
     background-repeat: no-repeat;
     background-position: center;
 }

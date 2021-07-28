@@ -1,3 +1,5 @@
+@use '../../../resources/styling/common/_colors.scss' as *;
+
 .project-plan {
     overflow-x: hidden;
     overflow-y: auto;
@@ -20,13 +22,18 @@
     cursor: pointer;
 }
 
-.project-plan-test:hover {
-    color: #a33d3d;
+.project-plan-folder-title {
+    font-weight: bolder;
+}
+
+.project-plan-test-title:hover {
+    text-decoration: underline;
 }
 
 .project-plan-test.is-selected::before {
-    background-color: #00b89c;
+    background-color: $secondary_pass_lighter_2;
     content: '\00a0';
+
 
     display: block;
     position: absolute;
@@ -35,4 +42,33 @@
     width: 100%;
     left: 0;
     pointer-events: none;
+}
+
+.project-plan-folder.failed > .title-icon {
+    color: $primary_fail;
+}
+
+.project-plan-folder.passed > .title-icon {
+    color: $primary_pass;
+}
+
+.project-plan-folder.running > .title-icon {
+    color: $secondary_pass_darker;
+}
+
+
+.project-plan-test-icon.failed, .project-plan-test-icon.exception {
+    color: $primary_fail;
+}
+
+.project-plan-test-icon.passed {
+    color: $primary_pass;
+}
+
+.project-plan-test-icon.passed {
+    color: $primary_pass;
+}
+
+.project-plan-test-icon.started, .project-plan-test-icon.running {
+    color: $secondary_pass_darker;
 }

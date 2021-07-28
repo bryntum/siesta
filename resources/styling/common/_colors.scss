@@ -1,0 +1,32 @@
+@use "sass:color";
+
+// the primary palette
+
+$primary_fail: #e76f51 !default;
+$secondary_fail: #f4a261 !default;
+$secondary_pass: #e9c46a !default;
+$primary_pass: #2a9d8f !default;
+$deccent: #264653 !default;
+// eof primary palette
+
+$accent : #bd69ee !default;
+$gray: #808080 !default;
+$black: #000000 !default;
+
+$primary_pass_lighter: color.scale($primary_pass, $lightness: 25%) !default;
+$primary_pass_lighter_lighter: color.scale($primary_pass, $lightness: 50%) !default;
+$primary_pass_darker: color.scale($primary_pass, $lightness: -25%) !default;
+
+$primary_fail_lighter: color.scale($primary_fail, $lightness: 25%) !default;
+$primary_fail_darker: color.scale($primary_fail, $lightness: -25%) !default;
+
+$secondary_pass_lighter: color.scale($secondary_pass, $lightness: 25%) !default;
+$secondary_pass_lighter_2: color.scale($secondary_pass, $lightness: 50%) !default;
+$secondary_pass_darker: color.scale($secondary_pass, $lightness: -25%) !default;
+
+$secondary_fail_lighter: color.scale($secondary_fail, $lightness: 25%) !default;
+$secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%) !default;
+
+$deccent_lighter: color.scale($deccent, $lightness: 25%) !default;
+$deccent_lighter_2: color.scale($deccent, $lightness: 50%) !default;
+$deccent_lighter_3: color.scale($deccent, $lightness: 75%) !default;

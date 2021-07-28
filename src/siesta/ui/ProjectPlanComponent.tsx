@@ -33,7 +33,6 @@ export class ProjectPlanComponent extends Mixin(
 
         render () : Element {
             return <div class="project-plan is-flex is-align-items-stretch is-flex-direction-column" style="height: 100%">
-                <div style="height: 1.5em">Project plan</div>
                 <div style="flex : 1">
                     <TestDescriptorComponent dispatcher={ this.dispatcher } selectedTestBox={ this.selectedTestBox } testDescriptor={ this.projectData.projectPlan }></TestDescriptorComponent>
                 </div>
@@ -60,14 +59,16 @@ export class TestDescriptorComponent extends Component {
         const testDescriptor    = this.testDescriptor
 
         if (testDescriptor.childNodes) {
+            const launchInfo    = this.dispatcher.resultsGroups.get(this.testDescriptor)
+
             return <TreeComponent
                 collapsible = { Boolean(testDescriptor.parentNode) }
                 state       = "expanded"
                 iconCls     = { [ 'far fa-folder-open', 'far fa-folder' ] }
                 iconClsSource = { () => this.calculateGroupIconClass() }
-                class       = "project-plan-folder"
+                class       = { () => `project-plan-folder ${ launchInfo.viewState }` }
             >
-                <span>{ testDescriptor.title || testDescriptor.filename }</span>
+                <span class='project-plan-folder-title'>{ testDescriptor.title || testDescriptor.filename }</span>
                 {
                     testDescriptor.childNodes.map(childNode =>
                         <leaf>
@@ -83,48 +84,48 @@ export class TestDescriptorComponent extends Component {
             const launchInfo        = this.dispatcher.results.get(testDescriptor)
 
             return <span class="project-plan-test" class:is-selected={ () => this.selectedTestBox.read() === testDescriptor }>
-                {
+                <span class={ () => `project-plan-test-icon icon ${ launchInfo.viewState }`}>{
                     () => {
                         switch (launchInfo.viewState) {
                             case 'noinfo':
-                                return <span class="icon"><i class='far fa-file'></i></span>
+                                return <i class='far fa-file'></i>
                             case 'pending':
-                                return <span class="icon"><i class='far fa-hourglass'></i></span>
+                                return <i class='far fa-hourglass'></i>
                             case 'started':
-                                return <span class="icon"><i class='far fa-clock'></i></span>
+                                return <i class='far fa-clock'></i>
                             case 'running':
-                                return <span class="icon"><i class='fas fa-bolt'></i></span>
+                                return <i class='fas fa-bolt'></i>
                             case 'exception':
-                                return <span class="icon"><i class='fas fa-spider'></i></span>
+                                return <i class='fas fa-spider'></i>
                             case 'passed':
-                                return <span class="icon"><i class='fas fa-check'></i></span>
+                                return <i class='fas fa-check'></i>
                             case 'failed':
-                                return <span class="icon"><i class='fas fa-times'></i></span>
+                                return <i class='fas fa-times'></i>
                         }
                     }
-                }
-                { testDescriptor.filename }
+                }</span>
+                <span class="project-plan-test-title">{ testDescriptor.filename }</span>
             </span>
         }
     }
 
 
     calculateGroupIconClass () : [ string, string ] {
-        const result    = this.dispatcher.resultsGroups.get(this.testDescriptor)
+        const launchInfo    = this.dispatcher.resultsGroups.get(this.testDescriptor)
 
-        if (result.viewState === 'noinfo') {
+        if (launchInfo.viewState === 'noinfo') {
             return [ 'far fa-folder-open', 'far fa-folder' ]
         }
-        else if (result.viewState === 'pending') {
+        else if (launchInfo.viewState === 'pending') {
             return [ 'far fa-hourglass', 'far fa-hourglass' ]
         }
-        else if (result.viewState === 'running') {
+        else if (launchInfo.viewState === 'running') {
             return [ 'fas fa-bolt', 'fas fa-bolt' ]
         }
-        else if (result.viewState === 'passed') {
+        else if (launchInfo.viewState === 'passed') {
             return [ 'fas fa-check', 'fas fa-check' ]
         }
-        else if (result.viewState === 'failed') {
+        else if (launchInfo.viewState === 'failed') {
             return [ 'fas fa-times', 'fas fa-times' ]
         }
     }
