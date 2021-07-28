@@ -2,7 +2,7 @@
 
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
-import { ChronoGraphJSX } from "../../../chronograph-jsx/ChronoGraphJSX.js"
+import { ChronoGraphJSX, ElementSource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
 
 ChronoGraphJSX
@@ -18,6 +18,7 @@ export class TreeComponent extends Mixin(
             iconCls?        : TreeComponent[ 'iconCls' ]
             collapsible?    : TreeComponent[ 'collapsible' ]
             iconClsSource?  : TreeComponent[ 'iconClsSource' ]
+            extraIconSource? : TreeComponent[ 'extraIconSource' ]
         }
 
         @field()
@@ -25,6 +26,8 @@ export class TreeComponent extends Mixin(
 
         @field()
         collapsible     : boolean                       = true
+
+        extraIconSource : () => ElementSource           = () => undefined
 
         @field()
         iconCls         : [ string, string ]            = undefined
@@ -47,6 +50,9 @@ export class TreeComponent extends Mixin(
                             </span>
                         :
                             null
+                }
+                {
+                    this.extraIconSource()
                 }
                 {
                     () => {

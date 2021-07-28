@@ -63,6 +63,12 @@ export class TestDescriptorComponent extends Component {
 
             return <TreeComponent
                 collapsible = { Boolean(testDescriptor.parentNode) }
+                extraIconSource = {
+                    () => <span onclick={ () => launchInfo.toggleChecked() } class="icon">
+                        <i class={ () => launchInfo.checked ? 'far fa-check-square' : 'far fa-square' }></i>
+                    </span>
+
+                }
                 state       = "expanded"
                 iconCls     = { [ 'far fa-folder-open', 'far fa-folder' ] }
                 iconClsSource = { () => this.calculateGroupIconClass() }
@@ -84,6 +90,9 @@ export class TestDescriptorComponent extends Component {
             const launchInfo        = this.dispatcher.results.get(testDescriptor)
 
             return <span class="project-plan-test" class:is-selected={ () => this.selectedTestBox.read() === testDescriptor }>
+                <span onclick={ () => launchInfo.toggleChecked() } class="icon">
+                    <i class={ () => launchInfo.checked ? 'far fa-check-square' : 'far fa-square' }></i>
+                </span>
                 <span class={ () => `project-plan-test-icon icon ${ launchInfo.viewState }`}>{
                     () => {
                         switch (launchInfo.viewState) {

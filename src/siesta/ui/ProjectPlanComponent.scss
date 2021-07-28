@@ -30,6 +30,10 @@
     text-decoration: underline;
 }
 
+.project-plan-test.is-selected > * {
+    position: relative;
+}
+
 .project-plan-test.is-selected::before {
     background-color: $secondary_pass_lighter_2;
     content: '\00a0';
@@ -37,7 +41,7 @@
 
     display: block;
     position: absolute;
-    z-index: -1;
+    z-index: 0;
 
     width: 100%;
     left: 0;

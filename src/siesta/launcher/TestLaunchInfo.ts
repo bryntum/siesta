@@ -44,6 +44,9 @@ export class TestLaunchInfo extends Mixin(
         @field()
         testSources         : string[]                  = undefined
 
+        @field()
+        checked             : boolean                   = false
+
 
         initialize (props? : Partial<TestLaunchInfo>) {
             super.initialize(props)
@@ -56,6 +59,23 @@ export class TestLaunchInfo extends Mixin(
 
             this.dispatcher.results.set(descriptor, this)
             this.dispatcher.localRemoteDescMap.set(descriptor.remoteId, descriptor)
+        }
+
+
+        get parentInfo () : TestGroupLaunchInfo {
+            return this.dispatcher.resultsGroups.get(this.descriptor.parentNode)
+        }
+
+
+        toggleChecked () {
+            this.setChecked(!this.checked)
+        }
+
+
+        setChecked (value : boolean) {
+            this.checked = value
+
+            if (!value) this.parentInfo.uncheckParents()
         }
 
 
@@ -106,6 +126,9 @@ export class TestGroupLaunchInfo extends Mixin(
         @field()
         viewState           : TestGroupViewState
 
+        @field()
+        checked             : boolean                   = false
+
 
         initialize (props? : Partial<TestGroupLaunchInfo>) {
             super.initialize(props)
@@ -120,6 +143,32 @@ export class TestGroupLaunchInfo extends Mixin(
                 })
 
             this.dispatcher.resultsGroups.set(this.descriptor, this)
+        }
+
+
+        get parentInfo () : TestGroupLaunchInfo {
+            return this.descriptor.parentNode ? this.dispatcher.resultsGroups.get(this.descriptor.parentNode) : undefined
+        }
+
+
+        toggleChecked () {
+            this.setChecked(!this.checked)
+        }
+
+
+        setChecked (value : boolean) {
+            this.checked = value
+
+            this.items.forEach(item => item.setChecked(value))
+
+            if (!value) this.uncheckParents()
+        }
+
+
+        uncheckParents () {
+            this.checked    = false
+
+            this.parentInfo && this.parentInfo.uncheckParents()
         }
 
 
