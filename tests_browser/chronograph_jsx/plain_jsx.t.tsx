@@ -133,20 +133,20 @@ it('Should render the plain JSX element with reactive children correctly', async
 it('Should support the reactive class activators', async t => {
     const boxCls    = Box.new(true)
 
-    const el   = <div class="static_cls" class:cls={ boxCls }></div>
+    const el   = <div class="static_cls" class:cls={ boxCls } class:static={ true }></div>
 
     document.body.appendChild(el)
 
     globalGraph.commit()
 
-    t.is(el.className, 'static_cls cls')
+    t.is(el.className, 'static_cls static cls')
 
     //-------------------
     boxCls.write(false)
 
     globalGraph.commit()
 
-    t.is(el.className, 'static_cls')
+    t.is(el.className, 'static_cls static')
 })
 
 
@@ -181,7 +181,7 @@ it('Should correctly merge reactive class property and reactive class activators
 it('Should support the reactive individual style properties', async t => {
     const boxWidth  = Box.new('10px')
 
-    const el        = <div style="height: 10px" style:width={ boxWidth }></div> as ReactiveHTMLElement
+    const el        = <div style="height: 10px" style:width={ boxWidth } style:color={ "red" }></div> as ReactiveHTMLElement
 
     document.body.appendChild(el)
 
@@ -189,6 +189,7 @@ it('Should support the reactive individual style properties', async t => {
 
     t.is(el.style.width, '10px')
     t.is(el.style.height, '10px')
+    t.is(el.style.color, 'red')
 
     //-------------------
     boxWidth.write('100px')
@@ -197,6 +198,7 @@ it('Should support the reactive individual style properties', async t => {
 
     t.is(el.style.width, '100px')
     t.is(el.style.height, '10px')
+    t.is(el.style.color, 'red')
 })
 
 

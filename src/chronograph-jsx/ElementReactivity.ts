@@ -150,7 +150,7 @@ export class ElementReactivity extends Mixin(
 
             Object.entries(this.classActivators || []).forEach(([ prop, source ]) => {
                 if (!isReactive(source)) {
-                    setProperty(this.el, prop, source)
+                    setProperty(this.el, `class:${ prop }`, source)
                 }
                 else {
                     const box       = CalculableBox.new({
@@ -182,7 +182,7 @@ export class ElementReactivity extends Mixin(
 
             Object.entries(this.styleProperties || []).forEach(([ prop, source ]) => {
                 if (!isReactive(source)) {
-                    setProperty(this.el, prop, source)
+                    setProperty(this.el, `style:${ prop }`, source)
                 }
                 else {
                     const box       = CalculableBox.new({
