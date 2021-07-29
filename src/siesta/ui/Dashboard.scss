@@ -82,3 +82,9 @@
     position: absolute;
     left: 0.5rem;
 }
+
+
+.current_test_filename {
+    font-weight: bold;
+    color: $primary_pass_darker;
+}

@@ -64,7 +64,9 @@ export class Dashboard extends Mixin(
                         </span>
                     </div>
                 </ProjectPlanComponent>
+
                 <Splitter mode="horizontal" style="width: 8px"></Splitter>
+
                 <div class="is-flex is-flex-direction-column" style="flex: 1">
                     <div class='project-plan-tbar is-flex'>
                         &nbsp;
@@ -109,7 +111,7 @@ export class Dashboard extends Mixin(
         noResultsContent () : ElementSource {
             return <div class="s-dashboard-no-results is-flex is-justify-content-center is-align-items-center" style="height: 100%">
                 <div>
-                    <div>No results yet for { this.currentTest.filename }</div>
+                    <div>No results yet for <span class='current_test_filename'>{ this.currentTest.filename }</span></div>
                     <div>Double click a test to launch it</div>
                     <div>Double click a folder to launch all tests in it</div>
                 </div>
