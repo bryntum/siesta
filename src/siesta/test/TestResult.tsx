@@ -375,6 +375,9 @@ export class TestNodeResultReactive extends Mixin(
         override parentNode      : TestNodeResultReactive    = undefined
 
         @field()
+        checked         : boolean       = false
+
+        @field()
         // @ts-ignore
         passed          : boolean
 
@@ -399,6 +402,16 @@ export class TestNodeResultReactive extends Mixin(
 
         get resultLogReactive () : ReactiveArray<TestResult> {
             return this.$.resultLog as ReactiveArray<TestResult>
+        }
+
+
+        toggleChecked () {
+            this.setChecked(!this.checked)
+        }
+
+
+        setChecked (value : boolean) {
+            this.checked = value
         }
 
 

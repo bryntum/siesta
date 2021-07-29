@@ -5,7 +5,7 @@ import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { ChronoGraphJSX, ElementSource, PropertySource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
-import { ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
+import { ComponentElement, ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { LogLevel } from "../../../logger/Logger.js"
 import { relative } from "../../../util/Path.js"
@@ -66,12 +66,20 @@ export class TestNodeResultComponent extends Mixin(
                     }</leaf>
             )
 
-            return <TreeComponent state={ this.testNode.passed && this.testNode.parentNode ? 'collapsed' : 'expanded' }>
+            return <TreeComponent
+                // @ts-ignore
+                onmousedown     = { e => this.onMouseDown(e) }
+                class           = { testNode.isRoot ? 'test-file-comp' : 'subtest-comp' }
+                state           = { this.testNode.passed && this.testNode.parentNode ? 'collapsed' : 'expanded' }
+            >
                 {
                     testNode.isRoot ?
                         [ testNodeState(testNode), ' ', testNodeUrlTemplate(testNode.descriptor, this.dispatcher.projectData) ]
                         :
                         [
+                            <span onclick={ () => testNode.toggleChecked() } class="icon">
+                                <i class={ () => testNode.checked ? 'far fa-check-square' : 'far fa-square' }></i>
+                            </span>,
                             testNodeState(testNode), ' ',
                             testNode.isTodo ? <span class="accented">[todo] </span> : '',
                             <span class={ this.dispatcher.reporter.detail === 'assertion' ? 'underline' : '' }>{ testNode.descriptor.title }</span>,
@@ -79,6 +87,14 @@ export class TestNodeResultComponent extends Mixin(
                 }
                 { children }
             </TreeComponent>
+        }
+
+
+        onMouseDown (e : MouseEvent) {
+            const testResultEl : ComponentElement<TestNodeResultComponent> = (e.target as Element).closest('.test-file-comp, .subtest-comp')
+
+            // prevent the text selection on double click only (still works for mouse drag)
+            if (testResultEl && e.detail > 1) e.preventDefault()
         }
     }
 ) {}
@@ -230,7 +246,7 @@ const testFileFail = (testNode : TestNodeResult) : Element => {
 }
 
 const subTestPass = (testNode : TestNodeResult) : Element => {
-    return <span class='icon sub_test_pass'><i class='fas fa-check-double'></i></span>
+    return <span class='icon sub_test_pass'><i class='fas fa-check'></i></span>
 }
 
 const subTestFail = (testNode : TestNodeResult) : Element => {
