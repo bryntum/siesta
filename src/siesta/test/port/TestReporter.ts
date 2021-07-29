@@ -32,7 +32,7 @@ XmlElement
 interface TestReporter {
     onSubTestStart (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) : Promise<any>
 
-    onSubTestFinish (testNodeId : LUID) : Promise<any>
+    onSubTestFinish (testNodeId : LUID, isIgnored : boolean) : Promise<any>
 
     onResult (testNodeId : LUID, result : TestResultLeaf) : Promise<any>
 
@@ -90,13 +90,13 @@ export class TestReporterParent extends Mixin(
             }
 
             @local()
-            async onSubTestFinish (testNodeId : LUID) {
+            async onSubTestFinish (testNodeId : LUID, isIgnored : boolean) {
                 if (!this.currentTestNodeResult || this.currentTestNodeResult.localId !== testNodeId) {
                     throw new Error("No current test node or test node id mismatch")
                 }
 
                 this.currentTestNodeResult.frozen   = true
-                this.currentTestNodeResult.state    = "completed"
+                this.currentTestNodeResult.state    = isIgnored ? 'ignored' : 'completed'
 
                 this.reporter.onSubTestFinish(this.currentTestNodeResult)
 
@@ -141,7 +141,7 @@ export class TestReporterChild extends Mixin(
             onSubTestStart : (testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => Promise<any>
 
             @remote()
-            onSubTestFinish : (testNodeId : LUID) => Promise<any>
+            onSubTestFinish : (testNodeId : LUID, isIgnored : boolean) => Promise<any>
 
             @remote()
             onResult : (testNodeId : LUID, result : TestResultLeaf) => Promise<any>

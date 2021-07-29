@@ -13,7 +13,7 @@ import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
-import { Exception, TestNodeResultReactive } from "../test/TestResult.js"
+import { Exception, SubTestCheckInfo, TestNodeResultReactive } from "../test/TestResult.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 import { Queue } from "./Queue.js"
 import { TestGroupLaunchInfo, TestLaunchInfo } from "./TestLaunchInfo.js"
@@ -31,8 +31,8 @@ export class Dispatcher extends Mixin(
 
         pendingQueue                : {
             order       : TestDescriptor[],
-            presence    : Set<TestDescriptor>
-        }                                                       = { order : [], presence : new Set() }
+            presence    : Map<TestDescriptor, SubTestCheckInfo | undefined>
+        }                                                       = { order : [], presence : new Map() }
 
         projectPlanLaunchInfo       : TestGroupLaunchInfo       = undefined
 
@@ -68,7 +68,7 @@ export class Dispatcher extends Mixin(
             this.runningQueue.onFreeSlotAvailableHook.on(queue => {
                 const desc      = this.shiftPendingTest()
 
-                desc && queue.push(desc, this.launchProjectPlanItem(desc))
+                if (desc) queue.push(desc[ 0 ], this.launchProjectPlanItem(...desc))
             })
 
             this.runningQueue.onSlotSettledHook.on((queue, descriptor : TestDescriptor, result) => {
@@ -106,6 +106,13 @@ export class Dispatcher extends Mixin(
         }
 
 
+        getTestMostRecentResult (desc : TestDescriptor) : TestNodeResultReactive | undefined {
+            const launchInfo            = this.getTestLaunchInfo(desc)
+
+            return launchInfo?.mostRecentResult
+        }
+
+
         isCompleted () : boolean {
             return this.pendingQueue.order.length === 0 && this.runningQueue.isEmpty
         }
@@ -118,7 +125,7 @@ export class Dispatcher extends Mixin(
         }
 
 
-        addPendingTest (desc : TestDescriptor) {
+        addPendingTest (desc : TestDescriptor, checkInfo : SubTestCheckInfo = undefined) {
             const pendingQueue  = this.pendingQueue
 
             if (pendingQueue.presence.has(desc)) return
@@ -126,19 +133,23 @@ export class Dispatcher extends Mixin(
             this.getTestLaunchInfo(desc).schedulePendingTestLaunch()
 
             pendingQueue.order.push(desc)
-            pendingQueue.presence.add(desc)
+            pendingQueue.presence.set(desc, checkInfo)
 
             this.runningQueue.pull()
         }
 
 
-        shiftPendingTest () : TestDescriptor | undefined {
+        shiftPendingTest () : [ TestDescriptor, SubTestCheckInfo | undefined ] | undefined {
             const pendingQueue  = this.pendingQueue
+
+            if (pendingQueue.order.length === 0) return undefined
+
             const desc          = pendingQueue.order.shift()
+            const checkInfo     = pendingQueue.presence.get(desc)
 
-            desc && pendingQueue.presence.delete(desc)
+            pendingQueue.presence.delete(desc)
 
-            return desc
+            return [ desc, checkInfo ]
         }
 
 
@@ -152,7 +163,7 @@ export class Dispatcher extends Mixin(
         }
 
 
-        async launchProjectPlanItem (item : TestDescriptor) {
+        async launchProjectPlanItem (item : TestDescriptor, checkInfo : SubTestCheckInfo = undefined) {
             const normalized        = item.flatten
 
             this.logger.debug("Launching project item: ", normalized.url)
@@ -208,7 +219,7 @@ export class Dispatcher extends Mixin(
 
                 this.logger.debug("Channel ready for: ", normalized.url)
 
-                await testLauncher.launchTest(stringifiedDesc)
+                await testLauncher.launchTest(stringifiedDesc, checkInfo)
 
                 launchInfo.launchState  = 'completed'
             } finally {

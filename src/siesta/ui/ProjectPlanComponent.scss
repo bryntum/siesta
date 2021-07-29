@@ -27,7 +27,7 @@
 }
 
 .project-plan-test-title:hover {
-    text-decoration: underline;
+    text-decoration: underline dashed;
 }
 
 .project-plan-test.is-selected > * {
@@ -38,10 +38,8 @@
     background-color: $secondary_pass_lighter_2;
     content: '\00a0';
 
-
     display: block;
     position: absolute;
-    z-index: 0;
 
     width: 100%;
     left: 0;

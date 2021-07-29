@@ -13,6 +13,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
+import { TreeNode } from "../../tree/TreeNode.js"
 import { escapeRegExp } from "../../util/Helpers.js"
 import { luid } from "../common/LUID.js"
 import { TestDescriptor } from "./TestDescriptor.js"
@@ -166,9 +167,9 @@ export class AssertionAsyncResolution extends Mixin(
 export type TestNodeState   = 'created' | 'running' | 'completed' | 'ignored'
 
 // serializable leaf nodes
-export type TestResultLeaf  = Exception | LogMessage | Assertion | AssertionAsyncCreation
+export type TestResultLeaf              = Exception | LogMessage | Assertion | AssertionAsyncCreation
 
-export type TestResultLeafConstructor  = typeof Exception | typeof LogMessage | typeof Assertion | typeof AssertionAsyncCreation
+export type TestResultLeafConstructor   = typeof Exception | typeof LogMessage | typeof Assertion | typeof AssertionAsyncCreation
 
 //---------------------------------------------------------------------------------------------------------------------
 export type TestResult                  = TestNodeResult | TestResultLeaf
@@ -484,3 +485,54 @@ globalGraph.historyLimit    = 0
 
 // // @ts-ignore
 // window.globalGraph = globalGraph
+
+@serializable({ id : 'SubTestCheckInfo' })
+export class SubTestCheckInfo extends Mixin(
+    [ Serializable, TreeNode, Base ],
+    (base : ClassUnion<typeof Serializable, typeof TreeNode, typeof Base>) =>
+
+    class SubTestCheckInfo extends base {
+        title       : string        = ''
+
+        childNodeT  : SubTestCheckInfo
+        parentNode  : SubTestCheckInfo
+
+        // the 2 consequently following subtests with the same title will be distinguished by their position
+        // (starting from 0)
+        position    : number        = 0
+    }
+) {}
+
+
+export const checkInfoFromTestResult    = (result : TestNodeResultReactive) : SubTestCheckInfo | undefined => {
+
+    const fromChildren  = CI(result.eachResultOfClass(TestNodeResultReactive))
+        .map(result => checkInfoFromTestResult(result))
+        .filter(el => Boolean(el))
+        .toArray()
+
+    if (fromChildren.length || result.checked) {
+        const info  = SubTestCheckInfo.new({ title : result.descriptor.title })
+
+        fromChildren.forEach(checkInfo => info.appendChild(checkInfo))
+
+        return info
+    } else
+        return undefined
+}
+
+export const individualCheckInfoForTestResult    = (result : TestNodeResultReactive) : SubTestCheckInfo => {
+    let checkInfo           = SubTestCheckInfo.new({ title : result.descriptor.title })
+
+    CI(result.eachParent()).forEach(parent => {
+        const parentCheckInfo   = SubTestCheckInfo.new({ title : parent.descriptor.title })
+
+        parentCheckInfo.appendChild(checkInfo)
+
+        checkInfo               = parentCheckInfo
+    })
+
+    return checkInfo
+}
+
+

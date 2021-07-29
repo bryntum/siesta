@@ -10,7 +10,6 @@ import { ArbitraryObject, ArbitraryObjectKey, isDeno, isNodejs, prototypeValue }
 import { stripBasename, stripDirname } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { Environment } from "../common/Environment.js"
-import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
 import { Launcher, LauncherError } from "../launcher/Launcher.js"
 import { SiestaProjectExtraction } from "../launcher/ProjectExtractor.js"
 import { Project } from "../project/Project.js"
@@ -25,7 +24,7 @@ import { TestLauncherChild } from "./port/TestLauncher.js"
 import { TestReporterChild } from "./port/TestReporter.js"
 import { Spy, SpyFunction } from "./Spy.js"
 import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
-import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResult } from "./TestResult.js"
+import { Assertion, AssertionAsyncResolution, Exception, LogMessage, SubTestCheckInfo, TestNodeResult, TestResult } from "./TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -404,7 +403,7 @@ export class Test extends TestPre {
     // }
 
 
-    async start () {
+    async start (checkInfo : SubTestCheckInfo = undefined) {
         // extra-early start hook, test is not yet marked as active in the reporter
         this.preStartHook.trigger(this)
 
@@ -420,7 +419,7 @@ export class Test extends TestPre {
             await this.setup()
         }
 
-        await this.launch()
+        await this.launch(checkInfo)
 
         if (this.isRoot) {
             await this.tearDown()
@@ -430,7 +429,7 @@ export class Test extends TestPre {
         // finish hook, test is still marked as active in the reporter
         this.finishHook.trigger(this)
 
-        this.reporter.onSubTestFinish(this.localId)
+        this.reporter.onSubTestFinish(this.localId, false)
 
         globalTestEnv.currentTest       = this.parentNode
 
@@ -463,7 +462,7 @@ export class Test extends TestPre {
     // TODO
     // need to figure out if we need to wait until all reports (`this.reporter.onXXX`)
     // has been completed or not, before completing the method
-    async launch () {
+    async launch (checkInfo : SubTestCheckInfo = undefined) {
         this.onExceptionHook.on((test, exception, type) => {
             this.addResult(Exception.new({ exception }))
         })
@@ -504,6 +503,8 @@ export class Test extends TestPre {
         const exclusiveSubTests = this.pendingSubTests.filter(subTest => subTest.isExclusive)
         const subTestsToLaunch  = exclusiveSubTests.length > 0 ? exclusiveSubTests : this.pendingSubTests
 
+        let currentCheckInfoIndex       = 0
+
         while (subTestsToLaunch.length) {
             const subTest       = subTestsToLaunch.shift()
 
@@ -515,7 +516,24 @@ export class Test extends TestPre {
             // the test structure is defined
             subTest.reporter    = this.reporter
 
-            await subTest.start()
+            if (checkInfo) {
+                const currentCheckInfo  = checkInfo.childNodes[ currentCheckInfoIndex ]
+
+                if (currentCheckInfo && subTest.descriptor.title === currentCheckInfo.title) {
+                    await subTest.start(currentCheckInfo)
+                    currentCheckInfoIndex++
+                }
+                else {
+                    // HACK
+                    // reporter does not have an ability to react on addition of subtest result above
+                    // instead it always assumes subtest is launched
+                    // so we do that, with a special flag for `onSubTestFinish`
+                    // this can be improved
+                    this.reporter.onSubTestStart(subTest.localId, subTest.parentNode ? subTest.parentNode.localId : null, subTest.descriptor)
+                    this.reporter.onSubTestFinish(subTest.localId, true)
+                }
+            } else
+                await subTest.start()
         }
 
         await this.awaitAllDone()

@@ -82,7 +82,7 @@ export class TestNodeResultComponent extends Mixin(
                             </span>,
                             testNodeState(testNode), ' ',
                             testNode.isTodo ? <span class="accented">[todo] </span> : '',
-                            <span class={ this.dispatcher.reporter.detail === 'assertion' ? 'underline' : '' }>{ testNode.descriptor.title }</span>,
+                            <span class='subtest-title'>{ testNode.descriptor.title }</span>,
                         ]
                 }
                 { children }
@@ -258,7 +258,10 @@ const testNodeState = (testNode : TestNodeResult) : ElementSource => {
     if (testNode.isRoot) {
         return () => testNode.passed ? testFilePass(testNode) : testFileFail(testNode)
     } else {
-        return () => testNode.passed ? subTestPass(testNode) : subTestFail(testNode)
+        if (testNode.state === 'ignored') {
+            return () => <span class='icon'><i class="far fa-eye-slash"></i></span>
+        } else
+            return () => testNode.passed ? subTestPass(testNode) : subTestFail(testNode)
     }
 }
 

@@ -28,6 +28,7 @@ import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { HasRuntimeAccess } from "../runtime/Runtime.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
+import { SubTestCheckInfo } from "../test/TestResult.js"
 import { Dispatcher } from "./Dispatcher.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -510,6 +511,13 @@ export class Launcher extends Mixin(
             await this.performSetupOnce()
 
             projectPlanItemsToLaunch.forEach(desc => this.dispatcher.addPendingTest(desc))
+        }
+
+
+        async launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
+            await this.performSetupOnce()
+
+            this.dispatcher.addPendingTest(desc, checkInfo)
         }
 
 

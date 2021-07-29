@@ -6,6 +6,7 @@ import { PortEvaluateChild, PortEvaluateParent } from "../../../rpc/port/PortEva
 import { PortHandshakeChild, PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
 import { parse } from "../../../serializable/Serializable.js"
 import { globalTestEnv, Test } from "../Test.js"
+import { SubTestCheckInfo } from "../TestResult.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
 // //---------------------------------------------------------------------------------------------------------------------
@@ -21,7 +22,7 @@ import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 interface TestLauncher {
-    launchTest (testDescriptorStr : string) : Promise<any>
+    launchTest (testDescriptorStr : string, checkInfo : SubTestCheckInfo) : Promise<any>
 
     // getSameContextChildLauncher () : Promise<TestLauncherChild>
 }
@@ -33,7 +34,7 @@ export class TestLauncherParent extends Mixin(
 
         class TestLauncherParent extends base implements TestLauncher {
             @remote()
-            launchTest : (testDescriptorStr : string) => Promise<any>
+            launchTest : (testDescriptorStr : string, checkInfo : SubTestCheckInfo) => Promise<any>
 
             // @remote()
             // getSameContextChildLauncher : () => Promise<TestLauncherChild>
@@ -56,7 +57,7 @@ export class TestLauncherChild extends Mixin(
 
 
             @local()
-            async launchTest (testDescriptorStr : string) {
+            async launchTest (testDescriptorStr : string, checkInfo : SubTestCheckInfo) {
                 // there might be no `topTest` if test file does not contain any calls
                 // to static `it` method of any test class
                 const topTest = globalTestEnv.topTest || Test.new({
@@ -65,7 +66,7 @@ export class TestLauncherChild extends Mixin(
 
                 topTest.reporter    = this
 
-                await topTest.start()
+                await topTest.start(checkInfo)
 
                 globalTestEnv.clear()
             }

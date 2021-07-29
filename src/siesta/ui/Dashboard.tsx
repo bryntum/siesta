@@ -10,6 +10,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { awaitDomReady } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
+import { checkInfoFromTestResult, individualCheckInfoForTestResult, TestNodeResultReactive } from "../test/TestResult.js"
 import { Splitter } from "./components/Splitter.js"
 import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComponent.js"
 import { TestNodeResultComponent } from "./test_result/TestResult.js"
@@ -71,13 +72,21 @@ export class Dashboard extends Mixin(
                     { () => {
                         if (!this.currentTest) return null
 
-                        return <div class='tbar is-flex'>
-                            <span class="icon is-large" class:is-disabled={ () => !this.currentTest } onclick={ () => this.runTest() }><i class="fas fa-lg fa-play"></i></span>
+                        const mostRecentResult      = dispatcher.getTestMostRecentResult(this.currentTest)
 
-                            <span class="icon icon-play-checked is-large" onclick={ () => this.runTestChecked() }>
-                                <i class="fas fa-lg fa-play"></i>
-                                <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
-                            </span>
+                        return <div class='tbar is-flex'>
+                            <span class="icon is-large" onclick={ () => this.runTest() }><i class="fas fa-lg fa-play"></i></span>
+
+                            {
+                                mostRecentResult
+                                    ?
+                                        <span class="icon icon-play-checked is-large" onclick={ () => this.runTestChecked() }>
+                                            <i class="fas fa-lg fa-play"></i>
+                                            <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
+                                        </span>
+                                    :
+                                        null
+                            }
                         </div>
                     }}
                     <div style="flex: 1; overflow-y: auto">
@@ -128,10 +137,17 @@ export class Dashboard extends Mixin(
         }
 
 
-        getTestDescriptorComponentFromMouseEvent (e : MouseEvent) : TestDescriptor {
+        getTestDescriptorComponentFromMouseEvent (e : MouseEvent) : TestDescriptor | undefined {
             const testPlanItem : ComponentElement<TestDescriptorComponent> = (e.target as Element).closest('.project-plan-test, .project-plan-folder')
 
             return testPlanItem ? testPlanItem.comp.testDescriptor : undefined
+        }
+
+
+        getTestResultComponentFromMouseEvent (e : MouseEvent) : TestNodeResultReactive | undefined {
+            const testResult : ComponentElement<TestNodeResultComponent> = (e.target as Element).closest('.test-file-comp, .subtest-comp')
+
+            return testResult ? testResult.comp.testNode : undefined
         }
 
 
@@ -157,6 +173,12 @@ export class Dashboard extends Mixin(
 
             if (desc) {
                 this.launcher.launchContinuously(desc.leavesAxis())
+            }
+
+            const result    = this.getTestResultComponentFromMouseEvent(e)
+
+            if (result) {
+                this.launcher.launchContinuouslyWithCheckInfo(this.currentTest, individualCheckInfoForTestResult(result))
             }
         }
 
@@ -189,7 +211,9 @@ export class Dashboard extends Mixin(
 
 
         runTestChecked () {
+            const testResult        = this.launcher.dispatcher.getTestMostRecentResult(this.currentTest)
 
+            this.launcher.launchContinuouslyWithCheckInfo(this.currentTest, checkInfoFromTestResult(testResult))
         }
     }
 ) {}
