@@ -7,8 +7,10 @@
 
 .project-plan-bbar {
     background-color: $deccent_lighter_2;
+    padding: 0.2rem;
 
     & .icon {
+        margin-right: 0.1rem;
         transition: background-color ease 0.7s;
         border-radius: 50%;
     }
