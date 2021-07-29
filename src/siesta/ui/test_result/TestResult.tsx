@@ -1,6 +1,7 @@
 /** @jsx ChronoGraphJSX.createElement */
 
 import { ReactiveArray } from "@bryntum/chronograph/src/chrono2/data/Array.js"
+import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { ChronoGraphJSX, ElementSource, PropertySource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
@@ -66,11 +67,17 @@ export class TestNodeResultComponent extends Mixin(
                     }</leaf>
             )
 
-            return <TreeComponent
+            const expandedState = this.testNode.expandedState != null
+                ?
+                    this.testNode.expandedState
+                :
+                    this.testNode.passed && this.testNode.parentNode ? 'collapsed' : 'expanded'
+
+            const el = <TreeComponent
                 // @ts-ignore
                 onmousedown     = { e => this.onMouseDown(e) }
                 class           = { testNode.isRoot ? 'test-file-comp' : 'subtest-comp' }
-                state           = { this.testNode.passed && this.testNode.parentNode ? 'collapsed' : 'expanded' }
+                state           = { expandedState }
             >
                 {
                     testNode.isRoot ?
@@ -86,7 +93,12 @@ export class TestNodeResultComponent extends Mixin(
                         ]
                 }
                 { children }
-            </TreeComponent>
+            </TreeComponent> as ComponentElement<TreeComponent>
+
+            // save changes in `state` atom of the TreeComponent to the `expanded
+            (el.comp.$.state as Box<TreeComponent[ 'state' ]>).commitValueOptimisticHook.on((atom, value) => this.testNode.expandedState = value)
+
+            return el
         }
 
 

@@ -398,6 +398,9 @@ export class TestNodeResultReactive extends Mixin(
         checked         : boolean       = false
 
         @field()
+        expandedState   : 'collapsed' | 'expanded'       = null
+
+        @field()
         // @ts-ignore
         passed          : boolean
 
@@ -479,6 +482,7 @@ export class TestNodeResultReactive extends Mixin(
 
                 if (previous) {
                     child.checked               = previous.checked
+                    child.expandedState         = previous.expandedState
 
                     child.syncFromPrevious(previous)
                 }
