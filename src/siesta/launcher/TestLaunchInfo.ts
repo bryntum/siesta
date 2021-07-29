@@ -32,6 +32,8 @@ export class TestLaunchInfo extends Mixin(
 
         descriptor          : TestDescriptor            = undefined
 
+        previousResult      : TestNodeResultReactive    = undefined
+
         @field()
         mostRecentResult    : TestNodeResultReactive    = undefined
 
@@ -59,6 +61,20 @@ export class TestLaunchInfo extends Mixin(
 
             this.dispatcher.results.set(descriptor, this)
             this.dispatcher.localRemoteDescMap.set(descriptor.remoteId, descriptor)
+        }
+
+
+        setMostRecentResult (value : TestNodeResultReactive) {
+            this.previousResult     = this.mostRecentResult
+
+            this.mostRecentResult   = value
+        }
+
+
+        syncResultsInfo () {
+            if (!this.previousResult) return
+
+            this.mostRecentResult.syncFromPrevious(this.previousResult)
         }
 
 

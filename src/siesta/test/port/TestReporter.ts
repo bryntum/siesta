@@ -82,7 +82,7 @@ export class TestReporterParent extends Mixin(
 
                     this.currentTestNodeResult          = this.rootTestNodeResult = newNode
 
-                    this.launchInfo.mostRecentResult    = newNode
+                    this.launchInfo.setMostRecentResult(newNode)
                     this.launchInfo.launchState         = 'running'
                 }
 
@@ -101,6 +101,10 @@ export class TestReporterParent extends Mixin(
                 this.reporter.onSubTestFinish(this.currentTestNodeResult)
 
                 this.currentTestNodeResult          = this.currentTestNodeResult.parentNode
+
+                if (!this.currentTestNodeResult) {
+                    this.launchInfo.syncResultsInfo()
+                }
             }
 
 

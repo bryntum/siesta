@@ -447,6 +447,45 @@ export class TestNodeResultReactive extends Mixin(
         }
 
 
+        getChildResultsIndex () : Map<string, TestNodeResultReactive> {
+            const index                         = new Map<string, TestNodeResultReactive>()
+
+            let previousTitle : string          = undefined
+            let previousCounter : number        = 0
+
+            CI(this.eachResultOfClass(TestNodeResultReactive)).forEach(result => {
+                const resultTitle               = result.descriptor.title
+
+                if (previousTitle !== undefined && resultTitle === previousTitle)
+                    previousCounter++
+                else {
+                    previousTitle               = undefined
+                    previousCounter             = 0
+                }
+
+                index.set(`${ resultTitle}::${ previousCounter }`, result)
+            })
+
+            return index
+        }
+
+
+        syncFromPrevious (previous : this) {
+            const previousResultsByTitle        = previous.getChildResultsIndex()
+            const ownIndex                      = this.getChildResultsIndex()
+
+            ownIndex.forEach((child, key) => {
+                const previous                  = previousResultsByTitle.get(key)
+
+                if (previous) {
+                    child.checked               = previous.checked
+
+                    child.syncFromPrevious(previous)
+                }
+            })
+        }
+
+
         static createPropertyAccessorsFor (field : Field) {
             if (!field.atomCls || !(field.atomCls.prototype instanceof ReactiveArray)) {
                 super.createPropertyAccessorsFor(field)
