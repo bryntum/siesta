@@ -28,7 +28,7 @@ it('`waitFor` assertion should work', async t => {
     }).postFinishHook.on(todoTest => {
         verifyAllFailed(todoTest, t)
 
-        t.is(CI(todoTest.eachResultLeafOfClass(Assertion)).size, 1)
+        t.is(CI(todoTest.eachResultOfClassDeep(Assertion)).size, 1)
     })
 })
 
@@ -54,7 +54,7 @@ it('`beginAsync/endAsync` assertion should work', async t => {
         }, 1)
 
     }).postFinishHook.on(nestedTest => {
-        const assertions    = CI(nestedTest.eachResultLeafOfClass(Assertion)).toArray()
+        const assertions    = CI(nestedTest.eachResultOfClassDeep(Assertion)).toArray()
 
         t.is(assertions.length, 1)
 
@@ -68,7 +68,7 @@ it('`beginAsync/endAsync` assertion should work', async t => {
     }).postFinishHook.on(todoTest => {
         verifyAllFailed(todoTest, t)
 
-        t.is(CI(todoTest.eachResultLeafOfClass(Assertion)).size, 1)
+        t.is(CI(todoTest.eachResultOfClassDeep(Assertion)).size, 1)
     })
 })
 

@@ -163,18 +163,20 @@ export class AssertionAsyncResolution extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type TestNodeState   = 'created' | 'running' | 'completed'
+export type TestNodeState   = 'created' | 'running' | 'completed' | 'ignored'
 
 // serializable leaf nodes
 export type TestResultLeaf  = Exception | LogMessage | Assertion | AssertionAsyncCreation
 
 export type TestResultLeafConstructor  = typeof Exception | typeof LogMessage | typeof Assertion | typeof AssertionAsyncCreation
 
-// non-serializable tree node - the serializable part is `descriptor`
-export type TestResultTree  = TestNodeResult
+//---------------------------------------------------------------------------------------------------------------------
+export type TestResult                  = TestNodeResult | TestResultLeaf
 
-export type TestResult      = TestResultLeaf | TestResultTree
+export type TestResultConstructor       = typeof TestNodeResult | TestResultLeafConstructor
 
+
+//---------------------------------------------------------------------------------------------------------------------
 export class TestNodeResult extends Mixin(
     [ Result ],
     (base : ClassUnion<typeof Result>) =>
@@ -355,11 +357,28 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        * eachResultLeafOfClass<Cls extends TestResultLeafConstructor> (resultClass : Cls) : Generator<InstanceType<Cls>> {
+        * eachResultOfClass<Cls extends TestResultConstructor> (resultClass : Cls) : Generator<InstanceType<Cls>> {
+            for (const result of this.resultLog) {
+                if (result instanceof resultClass) yield result as InstanceType<Cls>
+            }
+        }
+
+
+        * eachResultOfClassDeep<Cls extends TestResultConstructor> (resultClass : Cls) : Generator<InstanceType<Cls>> {
             for (const result of this.resultLog) {
                 if (result instanceof resultClass) yield result as InstanceType<Cls>
 
-                if (result instanceof TestNodeResult) yield* result.eachResultLeafOfClass(resultClass)
+                if (result instanceof TestNodeResult) yield* result.eachResultOfClassDeep(resultClass)
+            }
+        }
+
+
+        * eachParent () : Generator<this[ 'parentNode' ]> {
+            const parentNode        = this.parentNode
+
+            if (parentNode) {
+                yield parentNode
+                yield* parentNode.eachParent()
             }
         }
     }
