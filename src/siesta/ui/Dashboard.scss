@@ -27,9 +27,9 @@
 }
 
 
-.project-plan-bbar, .project-plan-tbar {
+.tbar {
     background-color: $deccent_lighter_2;
-    padding: 0.2rem;
+    padding: 0.2rem 0 0.2rem 0;
 
     & .icon {
         margin-right: 0.1rem;
@@ -38,25 +38,9 @@
     }
 }
 
-.project-plan-bbar > .icon:hover {
+.tbar > .icon:hover {
     background-color: rgba($deccent_lighter_3, 0.5);
 }
-
-//.project-plan-tbar {
-//    position: relative;
-//
-//    &::before {
-//        content: '';
-//        display: block;
-//        position: absolute;
-//        left: 0;
-//        top: 0;
-//        background-image: url('../images/siesta_logo_on_transparent.svg');
-//        background-repeat: no-repeat;
-//        background-position: left;
-//    }
-//}
-
 
 
 .icon-play-checked {

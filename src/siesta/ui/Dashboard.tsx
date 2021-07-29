@@ -50,10 +50,10 @@ export class Dashboard extends Mixin(
                     style           = "min-width: 100px; width: 300px"
                     projectData     = { this.launcher.projectData }
                 >
-                    <div class='project-plan-tbar is-flex'>
-                        &nbsp;
+                    <div class='tbar is-flex'>
+                        <input class="input" type="text" placeholder="Include glob"/>
                     </div>
-                    <div class='project-plan-bbar is-flex'>
+                    <div class='tbar is-flex'>
                         <span class="icon icon-play-checked is-large" onclick={ () => this.runChecked() }>
                             <i class="fas fa-lg fa-play"></i>
                             <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
@@ -68,9 +68,18 @@ export class Dashboard extends Mixin(
                 <Splitter mode="horizontal" style="width: 8px"></Splitter>
 
                 <div class="is-flex is-flex-direction-column" style="flex: 1">
-                    <div class='project-plan-tbar is-flex'>
-                        &nbsp;
-                    </div>
+                    { () => {
+                        if (!this.currentTest) return null
+
+                        return <div class='tbar is-flex'>
+                            <span class="icon is-large" class:is-disabled={ () => !this.currentTest } onclick={ () => this.runTest() }><i class="fas fa-lg fa-play"></i></span>
+
+                            <span class="icon icon-play-checked is-large" onclick={ () => this.runTestChecked() }>
+                                <i class="fas fa-lg fa-play"></i>
+                                <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
+                            </span>
+                        </div>
+                    }}
                     <div style="flex: 1; overflow-y: auto">
                         {
                             () => {
@@ -171,6 +180,16 @@ export class Dashboard extends Mixin(
             const dispatcher        = this.launcher.dispatcher
 
             this.launcher.launchContinuously(dispatcher.projectPlanLaunchInfo.descriptor.leavesAxis())
+        }
+
+
+        runTest () {
+            this.launcher.launchContinuously([ this.currentTest ])
+        }
+
+
+        runTestChecked () {
+
         }
     }
 ) {}
