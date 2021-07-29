@@ -154,3 +154,25 @@ it('Should merge the `style` config', async t => {
     t.is(el.style.width, '10px')
     t.is(el.style.height, '10px')
 })
+
+
+it('Should merge the event listeners', async t => {
+    const onclick   = t.createSpy()
+
+    class Comp1 extends Component {
+        render () : ReactiveElement {
+            return <div style={ () => "width: 10px" }></div>
+        }
+    }
+
+    // @ts-ignore
+    const comp1     = <Comp1 onclick={ onclick }></Comp1> as HTMLElement
+
+    document.body.appendChild(comp1)
+
+    globalGraph.commit()
+
+    comp1.click()
+
+    t.expect(onclick).toHaveBeenCalled(1)
+})

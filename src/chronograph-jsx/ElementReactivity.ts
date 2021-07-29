@@ -33,6 +33,7 @@ export class ElementReactivity extends Mixin(
         }
 
         eventListeners          : [ string, Listener ][]                = undefined
+        eventListenersAdded     : boolean                               = false
 
         classAttributeSources   : PropertySourceNormalized<string>[]    = undefined
         styleAttributeSources   : PropertySourceNormalized<string>[]    = undefined
@@ -221,6 +222,11 @@ export class ElementReactivity extends Mixin(
                 equality    : () => true,
 
                 calculation : () => {
+                    if (!this.eventListenersAdded) {
+                        this.eventListenersAdded        = true
+                        this.eventListeners && this.eventListeners.forEach(entry => addEventListener(this.el, entry[ 0 ], entry[ 1 ]))
+                    }
+
                     [
                         this.classAttributeBox,
                         this.styleAttributeBox,
@@ -244,8 +250,6 @@ export class ElementReactivity extends Mixin(
             if (this.reactiveChildren) this.$effect.commitValueOptimisticHook.on(
                 (self, newValue, oldValue) => reconcileChildNodes(this.el, newValue)
             )
-
-            this.eventListeners && this.eventListeners.forEach(entry => addEventListener(this.el, entry[ 0 ], entry[ 1 ]))
 
             return this.$effect
         }
