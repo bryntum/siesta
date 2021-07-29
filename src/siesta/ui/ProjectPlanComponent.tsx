@@ -136,7 +136,7 @@ export class TestDescriptorComponent extends Component {
             return [ 'fas fa-check-double', 'fas fa-check-double' ]
         }
         else if (launchInfo.viewState === 'failed') {
-            return [ 'far fa-times-circle', 'far fa-times-circle' ]
+            return [ 'fas fa-times-circle', 'fas fa-times-circle' ]
         }
     }
 }

@@ -1,0 +1,19 @@
+@use '../../../../resources/styling/common/_colors.scss' as *;
+
+.assertion {
+    & .assertion_icon_pass {
+        color: $primary_pass;
+    }
+
+    & .assertion_icon_fail {
+        color: $primary_fail;
+    }
+
+    & .assertion_icon_pass_todo {
+        color: $primary_pass_darker;
+    }
+
+    & .assertion_description {
+        font-weight: bolder;
+    }
+}

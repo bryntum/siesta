@@ -122,7 +122,7 @@ export class AssertionComponent extends Mixin(
             const shouldShowSourceContext   = sourceContext > 0
 
             return <div class="assertion">
-                <span class={`assertion_icon ${ cls }`}>{ assertion.passed ? '✔' : '✘' }</span>{ ' ' }
+                <span class={ `icon assertion_icon ${ cls }` }><i class={ assertion.passed ? 'far fa-check-circle' : 'far fa-times-circle' }></i></span>{ ' ' }
                 <span class="assertion_name">{ assertion.name }</span>
                 <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
                 { assertion.sourcePoint && !shouldShowSourceContext ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
@@ -230,11 +230,11 @@ const testFileFail = (testNode : TestNodeResult) : Element => {
 }
 
 const subTestPass = (testNode : TestNodeResult) : Element => {
-    return <span class='sub_test_pass'>✔</span>
+    return <span class='icon sub_test_pass'><i class='fas fa-check-double'></i></span>
 }
 
 const subTestFail = (testNode : TestNodeResult) : Element => {
-    return <span class='sub_test_fail'>✘</span>
+    return <span class='icon sub_test_fail'><i class='fas fa-times-circle'></i></span>
 }
 
 
