@@ -50,6 +50,9 @@ export class Dashboard extends Mixin(
                     style           = "min-width: 100px; width: 300px"
                     projectData     = { this.launcher.projectData }
                 >
+                    <div class='project-plan-tbar is-flex'>
+                        &nbsp;
+                    </div>
                     <div class='project-plan-bbar is-flex'>
                         <span class="icon icon-play-checked is-large" onclick={ () => this.runChecked() }>
                             <i class="fas fa-lg fa-play"></i>
@@ -62,32 +65,37 @@ export class Dashboard extends Mixin(
                     </div>
                 </ProjectPlanComponent>
                 <Splitter mode="horizontal" style="width: 8px"></Splitter>
-                <div style="flex: 1; overflow-y: auto">
-                    {
-                        () => {
-                            if (!this.currentTest) return this.noSelectionContent()
+                <div class="is-flex is-flex-direction-column" style="flex: 1">
+                    <div class='project-plan-tbar is-flex'>
+                        &nbsp;
+                    </div>
+                    <div style="flex: 1; overflow-y: auto">
+                        {
+                            () => {
+                                if (!this.currentTest) return this.noSelectionContent()
 
-                            const launchInfo            = dispatcher.getTestLaunchInfo(this.currentTest)
-                            const mostRecentResult      = launchInfo.mostRecentResult
+                                const launchInfo            = dispatcher.getTestLaunchInfo(this.currentTest)
+                                const mostRecentResult      = launchInfo.mostRecentResult
 
-                            return mostRecentResult
-                                ?
-                                    <TestNodeResultComponent
-                                        testNode={ mostRecentResult }
-                                        dispatcher={ dispatcher }
-                                        launchInfo={ launchInfo }
-                                    ></TestNodeResultComponent>
-                                :
-                                    this.noResultsContent()
+                                return mostRecentResult
+                                    ?
+                                        <TestNodeResultComponent
+                                            testNode={ mostRecentResult }
+                                            dispatcher={ dispatcher }
+                                            launchInfo={ launchInfo }
+                                        ></TestNodeResultComponent>
+                                    :
+                                        this.noResultsContent()
+                            }
                         }
-                    }
+                    </div>
                 </div>
             </div>
         }
 
 
         noSelectionContent () : ElementSource {
-            return <div class="s-dashboard-no-selection is-flex is-justify-content-center is-align-items-center" style="height:100%">
+            return <div class="s-dashboard-no-selection is-flex is-justify-content-center is-align-items-center" style="height: 100%">
                 <div>
                     <div>No test selected</div>
                     <div>Click a test to select it</div>
@@ -99,8 +107,8 @@ export class Dashboard extends Mixin(
 
 
         noResultsContent () : ElementSource {
-            return <div class="is-flex is-justify-content-center is-align-items-center" style="height:100%">
-                <div style="text-align:center">
+            return <div class="s-dashboard-no-results is-flex is-justify-content-center is-align-items-center" style="height: 100%">
+                <div>
                     <div>No results yet for { this.currentTest.filename }</div>
                     <div>Double click a test to launch it</div>
                     <div>Double click a folder to launch all tests in it</div>

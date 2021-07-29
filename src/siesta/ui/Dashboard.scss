@@ -1,11 +1,33 @@
 @use '../../../resources/styling/common/_colors.scss' as *;
 
-.s-dashboard-no-selection {
+.s-dashboard-no-selection, .s-dashboard-no-results {
     text-align: center;
+
+    & > div {
+        position: relative;
+    }
+
+    & > div::before {
+        content: '';
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        left: -50%;
+        background-image: url('../images/siesta_logo_on_transparent.svg');
+        background-repeat: no-repeat;
+        background-position: left;
+    }
+
+    font-weight: bolder;
+
+    & div {
+        margin: 1em;
+    }
 }
 
 
-.project-plan-bbar {
+.project-plan-bbar, .project-plan-tbar {
     background-color: $deccent_lighter_2;
     padding: 0.2rem;
 
@@ -19,6 +41,22 @@
 .project-plan-bbar > .icon:hover {
     background-color: rgba($deccent_lighter_3, 0.5);
 }
+
+//.project-plan-tbar {
+//    position: relative;
+//
+//    &::before {
+//        content: '';
+//        display: block;
+//        position: absolute;
+//        left: 0;
+//        top: 0;
+//        background-image: url('../images/siesta_logo_on_transparent.svg');
+//        background-repeat: no-repeat;
+//        background-position: left;
+//    }
+//}
+
 
 
 .icon-play-checked {

@@ -33,10 +33,11 @@ export class ProjectPlanComponent extends Mixin(
 
         render () : Element {
             return <div class="project-plan is-flex is-align-items-stretch is-flex-direction-column" style="height: 100%">
+                { this.children[ 0 ] }
                 <div style="flex : 1">
                     <TestDescriptorComponent dispatcher={ this.dispatcher } selectedTestBox={ this.selectedTestBox } testDescriptor={ this.projectData.projectPlan }></TestDescriptorComponent>
                 </div>
-                { this.children }
+                { this.children[ 1 ] }
             </div>
         }
     }
