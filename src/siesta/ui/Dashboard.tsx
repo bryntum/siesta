@@ -50,14 +50,14 @@ export class Dashboard extends Mixin(
                     style           = "min-width: 100px; width: 300px"
                     projectData     = { this.launcher.projectData }
                 >
-                    <div class='project-plan-bbar is-flex field has-addons'>
+                    <div class='project-plan-bbar is-flex'>
                         <span class="icon icon-play-checked is-large" onclick={ () => this.runChecked() }>
-                            <i class="fas fa-2x fa-play"></i>
-                            <span class="icon is-small"><i class="fas fa-check"></i></span>
+                            <i class="fas fa-lg fa-play"></i>
+                            <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
                         </span>
                         <span class="icon icon-play-all is-large" onclick={ () => this.runAll() }>
-                            <i class="fas fa-2x fa-play"></i>
-                            <span class="icon is-large"><i class="fas fa-2x fa-play"></i></span>
+                            <i class="fas fa-lg fa-play"></i>
+                            <span class="icon is-large"><i class="fas fa-lg fa-play"></i></span>
                         </span>
                     </div>
                 </ProjectPlanComponent>

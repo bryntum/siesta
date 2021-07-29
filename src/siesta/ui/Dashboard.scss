@@ -7,16 +7,22 @@
 
 .project-plan-bbar {
     background-color: $deccent_lighter_2;
+
+    & .icon {
+        transition: background-color ease 1s;
+        border-radius: 50%;
+    }
 }
 
-.project-plan-bbar .icon:hover {
-    color: $deccent_lighter_3;
+.project-plan-bbar > .icon:hover {
+    background-color: rgba($deccent_lighter_3, 0.5);
 }
 
 
 .icon-play-checked {
     position: relative;
 }
+
 
 .icon-play-checked .icon {
     position: absolute;
@@ -26,9 +32,13 @@
 
 .icon-play-all {
     position: relative;
+
+    & > i {
+        margin-left: -0.6rem;
+    }
 }
 
 .icon-play-all .icon {
     position: absolute;
-    left: 1rem;
+    left: 0.5rem;
 }
