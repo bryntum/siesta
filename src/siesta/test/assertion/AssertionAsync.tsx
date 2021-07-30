@@ -1,9 +1,10 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { Serializable, serializable } from "../../../serializable/Serializable.js"
+import { TextJSX } from "../../../jsx/TextJSX.js"
+import { serializable } from "../../../serializable/Serializable.js"
 import { delay, OrPromise, SetTimeoutHandler } from "../../../util/Helpers.js"
 import { isFunction } from "../../../util/Typeguards.js"
 import { luid, LUID } from "../../common/LUID.js"
-import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, Exception, Result, SourcePoint, TestNodeResult } from "../TestResult.js"
+import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, TestNodeResult } from "../TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ export type WaitForArg<R> = {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-export type AsyncGapId = number
+type AsyncGapId = number
 
 type AsyncGapInfo       = {
     handler         : SetTimeoutHandler,
@@ -60,6 +61,7 @@ export class AssertionAsync extends Mixin(
         get waitForTimeout () : number {
             return this.descriptor.waitForTimeout
         }
+
         get waitForPollInterval () : number {
             return this.descriptor.waitForPollInterval
         }
@@ -126,7 +128,7 @@ export class AssertionAsync extends Mixin(
                             name            : 'beginAsync',
                             sourcePoint,
                             passed          : false,
-                            description     : `No matching 'endAsync' call within ${timeout}ms`
+                            description     : `No matching 'endAsync' call within ${ timeout }ms`
                         }))
 
                         resolve()
@@ -151,15 +153,16 @@ export class AssertionAsync extends Mixin(
             const gapInfo       = this.gaps.get(gapId)
 
             if (gapInfo !== undefined) {
-                clearTimeout(gapInfo.handler)
-
                 this.gaps.delete(gapId)
+
+                clearTimeout(gapInfo.handler)
 
                 gapInfo.finalize()
             }
         }
 
 
+        // not needed?
         keepAlive <R> (during : Promise<R>) : Promise<R> {
             return during
         }
@@ -171,7 +174,7 @@ export class AssertionAsync extends Mixin(
          * For the waiting to complete, the condition checker function should return some truthy value.
          * That value (wrapped in a Promise) will be returned from the `waitFor` method.
          *
-         * Note, this method is `async`. Don't forget to `await` on it.
+         * Note, this method is `async`. Don't forget to `await` on it. Condition checker function can be `async` (return a `Promise`).
          *
          * For example:
          *
@@ -209,8 +212,7 @@ export class AssertionAsync extends Mixin(
                 pollInterval        = waiting.interval ?? pollInterval
             }
 
-
-            const creation = this.addResult(AssertionWaitFor.new({
+            const creation = this.addResult(AssertionWaitForCreation.new({
                 name            : 'waitFor',
                 description     : desc
             }))
@@ -218,25 +220,34 @@ export class AssertionAsync extends Mixin(
             const res       = await this.keepAlive(this.doWaitFor(condition, timeout, pollInterval))
 
             if (res.conditionIsMet) {
-
-                this.addAsyncResolution(AssertionAsyncResolution.new({
+                this.addAsyncResolution(AssertionWaitForResolution.new({
                     creation    : creation,
-                    passed      : true
+                    passed      : true,
+                    elapsedTime : res.elapsedTime,
+
+                    annotation  : <div>
+                        Waited { res.elapsedTime }ms to fulfill the condition
+                    </div>
                 }))
 
                 return res.result
             } else {
-                this.addAsyncResolution(AssertionAsyncResolution.new({
+                this.addAsyncResolution(AssertionWaitForResolution.new({
                     creation        : creation,
                     passed          : false,
-                    timeoutHappened : res.exception === undefined
-                }))
+                    elapsedTime     : res.elapsedTime,
 
-                if (res.exception !== undefined) {
-                    this.addResult(Exception.new({
-                        exception       : res.exception
-                    }))
-                }
+                    timeoutHappened : res.exception === undefined,
+                    exception       : res.exception,
+
+                    annotation      : res.exception
+                        ?
+                            <div>
+                                <div>Exception thrown from condition checker function:</div>
+                                <div>{ String(res.exception) }</div>
+                            </div>
+                        : <div>Waiting for condition aborted by timeout ({ timeout }ms)</div>
+                }))
 
                 return undefined
             }
@@ -244,7 +255,7 @@ export class AssertionAsync extends Mixin(
 
 
         async doWaitFor <R> (condition : () => OrPromise<R>, timeout : number, interval : number)
-            : Promise<{ conditionIsMet : boolean, result : R, exception : unknown }>
+            : Promise<{ conditionIsMet : boolean, result : R, exception : unknown, elapsedTime : number }>
         {
             const start             = Date.now()
 
@@ -254,14 +265,14 @@ export class AssertionAsync extends Mixin(
                 try {
                     result = await condition()
                 } catch (e) {
-                    return { conditionIsMet : false, result : undefined, exception : e }
+                    return { conditionIsMet : false, result : undefined, exception : e, elapsedTime : Date.now() - start }
                 }
 
                 if (result)
                     break
                 else {
                     if (Date.now() - start >= timeout) {
-                        return { conditionIsMet : false, result : undefined, exception : undefined }
+                        return { conditionIsMet : false, result : undefined, exception : undefined, elapsedTime : Date.now() - start }
                     }
 
                     await delay(interval)
@@ -269,29 +280,37 @@ export class AssertionAsync extends Mixin(
 
             } while (!result)
 
-            return { conditionIsMet : true, result, exception : undefined }
+            return { conditionIsMet : true, result, exception : undefined, elapsedTime : Date.now() - start }
         }
     }
 ) {}
 
 
 //---------------------------------------------------------------------------------------------------------------------
-
-// experiment - separate class per assertion
-
-// we use the final class as Mixin class, (even that a simple plain class would be enough)
+// we use the final class as Mixin class here, (even that a simple plain class would be enough)
 // for the purpose of declaration files generation
 
-@serializable({ id : 'AssertionWaitFor' })
-export class AssertionWaitFor extends Mixin(
+@serializable({ id : 'AssertionWaitForCreation' })
+export class AssertionWaitForCreation extends Mixin(
     [ AssertionAsyncCreation ],
     (base : ClassUnion<typeof AssertionAsyncCreation>) =>
 
-    class AssertionWaitFor extends base {
+    class AssertionWaitForCreation extends base {
         name            : string        = 'waitFor'
+    }
+) {}
 
-        get passed () : boolean {
-            return this.resolution.passed
-        }
+
+@serializable({ id : 'AssertionWaitForResolution' })
+export class AssertionWaitForResolution extends Mixin(
+    [ AssertionAsyncResolution ],
+    (base : ClassUnion<typeof AssertionAsyncResolution>) =>
+
+    class AssertionWaitForResolution extends base {
+        elapsedTime     : number            = 0
+
+        timeoutHappened : boolean           = false
+
+        exception       : unknown           = undefined
     }
 ) {}

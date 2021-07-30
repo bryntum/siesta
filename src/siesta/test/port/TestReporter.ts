@@ -4,7 +4,7 @@ import { local, Port, remote } from "../../../rpc/port/Port.js"
 import { LUID } from "../../common/LUID.js"
 import { TestLaunchInfo } from "../../launcher/TestLaunchInfo.js"
 import { Reporter } from "../../reporter/Reporter.js"
-import { AssertionWaitFor } from "../assertion/AssertionAsync.js"
+import { AssertionWaitForCreation, AssertionWaitForResolution } from "../assertion/AssertionAsync.js"
 import { TestDescriptor } from "../TestDescriptor.js"
 import {
     Assertion,
@@ -23,7 +23,8 @@ import {
 Assertion
 AssertionAsyncCreation
 AssertionAsyncResolution
-AssertionWaitFor
+AssertionWaitForCreation
+AssertionWaitForResolution
 Exception
 LogMessage
 XmlElement

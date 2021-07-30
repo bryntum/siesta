@@ -15,7 +15,15 @@ import { TestLaunchInfo } from "../../launcher/TestLaunchInfo.js"
 import { ProjectSerializableData } from "../../project/ProjectDescriptor.js"
 import { sourcePointTemplate } from "../../reporter/Reporter.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
-import { Assertion, Exception, LogMessage, TestNodeResult, TestNodeResultReactive, TestResult } from "../../test/TestResult.js"
+import {
+    Assertion,
+    AssertionAsyncCreation,
+    Exception,
+    LogMessage,
+    TestNodeResult,
+    TestNodeResultReactive,
+    TestResult
+} from "../../test/TestResult.js"
 import { TreeComponent } from "../components/TreeComponent.js"
 
 ChronoGraphJSX
@@ -39,8 +47,6 @@ export class TestNodeResultComponent extends Mixin(
 
 
         render () : ReactiveElement {
-            // const nodesToShow : TestResult[]  = testNode.resultLog.filter(result => this.needToShowResult(result, testNode.isTodo))
-
             const Self      = this.constructor as typeof TestNodeResultComponent
             const testNode  = this.testNode
 
@@ -121,10 +127,10 @@ export class AssertionComponent extends Mixin(
 
     class AssertionComponent extends base {
         props           : Component[ 'props' ] & {
-            testNode        : TestNodeResultReactive
-            assertion       : Assertion
-            dispatcher      : Dispatcher
-            launchInfo      : TestLaunchInfo
+            testNode        : AssertionComponent[ 'testNode' ]
+            assertion       : AssertionComponent[ 'assertion' ]
+            dispatcher      : AssertionComponent[ 'dispatcher' ]
+            launchInfo      : AssertionComponent[ 'launchInfo' ]
         }
 
         assertion       : Assertion                 = undefined
@@ -134,42 +140,57 @@ export class AssertionComponent extends Mixin(
 
 
         render () : Element {
-            const testNode      = this.testNode
-            const assertion     = this.assertion
-            const launcher      = this.dispatcher.launcher
-
-            const cls   = testNode.isTodo ?
-                assertion.passed ? 'assertion_icon_pass_todo' : 'assertion_icon_pass'
-            :
-                assertion.passed ? 'assertion_icon_pass' : 'assertion_icon_fail'
-
-            const passed                    = assertion.passed || testNode.isTodo
-            const canShowSourceContext      = assertion.sourcePoint
-
+            const testNode                  = this.testNode
+            const assertion                 = this.assertion
+            const launcher                  = this.dispatcher.launcher
+            const sourcePoint               = assertion.sourcePoint
             const sourceContext             = launcher.sourceContext
             const shouldShowSourceContext   = sourceContext > 0
 
-            return <div class="assertion">
-                <span class={ `icon assertion_icon ${ cls }` }><i class={ assertion.passed ? 'far fa-check-circle' : 'far fa-times-circle' }></i></span>{ ' ' }
-                <span class="assertion_name">{ assertion.name }</span>
-                <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
-                { assertion.sourcePoint && !shouldShowSourceContext ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
-                {
-                    () => !passed && canShowSourceContext && this.launchInfo.testSources && shouldShowSourceContext
-                        ?
-                            <pre class='assertion_annotation'>
-                                { launcher.render(sourcePointTemplate(assertion.sourcePoint, this.launchInfo.testSources, sourceContext)) }
-                            </pre>
+            return <div class="assertion">{
+                () => {
+                    if ((assertion instanceof AssertionAsyncCreation) && !assertion.resolution) {
+                        return [
+                            <span class={ `icon assertion_icon assertion_icon_waiting` }><i class='far fa-hourglass'></i></span>,
+                            ' ',
+                            <span class="assertion_name">{ assertion.name }</span>,
+                            <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>,
+                            sourcePoint && !shouldShowSourceContext
+                                ? [ ' at line ', <span class="assertion_source_line">{ sourcePoint.line }</span> ]
+                                : null
+                        ]
+                    }
+                    else {
+                        const cls       = testNode.isTodo ?
+                            assertion.passed ? 'assertion_icon_pass_todo' : 'assertion_icon_pass'
                         :
-                            // sources loading spinner
-                            null
+                            assertion.passed ? 'assertion_icon_pass' : 'assertion_icon_fail'
+
+                        const passed    = assertion.passed || testNode.isTodo
+
+                        return [
+                            <span class={ `icon assertion_icon ${ cls }` }><i class={ assertion.passed ? 'far fa-check-circle' : 'far fa-times-circle' }></i></span>,
+                            ' ' ,
+                            <span class="assertion_name">{ assertion.name }</span>,
+                            <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>,
+                            sourcePoint && !shouldShowSourceContext
+                                ? [ ' at line ', <span class="assertion_source_line">{ sourcePoint.line }</span> ]
+                                : null,
+                            () => !passed && sourcePoint && this.launchInfo.testSources && shouldShowSourceContext
+                                ?
+                                    <pre class='assertion_annotation'>
+                                        { launcher.render(sourcePointTemplate(sourcePoint, this.launchInfo.testSources, sourceContext)) }
+                                    </pre>
+                                :
+                                    // sources loading spinner
+                                    null,
+                            !passed && assertion.annotation
+                                ? <pre class='assertion_annotation'>{ launcher.render(assertion.annotation) }</pre>
+                                : null
+                        ]
+                    }
                 }
-                {
-                    !passed && assertion.annotation
-                        ? <pre class='assertion_annotation'>{ launcher.render(assertion.annotation) }</pre>
-                        : null
-                }
-            </div>
+            }</div>
         }
     }
 ) {}

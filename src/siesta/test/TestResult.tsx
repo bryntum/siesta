@@ -1,4 +1,5 @@
 import { ReactiveArray } from "@bryntum/chronograph/src/chrono2/data/Array.js"
+import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
 import { FieldBox } from "@bryntum/chronograph/src/replica2/Atom.js"
 import { calculate, Entity, field } from "@bryntum/chronograph/src/replica2/Entity.js"
@@ -12,7 +13,7 @@ import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
-import { serializable, Serializable } from "../../serializable/Serializable.js"
+import { exclude, serializable, Serializable } from "../../serializable/Serializable.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { escapeRegExp } from "../../util/Helpers.js"
 import { luid } from "../common/LUID.js"
@@ -100,12 +101,12 @@ export class Exception extends Mixin(
 export type SourcePoint = { line : number, char : number }
 
 
-@serializable({ id : 'AssertionBase' })
-export class AssertionBase extends Mixin(
+@serializable({ id : 'Assertion' })
+export class Assertion extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
-    class AssertionBase extends base {
+    class Assertion extends base {
         name            : string            = ''
 
         passed          : boolean           = true
@@ -113,16 +114,7 @@ export class AssertionBase extends Mixin(
         description     : string            = ''
 
         sourcePoint     : SourcePoint       = undefined
-    }
-) {}
 
-
-@serializable({ id : 'Assertion' })
-export class Assertion extends Mixin(
-    [ AssertionBase ],
-    (base : ClassUnion<typeof AssertionBase>) =>
-
-    class Assertion extends base {
         annotation      : XmlElement        = undefined
     }
 ) {}
@@ -131,22 +123,47 @@ export class Assertion extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ id : 'AssertionAsyncCreation' })
 export class AssertionAsyncCreation extends Mixin(
-    [ AssertionBase ],
-    (base : ClassUnion<typeof AssertionBase>) =>
+    [ Assertion, Entity ],
+    (base : ClassUnion<typeof Assertion, typeof Entity>) =>
 
     class AssertionAsyncCreation extends base {
-        resolution      : AssertionAsyncResolution  = undefined
+        $resolution     : AssertionAsyncResolution          = undefined
+
+        @exclude()
+        $resolutionBox   : Box<AssertionAsyncResolution>    = undefined
+
+        get resolutionBox () : Box<AssertionAsyncResolution> {
+            if (this.$resolutionBox !== undefined) return this.$resolutionBox
+
+            return this.$resolutionBox = Box.new(this.$resolution)
+        }
+
+        // @ts-ignore
+        get resolution () : AssertionAsyncResolution | null {
+            return this.resolutionBox.read()
+        }
+        set resolution (value : AssertionAsyncResolution) {
+            this.$resolution    = value
+            this.resolutionBox.write(value)
+        }
+
 
         get isRunning () : boolean {
             return !this.resolution
         }
 
         // @ts-ignore
-        get passed () : boolean {
+        get passed () : boolean | undefined {
             return this.resolution?.passed
         }
-
         set passed (value : boolean) {
+        }
+
+        // @ts-ignore
+        get annotation () : XmlElement {
+            return this.resolution?.annotation
+        }
+        set annotation (value : boolean) {
         }
     }
 ) {}
@@ -159,13 +176,11 @@ export class AssertionAsyncResolution extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class AssertionAsyncResolution extends base {
-        creation        : AssertionAsyncCreation = undefined
+        creation        : AssertionAsyncCreation    = undefined
 
-        passed          : boolean           = true
+        passed          : boolean                   = true
 
-        timeoutHappened : boolean           = false
-
-        exception       : unknown           = undefined
+        annotation      : XmlElement                = undefined
     }
 ) {}
 
