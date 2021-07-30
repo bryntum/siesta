@@ -100,28 +100,29 @@ export class Exception extends Mixin(
 export type SourcePoint = { line : number, char : number }
 
 
-@serializable({ id : 'Assertion' })
-export class Assertion extends Mixin(
+@serializable({ id : 'AssertionBase' })
+export class AssertionBase extends Mixin(
     [ Serializable, Result ],
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
-    class Assertion extends base {
+    class AssertionBase extends base {
         name            : string            = ''
 
-        $passed         : boolean           = true
-
-        get passed () : boolean {
-            return this.$passed
-        }
-
-        set passed (value : boolean) {
-            this.$passed = value
-        }
+        passed          : boolean           = true
 
         description     : string            = ''
 
         sourcePoint     : SourcePoint       = undefined
+    }
+) {}
 
+
+@serializable({ id : 'Assertion' })
+export class Assertion extends Mixin(
+    [ AssertionBase ],
+    (base : ClassUnion<typeof AssertionBase>) =>
+
+    class Assertion extends base {
         annotation      : XmlElement        = undefined
     }
 ) {}
@@ -130,14 +131,19 @@ export class Assertion extends Mixin(
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ id : 'AssertionAsyncCreation' })
 export class AssertionAsyncCreation extends Mixin(
-    [ Assertion, Serializable, Result ],
-    (base : ClassUnion<typeof Assertion, typeof Serializable, typeof Result>) =>
+    [ AssertionBase ],
+    (base : ClassUnion<typeof AssertionBase>) =>
 
     class AssertionAsyncCreation extends base {
         resolution      : AssertionAsyncResolution  = undefined
 
+        get isRunning () : boolean {
+            return !this.resolution
+        }
+
+        // @ts-ignore
         get passed () : boolean {
-            return this.resolution.passed
+            return this.resolution?.passed
         }
 
         set passed (value : boolean) {
@@ -158,6 +164,8 @@ export class AssertionAsyncResolution extends Mixin(
         passed          : boolean           = true
 
         timeoutHappened : boolean           = false
+
+        exception       : unknown           = undefined
     }
 ) {}
 
@@ -462,11 +470,11 @@ export class TestNodeResultReactive extends Mixin(
                 if (previousTitle !== undefined && resultTitle === previousTitle)
                     previousCounter++
                 else {
-                    previousTitle               = undefined
+                    previousTitle               = resultTitle
                     previousCounter             = 0
                 }
 
-                index.set(`${ resultTitle}::${ previousCounter }`, result)
+                index.set(`${ resultTitle }::${ previousCounter }`, result)
             })
 
             return index
