@@ -17,7 +17,7 @@ Supported styles:
 
 - `text-decoration: underline` (the only recognized value is `underline`)
 
-- `font-weight: bold` (the only recognized value is `bold`)
+- `font-weight: bolder` (the only recognized value is `bolder`)
 
 */
 
@@ -68,7 +68,7 @@ Supported styles:
 }
 
 .accented {
-    font-weight: bold;
+    font-weight: bolder;
 }
 
 .deccented {
@@ -88,7 +88,7 @@ Supported styles:
 }
 
 .test_file_url_filename {
-    font-weight: bold;
+    font-weight: bolder;
 }
 
 .test_file_pass {
@@ -139,7 +139,7 @@ Supported styles:
 }
 
 .assertion_description {
-    font-weight: bold;
+    font-weight: bolder;
 }
 
 
@@ -179,7 +179,7 @@ Supported styles:
 
 
 .summary {
-    font-weight: bold;
+    font-weight: bolder;
 }
 
 .summary_tests_passed {
@@ -213,10 +213,10 @@ Supported styles:
 }
 
 .option_name {
-    font-weight: bold;
+    font-weight: bolder;
 }
 
 .option_group_name {
     color: $primary_pass;
-    font-weight: bold;
+    font-weight: bolder;
 }

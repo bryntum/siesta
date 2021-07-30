@@ -517,7 +517,7 @@ export class Test extends TestPre {
             subTest.reporter    = this.reporter
 
             if (checkInfo) {
-                const currentCheckInfo  = checkInfo.childNodes[ currentCheckInfoIndex ]
+                const currentCheckInfo  = checkInfo.childNodes?.[ currentCheckInfoIndex ]
 
                 if (currentCheckInfo && subTest.descriptor.title === currentCheckInfo.title) {
                     await subTest.start(currentCheckInfo)

@@ -75,7 +75,7 @@ function styleToColorer (styleName : string, styleValue : string) : string | und
             return undefined
 
         case 'font-weight':
-            if (styleValue === 'bold') return '.bold'
+            if (styleValue === 'bolder') return '.bold'
 
             return undefined
     }
