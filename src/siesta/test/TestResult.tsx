@@ -584,10 +584,6 @@ export class SubTestCheckInfo extends Mixin(
 
         childNodeT  : SubTestCheckInfo
         parentNode  : SubTestCheckInfo
-
-        // the 2 consequently following subtests with the same title will be distinguished by their position
-        // (starting from 0)
-        position    : number        = 0
     }
 ) {}
 
@@ -609,7 +605,9 @@ export const checkInfoFromTestResult    = (result : TestNodeResultReactive) : Su
         return undefined
 }
 
-export const individualCheckInfoForTestResult    = (result : TestNodeResultReactive) : SubTestCheckInfo => {
+export const individualCheckInfoForTestResult    = (result : TestNodeResultReactive) : SubTestCheckInfo | undefined => {
+    if (!result.parentNode) return undefined
+
     let checkInfo           = SubTestCheckInfo.new({ title : result.descriptor.title })
 
     CI(result.eachParent()).forEach(parent => {
