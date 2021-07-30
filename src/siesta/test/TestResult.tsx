@@ -308,17 +308,27 @@ export class TestNodeResult extends Mixin(
         get passed () : boolean {
             if (this.$passed !== undefined) return this.$passed
 
+            return this.$passed     = this.calculatePassed()
+        }
+
+
+        calculatePassed () : boolean {
             let passed : boolean    = true
 
             this.resultLog.forEach(result => {
                 if ((result instanceof Exception) && !this.isTodo) passed = false
 
-                if ((result instanceof Assertion) && !result.passed && !this.isTodo) passed = false
+                if (
+                    (result instanceof Assertion) && (!(result instanceof AssertionAsyncCreation) || !result.isRunning)
+                    && !result.passed && !this.isTodo
+                ) {
+                    passed = false
+                }
 
                 if ((result instanceof TestNodeResult) && !result.passed && !this.isTodo) passed = false
             })
 
-            return this.$passed     = passed
+            return passed
         }
 
 
@@ -443,19 +453,12 @@ export class TestNodeResultReactive extends Mixin(
         // @ts-ignore
         passed          : boolean
 
+        @field()
+        state           : TestNodeState
+
         @calculate('passed')
         calculatePassed () : boolean {
-            let passed      = true
-
-            CI(this.resultLogReactive.readValues()).forEach(result => {
-                if ((result instanceof Exception) && !this.isTodo) { passed = false; return false }
-
-                if ((result instanceof Assertion) && !result.passed && !this.isTodo) { passed = false; return false }
-
-                if ((result instanceof TestNodeResult) && !result.passed && !this.isTodo) { passed = false; return false }
-            })
-
-            return passed
+            return super.calculatePassed()
         }
 
 

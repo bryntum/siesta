@@ -86,17 +86,18 @@ export class TestNodeResultComponent extends Mixin(
                 state           = { expandedState }
             >
                 {
-                    testNode.isRoot ?
-                        [ testNodeState(testNode), ' ', testNodeUrlTemplate(testNode.descriptor, this.dispatcher.projectData) ]
+                    testNode.isRoot
+                        ?
+                            [ testNodeStateIcon(testNode), ' ', testNodeUrlTemplate(testNode.descriptor, this.dispatcher.projectData) ]
                         :
-                        [
-                            <span onclick={ () => testNode.toggleChecked() } class="icon">
-                                <i class={ () => testNode.checked ? 'far fa-check-square' : 'far fa-square' }></i>
-                            </span>,
-                            testNodeState(testNode), ' ',
-                            testNode.isTodo ? <span class="accented">[todo] </span> : '',
-                            <span class='subtest-title'>{ testNode.descriptor.title }</span>,
-                        ]
+                            [
+                                <span onclick={ () => testNode.toggleChecked() } class="icon">
+                                    <i class={ () => testNode.checked ? 'far fa-check-square' : 'far fa-square' }></i>
+                                </span>,
+                                testNodeStateIcon(testNode), ' ',
+                                testNode.isTodo ? <span class="accented">[todo] </span> : '',
+                                <span class='subtest-title'>{ testNode.descriptor.title }</span>,
+                            ]
                 }
                 { children }
             </TreeComponent> as ComponentElement<TreeComponent>
@@ -269,32 +270,21 @@ export class ExceptionComponent extends Mixin(
 ) {}
 
 
-
-const testFilePass = (testNode : TestNodeResult) : Element => {
-    return <span class='test_file_pass'>PASS</span>
-}
-
-const testFileFail = (testNode : TestNodeResult) : Element => {
-    return <span class='test_file_fail'>FAIL</span>
-}
-
-const subTestPass = (testNode : TestNodeResult) : Element => {
-    return <span class='icon sub_test_pass'><i class='fas fa-check'></i></span>
-}
-
-const subTestFail = (testNode : TestNodeResult) : Element => {
-    return <span class='icon sub_test_fail'><i class='fas fa-times-circle'></i></span>
-}
-
-
-const testNodeState = (testNode : TestNodeResult) : ElementSource => {
+const testNodeStateIcon = (testNode : TestNodeResult) : ElementSource => {
     if (testNode.isRoot) {
-        return () => testNode.passed ? testFilePass(testNode) : testFileFail(testNode)
+        return () => !testNode.passed
+            ? <span class='test_file_fail'>FAIL</span>
+            : testNode.state === 'completed'
+                ? <span class='test_file_pass'>PASS</span>
+                : <span class='test_file_runs'>RUNS</span>
     } else {
-        if (testNode.state === 'ignored') {
-            return () => <span class='icon'><i class="far fa-eye-slash"></i></span>
-        } else
-            return () => testNode.passed ? subTestPass(testNode) : subTestFail(testNode)
+        return () => testNode.state === 'ignored'
+            ? <span class='icon'><i class="far fa-eye-slash"></i></span>
+            : !testNode.passed
+                ? <span class='icon sub_test_fail'><i class='fas fa-times-circle'></i></span>
+                : testNode.state === 'completed'
+                    ? <span class='icon sub_test_pass'><i class='fas fa-check'></i></span>
+                    : <span class='icon sub_test_runs'><i class='fas fa-running'></i></span>
     }
 }
 

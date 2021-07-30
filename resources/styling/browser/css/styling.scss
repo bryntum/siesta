@@ -8,7 +8,8 @@
 
 @use '../../terminal/_styling.scss';
 
-.test_file_pass, .test_file_fail {
+.test_file_pass, .test_file_fail, .test_file_runs {
+    font-family: "JetBrains Mono", monospace, serif;
     padding-left: 1ch;
     padding-right: 1ch;
 }
