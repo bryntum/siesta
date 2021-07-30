@@ -45,15 +45,19 @@ export class Dashboard extends Mixin(
                 ondblclick  = { e => this.onDoubleClick(e) }
                 class       = 'is-flex is-align-items-stretch' style='height: 100%;'
             >
-                <ProjectPlanComponent
-                    dispatcher      = { this.launcher.dispatcher }
-                    selectedTestBox = { this.$.currentTest as Box<TestDescriptor> }
-                    style           = "min-width: 100px; width: 300px"
-                    projectData     = { this.launcher.projectData }
-                >
-                    <div class='tbar is-flex'>
+                <div class="is-flex is-flex-direction-column" style = "min-width: 100px; width: 300px">
+                    <div class='tbar is-flex' style="height: 3em">
                         <input class="input" type="text" placeholder="Include glob"/>
                     </div>
+
+                    <ProjectPlanComponent
+                        dispatcher      = { this.launcher.dispatcher }
+                        selectedTestBox = { this.$.currentTest as Box<TestDescriptor> }
+                        projectData     = { this.launcher.projectData }
+                        style           = "flex: 1"
+                    >
+                    </ProjectPlanComponent>
+
                     <div class='tbar is-flex'>
                         <span class="icon icon-play-checked is-large" onclick={ () => this.runChecked() }>
                             <i class="fas fa-lg fa-play"></i>
@@ -64,7 +68,7 @@ export class Dashboard extends Mixin(
                             <span class="icon is-large"><i class="fas fa-lg fa-play"></i></span>
                         </span>
                     </div>
-                </ProjectPlanComponent>
+                </div>
 
                 <Splitter mode="horizontal" style="width: 8px"></Splitter>
 
