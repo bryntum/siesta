@@ -138,6 +138,7 @@ export class AssertionAsyncCreation extends Mixin(
             return this.$resolutionBox = Box.new(this.$resolution)
         }
 
+        // the `resolution` property effectively made reactive _and_ serializable
         // @ts-ignore
         get resolution () : AssertionAsyncResolution | null {
             return this.resolutionBox.read()
@@ -269,11 +270,16 @@ export class TestNodeResult extends Mixin(
         }
 
 
+        resetChildNodesCache () {
+            this.$childNodes = undefined
+        }
+
+
         addResult<T extends TestResult> (result : T) : T {
             if (this.frozen) throw new Error("Adding result after test finalization")
 
             // clear the `$childNodes` cache
-            if (result instanceof TestNodeResult) this.$childNodes = undefined
+            if (result instanceof TestNodeResult) this.resetChildNodesCache()
 
             this.$passed    = undefined
 
@@ -409,6 +415,14 @@ export class TestNodeResult extends Mixin(
 ) {}
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export type ChildResultsIndex = {
+    idToChild       : Map<string, TestNodeResultReactive>,
+    childToId       : Map<TestNodeResultReactive, string>
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 @entity()
 export class TestNodeResultReactive extends Mixin(
     [ TestNodeResult, Entity ],
@@ -416,6 +430,8 @@ export class TestNodeResultReactive extends Mixin(
 
     class TestNodeResultReactive extends base {
         override parentNode      : TestNodeResultReactive    = undefined
+
+        previous        : this          = undefined
 
         @field()
         checked         : boolean       = false
@@ -473,8 +489,22 @@ export class TestNodeResultReactive extends Mixin(
         }
 
 
-        getChildResultsIndex () : Map<string, TestNodeResultReactive> {
-            const index                         = new Map<string, TestNodeResultReactive>()
+        resetChildNodesCache () {
+            super.resetChildNodesCache()
+
+            this.$childResultsIndex = undefined
+        }
+
+
+        $childResultsIndex : ChildResultsIndex          = undefined
+
+        get childResultsIndex () : ChildResultsIndex {
+            if (this.$childResultsIndex !== undefined) return this.$childResultsIndex
+
+            const index : ChildResultsIndex     = {
+                idToChild       : new Map(),
+                childToId       : new Map()
+            }
 
             let previousTitle : string          = undefined
             let previousCounter : number        = 0
@@ -489,27 +519,19 @@ export class TestNodeResultReactive extends Mixin(
                     previousCounter             = 0
                 }
 
-                index.set(`${ resultTitle }::${ previousCounter }`, result)
+                const id        = `${ resultTitle }::${ previousCounter }`
+
+                index.idToChild.set(id, result)
+                index.childToId.set(result, id)
             })
 
-            return index
+            return this.$childResultsIndex = index
         }
 
 
-        syncFromPrevious (previous : this) {
-            const previousResultsByTitle        = previous.getChildResultsIndex()
-            const ownIndex                      = this.getChildResultsIndex()
-
-            ownIndex.forEach((child, key) => {
-                const previous                  = previousResultsByTitle.get(key)
-
-                if (previous) {
-                    child.checked               = previous.checked
-                    child.expandedState         = previous.expandedState
-
-                    child.syncFromPrevious(previous)
-                }
-            })
+        syncFromPrevious () {
+            this.checked        = this.previous.checked
+            this.expandedState  = this.previous.expandedState
         }
 
 

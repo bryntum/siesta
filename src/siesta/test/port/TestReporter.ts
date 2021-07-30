@@ -73,17 +73,32 @@ export class TestReporterParent extends Mixin(
 
                     this.currentTestNodeResult.addResult(newNode)
 
+                    const previousChildResultsIndex     = this.currentTestNodeResult.previous?.childResultsIndex
+
+                    if (previousChildResultsIndex) {
+                        const currentIndex      = this.currentTestNodeResult.childResultsIndex
+                        const newNodeId         = currentIndex.childToId.get(newNode)
+                        const previousNode      = previousChildResultsIndex.idToChild.get(newNodeId)
+
+                        if (previousNode) {
+                            newNode.previous = previousNode
+                            newNode.syncFromPrevious()
+                        }
+                    }
+
                     this.currentTestNodeResult  = newNode
                 } else {
                     const newNode       = TestNodeResultReactive.new({
                         localId         : testNodeId,
                         descriptor      : descriptor,
                         state           : 'running',
+
+                        previous        : this.launchInfo.mostRecentResult
                     })
 
                     this.currentTestNodeResult          = this.rootTestNodeResult = newNode
 
-                    this.launchInfo.setMostRecentResult(newNode)
+                    this.launchInfo.mostRecentResult    = newNode
                     this.launchInfo.launchState         = 'running'
                 }
 
@@ -102,10 +117,6 @@ export class TestReporterParent extends Mixin(
                 this.reporter.onSubTestFinish(this.currentTestNodeResult)
 
                 this.currentTestNodeResult          = this.currentTestNodeResult.parentNode
-
-                if (!this.currentTestNodeResult) {
-                    this.launchInfo.syncResultsInfo()
-                }
             }
 
 
