@@ -1,5 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { timeout } from "../../util/Helpers.js"
+import { timeout } from "../../util/TimeHelpers.js"
 import { Port, local, remote } from "./Port.js"
 
 //---------------------------------------------------------------------------------------------------------------------

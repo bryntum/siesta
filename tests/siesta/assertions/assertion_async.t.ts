@@ -1,7 +1,7 @@
 import { it } from "../../../index.js"
 import { CI } from "../../../src/iterator/Iterator.js"
 import { Assertion } from "../../../src/siesta/test/TestResult.js"
-import { delay } from "../../../src/util/Helpers.js"
+import { delay } from "../../../src/util/TimeHelpers.js"
 import { verifyAllFailed } from "../@helpers.js"
 
 //-------------------------------------------------------

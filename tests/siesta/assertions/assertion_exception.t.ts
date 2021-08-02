@@ -1,5 +1,5 @@
 import { it } from "../../../index.js"
-import { delay } from "../../../src/util/Helpers.js"
+import { delay } from "../../../src/util/TimeHelpers.js"
 import { verifyAllFailed } from "../@helpers.js"
 
 //-------------------------------------------------------

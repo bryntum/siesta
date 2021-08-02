@@ -1,5 +1,5 @@
 import { it } from "../../browser.js"
-import { delay } from "../../src/util/Helpers.js"
+import { delay } from "../../src/util/TimeHelpers.js"
 
 it('Annotation rendering', async t => {
     // @ts-ignore

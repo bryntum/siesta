@@ -116,45 +116,6 @@ export const copySetInto = <V>(sourceSet : Set<V>, targetSet : Set<V>) : Set<V> 
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const delay = (timeout : number) : Promise<any> => new Promise(resolve => setTimeout(resolve, timeout))
-
-
-//---------------------------------------------------------------------------------------------------------------------
-// it is recommended that the error instance, to throw on timeout, to be provided at the call site of this method
-// this way, the stack trace will point to the `timeout` call, instead of the `timeout` internals
-export const timeout = <T>(promise : Promise<T>, timeout : number, error : Error = new Error(`Timeout of ${ timeout }ms exceeded`)) : Promise<T> => {
-
-    return new Promise((resolve, reject) => {
-        let timeOutHappened     = false
-        let promiseSettled      = false
-
-        promise.then(resolved => {
-            promiseSettled      = true
-
-            if (!timeOutHappened) {
-                clearTimeout(timeoutHandler)
-                resolve(resolved)
-            }
-
-        }, rejected => {
-            promiseSettled      = true
-
-            if (!timeOutHappened) {
-                clearTimeout(timeoutHandler)
-                reject(rejected)
-            }
-        })
-
-        const timeoutHandler    = setTimeout(() => {
-            timeOutHappened     = true
-
-            if (!promiseSettled) reject(error)
-        }, timeout)
-    })
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
 export const awaitDomReady = async () : Promise<void> => {
     if (document.readyState === 'complete') return
 

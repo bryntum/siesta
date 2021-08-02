@@ -1,6 +1,6 @@
 import { describe } from "../../index.js"
 import { Assertion } from "../../src/siesta/test/TestResult.js"
-import { delay } from "../../src/util/Helpers.js"
+import { delay } from "../../src/util/TimeHelpers.js"
 
 //-------------------------------------------------------
 let log : string[]      = []

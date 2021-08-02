@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, it } from "../../index.js"
-import { delay } from "../../src/util/Helpers.js"
+import { delay } from "../../src/util/TimeHelpers.js"
 
 //-------------------------------------------------------
 describe('Should be possible to nest calls to global `it/describe``', t => {

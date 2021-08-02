@@ -1,7 +1,8 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
-import { delay, MIN_SMI, SetTimeoutHandler } from "../../util/Helpers.js"
+import { MIN_SMI, SetTimeoutHandler } from "../../util/Helpers.js"
+import { delay } from "../../util/TimeHelpers.js"
 import { Media } from "../media/Media.js"
 
 //---------------------------------------------------------------------------------------------------------------------
