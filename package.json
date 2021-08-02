@@ -36,7 +36,8 @@
   "dependencies": {
     "chained-iterator": "^0.0.2",
     "chalk": "^4.1.0",
-    "glob": "^7.1.6",
+    "glob": "^7.1.7",
+    "minimatch": "^3.0.4",
     "node-fetch": "^3.0.0-beta.9",
     "playwright": "^1.11.0",
     "puppeteer": "^10.0.0",
@@ -55,16 +56,11 @@
     "@web/dev-server": "^0.1.17",
     "bulma": "^0.9.3",
     "cssom": "^0.4.4",
+    "esinstall": "^1.1.7",
     "sass": "^1.32.11",
-    "snowpack": "^2.17.1",
     "tslint": "^6.1.3",
     "typedoc": "git://github.com/bryntum/typedoc.git#custom",
     "typedoc-default-themes": "git://github.com/bryntum/typedoc-default-themes.git",
     "typescript": "git://github.com/bryntum/TypeScript.git#feat/7342"
-  },
-  "snowpack": {
-    "installOptions": {
-      "polyfillNode": true
-    }
   }
 }
