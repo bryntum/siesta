@@ -1,13 +1,15 @@
 /** @jsx ChronoGraphJSX.createElement */
 
 import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
-import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
+import { calculate, field } from "@bryntum/chronograph/src/replica2/Entity.js"
+import minimatch from "../../../web_modules/minimatch.js"
 import { ChronoGraphJSX, ElementSource } from "../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../chronograph-jsx/Component.js"
 import { ComponentElement } from "../../chronograph-jsx/ElementReactivity.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { awaitDomReady } from "../../util/Helpers.js"
+import { buffer } from "../../util/TimeHelpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { checkInfoFromTestResult, individualCheckInfoForTestResult, TestNodeResultReactive } from "../test/TestResult.js"
@@ -28,6 +30,12 @@ export class Dashboard extends Mixin(
         @field()
         currentTest         : TestDescriptor                = undefined
 
+        @field()
+        filterBox           : string                        = undefined
+
+        @field()
+        testDescriptorFiltered : TestDescriptorFiltered     = undefined
+
 
         async start () {
             await awaitDomReady()
@@ -46,17 +54,19 @@ export class Dashboard extends Mixin(
                 class       = 'is-flex is-align-items-stretch' style='height: 100%;'
             >
                 <div class="is-flex is-flex-direction-column" style = "min-width: 100px; width: 300px">
-                    <div class='tbar is-flex' style="height: 3em">
-                        <input class="input" type="text" placeholder="Include glob"/>
+                    <div class='tbar is-flex' style="height: 2.7em">
+                        <input oninput={ buffer((e : InputEvent) => this.onFilterInput(e), 200) } class="input" type="text" placeholder="Include glob"/>
                     </div>
 
-                    <ProjectPlanComponent
-                        dispatcher      = { this.launcher.dispatcher }
-                        selectedTestBox = { this.$.currentTest as Box<TestDescriptor> }
-                        projectData     = { this.launcher.projectData }
-                        style           = "flex: 1"
-                    >
-                    </ProjectPlanComponent>
+                    {
+                        () => <ProjectPlanComponent
+                            dispatcher      = { this.launcher.dispatcher }
+                            selectedTestBox = { this.$.currentTest as Box<TestDescriptor> }
+                            testDescriptor  = { this.testDescriptorFiltered }
+                            style           = "flex: 1"
+                        >
+                        </ProjectPlanComponent>
+                    }
 
                     <div class='tbar is-flex'>
                         <span class="icon icon-play-checked is-large" onclick={ () => this.runChecked() }>
@@ -144,7 +154,7 @@ export class Dashboard extends Mixin(
         getTestDescriptorComponentFromMouseEvent (e : MouseEvent) : TestDescriptor | undefined {
             const testPlanItem : ComponentElement<TestDescriptorComponent> = (e.target as Element).closest('.project-plan-test, .project-plan-folder')
 
-            return testPlanItem ? testPlanItem.comp.testDescriptor : undefined
+            return testPlanItem ? testPlanItem.comp.testDescriptor.descriptor : undefined
         }
 
 
@@ -191,8 +201,7 @@ export class Dashboard extends Mixin(
             const dispatcher        = this.launcher.dispatcher
 
             const toLaunch          = Array.from(
-                dispatcher.projectPlanLaunchInfo.descriptor
-                    .leavesAxis()
+                flattenFilteredTestDescriptor(this.testDescriptorFiltered)
                     .map(desc => dispatcher.getTestLaunchInfo(desc))
                     .filter(info => info.checked)
                     .map(info => info.descriptor)
@@ -205,7 +214,7 @@ export class Dashboard extends Mixin(
         runAll () {
             const dispatcher        = this.launcher.dispatcher
 
-            this.launcher.launchContinuously(dispatcher.projectPlanLaunchInfo.descriptor.leavesAxis())
+            this.launcher.launchContinuously(flattenFilteredTestDescriptor(this.testDescriptorFiltered))
         }
 
 
@@ -219,5 +228,48 @@ export class Dashboard extends Mixin(
 
             this.launcher.launchContinuouslyWithCheckInfo(this.currentTest, checkInfoFromTestResult(testResult))
         }
+
+
+        onFilterInput (e : InputEvent) {
+            const filter        = (e.target as HTMLInputElement).value
+
+            this.filterBox      = filter ? filter.replace(/^(\*\*\/)?/, '**/') : ''
+        }
+
+
+        @calculate('testDescriptorFiltered')
+        calculateTestDescriptorFiltered () {
+            return filterTestDescriptor(this.launcher.projectData.projectPlan, this.filterBox)
+        }
+
     }
 ) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export type TestDescriptorFiltered = {
+    descriptor          : TestDescriptor,
+    filteredChildren?   : TestDescriptorFiltered[]
+}
+
+
+export const filterTestDescriptor = (desc : TestDescriptor, glob : string) : TestDescriptorFiltered | undefined => {
+    if (desc.isLeaf())
+        return !glob || minimatch(desc.urlAbs, glob, { matchBase : true }) ? { descriptor : desc } : undefined
+    else {
+        const filteredChildren   = desc.childNodes.map(child => filterTestDescriptor(child, glob)).filter(el => Boolean(el))
+
+        return !glob || filteredChildren.length > 0 ? { descriptor : desc, filteredChildren } : undefined
+    }
+}
+
+export const flattenFilteredTestDescriptor = (desc : TestDescriptorFiltered, res : TestDescriptor[] = []) : TestDescriptor[] => {
+    if (desc) {
+        if (!desc.filteredChildren)
+            res.push(desc.descriptor)
+        else
+            desc.filteredChildren.forEach(child => flattenFilteredTestDescriptor(child, res))
+    }
+
+    return res
+}

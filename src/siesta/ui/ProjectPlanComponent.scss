@@ -6,6 +6,8 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     position: relative;
+    border-bottom: 1px solid;
+    border-bottom-color: $deccent;
 }
 
 
@@ -16,6 +18,7 @@
 
 .project-plan-test {
     cursor: pointer;
+    line-height: 1.7em;
 }
 
 .project-plan-folder {

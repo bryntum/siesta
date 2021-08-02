@@ -9,6 +9,7 @@ import { Dispatcher } from "../launcher/Dispatcher.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TreeComponent } from "./components/TreeComponent.js"
+import { TestDescriptorFiltered } from "./Dashboard.js"
 
 ChronoGraphJSX
 
@@ -19,12 +20,14 @@ export class ProjectPlanComponent extends Mixin(
 
     class ProjectPlanComponent extends base {
         props : Component[ 'props' ] & {
-            projectData             : ProjectPlanComponent[ 'projectData' ]
             selectedTestBox         : ProjectPlanComponent[ 'selectedTestBox' ]
             dispatcher              : ProjectPlanComponent[ 'dispatcher' ]
+            testDescriptor          : ProjectPlanComponent[ 'testDescriptor' ]
         }
 
         projectData             : ProjectSerializableData               = undefined
+
+        testDescriptor          : TestDescriptorFiltered                = undefined
 
         selectedTestBox         : Box<TestDescriptor>                   = undefined
 
@@ -32,35 +35,47 @@ export class ProjectPlanComponent extends Mixin(
 
 
         render () : Element {
-            return <TestDescriptorComponent
-                class               = "project-plan"
-                dispatcher          = { this.dispatcher }
-                selectedTestBox     = { this.selectedTestBox }
-                testDescriptor      = { this.projectData.projectPlan }
-            ></TestDescriptorComponent>
+            return <div class="project-plan">
+                {
+                    () => {
+                        return this.testDescriptor
+                            ?
+                                <TestDescriptorComponent
+                                    dispatcher      = { this.dispatcher }
+                                    selectedTestBox = { this.selectedTestBox }
+                                    testDescriptor  = { this.testDescriptor }
+                                ></TestDescriptorComponent>
+                            :
+                                <div class='is-flex is-justify-content-center is-align-items-center' style='height: 100%'>
+                                    <div>No matching tests</div>
+                                </div>
+                    }
+                }
+            </div>
         }
     }
 ) {}
 
 
+//---------------------------------------------------------------------------------------------------------------------
 export class TestDescriptorComponent extends Component {
     props : Component[ 'props' ] & {
-        testDescriptor          : TestDescriptor
+        testDescriptor          : TestDescriptorComponent[ 'testDescriptor' ]
         selectedTestBox         : TestDescriptorComponent[ 'selectedTestBox' ]
         dispatcher              : TestDescriptorComponent[ 'dispatcher' ]
     }
 
     dispatcher                  : Dispatcher                    = undefined
 
-    testDescriptor              : TestDescriptor                = undefined
+    testDescriptor              : TestDescriptorFiltered        = undefined
     selectedTestBox             : Box<TestDescriptor>           = undefined
 
 
     render () : Element {
-        const testDescriptor    = this.testDescriptor
+        const testDescriptor    = this.testDescriptor.descriptor
 
         if (testDescriptor.childNodes) {
-            const launchInfo    = this.dispatcher.resultsGroups.get(this.testDescriptor)
+            const launchInfo    = this.dispatcher.resultsGroups.get(testDescriptor)
 
             return <TreeComponent
                 collapsible = { Boolean(testDescriptor.parentNode) }
@@ -77,10 +92,12 @@ export class TestDescriptorComponent extends Component {
             >
                 <span class='project-plan-folder-title'>{ testDescriptor.title || testDescriptor.filename }</span>
                 {
-                    testDescriptor.childNodes.map(childNode =>
+                    this.testDescriptor.filteredChildren.map(childNode =>
                         <leaf>
                             <TestDescriptorComponent
-                                dispatcher={ this.dispatcher } selectedTestBox={ this.selectedTestBox } testDescriptor={ childNode }
+                                dispatcher      = { this.dispatcher }
+                                selectedTestBox = { this.selectedTestBox }
+                                testDescriptor  = { childNode }
                             >
                             </TestDescriptorComponent>
                         </leaf>
@@ -121,7 +138,7 @@ export class TestDescriptorComponent extends Component {
 
 
     calculateGroupIconClass () : [ string, string ] {
-        const launchInfo    = this.dispatcher.resultsGroups.get(this.testDescriptor)
+        const launchInfo    = this.dispatcher.resultsGroups.get(this.testDescriptor.descriptor)
 
         if (launchInfo.viewState === 'noinfo') {
             return [ 'far fa-folder-open', 'far fa-folder' ]

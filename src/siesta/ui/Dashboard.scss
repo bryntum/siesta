@@ -1,3 +1,4 @@
+@use "sass:color";
 @use '../../../resources/styling/common/_colors.scss' as *;
 
 .s-dashboard-no-selection, .s-dashboard-no-results {
@@ -28,7 +29,6 @@
 
 
 .tbar {
-    background-color: $deccent_lighter_2;
     padding: 0.2rem 0 0.2rem 0;
 
     & .icon {
@@ -39,7 +39,7 @@
 }
 
 .tbar > .icon:hover {
-    background-color: rgba($deccent_lighter_3, 0.5);
+    background-color: color.scale($deccent, $lightness: 75%);
 }
 
 
