@@ -1,3 +1,4 @@
+import { AnyFunction } from "typescript-mixin-class/src/class/Mixin.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
@@ -20,11 +21,85 @@ import { TestGroupLaunchInfo, TestLaunchInfo } from "./TestLaunchInfo.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+class CleanupSlot extends Base {
+    task                : AnyFunction<Promise<any>>         = undefined
+
+    state               : 'keep' | 'dispose'                = 'keep'
+
+
+    async setTask (task : AnyFunction<Promise<any>>) {
+        if (this.state === 'keep')
+            this.task = task
+        else
+            await task()
+    }
+
+
+    async dispose () {
+        this.state  = 'dispose'
+
+        if (this.task) {
+            await this.task()
+
+            this.task   = undefined
+        }
+    }
+}
+
+class CleanupQueue extends Base {
+    dispatcher          : Dispatcher                        = undefined
+
+    order               : TestDescriptor[]                  = []
+
+    slots               : Map<TestDescriptor, CleanupSlot>  = new Map()
+
+
+    get keepNLastResults () : number {
+        return this.dispatcher.launcher.keepNLastResults
+    }
+
+
+    async reserveCleanupSlot (desc : TestDescriptor) {
+        const existing      = this.slots.get(desc)
+
+        if (existing) {
+            await this.extractSlot(desc).dispose()
+        }
+
+        while (this.slots.size > Math.max(this.keepNLastResults - 1, 0)) {
+            await this.extractSlot(this.order[ 0 ]).dispose()
+        }
+
+        const slot          = CleanupSlot.new()
+
+        this.slots.set(desc, slot)
+        this.order.push(desc)
+
+        return slot
+    }
+
+
+    extractSlot (desc : TestDescriptor) : CleanupSlot | undefined {
+        const slot      = this.slots.get(desc)
+
+        if (slot) {
+            this.slots.delete(desc)
+
+            this.order.splice(this.order.indexOf(desc), 1)
+        }
+
+        return slot
+    }
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 export class Dispatcher extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
 
     class Dispatcher extends base {
+        cleanupQueue                : CleanupQueue              = CleanupQueue.new({ dispatcher : this })
+
         launcher                    : Launcher                  = undefined
 
         runningQueue                : Queue                     = undefined
@@ -164,6 +239,8 @@ export class Dispatcher extends Mixin(
 
 
         async launchProjectPlanItem (item : TestDescriptor, checkInfo : SubTestCheckInfo = undefined) {
+            const slot              = await this.cleanupQueue.reserveCleanupSlot(item)
+
             const normalized        = item.flatten
 
             this.logger.debug("Launching project item: ", normalized.url)
@@ -174,7 +251,7 @@ export class Dispatcher extends Mixin(
 
             launchInfo.launchState  = 'started'
 
-            const context           = await this.contextProviders[ 0 ].createContext()
+            const context           = launchInfo.context = await this.contextProviders[ 0 ].createContext()
 
             let preLaunchRes : boolean
 
@@ -192,7 +269,10 @@ export class Dispatcher extends Mixin(
 
                 launchInfo.launchState  = 'completed'
 
-                await context.destroy()
+                await slot.setTask(async () => {
+                    launchInfo.context  = null
+                    await context.destroy()
+                })
 
                 return
             }
@@ -207,7 +287,10 @@ export class Dispatcher extends Mixin(
 
                 launchInfo.launchState  = 'completed'
 
-                await context.destroy()
+                await slot.setTask(async () => {
+                    launchInfo.context  = null
+                    await context.destroy()
+                })
 
                 return
             }
@@ -223,8 +306,11 @@ export class Dispatcher extends Mixin(
 
                 launchInfo.launchState  = 'completed'
             } finally {
-                await testLauncher.disconnect()
-                await context.destroy()
+                await slot.setTask(async () => {
+                    launchInfo.context  = null
+                    await testLauncher.disconnect()
+                    await context.destroy()
+                })
             }
         }
 
