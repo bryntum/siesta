@@ -1,7 +1,7 @@
 import { BoxUnbound } from '@bryntum/chronograph/src/chrono2/data/Box.js'
 import { XmlElement } from "../jsx/XmlElement.js"
 import { isArray, isFunction, isNumber, isString, isSyncFunction } from "../util/Typeguards.js"
-import { Component } from "./Component.js"
+import { Component, ComponentCommon, WebComponent } from "./Component.js"
 import { ComponentElement, ElementReactivity, ReactiveElement, ReactiveNode } from "./ElementReactivity.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -311,7 +311,7 @@ export namespace ChronoGraphJSX {
     export const FragmentSymbol  = Symbol('FragmentSymbol')
 
     export function createElement (
-        tagName         : string | typeof FragmentSymbol | typeof Component,
+        tagName         : string | typeof FragmentSymbol | typeof Component | typeof WebComponent,
         attributes      : Record<string, PropertySource<unknown>>,
         ...children     : ElementSource[]
     )
@@ -344,9 +344,14 @@ export namespace ChronoGraphJSX {
             }
         }
         else if (isSyncFunction(tagName) && (tagName.prototype instanceof Component)) {
-            const component     = tagName.new(Object.assign({}, attributes, { children }))
+            const component     = (tagName as typeof Component).new(Object.assign({}, attributes, { children }))
 
             return component.el
+        }
+        else if (isSyncFunction(tagName) && (tagName.prototype instanceof WebComponent)) {
+            const component     = (tagName as typeof WebComponent).new(Object.assign({}, attributes, { childrenNodes : children }))
+
+            return component
         }
         else {
             throw new Error("Unknown JSX source")
@@ -362,7 +367,7 @@ export declare namespace ChronoGraphJSX {
     namespace JSX {
         type Element        = DOMElement
 
-        interface ElementClass extends Component {
+        interface ElementClass extends ComponentCommon {
         }
 
         interface ElementAttributesProperty {

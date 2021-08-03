@@ -13,6 +13,7 @@ project.plan(
         items       : [
             'plain_jsx.t.js',
             'component.t.js',
+            'web_component.t.js',
             'test.t.js'
         ]
     }

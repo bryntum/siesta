@@ -9,11 +9,11 @@ import { ElementReactivity, ReactiveElement } from "./ElementReactivity.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class Component extends Mixin(
-    [ Entity, ElementReactivity, Base ],
-    (base : ClassUnion<typeof Entity, typeof ElementReactivity, typeof Base>) =>
+export class ComponentCommon extends Mixin(
+    [],
+    (base : ClassUnion) =>
 
-    class Component extends base {
+    class ComponentCommon extends base {
         props : {
             class?          : PropertySourceNormalized<string>
             style?          : PropertySourceNormalized<string>
@@ -27,7 +27,22 @@ export class Component extends Mixin(
         class           : PropertySourceNormalized<string>
         style           : PropertySourceNormalized<string>
 
-        children    : ElementSource[]       = []
+        // TODO unify with `children` in Component
+        childrenNodes   : ElementSource         = []
+
+        categorizedProperties    : PropertiesCategorizationResult     = undefined
+    }
+) {}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class Component extends Mixin(
+    [ ComponentCommon, Entity, ElementReactivity, Base ],
+    (base : ClassUnion<typeof ComponentCommon, typeof Entity, typeof ElementReactivity, typeof Base>) =>
+
+    class Component extends base {
+
+        children        : ElementSource[]       = []
 
         get el () : ReactiveElement {
             if (this.$el !== undefined) return this.$el
@@ -72,14 +87,11 @@ export class Component extends Mixin(
             return this.$effect = this.el.reactivity.effect
         }
 
-        categorizedProperties    : PropertiesCategorizationResult     = undefined
-
 
         initialize (props? : Partial<Component>) {
             const categorizedProperties     = this.categorizedProperties = categorizeProperties(props)
 
             super.initialize(Object.fromEntries(categorizedProperties.otherProperties))
-
             categorizedProperties.otherProperties   = []
 
             this.enterGraph(globalGraph as Replica)
@@ -99,30 +111,59 @@ export class Component extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class WebComponent extends Mixin(
-    [ Entity, HTMLElement ],
-    (base : ClassUnion<typeof HTMLElement, typeof Entity>) =>
+    [ ComponentCommon, Entity, HTMLElement ],
+    (base : ClassUnion<typeof ComponentCommon, typeof HTMLElement, typeof Entity>) =>
 
     class WebComponent extends base {
 
+        reactivity      : ElementReactivity         = undefined
+
+
         initialize (props? : Partial<this>) {
-            props && Object.assign(this, props)
+            this.attachShadow({ mode : 'open' })
+
+            const categorizedProperties     = this.categorizedProperties = categorizeProperties(props)
+
+            Object.assign(this, Object.fromEntries(categorizedProperties.otherProperties))
+            categorizedProperties.otherProperties   = []
 
             this.enterGraph(globalGraph as Replica)
+
+            const reactivity    = this.reactivity     = new ElementReactivity()
+
+            reactivity.el       = this
+
+            reactivity.adoptReactiveProperties(categorizedProperties)
         }
 
 
-        static new<T extends typeof Base> (this : T, props? : Partial<InstanceType<T>>) : InstanceType<T> {
+        static new<T extends typeof WebComponent> (this : T, props? : Partial<InstanceType<T>>) : InstanceType<T> {
             const instance      = new this() as InstanceType<T>
 
             instance.initialize(props)
 
             return instance
         }
+
+
+        render () : ElementSource {
+            return undefined
+        }
+
+
+        connectedCallback () {
+
+        }
+
+
+        disconnectedCallback () {
+
+        }
     }
 ) {}
 
 
-export const tag = (tagName : string) : ClassDecorator => {
+export const custom_element = (tagName : string) : ClassDecorator => {
     // @ts-ignore : https://github.com/Microsoft/TypeScript/issues/29828
     return <T extends typeof WebComponent>(target : T) : T => {
         customElements.define(tagName, target)
