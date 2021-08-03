@@ -9,12 +9,15 @@ ChronoGraphJSX
 //---------------------------------------------------------------------------------------------------------------------
 export class Splitter extends Component {
     props : Component[ 'props' ] & {
-        mode?       : Splitter[ 'mode' ]
+        mode?           : Splitter[ 'mode' ]
+        resizeTarget?   : Splitter[ 'resizeTarget' ]
     }
 
     mode            : 'horizontal' | 'vertical'     = 'horizontal'
 
-    resizeTarget    : (self : ComponentElement<Splitter>) => Element    = self => self.previousElementSibling
+    resizeTargetFunc : (self : ComponentElement<Splitter>) => Element    = undefined
+
+    resizeTarget    : 'next' | 'previous'           = 'previous'
 
 
     render () : Element {
@@ -25,13 +28,22 @@ export class Splitter extends Component {
     }
 
 
+    getResizeTarget () : HTMLElement {
+        if (this.resizeTargetFunc) return this.resizeTargetFunc(this.el as ComponentElement<this>) as HTMLElement
+
+        return this.resizeTarget === 'previous'
+            ? this.el.previousElementSibling as HTMLElement
+            : this.el.nextElementSibling as HTMLElement
+    }
+
+
     onPointerDown (e : MouseEvent) {
         let pointerMoveListener, pointerUpListener
 
         const startX        = e.clientX
         const startY        = e.clientY
 
-        const target        = this.resizeTarget(this.el as ComponentElement<this>) as HTMLElement
+        const target        = this.getResizeTarget()
 
         const initialWidth  = Number.parseInt(target.style.width)
         const initialHeight = Number.parseInt(target.style.height)
@@ -58,13 +70,15 @@ export class Splitter extends Component {
         this.onDragStart()
 
         document.addEventListener('pointermove', pointerMoveListener = (e : MouseEvent) => {
+            const direction = this.resizeTarget === 'previous' ? 1 : -1
+
             const deltaX    = e.clientX - startX
             const deltaY    = e.clientY - startY
 
             if (this.mode === 'horizontal') {
-                target.style.width  = (initialWidth + deltaX) + 'px'
+                target.style.width  = (initialWidth + deltaX * direction) + 'px'
             } else {
-                target.style.height  = (initialHeight + deltaY) + 'px'
+                target.style.height  = (initialHeight + deltaY * direction) + 'px'
             }
         })
 
