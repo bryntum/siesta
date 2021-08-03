@@ -5,6 +5,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { CI } from "../../iterator/Iterator.js"
 import { luid } from "../common/LUID.js"
+import { Context } from "../context/Context.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Exception, TestNodeResultReactive } from "../test/TestResult.js"
 import { Dispatcher } from "./Dispatcher.js"
@@ -31,6 +32,9 @@ export class TestLaunchInfo extends Mixin(
         dispatcher          : Dispatcher                = undefined
 
         descriptor          : TestDescriptor            = undefined
+
+        @field()
+        context             : Context                   = undefined
 
         @field()
         mostRecentResult    : TestNodeResultReactive    = undefined
