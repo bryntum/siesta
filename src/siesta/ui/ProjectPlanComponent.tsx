@@ -93,7 +93,8 @@ export class TestDescriptorComponent extends Component {
                 <span class='project-plan-folder-title'>{ testDescriptor.title || testDescriptor.filename }</span>
                 {
                     this.testDescriptor.filteredChildren.map(childNode =>
-                        <leaf>
+                        // enables ellipsis overflow, but hides the collapse/expand icon, wtf moment
+                        <leaf /*style='overflow-x: hidden; text-overflow: ellipsis'*/>
                             <TestDescriptorComponent
                                 dispatcher      = { this.dispatcher }
                                 selectedTestBox = { this.selectedTestBox }
