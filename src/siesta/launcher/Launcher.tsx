@@ -160,6 +160,8 @@ export class Launcher extends Mixin(
 
         contextProviderSameContext  : ContextProviderSameContext    = undefined
 
+        keepNLastResults        : number                    = 0
+
         // region options
         @option({
             type        : 'string',

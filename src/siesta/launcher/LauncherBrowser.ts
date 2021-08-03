@@ -27,6 +27,7 @@ export class LauncherBrowser extends Mixin(
 
         dashboard               : Dashboard                         = undefined
 
+        keepNLastResults        : number                            = 5
 
         contextProviderConstructors : (typeof ContextProvider)[]    = [
             ContextProviderBrowserIframe
