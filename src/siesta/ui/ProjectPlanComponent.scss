@@ -7,7 +7,7 @@
     text-overflow: ellipsis;
     position: relative;
     border-bottom: 1px solid;
-    border-bottom-color: $deccent;
+    border-bottom-color: $gray_lighter;
 }
 
 
@@ -29,16 +29,11 @@
     font-weight: bolder;
 }
 
-.project-plan-test-title:hover {
-    text-decoration: underline dashed;
-}
+//.project-plan-test-title:hover {
+//    text-decoration: underline dashed;
+//}
 
-.project-plan-test.is-selected > * {
-    position: relative;
-}
-
-.project-plan-test.is-selected::before {
-    background-color: $secondary_pass_lighter_2;
+@mixin overlay {
     content: '\00a0';
 
     display: block;
@@ -48,6 +43,30 @@
     left: 0;
     pointer-events: none;
 }
+
+
+.project-plan-test > * {
+    position: relative;
+}
+
+.project-plan-test:hover::before {
+    @include overlay;
+
+    background-color: rgba($gray_lighter, 0.5);
+}
+
+.project-plan-test.is-selected::before {
+    @include overlay;
+
+    background-color: rgba($secondary_pass_lighter_2, 0.5);
+}
+
+.project-plan-test.is-selected:hover::before {
+    @include overlay;
+
+    background-color: rgba($secondary_pass_lighter_2, 0.7);
+}
+
 
 .project-plan-folder.failed > .title-icon {
     color: $primary_fail;

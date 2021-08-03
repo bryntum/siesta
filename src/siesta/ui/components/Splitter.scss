@@ -2,23 +2,22 @@
 @use '../../../../resources/styling/common/_colors.scss' as *;
 
 .splitter {
-    border-color: $deccent;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 
 .splitter.splitter-vertical {
-    border-top: 1px solid;
-    border-bottom: 1px solid;
+    border-top: 1px solid $gray_lighter;
+    border-bottom: 1px solid $gray_lighter;
     cursor: row-resize;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
 }
 
 
 .splitter.splitter-horizontal {
-    border-left: 1px solid;
-    border-right: 1px solid;
+    border-left: 1px solid $gray_lighter;
+    border-right: 1px solid $gray_lighter;
     cursor: col-resize;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
 }

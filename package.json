@@ -10,7 +10,7 @@
   },
   "scripts": {
     "wds": "npx wds --node-resolve",
-    "sass": "npx sass --watch resources/styling/browser/css src/",
+    "sass": "npx sass --watch resources/styling/ src/",
     "chrome_bench": "google-chrome-stable --js-flags=\"--expose-gc\" $1",
     "bench": "node --expose-gc -r esm benchmarks/chrono2/suite_everything.js",
     "deno": "deno run --allow-read --allow-env --unstable --quiet",

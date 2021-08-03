@@ -29,7 +29,7 @@
 
 
 .tbar {
-    padding: 0.2rem 0 0.2rem 0;
+    padding: 0.2rem;
 
     & .icon {
         margin-right: 0.1rem;
@@ -71,4 +71,14 @@
 .current_test_filename {
     font-weight: bold;
     color: $primary_pass_darker;
+}
+
+.test-results-area {
+    & .content {
+        padding: 0.2rem;
+    }
+
+    & > .tbar {
+        border-bottom: 1px solid $gray_lighter;
+    }
 }

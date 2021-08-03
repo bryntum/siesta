@@ -30,3 +30,5 @@ $secondary_fail_darker: color.scale($secondary_fail, $lightness: -25%) !default;
 $deccent_lighter: color.scale($deccent, $lightness: 25%) !default;
 $deccent_lighter_2: color.scale($deccent, $lightness: 50%) !default;
 $deccent_lighter_3: color.scale($deccent, $lightness: 75%) !default;
+
+$gray_lighter: #dbdbdb !default;

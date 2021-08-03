@@ -82,7 +82,7 @@ export class Dashboard extends Mixin(
 
                 <Splitter mode="horizontal" style="width: 8px"></Splitter>
 
-                <div class="is-flex is-flex-direction-column" style="flex: 1">
+                <div class="test-results-area is-flex is-flex-direction-column" style="flex: 1">
                     { () => {
                         if (!this.currentTest) return null
 
@@ -103,7 +103,7 @@ export class Dashboard extends Mixin(
                             }
                         </div>
                     }}
-                    <div style="flex: 1; overflow-y: auto">
+                    <div class="content" style="flex: 1; overflow-y: auto">
                         {
                             () => {
                                 if (!this.currentTest) return this.noSelectionContent()
