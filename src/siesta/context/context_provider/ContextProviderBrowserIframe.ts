@@ -18,7 +18,7 @@ export class ContextProviderBrowserIframe extends Mixin(
             const iframe        = document.createElement('iframe')
 
             iframe.src          = 'about:blank'
-            iframe.style.border = '0'
+            iframe.setAttribute('style', 'border: 0; position: absolute; left:-10000px; top: -10000px;')
 
             return iframe
         }
