@@ -11,6 +11,7 @@ export class Splitter extends Component {
     props : Component[ 'props' ] & {
         mode?           : Splitter[ 'mode' ]
         resizeTarget?   : Splitter[ 'resizeTarget' ]
+        companionsFunc? : Splitter[ 'companionsFunc' ]
     }
 
     mode            : 'horizontal' | 'vertical'     = 'horizontal'
@@ -18,6 +19,8 @@ export class Splitter extends Component {
     resizeTargetFunc : (self : ComponentElement<Splitter>) => Element    = undefined
 
     resizeTarget    : 'next' | 'previous'           = 'previous'
+
+    companionsFunc : (self : ComponentElement<Splitter>) => HTMLElement[]   = undefined
 
 
     render () : Element {
@@ -37,6 +40,13 @@ export class Splitter extends Component {
     }
 
 
+    getCompanions () : HTMLElement[] {
+        if (this.companionsFunc) return this.companionsFunc(this.el as ComponentElement<this>)
+
+        return [ this.el.previousElementSibling, this.el.nextElementSibling ] as HTMLElement[]
+    }
+
+
     onPointerDown (e : MouseEvent) {
         let pointerMoveListener, pointerUpListener
 
@@ -48,7 +58,7 @@ export class Splitter extends Component {
         const initialWidth  = Number.parseInt(target.style.width)
         const initialHeight = Number.parseInt(target.style.height)
 
-        const companions    = [ this.el.previousElementSibling, this.el.nextElementSibling ] as HTMLElement[]
+        const companions    = this.getCompanions()
 
         const prevStyles    = companions.map(el => {
             return {
