@@ -12,9 +12,10 @@ import { awaitDomReady } from "../../util/Helpers.js"
 import { buffer } from "../../util/TimeHelpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { checkInfoFromTestResult, individualCheckInfoForTestResult, TestNodeResultReactive } from "../test/TestResult.js"
+import { individualCheckInfoForTestResult, TestNodeResultReactive } from "../test/TestResult.js"
 import { Splitter } from "./components/Splitter.js"
 import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComponent.js"
+import { LaunchInfoComponent } from "./test_result/LaunchInfoComponent.js"
 import { TestNodeResultComponent } from "./test_result/TestResult.js"
 
 ChronoGraphJSX
@@ -53,7 +54,7 @@ export class Dashboard extends Mixin(
                 ondblclick  = { e => this.onDoubleClick(e) }
                 class       = 'is-flex is-align-items-stretch' style='height: 100%;'
             >
-                <div class="is-flex is-flex-direction-column" style = "min-width: 100px; width: 300px">
+                <div class="is-flex is-flex-direction-column" style="min-width: 100px; width: 300px">
                     <div class='tbar is-flex' style="height: 2.7em">
                         <input oninput={ buffer((e : InputEvent) => this.onFilterInput(e), 200) } class="input" type="text" placeholder="Include glob"/>
                     </div>
@@ -82,68 +83,24 @@ export class Dashboard extends Mixin(
 
                 <Splitter mode="horizontal" style="width: 8px"></Splitter>
 
-                <div class="test-results-area is-flex is-flex-direction-column" style="flex: 1">
-                    { () => {
-                        if (!this.currentTest) return null
+                {
+                    () => {
+                        if (!this.currentTest) return this.noSelectionContent()
 
-                        const mostRecentResult      = dispatcher.getTestMostRecentResult(this.currentTest)
+                        const launchInfo            = dispatcher.getTestLaunchInfo(this.currentTest)
 
-                        return <div class='tbar is-flex'>
-                            <span class="icon is-large" onclick={ () => this.runTest() }><i class="fas fa-lg fa-play"></i></span>
-
-                            {
-                                mostRecentResult
-                                    ?
-                                        <span class="icon icon-play-checked is-large" onclick={ () => this.runTestChecked() }>
-                                            <i class="fas fa-lg fa-play"></i>
-                                            <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
-                                        </span>
-                                    :
-                                        null
-                            }
-                        </div>
-                    }}
-                    <div class="content" style="flex: 1; overflow-y: auto">
-                        {
-                            () => {
-                                if (!this.currentTest) return this.noSelectionContent()
-
-                                const launchInfo            = dispatcher.getTestLaunchInfo(this.currentTest)
-                                const mostRecentResult      = launchInfo.mostRecentResult
-
-                                return mostRecentResult
-                                    ?
-                                        <TestNodeResultComponent
-                                            testNode={ mostRecentResult }
-                                            dispatcher={ dispatcher }
-                                            launchInfo={ launchInfo }
-                                        ></TestNodeResultComponent>
-                                    :
-                                        this.noResultsContent()
-                            }
-                        }
-                    </div>
-                </div>
+                        return <LaunchInfoComponent dispatcher={ this.launcher.dispatcher } launchInfo={ launchInfo }></LaunchInfoComponent>
+                    }
+                }
             </div>
         }
 
 
         noSelectionContent () : ElementSource {
-            return <div class="s-dashboard-no-selection is-flex is-justify-content-center is-align-items-center" style="height: 100%">
+            return <div class="s-dashboard-no-selection is-flex is-justify-content-center is-align-items-center" style="flex: 1; height: 100%">
                 <div>
                     <div>No test selected</div>
                     <div>Click a test to select it</div>
-                    <div>Double click a test to launch it</div>
-                    <div>Double click a folder to launch all tests in it</div>
-                </div>
-            </div>
-        }
-
-
-        noResultsContent () : ElementSource {
-            return <div class="s-dashboard-no-results is-flex is-justify-content-center is-align-items-center" style="height: 100%">
-                <div>
-                    <div>No results yet for <span class='current_test_filename'>{ this.currentTest.filename }</span></div>
                     <div>Double click a test to launch it</div>
                     <div>Double click a folder to launch all tests in it</div>
                 </div>
@@ -215,18 +172,6 @@ export class Dashboard extends Mixin(
             const dispatcher        = this.launcher.dispatcher
 
             this.launcher.launchContinuously(flattenFilteredTestDescriptor(this.testDescriptorFiltered))
-        }
-
-
-        runTest () {
-            this.launcher.launchContinuously([ this.currentTest ])
-        }
-
-
-        runTestChecked () {
-            const testResult        = this.launcher.dispatcher.getTestMostRecentResult(this.currentTest)
-
-            this.launcher.launchContinuouslyWithCheckInfo(this.currentTest, checkInfoFromTestResult(testResult))
         }
 
 

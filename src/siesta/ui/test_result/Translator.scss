@@ -1,0 +1,25 @@
+.translating {
+    position: absolute;
+    z-index: 10000;
+    overflow: auto;
+
+    --translateX : 0;
+    --translateY : 0;
+    --scaleFactor : 1;
+    --scaledWidth : 0;
+    --scaledHeight : 0;
+
+    & > :first-child {
+        width: var(--scaledWidth);
+        height: var(--scaledHeight);
+        transform: translate(var(--translateX), var(--translateY));
+        overflow: hidden;
+    }
+
+    & > :first-child > :first-child {
+        transform: scale(var(--scaleFactor));
+        transform-origin: left top;
+        transition: transform 0.3s;
+    }
+}
+

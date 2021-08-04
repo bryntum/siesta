@@ -5,8 +5,12 @@
 @use '../../../../src/siesta/ui/ProjectPlanComponent.scss';
 @use '../../../../src/siesta/ui/Dashboard.scss';
 @use '../../../../src/siesta/ui/test_result/TestResult.scss';
+@use '../../../../src/siesta/ui/test_result/Translator.scss';
+@use '../../../../src/siesta/ui/test_result/LaunchInfoComponent.scss';
 
 @use '../../terminal/_styling.scss';
+
+@use '../../common/_colors.scss' as *;
 
 .test_file_pass, .test_file_fail, .test_file_runs {
     font-family: "JetBrains Mono", monospace, serif;
@@ -23,4 +27,9 @@ pre {
     font-family: "JetBrains Mono", monospace, serif;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
+}
+
+
+.s-iframe {
+    background-color: #f6f6f6;
 }
