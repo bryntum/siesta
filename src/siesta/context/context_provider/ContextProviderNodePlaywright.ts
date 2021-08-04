@@ -1,6 +1,7 @@
 import playwright from "playwright"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { LauncherNodejs } from "../../launcher/LauncherNodejs.js"
+import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { ContextPlaywright } from "../ContextPlaywright.js"
 import { ContextProviderTargetBrowser } from "./ContextProviderTargetBrowser.js"
 
@@ -8,7 +9,7 @@ import { ContextProviderTargetBrowser } from "./ContextProviderTargetBrowser.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProviderNodePlaywright extends Mixin(
     [ ContextProviderTargetBrowser ],
-    (base : ClassUnion<typeof ContextProviderTargetBrowser>) => 
+    (base : ClassUnion<typeof ContextProviderTargetBrowser>) =>
 
     class ContextProviderNodePlaywright extends base {
         local                   : boolean           = true
@@ -39,7 +40,7 @@ export class ContextProviderNodePlaywright extends Mixin(
         }
 
 
-        async doCreateContext () : Promise<InstanceType<this[ 'contextClass' ]>> {
+        async doCreateContext (desc? : TestDescriptor) : Promise<InstanceType<this[ 'contextClass' ]>> {
             // this.launcher.logger.debug('Context requested')
 
             const browser           = this.separateBrowserForEveryPage ? await this.createBrowser() : await this.getPrimaryBrowser()

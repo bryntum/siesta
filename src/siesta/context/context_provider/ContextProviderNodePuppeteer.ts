@@ -1,6 +1,7 @@
 import puppeteer from "puppeteer"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { LauncherNodejs } from "../../launcher/LauncherNodejs.js"
+import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { ContextPuppeteer } from "../ContextPuppeteer.js"
 import { ContextProvider } from "./ContextProvider.js"
 import { ContextProviderTargetBrowser } from "./ContextProviderTargetBrowser.js"
@@ -9,7 +10,7 @@ import { ContextProviderTargetBrowser } from "./ContextProviderTargetBrowser.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProviderNodePuppeteer extends Mixin(
     [ ContextProviderTargetBrowser ],
-    (base : ClassUnion<typeof ContextProviderTargetBrowser>) => 
+    (base : ClassUnion<typeof ContextProviderTargetBrowser>) =>
 
     class ContextProviderNodePuppeteer extends base {
         local                   : boolean           = true
@@ -40,7 +41,7 @@ export class ContextProviderNodePuppeteer extends Mixin(
         }
 
 
-        async doCreateContext () : Promise<InstanceType<this[ 'contextClass' ]>> {
+        async doCreateContext (desc? : TestDescriptor) : Promise<InstanceType<this[ 'contextClass' ]>> {
             const browser           = this.separateBrowserForEveryPage ? await this.createBrowser() : await this.getPrimaryBrowser()
 
             const page              = await browser.newPage()

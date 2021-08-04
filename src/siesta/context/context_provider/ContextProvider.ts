@@ -3,12 +3,13 @@ import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { Hook } from "../../../hook/Hook.js"
 import { CI } from "../../../iterator/Iterator.js"
 import { Launcher } from "../../launcher/Launcher.js"
+import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { Context } from "../Context.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProvider extends Mixin(
     [ Base ],
-    (base : ClassUnion<typeof Base>) => 
+    (base : ClassUnion<typeof Base>) =>
 
     class ContextProvider extends base {
         local                   : boolean           = false
@@ -40,12 +41,12 @@ export class ContextProvider extends Mixin(
         }
 
 
-        async createContext () : Promise<InstanceType<this[ 'contextClass' ]>> {
+        async createContext (desc? : TestDescriptor) : Promise<InstanceType<this[ 'contextClass' ]>> {
             if (this.contexts.size >= this.maxParallelContexts) {
                 await new Promise<void>(resolve => this.onSpareSlotAvailableHook.once(() => resolve))
             }
 
-            const context       = await this.doCreateContext()
+            const context       = await this.doCreateContext(desc)
 
             context.provider    = this
 
@@ -62,7 +63,7 @@ export class ContextProvider extends Mixin(
         }
 
 
-        async doCreateContext () : Promise<InstanceType<this[ 'contextClass' ]>> {
+        async doCreateContext (desc? : TestDescriptor) : Promise<InstanceType<this[ 'contextClass' ]>> {
             throw new Error("Abstract method")
         }
 

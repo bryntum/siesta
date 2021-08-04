@@ -1,5 +1,6 @@
 import child_process from "child_process"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
+import { TestDescriptorNodejs } from "../../test/TestDescriptorNodejs.js"
 import { ContextNodeChildProcess } from "../ContextNodeChildProcess.js"
 import { ContextProvider } from "./ContextProvider.js"
 
@@ -7,7 +8,7 @@ import { ContextProvider } from "./ContextProvider.js"
 //---------------------------------------------------------------------------------------------------------------------
 export class ContextProviderNodeChildProcess extends Mixin(
     [ ContextProvider ],
-    (base : ClassUnion<typeof ContextProvider>) => 
+    (base : ClassUnion<typeof ContextProvider>) =>
 
     class ContextProviderNodeChildProcess extends base {
         local                   : boolean           = true
@@ -17,7 +18,7 @@ export class ContextProviderNodeChildProcess extends Mixin(
         contextClass            : typeof ContextNodeChildProcess    = ContextNodeChildProcess
 
 
-        async doCreateContext () : Promise<InstanceType<this[ 'contextClass' ]>> {
+        async doCreateContext (desc? : TestDescriptorNodejs) : Promise<InstanceType<this[ 'contextClass' ]>> {
             const childProcess  = child_process.fork(
                 '',
                 {
