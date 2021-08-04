@@ -251,7 +251,7 @@ export class Dispatcher extends Mixin(
 
             launchInfo.launchState  = 'started'
 
-            const context           = launchInfo.context = await this.contextProviders[ 0 ].createContext()
+            const context           = launchInfo.context = await this.contextProviders[ 0 ].createContext(normalized)
 
             let preLaunchRes : boolean
 
