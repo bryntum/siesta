@@ -25,6 +25,7 @@ export class Translator extends Mixin(
     class Translator extends base {
         props : Component[ 'props' ] & {
             targetElement           : Translator[ 'targetElement' ]
+            scaleMode               : Translator[ 'scaleMode' ]
         }
 
         targetElement           : HTMLElement           = undefined
@@ -38,7 +39,7 @@ export class Translator extends Mixin(
         scrollBarSize           : { width : number, height : number }   = { width : 8, height : 8 }
 
         @field()
-        scaleMode               : 'none' | 'fit_full' | 'fit_width' | 'fit_height'   = 'fit_full'
+        scaleMode               : Box<'none' | 'fit_full' | 'fit_width' | 'fit_height'> = undefined
 
         @field()
         availableWidth          : number        = 0
@@ -63,11 +64,13 @@ export class Translator extends Mixin(
             const widthScale    = this.availableWidth / this.contentWidth
             const heightScale   = this.availableHeight / this.contentHeight
 
-            return this.scaleMode === 'none'
+            const scaleMode     = this.scaleMode.read()
+
+            return scaleMode === 'none'
                 ? 1
-                : this.scaleMode === 'fit_width'
+                : scaleMode === 'fit_width'
                     ? widthScale
-                    : this.scaleMode === 'fit_height'
+                    : scaleMode === 'fit_height'
                         ? heightScale
                         : Math.min(widthScale, heightScale)
 
@@ -76,7 +79,9 @@ export class Translator extends Mixin(
 
         @calculate('offset')
         calculateOffset () : [ number, number ] {
-            if (this.scaleMode === 'none') return [ 0, 0 ]
+            const scaleMode     = this.scaleMode.read()
+
+            if (scaleMode === 'none') return [ 0, 0 ]
 
             const leftWidth     = Math.max(this.availableWidth - this.scale * this.contentWidth, 0)
             const leftHeight    = Math.max(this.availableHeight - this.scale * this.contentHeight, 0)
@@ -107,7 +112,7 @@ export class Translator extends Mixin(
 
             const targetStyle   = this.targetElement.style;
 
-            (this.$.offset as Box<[ number, number]>).commitValueOptimisticHook.on((box, offset) => {
+            (this.$.offset as Box<[ number, number ]>).commitValueOptimisticHook.on((box, offset) => {
                 if (el.isConnected) {
                     targetStyle.setProperty('--translateX', String(offset[ 0 ]) + 'px')
                     targetStyle.setProperty('--translateY', String(offset[ 1 ]) + 'px')
@@ -120,9 +125,27 @@ export class Translator extends Mixin(
                     targetStyle.setProperty('--scaledWidth', String(scale * this.contentWidth) + 'px')
                     targetStyle.setProperty('--scaledHeight', String(scale * this.contentHeight) + 'px')
                 }
+            });
+
+            (this.$.scaleMode.read() as Translator[ 'scaleMode' ]).commitValueOptimisticHook.on((box, scaleModeBox) => {
+                this.applyScaleMode()
             })
 
             return el
+        }
+
+
+        applyScaleMode () {
+            if (this.el.isConnected) {
+                const scaleMode = this.scaleMode.read()
+
+                this.targetElement.classList.remove('fit_width')
+                this.targetElement.classList.remove('fit_height')
+                this.targetElement.classList.remove('fit_full')
+                this.targetElement.classList.remove('none')
+
+                this.targetElement.classList.add(scaleMode)
+            }
         }
 
 
@@ -150,6 +173,8 @@ export class Translator extends Mixin(
                 height          : targetStyle.height,
             }
 
+            this.applyScaleMode()
+
             this.syncPosition()
         }
 
@@ -157,8 +182,8 @@ export class Translator extends Mixin(
         syncPosition () {
             const ownRect           = this.el.getBoundingClientRect()
 
-            this.availableWidth     = ownRect.width - (this.scaleMode === 'fit_width' ? this.scrollBarSize.width : 0)
-            this.availableHeight    = ownRect.height - (this.scaleMode === 'fit_height' ? this.scrollBarSize.height : 0)
+            this.availableWidth     = ownRect.width - (this.scaleMode.read() === 'fit_width' ? this.scrollBarSize.width : 0)
+            this.availableHeight    = ownRect.height - (this.scaleMode.read() === 'fit_height' ? this.scrollBarSize.height : 0)
 
             const iframe            = this.targetElement.firstElementChild.firstElementChild as HTMLElement
 

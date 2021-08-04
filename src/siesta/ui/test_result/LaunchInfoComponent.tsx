@@ -1,6 +1,8 @@
 /** @jsx ChronoGraphJSX.createElement */
+/** @jsxFrag ChronoGraphJSX.FragmentSymbol */
 
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
+import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { ChronoGraphJSX, ElementSource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
@@ -31,6 +33,9 @@ export class LaunchInfoComponent extends Mixin(
         launchInfo  : TestLaunchInfo                = undefined
         dispatcher  : Dispatcher                    = undefined
 
+        @field()
+        scaleMode               : 'none' | 'fit_full' | 'fit_width' | 'fit_height'   = 'fit_full'
+
 
         get launcher () : Launcher {
             return this.dispatcher.launcher
@@ -46,10 +51,25 @@ export class LaunchInfoComponent extends Mixin(
                 {
                     mostRecentResult
                         ?
-                            <span class="icon icon-play-checked is-large" onclick={ () => this.runTestChecked() }>
-                                <i class="fas fa-lg fa-play"></i>
-                                <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
-                            </span>
+                            <>
+                                <span class="icon icon-play-checked is-large" onclick={ () => this.runTestChecked() }>
+                                    <i class="fas fa-lg fa-play"></i>
+                                    <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
+                                </span>
+                                <span style='flex:1'></span>
+                                <span class="icon is-large" onclick={ () => this.scaleMode = 'fit_width' }>
+                                    <i class="fas fa-lg fa-arrows-alt-h"></i>
+                                </span>
+                                <span class="icon is-large" onclick={ () => this.scaleMode = 'fit_height' }>
+                                    <i class="fas fa-lg fa-arrows-alt-v"></i>
+                                </span>
+                                <span class="icon is-large" onclick={ () => this.scaleMode = 'fit_full' }>
+                                    <i class="fas fa-lg fa-expand-arrows-alt"></i>
+                                </span>
+                                <span class="icon is-large" onclick={ () => this.scaleMode = 'none' }>
+                                    <i class="fas fa-lg fa-expand"></i>
+                                </span>
+                            </>
                         :
                             null
                 }
@@ -85,7 +105,7 @@ export class LaunchInfoComponent extends Mixin(
                         () => {
                             if (!launchInfo.mostRecentResult) return null
 
-                            return [
+                            return <>
                                 <Splitter
                                     resizeTarget    = 'next'
                                     mode            = "horizontal"
@@ -96,8 +116,7 @@ export class LaunchInfoComponent extends Mixin(
                                             ? [ el.previousElementSibling, el.nextElementSibling, launchInfo.context.wrapper ]
                                             : [ el.previousElementSibling, el.nextElementSibling ]
                                     }
-                                ></Splitter>,
-
+                                ></Splitter>
                                 <div class={ () => `is-flex ${ launchInfo.context ? 'is-align-items-stretch' : 'is-justify-content-center is-align-items-center' }` } style='width: 400px'>
                                     {
                                         launchInfo.context
@@ -107,12 +126,13 @@ export class LaunchInfoComponent extends Mixin(
                                                     targetElement={ launchInfo.context.wrapper }
                                                     style='flex: 1'
                                                     class='dom-container'
+                                                    scaleMode={ this.$.scaleMode as Translator[ 'scaleMode' ] }
                                                 ></Translator>
                                             :
                                                 <div style='text-align: center'>No DOM view available</div>
                                     }
                                 </div>
-                            ]
+                            </>
                         }
                     }
                 </div>
