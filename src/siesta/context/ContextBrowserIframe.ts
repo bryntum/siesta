@@ -12,7 +12,8 @@ export class ContextBrowserIframe extends Mixin(
 
     class ContextBrowserIframe extends base {
 
-        iframe                          : HTMLIFrameElement      = undefined
+        iframe                          : HTMLIFrameElement     = undefined
+        wrapper                         : HTMLDivElement        = undefined
 
         parentMediaClass                : typeof MediaBrowserMessagePortParent         = MediaBrowserMessagePortParent
 
