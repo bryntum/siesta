@@ -38,6 +38,11 @@ export class LauncherBrowser extends Mixin(
         }
 
 
+        getMaxLen () : number {
+            return 250
+        }
+
+
         async doStart () {
             if (this.ui) {
                 this.dashboard = Dashboard.new({ launcher : this })

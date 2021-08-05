@@ -7,6 +7,7 @@ import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { ChronoGraphJSX, ElementSource, PropertySource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
 import { ComponentElement, ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
+import { TextBlock } from "../../../jsx/TextBlock.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { LogLevel } from "../../../logger/Logger.js"
 import { relative } from "../../../util/Path.js"
@@ -180,13 +181,21 @@ export class AssertionComponent extends Mixin(
                             () => !passed && sourcePoint && this.launchInfo.testSources && shouldShowSourceContext
                                 ?
                                     <pre class='assertion_annotation'>
-                                        { launcher.render(sourcePointTemplate(sourcePoint, this.launchInfo.testSources, sourceContext)) }
+                                        {
+                                            launcher.render(
+                                                sourcePointTemplate(sourcePoint, this.launchInfo.testSources, sourceContext),
+                                                TextBlock.new({ maxLen : launcher.getMaxLen() })
+                                            )
+                                        }
                                     </pre>
                                 :
                                     // sources loading spinner
                                     null,
                             !passed && assertion.annotation
-                                ? <pre class='assertion_annotation'>{ launcher.render(assertion.annotation) }</pre>
+                                ?
+                                    <pre class='assertion_annotation'>{
+                                        launcher.render(assertion.annotation, TextBlock.new({ maxLen : launcher.getMaxLen() }))
+                                    }</pre>
                                 : null
                         ]
                     }
