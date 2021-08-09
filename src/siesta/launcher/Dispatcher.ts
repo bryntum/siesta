@@ -328,11 +328,13 @@ export class Dispatcher extends Mixin(
 
             this.logger.debug("Launching standalone test: ", topTest.descriptor.url)
 
+            const launchInfo            = this.results.get(topTest.descriptor)
+
             this.reporter.onTestSuiteStart()
 
             this.beforeTestLaunch(topTest.descriptor)
 
-            const testLauncher          = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter })
+            const testLauncher          = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter, launchInfo })
             const testLauncherChild     = TestLauncherChild.new()
 
             const parentMedia           = new MediaSameContext()
