@@ -37,9 +37,9 @@ Siesta runs the browser tests right on the browser page. This means, your test f
 
 Such architecture means that test script can create and manipulate arbitrary DOM, using the regular Web API. For example, test can render some Web component and then check that its DOM object is properly created with the `document.querySelector()` call.
 
-However, test script will not survive the page redirect or reload. You should avoid doing that. In the future release we will allow running the script in the side iframe, which will survive the redirects of the testing page.
+However, test script will not survive the page redirect or reload. You should avoid doing that. In the future release we will allow running the script in the side iframe, which will survive the same-domain redirects of the testing page.
 
-If you need to test the page redirects, then instead [[GettingStartedNodejsGuide|write your tests as Node.js scripts]] and use the "classic" Puppeteer or Playwright API to create the page instance and `evalulate` command of those libraries. In the future releases, we'll provide an unified API for both on-page and out-of-page testing scenarios.
+If you need to test the page with arbitrary redirects, then instead [[GettingStartedNodejsGuide|write your tests as Node.js scripts]] and use the "classic" Puppeteer or Playwright API to create the page instance and `evalulate` command of those libraries. In the future releases, we'll provide an unified API for both on-page and out-of-page testing scenarios.
 
 
 Importing API
