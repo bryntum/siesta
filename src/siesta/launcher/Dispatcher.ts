@@ -75,6 +75,8 @@ class CleanupQueue extends Base {
         this.slots.set(desc, slot)
         this.order.push(desc)
 
+        if (this.keepNLastResults === 0) slot.state = 'dispose'
+
         return slot
     }
 
