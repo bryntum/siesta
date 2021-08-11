@@ -110,10 +110,12 @@ Please start reading from one the following guides, corresponding to the environ
 [[GettingStartedBrowserGuide|Getting started with Siesta in browser environment]]
 
 
-Github repo
+Resources
 ===========
 
-https://github.com/bryntum/siesta
+Website: https://siesta.works
+
+Github repo: https://github.com/bryntum/siesta
 
 
 Connect
