@@ -11,11 +11,11 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xml:space="preserve"
-   width="1935.4822"
-   height="623.52179"
+   width="2245.2913"
+   height="791.4281"
    version="1.0"
    style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
-   viewBox="0 0 1787.6337 576.45097"
+   viewBox="0 0 2073.7769 731.68172"
    id="svg85"
    sodipodi:docname="readme_header.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"><metadata
@@ -35,8 +35,8 @@
    id="namedview87"
    showgrid="false"
    inkscape:zoom="0.87498648"
-   inkscape:cx="1026.3906"
-   inkscape:cy="160.28023"
+   inkscape:cx="1117.4562"
+   inkscape:cy="309.77005"
    inkscape:window-x="3840"
    inkscape:window-y="0"
    inkscape:window-maximized="1"
@@ -191,7 +191,8 @@
      y="-17.026205" /></clipPath></defs>
  <g
    id="g1338"
-   clip-path="url(#clipPath1340)"><g
+   clip-path="url(#clipPath1340)"
+   transform="translate(84.190952,17.026205)"><g
      transform="matrix(0.92450836,0,0,0.92450836,-846.67373,-19.826327)"
      id="g969"
      style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"><g
@@ -253,14 +254,14 @@
    <polygon
    style="fill:#3dc4b4"
    id="polygon24"
-   points="634.124,389.855 0,389.783 56.652,253.954 579.191,253.954 "
+   points="56.652,253.954 579.191,253.954 634.124,389.855 0,389.783 "
    class="fil1" />
    <g
    id="g34">
     <polygon
    style="fill:#ffffff"
    id="polygon26"
-   points="509.904,174.333 575.874,327.454 557.266,327.454 494.165,181.053 "
+   points="557.266,327.454 494.165,181.053 509.904,174.333 575.874,327.454 "
    class="fil2" />
     <path
    style="fill:url(#id0)"
@@ -371,7 +372,7 @@
    id="5" />
   <polygon
    style="fill:#e9c46a;fill-rule:nonzero"
-   points="914.804,384.784 934.006,384.784 934.006,392.046 914.804,392.046 "
+   points="934.006,392.046 914.804,392.046 914.804,384.784 934.006,384.784 "
    class="fil8"
    id="6" />
   <path
@@ -412,7 +413,7 @@
    id="12" />
   <polygon
    style="fill:#e9c46a;fill-rule:nonzero"
-   points="1214.701,370.54 1223.08,370.54 1207.09,407.826 1198.083,407.826 1182.093,370.54 1191.17,370.54 1202.761,398.191 "
+   points="1207.09,407.826 1198.083,407.826 1182.093,370.54 1191.17,370.54 1202.761,398.191 1214.701,370.54 1223.08,370.54 "
    class="fil8"
    id="13" />
   <path
