@@ -2,6 +2,8 @@
 [//]: # (That file is copied to the /README.md during `scripts/build_docs.sh` command)
 [//]: # (Do not edit the /README.md directly)
 
+<img src="./resources/readme_header.png">
+
 Siesta
 ======
 
