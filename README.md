@@ -4,9 +4,6 @@
 
 <img src="./resources/readme_header_1.svg">
 
-Siesta
-======
-
 Siesta is a stress-free, ubiquitous, open-source JavaScript/TypeScript testing tool, 
 developed at [Bryntum](https://www.bryntum.com/) starting from the 2009.
 
