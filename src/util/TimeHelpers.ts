@@ -42,10 +42,8 @@ export const buffer = <Args extends unknown[]>(func : (...args : Args) => unknow
     let timeoutHandler : SetTimeoutHandler  = undefined
 
     return (...args : Args) => {
-        if (timeoutHandler) clearTimeout(timeoutHandler)
+        if (timeoutHandler !== undefined) clearTimeout(timeoutHandler)
 
-        timeoutHandler      = setTimeout(() => {
-            func(...args)
-        }, timeout)
+        timeoutHandler      = setTimeout(() => func(...args), timeout)
     }
 }
