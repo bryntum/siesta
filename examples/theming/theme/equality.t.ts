@@ -9,12 +9,12 @@ it('Theming of the equality assertions', async t => {
     t.equal(
         {
             map : new Map([ [ { key1 : 'value1' }, 1 ] ]),
-            array : [ 'unequal', 2, 3, 4 ],
+            array : [ 'unequal', 'equal', 'extra' ],
             unexpected : 'unexpected'
         },
         {
-            map : new Map([ [ { key2 : 'value1' }, 1 ] ]),
-            array : [ 'UNEQUAL', 2 ],
+            map : new Map([ [ { key1 : 'value1' }, 1 ], [ { key2 : 'value2' }, 1 ] ]),
+            array : [ 'UNEQUAL', 'equal' ],
             expected : 'expected'
         }
     )
