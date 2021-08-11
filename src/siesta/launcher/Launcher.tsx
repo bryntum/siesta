@@ -1,3 +1,4 @@
+import minimatch, { IMinimatch } from "../../../web_modules/minimatch.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { CI } from "../../iterator/Iterator.js"
@@ -175,6 +176,7 @@ export class Launcher extends Mixin(
         @option({
             type        : 'number',
             group       : OptionsGroupFiltering,
+            defaultValue : () => 5,
             help        : <span>
                 This option defines the number of parallel "workers" for test processing.
             </span>
@@ -197,24 +199,38 @@ export class Launcher extends Mixin(
             group       : OptionsGroupFiltering,
             structure   : "array",
             help        : <span>
-                This option specifies a RegExp source, to which the test file URL needs to match,
+                This option specifies a glob pattern source, to which the test file URL needs to match,
                 to be <span class="accented">included</span> in the suite launch.
-                It can be repeated multiple times, meaning the URL to be included can match any of the provided RegExps.
+                It can be repeated multiple times, meaning the URL to be included can match any of the provided globs.
+                <div></div>
+                <span class="accented">░IMPORTANT░</span> Don't forget to wrap you pattern in single quotes: 'dir*/*', otherwise, shell
+                will expand it in-place
+                <div></div>
+                For convenience, the pattern is automatically prepended with `**/`, so it matches deeply across the directories.
             </span>
         })
-        include         : RegExp[]          = []
+        include         : string[]          = []
+
+        includeMatches  : IMinimatch[]      = []
 
         @option({
             group       : OptionsGroupFiltering,
             type        : 'string',
             structure   : "array",
-            help        : <span>
-                This option specifies a RegExp source, to which the test file URL needs to match,
+            help        : <div>
+                This option specifies a glob pattern source, to which the test file URL needs to match,
                 to be <span class="accented">excluded</span> in the suite launch.
-                It can be repeated multiple times, meaning the URL to be excluded can match any of the provided RegExps.
-            </span>
+                It can be repeated multiple times, meaning the URL to be excluded can match any of the provided globs.
+                <div></div>
+                <span class="accented">░IMPORTANT░</span> Don't forget to wrap you pattern in single quotes: 'dir*/*', otherwise, shell
+                will expand it in-place
+                <div></div>
+                For convenience, the pattern is automatically prepended with `**/`, so it matches deeply across the directories.
+            </div>
         })
-        exclude         : RegExp[]          = []
+        exclude         : string[]          = []
+
+        excludeMatches  : IMinimatch[]      = []
 
         @option({
             type        : 'string',
@@ -342,8 +358,8 @@ export class Launcher extends Mixin(
 
         getDescriptorsToLaunch () : TestDescriptor[] {
             return this.projectData.projectPlan.leavesAxis().filter(descriptor => {
-                return (this.include.length === 0 || this.include.some(pattern => pattern.test(descriptor.flatten.urlAbs)))
-                    && (this.exclude.length === 0 || !this.exclude.some(pattern => pattern.test(descriptor.flatten.urlAbs)))
+                return (this.includeMatches.length === 0 || this.includeMatches.some(pattern => pattern.match(descriptor.flatten.urlAbs)))
+                    && (this.excludeMatches.length === 0 || !this.excludeMatches.some(pattern => pattern.match(descriptor.flatten.urlAbs)))
             })
         }
 
@@ -395,10 +411,10 @@ export class Launcher extends Mixin(
 
             extractRes.values.forEach((value, option) => option.applyValue(this, value))
 
-            // TODO cleanup, need "reviver" concept on option
-            this.include    = this.include.map(pattern => new RegExp(pattern))
-            // TODO cleanup, need "reviver" concept on option
-            this.exclude    = this.exclude.map(pattern => new RegExp(pattern))
+            const Minimatch         = minimatch.Minimatch
+
+            this.includeMatches     = this.include.map(pattern => new Minimatch('**/' + pattern, { dot : true }))
+            this.excludeMatches     = this.exclude.map(pattern => new Minimatch('**/' + pattern, { dot : true }))
 
             // TODO cleanup, need "reviver" concept on option
             // @ts-ignore
