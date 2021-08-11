@@ -119,15 +119,28 @@ export const copySetInto = <V>(sourceSet : Set<V>, targetSet : Set<V>) : Set<V> 
 export const awaitDomReady = async () : Promise<void> => {
     if (document.readyState === 'complete') return
 
-    return new Promise<void>(resolve => {
-        let listener
+    let listener
 
-        window.addEventListener('load', listener = () => {
-            window.removeEventListener('load', listener)
-            resolve()
+    await new Promise<Event>(resolve => window.addEventListener('load', listener = resolve))
+
+    window.removeEventListener('load', listener)
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+export const awaitDomInteractive = async () : Promise<void> => {
+    if (document.readyState === 'interactive' || document.readyState === 'complete') return
+
+    let listener
+
+    await new Promise<void>(resolve => {
+        document.addEventListener('readystatechange', listener = () => {
+            if (document.readyState === 'interactive' || document.readyState === 'complete') resolve()
         })
     })
+
+    document.removeEventListener('readystatechange', listener)
 }
+
 
 
 //---------------------------------------------------------------------------------------------------------------------

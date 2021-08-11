@@ -2,13 +2,14 @@
 
 import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { calculate, field } from "@bryntum/chronograph/src/replica2/Entity.js"
+import { siestaPackageRootUrl } from "../../../index.js"
 import minimatch from "../../../web_modules/minimatch.js"
 import { ChronoGraphJSX, ElementSource } from "../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../chronograph-jsx/Component.js"
 import { ComponentElement } from "../../chronograph-jsx/ElementReactivity.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { awaitDomReady } from "../../util/Helpers.js"
+import { awaitDomInteractive } from "../../util/Helpers.js"
 import { buffer } from "../../util/TimeHelpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
@@ -39,7 +40,32 @@ export class Dashboard extends Mixin(
 
 
         async start () {
-            await awaitDomReady()
+            await awaitDomInteractive()
+
+            //------------------
+            const metas         = Array.from(document.head.getElementsByTagName('meta'))
+
+            if (!metas.some(meta => /viewport/i.test(meta.name))) {
+                const meta      = document.createElement('meta')
+
+                meta.setAttribute('name', 'viewport')
+                meta.setAttribute('content', 'width=device-width, initial-scale=1')
+
+                document.head.appendChild(meta)
+            }
+
+            //------------------
+            const links         = Array.from(document.head.getElementsByTagName('link'))
+
+            if (!links.some(link => /resources\/styling\/browser\/css\/styling\.css/.test(link.href))) {
+                const linkEl        = document.createElement('link')
+
+                linkEl.setAttribute('type', 'text/css')
+                linkEl.setAttribute('rel', 'stylesheet')
+                linkEl.setAttribute('href', `${ siestaPackageRootUrl }resources/styling/browser/css/styling.css`)
+
+                document.head.appendChild(linkEl)
+            }
 
             document.body.appendChild(this.el)
         }
