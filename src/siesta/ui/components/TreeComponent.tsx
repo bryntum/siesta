@@ -14,11 +14,12 @@ export class TreeComponent extends Mixin(
 
     class TreeComponent extends base {
         props : Component[ 'props' ] & {
-            state?          : TreeComponent[ 'state' ]
-            iconCls?        : TreeComponent[ 'iconCls' ]
-            collapsible?    : TreeComponent[ 'collapsible' ]
-            iconClsSource?  : TreeComponent[ 'iconClsSource' ]
-            extraIconSource? : TreeComponent[ 'extraIconSource' ]
+            state?                      : TreeComponent[ 'state' ]
+            iconCls?                    : TreeComponent[ 'iconCls' ]
+            collapsible?                : TreeComponent[ 'collapsible' ]
+            iconClsSource?              : TreeComponent[ 'iconClsSource' ]
+            extraIconSource?            : TreeComponent[ 'extraIconSource' ]
+            extraCollapseIconSource?    : TreeComponent[ 'extraCollapseIconSource' ]
         }
 
         @field()
@@ -27,7 +28,8 @@ export class TreeComponent extends Mixin(
         @field()
         collapsible     : boolean                       = true
 
-        extraIconSource : () => ElementSource           = () => undefined
+        extraIconSource         : () => ElementSource   = () => undefined
+        extraCollapseIconSource : () => ElementSource   = () => undefined
 
         @field()
         iconCls         : [ string, string ]            = undefined
@@ -43,13 +45,19 @@ export class TreeComponent extends Mixin(
         render () : Element {
             return <tree style={ () => this.collapsible ? '--leaf-offset: 3rem' : '--leaf-offset: 1.5rem' }>
                 {
-                    () => this.collapsible
-                        ?
-                            <span onclick={ () => this.toggle() } class="icon">
-                                <i class={ () => this.state === 'expanded' ? 'fas fa-caret-down' : 'fas fa-caret-right' }></i>
-                            </span>
-                        :
-                            null
+                    () => {
+                        const extra     = this.extraCollapseIconSource()
+
+                        if (extra) return extra
+
+                        return this.collapsible
+                            ?
+                                <span onclick={() => this.toggle()} class="icon">
+                                    <i class={() => this.state === 'expanded' ? 'fas fa-caret-down' : 'fas fa-caret-right'}></i>
+                                </span>
+                            :
+                                null
+                    }
                 }
                 {
                     this.extraIconSource()

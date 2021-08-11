@@ -85,6 +85,11 @@ export class TestNodeResultComponent extends Mixin(
                 onmousedown     = { e => this.onMouseDown(e) }
                 class           = { testNode.isRoot ? 'test-file-comp' : 'subtest-comp' }
                 state           = { expandedState }
+                extraCollapseIconSource = {
+                    () => testNode.state === 'ignored'
+                        ? <span class="icon"><i class='fas fa-circle' style='visibility: hidden'></i></span>
+                        : undefined
+                }
             >
                 {
                     testNode.isRoot
