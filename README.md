@@ -2,7 +2,7 @@
 [//]: # (That file is copied to the /README.md during `scripts/build_docs.sh` command)
 [//]: # (Do not edit the /README.md directly)
 
-<img src="./resources/readme_header_1.svg">
+<a target="_blank" href="https://siesta.works"><img src="./resources/readme_header_1.svg"></a>
 
 Siesta is a stress-free, ubiquitous, open-source JavaScript/TypeScript testing tool, 
 developed at [Bryntum](https://www.bryntum.com/) starting from the 2009.
