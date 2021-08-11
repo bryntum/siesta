@@ -93,8 +93,7 @@ export class TestDescriptorComponent extends Component {
                 <span class='project-plan-folder-title'>{ testDescriptor.title || testDescriptor.filename }</span>
                 {
                     this.testDescriptor.filteredChildren.map(childNode =>
-                        // enables ellipsis overflow, but hides the collapse/expand icon, wtf moment
-                        <leaf /*style='overflow-x: hidden; text-overflow: ellipsis'*/>
+                        <leaf>
                             <TestDescriptorComponent
                                 dispatcher      = { this.dispatcher }
                                 selectedTestBox = { this.selectedTestBox }
@@ -108,7 +107,7 @@ export class TestDescriptorComponent extends Component {
         } else {
             const launchInfo        = this.dispatcher.results.get(testDescriptor)
 
-            return <span class="project-plan-test" class:is-selected={ () => this.selectedTestBox.read() === testDescriptor }>
+            return <div class="project-plan-test" class:is-selected={ () => this.selectedTestBox.read() === testDescriptor }>
                 <span onclick={ () => launchInfo.toggleChecked() } class="icon">
                     <i class={ () => launchInfo.checked ? 'far fa-check-square' : 'far fa-square' }></i>
                 </span>
@@ -133,7 +132,7 @@ export class TestDescriptorComponent extends Component {
                     }
                 }</span>
                 <span class="project-plan-test-title">{ testDescriptor.filename }</span>
-            </span>
+            </div>
         }
     }
 

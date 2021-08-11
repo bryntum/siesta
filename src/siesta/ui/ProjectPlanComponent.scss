@@ -19,6 +19,8 @@
 .project-plan-test {
     cursor: pointer;
     line-height: 1.7em;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 }
 
 .project-plan-folder {
