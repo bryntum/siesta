@@ -140,7 +140,11 @@ export class Dashboard extends Mixin(
 
 
         getTestDescriptorComponentFromMouseEvent (e : MouseEvent) : TestDescriptor | undefined {
-            const testPlanItem : ComponentElement<TestDescriptorComponent> = (e.target as Element).closest('.project-plan-test, .project-plan-folder')
+            const testPlanItemTitle : Element = (e.target as Element).closest('.project-plan-test-title, .project-plan-folder-title')
+
+            if (!testPlanItemTitle) return undefined
+
+            const testPlanItem : ComponentElement<TestDescriptorComponent> = testPlanItemTitle.closest('.project-plan-test, .project-plan-folder')
 
             return testPlanItem ? testPlanItem.comp.testDescriptor.descriptor : undefined
         }
