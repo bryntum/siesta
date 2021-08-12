@@ -34,7 +34,7 @@ export class ContextBrowserIframe extends Mixin(
 
 
         async destroy () {
-            this.iframe.remove()
+            this.wrapper.remove()
 
             await super.destroy()
         }
@@ -45,7 +45,7 @@ export class ContextBrowserIframe extends Mixin(
 
             const parentMedia           = new this.parentMediaClass()
             parentMedia.messagePort     = messageChannel.port1
-            parentMedia.iframe          = this.iframe
+            parentMedia.iframeWrapper   = this.wrapper
 
             parentPort.media            = parentMedia
             parentPort.handshakeType    = 'parent_first'

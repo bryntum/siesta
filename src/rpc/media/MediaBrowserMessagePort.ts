@@ -43,13 +43,13 @@ export class MediaBrowserMessagePortParent extends Mixin(
     (base : ClassUnion<typeof MediaBrowserMessagePortChild>) =>
 
     class MediaBrowserMessagePortParent extends base {
-        iframe          : HTMLIFrameElement     = undefined
+        iframeWrapper       : HTMLElement       = undefined
 
 
         async doDisconnect () : Promise<any> {
             super.doDisconnect()
 
-            this.iframe.remove()
+            this.iframeWrapper.remove()
         }
     }
 ){}
