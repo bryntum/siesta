@@ -81,6 +81,53 @@ it('Should render the reactive JSX element', async t => {
 })
 
 
+it('Should not re-render child elements unnecessarily', async t => {
+    let box1Counter     = 0
+    let box2Counter     = 0
+
+    const box1          = Box.new(1)
+    const box2          = Box.new(2)
+
+    const el        = <div>
+        {
+            () => {
+                box1.read()
+                box1Counter++
+                return <span>child 1</span>
+            }
+        }
+        {
+            () => {
+                box2.read()
+                box2Counter++
+                return <span>child 2</span>
+            }
+        }
+    </div> as ReactiveHTMLElement
+
+    document.body.appendChild(el)
+
+    globalGraph.commit()
+
+    t.is(box1Counter, 1)
+    t.is(box2Counter, 1)
+
+    const child2        = el.lastElementChild
+    //-------------------
+
+    //-------------------
+    box1.write(10)
+
+    globalGraph.commit()
+
+    t.is(box1Counter, 2)
+    t.is(box2Counter, 1)
+
+    t.is(child2, el.lastElementChild)
+})
+
+
+
 it('Should render the plain JSX element with reactive children correctly', async t => {
     let boxCounter      = 0
     let styleCounter    = 0

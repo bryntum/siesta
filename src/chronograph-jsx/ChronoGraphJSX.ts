@@ -1,4 +1,5 @@
 import { BoxUnbound } from '@bryntum/chronograph/src/chrono2/data/Box.js'
+import { CalculableBox } from "@bryntum/chronograph/src/chrono2/data/CalculableBox.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { isArray, isFunction, isNumber, isString, isSyncFunction } from "../util/Typeguards.js"
 import { Component, ComponentCommon, WebComponent } from "./Component.js"
@@ -241,7 +242,16 @@ export const normalizeElementSource = (
     else if (isArray(source)) {
         source.forEach(source => normalizeElementSource(source, result))
     }
-    else if (isSyncFunction(source) || (source instanceof BoxUnbound)) {
+    else if (isSyncFunction(source)) {
+        const box       = CalculableBox.new({
+            calculation : () => resolveElementSource(source)
+        })
+
+        normalized.push(box)
+
+        result.hasReactivity = true
+    }
+    else if ((source instanceof BoxUnbound)) {
         normalized.push(source)
 
         result.hasReactivity = true
