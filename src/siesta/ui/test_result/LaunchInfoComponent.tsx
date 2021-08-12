@@ -46,27 +46,27 @@ export class LaunchInfoComponent extends Mixin(
             const mostRecentResult      = this.launchInfo
 
             return <div class='tbar is-flex'>
-                <span class="icon is-large" onclick={ () => this.runTest() }><i class="fas fa-lg fa-play"></i></span>
+                <span class="icon ripple is-large" onclick={ () => this.runTest() }><i class="fas fa-lg fa-play"></i></span>
 
                 {
                     mostRecentResult
                         ?
                             <>
-                                <span class="icon icon-play-checked is-large" onclick={ () => this.runTestChecked() }>
+                                <span class="icon ripple icon-play-checked is-large" onclick={ () => this.runTestChecked() }>
                                     <i class="fas fa-lg fa-play"></i>
                                     <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
                                 </span>
                                 <span style='flex:1'></span>
-                                <span class="icon is-large" onclick={ () => this.scaleMode = 'fit_width' }>
+                                <span class="icon ripple is-large" onclick={ () => this.scaleMode = 'fit_width' }>
                                     <i class="fas fa-lg fa-arrows-alt-h"></i>
                                 </span>
-                                <span class="icon is-large" onclick={ () => this.scaleMode = 'fit_height' }>
+                                <span class="icon ripple is-large" onclick={ () => this.scaleMode = 'fit_height' }>
                                     <i class="fas fa-lg fa-arrows-alt-v"></i>
                                 </span>
-                                <span class="icon is-large" onclick={ () => this.scaleMode = 'fit_full' }>
+                                <span class="icon ripple is-large" onclick={ () => this.scaleMode = 'fit_full' }>
                                     <i class="fas fa-lg fa-expand-arrows-alt"></i>
                                 </span>
-                                <span class="icon is-large" onclick={ () => this.scaleMode = 'none' }>
+                                <span class="icon ripple is-large" onclick={ () => this.scaleMode = 'none' }>
                                     <i class="fas fa-lg fa-expand"></i>
                                 </span>
                             </>
