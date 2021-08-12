@@ -34,9 +34,12 @@ export class RippleEffectManager extends Mixin(
 
         onPointerUp (e : PointerEvent) {
             const el                = this.lastRippledEl
-            const style             = el.style
 
-            style.setProperty('--r-opacity', '0')
+            if (el) {
+                const style             = el.style
+
+                style.setProperty('--r-opacity', '0')
+            }
         }
 
 
