@@ -52,8 +52,8 @@ export class TreeComponent extends Mixin(
 
                         return this.collapsible
                             ?
-                                <span onclick={() => this.toggle()} class="icon">
-                                    <i class={() => this.state === 'expanded' ? 'fas fa-caret-down' : 'fas fa-caret-right'}></i>
+                                <span onclick={ () => this.toggle() } class="icon ripple">
+                                    <i class={ () => this.state === 'expanded' ? 'fas fa-caret-down' : 'fas fa-caret-right' }></i>
                                 </span>
                             :
                                 null

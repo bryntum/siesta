@@ -80,7 +80,7 @@ export class TestDescriptorComponent extends Component {
             return <TreeComponent
                 collapsible = { Boolean(testDescriptor.parentNode) }
                 extraIconSource = {
-                    () => <span onclick={ () => launchInfo.toggleChecked() } class="icon">
+                    () => <span onclick={ () => launchInfo.toggleChecked() } class="icon ripple">
                         <i class={ () => launchInfo.checked ? 'far fa-check-square' : 'far fa-square' }></i>
                     </span>
 
@@ -108,30 +108,32 @@ export class TestDescriptorComponent extends Component {
             const launchInfo        = this.dispatcher.results.get(testDescriptor)
 
             return <div class="project-plan-test" class:is-selected={ () => this.selectedTestBox.read() === testDescriptor }>
-                <span onclick={ () => launchInfo.toggleChecked() } class="icon">
+                <span onclick={ () => launchInfo.toggleChecked() } class="icon ripple">
                     <i class={ () => launchInfo.checked ? 'far fa-check-square' : 'far fa-square' }></i>
                 </span>
-                <span class={ () => `project-plan-test-icon icon ${ launchInfo.viewState }`}>{
-                    () => {
-                        switch (launchInfo.viewState) {
-                            case 'noinfo':
-                                return <i class='far fa-file'></i>
-                            case 'pending':
-                                return <i class='far fa-hourglass'></i>
-                            case 'started':
-                                return <i class='far fa-clock'></i>
-                            case 'running':
-                                return <i class='fas fa-running'></i>
-                            case 'exception':
-                                return <i class='fas fa-spider'></i>
-                            case 'passed':
-                                return <i class='far fa-check-circle'></i>
-                            case 'failed':
-                                return <i class='far fa-times-circle'></i>
+                <span class="ripple">
+                    <span class={ () => `project-plan-test-icon icon ${ launchInfo.viewState }`}>{
+                        () => {
+                            switch (launchInfo.viewState) {
+                                case 'noinfo':
+                                    return <i class='far fa-file'></i>
+                                case 'pending':
+                                    return <i class='far fa-hourglass'></i>
+                                case 'started':
+                                    return <i class='far fa-clock'></i>
+                                case 'running':
+                                    return <i class='fas fa-running'></i>
+                                case 'exception':
+                                    return <i class='fas fa-spider'></i>
+                                case 'passed':
+                                    return <i class='far fa-check-circle'></i>
+                                case 'failed':
+                                    return <i class='far fa-times-circle'></i>
+                            }
                         }
-                    }
-                }</span>
-                <span class="project-plan-test-title">{ testDescriptor.filename }</span>
+                    }</span>
+                    <span class="project-plan-test-title">{ testDescriptor.filename }</span>
+                </span>
             </div>
         }
     }

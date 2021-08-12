@@ -1,0 +1,32 @@
+@use '../../../resources/styling/common/_colors.scss' as *;
+
+.ripple {
+    position: relative;
+    overflow: hidden;
+
+    // this seemingly redundant declarations prevents the inheritance from the parent element
+    --r-opacity: 0;
+
+    &:before {
+        content: '';
+        display: block;
+        position: absolute;
+        pointer-events: none;
+
+        top: calc(var(--r-top) * 1px);
+        left: calc(var(--r-left) * 1px);
+        width: calc(var(--r-size) * 1px);
+        height: calc(var(--r-size) * 1px);
+
+        background: var(--ripple-background, rgba(187, 187, 187, 0.7));
+
+        border-radius: 50%;
+
+        opacity: calc(var(--r-opacity, 1));
+        transition:
+            transform calc(var(--r-duration, 0) * var(--ripple-duration, 450ms)) var(--ripple-easing, linear),
+            opacity calc(var(--r-duration, 0) * var(--ripple-duration, 450ms)) var(--ripple-easing, linear);
+        transform: translate(-50%, -50%) scale(var(--r-scale, 1));
+        transform-origin: center;
+    }
+}

@@ -16,6 +16,7 @@ import { TestDescriptor } from "../test/TestDescriptor.js"
 import { individualCheckInfoForTestResult, TestNodeResultReactive } from "../test/TestResult.js"
 import { Splitter } from "./components/Splitter.js"
 import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComponent.js"
+import { RippleEffectManager } from "./RippleEffectManager.js"
 import { LaunchInfoComponent } from "./test_result/LaunchInfoComponent.js"
 import { TestNodeResultComponent } from "./test_result/TestResult.js"
 
@@ -41,6 +42,10 @@ export class Dashboard extends Mixin(
 
         async start () {
             await awaitDomInteractive()
+
+            const rippleEffectManager   = RippleEffectManager.new()
+
+            rippleEffectManager.start()
 
             //------------------
             const metas         = Array.from(document.head.getElementsByTagName('meta'))
@@ -96,11 +101,11 @@ export class Dashboard extends Mixin(
                     }
 
                     <div class='tbar is-flex'>
-                        <span class="icon icon-play-checked is-large" onclick={ () => this.runChecked() }>
+                        <span class="icon ripple icon-play-checked is-large" onclick={ () => this.runChecked() }>
                             <i class="fas fa-lg fa-play"></i>
                             <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
                         </span>
-                        <span class="icon icon-play-all is-large" onclick={ () => this.runAll() }>
+                        <span class="icon ripple icon-play-all is-large" onclick={ () => this.runAll() }>
                             <i class="fas fa-lg fa-play"></i>
                             <span class="icon is-large"><i class="fas fa-lg fa-play"></i></span>
                         </span>
