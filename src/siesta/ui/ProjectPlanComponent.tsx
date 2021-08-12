@@ -108,10 +108,12 @@ export class TestDescriptorComponent extends Component {
             const launchInfo        = this.dispatcher.results.get(testDescriptor)
 
             return <div class="project-plan-test" class:is-selected={ () => this.selectedTestBox.read() === testDescriptor }>
-                <span onclick={ () => launchInfo.toggleChecked() } class="icon ripple">
-                    <i class={ () => launchInfo.checked ? 'far fa-check-square' : 'far fa-square' }></i>
-                </span>
-                <span class="ripple">
+                <div class="ripple">
+
+                    <span onclick={ () => launchInfo.toggleChecked() } class="icon ripple">
+                        <i class={ () => launchInfo.checked ? 'far fa-check-square' : 'far fa-square' }></i>
+                    </span>
+
                     <span class={ () => `project-plan-test-icon icon ${ launchInfo.viewState }`}>{
                         () => {
                             switch (launchInfo.viewState) {
@@ -133,7 +135,7 @@ export class TestDescriptorComponent extends Component {
                         }
                     }</span>
                     <span class="project-plan-test-title">{ testDescriptor.filename }</span>
-                </span>
+                </div>
             </div>
         }
     }
