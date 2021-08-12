@@ -31,4 +31,6 @@ $deccent_lighter: color.scale($deccent, $lightness: 25%) !default;
 $deccent_lighter_2: color.scale($deccent, $lightness: 50%) !default;
 $deccent_lighter_3: color.scale($deccent, $lightness: 75%) !default;
 
+$deccent_darker: color.scale($deccent, $lightness: -25%) !default;
+
 $gray_lighter: #dbdbdb !default;

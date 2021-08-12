@@ -43,3 +43,12 @@ body {
     font-family: "JetBrains Mono";
     src: url(../fonts/jetbrains_mono/JetBrainsMono-Light.woff2);
 }
+
+.input {
+    border-radius: 0;
+    height: 2.1em;
+
+    &:active, &:focus {
+        border-color: #b5b5b5 !important;
+    }
+}
