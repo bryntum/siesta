@@ -2,6 +2,7 @@
 
 import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { calculate, field } from "@bryntum/chronograph/src/replica2/Entity.js"
+import { parse, stringify } from "typescript-serializable-mixin/index.js"
 import { siestaPackageRootUrl } from "../../../index.js"
 import minimatch from "../../../web_modules/minimatch.js"
 import { ChronoGraphJSX, ElementSource } from "../../chronograph-jsx/ChronoGraphJSX.js"
@@ -23,6 +24,14 @@ import { TestNodeResultComponent } from "./test_result/TestResult.js"
 ChronoGraphJSX
 
 //---------------------------------------------------------------------------------------------------------------------
+type DashboardPersistentData = {
+    currentTestUrl      : string
+    filterValue         : string
+    domContainerWidth   : number
+    projectPlanWidth    : number
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 export class Dashboard extends Mixin(
     [ Component ],
     (base : ClassUnion<typeof Component>) =>
@@ -40,10 +49,76 @@ export class Dashboard extends Mixin(
         testDescriptorFiltered : TestDescriptorFiltered     = undefined
 
         domContainerWidthBox    : Box<number>               = Box.new(400)
+        projectPlanWidthBox     : Box<number>               = Box.new(300)
+
+
+        collectPersistentState () : DashboardPersistentData {
+            return {
+                // TODO should use `urlRel`
+                currentTestUrl      : this.currentTest?.urlAbs,
+                filterValue         : this.filterBox,
+
+                domContainerWidth   : this.domContainerWidthBox.read(),
+                projectPlanWidth    : this.projectPlanWidthBox.read()
+            }
+        }
+
+
+        applyPersistentState (state : DashboardPersistentData) {
+            this.filterBox      = state.filterValue || ''
+
+            state.domContainerWidth && this.domContainerWidthBox.write(state.domContainerWidth)
+            state.projectPlanWidth && this.projectPlanWidthBox.write(state.projectPlanWidth)
+
+            if (state.currentTestUrl) {
+                this.launcher.projectData.projectPlan.traverse(desc => {
+                    if (desc.urlAbs === state.currentTestUrl) {
+                        this.currentTest    = desc
+
+                        return false
+                    }
+                })
+            }
+        }
+
+
+        get persistenceKey () : string {
+            return `siesta-dashboard-${ this.launcher.projectData.projectPlan.title }`
+        }
+
+
+        retrievePersistentState () : DashboardPersistentData {
+            const str           = localStorage.getItem(this.persistenceKey)
+
+            return parse(str)
+        }
+
+
+        savePersistentState () {
+            localStorage.setItem(this.persistenceKey, stringify(this.collectPersistentState()))
+        }
+
+
+        bindStatePersistence () {
+            const savePersistentState   = buffer(() => this.savePersistentState(), 150);
+
+            [
+                this.$.filterBox,
+                this.$.currentTest,
+                this.domContainerWidthBox,
+                this.projectPlanWidthBox
+            ].forEach(box => box.commitValueOptimisticHook.on(savePersistentState))
+        }
 
 
         async start () {
             await awaitDomInteractive()
+
+            const persistentState       = this.retrievePersistentState()
+
+            persistentState && this.applyPersistentState(persistentState)
+
+            this.bindStatePersistence()
 
             const rippleEffectManager   = RippleEffectManager.new()
 
@@ -87,9 +162,13 @@ export class Dashboard extends Mixin(
                 ondblclick  = { e => this.onDoubleClick(e) }
                 class       = 'is-flex is-align-items-stretch' style='height: 100%;'
             >
-                <div class="is-flex is-flex-direction-column" style="min-width: 100px; width: 300px">
+                <div class="is-flex is-flex-direction-column" style="min-width: 100px" style:width={ () => this.projectPlanWidthBox.read() + 'px' }>
                     <div class='tbar is-flex' style="height: 2.7em">
-                        <input oninput={ buffer((e : InputEvent) => this.onFilterInput(e), 200) } class="input" type="text" placeholder="Include glob"/>
+                        <input
+                            value   = { String(this.filterBox).replace(/^\*\*\//, '') }
+                            oninput = { buffer((e : InputEvent) => this.onFilterInput(e), 200) }
+                            class   = "input" type="text" placeholder="Include glob"
+                        />
                     </div>
 
                     {
@@ -114,7 +193,7 @@ export class Dashboard extends Mixin(
                     </div>
                 </div>
 
-                <Splitter mode="horizontal" style="width: 8px"></Splitter>
+                <Splitter mode="horizontal" style="width: 8px" sizeBox={ this.projectPlanWidthBox }></Splitter>
 
                 {
                     () => {
