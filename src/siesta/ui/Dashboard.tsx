@@ -210,6 +210,15 @@ export class Dashboard extends Mixin(
         }
 
 
+        clearFilter () {
+            this.filterBox  = ''
+
+            const el        = this.el.querySelector('.filter-input') as HTMLInputElement
+
+            el.value        = ''
+        }
+
+
         render () : Element {
             const dispatcher        = this.launcher.dispatcher
 
@@ -224,8 +233,11 @@ export class Dashboard extends Mixin(
                         <input
                             value   = { String(this.filterBox).replace(/^\*\*\//, '') }
                             oninput = { buffer((e : InputEvent) => this.onFilterInput(e), 200) }
-                            class   = "input" type="text" placeholder="Include glob"
+                            class   = 'filter-input input' type="text" placeholder="Include glob"
                         />
+                        <span class="icon ripple is-medium" onclick={ () => this.clearFilter() }>
+                            <i class="fas fa-times"></i>
+                        </span>
                     </div>
 
                     {
@@ -323,6 +335,7 @@ export class Dashboard extends Mixin(
                 this.launcher.launchContinuously(desc.leavesAxis())
             }
 
+            // TODO move this to `LaunchInfoComponent`
             const result    = this.getTestResultComponentFromMouseEvent(e)
 
             if (result) {
@@ -346,8 +359,6 @@ export class Dashboard extends Mixin(
 
 
         runAll () {
-            const dispatcher        = this.launcher.dispatcher
-
             this.launcher.launchContinuously(flattenFilteredTestDescriptor(this.testDescriptorFiltered))
         }
 
