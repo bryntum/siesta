@@ -447,7 +447,7 @@ export class TestNodeResultReactive extends Mixin(
         checked         : boolean       = false
 
         @field()
-        expandedState   : 'collapsed' | 'expanded'       = null
+        expandedState   : 'collapsed' | 'expanded'      = null
 
         @field()
         // @ts-ignore

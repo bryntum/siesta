@@ -9,9 +9,11 @@ import { ChronoGraphJSX, ElementSource } from "../../chronograph-jsx/ChronoGraph
 import { Component } from "../../chronograph-jsx/Component.js"
 import { ComponentElement } from "../../chronograph-jsx/ElementReactivity.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { awaitDomInteractive } from "../../util/Helpers.js"
 import { buffer } from "../../util/TimeHelpers.js"
+import { Dispatcher } from "../launcher/Dispatcher.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { individualCheckInfoForTestResult, TestNodeResultReactive } from "../test/TestResult.js"
@@ -29,7 +31,16 @@ type DashboardPersistentData = {
     filterValue         : string
     domContainerWidth   : number
     projectPlanWidth    : number
+
+    projectPlanItems    : Map<string, ProjectPlanItemPersistentData>
 }
+
+type ProjectPlanItemPersistentData = {
+    checked             : boolean
+    expanded            : 'collapsed' | 'expanded'
+}
+
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Dashboard extends Mixin(
@@ -52,15 +63,44 @@ export class Dashboard extends Mixin(
         projectPlanWidthBox     : Box<number>               = Box.new(300)
 
 
+        get projectPlan () : TestDescriptor {
+            return this.launcher.projectData.projectPlan
+        }
+
+        get dispatcher () : Dispatcher {
+            return this.launcher.dispatcher
+        }
+
+
         collectPersistentState () : DashboardPersistentData {
             return {
-                // TODO should use `urlRel`
                 currentTestUrl      : this.currentTest?.urlAbs,
                 filterValue         : this.filterBox,
 
                 domContainerWidth   : this.domContainerWidthBox.read(),
-                projectPlanWidth    : this.projectPlanWidthBox.read()
+                projectPlanWidth    : this.projectPlanWidthBox.read(),
+
+                projectPlanItems    : CI(this.projectPlan.traverseGen(true))
+                    .map(item => {
+                        if (item.isLeaf()) {
+                            const info      = this.dispatcher.results.get(item)
+
+                            return [ item.titleIdentifier, { checked : info.checked, expanded : null }  ]
+                        } else {
+                            const info      = this.dispatcher.resultsGroups.get(item)
+
+                            return [ item.titleIdentifier, { checked : info.checked, expanded : info.expandedState }  ]
+                        }
+                    })
+                    .toMap()
             }
+        }
+
+
+        getProjectPlanIndex () : Map<string, TestDescriptor> {
+            return CI(this.projectPlan.traverseGen(true))
+                .map(item => [ item.titleIdentifier, item ])
+                .toMap()
         }
 
 
@@ -71,7 +111,7 @@ export class Dashboard extends Mixin(
             state.projectPlanWidth && this.projectPlanWidthBox.write(state.projectPlanWidth)
 
             if (state.currentTestUrl) {
-                this.launcher.projectData.projectPlan.traverse(desc => {
+                this.projectPlan.traverse(desc => {
                     if (desc.urlAbs === state.currentTestUrl) {
                         this.currentTest    = desc
 
@@ -79,11 +119,28 @@ export class Dashboard extends Mixin(
                     }
                 })
             }
+
+            const index         = this.getProjectPlanIndex()
+
+            state.projectPlanItems?.forEach((itemInfo, titleIdentifier) => {
+                const item      = index.get(titleIdentifier)
+
+                if (item) {
+                    if (item.isLeaf()) {
+                        this.dispatcher.results.get(item).checked   = itemInfo.checked
+                    } else {
+                        const groupInfo     = this.dispatcher.resultsGroups.get(item)
+
+                        groupInfo.checked           = itemInfo.checked
+                        groupInfo.expandedState     = itemInfo.expanded
+                    }
+                }
+            })
         }
 
 
         get persistenceKey () : string {
-            return `siesta-dashboard-${ this.launcher.projectData.projectPlan.title }`
+            return `siesta-dashboard-${ this.projectPlan.title }`
         }
 
 
@@ -304,7 +361,7 @@ export class Dashboard extends Mixin(
 
         @calculate('testDescriptorFiltered')
         calculateTestDescriptorFiltered () {
-            return filterTestDescriptor(this.launcher.projectData.projectPlan, this.filterBox)
+            return filterTestDescriptor(this.projectPlan, this.filterBox)
         }
 
     }

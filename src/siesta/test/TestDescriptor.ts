@@ -247,6 +247,12 @@ export class TestDescriptor extends TestDescriptorPre {
                 this.parentNode && this.parentNode.urlAbs ? joinUrls(this.parentNode.urlAbs, this.url || this.filename) : null
     }
 
+    // a string used to identify the test descriptor when saving/restoring the persistent UI state
+    get titleIdentifier () : string {
+        return this.title || this.urlAbs || this.filename
+    }
+
+
     // here the type should be `this`, but TS got mad when mixin `Project` and `ProjectBrowser` for example
     // `TestDescriptor` seems to be enough, since `flatten` is always used in generic `TestDescriptor` context it seems
     $flatten        : TestDescriptor      = undefined

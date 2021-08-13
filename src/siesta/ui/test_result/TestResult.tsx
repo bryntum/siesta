@@ -74,11 +74,11 @@ export class TestNodeResultComponent extends Mixin(
                     }</leaf>
             )
 
-            const expandedState = this.testNode.expandedState != null
+            const expandedState = testNode.expandedState != null
                 ?
-                    this.testNode.expandedState
+                    testNode.expandedState
                 :
-                    this.testNode.passed && this.testNode.parentNode ? 'collapsed' : 'expanded'
+                    testNode.passed && testNode.parentNode ? 'collapsed' : 'expanded'
 
             const el = <TreeComponent
                 // @ts-ignore

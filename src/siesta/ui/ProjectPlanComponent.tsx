@@ -3,6 +3,7 @@
 import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { ChronoGraphJSX } from "../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../chronograph-jsx/Component.js"
+import { ComponentElement } from "../../chronograph-jsx/ElementReactivity.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { Dispatcher } from "../launcher/Dispatcher.js"
@@ -77,15 +78,14 @@ export class TestDescriptorComponent extends Component {
         if (testDescriptor.childNodes) {
             const launchInfo    = this.dispatcher.resultsGroups.get(testDescriptor)
 
-            return <TreeComponent
+            const el = <TreeComponent
                 collapsible = { Boolean(testDescriptor.parentNode) }
                 extraIconSource = {
                     () => <span onclick={ () => launchInfo.toggleChecked() } class="icon ripple">
                         <i class={ () => launchInfo.checked ? 'far fa-check-square' : 'far fa-square' }></i>
                     </span>
-
                 }
-                state       = "expanded"
+                state       = { launchInfo.expandedState != null ? launchInfo.expandedState : 'expanded' }
                 iconCls     = { [ 'far fa-folder-open', 'far fa-folder' ] }
                 iconClsSource = { () => this.calculateGroupIconClass() }
                 class       = { () => `project-plan-folder ${ launchInfo.viewState }` }
@@ -103,7 +103,12 @@ export class TestDescriptorComponent extends Component {
                         </leaf>
                     )
                 }
-            </TreeComponent>
+            </TreeComponent> as ComponentElement<TreeComponent>
+
+            // save changes in `state` atom of the TreeComponent to the `expanded
+            (el.comp.$.state as Box<TreeComponent[ 'state' ]>).commitValueOptimisticHook.on((atom, value) => launchInfo.expandedState = value)
+
+            return el
         } else {
             const launchInfo        = this.dispatcher.results.get(testDescriptor)
 
