@@ -6,10 +6,14 @@
 
     // this seemingly redundant declarations prevents the inheritance from the parent element
     --r-opacity: 0;
+    --r-scale: 0;
+    --ripple-background: rgba(187, 187, 187, 0.7);
+    --ripple-duration: 450ms;
+    --ripple-easing: ease-in-out;
 
     &:before {
         content: '';
-        display: block;
+        display: none;
         position: absolute;
         pointer-events: none;
 
@@ -28,5 +32,9 @@
             opacity calc(var(--r-duration, 0) * var(--ripple-duration, 450ms)) var(--ripple-easing, linear);
         transform: translate(-50%, -50%) scale(var(--r-scale, 1));
         transform-origin: center;
+    }
+
+    &.rippling:hover:before {
+        display: block;
     }
 }

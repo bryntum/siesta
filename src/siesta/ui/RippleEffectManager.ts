@@ -11,6 +11,9 @@ export class RippleEffectManager extends Mixin(
         listenerDown    : (e : PointerEvent) => void        = undefined
         listenerUp      : (e : PointerEvent) => void        = undefined
 
+        listenerClearance1  : (e : TransitionEvent) => void = undefined
+        listenerClearance2  : (e : TransitionEvent) => void = undefined
+
         // TODO handle several touches?
         lastRippledEl   : HTMLElement                       = undefined
 
@@ -18,27 +21,49 @@ export class RippleEffectManager extends Mixin(
         async start () {
             await awaitDomInteractive()
 
-            const listenerDown  = this.listenerDown = e => this.onPointerDown(e)
-            const listenerUp    = this.listenerUp   = e => this.onPointerUp(e)
+            this.listenerDown           = e => this.onPointerDown(e)
+            this.listenerUp             = e => this.onPointerUp(e)
+            this.listenerClearance1     = e => e.target.addEventListener('transitionend', this.listenerClearance2, { once : true })
+            this.listenerClearance2     = e => this.stopRipplingAfterTransition(e.target as HTMLElement)
 
-            document.addEventListener('pointerdown', listenerDown)
-            document.addEventListener('pointerup', listenerUp, true)
+            document.addEventListener('pointerdown', this.listenerDown)
         }
 
 
         stop () {
             document.removeEventListener('pointerdown', this.listenerDown)
             document.removeEventListener('pointerup', this.listenerUp, true)
+            document.removeEventListener('dragstart', this.listenerUp, true)
+        }
+
+
+        stopRipplingAfterTransition (el : HTMLElement) {
+            const style     = el.style
+
+            el.classList.remove('rippling')
+
+            style.setProperty('--r-scale', '')
+            style.setProperty('--r-duration', '')
+            style.setProperty('--r-opacity', '')
+            style.setProperty('--r-size', '')
+            style.setProperty('--r-left', '')
+            style.setProperty('--r-top', '')
         }
 
 
         onPointerUp (e : PointerEvent) {
+            document.removeEventListener('pointerup', this.listenerUp, true)
+            document.removeEventListener('dragstart', this.listenerUp, true)
+
             const el                = this.lastRippledEl
 
             if (el) {
-                const style             = el.style
+                this.lastRippledEl  = undefined
 
-                style.setProperty('--r-opacity', '0')
+                el.addEventListener('transitionstart', this.listenerClearance1, { once : true })
+
+                // this will trigger the new opacity transition
+                el.style.setProperty('--r-opacity', '0')
             }
         }
 
@@ -47,6 +72,17 @@ export class RippleEffectManager extends Mixin(
             const el : HTMLElement = (e.target as Element).closest('.ripple')
 
             if (el) {
+                // their might be a case, that these listeners has not been cleared on the element
+                // (because the fade-out transition did not start, because of the mouse-out)
+                // cleaning up manually for that case
+                el.removeEventListener('transitionstart', this.listenerClearance1)
+                el.removeEventListener('transitionend', this.listenerClearance2)
+
+                document.addEventListener('pointerup', this.listenerUp, true)
+                // if user pushed the mouse button and then moved the mouse somewhere,
+                // a drag may occur and `pointerup` won't be fired
+                document.addEventListener('dragstart', this.listenerUp, true)
+
                 this.lastRippledEl  = el
 
                 const rect      = el.getBoundingClientRect()
@@ -75,6 +111,8 @@ export class RippleEffectManager extends Mixin(
                 style.setProperty('--r-size', String(maxSide))
                 style.setProperty('--r-left', String(e.clientX - rect.left))
                 style.setProperty('--r-top', String(e.clientY - rect.top))
+
+                el.classList.add('rippling')
 
                 // flush the style changes
                 el.offsetTop
