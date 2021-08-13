@@ -70,7 +70,7 @@ export class TreeNode extends Mixin(
         }
 
 
-        *forEachChildNodeGen () : Generator<this[ 'childNodeT' ]> {
+        * forEachChildNodeGen () : Generator<this[ 'childNodeT' ]> {
             const childNodes      = this.childNodes
 
             if (childNodes)
@@ -90,7 +90,7 @@ export class TreeNode extends Mixin(
         }
 
 
-        *traverseGen (includeThis : boolean = true) : Generator<this[ 'childNodeT' ]> {
+        * traverseGen (includeThis : boolean = true) : Generator<this[ 'childNodeT' ]> {
             if (includeThis) yield this
 
             const childNodes      = this.childNodes

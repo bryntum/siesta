@@ -17,12 +17,10 @@ export class Splitter extends Component {
     }
 
     mode            : 'horizontal' | 'vertical'     = 'horizontal'
-
-    resizeTargetFunc : (self : ComponentElement<Splitter>) => Element    = undefined
-
     resizeTarget    : 'next' | 'previous'           = 'previous'
 
-    companionsFunc  : (self : ComponentElement<Splitter>) => HTMLElement[]   = undefined
+    resizeTargetFunc    : (self : ComponentElement<Splitter>) => Element    = undefined
+    companionsFunc      : (self : ComponentElement<Splitter>) => HTMLElement[]   = undefined
 
     sizeBox         : Box<number>       = undefined
 
