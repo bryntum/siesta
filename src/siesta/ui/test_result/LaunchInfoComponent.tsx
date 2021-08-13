@@ -1,6 +1,7 @@
 /** @jsx ChronoGraphJSX.createElement */
 /** @jsxFrag ChronoGraphJSX.FragmentSymbol */
 
+import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
@@ -26,8 +27,9 @@ export class LaunchInfoComponent extends Mixin(
 
     class LaunchInfoComponent extends base {
         props       : Component[ 'props' ] & {
-            dispatcher      : LaunchInfoComponent[ 'dispatcher' ]
-            launchInfo      : LaunchInfoComponent[ 'launchInfo' ]
+            dispatcher              : LaunchInfoComponent[ 'dispatcher' ]
+            launchInfo              : LaunchInfoComponent[ 'launchInfo' ]
+            domContainerWidthBox?   : LaunchInfoComponent[ 'domContainerWidthBox' ]
         }
 
         launchInfo  : TestLaunchInfo                = undefined
@@ -35,6 +37,8 @@ export class LaunchInfoComponent extends Mixin(
 
         @field()
         scaleMode               : 'none' | 'fit_full' | 'fit_width' | 'fit_height'   = 'fit_full'
+
+        domContainerWidthBox    : Box<number>       = Box.new(400)
 
 
         get launcher () : Launcher {
@@ -116,8 +120,12 @@ export class LaunchInfoComponent extends Mixin(
                                             ? [ el.previousElementSibling, el.nextElementSibling, launchInfo.context.wrapper ]
                                             : [ el.previousElementSibling, el.nextElementSibling ]
                                     }
+                                    sizeBox         = { this.domContainerWidthBox }
                                 ></Splitter>
-                                <div class={ () => `is-flex ${ launchInfo.context ? 'is-align-items-stretch' : 'is-justify-content-center is-align-items-center' }` } style='width: 400px'>
+                                <div
+                                    class={ () => `is-flex ${ launchInfo.context ? 'is-align-items-stretch' : 'is-justify-content-center is-align-items-center' }` }
+                                    style:width={ () => this.domContainerWidthBox.read() + 'px' }
+                                >
                                     {
                                         launchInfo.context
                                             ?

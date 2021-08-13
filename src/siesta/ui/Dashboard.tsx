@@ -39,6 +39,8 @@ export class Dashboard extends Mixin(
         @field()
         testDescriptorFiltered : TestDescriptorFiltered     = undefined
 
+        domContainerWidthBox    : Box<number>               = Box.new(400)
+
 
         async start () {
             await awaitDomInteractive()
@@ -120,7 +122,11 @@ export class Dashboard extends Mixin(
 
                         const launchInfo            = dispatcher.getTestLaunchInfo(this.currentTest)
 
-                        return <LaunchInfoComponent dispatcher={ this.launcher.dispatcher } launchInfo={ launchInfo }></LaunchInfoComponent>
+                        return <LaunchInfoComponent
+                            dispatcher              = { this.launcher.dispatcher }
+                            launchInfo              = { launchInfo }
+                            domContainerWidthBox    = { this.domContainerWidthBox }
+                        ></LaunchInfoComponent>
                     }
                 }
             </div>

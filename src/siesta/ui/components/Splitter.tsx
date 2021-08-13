@@ -1,5 +1,6 @@
 /** @jsx ChronoGraphJSX.createElement */
 
+import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { ChronoGraphJSX } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
 import { ComponentElement } from "../../../chronograph-jsx/ElementReactivity.js"
@@ -12,6 +13,7 @@ export class Splitter extends Component {
         mode?           : Splitter[ 'mode' ]
         resizeTarget?   : Splitter[ 'resizeTarget' ]
         companionsFunc? : Splitter[ 'companionsFunc' ]
+        sizeBox?        : Splitter[ 'sizeBox' ]
     }
 
     mode            : 'horizontal' | 'vertical'     = 'horizontal'
@@ -20,7 +22,9 @@ export class Splitter extends Component {
 
     resizeTarget    : 'next' | 'previous'           = 'previous'
 
-    companionsFunc : (self : ComponentElement<Splitter>) => HTMLElement[]   = undefined
+    companionsFunc  : (self : ComponentElement<Splitter>) => HTMLElement[]   = undefined
+
+    sizeBox         : Box<number>       = undefined
 
 
     render () : Element {
@@ -48,8 +52,6 @@ export class Splitter extends Component {
 
 
     onPointerDown (e : MouseEvent) {
-        let pointerMoveListener, pointerUpListener
-
         const startX        = e.clientX
         const startY        = e.clientY
 
@@ -79,6 +81,8 @@ export class Splitter extends Component {
 
         this.onDragStart()
 
+        let pointerMoveListener
+
         document.addEventListener('pointermove', pointerMoveListener = (e : MouseEvent) => {
             const direction = this.resizeTarget === 'previous' ? 1 : -1
 
@@ -86,14 +90,17 @@ export class Splitter extends Component {
             const deltaY    = e.clientY - startY
 
             if (this.mode === 'horizontal') {
-                target.style.width  = (initialWidth + deltaX * direction) + 'px'
+                const newWidth  = initialWidth + deltaX * direction
+
+                this.sizeBox ? this.sizeBox.write(newWidth) : target.style.width = newWidth + 'px'
             } else {
-                target.style.height  = (initialHeight + deltaY * direction) + 'px'
+                const newHeight = initialHeight + deltaY * direction
+
+                this.sizeBox ? this.sizeBox.write(newHeight) : target.style.height = newHeight + 'px'
             }
         })
 
-        document.addEventListener('pointerup', pointerUpListener = (e : MouseEvent) => {
-            document.removeEventListener('pointerup', pointerUpListener)
+        document.addEventListener('pointerup', (e : MouseEvent) => {
             document.removeEventListener('pointermove', pointerMoveListener)
 
             document.body.style.cursor  = prevBodyCursor
@@ -106,7 +113,7 @@ export class Splitter extends Component {
             })
 
             this.onDragStop()
-        })
+        }, { once : true })
     }
 
 
