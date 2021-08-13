@@ -52,15 +52,11 @@ export class ContextProviderBrowserIframe extends Mixin(
         async doCreateContext (desc? : TestDescriptorBrowser) : Promise<InstanceType<this[ 'contextClass' ]>> {
             const [ wrapper, iframe ]       = this.createIframe(desc)
 
-            let listener : AnyFunction
-
             await new Promise(resolve => {
-                iframe.addEventListener('load', listener = resolve)
+                iframe.addEventListener('load', resolve, { once : true })
 
                 document.body.appendChild(wrapper)
             })
-
-            iframe.removeEventListener('load', listener)
 
             return this.contextClass.new({ iframe, wrapper }) as InstanceType<this[ 'contextClass' ]>
         }
