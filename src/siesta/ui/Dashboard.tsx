@@ -1,6 +1,7 @@
 /** @jsx ChronoGraphJSX.createElement */
 
 import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
+import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
 import { calculate, field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { parse, stringify } from "typescript-serializable-mixin/index.js"
 import { siestaPackageRootUrl } from "../../../index.js"
@@ -209,6 +210,14 @@ export class Dashboard extends Mixin(
             this.el.addEventListener('treecomponent-expand-click', this.triggerSavePersistentData)
 
             document.body.appendChild(this.el)
+
+            if (this.currentTest) {
+                globalGraph.commit()
+
+                const selected  = this.el.querySelector('.is-selected')
+
+                if (selected) selected.scrollIntoView({ block : 'center', inline : 'center' })
+            }
         }
 
 
