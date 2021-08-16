@@ -1,5 +1,6 @@
 /** @jsx ChronoGraphJSX.createElement */
 
+import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { ChronoGraphJSX, ElementSource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
@@ -15,6 +16,7 @@ export class TreeComponent extends Mixin(
     class TreeComponent extends base {
         props : Component[ 'props' ] & {
             state?                      : TreeComponent[ 'state' ]
+            stateBox?                   : TreeComponent[ 'stateBox' ]
             iconCls?                    : TreeComponent[ 'iconCls' ]
             collapsible?                : TreeComponent[ 'collapsible' ]
             iconClsSource?              : TreeComponent[ 'iconClsSource' ]
@@ -24,6 +26,8 @@ export class TreeComponent extends Mixin(
 
         @field()
         state           : 'collapsed' | 'expanded'      = 'expanded'
+
+        stateBox        : Box<'collapsed' | 'expanded'> = undefined
 
         @field()
         collapsible     : boolean                       = true
@@ -38,7 +42,33 @@ export class TreeComponent extends Mixin(
 
 
         toggle () {
-            this.state  = this.state === 'expanded' ? 'collapsed' : 'expanded'
+            this.setState(this.getState() === 'expanded' ? 'collapsed' : 'expanded')
+        }
+
+
+        onExpandCollapseClick () {
+            this.toggle()
+
+            this.el.dispatchEvent(new CustomEvent<TreeComponent>('treecomponent-expand-click', { bubbles : true, detail : this }))
+        }
+
+
+        setState (value : 'collapsed' | 'expanded') {
+            if (this.stateBox)
+                this.stateBox.write(value)
+            else
+                this.state = value
+        }
+
+
+        getState () : 'collapsed' | 'expanded' {
+            if (this.stateBox) {
+                const state         = this.stateBox.read()
+
+                if (state != null) return state
+            }
+
+            return this.state
         }
 
 
@@ -52,8 +82,8 @@ export class TreeComponent extends Mixin(
 
                         return this.collapsible
                             ?
-                                <span onclick={ () => this.toggle() } class="icon ripple">
-                                    <i class={ () => this.state === 'expanded' ? 'fas fa-caret-down' : 'fas fa-caret-right' }></i>
+                                <span onclick={ () => this.onExpandCollapseClick() } class="icon ripple">
+                                    <i class={ () => this.getState() === 'expanded' ? 'fas fa-caret-down' : 'fas fa-caret-right' }></i>
                                 </span>
                             :
                                 null
@@ -69,13 +99,13 @@ export class TreeComponent extends Mixin(
                         return iconCls
                             ?
                                 <span class="icon title-icon">
-                                    <i class={ () => this.state === 'expanded' ? iconCls[ 0 ] : iconCls[ 1 ] }></i>
+                                    <i class={ () => this.getState() === 'expanded' ? iconCls[ 0 ] : iconCls[ 1 ] }></i>
                                 </span>
                             :
                                 null
                     }
                 }
-                { () => this.state === 'expanded' ? this.children : this.children[ 0 ] }
+                { () => this.getState() === 'expanded' ? this.children : this.children[ 0 ] }
             </tree>
         }
     }
