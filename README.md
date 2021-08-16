@@ -4,6 +4,8 @@
 
 <a target="_blank" href="https://siesta.works"><img src="./resources/readme_header_1.svg"></a>
 
+<a href="https://www.npmjs.com/package/@bryntum/siesta"><img alt="link to npm package" src="https://img.shields.io/npm/v/@bryntum/siesta"></a>
+
 Siesta is a stress-free, ubiquitous, open-source JavaScript/TypeScript testing tool, 
 developed at [Bryntum](https://www.bryntum.com/) starting from the 2009.
 
