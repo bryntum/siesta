@@ -85,7 +85,7 @@ export class TestDescriptorComponent extends Component {
                         <i class={ () => launchInfo.checked ? 'far fa-check-square' : 'far fa-square' }></i>
                     </span>
                 }
-                state       = { launchInfo.expandedState != null ? launchInfo.expandedState : 'expanded' }
+                stateBox    = { launchInfo.$.expandedState as Box<'collapsed' | 'expanded'> }
                 iconCls     = { [ 'far fa-folder-open', 'far fa-folder' ] }
                 iconClsSource = { () => this.calculateGroupIconClass() }
                 class       = { () => `project-plan-folder ${ launchInfo.viewState }` }
@@ -105,8 +105,8 @@ export class TestDescriptorComponent extends Component {
                 }
             </TreeComponent> as ComponentElement<TreeComponent>
 
-            // save changes in `state` atom of the TreeComponent to the `expanded
-            (el.comp.$.state as Box<TreeComponent[ 'state' ]>).commitValueOptimisticHook.on((atom, value) => launchInfo.expandedState = value)
+            // // save changes in `state` atom of the TreeComponent to the `expanded
+            // (el.comp.$.state as Box<TreeComponent[ 'state' ]>).commitValueOptimisticHook.on((atom, value) => launchInfo.expandedState = value)
 
             return el
         } else {
