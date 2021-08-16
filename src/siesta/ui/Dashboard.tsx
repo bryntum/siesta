@@ -62,6 +62,8 @@ export class Dashboard extends Mixin(
         domContainerWidthBox    : Box<number>               = Box.new(400)
         projectPlanWidthBox     : Box<number>               = Box.new(300)
 
+        triggerSavePersistentData   : () => void            = buffer(() => this.savePersistentState(), 150)
+
 
         get projectPlan () : TestDescriptor {
             return this.launcher.projectData.projectPlan
@@ -157,14 +159,12 @@ export class Dashboard extends Mixin(
 
 
         bindStatePersistence () {
-            const savePersistentState   = buffer(() => this.savePersistentState(), 150);
-
             [
                 this.$.filterBox,
                 this.$.currentTest,
                 this.domContainerWidthBox,
                 this.projectPlanWidthBox
-            ].forEach(box => box.commitValueOptimisticHook.on(savePersistentState))
+            ].forEach(box => box.commitValueOptimisticHook.on(this.triggerSavePersistentData))
         }
 
 
@@ -205,6 +205,8 @@ export class Dashboard extends Mixin(
 
                 document.head.appendChild(linkEl)
             }
+
+            this.el.addEventListener('treecomponent-expand-click', this.triggerSavePersistentData)
 
             document.body.appendChild(this.el)
         }
