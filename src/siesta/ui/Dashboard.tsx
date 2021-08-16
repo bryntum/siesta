@@ -372,7 +372,9 @@ export class Dashboard extends Mixin(
 
         @calculate('testDescriptorFiltered')
         calculateTestDescriptorFiltered () {
-            return filterTestDescriptor(this.projectPlan, this.filterBox)
+            return filterTestDescriptor(this.projectPlan, this.filterBox, desc => {
+                this.dispatcher.resultsGroups.get(desc).expandedState   = 'expanded'
+            })
         }
 
     }
@@ -386,13 +388,19 @@ export type TestDescriptorFiltered = {
 }
 
 
-export const filterTestDescriptor = (desc : TestDescriptor, glob : string) : TestDescriptorFiltered | undefined => {
+export const filterTestDescriptor = (desc : TestDescriptor, glob : string, expandGroup? : (desc : TestDescriptor) => void) : TestDescriptorFiltered | undefined => {
     if (desc.isLeaf())
         return !glob || minimatch(desc.urlAbs, glob, { matchBase : true }) ? { descriptor : desc } : undefined
     else {
-        const filteredChildren   = desc.childNodes.map(child => filterTestDescriptor(child, glob)).filter(el => Boolean(el))
+        const filteredChildren   = desc.childNodes.map(child => filterTestDescriptor(child, glob, expandGroup)).filter(el => Boolean(el))
 
-        return !glob || filteredChildren.length > 0 ? { descriptor : desc, filteredChildren } : undefined
+        if (!glob || filteredChildren.length > 0) {
+            glob && expandGroup && expandGroup(desc)
+
+            return { descriptor : desc, filteredChildren }
+        } else {
+            return undefined
+        }
     }
 }
 
