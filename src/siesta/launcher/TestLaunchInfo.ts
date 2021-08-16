@@ -134,7 +134,7 @@ export class TestGroupLaunchInfo extends Mixin(
         checked             : boolean                   = false
 
         @field()
-        expandedState   : 'collapsed' | 'expanded'      = null
+        expandedState       : 'collapsed' | 'expanded'  = null
 
 
         initialize (props? : Partial<TestGroupLaunchInfo>) {
