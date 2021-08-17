@@ -2,17 +2,18 @@
 [//]: # (That file is copied to the /README.md during `scripts/build_docs.sh` command)
 [//]: # (Do not edit the /README.md directly)
 
-Siesta
-======
+<a target="_blank" href="https://siesta.works"><img src="./resources/readme_header_1.svg"></a>
 
-Siesta is a stress-free, ubiquitous, open-source JavaScript/TypeScript testing tool, 
-developed at [Bryntum](https://www.bryntum.com/) starting from the 2009.
+<a href="https://www.npmjs.com/package/@bryntum/siesta"><img alt="link to npm package" src="https://img.shields.io/npm/v/@bryntum/siesta"></a>
 
-Version 6 is a complete rewrite, using a modern technology stack and the decade of test driven development experience.
+Siesta is a stress-free, ubiquitous & open-source JavaScript/TypeScript testing tool 
+developed by [Bryntum](https://www.bryntum.com/) since 2009.
+
+Version 6 is a complete rewrite, using a modern technology stack and a decade of test driven development experience.
 
 Main features:
 
-- One test tool to run them all. Siesta can run tests in browsers, Node.js and Deno environments.
+- One test tool to run all types of tests. Siesta can run tests in all modern browsers, Node.js and Deno.
 - Supports parallel execution
 - Provides accurate and well-formatted deep diff for equality assertion
 
@@ -111,18 +112,19 @@ Please start reading from one the following guides, corresponding to the environ
 [[GettingStartedBrowserGuide|Getting started with Siesta in browser environment]]
 
 
-Github repo
+Resources
 ===========
 
-https://github.com/bryntum/siesta
+Website: https://siesta.works
 
+Github repo: https://github.com/bryntum/siesta
 
 Connect
 =======
 
-We welcome all feedback - please tell us what works well in Siesta, what causes trouble and what any other features you would like to see implemented.
+We welcome all feedback, so please let us know how we can improve your testing experience and reduce friction in your TDD cycle.
 
-Please report any found bugs in the [issues tracker](https://github.com/bryntum/siesta/issues)
+Please report any bugs found and request features in the [issues tracker](https://github.com/bryntum/siesta/issues)
 
 Ask questions in the [forum](https://bryntum.com/forum/viewforum.php?f=20)
 

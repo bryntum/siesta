@@ -2,8 +2,9 @@
 [//]: # (That file is copied to the /README.md during `scripts/build_docs.sh` command)
 [//]: # (Do not edit the /README.md directly)
 
-Siesta
-======
+<a target="_blank" href="https://siesta.works"><img src="./resources/readme_header_1.svg"></a>
+
+<a href="https://www.npmjs.com/package/@bryntum/siesta"><img alt="link to npm package" src="https://img.shields.io/npm/v/@bryntum/siesta"></a>
 
 Siesta is a stress-free, ubiquitous, open-source JavaScript/TypeScript testing tool, 
 developed at [Bryntum](https://www.bryntum.com/) starting from the 2009.
@@ -111,10 +112,12 @@ Please start reading from one the following guides, corresponding to the environ
 [Getting started with Siesta in browser environment](https://bryntum.github.io/siesta/docs/modules/_src_guides_getting_started_browser_getting_started_browser_.html#gettingstartedbrowserguide)
 
 
-Github repo
+Resources
 ===========
 
-https://github.com/bryntum/siesta
+Website: https://siesta.works
+
+Github repo: https://github.com/bryntum/siesta
 
 
 Connect
