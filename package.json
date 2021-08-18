@@ -1,0 +1,5 @@
+{
+    "private": true,
+    "description": "Monorepo for Siesta - stress-free JavaScript/TypeScript testing and benchmarking tool",
+    "type": "module"
+}
