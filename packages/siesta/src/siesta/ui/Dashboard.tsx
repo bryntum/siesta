@@ -169,20 +169,7 @@ export class Dashboard extends Mixin(
         }
 
 
-        async start () {
-            await awaitDomInteractive()
-
-            const persistentState       = this.retrievePersistentState()
-
-            persistentState && this.applyPersistentState(persistentState)
-
-            this.bindStatePersistence()
-
-            const rippleEffectManager   = RippleEffectManager.new()
-
-            rippleEffectManager.start()
-
-            //------------------
+        tweakTheHead () {
             const metas         = Array.from(document.head.getElementsByTagName('meta'))
 
             if (!metas.some(meta => /viewport/i.test(meta.name))) {
@@ -206,6 +193,34 @@ export class Dashboard extends Mixin(
 
                 document.head.appendChild(linkEl)
             }
+
+            if (!links.some(link => /icon/.test(link.rel))) {
+                const linkEl        = document.createElement('link')
+
+                linkEl.setAttribute('type', 'image/svg+xml')
+                linkEl.setAttribute('rel', 'icon')
+                linkEl.setAttribute('href', `${ siestaPackageRootUrl }resources/styling/browser/images/logo_on_transparent.svg`)
+
+                document.head.appendChild(linkEl)
+            }
+
+        }
+
+
+        async start () {
+            await awaitDomInteractive()
+
+            const persistentState       = this.retrievePersistentState()
+
+            persistentState && this.applyPersistentState(persistentState)
+
+            this.bindStatePersistence()
+
+            const rippleEffectManager   = RippleEffectManager.new()
+
+            rippleEffectManager.start()
+
+            this.tweakTheHead()
 
             this.el.addEventListener('treecomponent-expand-click', this.triggerSavePersistentData)
 
