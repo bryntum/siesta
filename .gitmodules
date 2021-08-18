@@ -1,0 +1,12 @@
+[submodule "packages/chained-iterator"]
+	path = packages/chained-iterator
+	url = git@github.com:canonic-epicure/chained-iterator.git
+[submodule "packages/typescript-mixin-class"]
+	path = packages/typescript-mixin-class
+	url = git@github.com:canonic-epicure/typescript-mixin-class.git
+[submodule "packages/typescript-serializable-mixin"]
+	path = packages/typescript-serializable-mixin
+	url = git@github.com:canonic-epicure/typescript-serializable-mixin.git
+[submodule "packages/chronograph"]
+	path = packages/chronograph
+	url = git@github.com:bryntum/chronograph.git
