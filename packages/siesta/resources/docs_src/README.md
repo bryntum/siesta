@@ -2,7 +2,7 @@
 [//]: # (That file is copied to the /README.md during `scripts/build_docs.sh` command)
 [//]: # (Do not edit the /README.md directly)
 
-<a target="_blank" href="https://siesta.works"><img src=".packages/siesta/resources/readme_header_1.svg?damn"></a>
+<a target="_blank" href="https://siesta.works"><img src="./packages/siesta/resources/readme_header_1.svg?damn"></a>
 
 <a href="https://www.npmjs.com/package/@bryntum/siesta"><img alt="link to npm package" src="https://img.shields.io/npm/v/@bryntum/siesta"></a>
 
