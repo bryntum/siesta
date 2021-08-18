@@ -2,6 +2,12 @@ lockfileVersion: 5.3
 
 overrides:
   typescript-mixin-class>chained-iterator: workspace:*
+  typescript-serializable-mixin>typescript-mixin-class: workspace:*
+  '@bryntum/chronograph>typescript-mixin-class': workspace:*
+  '@bryntum/chronograph>typescript-serializable-mixin': workspace:*
+  '@bryntum/siesta>typescript-mixin-class': workspace:*
+  '@bryntum/siesta>typescript-serializable-mixin': workspace:*
+  '@bryntum/siesta>@bryntum/chronograph': workspace:*
 
 importers:
 
@@ -10,7 +16,7 @@ importers:
 
   packages/chained-iterator:
     specifiers:
-      '@bryntum/siesta': 6.0.0-alpha-3
+      '@bryntum/siesta': ^6.0.0-alpha-3
       tslint: ^6.1.3
       typescript: ^4.3.5
     devDependencies:
@@ -20,7 +26,10 @@ importers:
 
   packages/chronograph:
     specifiers:
+      '@bryntum/siesta': ^6.0.0-alpha-3
       '@types/node': ^12.7.2
+      '@web/dev-server': ^0.1.17
+      chained-iterator: ^0.0.2
       core-js: ^2.6.5
       cose-base: ^1.0.2
       cytoscape: ^3.14.1
@@ -32,19 +41,26 @@ importers:
       esm: ^3.2.25
       klayjs: ^0.4.1
       layout-base: ^1.0.2
-      mobx: ^5.13.0
+      mobx: ^5.15.4
       regenerator-runtime: ^0.13.1
       siesta-lite: ^5.5.0
       tslib: ^1.9.3
       tslint: ^5.16.0
       typedoc: git://github.com/bryntum/typedoc.git#custom
       typedoc-default-themes: git://github.com/bryntum/typedoc-default-themes.git
-      typescript: 3.8.3
+      typescript: 4.3.2
+      typescript-mixin-class: workspace:*
+      typescript-serializable-mixin: workspace:*
     dependencies:
+      chained-iterator: 0.0.2
       esm: 3.2.25
       tslib: 1.14.1
+      typescript-mixin-class: link:../typescript-mixin-class
+      typescript-serializable-mixin: link:../typescript-serializable-mixin
     devDependencies:
+      '@bryntum/siesta': 6.0.0-alpha-3
       '@types/node': 12.20.19
+      '@web/dev-server': 0.1.21
       core-js: 2.6.12
       cose-base: 1.0.3
       cytoscape: 3.19.1
@@ -58,14 +74,14 @@ importers:
       mobx: 5.15.7
       regenerator-runtime: 0.13.9
       siesta-lite: 5.5.2
-      tslint: 5.20.1_typescript@3.8.3
-      typedoc: github.com/bryntum/typedoc/0a7c77fe0170c4084712c1d56bf27fc9adda7035_typescript@3.8.3
+      tslint: 5.20.1_typescript@4.3.2
+      typedoc: github.com/bryntum/typedoc/0a7c77fe0170c4084712c1d56bf27fc9adda7035_typescript@4.3.2
       typedoc-default-themes: github.com/bryntum/typedoc-default-themes/35a96be59eb3ad4e8cb7d991bd7b6fe6b931c326
-      typescript: 3.8.3
+      typescript: 4.3.2
 
   packages/siesta:
     specifiers:
-      '@bryntum/chronograph': ^2.0.1
+      '@bryntum/chronograph': workspace:*
       '@types/cssom': ^0.4.1
       '@types/glob': ^7.1.3
       '@types/minimatch': ^3.0.5
@@ -88,11 +104,11 @@ importers:
       typedoc: git://github.com/bryntum/typedoc.git#custom
       typedoc-default-themes: git://github.com/bryntum/typedoc-default-themes.git
       typescript: git://github.com/bryntum/TypeScript.git#feat/7342
-      typescript-mixin-class: ^0.0.1
-      typescript-serializable-mixin: ^0.0.1
+      typescript-mixin-class: workspace:*
+      typescript-serializable-mixin: workspace:*
       ws: ^7.4.4
     dependencies:
-      '@bryntum/chronograph': 2.0.1_57b8a246cd50a35ab675aef08134a28f
+      '@bryntum/chronograph': link:../chronograph
       chained-iterator: 0.0.2
       chalk: 4.1.2
       glob: 7.1.7
@@ -100,8 +116,8 @@ importers:
       node-fetch: 3.0.0-beta.10
       playwright: 1.14.0
       puppeteer: 10.2.0
-      typescript-mixin-class: 0.0.1
-      typescript-serializable-mixin: 0.0.1_typescript-mixin-class@0.0.1
+      typescript-mixin-class: link:../typescript-mixin-class
+      typescript-serializable-mixin: link:../typescript-serializable-mixin
       ws: 7.5.3
     devDependencies:
       '@types/cssom': 0.4.1
@@ -138,9 +154,9 @@ importers:
       '@bryntum/siesta': ^6.0.0-alpha-3
       '@web/dev-server': ^0.1.17
       typescript: ^4.3.5
-      typescript-mixin-class: ^0.0.1
+      typescript-mixin-class: workspace:*
     dependencies:
-      typescript-mixin-class: 0.0.1
+      typescript-mixin-class: link:../typescript-mixin-class
     devDependencies:
       '@bryntum/siesta': 6.0.0-alpha-3
       '@web/dev-server': 0.1.21
@@ -360,19 +376,6 @@ packages:
       '@babel/helper-validator-identifier': 7.14.9
       to-fast-properties: 2.0.0
     dev: true
-
-  /@bryntum/chronograph/2.0.1_57b8a246cd50a35ab675aef08134a28f:
-    resolution: {integrity: sha512-+XT9kh/doExTjeUZbzTrAoJU+Y+DsBqlf34L/TwaO+MKwAerW96YjgAPnGTd5gJzmO7IyDMyLYVROD+yMFg+lA==}
-    peerDependencies:
-      typescript-mixin-class: ^0.0.1
-      typescript-serializable-mixin: ^0.0.1
-    dependencies:
-      chained-iterator: 0.0.2
-      esm: 3.2.25
-      tslib: 1.14.1
-      typescript-mixin-class: 0.0.1
-      typescript-serializable-mixin: 0.0.1_typescript-mixin-class@0.0.1
-    dev: false
 
   /@bryntum/siesta/6.0.0-alpha-3:
     resolution: {integrity: sha512-lc8liEc39VxwUv5KKTh6EV+2RJSQsLqBP2Dje019Qira4Ui0M6RBTcmrp9V8Z1A2HEbSDx1XKEYjNkbtmXx2Eg==}
@@ -3466,7 +3469,7 @@ packages:
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
 
-  /tslint/5.20.1_typescript@3.8.3:
+  /tslint/5.20.1_typescript@4.3.2:
     resolution: {integrity: sha512-EcMxhzCFt8k+/UP5r8waCf/lzmeSyVlqxqMEDQE7rWYiQky8KpIBz1JAoYXfROHrPZ1XXd43q8yQnULOLiBRQg==}
     engines: {node: '>=4.8.0'}
     hasBin: true
@@ -3485,8 +3488,8 @@ packages:
       resolve: 1.20.0
       semver: 5.7.1
       tslib: 1.14.1
-      tsutils: 2.29.0_typescript@3.8.3
-      typescript: 3.8.3
+      tsutils: 2.29.0_typescript@4.3.2
+      typescript: 4.3.2
     dev: true
 
   /tslint/6.1.3_typescript@4.3.5:
@@ -3542,13 +3545,13 @@ packages:
     engines: {node: '>=0.6.x'}
     dev: true
 
-  /tsutils/2.29.0_typescript@3.8.3:
+  /tsutils/2.29.0_typescript@4.3.2:
     resolution: {integrity: sha512-g5JVHCIJwzfISaXpXE1qvNalca5Jwob6FjI4AoPlqMusJ6ftFE7IkkFoMhVLRgK+4Kx3gkzb8UZK5t5yTTvEmA==}
     peerDependencies:
       typescript: '>=2.1.0 || >=2.1.0-dev || >=2.2.0-dev || >=2.3.0-dev || >=2.4.0-dev || >=2.5.0-dev || >=2.6.0-dev || >=2.7.0-dev || >=2.8.0-dev || >=2.9.0-dev || >= 3.0.0-dev || >= 3.1.0-dev'
     dependencies:
       tslib: 1.14.1
-      typescript: 3.8.3
+      typescript: 4.3.2
     dev: true
 
   /tsutils/2.29.0_typescript@4.3.5:
@@ -3595,22 +3598,8 @@ packages:
       lunr: 2.3.9
     dev: true
 
-  /typescript-mixin-class/0.0.1:
-    resolution: {integrity: sha512-48hSBOZi5gBi7JL3Joh7pyOtU5nvKhzsD3IijlxSh/zZKt73ERCeiM0HRPp6VhAzO3kYgjgaABZXeagOKfS1YA==}
-    dependencies:
-      chained-iterator: link:packages/chained-iterator
-    dev: false
-
-  /typescript-serializable-mixin/0.0.1_typescript-mixin-class@0.0.1:
-    resolution: {integrity: sha512-bUq8AGKpTVEQpMh0lFIzW2EZumBqfVFc7x97JydFMX4IQwSEeXZ1JPGMTtUEGxukZXIxghwhhvMa40Tqz9coww==}
-    peerDependencies:
-      typescript-mixin-class: ^0.0.1
-    dependencies:
-      typescript-mixin-class: 0.0.1
-    dev: false
-
-  /typescript/3.8.3:
-    resolution: {integrity: sha512-MYlEfn5VrLNsgudQTVJeNaQFUAI7DkhnOjdpAp4T+ku1TfQClewlbSuTVHiA+8skNBgaf02TL/kLOvig4y3G8w==}
+  /typescript/4.3.2:
+    resolution: {integrity: sha512-zZ4hShnmnoVnAHpVHWpTcxdv7dWP60S2FsydQLV8V5PbS3FifjWFFRiHSWpDJahly88PRyV5teTSLoq4eG7mKw==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
@@ -3922,7 +3911,7 @@ packages:
       lunr: 2.3.9
     dev: true
 
-  github.com/bryntum/typedoc/0a7c77fe0170c4084712c1d56bf27fc9adda7035_typescript@3.8.3:
+  github.com/bryntum/typedoc/0a7c77fe0170c4084712c1d56bf27fc9adda7035_typescript@4.3.2:
     resolution: {tarball: https://codeload.github.com/bryntum/typedoc/tar.gz/0a7c77fe0170c4084712c1d56bf27fc9adda7035}
     id: github.com/bryntum/typedoc/0a7c77fe0170c4084712c1d56bf27fc9adda7035
     name: typedoc
@@ -3944,7 +3933,7 @@ packages:
       progress: 2.0.3
       shelljs: 0.8.4
       typedoc-default-themes: 0.10.1
-      typescript: 3.8.3
+      typescript: 4.3.2
     dev: true
 
   github.com/bryntum/typedoc/0a7c77fe0170c4084712c1d56bf27fc9adda7035_typescript@4.4.0:

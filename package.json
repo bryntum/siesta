@@ -1,4 +1,5 @@
 {
+    "name": "siesta-monorepo",
     "private": true,
     "description": "Monorepo for Siesta - stress-free JavaScript/TypeScript testing and benchmarking tool",
     "type": "module",
@@ -7,7 +8,13 @@
             "typescript-mixin-class>chained-iterator": "workspace:*",
             "typescript-serializable-mixin>typescript-mixin-class": "workspace:*",
             "@bryntum/chronograph>typescript-mixin-class": "workspace:*",
-            "@bryntum/chronograph>typescript-serializable-mixin": "workspace:*"
+            "@bryntum/chronograph>typescript-serializable-mixin": "workspace:*",
+            "@bryntum/siesta>typescript-mixin-class": "workspace:*",
+            "@bryntum/siesta>typescript-serializable-mixin": "workspace:*",
+            "@bryntum/siesta>@bryntum/chronograph": "workspace:*"
         }
+    },
+    "engines": {
+        "pnpm": ">=6"
     }
 }
