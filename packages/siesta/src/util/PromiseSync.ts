@@ -1,4 +1,4 @@
-export class BetterPromise<V> extends Promise<V> {
+export class PromiseSync<V> extends Promise<V> {
 
     resolved        : V         = undefined
     rejected        : any       = undefined

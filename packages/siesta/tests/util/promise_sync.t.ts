@@ -1,9 +1,9 @@
 import { it } from "../../index.js"
-import { BetterPromise } from "../../src/util/BetterPromise.js"
+import { PromiseSync } from "../../src/util/PromiseSync.js"
 
 it('Better promise resolution detection should work', async t => {
 
-    const promise       = new BetterPromise<number>((resolve, reject) => {
+    const promise       = new PromiseSync<number>((resolve, reject) => {
         setTimeout(() => resolve(10), 1)
     })
 
@@ -17,7 +17,7 @@ it('Better promise resolution detection should work', async t => {
 
 it('Better promise rejection detection should work', async t => {
 
-    const promise       = new BetterPromise<number>((resolve, reject) => {
+    const promise       = new PromiseSync<number>((resolve, reject) => {
         setTimeout(() => reject('reason'), 1)
     })
 
