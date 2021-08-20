@@ -34,4 +34,11 @@ window.connect = port => {
     connect(port)
 }
 
-
+// // @ts-ignore
+// console.log('HAS CONNECT: ', window.connect !== undefined)
+//
+//
+// document.addEventListener('load', () => {
+//     // @ts-ignore
+//     console.log('HAS CONNECT: ', window.connect !== undefined)
+// })
