@@ -16,5 +16,8 @@
     },
     "engines": {
         "pnpm": ">=6"
+    },
+    "scripts": {
+        "compile": "scripts/compile.sh"
     }
 }
