@@ -203,7 +203,7 @@ export class Launcher extends Mixin(
                 to be <span class="accented">included</span> in the suite launch.
                 It can be repeated multiple times, meaning the URL to be included can match any of the provided globs.
                 <div></div>
-                <span class="accented">░IMPORTANT░</span> Don't forget to wrap you pattern in single quotes: 'dir*/*', otherwise, shell
+                <span class="inverse"> IMPORTANT </span> Don't forget to wrap you pattern in single quotes: 'dir*/*', otherwise, shell
                 will expand it in-place
                 <div></div>
                 For convenience, the pattern is automatically prepended with `**/`, so it matches deeply across the directories.
@@ -222,7 +222,7 @@ export class Launcher extends Mixin(
                 to be <span class="accented">excluded</span> in the suite launch.
                 It can be repeated multiple times, meaning the URL to be excluded can match any of the provided globs.
                 <div></div>
-                <span class="accented">░IMPORTANT░</span> Don't forget to wrap you pattern in single quotes: 'dir*/*', otherwise, shell
+                <span class="inverse"> IMPORTANT </span> Don't forget to wrap you pattern in single quotes: 'dir*/*', otherwise, shell
                 will expand it in-place
                 <div></div>
                 For convenience, the pattern is automatically prepended with `**/`, so it matches deeply across the directories.

@@ -71,6 +71,7 @@ function styleToColorer (styleName : string, styleValue : string) : string | und
 
         case 'text-decoration':
             if (styleValue === 'underline') return '.underline'
+            if (styleValue === 'inverse') return '.inverse'
 
             return undefined
 

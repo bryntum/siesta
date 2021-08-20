@@ -15,7 +15,7 @@ Supported styles:
 
 - `background-color` in the same format
 
-- `text-decoration: underline` (the only recognized value is `underline`)
+- `text-decoration: underline` (the only recognized values are `underline` and `inverse`)
 
 - `font-weight: bolder` (the only recognized value is `bolder`)
 
@@ -69,6 +69,10 @@ Supported styles:
 
 .accented {
     font-weight: bolder;
+}
+
+.inverse {
+    text-decoration: inverse;
 }
 
 .deccented {
