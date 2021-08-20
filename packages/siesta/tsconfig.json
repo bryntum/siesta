@@ -42,7 +42,7 @@
         "tests_deno/**/*.ts",
         "tests_deno/**/*.tsx",
         "examples/**/*.ts",
-        "examples/**/*.tsx"
+        "resources/dashboard/**/*.ts"
     ],
 
     "exclude" : [

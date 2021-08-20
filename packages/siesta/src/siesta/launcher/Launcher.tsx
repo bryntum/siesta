@@ -6,6 +6,8 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
+import { local } from "../../rpc/port/Port.js"
+import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
@@ -31,6 +33,7 @@ import { HasRuntimeAccess } from "../runtime/Runtime.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { SubTestCheckInfo } from "../test/TestResult.js"
 import { Dispatcher } from "./Dispatcher.js"
+import { LauncherRemoteInterface } from "./LauncherRemoteInterface.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -123,13 +126,13 @@ export type PrepareOptionsResult = {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Launcher extends Mixin(
-    [ HasOptions, ConsoleXmlRenderer, HasRuntimeAccess, Base ],
-    (base : ClassUnion<typeof HasOptions, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess, typeof Base>) =>
+    [ PortHandshakeParent, HasOptions, ConsoleXmlRenderer, HasRuntimeAccess, Base ],
+    (base : ClassUnion<typeof PortHandshakeParent, typeof HasOptions, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess, typeof Base>) =>
 
-    class Launcher extends base {
+    class Launcher extends base implements LauncherRemoteInterface {
         projectData             : ProjectSerializableData   = undefined
 
-        logger                  : Logger                    = LoggerConsole.new({ logLevel : LogLevel.warn })
+        $logger                 : Logger                    = LoggerConsole.new({ logLevel : LogLevel.warn })
 
         //------------------
         inputArguments          : string[]                  = []
@@ -162,6 +165,16 @@ export class Launcher extends Mixin(
         contextProviderSameContext  : ContextProviderSameContext    = undefined
 
         keepNLastResults        : number                    = 0
+
+
+        get logger () : Logger {
+            return this.$logger
+        }
+
+        set logger (value : Logger) {
+            this.$logger    = value
+        }
+
 
         // region options
         @option({
@@ -541,6 +554,7 @@ export class Launcher extends Mixin(
         }
 
 
+        @local()
         async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) {
             await this.performSetupOnce()
 
@@ -548,6 +562,7 @@ export class Launcher extends Mixin(
         }
 
 
+        @local()
         async launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
             await this.performSetupOnce()
 

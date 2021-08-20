@@ -1,6 +1,10 @@
+import { startDevServer } from "@web/dev-server"
 import path from "path"
 import playwright from "playwright"
 import { LaunchOptions } from "playwright/types/types.js"
+import { fileURLToPath } from "url"
+import ws from "ws"
+import { siestaPackageRootUrl } from "../../../index.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContextAttachable } from "../../context/ExecutionContext.js"
 import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
@@ -8,6 +12,10 @@ import { Colorer } from "../../jsx/Colorer.js"
 import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
+import { MediaNodeWebSocketParent } from "../../rpc/media/MediaNodeWebSocketParent.js"
+import { ServerNodeWebSocket } from "../../rpc/server/ServerNodeWebSocket.js"
+import { UnwrapPromise } from "../../util/Helpers.js"
+import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { browserType } from "../common/PlaywrightHelpers.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
@@ -22,9 +30,9 @@ import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeNodejs } from "../runtime/RuntimeNodejs.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { Dispatcher } from "./Dispatcher.js"
+import { DispatcherNodejs } from "./DispatcherNodejs.js"
 import { ExitCodes, Launcher, LauncherError, OptionsGroupPrimary } from "./Launcher.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
-import { DispatcherNodejs } from "./DispatcherNodejs.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -214,17 +222,57 @@ export class LauncherNodejs extends Mixin(
             const launchOptions : LaunchOptions  = { headless : false }
 
             if (this.browser === 'chrome') {
-                launchOptions.args        = [ '--start-maximized', '--allow-file-access-from-files' ]
+                launchOptions.args        = [ '--start-maximized', '--allow-file-access-from-files', '--disable-web-security' ]
             }
 
             const browser       = await browserType(this.browser).launch(launchOptions)
             const page          = await browser.newPage({ viewport : null })
-            page.on('close', e => browser.close())
+
+            let webServer : UnwrapPromise<ReturnType<typeof startDevServer>>
+
+            page.on('close', async () => {
+                browser.close()
+                console.log("CLOSING SERVER")
+
+                await webServer.stop()
+
+                console.log("CLOSING SERVER DONE")
+            })
 
             if (this.getEnvironmentByUrl(this.project) === 'browser') {
 
             } else {
-                page.goto(`file://${ path.resolve(this.project) }`)
+                webServer               = await startDevServer({
+                    config : {
+                        nodeResolve : true
+                    }
+                })
+
+                const address           = webServer.server.address()
+                const webPort           = !isString(address) ? address.port : undefined
+
+                if (webPort === undefined) throw new Error("Address should be available")
+
+                const wsServer          = new ServerNodeWebSocket()
+                const wsPort            = await wsServer.startWebSocketServer()
+                const awaitConnection   = new Promise<ws>(resolve => wsServer.onConnectionHook.once((self, socket) => resolve(socket)))
+
+                const port              = this
+                const media             = MediaNodeWebSocketParent.new()
+
+                port.media              = media
+
+                const relPath           = path.relative('./', fileURLToPath(`${ siestaPackageRootUrl }resources/dashboard/index.html`))
+
+                page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
+
+                media.socket            = await awaitConnection
+
+                port.handshakeType      = 'parent_first'
+
+                await port.connect()
+
+                this.logger.debug('Launcher connected to dashboard')
             }
         }
 

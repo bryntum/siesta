@@ -16,6 +16,7 @@ import { awaitDomInteractive } from "../../util/Helpers.js"
 import { buffer } from "../../util/TimeHelpers.js"
 import { Dispatcher } from "../launcher/Dispatcher.js"
 import { Launcher } from "../launcher/Launcher.js"
+import { LauncherRemoteClient } from "../launcher/LauncherRemoteInterface.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { individualCheckInfoForTestResult, TestNodeResultReactive } from "../test/TestResult.js"
 import { Splitter } from "./components/Splitter.js"
@@ -45,8 +46,8 @@ type ProjectPlanItemPersistentData = {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Dashboard extends Mixin(
-    [ Component ],
-    (base : ClassUnion<typeof Component>) =>
+    [ LauncherRemoteClient, Component ],
+    (base : ClassUnion<typeof LauncherRemoteClient, typeof Component>) =>
 
     class Dashboard extends base {
         launcher            : Launcher                      = undefined
@@ -58,7 +59,7 @@ export class Dashboard extends Mixin(
         filterBox           : string                        = undefined
 
         @field()
-        testDescriptorFiltered : TestDescriptorFiltered     = undefined
+        testDescriptorFiltered  : TestDescriptorFiltered    = undefined
 
         domContainerWidthBox    : Box<number>               = Box.new(400)
         projectPlanWidthBox     : Box<number>               = Box.new(300)
