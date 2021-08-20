@@ -13,6 +13,7 @@ export class ServerNodeWebSocket extends Mixin(
     (base : ClassUnion) =>
 
     class ServerNodeWebSocket extends base {
+        // request any free port
         wsPort                  : number        = 0
 
         wsServer                : ws.Server     = undefined
@@ -21,17 +22,18 @@ export class ServerNodeWebSocket extends Mixin(
         onErrorHook             : Hook<[ this, Error ]>         = new Hook()
 
 
-        startWebSocketServer () : Promise<any> {
-            return new Promise<void>((resolve, reject) => {
+        startWebSocketServer () : Promise<number> {
+            return new Promise((resolve, reject) => {
                 const wsServer    = this.wsServer = new ws.Server({
                     clientTracking      : true,
                     port                : this.wsPort
                 }, () => {
                     const address       = wsServer.address()
 
+                    // save the assigned port
                     if (!isString(address)) this.wsPort = address.port
 
-                    resolve()
+                    resolve(this.wsPort)
                 })
 
                 wsServer.on('connection', socket => this.onConnection(socket))
