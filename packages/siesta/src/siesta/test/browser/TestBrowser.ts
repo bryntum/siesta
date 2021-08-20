@@ -1,5 +1,4 @@
 import { AnyConstructor, Mixin } from "../../../class/Mixin.js"
-import { UserAgent } from "../../user_agent/UserAgent.js"
 import { Test } from "../Test.js"
 
 
@@ -10,6 +9,6 @@ export class TestBrowser extends Mixin(
 
     class TestBrowser extends base {
 
-        userAgent           : UserAgent     = undefined
+        // userAgent           : UserAgent     = undefined
     }
 ) {}
