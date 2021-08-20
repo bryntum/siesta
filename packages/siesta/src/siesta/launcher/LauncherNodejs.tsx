@@ -1,3 +1,6 @@
+import path from "path"
+import playwright from "playwright"
+import { LaunchOptions } from "playwright/types/types.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContextAttachable } from "../../context/ExecutionContext.js"
 import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
@@ -6,6 +9,7 @@ import { ColorerNodejs } from "../../jsx/ColorerNodejs.js"
 import { ColorerNoop } from "../../jsx/ColorerNoop.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { EnvironmentType } from "../common/Environment.js"
+import { browserType } from "../common/PlaywrightHelpers.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
 import { ContextProviderNodePlaywright } from "../context/context_provider/ContextProviderNodePlaywright.js"
@@ -32,6 +36,9 @@ export const OptionsGroupBrowser  = OptionGroup.new({
     title       : 'Browser',
     weight      : 900
 })
+
+
+export type SupportedBrowsers   = 'chrome' | 'firefox' | 'edge' | 'safari'
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -80,7 +87,7 @@ export class LauncherNodejs extends Mixin(
                 The browser where the tests should be launched. This option is only used when launching browser-based projects.
             </div>
         })
-        browser        : string                 = 'chrome'
+        browser        : SupportedBrowsers      = 'chrome'
 
 
         @option({
@@ -200,6 +207,25 @@ export class LauncherNodejs extends Mixin(
 
         setExitCode (code : ExitCodes) {
             process.exitCode    = process.exitCode ?? code
+        }
+
+
+        async launchDashboardUI () {
+            const launchOptions : LaunchOptions  = { headless : false }
+
+            if (this.browser === 'chrome') {
+                launchOptions.args        = [ '--start-maximized', '--allow-file-access-from-files' ]
+            }
+
+            const browser       = await browserType(this.browser).launch(launchOptions)
+            const page          = await browser.newPage({ viewport : null })
+            page.on('close', e => browser.close())
+
+            if (this.getEnvironmentByUrl(this.project) === 'browser') {
+
+            } else {
+                page.goto(`file://${ path.resolve(this.project) }`)
+            }
         }
 
 

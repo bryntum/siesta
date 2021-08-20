@@ -1,5 +1,6 @@
 import playwright from "playwright"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
+import { browserType } from "../../common/PlaywrightHelpers.js"
 import { LauncherNodejs } from "../../launcher/LauncherNodejs.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { ContextPlaywright } from "../ContextPlaywright.js"
@@ -62,16 +63,7 @@ export class ContextProviderNodePlaywright extends Mixin(
 
 
         get browserType () : playwright.BrowserType<any> {
-            switch (this.launcher.browser) {
-                case 'chrome':
-                    return playwright.chromium
-                case 'edge':
-                    return playwright.chromium
-                case 'firefox':
-                    return playwright.firefox
-                case 'safari':
-                    return playwright.webkit
-            }
+            return browserType(this.launcher.browser)
         }
 
 

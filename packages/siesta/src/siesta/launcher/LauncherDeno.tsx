@@ -66,7 +66,7 @@ export class LauncherDeno extends Mixin(
 
 
         getEnvironmentByUrl (url : string) : EnvironmentType {
-            return /^https?:/.test(url) ? 'browser' : 'nodejs'
+            return /^https?:/.test(url) ? 'browser' : 'deno'
         }
 
 
