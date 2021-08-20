@@ -255,6 +255,14 @@ export class Launcher extends Mixin(
         })
         sourceContext   : number    = 5
 
+        @option({
+            type        : 'boolean',
+            group       : OptionsGroupPrimary,
+            help        : <span>
+                Opens the Siesta Dashboard UI instead of running the project immediately.
+            </span>
+        })
+        ui                      : boolean   = false
 
         @option({
             type        : 'boolean',
@@ -329,9 +337,18 @@ export class Launcher extends Mixin(
 
 
         async doStart () {
-            await this.launchOnce(this.getDescriptorsToLaunch())
+            if (this.ui) {
+                await this.launchDashboardUI()
+            } else {
+                await this.launchOnce(this.getDescriptorsToLaunch())
 
-            this.setExitCode(this.computeExitCode())
+                this.setExitCode(this.computeExitCode())
+            }
+        }
+
+
+        async launchDashboardUI () {
+
         }
 
 
