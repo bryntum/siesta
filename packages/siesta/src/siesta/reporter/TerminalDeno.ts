@@ -1,4 +1,4 @@
-import { clearLine, clearLeft, clearRight, goDown, goLeft, goRight, goUp, hideCursor, showCursor } from "../../util_nodejs/TerminalDeno.js"
+import { clearLine, clearLeft, clearRight, goDown, goLeft, goRight, goUp, hideCursor, showCursor } from "../../util_deno/TerminalDeno.js"
 import { Terminal } from "./Terminal.js"
 
 
