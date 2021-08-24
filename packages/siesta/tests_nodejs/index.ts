@@ -6,36 +6,8 @@ const project = Project.new({
     testDescriptor          : {}
 })
 
-project.plan(
-    {
-        filename    : 'compare_deep',
-
-        items       : [
-            'compare_deep_diff_rendering.t.js',
-        ]
-    },
-    {
-        filename    : 'jsx',
-
-        items       : [
-            'xml_element_rendering.t.js'
-        ]
-    },
-    {
-        filename    : 'suite_launching',
-
-        items       : [
-            'suite_launching.t.js'
-        ]
-    },
-    {
-        filename    : 'plan',
-
-        items       : [
-            'project_plan.t.js'
-        ]
-    },
-)
+project.includeDir('./')
+project.excludeDir('./@sample_test_suites')
 
 project.start()
 
