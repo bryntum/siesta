@@ -6,7 +6,7 @@ import { SimulatorPlaywrightServer } from "./siesta/simulate/SimulatorPlaywright
 
 
 const run = async () => {
-    const browser           = await playwright.webkit.launch({ headless : false, /*devtools : true, args : [ '--start-maximized' ]*/ })
+    const browser           = await playwright.firefox.launch({ headless : false, /*devtools : true, */args : [ '--window-size maximized' ] })
 
     const wsServer          = new ServerNodeWebSocket()
 

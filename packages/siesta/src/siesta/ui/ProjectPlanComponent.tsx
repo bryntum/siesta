@@ -6,11 +6,10 @@ import { Component } from "../../chronograph-jsx/Component.js"
 import { ComponentElement } from "../../chronograph-jsx/ElementReactivity.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { Dispatcher } from "../launcher/Dispatcher.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TreeComponent } from "./components/TreeComponent.js"
-import { TestDescriptorFiltered } from "./Dashboard.js"
+import { Dashboard, TestDescriptorFiltered } from "./Dashboard.js"
 
 ChronoGraphJSX
 
@@ -22,7 +21,7 @@ export class ProjectPlanComponent extends Mixin(
     class ProjectPlanComponent extends base {
         props : Component[ 'props' ] & {
             selectedTestBox         : ProjectPlanComponent[ 'selectedTestBox' ]
-            dispatcher              : ProjectPlanComponent[ 'dispatcher' ]
+            dashboard               : ProjectPlanComponent[ 'dashboard' ]
             testDescriptor          : ProjectPlanComponent[ 'testDescriptor' ]
         }
 
@@ -32,7 +31,7 @@ export class ProjectPlanComponent extends Mixin(
 
         selectedTestBox         : Box<TestDescriptor>                   = undefined
 
-        dispatcher              : Dispatcher                            = undefined
+        dashboard               : Dashboard                             = undefined
 
 
         render () : Element {
@@ -42,7 +41,7 @@ export class ProjectPlanComponent extends Mixin(
                         return this.testDescriptor
                             ?
                                 <TestDescriptorComponent
-                                    dispatcher      = { this.dispatcher }
+                                    dashboard= { this.dashboard }
                                     selectedTestBox = { this.selectedTestBox }
                                     testDescriptor  = { this.testDescriptor }
                                 ></TestDescriptorComponent>
@@ -63,10 +62,10 @@ export class TestDescriptorComponent extends Component {
     props : Component[ 'props' ] & {
         testDescriptor          : TestDescriptorComponent[ 'testDescriptor' ]
         selectedTestBox         : TestDescriptorComponent[ 'selectedTestBox' ]
-        dispatcher              : TestDescriptorComponent[ 'dispatcher' ]
+        dashboard               : TestDescriptorComponent[ 'dashboard' ]
     }
 
-    dispatcher                  : Dispatcher                    = undefined
+    dashboard                   : Dashboard                     = undefined
 
     testDescriptor              : TestDescriptorFiltered        = undefined
     selectedTestBox             : Box<TestDescriptor>           = undefined
@@ -76,7 +75,7 @@ export class TestDescriptorComponent extends Component {
         const testDescriptor    = this.testDescriptor.descriptor
 
         if (testDescriptor.childNodes) {
-            const launchInfo    = this.dispatcher.resultsGroups.get(testDescriptor)
+            const launchInfo    = this.dashboard.resultsGroups.get(testDescriptor)
 
             const el = <TreeComponent
                 collapsible = { Boolean(testDescriptor.parentNode) }
@@ -95,7 +94,7 @@ export class TestDescriptorComponent extends Component {
                     this.testDescriptor.filteredChildren.map(childNode =>
                         <leaf>
                             <TestDescriptorComponent
-                                dispatcher      = { this.dispatcher }
+                                dashboard= { this.dashboard }
                                 selectedTestBox = { this.selectedTestBox }
                                 testDescriptor  = { childNode }
                             >
@@ -110,7 +109,7 @@ export class TestDescriptorComponent extends Component {
 
             return el
         } else {
-            const launchInfo        = this.dispatcher.results.get(testDescriptor)
+            const launchInfo        = this.dashboard.results.get(testDescriptor)
 
             return <div class="project-plan-test" class:is-selected={ () => this.selectedTestBox.read() === testDescriptor }>
                 <div class="ripple">
@@ -147,7 +146,7 @@ export class TestDescriptorComponent extends Component {
 
 
     calculateGroupIconClass () : [ string, string ] {
-        const launchInfo    = this.dispatcher.resultsGroups.get(this.testDescriptor.descriptor)
+        const launchInfo    = this.dashboard.resultsGroups.get(this.testDescriptor.descriptor)
 
         if (launchInfo.viewState === 'noinfo') {
             return [ 'far fa-folder-open', 'far fa-folder' ]

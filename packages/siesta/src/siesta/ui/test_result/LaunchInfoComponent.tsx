@@ -9,11 +9,10 @@ import { ChronoGraphJSX, ElementSource } from "../../../chronograph-jsx/ChronoGr
 import { Component } from "../../../chronograph-jsx/Component.js"
 import { ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
-import { Dispatcher } from "../../launcher/Dispatcher.js"
-import { Launcher } from "../../launcher/Launcher.js"
-import { TestLaunchInfo } from "../../launcher/TestLaunchInfo.js"
 import { checkInfoFromTestResult } from "../../test/TestResult.js"
 import { Splitter } from "../components/Splitter.js"
+import { Dashboard } from "../Dashboard.js"
+import { TestLaunchInfo } from "../TestLaunchInfo.js"
 import { TestNodeResultComponent } from "./TestResult.js"
 import { Translator } from "./Translator.js"
 
@@ -27,23 +26,18 @@ export class LaunchInfoComponent extends Mixin(
 
     class LaunchInfoComponent extends base {
         props       : Component[ 'props' ] & {
-            dispatcher              : LaunchInfoComponent[ 'dispatcher' ]
+            dashboard               : LaunchInfoComponent[ 'dashboard' ]
             launchInfo              : LaunchInfoComponent[ 'launchInfo' ]
             domContainerWidthBox?   : LaunchInfoComponent[ 'domContainerWidthBox' ]
         }
 
-        launchInfo  : TestLaunchInfo                = undefined
-        dispatcher  : Dispatcher                    = undefined
+        launchInfo              : TestLaunchInfo    = undefined
+        dashboard               : Dashboard         = undefined
 
         @field()
         scaleMode               : 'none' | 'fit_full' | 'fit_width' | 'fit_height'   = 'fit_full'
 
         domContainerWidthBox    : Box<number>       = Box.new(400)
-
-
-        get launcher () : Launcher {
-            return this.dispatcher.launcher
-        }
 
 
         topToolbar () : ElementSource {
@@ -98,7 +92,7 @@ export class LaunchInfoComponent extends Mixin(
                                         class='result-content'
                                         style='flex: 1; overflow-y: auto'
                                         testNode={ mostRecentResult }
-                                        dispatcher={ this.dispatcher }
+                                        dashboard={ this.dashboard }
                                         launchInfo={ launchInfo }
                                     ></TestNodeResultComponent>
                                 :
@@ -131,10 +125,10 @@ export class LaunchInfoComponent extends Mixin(
                                             ?
                                                 <Translator
                                                     // @ts-expect-error
-                                                    targetElement={ launchInfo.context.wrapper }
-                                                    style='flex: 1'
-                                                    class='dom-container'
-                                                    scaleMode={ this.$.scaleMode as Translator[ 'scaleMode' ] }
+                                                    targetElement   = { launchInfo.context.wrapper }
+                                                    style           = 'flex: 1'
+                                                    class           = 'dom-container'
+                                                    scaleMode       = { this.$.scaleMode as Translator[ 'scaleMode' ] }
                                                 ></Translator>
                                             :
                                                 <div style='text-align: center'>No DOM view available</div>
@@ -172,14 +166,14 @@ export class LaunchInfoComponent extends Mixin(
 
 
         runTest () {
-            this.launcher.launchContinuously([ this.launchInfo.descriptor ])
+            this.dashboard.doLaunchContinuously([ this.launchInfo.descriptor ])
         }
 
 
         runTestChecked () {
             const testResult        = this.launchInfo.mostRecentResult
 
-            this.launcher.launchContinuouslyWithCheckInfo(this.launchInfo.descriptor, checkInfoFromTestResult(testResult))
+            this.dashboard.doLaunchContinuouslyWithCheckInfo(this.launchInfo.descriptor, checkInfoFromTestResult(testResult))
         }
     }
 ) {}

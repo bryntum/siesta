@@ -44,7 +44,8 @@
         "ws": "^7.4.4",
         "typescript-mixin-class": "^0.0.1",
         "typescript-serializable-mixin": "^0.0.1",
-        "@bryntum/chronograph": "^2.0.1"
+        "@bryntum/chronograph": "^2.0.1",
+        "@web/dev-server": "^0.1.17"
     },
     "peerDependencies": {
         "typescript-mixin-class": "^0.0.1",
@@ -57,7 +58,6 @@
         "@types/node": "^14.14.10",
         "@types/sass": "^1.16.0",
         "@types/ws": "^7.4.1",
-        "@web/dev-server": "^0.1.17",
         "bulma": "^0.9.3",
         "cssom": "^0.4.4",
         "esinstall": "^1.1.7",

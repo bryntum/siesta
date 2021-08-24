@@ -6,7 +6,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
-import { local } from "../../rpc/port/Port.js"
+import { local, remote } from "../../rpc/port/Port.js"
 import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
@@ -113,8 +113,7 @@ export const OptionsGroupOutput  = OptionGroup.new({
 
 
 //---------------------------------------------------------------------------------------------------------------------
-const optionsToArray    = (obj : { [ key : string ] : Option }) : Option[] =>
-    objectEntriesDeep(obj).map(entry => entry[ 1 ])
+const optionsToArray    = (obj : Record<string, Option>) : Option[] => objectEntriesDeep(obj).map(entry => entry[ 1 ])
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -125,58 +124,13 @@ export type PrepareOptionsResult = {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export class Launcher extends Mixin(
-    [ PortHandshakeParent, HasOptions, ConsoleXmlRenderer, HasRuntimeAccess, Base ],
-    (base : ClassUnion<typeof PortHandshakeParent, typeof HasOptions, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess, typeof Base>) =>
+@serializable({ id : 'LauncherDescriptor' })
+export class LauncherDescriptor extends Mixin(
+    [ Serializable, HasOptions, Base ],
+    (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof Base>) =>
 
-    class Launcher extends base implements LauncherRemoteInterface {
-        projectData             : ProjectSerializableData   = undefined
+    class LauncherDescriptor extends base {
 
-        $logger                 : Logger                    = LoggerConsole.new({ logLevel : LogLevel.warn })
-
-        //------------------
-        inputArguments          : string[]                  = []
-
-        optionsBag              : OptionsBag                = undefined
-
-        //------------------
-        dispatcherClass         : typeof Dispatcher         = Dispatcher
-
-        projectDescriptorClass  : typeof ProjectDescriptor  = ProjectDescriptor
-
-        testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
-
-        reporterClass           : typeof Reporter           = undefined
-
-        //------------------
-        dispatcher              : Dispatcher                = undefined
-
-        reporter                : Reporter                  = undefined
-
-        //------------------
-        setupDone               : boolean                   = false
-        setupPromise            : Promise<any>              = undefined
-
-        //------------------
-        contextProviderConstructors : (typeof ContextProvider)[]    = []
-
-        contextProviders            : ContextProvider[]             = []
-
-        contextProviderSameContext  : ContextProviderSameContext    = undefined
-
-        keepNLastResults        : number                    = 0
-
-
-        get logger () : Logger {
-            return this.$logger
-        }
-
-        set logger (value : Logger) {
-            this.$logger    = value
-        }
-
-
-        // region options
         @option({
             type        : 'string',
             group       : OptionsGroupPrimary,
@@ -294,8 +248,59 @@ export class Launcher extends Mixin(
             </span>
         })
         version         : boolean           = false
+    }
+) {}
 
-        // endregion
+
+export class Launcher extends Mixin(
+    [ PortHandshakeParent, LauncherDescriptor, ConsoleXmlRenderer, HasRuntimeAccess ],
+    (base : ClassUnion<typeof PortHandshakeParent, typeof LauncherDescriptor, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess>) =>
+
+    class Launcher extends base implements LauncherRemoteInterface {
+        projectData             : ProjectSerializableData   = undefined
+
+        $logger                 : Logger                    = LoggerConsole.new({ logLevel : LogLevel.warn })
+
+        //------------------
+        inputArguments          : string[]                  = []
+
+        optionsBag              : OptionsBag                = undefined
+
+        //------------------
+        dispatcherClass         : typeof Dispatcher         = Dispatcher
+
+        projectDescriptorClass  : typeof ProjectDescriptor  = ProjectDescriptor
+
+        testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
+
+        reporterClass           : typeof Reporter           = undefined
+
+        //------------------
+        dispatcher              : Dispatcher                = undefined
+
+        reporter                : Reporter                  = undefined
+
+        //------------------
+        setupDone               : boolean                   = false
+        setupPromise            : Promise<any>              = undefined
+
+        //------------------
+        contextProviderConstructors : (typeof ContextProvider)[]    = []
+
+        contextProviders            : ContextProvider[]             = []
+
+        contextProviderSameContext  : ContextProviderSameContext    = undefined
+
+        keepNLastResults        : number                    = 0
+
+
+        get logger () : this[ '$logger' ] {
+            return this.$logger
+        }
+
+        set logger (value : this[ '$logger' ]) {
+            this.$logger    = value
+        }
 
 
         get contextProviderBrowser () : ContextProviderTargetBrowser[] {
@@ -308,6 +313,20 @@ export class Launcher extends Mixin(
 
         get contextProviderDeno () : ContextProvider[] {
             return this.contextProviders.filter(provider => provider.supportsDeno)
+        }
+
+
+        descriptorClass         : typeof LauncherDescriptor     = LauncherDescriptor
+
+        getDescriptor () : InstanceType<this[ 'descriptorClass' ]> {
+            const descriptorClass       = this.descriptorClass as this[ 'descriptorClass' ]
+
+            const config                = optionsToArray(this.$options).reduce((acc : Record<string, any>, option : Option) => {
+                acc[ option.name ] = this[ option.name ]
+                return acc
+            }, {}) as Partial<InstanceType<this[ 'descriptorClass' ]>>
+
+            return descriptorClass.new(config)
         }
 
 
@@ -362,6 +381,10 @@ export class Launcher extends Mixin(
 
         async launchDashboardUI () {
         }
+
+
+        @remote()
+        startDashboard : (data : ProjectSerializableData, launcherDescriptor : LauncherDescriptor) => Promise<any>
 
 
         computeExitCode () : ExitCodes {
@@ -555,7 +578,7 @@ export class Launcher extends Mixin(
 
 
         @local()
-        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) {
+        async doLaunchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) {
             await this.performSetupOnce()
 
             projectPlanItemsToLaunch.forEach(desc => this.dispatcher.addPendingTest(desc))
@@ -563,7 +586,7 @@ export class Launcher extends Mixin(
 
 
         @local()
-        async launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
+        async doLaunchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
             await this.performSetupOnce()
 
             this.dispatcher.addPendingTest(desc, checkInfo)

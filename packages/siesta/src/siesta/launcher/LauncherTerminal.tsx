@@ -26,7 +26,7 @@ export class LauncherTerminal extends Mixin(
     (base : ClassUnion<typeof Launcher>) =>
 
     class LauncherTerminal extends base {
-        logger                  : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
+        $logger             : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
 
         // region options
         @option({

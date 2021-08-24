@@ -1,5 +1,5 @@
 import playwright from "playwright"
-import { SupportedBrowsers } from "../launcher/LauncherNodejs.js"
+import { SupportedBrowsers } from "../launcher/LauncherDescriptorNodejs.js"
 
 
 export const browserType = (browser : SupportedBrowsers) : playwright.BrowserType => {

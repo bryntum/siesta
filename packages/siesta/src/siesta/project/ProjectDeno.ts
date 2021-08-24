@@ -8,8 +8,6 @@ import { Project } from "./Project.js"
 import { ProjectDescriptorDeno } from "./ProjectDescriptor.js"
 import { ProjectTerminal } from "./ProjectTerminal.js"
 
-//---------------------------------------------------------------------------------------------------------------------
-declare const Deno
 
 //---------------------------------------------------------------------------------------------------------------------
 /**

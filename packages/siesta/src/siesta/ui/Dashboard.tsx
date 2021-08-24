@@ -14,9 +14,12 @@ import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { awaitDomInteractive } from "../../util/Helpers.js"
 import { buffer } from "../../util/TimeHelpers.js"
-import { Dispatcher } from "../launcher/Dispatcher.js"
-import { Launcher } from "../launcher/Launcher.js"
+import { LauncherDescriptor } from "../launcher/Launcher.js"
+import { LauncherDescriptorNodejs } from "../launcher/LauncherDescriptorNodejs.js"
 import { LauncherRemoteClient } from "../launcher/LauncherRemoteInterface.js"
+import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
+import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
+import { TestReporterParent } from "../test/port/TestReporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { individualCheckInfoForTestResult, TestNodeResultReactive } from "../test/TestResult.js"
 import { Splitter } from "./components/Splitter.js"
@@ -24,8 +27,12 @@ import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComp
 import { RippleEffectManager } from "./RippleEffectManager.js"
 import { LaunchInfoComponent } from "./test_result/LaunchInfoComponent.js"
 import { TestNodeResultComponent } from "./test_result/TestResult.js"
+import { TestGroupLaunchInfo, TestLaunchInfo } from "./TestLaunchInfo.js"
 
 ChronoGraphJSX
+
+TestReporterParent
+LauncherDescriptorNodejs
 
 //---------------------------------------------------------------------------------------------------------------------
 type DashboardPersistentData = {
@@ -43,6 +50,21 @@ type ProjectPlanItemPersistentData = {
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
+export class DashboardRenderer extends Mixin(
+    [ ConsoleXmlRenderer ],
+    (base : ClassUnion<typeof ConsoleXmlRenderer>) =>
+
+    class DashboardRenderer extends base {
+        dashboard           : Dashboard         = undefined
+
+
+        getMaxLen () : number {
+            return 250
+        }
+    }
+) {}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Dashboard extends Mixin(
@@ -50,29 +72,41 @@ export class Dashboard extends Mixin(
     (base : ClassUnion<typeof LauncherRemoteClient, typeof Component>) =>
 
     class Dashboard extends base {
-        launcher            : Launcher                      = undefined
+        @field()
+        currentTest                 : TestDescriptor            = undefined
 
         @field()
-        currentTest         : TestDescriptor                = undefined
+        filterBox                   : string                    = undefined
 
         @field()
-        filterBox           : string                        = undefined
+        testDescriptorFiltered      : TestDescriptorFiltered    = undefined
 
-        @field()
-        testDescriptorFiltered  : TestDescriptorFiltered    = undefined
+        domContainerWidthBox        : Box<number>               = Box.new(400)
+        projectPlanWidthBox         : Box<number>               = Box.new(300)
 
-        domContainerWidthBox    : Box<number>               = Box.new(400)
-        projectPlanWidthBox     : Box<number>               = Box.new(300)
+        triggerSavePersistentData   : () => void                = buffer(() => this.savePersistentState(), 150)
 
-        triggerSavePersistentData   : () => void            = buffer(() => this.savePersistentState(), 150)
+        projectData                 : ProjectSerializableData                   = undefined
+
+        launcherDescriptor          : LauncherDescriptor                        = LauncherDescriptor.new()
+
+        projectPlanLaunchInfo       : TestGroupLaunchInfo                       = undefined
+        resultsGroups               : Map<TestDescriptor, TestGroupLaunchInfo>  = new Map()
+        results                     : Map<TestDescriptor, TestLaunchInfo>       = new Map()
+
+        renderer                    : DashboardRenderer     = DashboardRenderer.new({ dashboard : this })
+
+
+        async startDashboard (data : ProjectSerializableData, launcherDescriptor : LauncherDescriptor) {
+            this.projectData        = data
+            this.launcherDescriptor = launcherDescriptor
+
+            this.start()
+        }
 
 
         get projectPlan () : TestDescriptor {
-            return this.launcher.projectData.projectPlan
-        }
-
-        get dispatcher () : Dispatcher {
-            return this.launcher.dispatcher
+            return this.projectData.projectPlan
         }
 
 
@@ -87,11 +121,11 @@ export class Dashboard extends Mixin(
                 projectPlanItems    : CI(this.projectPlan.traverseGen(true))
                     .map(item => {
                         if (item.isLeaf()) {
-                            const info      = this.dispatcher.results.get(item)
+                            const info      = this.results.get(item)
 
                             return [ item.titleIdentifier, { checked : info.checked, expanded : null }  ]
                         } else {
-                            const info      = this.dispatcher.resultsGroups.get(item)
+                            const info      = this.resultsGroups.get(item)
 
                             return [ item.titleIdentifier, { checked : info.checked, expanded : info.expandedState }  ]
                         }
@@ -131,9 +165,9 @@ export class Dashboard extends Mixin(
 
                 if (item) {
                     if (item.isLeaf()) {
-                        this.dispatcher.results.get(item).checked   = itemInfo.checked
+                        this.results.get(item).checked   = itemInfo.checked
                     } else {
-                        const groupInfo     = this.dispatcher.resultsGroups.get(item)
+                        const groupInfo     = this.resultsGroups.get(item)
 
                         groupInfo.checked           = itemInfo.checked
                         groupInfo.expandedState     = itemInfo.expanded
@@ -148,7 +182,7 @@ export class Dashboard extends Mixin(
         }
 
 
-        retrievePersistentState () : DashboardPersistentData {
+        loadPersistentState () : DashboardPersistentData {
             const str           = localStorage.getItem(this.persistenceKey)
 
             return parse(str)
@@ -167,6 +201,8 @@ export class Dashboard extends Mixin(
                 this.domContainerWidthBox,
                 this.projectPlanWidthBox
             ].forEach(box => box.commitValueOptimisticHook.on(this.triggerSavePersistentData))
+
+            this.el.addEventListener('treecomponent-expand-click', this.triggerSavePersistentData)
         }
 
 
@@ -209,21 +245,27 @@ export class Dashboard extends Mixin(
 
 
         async start () {
+            this.projectPlanLaunchInfo  = TestGroupLaunchInfo.new({
+                descriptor  : this.projectData.projectPlan,
+                dashboard   : this
+            })
+
             await awaitDomInteractive()
 
-            const persistentState       = this.retrievePersistentState()
+            //-----------------
+            const persistentState       = this.loadPersistentState()
 
             persistentState && this.applyPersistentState(persistentState)
 
             this.bindStatePersistence()
 
+            //-----------------
             const rippleEffectManager   = RippleEffectManager.new()
 
             rippleEffectManager.start()
 
+            //-----------------
             this.tweakTheHead()
-
-            this.el.addEventListener('treecomponent-expand-click', this.triggerSavePersistentData)
 
             document.body.appendChild(this.el)
 
@@ -247,8 +289,6 @@ export class Dashboard extends Mixin(
 
 
         render () : Element {
-            const dispatcher        = this.launcher.dispatcher
-
             return <div
                 onmousedown = { e => this.onMouseDown(e) }
                 onclick     = { e => this.onClick(e) }
@@ -269,7 +309,7 @@ export class Dashboard extends Mixin(
 
                     {
                         () => <ProjectPlanComponent
-                            dispatcher      = { this.launcher.dispatcher }
+                            dashboard       = { this }
                             selectedTestBox = { this.$.currentTest as Box<TestDescriptor> }
                             testDescriptor  = { this.testDescriptorFiltered }
                             style           = "flex: 1"
@@ -295,10 +335,10 @@ export class Dashboard extends Mixin(
                     () => {
                         if (!this.currentTest) return this.noSelectionContent()
 
-                        const launchInfo            = dispatcher.getTestLaunchInfo(this.currentTest)
+                        const launchInfo            = this.getTestLaunchInfo(this.currentTest)
 
                         return <LaunchInfoComponent
-                            dispatcher              = { this.launcher.dispatcher }
+                            dashboard               = { this }
                             launchInfo              = { launchInfo }
                             domContainerWidthBox    = { this.domContainerWidthBox }
                         ></LaunchInfoComponent>
@@ -359,34 +399,37 @@ export class Dashboard extends Mixin(
             const desc      = this.getTestDescriptorComponentFromMouseEvent(e)
 
             if (desc) {
-                this.launcher.launchContinuously(desc.leavesAxis())
+                this.launchContinuously(desc.leavesAxis())
             }
 
             // TODO move this to `LaunchInfoComponent`
             const result    = this.getTestResultComponentFromMouseEvent(e)
 
             if (result) {
-                this.launcher.launchContinuouslyWithCheckInfo(this.currentTest, individualCheckInfoForTestResult(result))
+                this.doLaunchContinuouslyWithCheckInfo(this.currentTest, individualCheckInfoForTestResult(result))
             }
         }
 
 
         runChecked () {
-            const dispatcher        = this.launcher.dispatcher
-
             const toLaunch          = Array.from(
                 flattenFilteredTestDescriptor(this.testDescriptorFiltered)
-                    .map(desc => dispatcher.getTestLaunchInfo(desc))
+                    .map(desc => this.getTestLaunchInfo(desc))
                     .filter(info => info.checked)
                     .map(info => info.descriptor)
             )
 
-            this.launcher.launchContinuously(toLaunch)
+            this.launchContinuously(toLaunch)
         }
 
 
         runAll () {
-            this.launcher.launchContinuously(flattenFilteredTestDescriptor(this.testDescriptorFiltered))
+            this.launchContinuously(flattenFilteredTestDescriptor(this.testDescriptorFiltered))
+        }
+
+
+        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<any> {
+            projectPlanItemsToLaunch.forEach(desc => this.getTestLaunchInfo(desc).schedulePendingTestLaunch())
         }
 
 
@@ -400,10 +443,21 @@ export class Dashboard extends Mixin(
         @calculate('testDescriptorFiltered')
         calculateTestDescriptorFiltered () {
             return filterTestDescriptor(this.projectPlan, this.filterBox, desc => {
-                this.dispatcher.resultsGroups.get(desc).expandedState   = 'expanded'
+                this.resultsGroups.get(desc).expandedState   = 'expanded'
             })
         }
 
+
+        getTestLaunchInfo (desc : TestDescriptor) : TestLaunchInfo {
+            return this.results.get(desc)
+        }
+
+
+        getTestMostRecentResult (desc : TestDescriptor) : TestNodeResultReactive | undefined {
+            const launchInfo            = this.getTestLaunchInfo(desc)
+
+            return launchInfo?.mostRecentResult
+        }
     }
 ) {}
 

@@ -8,7 +8,7 @@ import { luid } from "../common/LUID.js"
 import { Context } from "../context/Context.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Exception, TestNodeResultReactive } from "../test/TestResult.js"
-import { Dispatcher } from "./Dispatcher.js"
+import { Dashboard } from "./Dashboard.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type LaunchState =
@@ -29,7 +29,7 @@ export class TestLaunchInfo extends Mixin(
     (base : ClassUnion<typeof Entity, typeof Base>) =>
 
     class TestLaunchInfo extends base {
-        dispatcher          : Dispatcher                = undefined
+        dashboard           : Dashboard                 = undefined
 
         descriptor          : TestDescriptor            = undefined
 
@@ -61,13 +61,13 @@ export class TestLaunchInfo extends Mixin(
 
             descriptor.remoteId     = luid()
 
-            this.dispatcher.results.set(descriptor, this)
-            this.dispatcher.localRemoteDescMap.set(descriptor.remoteId, descriptor)
+            this.dashboard.results.set(descriptor, this)
+            // this.dispatcher.localRemoteDescMap.set(descriptor.remoteId, descriptor)
         }
 
 
         get parentInfo () : TestGroupLaunchInfo {
-            return this.dispatcher.resultsGroups.get(this.descriptor.parentNode)
+            return this.dashboard.resultsGroups.get(this.descriptor.parentNode)
         }
 
 
@@ -87,7 +87,7 @@ export class TestLaunchInfo extends Mixin(
             this.launchState        = 'pending'
 
             try {
-                this.testSources    = await this.dispatcher.reporter.fetchSources(this.descriptor.urlAbs)
+                // this.testSources    = await this.dashboard.reporter.fetchSources(this.descriptor.urlAbs)
             } catch (e) {
             }
         }
@@ -121,7 +121,7 @@ export class TestGroupLaunchInfo extends Mixin(
     (base : ClassUnion<typeof Entity, typeof Base>) =>
 
     class TestGroupLaunchInfo extends base {
-        dispatcher          : Dispatcher                = undefined
+        dashboard           : Dashboard                 = undefined
 
         descriptor          : TestDescriptor            = undefined
 
@@ -144,17 +144,17 @@ export class TestGroupLaunchInfo extends Mixin(
 
             if (this.descriptor.childNodes)
                 this.items      = this.descriptor.childNodes.map(descriptor => {
-                    return descriptor.childNodes === undefined
-                        ? TestLaunchInfo.new({ descriptor, dispatcher : this.dispatcher })
-                        : TestGroupLaunchInfo.new({ descriptor, dispatcher : this.dispatcher })
+                    return descriptor.isLeaf()
+                        ? TestLaunchInfo.new({ descriptor, dashboard : this.dashboard })
+                        : TestGroupLaunchInfo.new({ descriptor, dashboard : this.dashboard })
                 })
 
-            this.dispatcher.resultsGroups.set(this.descriptor, this)
+            this.dashboard.resultsGroups.set(this.descriptor, this)
         }
 
 
         get parentInfo () : TestGroupLaunchInfo {
-            return this.descriptor.parentNode ? this.dispatcher.resultsGroups.get(this.descriptor.parentNode) : undefined
+            return this.descriptor.parentNode ? this.dashboard.resultsGroups.get(this.descriptor.parentNode) : undefined
         }
 
 

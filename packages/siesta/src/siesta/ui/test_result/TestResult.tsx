@@ -11,8 +11,6 @@ import { TextBlock } from "../../../jsx/TextBlock.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { LogLevel } from "../../../logger/Logger.js"
 import { relative } from "../../../util/Path.js"
-import { Dispatcher } from "../../launcher/Dispatcher.js"
-import { TestLaunchInfo } from "../../launcher/TestLaunchInfo.js"
 import { ProjectSerializableData } from "../../project/ProjectDescriptor.js"
 import { sourcePointTemplate } from "../../reporter/Reporter.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
@@ -26,6 +24,8 @@ import {
     TestResult
 } from "../../test/TestResult.js"
 import { TreeComponent } from "../components/TreeComponent.js"
+import { Dashboard } from "../Dashboard.js"
+import { TestLaunchInfo } from "../TestLaunchInfo.js"
 
 ChronoGraphJSX
 
@@ -38,13 +38,13 @@ export class TestNodeResultComponent extends Mixin(
     class TestNodeResultComponent extends base {
         props       : Component[ 'props' ] & {
             testNode        : PropertySource<TestNodeResultReactive>
-            dispatcher      : Dispatcher
-            launchInfo      : TestLaunchInfo
+            dashboard       : TestNodeResultComponent[ 'dashboard' ]
+            launchInfo      : TestNodeResultComponent[ 'launchInfo' ]
         }
 
         launchInfo  : TestLaunchInfo                = undefined
         testNode    : TestNodeResultReactive        = undefined
-        dispatcher  : Dispatcher                    = undefined
+        dashboard   : Dashboard                     = undefined
 
 
         render () : ReactiveElement {
@@ -56,11 +56,11 @@ export class TestNodeResultComponent extends Mixin(
                     <leaf>{
                         (result instanceof TestNodeResultReactive)
                             ?
-                                <Self dispatcher={ this.dispatcher } launchInfo={ this.launchInfo } testNode={ result }></Self>
+                                <Self dashboard={ this.dashboard } launchInfo={ this.launchInfo } testNode={ result }></Self>
                             :
                                 (result instanceof Assertion)
                                     ?
-                                        <AssertionComponent dispatcher={ this.dispatcher } launchInfo={ this.launchInfo } testNode={ testNode } assertion={ result }></AssertionComponent>
+                                        <AssertionComponent dashboard={ this.dashboard } launchInfo={ this.launchInfo } testNode={ testNode } assertion={ result }></AssertionComponent>
                                     :
                                     (result instanceof LogMessage)
                                         ?
@@ -94,7 +94,7 @@ export class TestNodeResultComponent extends Mixin(
                 {
                     testNode.isRoot
                         ?
-                            [ testNodeStateIcon(testNode), ' ', testNodeUrlTemplate(testNode.descriptor, this.dispatcher.projectData) ]
+                            [ testNodeStateIcon(testNode), ' ', testNodeUrlTemplate(testNode.descriptor, this.dashboard.projectData) ]
                         :
                             [
                                 <span onclick={ () => testNode.toggleChecked() } class="icon">
@@ -136,22 +136,22 @@ export class AssertionComponent extends Mixin(
         props           : Component[ 'props' ] & {
             testNode        : AssertionComponent[ 'testNode' ]
             assertion       : AssertionComponent[ 'assertion' ]
-            dispatcher      : AssertionComponent[ 'dispatcher' ]
+            dashboard       : AssertionComponent[ 'dashboard' ]
             launchInfo      : AssertionComponent[ 'launchInfo' ]
         }
 
         assertion       : Assertion                 = undefined
         testNode        : TestNodeResultReactive    = undefined
-        dispatcher      : Dispatcher                = undefined
+        dashboard       : Dashboard                 = undefined
         launchInfo      : TestLaunchInfo            = undefined
 
 
         render () : Element {
             const testNode                  = this.testNode
             const assertion                 = this.assertion
-            const launcher                  = this.dispatcher.launcher
             const sourcePoint               = assertion.sourcePoint
-            const sourceContext             = launcher.sourceContext
+            const dashboard                 = this.dashboard
+            const sourceContext             = dashboard.launcherDescriptor.sourceContext
             const shouldShowSourceContext   = sourceContext > 0
 
             return <div class="assertion">{
@@ -187,19 +187,19 @@ export class AssertionComponent extends Mixin(
                                 ?
                                     <pre class='assertion_annotation'>
                                         {
-                                            launcher.render(
+                                            dashboard.renderer.render(
                                                 sourcePointTemplate(sourcePoint, this.launchInfo.testSources, sourceContext),
-                                                TextBlock.new({ maxLen : launcher.getMaxLen() })
+                                                TextBlock.new({ maxLen : dashboard.renderer.getMaxLen() })
                                             )
                                         }
                                     </pre>
                                 :
-                                    // sources loading spinner
+                                    // TODO very low prio, sources loading spinner
                                     null,
                             !passed && assertion.annotation
                                 ?
                                     <pre class='assertion_annotation'>{
-                                        launcher.render(assertion.annotation, TextBlock.new({ maxLen : launcher.getMaxLen() }))
+                                        dashboard.renderer.render(assertion.annotation, TextBlock.new({ maxLen : dashboard.renderer.getMaxLen() }))
                                     }</pre>
                                 : null
                         ]
