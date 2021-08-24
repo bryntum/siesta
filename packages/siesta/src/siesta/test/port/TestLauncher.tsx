@@ -2,7 +2,6 @@ import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { local, remote } from "../../../rpc/port/Port.js"
-import { PortEvaluateChild, PortEvaluateParent } from "../../../rpc/port/PortEvaluate.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
 import { parse } from "../../../serializable/Serializable.js"
 import { globalTestEnv, Test } from "../Test.js"
@@ -17,8 +16,8 @@ interface TestLauncher {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherParent extends Mixin(
-    [ TestReporterParent, PortEvaluateParent, PortHandshakeParent, Base ],
-    (base : ClassUnion<typeof TestReporterParent, typeof PortEvaluateParent, typeof PortHandshakeParent, typeof Base>) =>
+    [ TestReporterParent, PortHandshakeParent, Base ],
+    (base : ClassUnion<typeof TestReporterParent, typeof PortHandshakeParent, typeof Base>) =>
 
     class TestLauncherParent extends base implements TestLauncher {
         @remote()
@@ -29,8 +28,8 @@ export class TestLauncherParent extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class TestLauncherChild extends Mixin(
-    [ TestReporterChild, PortEvaluateChild, PortHandshakeChild, Base ],
-    (base : ClassUnion<typeof TestReporterChild, typeof PortEvaluateChild, typeof PortHandshakeChild, typeof Base>) =>
+    [ TestReporterChild, PortHandshakeChild, Base ],
+    (base : ClassUnion<typeof TestReporterChild, typeof PortHandshakeChild, typeof Base>) =>
 
     class TestLauncherChild extends base implements TestLauncher {
 
