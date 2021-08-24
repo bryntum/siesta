@@ -51,6 +51,10 @@ export const remote = (messageDesc : Partial<Message> = Message.new()) : Propert
     const message       = Message.maybeNew(messageDesc)
 
     return function (target : Port, propertyKey : string) : void {
+        if (!(target instanceof Port))
+            // @ts-ignore
+            throw new Error(`The property [${ propertyKey }] of class [${ target.constructor.name }] is decorated with @remote, but class does not include the Port mixin.`)
+
         const { remoteMessages } = ensureMessagesStorage(target)
 
         remoteMessages[ propertyKey ] = message
@@ -72,6 +76,10 @@ export const remote = (messageDesc : Partial<Message> = Message.new()) : Propert
 export const local = function (message : Partial<Message> = Message.new()) : MethodDecorator {
 
     return function (target : Port, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
+        if (!(target instanceof Port))
+            // @ts-ignore
+            throw new Error(`The property [${ propertyKey }] of class [${ target.constructor.name }] is decorated with @local, but class does not include the Port mixin.`)
+
         const { localMessages } = ensureMessagesStorage(target)
 
         localMessages[ propertyKey ] = message
