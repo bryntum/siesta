@@ -151,29 +151,6 @@ export const matchAll = function* (regexp : RegExp, testStr : string) : Generato
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// TODO review whats the difference with native `String.matchAll()` and possibly remove, not supported everywhere?
-export const allMatches = function (regexp : RegExp, testStr : string) : string[] {
-    return CI(matchAll(regexp, testStr)).map(match => CI(match).drop(1)).concat().toArray()
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-declare const regeneratorRuntime : any
-
-let isRegeneratorRuntime : boolean | null = null
-
-export const isGeneratorFunction = function (func : any) : boolean {
-    if (isRegeneratorRuntime === null) isRegeneratorRuntime = typeof regeneratorRuntime !== 'undefined'
-
-    if (isRegeneratorRuntime === true) {
-        return regeneratorRuntime.isGeneratorFunction(func)
-    } else {
-        return func.constructor.name === 'GeneratorFunction'
-    }
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
 export const isNodejs = function () : boolean {
     return typeof process !== 'undefined'
         && process.release && process.release.name === 'node'
