@@ -1,5 +1,5 @@
 import { Base, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { awaitDomInteractive } from "../../util/Helpers.js"
+import { awaitDomInteractive } from "../../util_browser/Dom.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class RippleEffectManager extends Mixin(

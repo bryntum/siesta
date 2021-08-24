@@ -1,5 +1,5 @@
 import { AnyFunction, ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { awaitDomReady } from "../../../util/Helpers.js"
+import { awaitDomReady } from "../../../util_browser/Dom.js"
 import { TestDescriptorBrowser } from "../../test/TestDescriptorBrowser.js"
 import { ContextBrowserIframe } from "../ContextBrowserIframe.js"
 import { ContextProvider } from "./ContextProvider.js"

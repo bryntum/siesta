@@ -1,7 +1,7 @@
 import { MediaBrowserWebSocketChild } from "./rpc/media/MediaBrowserWebSocketChild.js"
 import { SimulatorPlaywrightClient } from "./siesta/simulate/SimulatorPlaywright.js"
-import { awaitDomReady } from "./util/Helpers.js"
 import { delay } from "./util/TimeHelpers.js"
+import { awaitDomReady } from "./util_browser/Dom.js"
 
 
 const connect = async (wsPort : number) => {

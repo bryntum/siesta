@@ -1,5 +1,4 @@
 import { AnyConstructor } from "../class/Mixin.js"
-import { CI } from "../iterator/Iterator.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 // assume 32-bit platform (https://v8.dev/blog/react-cliff)
@@ -112,29 +111,6 @@ export const copySetInto = <V>(sourceSet : Set<V>, targetSet : Set<V>) : Set<V> 
     for (const value of sourceSet) targetSet.add(value)
 
     return targetSet
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-export const awaitDomReady = async () : Promise<void> => {
-    if (document.readyState === 'complete') return
-
-    await new Promise<Event>(resolve => window.addEventListener('load', resolve, { once : true }))
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-export const awaitDomInteractive = async () : Promise<void> => {
-    if (document.readyState === 'interactive' || document.readyState === 'complete') return
-
-    await new Promise<void>(resolve => {
-        document.addEventListener(
-            'readystatechange',
-            () => {
-                if (document.readyState === 'interactive' || document.readyState === 'complete') resolve()
-            },
-            { once : true }
-        )
-    })
 }
 
 
