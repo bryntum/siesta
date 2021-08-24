@@ -117,8 +117,13 @@ export class TreeNode extends Mixin(
         }
 
 
-        leavesAxis () : this[ 'childNodeT' ][] {
-            return this.childNodes ? this.childNodes.flatMap(node => node.leavesAxis()) : [ this ]
+        leavesAxis (res : this[ 'childNodeT' ][] = []) : this[ 'childNodeT' ][] {
+            if (this.childNodes)
+                this.childNodes.flatMap(node => node.leavesAxis(res))
+            else
+                res.push(this)
+
+            return res
         }
     }
 ) {}
