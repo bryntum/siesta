@@ -298,7 +298,7 @@ export class Dashboard extends Mixin(
                 <div class="is-flex is-flex-direction-column" style="min-width: 100px" style:width={ () => this.projectPlanWidthBox.read() + 'px' }>
                     <div class='tbar is-flex' style="height: 2.7em">
                         <input
-                            value   = { String(this.filterBox).replace(/^\*\*\//, '') }
+                            value   = { String(this.filterBox || '').replace(/^\*\*\//, '') }
                             oninput = { buffer((e : InputEvent) => this.onFilterInput(e), 200) }
                             class   = 'filter-input input' type="text" placeholder="Include glob"
                         />
