@@ -1,5 +1,6 @@
 import { Base } from "../class/Base.js"
 
+// XXX does not work with `super` calls! which makes it not so useful...
 
 //---------------------------------------------------------------------------------------------------------------------
 export class QueuedCall extends Base {
@@ -48,7 +49,6 @@ export class QueuedCall extends Base {
     }
 }
 
-// XXX does not work with `super` calls! which makes it not so useful...
 
 export const queued = function (propName? : string) : MethodDecorator {
 
