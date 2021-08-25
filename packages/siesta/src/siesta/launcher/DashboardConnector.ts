@@ -77,7 +77,7 @@ export class DashboardConnectorClient extends Mixin(
             this.dashboard.projectData        = data
             this.dashboard.launcherDescriptor = launcherDescriptor
 
-            this.dashboard.start()
+            await this.dashboard.start()
         }
 
 

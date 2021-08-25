@@ -196,10 +196,15 @@ export class LauncherNodejs extends Mixin(
 
                 if (webPort === undefined) throw new Error("Address should be available")
 
-                console.log("SERVER LAUNCHED")
+                this.write(<div>
+                    <p>Local web server launched</p>
+                    <p class="indented">Root dir : <span class="accented">{ process.cwd() }</span></p>
+                    <p class="indented">Address  : <span class="accented">http://localhost:{ webPort }</span></p>
+                </div>)
 
                 const wsServer          = new ServerNodeWebSocket()
                 const wsPort            = await wsServer.startWebSocketServer()
+
                 const awaitConnection   = new Promise<ws>(resolve => wsServer.onConnectionHook.once((self, socket) => resolve(socket)))
 
                 const port              = this.dashboardConnector = DashboardConnectorServer.new({ launcher : this })
@@ -211,21 +216,17 @@ export class LauncherNodejs extends Mixin(
 
                 page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
 
-                console.log("GOTO DONE")
-
                 media.socket            = await awaitConnection
 
                 port.handshakeType      = 'parent_first'
 
                 await port.connect()
 
-                console.log("CONNECTED")
-
-                port.startDashboard(this.projectData, this.getDescriptor())
-
-                console.log("STARTED")
-
                 this.logger.debug('Launcher connected to dashboard')
+
+                await port.startDashboard(this.projectData, this.getDescriptor())
+
+                this.logger.debug('Dashboard started')
             }
         }
 
