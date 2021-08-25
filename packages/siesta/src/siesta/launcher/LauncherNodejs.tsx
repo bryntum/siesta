@@ -79,21 +79,21 @@ export class LauncherNodejs extends Mixin(
         }
 
 
-        getSuitableContextProviders (environment : EnvironmentType) : ContextProvider[] {
-            if (environment === 'browser') {
-                const requestedProvider     = this.provider
-
-                return this.contextProviderBrowser.filter(provider =>
-                    !requestedProvider || (provider.constructor as typeof ContextProvider).providerName === requestedProvider)
-            }
-            else if (environment === 'nodejs' || environment === 'isomorphic') {
-                return this.contextProviderNode
-            }
-            else if (this.project) {
-                return this.getSuitableContextProviders(this.getEnvironmentByUrl(this.project))
-            } else
-                throw new Error("Can't determine suitable context providers")
-        }
+        // getSuitableContextProviders (environment : EnvironmentType) : ContextProvider[] {
+        //     if (environment === 'browser') {
+        //         const requestedProvider     = this.provider
+        //
+        //         return this.contextProviderBrowser.filter(provider =>
+        //             !requestedProvider || (provider.constructor as typeof ContextProvider).providerName === requestedProvider)
+        //     }
+        //     else if (environment === 'nodejs' || environment === 'isomorphic') {
+        //         return this.contextProviderNode
+        //     }
+        //     else if (this.project) {
+        //         return this.getSuitableContextProviders(this.getEnvironmentByUrl(this.project))
+        //     } else
+        //         throw new Error("Can't determine suitable context providers")
+        // }
 
 
         async onLauncherOptionsAvailable () {

@@ -76,11 +76,6 @@ export class LauncherTerminal extends Mixin(
         }
 
 
-        getEnvironmentByUrl (url : string) : EnvironmentType {
-            return /^https?:/.test(url) ? 'browser' : 'nodejs'
-        }
-
-
         async onLauncherOptionsAvailable () {
             // setup theme as early as possible to have right styling of error messages, which might
             // appear right in this method

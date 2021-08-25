@@ -330,12 +330,17 @@ export class Launcher extends Mixin(
         }
 
 
-        getSuitableContextProviders (environment : EnvironmentType) : ContextProvider[] {
-            if (environment === 'browser')
+        getEnvironmentByUrl (url : string) : EnvironmentType {
+            return /^https?:/.test(url) ? 'browser' : 'nodejs'
+        }
+
+
+        getSuitableContextProviders (projectType : EnvironmentType, requestedEnvironmentType : EnvironmentType) : ContextProvider[] {
+            if (requestedEnvironmentType === 'browser')
                 return this.contextProviderBrowser
-            else if (environment === 'nodejs')
+            else if (requestedEnvironmentType === 'nodejs')
                 return this.contextProviderNode
-            else if (environment === 'deno')
+            else if (requestedEnvironmentType === 'deno')
                 return this.contextProviderDeno
             else
                 // for isomorphic code any provider is ok
@@ -546,7 +551,10 @@ export class Launcher extends Mixin(
             if (errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
             //-----------------------
-            const contextProviders          = this.getSuitableContextProviders(this.projectData.type)
+            const contextProviders          = this.getSuitableContextProviders(
+                this.projectData.type,
+                this.getEnvironmentByUrl(this.project)
+            )
 
             if (contextProviders.length === 0) throw LauncherError.new({
                 message     : 'No suitable context providers found. Check the `--provider` option'
