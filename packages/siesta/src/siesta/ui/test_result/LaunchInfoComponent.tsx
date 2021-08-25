@@ -101,7 +101,7 @@ export class LaunchInfoComponent extends Mixin(
                     }
                     {
                         () => {
-                            if (!launchInfo.mostRecentResult) return null
+                            if (!this.shouldShowDomContainer(launchInfo)) return null
 
                             return <>
                                 <Splitter
@@ -162,6 +162,17 @@ export class LaunchInfoComponent extends Mixin(
                     <div>Double click a folder to launch all tests in it</div>
                 </div>
             </div>
+        }
+
+
+        shouldShowDomContainer (launchInfo : TestLaunchInfo) : boolean {
+            if (this.dashboard.projectData.type === 'nodejs' || this.dashboard.projectData.type === 'deno') return false
+
+            if (this.dashboard.projectData.environment.type !== 'browser') return false
+
+            if (!launchInfo.mostRecentResult) return false
+
+            return true
         }
 
 
