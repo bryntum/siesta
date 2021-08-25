@@ -205,28 +205,26 @@ export class LauncherNodejs extends Mixin(
                 const wsServer          = new ServerNodeWebSocket()
                 const wsPort            = await wsServer.startWebSocketServer()
 
-                const awaitConnection   = new Promise<ws>(resolve => wsServer.onConnectionHook.once((self, socket) => resolve(socket)))
+                wsServer.onConnectionHook.on(async (self, socket) => {
+                    const port              = this.dashboardConnector = DashboardConnectorServer.new({ launcher : this })
+                    const media             = MediaNodeWebSocketParent.new()
 
-                const port              = this.dashboardConnector = DashboardConnectorServer.new({ launcher : this })
-                const media             = MediaNodeWebSocketParent.new()
+                    port.media              = media
+                    media.socket            = socket
+                    port.handshakeType      = 'parent_first'
 
-                port.media              = media
+                    await port.connect()
+
+                    this.logger.debug('Launcher connected to dashboard')
+
+                    await port.startDashboard(this.projectData, this.getDescriptor())
+
+                    this.logger.debug('Dashboard started')
+                })
 
                 const relPath           = path.relative('./', fileURLToPath(`${ siestaPackageRootUrl }resources/dashboard/index.html`))
 
                 page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
-
-                media.socket            = await awaitConnection
-
-                port.handshakeType      = 'parent_first'
-
-                await port.connect()
-
-                this.logger.debug('Launcher connected to dashboard')
-
-                await port.startDashboard(this.projectData, this.getDescriptor())
-
-                this.logger.debug('Dashboard started')
             }
         }
 
