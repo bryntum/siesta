@@ -172,18 +172,21 @@ export class LauncherNodejs extends Mixin(
 
             let webServer : UnwrapPromise<ReturnType<typeof startDevServer>>
 
-            page.on('close', async () => {
-                browser.close()
-                console.log("CLOSING SERVER")
-
-                await webServer.stop()
-
-                console.log("CLOSING SERVER DONE")
-            })
-
             if (this.getEnvironmentByUrl(this.project) === 'browser') {
 
             } else {
+                let connectedPort : DashboardConnectorServer   = undefined
+
+                page.on('close', async () => {
+                    await Promise.all([
+                        browser.close(),
+                        webServer.stop(),
+                        connectedPort ? connectedPort.disconnect() : Promise.resolve()
+                    ])
+
+                    await wsServer.stopWebSocketServer()
+                })
+
                 webServer               = await startDevServer({
                     config : {
                         nodeResolve : true
@@ -206,7 +209,12 @@ export class LauncherNodejs extends Mixin(
                 const wsPort            = await wsServer.startWebSocketServer()
 
                 wsServer.onConnectionHook.on(async (self, socket) => {
-                    const port              = this.dashboardConnector = DashboardConnectorServer.new({ launcher : this })
+                    if (connectedPort) {
+                        await connectedPort.disconnect()
+                        connectedPort       = undefined
+                    }
+
+                    const port              = this.dashboardConnector = connectedPort = DashboardConnectorServer.new({ launcher : this })
                     const media             = MediaNodeWebSocketParent.new()
 
                     port.media              = media
