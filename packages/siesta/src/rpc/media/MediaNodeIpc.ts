@@ -1,11 +1,11 @@
 import { ChildProcess, Serializable } from "child_process"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaSerializableJSONScoped } from "./MediaSerializable.js"
+import { MediaSerializableJSON } from "./MediaSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class MediaNodeIpcParent extends Mixin(
-    [ MediaSerializableJSONScoped ],
-    (base : ClassUnion<typeof MediaSerializableJSONScoped>) =>
+    [ MediaSerializableJSON ],
+    (base : ClassUnion<typeof MediaSerializableJSON>) =>
 
     class MediaNodeIpcParent extends base {
         childProcess            : ChildProcess                  = undefined
@@ -47,8 +47,8 @@ export class MediaNodeIpcParent extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class MediaNodeIpcChild extends Mixin(
-    [ MediaSerializableJSONScoped ],
-    (base : ClassUnion<typeof MediaSerializableJSONScoped>) =>
+    [ MediaSerializableJSON ],
+    (base : ClassUnion<typeof MediaSerializableJSON>) =>
 
     class MediaNodeIpcChild extends base {
         process                 : NodeJS.Process                = process

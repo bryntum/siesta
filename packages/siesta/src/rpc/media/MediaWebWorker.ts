@@ -1,7 +1,7 @@
 import { Serializable } from "child_process"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaSerializableJSONScoped } from "./MediaSerializable.js"
+import { MediaSerializableJSON } from "./MediaSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 // this type is declared in TS definitions lib, called `webworker`:
@@ -19,8 +19,8 @@ declare const self : DedicatedWorkerGlobalScope
 
 //---------------------------------------------------------------------------------------------------------------------
 export class MediaWebWorkerChild extends Mixin(
-    [ MediaSerializableJSONScoped, Base ],
-    (base : ClassUnion<typeof MediaSerializableJSONScoped, typeof Base>) =>
+    [ MediaSerializableJSON, Base ],
+    (base : ClassUnion<typeof MediaSerializableJSON, typeof Base>) =>
 
     class MediaWebWorkerChild extends base {
 
@@ -54,8 +54,8 @@ export class MediaWebWorkerChild extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class MediaWebWorkerParent extends Mixin(
-    [ MediaSerializableJSONScoped, Base ],
-    (base : ClassUnion<typeof MediaSerializableJSONScoped, typeof Base>) =>
+    [ MediaSerializableJSON, Base ],
+    (base : ClassUnion<typeof MediaSerializableJSON, typeof Base>) =>
 
     class MediaWebWorkerParent extends base {
         worker                  : Worker                        = undefined

@@ -28,6 +28,10 @@ export class MediaSerializableJSON extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
+// TODO this serializer is not ready for production yet
+// it can mix the local and remote ids, providing very unexpected results
+// need to either split local/remote ids in different namespaces,
+// or maintain mapping between them
 export class MediaSerializableJSONScoped extends Mixin(
     [ Media ],
     (base : ClassUnion<typeof Media>) =>

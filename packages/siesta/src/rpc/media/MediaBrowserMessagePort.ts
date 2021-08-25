@@ -1,10 +1,10 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaSerializableJSONScoped } from "./MediaSerializable.js"
+import { MediaSerializableJSON } from "./MediaSerializable.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class MediaBrowserMessagePortChild extends Mixin(
-    [ MediaSerializableJSONScoped ],
-    (base : ClassUnion<typeof MediaSerializableJSONScoped>) =>
+    [ MediaSerializableJSON ],
+    (base : ClassUnion<typeof MediaSerializableJSON>) =>
 
     class MediaBrowserMessagePortChild extends base {
         messagePort             : MessagePort                   = undefined
