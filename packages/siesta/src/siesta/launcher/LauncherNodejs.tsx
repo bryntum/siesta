@@ -27,6 +27,7 @@ import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeNodejs } from "../runtime/RuntimeNodejs.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
+import { DashboardConnectorServer } from "./DashboardConnector.js"
 import { Dispatcher } from "./Dispatcher.js"
 import { DispatcherNodejs } from "./DispatcherNodejs.js"
 import { ExitCodes, Launcher, LauncherError } from "./Launcher.js"
@@ -158,6 +159,8 @@ export class LauncherNodejs extends Mixin(
 
 
         async launchDashboardUI () {
+            this.reporter.disabled  = true
+
             const launchOptions : LaunchOptions  = { headless : false }
 
             if (this.browser === 'chrome') {
@@ -193,11 +196,13 @@ export class LauncherNodejs extends Mixin(
 
                 if (webPort === undefined) throw new Error("Address should be available")
 
+                console.log("SERVER LAUNCHED")
+
                 const wsServer          = new ServerNodeWebSocket()
                 const wsPort            = await wsServer.startWebSocketServer()
                 const awaitConnection   = new Promise<ws>(resolve => wsServer.onConnectionHook.once((self, socket) => resolve(socket)))
 
-                const port              = this
+                const port              = this.dashboardConnector = DashboardConnectorServer.new({ launcher : this })
                 const media             = MediaNodeWebSocketParent.new()
 
                 port.media              = media
@@ -216,7 +221,7 @@ export class LauncherNodejs extends Mixin(
 
                 console.log("CONNECTED")
 
-                this.startDashboard(this.projectData, this.getDescriptor())
+                port.startDashboard(this.projectData, this.getDescriptor())
 
                 console.log("STARTED")
 

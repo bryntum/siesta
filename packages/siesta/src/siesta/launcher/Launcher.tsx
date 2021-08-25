@@ -6,8 +6,6 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel } from "../../logger/Logger.js"
 import { LoggerConsole } from "../../logger/LoggerConsole.js"
-import { local, remote } from "../../rpc/port/Port.js"
-import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
@@ -32,8 +30,8 @@ import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { HasRuntimeAccess } from "../runtime/Runtime.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { SubTestCheckInfo } from "../test/TestResult.js"
+import { DashboardConnectorServer } from "./DashboardConnector.js"
 import { Dispatcher } from "./Dispatcher.js"
-import { LauncherRemoteInterface } from "./LauncherRemoteInterface.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -253,10 +251,10 @@ export class LauncherDescriptor extends Mixin(
 
 
 export class Launcher extends Mixin(
-    [ PortHandshakeParent, LauncherDescriptor, ConsoleXmlRenderer, HasRuntimeAccess ],
-    (base : ClassUnion<typeof PortHandshakeParent, typeof LauncherDescriptor, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess>) =>
+    [ LauncherDescriptor, ConsoleXmlRenderer, HasRuntimeAccess ],
+    (base : ClassUnion<typeof LauncherDescriptor, typeof ConsoleXmlRenderer, typeof HasRuntimeAccess>) =>
 
-    class Launcher extends base implements LauncherRemoteInterface {
+    class Launcher extends base {
         projectData             : ProjectSerializableData   = undefined
 
         $logger                 : Logger                    = LoggerConsole.new({ logLevel : LogLevel.warn })
@@ -279,6 +277,8 @@ export class Launcher extends Mixin(
         dispatcher              : Dispatcher                = undefined
 
         reporter                : Reporter                  = undefined
+
+        dashboardConnector      : DashboardConnectorServer  = undefined
 
         //------------------
         setupDone               : boolean                   = false
@@ -380,11 +380,8 @@ export class Launcher extends Mixin(
 
 
         async launchDashboardUI () {
+            throw new Error("Abstract method called")
         }
-
-
-        @remote()
-        startDashboard : (data : ProjectSerializableData, launcherDescriptor : LauncherDescriptor) => Promise<any>
 
 
         computeExitCode () : ExitCodes {
@@ -577,16 +574,14 @@ export class Launcher extends Mixin(
         }
 
 
-        @local()
-        async doLaunchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) {
+        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) {
             await this.performSetupOnce()
 
             projectPlanItemsToLaunch.forEach(desc => this.dispatcher.addPendingTest(desc))
         }
 
 
-        @local()
-        async doLaunchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
+        async launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
             await this.performSetupOnce()
 
             this.dispatcher.addPendingTest(desc, checkInfo)

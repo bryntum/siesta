@@ -4,7 +4,6 @@ import { Replica } from "@bryntum/chronograph/src/replica2/Replica.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { CI } from "../../iterator/Iterator.js"
-import { luid } from "../common/LUID.js"
 import { Context } from "../context/Context.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Exception, TestNodeResultReactive } from "../test/TestResult.js"
@@ -39,6 +38,8 @@ export class TestLaunchInfo extends Mixin(
         @field()
         mostRecentResult    : TestNodeResultReactive    = undefined
 
+        currentTestNodeResult : TestNodeResultReactive  = undefined
+
         @field()
         viewState           : TestViewState
 
@@ -59,10 +60,8 @@ export class TestLaunchInfo extends Mixin(
 
             const descriptor        = this.descriptor
 
-            descriptor.remoteId     = luid()
-
             this.dashboard.results.set(descriptor, this)
-            // this.dispatcher.localRemoteDescMap.set(descriptor.remoteId, descriptor)
+            this.dashboard.mapping.set(descriptor.guid, this)
         }
 
 
@@ -87,7 +86,7 @@ export class TestLaunchInfo extends Mixin(
             this.launchState        = 'pending'
 
             try {
-                // this.testSources    = await this.dashboard.reporter.fetchSources(this.descriptor.urlAbs)
+                this.testSources    = await this.dashboard.connector.fetchSources(this.descriptor.urlAbs)
             } catch (e) {
             }
         }

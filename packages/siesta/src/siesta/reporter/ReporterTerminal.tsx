@@ -120,6 +120,8 @@ export class ReporterTerminal extends Mixin(
 
 
         onBeforeTestLaunch (desc : TestDescriptor) {
+            if (this.disabled) return
+
             this.revertFooter()
 
             super.onBeforeTestLaunch(desc)

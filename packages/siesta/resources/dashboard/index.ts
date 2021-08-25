@@ -3,9 +3,11 @@ import { Dashboard } from "../../src/siesta/ui/Dashboard.js"
 
 
 const connect = async (wsPort : number) => {
-    const port          = Dashboard.new()
+    const dashboard     = Dashboard.new()
 
-    // TODO move this inside the dashboard itself
+    // TODO move this inside the dashboard itself ?
+    const port          = dashboard.connector
+
     const media         = MediaBrowserWebSocketChild.new({ wsHost : '127.0.0.1', wsPort : wsPort })
 
     port.media          = media
@@ -13,7 +15,6 @@ const connect = async (wsPort : number) => {
     port.handshakeType  = 'parent_first'
 
     await port.connect()
-
 }
 
 connect(Number(new URL(location.href).searchParams.get('port')))

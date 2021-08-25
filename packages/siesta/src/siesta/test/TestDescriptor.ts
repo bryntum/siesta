@@ -47,7 +47,7 @@ export class TestDescriptorPre extends Mixin(
  */
 @serializable({ id : 'TestDescriptor' })
 export class TestDescriptor extends TestDescriptorPre {
-    remoteId        : LUID                  = undefined
+    guid            : LUID                  = undefined
 
     type            : EnvironmentType       = 'isomorphic'
 

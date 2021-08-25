@@ -230,7 +230,7 @@ export class Test extends TestPre {
 
         super.addResult(result)
 
-        if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.localId, result)
+        if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.rootTest.descriptor.guid, this.localId, result)
 
         return result
     }
@@ -239,7 +239,7 @@ export class Test extends TestPre {
     addAsyncResolution (resolution : AssertionAsyncResolution) : AssertionAsyncResolution {
         super.addAsyncResolution(resolution)
 
-        this.reporter.onAssertionFinish(this.localId, resolution)
+        this.reporter.onAssertionFinish(this.rootTest.descriptor.guid, this.localId, resolution)
 
         return resolution
     }
@@ -409,7 +409,7 @@ export class Test extends TestPre {
 
         globalTestEnv.currentTest       = this
 
-        this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
+        this.reporter.onSubTestStart(this.rootTest.descriptor.guid, this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
         // start hook, test is marked as active in the reporter
         this.startHook.trigger(this)
@@ -429,7 +429,7 @@ export class Test extends TestPre {
         // finish hook, test is still marked as active in the reporter
         this.finishHook.trigger(this)
 
-        this.reporter.onSubTestFinish(this.localId, false)
+        this.reporter.onSubTestFinish(this.rootTest.descriptor.guid, this.localId, false)
 
         globalTestEnv.currentTest       = this.parentNode
 
@@ -529,8 +529,8 @@ export class Test extends TestPre {
                     // instead it always assumes subtest is launched
                     // so we do that, with a special flag for `onSubTestFinish`
                     // this can be improved
-                    this.reporter.onSubTestStart(subTest.localId, subTest.parentNode ? subTest.parentNode.localId : null, subTest.descriptor)
-                    this.reporter.onSubTestFinish(subTest.localId, true)
+                    this.reporter.onSubTestStart(this.rootTest.descriptor.guid, subTest.localId, subTest.parentNode ? subTest.parentNode.localId : null, subTest.descriptor)
+                    this.reporter.onSubTestFinish(this.rootTest.descriptor.guid, subTest.localId, true)
                 }
             } else
                 await subTest.start()

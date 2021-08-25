@@ -4,6 +4,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Logger } from "../../logger/Logger.js"
 import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
 import { stringify } from "../../serializable/Serializable.js"
+import { LUID, luid } from "../common/LUID.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
@@ -14,8 +15,10 @@ import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { Exception, SubTestCheckInfo, TestNodeResultReactive } from "../test/TestResult.js"
+import { LaunchState } from "../ui/TestLaunchInfo.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 import { Queue } from "./Queue.js"
+import { TestLaunchResult } from "./TestLaunchResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -109,11 +112,10 @@ export class Dispatcher extends Mixin(
             presence    : Map<TestDescriptor, SubTestCheckInfo | undefined>
         }                                                       = { order : [], presence : new Map() }
 
-        // projectPlanLaunchInfo       : TestGroupLaunchInfo       = undefined
+        projectPlanLaunchResult     : TestLaunchResult          = undefined
 
-        // resultsGroups               : Map<TestDescriptor, TestGroupLaunchInfo>   = new Map()
-        // results                     : Map<TestDescriptor, TestLaunchInfo>   = new Map()
-        // localRemoteDescMap          : Map<LUID, TestDescriptor> = new Map()
+        resultsMappingById          : Map<LUID, TestLaunchResult>               = new Map()
+        resultsMapping              : Map<TestDescriptor, TestLaunchResult>     = new Map()
 
         projectPlanItemsToLaunch    : TestDescriptor[]          = []
 
@@ -152,10 +154,19 @@ export class Dispatcher extends Mixin(
                 queue.pull()
             })
 
-            // this.projectPlanLaunchInfo  = TestGroupLaunchInfo.new({
-            //     descriptor  : this.launcher.projectData.projectPlan,
-            //     dispatcher  : this
-            // })
+            this.projectPlanLaunchResult    = TestLaunchResult.fromTreeNode(
+                this.launcher.projectData.projectPlan,
+                descriptor => {
+                    descriptor.guid     = luid()
+
+                    const result        = TestLaunchResult.new({ descriptor })
+
+                    this.resultsMapping.set(descriptor, result)
+                    this.resultsMappingById.set(descriptor.guid, result)
+
+                    return result
+                }
+            )
         }
 
 
@@ -176,18 +187,11 @@ export class Dispatcher extends Mixin(
         }
 
 
-        // getTestLaunchInfo (desc : TestDescriptor) : TestLaunchInfo {
-        //     return this.results.get(desc)
-        // }
-        //
-        //
-        // getTestMostRecentResult (desc : TestDescriptor) : TestNodeResultReactive | undefined {
-        //     const launchInfo            = this.getTestLaunchInfo(desc)
-        //
-        //     return launchInfo?.mostRecentResult
-        // }
-        //
-        //
+        getTestLaunchInfo (desc : TestDescriptor) : TestLaunchResult {
+            return this.resultsMapping.get(desc)
+        }
+
+
         isCompleted () : boolean {
             return this.pendingQueue.order.length === 0 && this.runningQueue.isEmpty
         }
@@ -204,8 +208,6 @@ export class Dispatcher extends Mixin(
             const pendingQueue  = this.pendingQueue
 
             if (pendingQueue.presence.has(desc)) return
-
-            // this.getTestLaunchInfo(desc).schedulePendingTestLaunch()
 
             pendingQueue.order.push(desc)
             pendingQueue.presence.set(desc, checkInfo)
@@ -238,6 +240,11 @@ export class Dispatcher extends Mixin(
         }
 
 
+        setDashboardLaunchState (desc : TestDescriptor, launchState : LaunchState) {
+            this.launcher.dashboardConnector?.setLaunchState(desc.guid, launchState)
+        }
+
+
         async launchProjectPlanItem (item : TestDescriptor, checkInfo : SubTestCheckInfo = undefined) {
             const slot              = await this.cleanupQueue.reserveCleanupSlot(item)
 
@@ -247,11 +254,11 @@ export class Dispatcher extends Mixin(
 
             this.beforeTestLaunch(normalized)
 
-            const launchInfo        = { launchState : null, context : null }//this.results.get(item)
+            const launchInfo        = this.resultsMappingById.get(item.guid)
 
-            launchInfo.launchState  = 'started'
+            this.setDashboardLaunchState(item, 'started')
 
-            const context           = launchInfo.context = await this.contextProviders[ 0 ].createContext(normalized)
+            const context           = /*launchInfo.context =*/ await this.contextProviders[ 0 ].createContext(normalized)
 
             let preLaunchRes : boolean
 
@@ -267,10 +274,10 @@ export class Dispatcher extends Mixin(
                 testNode.addResult(Exception.new({ exception : e }))
                 this.reporter.onSubTestFinish(testNode)
 
-                launchInfo.launchState  = 'completed'
+                this.setDashboardLaunchState(item, 'completed')
 
                 await slot.setTask(async () => {
-                    launchInfo.context  = null
+                    // launchInfo.context  = null
                     await context.destroy()
                 })
 
@@ -285,17 +292,17 @@ export class Dispatcher extends Mixin(
                 this.reporter.onSubTestStart(testNode)
                 this.reporter.onSubTestFinish(testNode)
 
-                launchInfo.launchState  = 'completed'
+                this.setDashboardLaunchState(item, 'completed')
 
                 await slot.setTask(async () => {
-                    launchInfo.context  = null
+                    // launchInfo.context  = null
                     await context.destroy()
                 })
 
                 return
             }
 
-            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter/*, launchInfo*/ })
+            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter, launchInfo })
 
             try {
                 await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
@@ -304,10 +311,10 @@ export class Dispatcher extends Mixin(
 
                 await testLauncher.launchTest(stringifiedDesc, checkInfo)
 
-                launchInfo.launchState  = 'completed'
+                this.setDashboardLaunchState(item, 'completed')
             } finally {
                 await slot.setTask(async () => {
-                    launchInfo.context  = null
+                    // launchInfo.context  = null
                     await testLauncher.disconnect()
                     await context.destroy()
                 })
@@ -322,17 +329,19 @@ export class Dispatcher extends Mixin(
 
 
         async launchStandaloneSameContextTest (topTest : Test) {
-            this.projectPlanItemsToLaunch = [ topTest.descriptor ]
+            const descriptor                = topTest.descriptor
 
-            this.logger.debug("Launching standalone test: ", topTest.descriptor.url)
+            this.projectPlanItemsToLaunch   = [ descriptor ]
 
-            // const launchInfo            = this.results.get(topTest.descriptor)
+            this.logger.debug("Launching standalone test: ", descriptor.url)
+
+            const launchInfo                = this.resultsMappingById.get(descriptor.guid)
 
             this.reporter.onTestSuiteStart()
 
-            this.beforeTestLaunch(topTest.descriptor)
+            this.beforeTestLaunch(descriptor)
 
-            const testLauncher          = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter/*, launchInfo*/ })
+            const testLauncher          = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter, launchInfo })
             const testLauncherChild     = TestLauncherChild.new()
 
             const parentMedia           = new MediaSameContext()

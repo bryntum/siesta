@@ -14,14 +14,15 @@ import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { buffer } from "../../util/TimeHelpers.js"
 import { awaitDomInteractive } from "../../util_browser/Dom.js"
+import { LUID } from "../common/LUID.js"
+import { DashboardConnectorClient } from "../launcher/DashboardConnector.js"
 import { LauncherDescriptor } from "../launcher/Launcher.js"
 import { LauncherDescriptorNodejs } from "../launcher/LauncherDescriptorNodejs.js"
-import { LauncherRemoteClient } from "../launcher/LauncherRemoteInterface.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { TestReporterParent } from "../test/port/TestReporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { individualCheckInfoForTestResult, TestNodeResultReactive } from "../test/TestResult.js"
+import { individualCheckInfoForTestResult, SubTestCheckInfo, TestNodeResultReactive } from "../test/TestResult.js"
 import { Splitter } from "./components/Splitter.js"
 import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComponent.js"
 import { RippleEffectManager } from "./RippleEffectManager.js"
@@ -68,8 +69,8 @@ export class DashboardRenderer extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export class Dashboard extends Mixin(
-    [ LauncherRemoteClient, Component ],
-    (base : ClassUnion<typeof LauncherRemoteClient, typeof Component>) =>
+    [ Component ],
+    (base : ClassUnion<typeof Component>) =>
 
     class Dashboard extends base {
         @field()
@@ -93,16 +94,11 @@ export class Dashboard extends Mixin(
         projectPlanLaunchInfo       : TestGroupLaunchInfo                       = undefined
         resultsGroups               : Map<TestDescriptor, TestGroupLaunchInfo>  = new Map()
         results                     : Map<TestDescriptor, TestLaunchInfo>       = new Map()
+        mapping                     : Map<LUID, TestLaunchInfo>                 = new Map()
 
-        renderer                    : DashboardRenderer     = DashboardRenderer.new({ dashboard : this })
+        renderer                    : DashboardRenderer         = DashboardRenderer.new({ dashboard : this })
 
-
-        async startDashboard (data : ProjectSerializableData, launcherDescriptor : LauncherDescriptor) {
-            this.projectData        = data
-            this.launcherDescriptor = launcherDescriptor
-
-            this.start()
-        }
+        connector                   : DashboardConnectorClient  = DashboardConnectorClient.new({ dashboard : this })
 
 
         get projectPlan () : TestDescriptor {
@@ -406,7 +402,7 @@ export class Dashboard extends Mixin(
             const result    = this.getTestResultComponentFromMouseEvent(e)
 
             if (result) {
-                this.doLaunchContinuouslyWithCheckInfo(this.currentTest, individualCheckInfoForTestResult(result))
+                this.launchContinuouslyWithCheckInfo(this.currentTest, individualCheckInfoForTestResult(result))
             }
         }
 
@@ -430,6 +426,13 @@ export class Dashboard extends Mixin(
 
         async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<any> {
             projectPlanItemsToLaunch.forEach(desc => this.getTestLaunchInfo(desc).schedulePendingTestLaunch())
+
+            this.connector.launchContinuously(projectPlanItemsToLaunch)
+        }
+
+
+        async launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
+            this.connector.launchContinuouslyWithCheckInfo(desc, checkInfo)
         }
 
 

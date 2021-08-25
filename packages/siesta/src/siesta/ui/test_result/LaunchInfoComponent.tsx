@@ -166,14 +166,14 @@ export class LaunchInfoComponent extends Mixin(
 
 
         runTest () {
-            this.dashboard.doLaunchContinuously([ this.launchInfo.descriptor ])
+            this.dashboard.launchContinuously([ this.launchInfo.descriptor ])
         }
 
 
         runTestChecked () {
             const testResult        = this.launchInfo.mostRecentResult
 
-            this.dashboard.doLaunchContinuouslyWithCheckInfo(this.launchInfo.descriptor, checkInfoFromTestResult(testResult))
+            this.dashboard.launchContinuouslyWithCheckInfo(this.launchInfo.descriptor, checkInfoFromTestResult(testResult))
         }
     }
 ) {}

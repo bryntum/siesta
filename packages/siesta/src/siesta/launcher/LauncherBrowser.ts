@@ -44,9 +44,9 @@ export class LauncherBrowser extends Mixin(
 
 
         async launchDashboardUI () {
-            this.dashboard = Dashboard.new()
-
-            await this.dashboard.startDashboard(this.projectData, this.getDescriptor())
+            // this.dashboard = Dashboard.new()
+            //
+            // await this.dashboard.startDashboard(this.projectData, this.getDescriptor())
         }
 
 

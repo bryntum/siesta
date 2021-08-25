@@ -67,6 +67,8 @@ export class Reporter extends Mixin(
         startTime           : Date                      = undefined
         endTime             : Date                      = undefined
 
+        disabled            : boolean                   = false
+
 
         // failed assertions are always included (along with all their parent sub-tests)
         // otherwise, include everything at the specified `detail` level
@@ -97,7 +99,7 @@ export class Reporter extends Mixin(
 
 
         onBeforeTestLaunch (desc : TestDescriptor) {
-            this.resultsRunningMap.set(desc.remoteId, desc)
+            this.resultsRunningMap.set(desc.guid, desc)
         }
 
 
@@ -113,8 +115,10 @@ export class Reporter extends Mixin(
         pendingPrints   : number        = 0
 
         async onSubTestFinish (testNode : TestNodeResultReactive) {
+            if (this.disabled) return
+
             if (testNode.isRoot) {
-                const runningDescId = testNode.descriptor.remoteId
+                const runningDescId = testNode.descriptor.guid
                 const runningDesc   = this.resultsRunningMap.get(runningDescId)
 
                 if (!runningDesc) throw new Error("Test completed before starting")
