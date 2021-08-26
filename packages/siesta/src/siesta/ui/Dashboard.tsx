@@ -63,6 +63,11 @@ export class DashboardRenderer extends Mixin(
         getMaxLen () : number {
             return 250
         }
+
+
+        async setupTheme () {
+            this.styles         = (await import(`../reporter/styling/theme_${ this.dashboard.launcherDescriptor.theme }.js`)).styles
+        }
     }
 ) {}
 
@@ -89,7 +94,7 @@ export class Dashboard extends Mixin(
 
         projectData                 : ProjectSerializableData                   = undefined
 
-        launcherDescriptor          : LauncherDescriptor                        = LauncherDescriptor.new()
+        launcherDescriptor          : LauncherDescriptorNodejs                  = LauncherDescriptorNodejs.new()
 
         projectPlanLaunchInfo       : TestGroupLaunchInfo                       = undefined
         resultsGroups               : Map<TestDescriptor, TestGroupLaunchInfo>  = new Map()
@@ -240,13 +245,18 @@ export class Dashboard extends Mixin(
         }
 
 
-        async start () {
+        async setup () {
             this.projectPlanLaunchInfo  = TestGroupLaunchInfo.new({
                 descriptor  : this.projectData.projectPlan,
                 dashboard   : this
             })
 
-            await awaitDomInteractive()
+            await Promise.all([ awaitDomInteractive(), this.renderer.setupTheme() ])
+        }
+
+
+        async start () {
+            await this.setup()
 
             //-----------------
             const persistentState       = this.loadPersistentState()
