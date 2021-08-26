@@ -172,68 +172,66 @@ export class LauncherNodejs extends Mixin(
 
             let webServer : UnwrapPromise<ReturnType<typeof startDevServer>>
 
-            if (this.getEnvironmentByUrl(this.project) === 'browser') {
+            const isBrowserProject  = this.getEnvironmentByUrl(this.project) === 'browser'
 
-            } else {
-                let connectedPort : DashboardConnectorServer   = undefined
+            let connectedPort : DashboardConnectorServer   = undefined
 
-                page.on('close', async () => {
-                    await Promise.all([
-                        browser.close(),
-                        webServer.stop(),
-                        connectedPort ? connectedPort.disconnect() : Promise.resolve()
-                    ])
+            page.on('close', async () => {
+                await Promise.all([
+                    browser.close(),
+                    webServer.stop(),
+                    connectedPort?.disconnect() ?? Promise.resolve()
+                ])
 
-                    await wsServer.stopWebSocketServer()
-                })
+                await wsServer.stopWebSocketServer()
+            })
 
-                webServer               = await startDevServer({
-                    config : {
-                        nodeResolve : true
-                    },
-                    logStartMessage     : false
-                })
+            webServer               = await startDevServer({
+                config : {
+                    nodeResolve : true
+                },
+                logStartMessage     : false
+            })
 
-                const address           = webServer.server.address()
-                const webPort           = !isString(address) ? address.port : undefined
+            const address           = webServer.server.address()
+            const webPort           = !isString(address) ? address.port : undefined
 
-                if (webPort === undefined) throw new Error("Address should be available")
+            if (webPort === undefined) throw new Error("Address should be available")
 
-                this.write(<div>
-                    <p>Local web server launched</p>
-                    <p class="indented">Root dir : <span class="accented">{ process.cwd() }</span></p>
-                    <p class="indented">Address  : <span class="accented">http://localhost:{ webPort }</span></p>
-                </div>)
+            this.write(<div>
+                <p>Local web server launched</p>
+                <p class="indented">Root dir : <span class="accented">{ process.cwd() }</span></p>
+                <p class="indented">Address  : <span class="accented">http://localhost:{ webPort }</span></p>
+            </div>)
 
-                const wsServer          = new ServerNodeWebSocket()
-                const wsPort            = await wsServer.startWebSocketServer()
+            const wsServer          = new ServerNodeWebSocket()
+            const wsPort            = await wsServer.startWebSocketServer()
 
-                wsServer.onConnectionHook.on(async (self, socket) => {
-                    if (connectedPort) {
-                        await connectedPort.disconnect()
-                        connectedPort       = undefined
-                    }
+            wsServer.onConnectionHook.on(async (self, socket) => {
+                if (connectedPort) {
+                    await connectedPort.disconnect()
+                    connectedPort       = undefined
+                }
 
-                    const port              = this.dashboardConnector = connectedPort = DashboardConnectorServer.new({ launcher : this })
-                    const media             = MediaNodeWebSocketParent.new()
+                const port              = this.dashboardConnector = connectedPort = DashboardConnectorServer.new({ launcher : this })
+                const media             = MediaNodeWebSocketParent.new()
 
-                    port.media              = media
-                    media.socket            = socket
-                    port.handshakeType      = 'parent_first'
+                port.media              = media
+                media.socket            = socket
+                port.handshakeType      = 'parent_first'
 
-                    await port.connect()
+                await port.connect()
 
-                    this.logger.debug('Launcher connected to dashboard')
+                this.logger.debug('Launcher connected to dashboard')
 
-                    await port.startDashboard(this.projectData, this.getDescriptor())
+                await port.startDashboard(this.projectData, this.getDescriptor())
 
-                    this.logger.debug('Dashboard started')
-                })
+                this.logger.debug('Dashboard started')
+            })
 
-                const relPath           = path.relative('./', fileURLToPath(`${ siestaPackageRootUrl }resources/dashboard/index.html`))
+            const relPath           = path.relative('./', fileURLToPath(`${ siestaPackageRootUrl }resources/dashboard/index.html`))
 
-                page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
-            }
+            page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
         }
 
 

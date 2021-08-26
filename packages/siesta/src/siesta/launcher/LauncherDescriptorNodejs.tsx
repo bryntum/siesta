@@ -3,6 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { option, OptionGroup } from "../option/Option.js"
 import { LauncherDescriptor, OptionsGroupPrimary } from "./Launcher.js"
+import { LauncherDescriptorTerminal } from "./LauncherTerminal.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -19,8 +20,8 @@ export type SupportedBrowsers   = 'chrome' | 'firefox' | 'edge' | 'safari'
 //---------------------------------------------------------------------------------------------------------------------
 @serializable({ id : 'LauncherDescriptorNodejs' })
 export class LauncherDescriptorNodejs extends Mixin(
-    [ LauncherDescriptor ],
-    (base : ClassUnion<typeof LauncherDescriptor>) =>
+    [ LauncherDescriptor, LauncherDescriptorTerminal ],
+    (base : ClassUnion<typeof LauncherDescriptor, typeof LauncherDescriptorTerminal>) =>
 
     class LauncherDescriptorNodejs extends base {
 

@@ -10,6 +10,7 @@ import { AssertionAsyncResolution, SubTestCheckInfo, TestNodeResultReactive, Tes
 import { Dashboard } from "../ui/Dashboard.js"
 import { LaunchState, TestLaunchInfo } from "../ui/TestLaunchInfo.js"
 import { Launcher, LauncherDescriptor } from "./Launcher.js"
+import { LauncherDescriptorNodejs } from "./LauncherDescriptorNodejs.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ export class DashboardConnectorClient extends Mixin(
 
         // region DashboardConnectorInterface
         @local()
-        async startDashboard (data : ProjectSerializableData, launcherDescriptor : LauncherDescriptor) {
+        async startDashboard (data : ProjectSerializableData, launcherDescriptor : LauncherDescriptorNodejs) {
             this.dashboard.projectData        = data
             this.dashboard.launcherDescriptor = launcherDescriptor
 

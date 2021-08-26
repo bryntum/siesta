@@ -21,14 +21,11 @@ import { extractProjectInfo } from "./ProjectExtractor.js"
 // DO NOT USE THE NODE.JS/NPM/DENO MODULES HERE
 
 //---------------------------------------------------------------------------------------------------------------------
-export class LauncherTerminal extends Mixin(
+export class LauncherDescriptorTerminal extends Mixin(
     [ Launcher ],
     (base : ClassUnion<typeof Launcher>) =>
 
-    class LauncherTerminal extends base {
-        $logger             : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
-
-        // region options
+    class LauncherDescriptorTerminal extends base {
         @option({
             type        : 'boolean',
             group       : OptionsGroupOutput,
@@ -51,8 +48,16 @@ export class LauncherTerminal extends Mixin(
             </span>
         })
         theme           : string            = 'universal'
+    }
+) {}
 
-        // endregion
+
+export class LauncherTerminal extends Mixin(
+    [ Launcher, LauncherDescriptorTerminal ],
+    (base : ClassUnion<typeof Launcher, typeof LauncherDescriptorTerminal>) =>
+
+    class LauncherTerminal extends base {
+        $logger             : LoggerHookable            = LoggerHookable.new({ logLevel : LogLevel.warn })
 
 
         initialize (props? : Partial<LauncherTerminal>) {
