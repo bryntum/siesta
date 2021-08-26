@@ -199,7 +199,7 @@ export class LauncherNodejs extends Mixin(
             if (webPort === undefined) throw new Error("Address should be available")
 
             this.write(<div>
-                <p>Local web server launched</p>
+                <p>Dashboard web server launched</p>
                 <p class="indented">Root dir : <span class="accented">{ process.cwd() }</span></p>
                 <p class="indented">Address  : <span class="accented">http://localhost:{ webPort }</span></p>
             </div>)

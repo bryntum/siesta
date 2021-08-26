@@ -14,12 +14,12 @@ export class Context extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class Context extends base {
-        provider            : ContextProvider       = undefined
+        provider                        : ContextProvider       = undefined
 
-        parentMediaClass    : typeof Media          = Media
+        parentMediaClass                : typeof Media          = Media
 
-        relativeChildMediaModuleUrl     : string    = ''
-        relativeChildMediaClassSymbol   : string    = ''
+        relativeChildMediaModuleUrl     : string                = ''
+        relativeChildMediaClassSymbol   : string                = ''
 
 
         // non-cyclic, json-only serialization for arguments/result
@@ -79,6 +79,8 @@ export const seedChildPort = async (
     mediaModuleUrl  : string, mediaClassSymbol : string,
     portConfig      : object,
     mediaConfig     : object,
+
+    // TODO remove this arg
     // the only case when its safe to return the port from this method is same context
     returnPort      : boolean = false
 )

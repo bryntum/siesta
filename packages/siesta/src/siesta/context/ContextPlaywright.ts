@@ -14,14 +14,14 @@ export class ContextPlaywright extends Mixin(
 
     class ContextPlaywright extends base {
 
-        parentMediaClass        : typeof MediaNodeWebSocketParent       = MediaNodeWebSocketParent
+        parentMediaClass                : typeof MediaNodeWebSocketParent = MediaNodeWebSocketParent
 
-        relativeChildMediaModuleUrl     : string    = 'src/rpc/media/MediaBrowserWebSocketChild.js'
-        relativeChildMediaClassSymbol   : string    = 'MediaBrowserWebSocketChild'
+        relativeChildMediaModuleUrl     : string                = 'src/rpc/media/MediaBrowserWebSocketChild.js'
+        relativeChildMediaClassSymbol   : string                = 'MediaBrowserWebSocketChild'
 
-        page            : playwright.Page        = undefined
+        page                            : playwright.Page       = undefined
 
-        maintainsBrowser    : boolean           = false
+        maintainsBrowser                : boolean               = false
 
 
         async evaluateBasic <A extends unknown[], R extends unknown> (func : (...args : A) => R, ...args : A) : Promise<UnwrapPromise<R>> {
