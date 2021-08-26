@@ -110,9 +110,8 @@ export class LaunchInfoComponent extends Mixin(
                                     style           = "width: 8px"
                                     companionsFunc  = {
                                         el => launchInfo.context
-                                            // @ts-ignore
-                                            ? [ el.previousElementSibling, el.nextElementSibling, launchInfo.context.wrapper ]
-                                            : [ el.previousElementSibling, el.nextElementSibling ]
+                                            ? [ el.previousElementSibling, el.nextElementSibling, launchInfo.context.wrapper ] as HTMLElement[]
+                                            : [ el.previousElementSibling, el.nextElementSibling ] as HTMLElement[]
                                     }
                                     sizeBox         = { this.domContainerWidthBox }
                                 ></Splitter>
@@ -124,7 +123,6 @@ export class LaunchInfoComponent extends Mixin(
                                         launchInfo.context
                                             ?
                                                 <Translator
-                                                    // @ts-expect-error
                                                     targetElement   = { launchInfo.context.wrapper }
                                                     style           = 'flex: 1'
                                                     class           = 'dom-container'

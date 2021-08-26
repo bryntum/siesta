@@ -4,7 +4,7 @@ import { Replica } from "@bryntum/chronograph/src/replica2/Replica.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { CI } from "../../iterator/Iterator.js"
-import { Context } from "../context/Context.js"
+import { ContextBrowserIframe } from "../context/ContextBrowserIframe.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Exception, TestNodeResultReactive } from "../test/TestResult.js"
 import { Dashboard } from "./Dashboard.js"
@@ -32,8 +32,10 @@ export class TestLaunchInfo extends Mixin(
 
         descriptor          : TestDescriptor            = undefined
 
+        // the only possible type of context to be here is `ContextBrowserIframe`
+        // it indicates the iframe created by the dashboard
         @field()
-        context             : Context                   = undefined
+        context             : ContextBrowserIframe      = undefined
 
         @field()
         mostRecentResult    : TestNodeResultReactive    = undefined
