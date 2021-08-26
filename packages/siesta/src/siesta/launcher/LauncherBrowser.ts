@@ -1,4 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { MediaNodeWebSocketParent } from "../../rpc/media/MediaNodeWebSocketParent.js"
+import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderBrowserIframe } from "../context/context_provider/ContextProviderBrowserIframe.js"
@@ -8,6 +10,7 @@ import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeBrowser } from "../runtime/RuntimeBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Dashboard } from "../ui/Dashboard.js"
+import { DashboardConnectorServer } from "./DashboardConnector.js"
 import { Launcher } from "./Launcher.js"
 
 
@@ -44,9 +47,23 @@ export class LauncherBrowser extends Mixin(
 
 
         async launchDashboardUI () {
-            // this.dashboard = Dashboard.new()
-            //
-            // await this.dashboard.startDashboard(this.projectData, this.getDescriptor())
+            this.dashboard          = Dashboard.new()
+
+            const dashboardPort     = this.dashboard.connector
+            const dashboardMedia    = new MediaSameContext()
+            dashboardPort.media     = dashboardMedia
+
+            const launcherPort      = this.dashboardConnector = DashboardConnectorServer.new({ launcher : this })
+            const launcherMedia     = new MediaSameContext()
+            launcherPort.media      = launcherMedia
+
+            launcherMedia.targetMedia       = dashboardMedia
+            dashboardMedia.targetMedia      = launcherMedia
+
+            dashboardPort.connect()
+            await launcherPort.connect()
+
+            await launcherPort.startDashboard(this.projectData, this.getDescriptor())
         }
 
 

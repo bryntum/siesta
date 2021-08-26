@@ -10,6 +10,7 @@ import { ArbitraryObject, cloneObject, objectEntriesDeep, prototypeValue } from 
 import { isAbsolute, joinUrls, stripDirname, stripTrailingSlash } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
+import { IsolationLevel } from "../common/IsolationLevel.js"
 import { LUID } from "../common/LUID.js"
 import { HasOptions, option, OptionGroup } from "../option/Option.js"
 import { Test } from "./Test.js"
@@ -49,7 +50,8 @@ export class TestDescriptorPre extends Mixin(
 export class TestDescriptor extends TestDescriptorPre {
     guid            : LUID                  = undefined
 
-    type            : EnvironmentType       = 'isomorphic'
+    type            : EnvironmentType           = 'isomorphic'
+    isolation       : IsolationLevel            = 'process'
 
     childNodeT      : TestDescriptor
     parentNode      : TestDescriptor

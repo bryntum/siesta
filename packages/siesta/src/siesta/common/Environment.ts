@@ -4,7 +4,7 @@ import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { isDeno, isNodejs } from "../../util/Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export type EnvironmentType = 'browser' | 'nodejs' | 'isomorphic' | 'deno'
+export type EnvironmentType = 'isomorphic' | 'browser' | 'nodejs' | 'deno'
 
 class EnvironmentPre extends Mixin(
     [ Serializable, Base ],

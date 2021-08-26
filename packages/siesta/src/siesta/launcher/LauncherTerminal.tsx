@@ -36,18 +36,6 @@ export class LauncherDescriptorTerminal extends Mixin(
             </div>
         })
         noColor         : boolean               = false
-
-        @option({
-            type        : 'string',
-            structure   : 'enum',
-            enumeration : [ 'dark', 'light', 'universal', 'accessible' ],
-            defaultValue : () => 'universal',
-            group       : OptionsGroupOutput,
-            help        : <span>
-                The output theme.
-            </span>
-        })
-        theme           : string            = 'universal'
     }
 ) {}
 

@@ -1,6 +1,6 @@
 import playwright from "playwright"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { browserType } from "../../common/PlaywrightHelpers.js"
+import { browserType } from "../../../util_browser/PlaywrightHelpers.js"
 import { LauncherNodejs } from "../../launcher/LauncherNodejs.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { ContextPlaywright } from "../ContextPlaywright.js"

@@ -1,6 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
 import { EnvironmentType } from "../common/Environment.js"
+import { IsolationLevel } from "../common/IsolationLevel.js"
 import { option } from "../option/Option.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
@@ -13,7 +14,8 @@ import { TestDescriptor } from "./TestDescriptor.js"
  */
 
 //---------------------------------------------------------------------------------------------------------------------
-export type PreloadDescriptor = string
+export type PreloadDescriptor =
+    | string
     | { type? : 'js' | 'css', url : string }
     | { code : string | Function }
     | { style : string }
@@ -31,6 +33,7 @@ export class TestDescriptorBrowser extends Mixin(
 
     class TestDescriptorBrowser extends base {
         type                : EnvironmentType           = 'browser'
+        isolation           : IsolationLevel            = 'iframe'
 
         @option()
         preload             : PreloadDescriptor[]       = []

@@ -246,6 +246,19 @@ export class LauncherDescriptor extends Mixin(
             </span>
         })
         version         : boolean           = false
+
+
+        @option({
+            type        : 'string',
+            structure   : 'enum',
+            enumeration : [ 'dark', 'light', 'universal', 'accessible' ],
+            defaultValue : () => 'universal',
+            group       : OptionsGroupOutput,
+            help        : <span>
+                The output theme.
+            </span>
+        })
+        theme           : string            = 'universal'
     }
 ) {}
 
