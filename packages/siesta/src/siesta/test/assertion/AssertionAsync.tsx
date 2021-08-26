@@ -222,7 +222,7 @@ export class AssertionAsync extends Mixin(
 
             if (res.conditionIsMet) {
                 this.addAsyncResolution(AssertionWaitForResolution.new({
-                    creation    : creation,
+                    creationId  : creation.localId,
                     passed      : true,
                     elapsedTime : res.elapsedTime,
 
@@ -234,7 +234,7 @@ export class AssertionAsync extends Mixin(
                 return res.result
             } else {
                 this.addAsyncResolution(AssertionWaitForResolution.new({
-                    creation        : creation,
+                    creationId      : creation.localId,
                     passed          : false,
                     elapsedTime     : res.elapsedTime,
 

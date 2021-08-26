@@ -144,16 +144,16 @@ export class TestReporterParent extends Mixin(
 
 
         @local()
-        async onAssertionFinish (rootTestId : LUID, testNodeId : LUID, assertion : AssertionAsyncResolution) {
+        async onAssertionFinish (rootTestId : LUID, testNodeId : LUID, resolution : AssertionAsyncResolution) {
             if (!this.currentTestNodeResult || this.currentTestNodeResult.localId !== testNodeId) {
                 throw new Error("Parent node id mismatch for asynchronous test result finalization")
             }
 
-            this.currentTestNodeResult.addAsyncResolution(assertion)
+            this.currentTestNodeResult.addAsyncResolution(resolution)
 
-            this.reporter.onAssertionFinish(this.currentTestNodeResult, assertion)
+            this.reporter.onAssertionFinish(this.currentTestNodeResult, resolution)
 
-            if (this.connector) this.connector.onAssertionFinish(rootTestId, testNodeId, assertion)
+            if (this.connector) this.connector.onAssertionFinish(rootTestId, testNodeId, resolution)
         }
     }
 ) {}

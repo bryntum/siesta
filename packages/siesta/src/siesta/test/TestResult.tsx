@@ -16,7 +16,7 @@ import { LogLevel } from "../../logger/Logger.js"
 import { exclude, serializable, Serializable } from "../../serializable/Serializable.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { escapeRegExp } from "../../util/Helpers.js"
-import { luid } from "../common/LUID.js"
+import { LUID, luid } from "../common/LUID.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -139,7 +139,6 @@ export class AssertionAsyncCreation extends Mixin(
         }
 
         // the `resolution` property effectively made reactive _and_ serializable
-        // @ts-ignore
         get resolution () : AssertionAsyncResolution | null {
             return this.resolutionBox.read()
         }
@@ -177,7 +176,7 @@ export class AssertionAsyncResolution extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class AssertionAsyncResolution extends base {
-        creation        : AssertionAsyncCreation    = undefined
+        creationId      : LUID                      = undefined
 
         passed          : boolean                   = true
 
@@ -218,6 +217,8 @@ export class TestNodeResult extends Mixin(
         parentNode      : TestNodeResult    = undefined
 
         resultLog       : TestResult[]      = []
+
+        asyncAssertionsMapping  : Map<LUID, AssertionAsyncCreation>     = new Map()
 
 
         get url () : string {
@@ -281,6 +282,8 @@ export class TestNodeResult extends Mixin(
             // clear the `$childNodes` cache
             if (result instanceof TestNodeResult) this.resetChildNodesCache()
 
+            if (result instanceof AssertionAsyncCreation) this.asyncAssertionsMapping.set(result.localId, result)
+
             this.$passed    = undefined
 
             this.doAddResult(result)
@@ -297,7 +300,9 @@ export class TestNodeResult extends Mixin(
         addAsyncResolution (resolution : AssertionAsyncResolution) : AssertionAsyncResolution {
             if (this.frozen) throw new Error("Adding async resolution after test finalization")
 
-            resolution.creation.resolution = resolution
+            const creation      = this.asyncAssertionsMapping.get(resolution.creationId)
+
+            creation.resolution = resolution
 
             return resolution
         }
@@ -357,9 +362,7 @@ export class TestNodeResult extends Mixin(
         get childNodes () : TestNodeResult[] {
             if (this.$childNodes !== undefined) return this.$childNodes
 
-            return this.$childNodes = (this.resultLog as TestNodeResult[]).filter(result => {
-                return result instanceof TestNodeResult
-            })
+            return this.$childNodes = (this.resultLog as TestNodeResult[]).filter(result => result instanceof TestNodeResult)
         }
 
 
