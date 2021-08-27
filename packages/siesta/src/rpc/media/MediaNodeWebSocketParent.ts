@@ -16,6 +16,13 @@ export class MediaNodeWebSocketParent extends Mixin(
 
         async doConnect () : Promise<void> {
             this.socket.addEventListener('message', this.messageListener = (message : ws.MessageEvent) => this.receiveMessage(message.data))
+
+            this.socket.addEventListener('close', event => this.onSocketClose(event))
+        }
+
+
+        onSocketClose (event : { wasClean : boolean; code : number; reason : string; target : ws }) {
+            this.port.disconnect()
         }
 
 
