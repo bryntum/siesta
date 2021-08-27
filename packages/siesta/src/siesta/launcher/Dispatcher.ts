@@ -276,9 +276,9 @@ export class Dispatcher extends Mixin(
 
             const launchInfo        = this.resultsMappingById.get(item.guid)
 
-            this.setDashboardLaunchState(item, 'started')
-
             const context           = /*launchInfo.context =*/ await this.chooseContextProviderFor(normalized).createContext(normalized)
+
+            this.setDashboardLaunchState(item, 'started')
 
             let preLaunchRes : boolean
 

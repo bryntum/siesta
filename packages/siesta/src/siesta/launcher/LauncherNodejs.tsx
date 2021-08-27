@@ -220,6 +220,8 @@ export class LauncherNodejs extends Mixin(
 
             wsServer.onConnectionHook.on(async (self, socket) => {
                 if (connectedPort) {
+                    await this.dispatcher.cleanupQueue.clearAll()
+
                     await connectedPort.disconnect()
                     connectedPort       = undefined
                 }

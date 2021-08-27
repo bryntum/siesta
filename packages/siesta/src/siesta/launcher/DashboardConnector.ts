@@ -116,7 +116,8 @@ export class DashboardConnectorClient extends Mixin(
 
         iframeContextProvider       : ContextProviderBrowserIframe  = ContextProviderBrowserIframe.new()
 
-        iframeContexts              : Map<LUID, ContextBrowserIframe>   = new Map()
+        iframeContexts              : Map<LUID, [ LUID, ContextBrowserIframe ]>     = new Map()
+        iframeContextsByDescId      : Map<LUID, ContextBrowserIframe>               = new Map()
 
 
         // region DashboardConnectorInterface
@@ -134,6 +135,12 @@ export class DashboardConnectorClient extends Mixin(
             const launchInfo        = this.dashboard.mapping.get(rootTestId)
 
             launchInfo.launchState  = launchState
+
+            if (launchState === 'started') {
+                const context          = this.iframeContextsByDescId.get(launchInfo.descriptor.guid)
+
+                if (context) launchInfo.context = context
+            }
         }
 
 
@@ -153,7 +160,8 @@ export class DashboardConnectorClient extends Mixin(
         async createIframeContext (desc : TestDescriptor) : Promise<LUID> {
             const context       = await this.iframeContextProvider.createContext(desc)
 
-            this.iframeContexts.set(context.id, context)
+            this.iframeContexts.set(context.id, [ desc.guid, context ])
+            this.iframeContextsByDescId.set(desc.guid, context)
 
             return context.id
         }
@@ -165,23 +173,27 @@ export class DashboardConnectorClient extends Mixin(
         )
             : Promise<UnwrapPromise<R>>
         {
-            const context       = this.iframeContexts.get(contextId)
+            const data       = this.iframeContexts.get(contextId)
 
-            if (!context) throw new Error(`No context with id ${ contextId } available`)
+            if (!data) throw new Error(`No context with id ${ contextId } available`)
 
-            return context.evaluateBasic(func, ...args)
+            return data[ 1 ].evaluateBasic(func, ...args)
         }
 
 
         @local()
         async iframeContextDestroy (contextId : LUID) {
-            const context       = this.iframeContexts.get(contextId)
+            const data       = this.iframeContexts.get(contextId)
 
-            if (!context) throw new Error(`No context with id ${ contextId } available`)
+            if (!data) throw new Error(`No context with id ${ contextId } available`)
 
-            await context.destroy()
+            await data[ 1 ].destroy()
 
             this.iframeContexts.delete(contextId)
+            this.iframeContexts.delete(data[ 0 ])
+
+            const launchInfo        = this.dashboard.mapping.get(data[ 0 ])
+            launchInfo.context      = undefined
         }
 
 

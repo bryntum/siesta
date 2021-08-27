@@ -109,18 +109,18 @@ export class LaunchInfoComponent extends Mixin(
                                     mode            = "horizontal"
                                     style           = "width: 8px"
                                     companionsFunc  = {
-                                        el => launchInfo.context
+                                        el => launchInfo?.context?.wrapper
                                             ? [ el.previousElementSibling, el.nextElementSibling, launchInfo.context.wrapper ] as HTMLElement[]
                                             : [ el.previousElementSibling, el.nextElementSibling ] as HTMLElement[]
                                     }
                                     sizeBox         = { this.domContainerWidthBox }
                                 ></Splitter>
                                 <div
-                                    class={ () => `is-flex ${ launchInfo.context ? 'is-align-items-stretch' : 'is-justify-content-center is-align-items-center' }` }
+                                    class={ () => `is-flex ${ launchInfo?.context?.wrapper ? 'is-align-items-stretch' : 'is-justify-content-center is-align-items-center' }` }
                                     style:width={ () => this.domContainerWidthBox.read() + 'px' }
                                 >
                                     {
-                                        launchInfo.context
+                                        launchInfo?.context?.wrapper
                                             ?
                                                 <Translator
                                                     targetElement   = { launchInfo.context.wrapper }
