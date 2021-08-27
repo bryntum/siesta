@@ -93,6 +93,17 @@ class CleanupQueue extends Base {
 
         return slot
     }
+
+
+    async clearAll () {
+        const slots         = Array.from(this.slots.values())
+
+        this.slots.clear()
+        this.order.length   = 0
+
+        // this swallows the exceptions
+        await Promise.allSettled(slots.map(slot => slot.dispose()))
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------------------

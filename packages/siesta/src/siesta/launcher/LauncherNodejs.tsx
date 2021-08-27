@@ -179,9 +179,15 @@ export class LauncherNodejs extends Mixin(
 
             const isBrowserProject  = this.getEnvironmentByUrl(this.project) === 'browser'
 
+            if (isBrowserProject && this.keepNLastResults === 0) {
+                this.keepNLastResults   = 5
+            }
+
             let connectedPort : DashboardConnectorServer   = undefined
 
             page.on('close', async () => {
+                await this.dispatcher.cleanupQueue.clearAll()
+
                 await Promise.all([
                     browser.close(),
                     webServer.stop(),
