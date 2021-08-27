@@ -38,6 +38,9 @@ export class ContextBrowserIframe extends Mixin(
         async destroy () {
             this.wrapper.remove()
 
+            this.wrapper        = undefined
+            this.iframe         = undefined
+
             await super.destroy()
         }
 
