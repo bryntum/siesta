@@ -10,7 +10,6 @@ export class ContextProviderSameContext extends Mixin(
     (base : ClassUnion<typeof ContextProvider>) =>
 
     class ContextProviderSameContext extends base {
-        local                   : boolean           = true
         supportsBrowser         : boolean           = true
         supportsNodejs          : boolean           = true
 

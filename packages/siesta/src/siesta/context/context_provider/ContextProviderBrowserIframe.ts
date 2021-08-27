@@ -10,7 +10,6 @@ export class ContextProviderBrowserIframe extends Mixin(
     (base : ClassUnion<typeof ContextProvider>) =>
 
     class ContextProviderBrowserIframe extends base {
-        local                   : boolean           = true
 
         contextClass            : typeof ContextBrowserIframe    = ContextBrowserIframe
 

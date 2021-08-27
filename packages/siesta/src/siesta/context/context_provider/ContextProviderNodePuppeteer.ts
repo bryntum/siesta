@@ -13,7 +13,6 @@ export class ContextProviderNodePuppeteer extends Mixin(
     (base : ClassUnion<typeof ContextProviderTargetBrowser>) =>
 
     class ContextProviderNodePuppeteer extends base {
-        local                   : boolean           = true
         supportsBrowser         : boolean           = true
         supportsNodejs          : boolean           = false
 

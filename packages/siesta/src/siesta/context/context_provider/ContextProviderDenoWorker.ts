@@ -10,8 +10,6 @@ export class ContextProviderDenoWorker extends Mixin(
     (base : ClassUnion<typeof ContextProvider>) =>
 
     class ContextProviderDenoWorker extends base {
-        local                   : boolean           = true
-
         supportsDeno            : boolean           = true
 
         contextClass            : typeof ContextDenoWorker    = ContextDenoWorker

@@ -13,7 +13,6 @@ export class ContextProviderNodePlaywright extends Mixin(
     (base : ClassUnion<typeof ContextProviderTargetBrowser>) =>
 
     class ContextProviderNodePlaywright extends base {
-        local                   : boolean           = true
         supportsBrowser         : boolean           = true
         supportsNodejs          : boolean           = false
 

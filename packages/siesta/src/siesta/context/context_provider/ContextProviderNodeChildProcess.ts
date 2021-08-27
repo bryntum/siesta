@@ -11,7 +11,6 @@ export class ContextProviderNodeChildProcess extends Mixin(
     (base : ClassUnion<typeof ContextProvider>) =>
 
     class ContextProviderNodeChildProcess extends base {
-        local                   : boolean           = true
         supportsBrowser         : boolean           = false
         supportsNodejs          : boolean           = true
 
