@@ -35,6 +35,9 @@ export interface DashboardConnectorInterface {
     // iframeContextNavigate (contextId : LUID, url : string) : Promise<any>
 
     iframeContextDestroy (contextId : LUID) : Promise<any>
+
+    // // not used
+    // iframeContextDestroyAll () : Promise<any>
 }
 
 
@@ -53,13 +56,21 @@ export class DashboardConnectorServer extends Mixin(
 
         @local()
         async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) {
-            this.launcher.launchContinuously(projectPlanItemsToLaunch)
+            this.launcher.launchContinuously(
+                projectPlanItemsToLaunch
+                    // TODO remove after scoped serialization will be back
+                    .map(desc => this.launcher.dispatcher.resultsMappingById.get(desc.guid).descriptor)
+            )
         }
 
 
         @local()
         async launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
-            this.launcher.launchContinuouslyWithCheckInfo(desc, checkInfo)
+            this.launcher.launchContinuouslyWithCheckInfo(
+                // TODO remove after scoped serialization will be back
+                [ desc ].map(desc => this.launcher.dispatcher.resultsMappingById.get(desc.guid).descriptor)[ 0 ],
+                checkInfo
+            )
         }
 
 
@@ -87,6 +98,10 @@ export class DashboardConnectorServer extends Mixin(
 
         @remote()
         iframeContextDestroy : (contextId : LUID) => Promise<any>
+
+
+        // @remote()
+        // iframeContextDestroyAll : () => Promise<any>
     }
 ) {}
 
@@ -168,6 +183,14 @@ export class DashboardConnectorClient extends Mixin(
 
             this.iframeContexts.delete(contextId)
         }
+
+
+        // @local()
+        // async iframeContextDestroyAll () {
+        //     await Promise.all(Array.from(this.iframeContexts.values()).map(context => context.destroy()))
+        //
+        //     this.iframeContexts.clear()
+        // }
 
 
         // @local()
