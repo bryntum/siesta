@@ -19,21 +19,19 @@ export class SimulatorPlaywrightServer extends Mixin(
 
         @local()
         async mouseUp (options? : Partial<PointerUpDownOptions>) : Promise<any> {
-            this.page.mouse.up(options)
+            await this.page.mouse.up(options)
         }
 
 
         @local()
         async mouseDown (options? : Partial<PointerUpDownOptions>) : Promise<any> {
-            this.page.mouse.down(options)
+            await this.page.mouse.down(options)
         }
 
 
         @local()
         async mouseMove (target : Point, options? : PointerMoveOptions) : Promise<any> {
-            console.log("MOUSE MOVE", target)
-
-            this.page.mouse.move(target[ 0 ], target[ 1 ], { steps : 10 })
+            await this.page.mouse.move(target[ 0 ], target[ 1 ], { steps : 10 })
         }
     }
 ) {}

@@ -17,7 +17,6 @@ export type MouseActionOptions      = {
 
 //---------------------------------------------------------------------------------------------------------------------
 export interface UserAgent {
-
     click (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
 
     rightClick (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>

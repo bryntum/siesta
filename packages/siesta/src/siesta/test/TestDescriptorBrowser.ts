@@ -1,7 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
 import { EnvironmentType } from "../common/Environment.js"
-import { IsolationLevel } from "../common/IsolationLevel.js"
+import { IsolationLevel, SimulationType } from "../common/IsolationLevel.js"
 import { option } from "../option/Option.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
@@ -33,6 +33,11 @@ export class TestDescriptorBrowser extends Mixin(
 
     class TestDescriptorBrowser extends base {
         type                : EnvironmentType           = 'browser'
+
+        @option()
+        simulation          : SimulationType            = 'native'
+
+        @option()
         isolation           : IsolationLevel            = 'iframe'
 
         @option()
