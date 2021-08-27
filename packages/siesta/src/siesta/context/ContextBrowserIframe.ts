@@ -2,6 +2,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaBrowserMessagePortParent } from "../../rpc/media/MediaBrowserMessagePort.js"
 import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
+import { luid, LUID } from "../common/LUID.js"
 import { Context, seedChildPort } from "./Context.js"
 
 
@@ -11,6 +12,7 @@ export class ContextBrowserIframe extends Mixin(
     (base : ClassUnion<typeof Context>) =>
 
     class ContextBrowserIframe extends base {
+        id                              : LUID                  = luid()
 
         iframe                          : HTMLIFrameElement     = undefined
         wrapper                         : HTMLDivElement        = undefined

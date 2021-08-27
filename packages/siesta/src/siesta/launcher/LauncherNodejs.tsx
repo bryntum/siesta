@@ -14,10 +14,12 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { MediaNodeWebSocketParent } from "../../rpc/media/MediaNodeWebSocketParent.js"
 import { ServerNodeWebSocket } from "../../rpc/server/ServerNodeWebSocket.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
+import { delay } from "../../util/TimeHelpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { browserType } from "../../util_browser/PlaywrightHelpers.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
+import { ContextProviderDashboardIframe } from "../context/context_provider/ContextProviderDashboardIframe.js"
 import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
 import { ContextProviderNodePlaywright } from "../context/context_provider/ContextProviderNodePlaywright.js"
 import { ContextProviderNodePuppeteer } from "../context/context_provider/ContextProviderNodePuppeteer.js"
@@ -51,7 +53,10 @@ export class LauncherNodejs extends Mixin(
 
 
         contextProviderConstructors : (typeof ContextProvider)[]    = [
-            ContextProviderNodePlaywright, ContextProviderNodePuppeteer, ContextProviderNodeChildProcess
+            ContextProviderNodePlaywright,
+            ContextProviderDashboardIframe,
+            ContextProviderNodePuppeteer,
+            ContextProviderNodeChildProcess,
         ]
 
 
@@ -161,7 +166,7 @@ export class LauncherNodejs extends Mixin(
         async launchDashboardUI () {
             this.reporter.disabled  = true
 
-            const launchOptions : LaunchOptions  = { headless : false }
+            const launchOptions : LaunchOptions  = { headless : false, devtools : true }
 
             if (this.browser === 'chrome') {
                 launchOptions.args        = [ '--start-maximized', '--allow-file-access-from-files', '--disable-web-security' ]

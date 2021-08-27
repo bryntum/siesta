@@ -2,7 +2,10 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { local, remote } from "../../rpc/port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
+import { UnwrapPromise } from "../../util/Helpers.js"
 import { LUID } from "../common/LUID.js"
+import { ContextProviderBrowserIframe } from "../context/context_provider/ContextProviderBrowserIframe.js"
+import { ContextBrowserIframe } from "../context/ContextBrowserIframe.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { TestReporter, TestReporterChild, TestReporterParent } from "../test/port/TestReporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
@@ -24,6 +27,20 @@ export interface DashboardConnectorInterface {
     launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) : Promise<any>
 
     fetchSources (url : string) : Promise<string[]>
+
+    createIframeContext (
+        desc            : TestDescriptor,
+        // portModuleUrl   : string, portClassSymbol : string,
+        // mediaModuleUrl  : string, mediaClassSymbol : string,
+        // portConfig      : object,
+        // mediaConfig     : object,
+    ) : Promise<LUID>
+
+    iframeContextEvaluateBasic <A extends unknown[], R extends unknown> (contextId : LUID, func : (...args : A) => R, ...args : A) : Promise<UnwrapPromise<R>>
+
+    // iframeContextNavigate (contextId : LUID, url : string) : Promise<any>
+
+    iframeContextDestroy (contextId : LUID) : Promise<any>
 }
 
 
@@ -60,6 +77,28 @@ export class DashboardConnectorServer extends Mixin(
 
         @remote()
         setLaunchState : (rootTestId : LUID, launchState : LaunchState) => Promise<any>
+
+
+        @remote()
+        createIframeContext : (
+            desc            : TestDescriptor,
+            // portModuleUrl   : string, portClassSymbol : string,
+            // mediaModuleUrl  : string, mediaClassSymbol : string,
+            // portConfig      : object,
+            // mediaConfig     : object,
+        ) => Promise<LUID>
+
+
+        @remote()
+        iframeContextEvaluateBasic : <A extends unknown[], R extends unknown>(contextId : LUID, func : (...args : A) => R, ...args : A) => Promise<UnwrapPromise<R>>
+
+
+        // @remote()
+        // iframeContextNavigate : (contextId : LUID, url : string) => Promise<any>
+
+
+        @remote()
+        iframeContextDestroy : (contextId : LUID) => Promise<any>
     }
 ) {}
 
@@ -70,7 +109,12 @@ export class DashboardConnectorClient extends Mixin(
     (base : ClassUnion<typeof PortHandshakeChild, typeof Base>) =>
 
     class DashboardConnectorClient extends base implements DashboardConnectorInterface, TestReporter {
-        dashboard           : Dashboard         = undefined
+        dashboard                   : Dashboard         = undefined
+
+        iframeContextProvider       : ContextProviderBrowserIframe  = ContextProviderBrowserIframe.new()
+
+        iframeContexts              : Map<LUID, ContextBrowserIframe>   = new Map()
+
 
         // region DashboardConnectorInterface
         @local()
@@ -101,6 +145,56 @@ export class DashboardConnectorClient extends Mixin(
         @remote()
         fetchSources : (url : string) => Promise<string[]>
         // endregion
+
+        @local()
+        async createIframeContext (
+            desc            : TestDescriptor,
+            // portModuleUrl   : string, portClassSymbol : string,
+            // mediaModuleUrl  : string, mediaClassSymbol : string,
+            // portConfig      : object,
+            // mediaConfig     : object,
+        )
+            : Promise<LUID>
+        {
+            const context       = await this.iframeContextProvider.createContext(desc)
+
+            // context.relativeChildMediaClassSymbol   = 'MediaBrowserWebSocketChild'
+            // context.relativeChildMediaModuleUrl     = 'src/rpc/media/MediaBrowserWebSocketChild.js'
+
+            this.iframeContexts.set(context.id, context)
+
+            return context.id
+        }
+
+
+        @local()
+        iframeContextEvaluateBasic <A extends unknown[], R extends unknown> (
+            contextId : LUID, func : (...args : A) => R, ...args : A
+        )
+            : Promise<UnwrapPromise<R>>
+        {
+            const context       = this.iframeContexts.get(contextId)
+
+            if (!context) throw new Error(`No context with id ${ contextId } available`)
+
+            return context.evaluateBasic(func, ...args)
+        }
+
+
+        @local()
+        async iframeContextDestroy (contextId : LUID) {
+            const context       = this.iframeContexts.get(contextId)
+
+            if (!context) throw new Error(`No context with id ${ contextId } available`)
+
+            await context.destroy()
+        }
+
+
+        // @local()
+        // async iframeContextNavigate (contextId : LUID, url : string) {
+        //
+        // }
 
 
         // region TestReporter

@@ -245,6 +245,15 @@ export class Dispatcher extends Mixin(
         }
 
 
+        chooseContextProviderFor (desc : TestDescriptor) : ContextProvider {
+            if (desc.type === 'browser' && (desc.isolation === 'iframe' || desc.isolation === 'context')) {
+                return this.contextProviders[ 1 ]
+            } else {
+                return this.contextProviders[ 0 ]
+            }
+        }
+
+
         async launchProjectPlanItem (item : TestDescriptor, checkInfo : SubTestCheckInfo = undefined) {
             const slot              = await this.cleanupQueue.reserveCleanupSlot(item)
 
@@ -258,7 +267,7 @@ export class Dispatcher extends Mixin(
 
             this.setDashboardLaunchState(item, 'started')
 
-            const context           = /*launchInfo.context =*/ await this.contextProviders[ 0 ].createContext(normalized)
+            const context           = /*launchInfo.context =*/ await this.chooseContextProviderFor(normalized).createContext(normalized)
 
             let preLaunchRes : boolean
 
@@ -310,9 +319,9 @@ export class Dispatcher extends Mixin(
                 this.logger.debug("Channel ready for: ", normalized.url)
 
                 await testLauncher.launchTest(stringifiedDesc, checkInfo)
-
-                this.setDashboardLaunchState(item, 'completed')
             } finally {
+                this.setDashboardLaunchState(item, 'completed')
+
                 await slot.setTask(async () => {
                     // launchInfo.context  = null
                     await testLauncher.disconnect()

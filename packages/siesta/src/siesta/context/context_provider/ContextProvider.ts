@@ -2,6 +2,7 @@ import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { Hook } from "../../../hook/Hook.js"
 import { CI } from "../../../iterator/Iterator.js"
+import { IsolationLevel } from "../../common/IsolationLevel.js"
 import { Launcher } from "../../launcher/Launcher.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { Context } from "../Context.js"
@@ -16,6 +17,8 @@ export class ContextProvider extends Mixin(
         supportsBrowser         : boolean           = false
         supportsNodejs          : boolean           = false
         supportsDeno            : boolean           = false
+
+        supportsIsolation       : Set<IsolationLevel>   = new Set()
 
         launcher                : Launcher          = undefined
 
