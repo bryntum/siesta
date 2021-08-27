@@ -8,13 +8,12 @@ import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { isDeno, isNodejs } from "../../util/Helpers.js"
 import { stripBasename } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
-import { EnvironmentType } from "../common/Environment.js"
 import { Context } from "../context/Context.js"
 import { option } from "../option/Option.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ProjectTerminal } from "../project/ProjectTerminal.js"
 import { LogMessage } from "../test/TestResult.js"
-import { ExitCodes, Launcher, LauncherError, OptionsGroupOutput } from "./Launcher.js"
+import { ExitCodes, Launcher, LauncherDescriptor, LauncherError, OptionsGroupOutput } from "./Launcher.js"
 import { extractProjectInfo } from "./ProjectExtractor.js"
 
 // generic sever-side, cross Node/Deno functionality
@@ -22,8 +21,8 @@ import { extractProjectInfo } from "./ProjectExtractor.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export class LauncherDescriptorTerminal extends Mixin(
-    [ Launcher ],
-    (base : ClassUnion<typeof Launcher>) =>
+    [ LauncherDescriptor ],
+    (base : ClassUnion<typeof LauncherDescriptor>) =>
 
     class LauncherDescriptorTerminal extends base {
         @option({
