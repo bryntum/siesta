@@ -176,8 +176,6 @@ export class LauncherDescriptor extends Mixin(
         })
         include         : string[]          = []
 
-        includeMatches  : IMinimatch[]      = []
-
         @option({
             group       : OptionsGroupFiltering,
             type        : 'string',
@@ -194,8 +192,6 @@ export class LauncherDescriptor extends Mixin(
             </div>
         })
         exclude         : string[]          = []
-
-        excludeMatches  : IMinimatch[]      = []
 
         @option({
             type        : 'string',
@@ -285,6 +281,10 @@ export class Launcher extends Mixin(
         testDescriptorClass     : typeof TestDescriptor     = TestDescriptor
 
         reporterClass           : typeof Reporter           = undefined
+
+        //------------------
+        includeMatches          : IMinimatch[]              = []
+        excludeMatches          : IMinimatch[]              = []
 
         //------------------
         dispatcher              : Dispatcher                = undefined
