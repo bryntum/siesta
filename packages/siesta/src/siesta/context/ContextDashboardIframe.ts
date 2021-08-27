@@ -40,7 +40,7 @@ export class ContextDashboardIframe extends Mixin(
         async destroy () {
             const connector             = this.provider.launcher.dashboardConnector
 
-            await connector.iframeContextDestroy(this.contextId)
+            await Promise.all([ this.stopWebSocketServer(), connector.iframeContextDestroy(this.contextId) ])
 
             await super.destroy()
         }
