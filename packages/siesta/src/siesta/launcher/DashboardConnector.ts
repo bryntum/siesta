@@ -28,13 +28,7 @@ export interface DashboardConnectorInterface {
 
     fetchSources (url : string) : Promise<string[]>
 
-    createIframeContext (
-        desc            : TestDescriptor,
-        // portModuleUrl   : string, portClassSymbol : string,
-        // mediaModuleUrl  : string, mediaClassSymbol : string,
-        // portConfig      : object,
-        // mediaConfig     : object,
-    ) : Promise<LUID>
+    createIframeContext (desc : TestDescriptor) : Promise<LUID>
 
     iframeContextEvaluateBasic <A extends unknown[], R extends unknown> (contextId : LUID, func : (...args : A) => R, ...args : A) : Promise<UnwrapPromise<R>>
 
@@ -80,13 +74,7 @@ export class DashboardConnectorServer extends Mixin(
 
 
         @remote()
-        createIframeContext : (
-            desc            : TestDescriptor,
-            // portModuleUrl   : string, portClassSymbol : string,
-            // mediaModuleUrl  : string, mediaClassSymbol : string,
-            // portConfig      : object,
-            // mediaConfig     : object,
-        ) => Promise<LUID>
+        createIframeContext : (desc : TestDescriptor) => Promise<LUID>
 
 
         @remote()
@@ -147,15 +135,7 @@ export class DashboardConnectorClient extends Mixin(
         // endregion
 
         @local()
-        async createIframeContext (
-            desc            : TestDescriptor,
-            // portModuleUrl   : string, portClassSymbol : string,
-            // mediaModuleUrl  : string, mediaClassSymbol : string,
-            // portConfig      : object,
-            // mediaConfig     : object,
-        )
-            : Promise<LUID>
-        {
+        async createIframeContext (desc : TestDescriptor) : Promise<LUID> {
             const context       = await this.iframeContextProvider.createContext(desc)
 
             // context.relativeChildMediaClassSymbol   = 'MediaBrowserWebSocketChild'
