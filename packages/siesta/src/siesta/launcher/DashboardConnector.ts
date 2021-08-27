@@ -138,9 +138,6 @@ export class DashboardConnectorClient extends Mixin(
         async createIframeContext (desc : TestDescriptor) : Promise<LUID> {
             const context       = await this.iframeContextProvider.createContext(desc)
 
-            // context.relativeChildMediaClassSymbol   = 'MediaBrowserWebSocketChild'
-            // context.relativeChildMediaModuleUrl     = 'src/rpc/media/MediaBrowserWebSocketChild.js'
-
             this.iframeContexts.set(context.id, context)
 
             return context.id
@@ -168,6 +165,8 @@ export class DashboardConnectorClient extends Mixin(
             if (!context) throw new Error(`No context with id ${ contextId } available`)
 
             await context.destroy()
+
+            this.iframeContexts.delete(contextId)
         }
 
 
