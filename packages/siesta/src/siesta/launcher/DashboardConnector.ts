@@ -136,10 +136,15 @@ export class DashboardConnectorClient extends Mixin(
 
             launchInfo.launchState  = launchState
 
-            if (launchState === 'started') {
-                const context          = this.iframeContextsByDescId.get(launchInfo.descriptor.guid)
+            const context           = this.iframeContextsByDescId.get(launchInfo.descriptor.guid)
 
-                if (context) launchInfo.context = context
+            if (launchState === 'started') {
+                if (context) this.dashboard.overlay.context = context
+            }
+            else if (launchState === 'completed') {
+                this.dashboard.overlay.context      = null
+
+                if (context) launchInfo.context  = context
             }
         }
 

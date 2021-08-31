@@ -1,6 +1,7 @@
 import { AnyFunction } from "typescript-mixin-class/src/class/Mixin.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { importer } from "../../importer/Importer.js"
 import { Logger } from "../../logger/Logger.js"
 import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
 import { stringify } from "../../serializable/Serializable.js"
@@ -9,6 +10,7 @@ import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestLauncherChild, TestLauncherParent } from "../test/port/TestLauncher.js"
+import { TestLauncherBrowserParent } from "../test/port/TestLauncherBrowser.js"
 import { Test } from "../test/Test.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
@@ -19,6 +21,18 @@ import { LaunchState } from "../ui/TestLaunchInfo.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 import { Queue } from "./Queue.js"
 import { TestLaunchResult } from "./TestLaunchResult.js"
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export type LauncherConnectorClassLocator = {
+    server : {
+        launcherConnectorClass : typeof TestLauncherParent
+    }
+    client : {
+        importerUrl         : string
+        symbol              : string
+    }
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -322,10 +336,12 @@ export class Dispatcher extends Mixin(
                 return
             }
 
-            const testLauncher      = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter, launchInfo })
+            const { server, client } = this.getLauncherConnectorInfo(item)
+
+            const testLauncher      = server.launcherConnectorClass.new({ launcher : this.launcher, logger : this.logger, reporter : this.reporter, launchInfo })
 
             try {
-                await context.setupChannel(testLauncher, 'src/siesta/test/port/TestLauncher.js', 'TestLauncherChild')
+                await context.setupChannel(testLauncher, client.importerUrl, client.symbol)
 
                 this.logger.debug("Channel ready for: ", normalized.url)
 
@@ -339,6 +355,25 @@ export class Dispatcher extends Mixin(
                     await context.destroy()
                 })
             }
+        }
+
+
+        getLauncherConnectorInfo (desc : TestDescriptor) : LauncherConnectorClassLocator {
+            return desc.type === 'browser'
+                ? {
+                    server  : { launcherConnectorClass : TestLauncherBrowserParent },
+                    client  : {
+                        importerUrl     : 'src/siesta/test/port/TestLauncherBrowser.js',
+                        symbol          : 'TestLauncherBrowserChild'
+                    }
+                }
+                : {
+                    server  : { launcherConnectorClass : TestLauncherParent },
+                    client  : {
+                        importerUrl     : 'src/siesta/test/port/TestLauncher.js',
+                        symbol          : 'TestLauncherChild'
+                    }
+                }
         }
 
 
@@ -361,8 +396,10 @@ export class Dispatcher extends Mixin(
 
             this.beforeTestLaunch(descriptor)
 
-            const testLauncher          = TestLauncherParent.new({ logger : this.logger, reporter : this.reporter, launchInfo })
-            const testLauncherChild     = TestLauncherChild.new()
+            const { server, client }    = this.getLauncherConnectorInfo(descriptor)
+
+            const testLauncher          = server.launcherConnectorClass.new({ launcher : this.launcher, logger : this.logger, reporter : this.reporter, launchInfo })
+            const testLauncherChild : TestLauncherChild = (await importer.getImporter(client.importerUrl)())[ client.symbol ].new()
 
             const parentMedia           = new MediaSameContext()
             const childMedia            = new MediaSameContext()
@@ -377,7 +414,7 @@ export class Dispatcher extends Mixin(
             await testLauncher.connect()
 
             //---------------------
-            topTest.reporter            = testLauncherChild
+            topTest.connector            = testLauncherChild
 
             await topTest.start()
 

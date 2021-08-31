@@ -1,5 +1,5 @@
 import { Base } from "../../class/Base.js"
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext, ExecutionContextAttachable } from "../../context/ExecutionContext.js"
 import { Hook } from "../../hook/Hook.js"
 import { XmlNode } from "../../jsx/XmlElement.js"
@@ -91,7 +91,7 @@ export class Test extends TestPre {
 
     pendingSubTests     : Test[]                = []
 
-    reporter            : TestReporterChild     = undefined
+    connector           : TestLauncherChild     = undefined
 
     beforeEachHooks     : ((t : this) => any)[] = []
     afterEachHooks      : ((t : this) => any)[] = []
@@ -230,7 +230,7 @@ export class Test extends TestPre {
 
         super.addResult(result)
 
-        if (!(result instanceof TestNodeResult)) this.reporter.onResult(this.rootTest.descriptor.guid, this.localId, result)
+        if (!(result instanceof TestNodeResult)) this.connector.onResult(this.rootTest.descriptor.guid, this.localId, result)
 
         return result
     }
@@ -239,7 +239,7 @@ export class Test extends TestPre {
     addAsyncResolution (resolution : AssertionAsyncResolution) : AssertionAsyncResolution {
         super.addAsyncResolution(resolution)
 
-        this.reporter.onAssertionFinish(this.rootTest.descriptor.guid, this.localId, resolution)
+        this.connector.onAssertionFinish(this.rootTest.descriptor.guid, this.localId, resolution)
 
         return resolution
     }
@@ -371,7 +371,7 @@ export class Test extends TestPre {
 
         const cls       = this.constructor as typeof Test
 
-        const test      = cls.new({ descriptor : flatten, code, parentNode : this, reporter : this.reporter })
+        const test      = cls.new({ descriptor : flatten, code, parentNode : this, connector : this.connector })
 
         this.pendingSubTests.push(test)
 
@@ -409,7 +409,7 @@ export class Test extends TestPre {
 
         globalTestEnv.currentTest       = this
 
-        this.reporter.onSubTestStart(this.rootTest.descriptor.guid, this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
+        this.connector.onSubTestStart(this.rootTest.descriptor.guid, this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
         // start hook, test is marked as active in the reporter
         this.startHook.trigger(this)
@@ -429,7 +429,7 @@ export class Test extends TestPre {
         // finish hook, test is still marked as active in the reporter
         this.finishHook.trigger(this)
 
-        this.reporter.onSubTestFinish(this.rootTest.descriptor.guid, this.localId, false)
+        this.connector.onSubTestFinish(this.rootTest.descriptor.guid, this.localId, false)
 
         globalTestEnv.currentTest       = this.parentNode
 
@@ -514,7 +514,7 @@ export class Test extends TestPre {
             // supports the launching individual test file case
             // in that case the `reporter` appears already after
             // the test structure is defined
-            subTest.reporter    = this.reporter
+            subTest.connector    = this.connector
 
             if (checkInfo) {
                 const currentCheckInfo  = checkInfo.childNodes?.[ currentCheckInfoIndex ]
@@ -529,8 +529,8 @@ export class Test extends TestPre {
                     // instead it always assumes subtest is launched
                     // so we do that, with a special flag for `onSubTestFinish`
                     // this can be improved
-                    this.reporter.onSubTestStart(this.rootTest.descriptor.guid, subTest.localId, subTest.parentNode ? subTest.parentNode.localId : null, subTest.descriptor)
-                    this.reporter.onSubTestFinish(this.rootTest.descriptor.guid, subTest.localId, true)
+                    this.connector.onSubTestStart(this.rootTest.descriptor.guid, subTest.localId, subTest.parentNode ? subTest.parentNode.localId : null, subTest.descriptor)
+                    this.connector.onSubTestFinish(this.rootTest.descriptor.guid, subTest.localId, true)
                 }
             } else
                 await subTest.start()
@@ -660,11 +660,13 @@ export class Test extends TestPre {
      *
      * @return Created function. The associated spy instance is assigned to it as the `spy` property
      */
-    createSpy (spyName : string = 'James Bond') : Function & { spy : Spy } {
-        return Spy.new({
+    createSpy<T extends AnyFunction = AnyFunction> (spyName : string = 'James Bond') : T & { spy : Spy } {
+        const processor = Spy.new({
             name            : spyName,
             t               : this
         }).stub().processor
+
+        return processor as T & { spy : Spy }
     }
 
 
@@ -737,11 +739,10 @@ export class Test extends TestPre {
         if (!globalTestEnv.topTest) {
 
             if (globalTestEnv.hasPendingTest) {
+
                 // launched from the outside, by the Launcher
                 globalTestEnv.topTest   = this.new({
-                    descriptor      : parse(globalTestEnv.topTestDescriptorStr),
-                    // TS can't figure out types compatibility
-                    reporter        : globalTestEnv.launcher as TestReporterChild
+                    descriptor      : parse(globalTestEnv.topTestDescriptorStr)
                 } as Partial<InstanceType<T>>)
             } else {
                 // launched standalone, by user executing the test file
@@ -929,8 +930,6 @@ export class Test extends TestPre {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class GlobalTestEnvironment extends Base {
-    launcher                : TestLauncherChild = undefined
-
     // the test instance, representing the whole current test file
     // not directly accessible by user, but every global `it/describe` section
     // is created as child node of it
@@ -947,7 +946,6 @@ export class GlobalTestEnvironment extends Base {
 
 
     clear () {
-        this.launcher               = undefined
         this.topTest                = undefined
         this.topTestDescriptorStr   = undefined
         this.currentTest            = undefined

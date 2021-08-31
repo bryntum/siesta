@@ -1,6 +1,6 @@
 import { startDevServer } from "@web/dev-server"
 import path from "path"
-import { LaunchOptions } from "playwright/types/types.js"
+import { Page, LaunchOptions } from "playwright/index.js"
 import { fileURLToPath } from "url"
 import ws from "ws"
 import { siestaPackageRootUrl } from "../../../index.js"
@@ -67,6 +67,8 @@ export class LauncherNodejs extends Mixin(
 
         projectDescriptorClass  : typeof ProjectDescriptorNodejs    = ProjectDescriptorNodejs
         testDescriptorClass     : typeof TestDescriptorNodejs       = TestDescriptorNodejs
+
+        dashboardPage           : Page  = undefined
 
 
         getMaxLen () : number {
@@ -173,7 +175,7 @@ export class LauncherNodejs extends Mixin(
             }
 
             const browser       = await browserType(this.browser).launch(launchOptions)
-            const page          = await browser.newPage({ viewport : null })
+            const page          = this.dashboardPage = await browser.newPage({ viewport : null })
 
             let webServer : UnwrapPromise<ReturnType<typeof startDevServer>>
 

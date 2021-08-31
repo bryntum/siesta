@@ -4,6 +4,7 @@ import { TextJSX } from "../../../jsx/TextJSX.js"
 import { local, remote } from "../../../rpc/port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
 import { parse } from "../../../serializable/Serializable.js"
+import { Launcher } from "../../launcher/Launcher.js"
 import { globalTestEnv, Test } from "../Test.js"
 import { SubTestCheckInfo } from "../TestResult.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
@@ -20,6 +21,8 @@ export class TestLauncherParent extends Mixin(
     (base : ClassUnion<typeof TestReporterParent, typeof PortHandshakeParent, typeof Base>) =>
 
     class TestLauncherParent extends base implements TestLauncher {
+        launcher        : Launcher          = undefined
+
         @remote()
         launchTest : (testDescriptorStr : string, checkInfo : SubTestCheckInfo) => Promise<any>
     }
@@ -41,7 +44,7 @@ export class TestLauncherChild extends Mixin(
                 descriptor      : parse(testDescriptorStr)
             })
 
-            topTest.reporter    = this
+            topTest.connector    = this
 
             await topTest.start(checkInfo)
 

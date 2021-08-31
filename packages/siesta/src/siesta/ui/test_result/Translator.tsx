@@ -26,6 +26,7 @@ export class Translator extends Mixin(
         props : Component[ 'props' ] & {
             targetElement           : Translator[ 'targetElement' ]
             scaleMode               : Translator[ 'scaleMode' ]
+            roundValues             : Translator[ 'roundValues' ]
         }
 
         targetElement           : HTMLElement           = undefined
@@ -37,6 +38,8 @@ export class Translator extends Mixin(
         connected               : boolean               = false
 
         scrollBarSize           : { width : number, height : number }   = { width : 8, height : 8 }
+
+        roundValues             : boolean               = false
 
         @field()
         scaleMode               : Box<'none' | 'fit_full' | 'fit_width' | 'fit_height'> = undefined
@@ -192,8 +195,8 @@ export class Translator extends Mixin(
 
             const targetStyle       = this.targetElement.style
 
-            targetStyle.left        = ownRect.left + 'px'
-            targetStyle.top         = ownRect.top + 'px'
+            targetStyle.left        = (this.roundValues ? Math.round(ownRect.left) : ownRect.left) + 'px'
+            targetStyle.top         = (this.roundValues ? Math.round(ownRect.top) : ownRect.top) + 'px'
             targetStyle.height      = ownRect.height + 'px'
             targetStyle.width       = ownRect.width + 'px'
 

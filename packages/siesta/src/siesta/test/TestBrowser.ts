@@ -3,6 +3,9 @@ import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
+import { Simulator } from "../simulate/Simulator.js"
+import { UserAgentOnPage } from "../simulate/UserAgent.js"
+import { TestLauncherBrowserChild } from "./port/TestLauncherBrowser.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
 
@@ -13,11 +16,13 @@ import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
  */
 export class TestBrowser extends Mixin(
     [
+        UserAgentOnPage,
         Test
     ],
     (base : ClassUnion<
+        typeof UserAgentOnPage,
         typeof Test
-    >) => 
+    >) =>
 
     class TestBrowser extends base {
         @prototypeValue(TestDescriptorBrowser)
@@ -25,6 +30,15 @@ export class TestBrowser extends Mixin(
 
         // @prototypeValue(ExecutionContextBrowser)
         // executionContextClass   : typeof ExecutionContext
+
+        connector           : TestLauncherBrowserChild
+
+        // @ts-expect-error
+        get simulator () : Simulator {
+            return this.connector
+        }
+        set simulator (value : Simulator) {
+        }
 
 
         static async getIsomorphicTestClass () : Promise<typeof Test> {

@@ -27,6 +27,7 @@ import { Splitter } from "./components/Splitter.js"
 import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComponent.js"
 import { RippleEffectManager } from "./RippleEffectManager.js"
 import { LaunchInfoComponent } from "./test_result/LaunchInfoComponent.js"
+import { TestOverlay } from "./test_result/TestOverlay.js"
 import { TestNodeResultComponent } from "./test_result/TestResult.js"
 import { TestGroupLaunchInfo, TestLaunchInfo } from "./TestLaunchInfo.js"
 
@@ -282,6 +283,19 @@ export class Dashboard extends Mixin(
 
                 if (selected) selected.scrollIntoView({ block : 'center', inline : 'center' })
             }
+        }
+
+
+        $overlay : TestOverlay          = undefined
+
+        get overlay () : TestOverlay {
+            if (this.$overlay !== undefined) return this.$overlay
+
+            const overlay       = TestOverlay.new()
+
+            document.body.appendChild(overlay.el)
+
+            return this.$overlay = overlay
         }
 
 

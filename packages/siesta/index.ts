@@ -13,3 +13,4 @@ importer.registerImporter('src/rpc/media/MediaSameContext.js', async () => impor
 importer.registerImporter('src/rpc/media/MediaWebWorker.js', async () => import('./src/rpc/media/MediaWebWorker.js'))
 
 importer.registerImporter('src/siesta/test/port/TestLauncher.js', async () => import('./src/siesta/test/port/TestLauncher.js'))
+importer.registerImporter('src/siesta/test/port/TestLauncherBrowser.js', async () => import('./src/siesta/test/port/TestLauncherBrowser.js'))

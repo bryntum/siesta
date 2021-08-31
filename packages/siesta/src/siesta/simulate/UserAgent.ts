@@ -1,5 +1,5 @@
 import { Base } from "../../class/Base.js"
-import { AnyConstructor, Mixin } from "../../class/Mixin.js"
+import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { isArray, isFunction, isString } from "../../util/Typeguards.js"
 import { clientXtoPageX, clientYtoPageY } from "../../util_browser/Coordinates.js"
 import { Simulator } from "./Simulator.js"
@@ -36,8 +36,8 @@ export interface UserAgent {
 // user agent for Siesta's on-page tests
 
 export class UserAgentOnPage extends Mixin(
-    [ Base ],
-    (base : AnyConstructor<Base, typeof Base>) =>
+    [],
+    (base : ClassUnion) =>
 
     class UserAgentOnPage extends base implements UserAgent {
 
@@ -46,8 +46,26 @@ export class UserAgentOnPage extends Mixin(
         simulator           : Simulator     = undefined
 
 
-        resolveActionTargetElement (target : ActionTargetElement) {
+        resolveActionTarget (action : MouseActionOptions) : Point {
+            const target        = action.target
 
+            if (target instanceof Array) {
+                if (target.length === 0)
+                    return this.getCursorPagePosition()
+                else
+                    return target
+            }
+            else if (target instanceof Element) {
+
+            }
+            else {
+                target
+            }
+        }
+
+
+        resolveQuery (query : string) : NodeListOf<Element> {
+            return this.window.document.querySelectorAll(query)
         }
 
 
@@ -85,7 +103,9 @@ export class UserAgentOnPage extends Mixin(
         async click (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target, offset)
 
-            if (isArray(action.target) && action.target.length === 0) action.target = this.getCursorPagePosition()
+            const targetPoint   = this.resolveActionTarget(action)
+
+            await this.simulator.click(targetPoint, { button : action.button })
         }
 
 

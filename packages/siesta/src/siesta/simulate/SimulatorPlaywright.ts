@@ -2,7 +2,7 @@ import { Page } from "playwright"
 import { AnyConstructor, Base, ClassUnion, Mixin } from "typescript-mixin-class"
 import { local, remote } from "../../rpc/port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
-import { PointerMoveOptions, PointerUpDownOptions, Simulator } from "./Simulator.js"
+import { PointerClickOptions, PointerMoveOptions, PointerUpDownOptions, Simulator } from "./Simulator.js"
 import { MouseButton, Point } from "./Types.js"
 
 
@@ -33,6 +33,19 @@ export class SimulatorPlaywrightServer extends Mixin(
         async mouseMove (target : Point, options? : PointerMoveOptions) : Promise<any> {
             await this.page.mouse.move(target[ 0 ], target[ 1 ], { steps : 10 })
         }
+
+
+        @local()
+        async click (target : Point, options? : PointerClickOptions) : Promise<any> {
+            console.log("CLICKING", target)
+
+            await this.page.mouse.click(target[ 0 ], target[ 1 ], options)
+        }
+
+
+        @local()
+        async dblClick (target : Point, options? : PointerClickOptions) : Promise<any> {
+        }
     }
 ) {}
 
@@ -54,5 +67,11 @@ export class SimulatorPlaywrightClient extends Mixin(
 
         @remote()
         mouseMove : (target : Point, options? : PointerMoveOptions) => Promise<any>
+
+        @remote()
+        click : (target : Point, options? : PointerClickOptions) => Promise<any>
+
+        @remote()
+        dblClick : (target : Point, options? : PointerClickOptions) => Promise<any>
     }
 ) {}
