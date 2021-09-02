@@ -4,6 +4,7 @@ import { TextJSX } from "../../../jsx/TextJSX.js"
 import { local, remote } from "../../../rpc/port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
 import { parse } from "../../../serializable/Serializable.js"
+import { DashboardLaunchInfo } from "../../launcher/DashboardConnector.js"
 import { Launcher } from "../../launcher/Launcher.js"
 import { globalTestEnv, Test } from "../Test.js"
 import { SubTestCheckInfo } from "../TestResult.js"
@@ -12,7 +13,7 @@ import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 interface TestLauncher {
-    launchTest (testDescriptorStr : string, checkInfo : SubTestCheckInfo) : Promise<any>
+    launchTest (testDescriptorStr : string, checkInfo : SubTestCheckInfo, dashboardLaunchInfo : DashboardLaunchInfo) : Promise<any>
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -24,7 +25,7 @@ export class TestLauncherParent extends Mixin(
         launcher        : Launcher          = undefined
 
         @remote()
-        launchTest : (testDescriptorStr : string, checkInfo : SubTestCheckInfo) => Promise<any>
+        launchTest : (testDescriptorStr : string, checkInfo : SubTestCheckInfo, dashboardLaunchInfo : DashboardLaunchInfo) => Promise<any>
     }
 ) {}
 
@@ -37,7 +38,7 @@ export class TestLauncherChild extends Mixin(
     class TestLauncherChild extends base implements TestLauncher {
 
         @local()
-        async launchTest (testDescriptorStr : string, checkInfo : SubTestCheckInfo) {
+        async launchTest (testDescriptorStr : string, checkInfo : SubTestCheckInfo, dashboardLaunchInfo : DashboardLaunchInfo) {
             // there might be no `topTest` if test file does not contain any calls
             // to static `it` method of any test class
             const topTest = globalTestEnv.topTest || Test.new({
@@ -46,7 +47,7 @@ export class TestLauncherChild extends Mixin(
 
             topTest.connector    = this
 
-            await topTest.start(checkInfo)
+            await topTest.start(checkInfo, dashboardLaunchInfo)
 
             globalTestEnv.clear()
         }

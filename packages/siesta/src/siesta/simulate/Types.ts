@@ -29,3 +29,9 @@ export const normalizeActionTarget    = (actionTarget : ActionTarget) : ActionTa
 
     return target
 }
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const sumPoints    = (point1 : Point, point2 : Point) : Point => {
+    return [ point1[ 0 ] + point2[ 0 ], point1[ 1 ] + point2[ 1 ]]
+}

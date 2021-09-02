@@ -10,6 +10,7 @@ import { ArbitraryObject, ArbitraryObjectKey, isDeno, isNodejs, prototypeValue }
 import { stripBasename, stripDirname } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { Environment } from "../common/Environment.js"
+import { DashboardLaunchInfo } from "../launcher/DashboardConnector.js"
 import { Launcher, LauncherError } from "../launcher/Launcher.js"
 import { SiestaProjectExtraction } from "../launcher/ProjectExtractor.js"
 import { Project } from "../project/Project.js"
@@ -108,6 +109,8 @@ export class Test extends TestPre {
     postFinishHook      : Hook<[ this ]>        = new Hook()
 
     spies               : Spy[]                 = []
+
+    dashboardLaunchInfo : DashboardLaunchInfo   = undefined
 
 
     $rootTest           : Test      = undefined
@@ -403,7 +406,9 @@ export class Test extends TestPre {
     // }
 
 
-    async start (checkInfo : SubTestCheckInfo = undefined) {
+    async start (checkInfo : SubTestCheckInfo = undefined, dashboardLaunchInfo : DashboardLaunchInfo = undefined) {
+        this.dashboardLaunchInfo        = dashboardLaunchInfo
+
         // extra-early start hook, test is not yet marked as active in the reporter
         this.preStartHook.trigger(this)
 
@@ -561,6 +566,7 @@ export class Test extends TestPre {
     }
 
 
+    // internal "setup"
     async setupRootTest () {
         const executionContextClass     = await (this.constructor as typeof Test).getExecutionContextClass()
 

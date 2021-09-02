@@ -3,7 +3,7 @@ import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { isArray, isFunction, isString } from "../../util/Typeguards.js"
 import { clientXtoPageX, clientYtoPageY } from "../../util_browser/Coordinates.js"
 import { Simulator } from "./Simulator.js"
-import { ActionTarget, ActionTargetElement, ActionTargetOffset, MouseButton, normalizeActionTarget, Point } from "./Types.js"
+import { ActionTarget, ActionTargetElement, ActionTargetOffset, MouseButton, normalizeActionTarget, Point, sumPoints } from "./Types.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type MouseActionOptions      = {
@@ -105,7 +105,11 @@ export class UserAgentOnPage extends Mixin(
 
             const targetPoint   = this.resolveActionTarget(action)
 
-            await this.simulator.click(targetPoint, { button : action.button })
+            const simulatorOffset   = this.simulator.offset
+
+            console.log("CLICKING TEST", targetPoint, simulatorOffset)
+
+            await this.simulator.click(sumPoints(targetPoint, simulatorOffset), { button : action.button })
         }
 
 
@@ -128,7 +132,13 @@ export class UserAgentOnPage extends Mixin(
 
 
         async mouseMove (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+            const action            = this.normalizeMouseActionOptions(target, offset)
 
+            const targetPoint       = this.resolveActionTarget(action)
+
+            const simulatorOffset   = this.simulator.offset
+
+            await this.simulator.mouseMove(sumPoints(targetPoint, simulatorOffset))
         }
     }
 ) {}

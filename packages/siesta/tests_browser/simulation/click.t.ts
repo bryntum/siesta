@@ -16,7 +16,7 @@ it('Should be able to click on an element', async t => {
 
     document.body.appendChild(div)
 
-    await t.click([ 50, 50 ])
+    await t.click([ 0, 0 ])
 
     t.expect(mouseDown).toHaveBeenCalled(1)
     t.expect(mouseUp).toHaveBeenCalled(1)

@@ -41,6 +41,17 @@ export class TestBrowser extends Mixin(
         }
 
 
+        async setupRootTest () {
+            await super.setupRootTest()
+
+            if (this.dashboardLaunchInfo) {
+                this.simulator.offset   = this.dashboardLaunchInfo.offset
+
+                await this.mouseMove([ 0, 0 ])
+            }
+        }
+
+
         static async getIsomorphicTestClass () : Promise<typeof Test> {
             return this
         }

@@ -1,3 +1,5 @@
+import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
+import { ComponentElement } from "../../chronograph-jsx/ElementReactivity.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { local, remote } from "../../rpc/port/Port.js"
@@ -7,20 +9,27 @@ import { LUID } from "../common/LUID.js"
 import { ContextProviderBrowserIframe } from "../context/context_provider/ContextProviderBrowserIframe.js"
 import { ContextBrowserIframe } from "../context/ContextBrowserIframe.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
+import { Point } from "../simulate/Types.js"
 import { TestReporter, TestReporterChild, TestReporterParent } from "../test/port/TestReporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { AssertionAsyncResolution, SubTestCheckInfo, TestNodeResultReactive, TestResultLeaf } from "../test/TestResult.js"
 import { Dashboard } from "../ui/Dashboard.js"
+import { Translator } from "../ui/test_result/Translator.js"
 import { LaunchState, TestLaunchInfo } from "../ui/TestLaunchInfo.js"
 import { Launcher, LauncherDescriptor } from "./Launcher.js"
 import { LauncherDescriptorNodejs } from "./LauncherDescriptorNodejs.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export type DashboardLaunchInfo = {
+    offset      : Point
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 export interface DashboardConnectorInterface {
     startDashboard (data : ProjectSerializableData, launcherDescriptor : LauncherDescriptor) : Promise<any>
 
-    setLaunchState (rootTestId : LUID, launchState : LaunchState) : Promise<any>
+    setLaunchState (rootTestId : LUID, launchState : LaunchState) : Promise<DashboardLaunchInfo | undefined>
 
     launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<any>
 
@@ -81,7 +90,7 @@ export class DashboardConnectorServer extends Mixin(
 
 
         @remote()
-        setLaunchState : (rootTestId : LUID, launchState : LaunchState) => Promise<any>
+        setLaunchState : (rootTestId : LUID, launchState : LaunchState) => Promise<DashboardLaunchInfo | undefined>
 
 
         @remote()
@@ -131,7 +140,7 @@ export class DashboardConnectorClient extends Mixin(
 
 
         @local()
-        async setLaunchState (rootTestId : LUID, launchState : LaunchState) {
+        async setLaunchState (rootTestId : LUID, launchState : LaunchState) : Promise<DashboardLaunchInfo | undefined> {
             const launchInfo        = this.dashboard.mapping.get(rootTestId)
 
             launchInfo.launchState  = launchState
@@ -139,7 +148,20 @@ export class DashboardConnectorClient extends Mixin(
             const context           = this.iframeContextsByDescId.get(launchInfo.descriptor.guid)
 
             if (launchState === 'started') {
-                if (context) this.dashboard.overlay.context = context
+                if (context) {
+                    this.dashboard.overlay.context = context
+
+                    globalGraph.commit()
+
+                    const translatorEl  = this.dashboard.overlay.el.querySelector('.translator') as ComponentElement<Translator>
+                    const translator    = translatorEl.comp
+
+                    translator.syncPosition()
+
+                    const style         = translator.targetElement.style
+
+                    return { offset : [ Number.parseInt(style.left), Number.parseInt(style.top) ] }
+                }
             }
             else if (launchState === 'completed') {
                 this.dashboard.overlay.context      = null

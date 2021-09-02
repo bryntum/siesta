@@ -33,17 +33,16 @@ export class TestOverlay extends Mixin(
         context                 : ContextBrowserIframe      = undefined
 
 
-
         render () : ReactiveElement {
             // const launchInfo            = this.launchInfo
 
-            // return <div class="test-overlay is-justify-content-center is-align-items-center" class:overlay-active={ () => Boolean(this.context) }>
-            return <div class="test-overlay" class:overlay-active={ () => Boolean(this.context) }>
+            return <div class="test-overlay is-justify-content-center is-align-items-center" class:overlay-active={ () => Boolean(this.context) }>
                 <div class='close-button'><span class='icon is-large'><i class='far fa-lg fa-times-circle'></i></span></div>
                 {
                     () => this.context?.wrapper
                         ?
                             <Translator
+                                class           = 'translator'
                                 roundValues     = { true }
                                 targetElement   = { this.context?.wrapper }
                                 style           = { `width: ${ this.context?.iframe.style.width }; height: ${ this.context?.iframe.style.height }` }

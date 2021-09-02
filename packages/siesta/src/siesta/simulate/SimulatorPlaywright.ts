@@ -1,5 +1,5 @@
 import { Page } from "playwright"
-import { AnyConstructor, Base, ClassUnion, Mixin } from "typescript-mixin-class"
+import { AnyConstructor, Base, ClassUnion, Mixin } from "typescript-mixin-class/index.js"
 import { local, remote } from "../../rpc/port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { PointerClickOptions, PointerMoveOptions, PointerUpDownOptions, Simulator } from "./Simulator.js"
@@ -12,9 +12,11 @@ export class SimulatorPlaywrightServer extends Mixin(
     (base : ClassUnion<typeof PortHandshakeParent, typeof Base>) =>
 
     class SimulatorPlaywrightServer extends base implements Simulator {
-        page            : Page      = undefined
+        page                : Page      = undefined
 
-        currentPosition : Point     = [ 0, 0 ]
+        currentPosition     : Point     = [ 0, 0 ]
+
+        offset              : Point     = [ 0, 0 ]
 
 
         @local()
@@ -56,6 +58,8 @@ export class SimulatorPlaywrightClient extends Mixin(
     (base : ClassUnion<typeof PortHandshakeChild, typeof Base>) =>
 
     class SimulatorPlaywrightClient extends base implements Simulator {
+        offset              : Point     = [ 0, 0 ]
+
         currentPosition     : Point     = [ 0, 0 ]
 
 

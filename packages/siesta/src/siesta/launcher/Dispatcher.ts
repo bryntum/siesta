@@ -10,7 +10,6 @@ import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
 import { TestLauncherChild, TestLauncherParent } from "../test/port/TestLauncher.js"
-import { TestLauncherBrowserParent } from "../test/port/TestLauncherBrowser.js"
 import { Test } from "../test/Test.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
@@ -18,6 +17,7 @@ import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { Exception, SubTestCheckInfo, TestNodeResultReactive } from "../test/TestResult.js"
 import { LaunchState } from "../ui/TestLaunchInfo.js"
+import { DashboardLaunchInfo } from "./DashboardConnector.js"
 import { ExitCodes, Launcher } from "./Launcher.js"
 import { Queue } from "./Queue.js"
 import { TestLaunchResult } from "./TestLaunchResult.js"
@@ -265,8 +265,8 @@ export class Dispatcher extends Mixin(
         }
 
 
-        setDashboardLaunchState (desc : TestDescriptor, launchState : LaunchState) {
-            this.launcher.dashboardConnector?.setLaunchState(desc.guid, launchState)
+        async setDashboardLaunchState (desc : TestDescriptor, launchState : LaunchState) : Promise<DashboardLaunchInfo | undefined> {
+            return this.launcher.dashboardConnector?.setLaunchState(desc.guid, launchState)
         }
 
 
@@ -290,9 +290,9 @@ export class Dispatcher extends Mixin(
 
             const launchInfo        = this.resultsMappingById.get(item.guid)
 
-            const context           = /*launchInfo.context =*/ await this.chooseContextProviderFor(normalized).createContext(normalized)
+            const context           = await this.chooseContextProviderFor(normalized).createContext(normalized)
 
-            this.setDashboardLaunchState(item, 'started')
+            const dashboardLaunchInfo = await this.setDashboardLaunchState(item, 'started')
 
             let preLaunchRes : boolean
 
@@ -311,7 +311,6 @@ export class Dispatcher extends Mixin(
                 this.setDashboardLaunchState(item, 'completed')
 
                 await slot.setTask(async () => {
-                    // launchInfo.context  = null
                     await context.destroy()
                 })
 
@@ -329,7 +328,6 @@ export class Dispatcher extends Mixin(
                 this.setDashboardLaunchState(item, 'completed')
 
                 await slot.setTask(async () => {
-                    // launchInfo.context  = null
                     await context.destroy()
                 })
 
@@ -338,19 +336,23 @@ export class Dispatcher extends Mixin(
 
             const { server, client } = this.getLauncherConnectorInfo(item)
 
-            const testLauncher      = server.launcherConnectorClass.new({ launcher : this.launcher, logger : this.logger, reporter : this.reporter, launchInfo })
+            const testLauncher      = server.launcherConnectorClass.new({
+                launcher            : this.launcher,
+                logger              : this.logger,
+                reporter            : this.reporter,
+                launchInfo
+            })
 
             try {
                 await context.setupChannel(testLauncher, client.importerUrl, client.symbol)
 
                 this.logger.debug("Channel ready for: ", normalized.url)
 
-                await testLauncher.launchTest(stringifiedDesc, checkInfo)
+                await testLauncher.launchTest(stringifiedDesc, checkInfo, dashboardLaunchInfo)
             } finally {
                 this.setDashboardLaunchState(item, 'completed')
 
                 await slot.setTask(async () => {
-                    // launchInfo.context  = null
                     await testLauncher.disconnect()
                     await context.destroy()
                 })
@@ -359,21 +361,13 @@ export class Dispatcher extends Mixin(
 
 
         getLauncherConnectorInfo (desc : TestDescriptor) : LauncherConnectorClassLocator {
-            return desc.type === 'browser'
-                ? {
-                    server  : { launcherConnectorClass : TestLauncherBrowserParent },
-                    client  : {
-                        importerUrl     : 'src/siesta/test/port/TestLauncherBrowser.js',
-                        symbol          : 'TestLauncherBrowserChild'
-                    }
+            return {
+                server  : { launcherConnectorClass : TestLauncherParent },
+                client  : {
+                    importerUrl     : 'src/siesta/test/port/TestLauncher.js',
+                    symbol          : 'TestLauncherChild'
                 }
-                : {
-                    server  : { launcherConnectorClass : TestLauncherParent },
-                    client  : {
-                        importerUrl     : 'src/siesta/test/port/TestLauncher.js',
-                        symbol          : 'TestLauncherChild'
-                    }
-                }
+            }
         }
 
 
@@ -398,7 +392,12 @@ export class Dispatcher extends Mixin(
 
             const { server, client }    = this.getLauncherConnectorInfo(descriptor)
 
-            const testLauncher          = server.launcherConnectorClass.new({ launcher : this.launcher, logger : this.logger, reporter : this.reporter, launchInfo })
+            const testLauncher          = server.launcherConnectorClass.new({
+                launcher        : this.launcher,
+                logger          : this.logger,
+                reporter        : this.reporter,
+                launchInfo
+            })
             const testLauncherChild : TestLauncherChild = (await importer.getImporter(client.importerUrl)())[ client.symbol ].new()
 
             const parentMedia           = new MediaSameContext()

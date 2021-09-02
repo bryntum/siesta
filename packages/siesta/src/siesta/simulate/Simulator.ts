@@ -39,6 +39,8 @@ export type PointerMoveOptions      = {
 
 //---------------------------------------------------------------------------------------------------------------------
 interface SimulatorMouse {
+    offset              : Point
+
     currentPosition     : Point
 
     mouseUp (options? : Partial<PointerUpDownOptions>) : Promise<any>
