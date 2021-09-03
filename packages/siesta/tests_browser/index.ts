@@ -17,6 +17,13 @@ project.plan(
         ]
     },
     {
+        filename       : 'serializer',
+
+        items       : [
+            'serializer_xml.t.js',
+        ]
+    },
+    {
         filename       : 'simulation',
 
         items       : [
