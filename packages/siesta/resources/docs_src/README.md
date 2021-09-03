@@ -133,6 +133,14 @@ Chat live at [Discord](https://discord.gg/6mwJZGnwbq)
 Follow the [development blog](https://www.bryntum.com/blog/)
 
 
+Attribution
+===========
+
+This software contains icons from the following icon packs (licensed under Creative Common 2.5/3.0 Attribution licenses)
+
+- <https://fontawesome.com/>
+
+
 COPYRIGHT AND LICENSE
 =================
 

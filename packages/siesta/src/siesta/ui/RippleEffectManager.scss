@@ -22,15 +22,18 @@
         width: calc(var(--r-size) * 1px);
         height: calc(var(--r-size) * 1px);
 
-        background: var(--ripple-background, rgba(187, 187, 187, 0.7));
+        background: var(--ripple-background);
 
         border-radius: 50%;
 
-        opacity: calc(var(--r-opacity, 1));
+        opacity: var(--r-opacity, 1);
+
         transition:
-            transform calc(var(--r-duration, 0) * var(--ripple-duration, 450ms)) var(--ripple-easing, linear),
-            opacity calc(var(--r-duration, 0) * var(--ripple-duration, 450ms)) var(--ripple-easing, linear);
+            transform calc(var(--r-duration, 0) * var(--ripple-duration)) var(--ripple-easing),
+            opacity calc(var(--r-duration, 0) * var(--ripple-duration)) var(--ripple-easing);
+
         transform: translate(-50%, -50%) scale(var(--r-scale, 1));
+
         transform-origin: center;
     }
 
