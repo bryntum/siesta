@@ -5,6 +5,7 @@ import { isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { Simulator } from "../simulate/Simulator.js"
 import { UserAgentOnPage } from "../simulate/UserAgent.js"
+import { MouseCursorVisualizer } from "../ui/MouseCursorVisualizer.js"
 import { TestLauncherBrowserChild } from "./port/TestLauncherBrowser.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
@@ -33,6 +34,8 @@ export class TestBrowser extends Mixin(
 
         connector           : TestLauncherBrowserChild
 
+        mouseCursorVisualizer   : MouseCursorVisualizer     = MouseCursorVisualizer.new()
+
         // @ts-expect-error
         get simulator () : Simulator {
             return this.connector
@@ -44,11 +47,20 @@ export class TestBrowser extends Mixin(
         async setupRootTest () {
             await super.setupRootTest()
 
+            await this.mouseCursorVisualizer.start()
+
             if (this.dashboardLaunchInfo) {
                 this.simulator.offset   = this.dashboardLaunchInfo.offset
 
                 await this.mouseMove([ 0, 0 ])
             }
+        }
+
+
+        async tearDownRootTest () {
+            await super.tearDownRootTest()
+
+            this.mouseCursorVisualizer.stop()
         }
 
 
