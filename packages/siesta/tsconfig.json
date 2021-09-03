@@ -11,19 +11,18 @@
         "jsxFactory"                : "TextJSX.createElement",
         "jsxFragmentFactory"        : "TextJSX.Fragment",
 
-        "target"                    : "es2020",
+        "target"                    : "es2017",
         "sourceMap"                 : false,
 
         "lib"                       : [
-            "es2020",
+            "esnext",
             "dom"
         ],
 
         "module"                    : "esnext",
         "moduleResolution"          : "node",
 
-        "allowSyntheticDefaultImports"  : true,
-        "useDefineForClassFields"       : false
+        "allowSyntheticDefaultImports"    : true
     },
 
     "include" : [
