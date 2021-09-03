@@ -1,11 +1,12 @@
 import { ActionTargetOffset } from "../siesta/simulate/Types.js"
-import { lastElement } from "../util/Helpers.js"
 import { Rect } from "../util/Rect.js"
 import { getBoundingPageRect, normalizeOffset } from "./Coordinates.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const isElementPointScrolledOut = (el : Element, offset : ActionTargetOffset = [ '50%', '50%' ]) : boolean => {
+// this method assumes offset is within the element! see `isOffsetInsideElementBox`
+
+export const isElementPointCropped = (el : Element, offset : ActionTargetOffset = [ '50%', '50%' ]) : boolean => {
     const doc               = el.ownerDocument
     const win               = doc.defaultView
 
