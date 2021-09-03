@@ -272,7 +272,8 @@ export class TestNodeResult extends Mixin(
 
 
         resetChildNodesCache () {
-            this.$childNodes = undefined
+            this.$childNodes            = undefined
+            this.$childResultsIndex     = undefined
         }
 
 
@@ -366,6 +367,37 @@ export class TestNodeResult extends Mixin(
         }
 
 
+        $childResultsIndex : ChildResultsIndex          = undefined
+
+        get childResultsIndex () : ChildResultsIndex {
+            if (this.$childResultsIndex !== undefined) return this.$childResultsIndex
+
+            const index : ChildResultsIndex     = {
+                idToChild       : new Map(),
+                childToId       : new Map()
+            }
+
+            const titleCounters                 = new Map<string, number>()
+
+            CI(this.eachResultOfClass(TestNodeResult)).forEach(result => {
+                const title         = result.descriptor.title
+
+                let counter         = titleCounters.get(title) ?? -1
+
+                counter++
+
+                titleCounters.set(title, counter)
+
+                const id            = `${ title }::${ counter }`
+
+                index.idToChild.set(id, result)
+                index.childToId.set(result, id)
+            })
+
+            return this.$childResultsIndex = index
+        }
+
+
         collectParents (rootFirst : boolean = false) : this[ 'parentNode' ][] {
             const parents   : this[ 'parentNode' ][]    = []
 
@@ -430,8 +462,8 @@ export class TestNodeResult extends Mixin(
 
 //---------------------------------------------------------------------------------------------------------------------
 export type ChildResultsIndex = {
-    idToChild       : Map<string, TestNodeResultReactive>,
-    childToId       : Map<TestNodeResultReactive, string>
+    idToChild       : Map<string, TestNodeResult>,
+    childToId       : Map<TestNodeResult, string>
 }
 
 
@@ -495,46 +527,6 @@ export class TestNodeResultReactive extends Mixin(
         }
 
 
-        resetChildNodesCache () {
-            super.resetChildNodesCache()
-
-            this.$childResultsIndex = undefined
-        }
-
-
-        $childResultsIndex : ChildResultsIndex          = undefined
-
-        get childResultsIndex () : ChildResultsIndex {
-            if (this.$childResultsIndex !== undefined) return this.$childResultsIndex
-
-            const index : ChildResultsIndex     = {
-                idToChild       : new Map(),
-                childToId       : new Map()
-            }
-
-            let previousTitle : string          = undefined
-            let previousCounter : number        = 0
-
-            CI(this.eachResultOfClass(TestNodeResultReactive)).forEach(result => {
-                const resultTitle               = result.descriptor.title
-
-                if (previousTitle !== undefined && resultTitle === previousTitle)
-                    previousCounter++
-                else {
-                    previousTitle               = resultTitle
-                    previousCounter             = 0
-                }
-
-                const id        = `${ resultTitle }::${ previousCounter }`
-
-                index.idToChild.set(id, result)
-                index.childToId.set(result, id)
-            })
-
-            return this.$childResultsIndex = index
-        }
-
-
         syncFromPrevious () {
             this.checked        = this.previous.checked
             this.expandedState  = this.previous.expandedState
@@ -588,8 +580,18 @@ export class SubTestCheckInfo extends Mixin(
     class SubTestCheckInfo extends base {
         title       : string        = ''
 
+        titleId     : string        = ''
+
         childNodeT  : SubTestCheckInfo
         parentNode  : SubTestCheckInfo
+
+
+        static fromTestResult<T extends typeof SubTestCheckInfo> (this : T, result : TestNodeResultReactive) : InstanceType<T> {
+            return this.new({
+                title       : result.descriptor.title,
+                titleId     : result.parentNode?.childResultsIndex.childToId.get(result)
+            } as Partial<InstanceType<T>>)
+        }
     }
 ) {}
 
@@ -602,7 +604,7 @@ export const checkInfoFromTestResult    = (result : TestNodeResultReactive) : Su
         .toArray()
 
     if (fromChildren.length || result.checked) {
-        const info  = SubTestCheckInfo.new({ title : result.descriptor.title })
+        const info  = SubTestCheckInfo.fromTestResult(result)
 
         fromChildren.forEach(checkInfo => info.appendChild(checkInfo))
 
@@ -611,13 +613,14 @@ export const checkInfoFromTestResult    = (result : TestNodeResultReactive) : Su
         return undefined
 }
 
+// this method returns "check info" which corresponds to a double click on the sub-test
 export const individualCheckInfoForTestResult    = (result : TestNodeResultReactive) : SubTestCheckInfo | undefined => {
     if (!result.parentNode) return undefined
 
-    let checkInfo           = SubTestCheckInfo.new({ title : result.descriptor.title })
+    let checkInfo           = SubTestCheckInfo.fromTestResult(result)
 
     CI(result.eachParent()).forEach(parent => {
-        const parentCheckInfo   = SubTestCheckInfo.new({ title : parent.descriptor.title })
+        const parentCheckInfo   = SubTestCheckInfo.fromTestResult(parent)
 
         parentCheckInfo.appendChild(checkInfo)
 

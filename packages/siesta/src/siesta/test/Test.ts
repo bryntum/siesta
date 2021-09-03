@@ -524,7 +524,7 @@ export class Test extends TestPre {
             if (checkInfo) {
                 const currentCheckInfo  = checkInfo.childNodes?.[ currentCheckInfoIndex ]
 
-                if (currentCheckInfo && subTest.descriptor.title === currentCheckInfo.title) {
+                if (currentCheckInfo && this.childResultsIndex.childToId.get(subTest) === currentCheckInfo.titleId) {
                     await subTest.start(currentCheckInfo)
                     currentCheckInfoIndex++
                 }
