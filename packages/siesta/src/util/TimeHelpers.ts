@@ -1,4 +1,4 @@
-import { SetTimeoutHandler } from "./Helpers.js"
+import { OrPromise, SetTimeoutHandler } from "./Helpers.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export const delay = (timeout : number) : Promise<any> => new Promise(resolve => setTimeout(resolve, timeout))
@@ -46,4 +46,35 @@ export const buffer = <Args extends unknown[]>(func : (...args : Args) => unknow
 
         timeoutHandler      = setTimeout(() => func(...args), timeout)
     }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const waitFor  = async <R> (condition : () => OrPromise<R>, timeout : number, interval : number)
+    : Promise<{ conditionIsMet : boolean, result : R, exception : unknown, elapsedTime : number }> =>
+{
+    const start             = Date.now()
+
+    let result : R
+
+    do {
+        try {
+            result = await condition()
+        } catch (e) {
+            return { conditionIsMet : false, result : undefined, exception : e, elapsedTime : Date.now() - start }
+        }
+
+        if (result)
+            break
+        else {
+            if (Date.now() - start >= timeout) {
+                return { conditionIsMet : false, result : undefined, exception : undefined, elapsedTime : Date.now() - start }
+            }
+
+            await delay(interval)
+        }
+
+    } while (!result)
+
+    return { conditionIsMet : true, result, exception : undefined, elapsedTime : Date.now() - start }
 }

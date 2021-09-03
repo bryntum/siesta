@@ -2,7 +2,7 @@ import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { serializable } from "../../../serializable/Serializable.js"
 import { OrPromise, SetTimeoutHandler } from "../../../util/Helpers.js"
-import { delay } from "../../../util/TimeHelpers.js"
+import { delay, waitFor } from "../../../util/TimeHelpers.js"
 import { isFunction } from "../../../util/Typeguards.js"
 import { luid, LUID } from "../../common/LUID.js"
 import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, TestNodeResult } from "../TestResult.js"
@@ -218,7 +218,7 @@ export class AssertionAsync extends Mixin(
                 description     : desc
             }))
 
-            const res       = await this.keepAlive(this.doWaitFor(condition, timeout, pollInterval))
+            const res       = await this.keepAlive(waitFor(condition, timeout, pollInterval))
 
             if (res.conditionIsMet) {
                 this.addAsyncResolution(AssertionWaitForResolution.new({
@@ -252,36 +252,6 @@ export class AssertionAsync extends Mixin(
 
                 return undefined
             }
-        }
-
-
-        async doWaitFor <R> (condition : () => OrPromise<R>, timeout : number, interval : number)
-            : Promise<{ conditionIsMet : boolean, result : R, exception : unknown, elapsedTime : number }>
-        {
-            const start             = Date.now()
-
-            let result : R
-
-            do {
-                try {
-                    result = await condition()
-                } catch (e) {
-                    return { conditionIsMet : false, result : undefined, exception : e, elapsedTime : Date.now() - start }
-                }
-
-                if (result)
-                    break
-                else {
-                    if (Date.now() - start >= timeout) {
-                        return { conditionIsMet : false, result : undefined, exception : undefined, elapsedTime : Date.now() - start }
-                    }
-
-                    await delay(interval)
-                }
-
-            } while (!result)
-
-            return { conditionIsMet : true, result, exception : undefined, elapsedTime : Date.now() - start }
         }
     }
 ) {}
