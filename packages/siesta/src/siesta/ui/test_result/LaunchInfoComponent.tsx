@@ -78,7 +78,10 @@ export class LaunchInfoComponent extends Mixin(
         render () : ReactiveElement {
             const launchInfo            = this.launchInfo
 
-            return <div class="test-results-area is-flex is-flex-direction-column" style="flex: 1">
+            // w/o the `min-width: 0` the nested results tree does not shrink smaller than its content size
+            // which prevents the dom container splitter from working
+            // https://stackoverflow.com/questions/36247140/why-dont-flex-items-shrink-past-content-size
+            return <div class="test-results-area is-flex is-flex-direction-column" style="flex: 1; min-width: 0">
                 { () => this.topToolbar() }
 
                 <div class="is-flex is-flex-direction-row is-align-items-stretch" style="flex: 1;overflow: hidden">
@@ -107,7 +110,7 @@ export class LaunchInfoComponent extends Mixin(
                                 <Splitter
                                     resizeTarget    = 'next'
                                     mode            = "horizontal"
-                                    style           = "width: 8px"
+                                    style           = "min-width: 8px; width: 8px"
                                     companionsFunc  = {
                                         el => launchInfo?.context?.wrapper
                                             ? [ el.previousElementSibling, el.nextElementSibling, launchInfo.context.wrapper ] as HTMLElement[]

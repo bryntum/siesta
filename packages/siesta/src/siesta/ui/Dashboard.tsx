@@ -315,7 +315,7 @@ export class Dashboard extends Mixin(
                 ondblclick  = { e => this.onDoubleClick(e) }
                 class       = 'is-flex is-align-items-stretch' style='height: 100%;'
             >
-                <div class="is-flex is-flex-direction-column" style="min-width: 100px" style:width={ () => this.projectPlanWidthBox.read() + 'px' }>
+                <div class="is-flex is-flex-direction-column" style:width={ () => this.projectPlanWidthBox.read() + 'px' }>
                     <div class='tbar is-flex' style="height: 2.7em">
                         <input
                             value   = { String(this.filterBox || '').replace(/^\*\*\//, '') }
@@ -349,7 +349,7 @@ export class Dashboard extends Mixin(
                     </div>
                 </div>
 
-                <Splitter mode="horizontal" style="width: 8px" sizeBox={ this.projectPlanWidthBox }></Splitter>
+                <Splitter mode="horizontal" style="min-width: 8px; width: 8px" sizeBox={ this.projectPlanWidthBox }></Splitter>
 
                 {
                     () => {
