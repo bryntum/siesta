@@ -1,9 +1,15 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { isArray, isFunction, isString } from "../../util/Typeguards.js"
+import { TextJSX } from "../../jsx/TextJSX.js"
+import { Logger } from "../../logger/Logger.js"
+import { waitFor } from "../../util/TimeHelpers.js"
+import { isArray, isString } from "../../util/Typeguards.js"
 import { clientXtoPageX, clientYtoPageY } from "../../util_browser/Coordinates.js"
+import { isElementVisible } from "../../util_browser/Dom.js"
+import { Test } from "../test/Test.js"
+import { Assertion } from "../test/TestResult.js"
 import { Simulator } from "./Simulator.js"
-import { ActionTarget, ActionTargetElement, ActionTargetOffset, MouseButton, normalizeActionTarget, Point, sumPoints } from "./Types.js"
+import { ActionTarget, ActionTargetOffset, MouseButton, Point, sumPoints } from "./Types.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type MouseActionOptions      = {
@@ -35,15 +41,22 @@ export interface UserAgent {
 //---------------------------------------------------------------------------------------------------------------------
 // user agent for Siesta's on-page tests
 
+const defaultNormalizeElementOptions    = { warnOnMultiple : true }
+
 export class UserAgentOnPage extends Mixin(
-    [],
-    (base : ClassUnion) =>
+    [ Test ],
+    (base : ClassUnion<typeof Test>) =>
 
     class UserAgentOnPage extends base implements UserAgent {
 
-        window              : Window        = undefined
+        window              : Window        = window
 
         simulator           : Simulator     = undefined
+
+
+        get defaultTimeout () : number {
+            throw new Error("Abstract method called")
+        }
 
 
         resolveActionTarget (action : MouseActionOptions) : Point {
@@ -64,15 +77,30 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        resolveQuery (query : string) : NodeListOf<Element> {
-            return this.window.document.querySelectorAll(query)
+        normalizeElement (el : string | Element, options : { warnOnMultiple : boolean } = defaultNormalizeElementOptions) : Element | undefined {
+            if (isString(el)) {
+                const resolved      = this.query(el)
+
+                if (resolved.length > 1 && options.warnOnMultiple) {
+                    this.warn(`Query resolved to multiple elements: ${ el }`)
+                }
+
+                return resolved[ 0 ]
+            } else {
+                return el
+            }
+        }
+
+
+        query (query : string) : Element[] {
+            return Array.from(this.window.document.querySelectorAll(query))
         }
 
 
         normalizeMouseActionOptions (targetOrOptions : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : MouseActionOptions {
-            if (isFunction(targetOrOptions) || isString(targetOrOptions) || isArray(targetOrOptions) || (targetOrOptions instanceof Element)) {
+            if (isString(targetOrOptions) || isArray(targetOrOptions) || (targetOrOptions instanceof Element)) {
                 return {
-                    target      : normalizeActionTarget(targetOrOptions),
+                    target      : targetOrOptions,
                     offset      : offset,
                     button      : 'left',
 
@@ -100,8 +128,34 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async click (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target, offset)
+        waitForTarget
+
+
+        async click (targetInfo : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+            const action        = this.normalizeMouseActionOptions(targetInfo, offset)
+
+            const target        = action.target
+
+            const targetIsPoint = isArray(target)
+
+            if (!isArray(target)) {
+                const el        = this.normalizeElement(target)
+
+                const waitRes   = await waitFor(() => isElementVisible(el), this.defaultTimeout, 15)
+
+                if (!waitRes.conditionIsMet) {
+                    this.addResult(Assertion.new({
+                        name        : 'waitForElementVisible',
+                        passed      : false,
+                        annotation  : <div>
+                            Waited too long for click target <span>{ target }</span> to become visible
+                        </div>
+                    }))
+
+                    return
+                }
+            }
+
 
             const targetPoint   = this.resolveActionTarget(action)
 
@@ -109,7 +163,7 @@ export class UserAgentOnPage extends Mixin(
 
             console.log("CLICKING TEST", targetPoint, simulatorOffset)
 
-            await this.simulator.click(sumPoints(targetPoint, simulatorOffset), { button : action.button })
+            await this.simulator.simulateClick(sumPoints(targetPoint, simulatorOffset), { button : action.button })
         }
 
 
@@ -138,7 +192,7 @@ export class UserAgentOnPage extends Mixin(
 
             const simulatorOffset   = this.simulator.offset
 
-            await this.simulator.mouseMove(sumPoints(targetPoint, simulatorOffset))
+            await this.simulator.simulateMouseMove(sumPoints(targetPoint, simulatorOffset))
         }
     }
 ) {}

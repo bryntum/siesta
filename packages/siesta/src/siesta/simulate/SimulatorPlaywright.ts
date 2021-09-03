@@ -20,25 +20,25 @@ export class SimulatorPlaywrightServer extends Mixin(
 
 
         @local()
-        async mouseUp (options? : Partial<PointerUpDownOptions>) : Promise<any> {
+        async simulateMouseUp (options? : Partial<PointerUpDownOptions>) : Promise<any> {
             await this.page.mouse.up(options)
         }
 
 
         @local()
-        async mouseDown (options? : Partial<PointerUpDownOptions>) : Promise<any> {
+        async simulateMouseDown (options? : Partial<PointerUpDownOptions>) : Promise<any> {
             await this.page.mouse.down(options)
         }
 
 
         @local()
-        async mouseMove (target : Point, options? : PointerMoveOptions) : Promise<any> {
+        async simulateMouseMove (target : Point, options? : PointerMoveOptions) : Promise<any> {
             await this.page.mouse.move(target[ 0 ], target[ 1 ], { steps : 10 })
         }
 
 
         @local()
-        async click (target : Point, options? : PointerClickOptions) : Promise<any> {
+        async simulateClick (target : Point, options? : PointerClickOptions) : Promise<any> {
             console.log("CLICKING", target)
 
             await this.page.mouse.click(target[ 0 ], target[ 1 ], options)
@@ -46,7 +46,7 @@ export class SimulatorPlaywrightServer extends Mixin(
 
 
         @local()
-        async dblClick (target : Point, options? : PointerClickOptions) : Promise<any> {
+        async simulateDblClick (target : Point, options? : PointerClickOptions) : Promise<any> {
         }
     }
 ) {}
@@ -64,18 +64,18 @@ export class SimulatorPlaywrightClient extends Mixin(
 
 
         @remote()
-        mouseUp : (options? : Partial<PointerUpDownOptions>) => Promise<any>
+        simulateMouseUp : (options? : Partial<PointerUpDownOptions>) => Promise<any>
 
         @remote()
-        mouseDown : (options? : Partial<PointerUpDownOptions>) => Promise<any>
+        simulateMouseDown : (options? : Partial<PointerUpDownOptions>) => Promise<any>
 
         @remote()
-        mouseMove : (target : Point, options? : PointerMoveOptions) => Promise<any>
+        simulateMouseMove : (target : Point, options? : PointerMoveOptions) => Promise<any>
 
         @remote()
-        click : (target : Point, options? : PointerClickOptions) => Promise<any>
+        simulateClick : (target : Point, options? : PointerClickOptions) => Promise<any>
 
         @remote()
-        dblClick : (target : Point, options? : PointerClickOptions) => Promise<any>
+        simulateDblClick : (target : Point, options? : PointerClickOptions) => Promise<any>
     }
 ) {}

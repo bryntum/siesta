@@ -22,7 +22,7 @@ const connect = async (wsPort : number) => {
 
     await delay(1000)
 
-    await port.mouseMove([ 50, 50 ])
+    await port.simulateMouseMove([ 50, 50 ])
 
     await delay(500)
 }

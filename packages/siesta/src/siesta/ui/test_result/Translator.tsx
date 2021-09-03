@@ -26,7 +26,7 @@ export class Translator extends Mixin(
         props : Component[ 'props' ] & {
             targetElement           : Translator[ 'targetElement' ]
             scaleMode               : Translator[ 'scaleMode' ]
-            roundValues             : Translator[ 'roundValues' ]
+            roundValues?            : Translator[ 'roundValues' ]
         }
 
         targetElement           : HTMLElement           = undefined
@@ -210,8 +210,8 @@ export class Translator extends Mixin(
             const targetStyle       = this.targetElement.style
             const previousStyles    = this.previousStyles
 
-            targetStyle.left    = previousStyles.left
-            targetStyle.top     = previousStyles.top
+            targetStyle.left    = '-10000px'//previousStyles.left
+            targetStyle.top     = '-10000px'//previousStyles.top
             targetStyle.height  = previousStyles.height
             targetStyle.width   = previousStyles.width
         }

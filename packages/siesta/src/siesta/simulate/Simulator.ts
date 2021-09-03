@@ -39,19 +39,17 @@ export type PointerMoveOptions      = {
 
 //---------------------------------------------------------------------------------------------------------------------
 interface SimulatorMouse {
-    offset              : Point
-
     currentPosition     : Point
 
-    mouseUp (options? : Partial<PointerUpDownOptions>) : Promise<any>
+    simulateMouseUp (options? : Partial<PointerUpDownOptions>) : Promise<any>
 
-    mouseDown (options? : Partial<PointerUpDownOptions>) : Promise<any>
+    simulateMouseDown (options? : Partial<PointerUpDownOptions>) : Promise<any>
 
-    mouseMove (target : Point, options? : PointerMoveOptions) : Promise<any>
+    simulateMouseMove (target : Point, options? : PointerMoveOptions) : Promise<any>
 
-    click (target : Point, options? : PointerClickOptions) : Promise<any>
+    simulateClick (target : Point, options? : PointerClickOptions) : Promise<any>
 
-    dblClick (target : Point, options? : PointerClickOptions) : Promise<any>
+    simulateDblClick (target : Point, options? : PointerClickOptions) : Promise<any>
 }
 
 
