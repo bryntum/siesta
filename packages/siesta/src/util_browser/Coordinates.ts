@@ -1,4 +1,5 @@
 import { ActionTargetOffset, Point } from "../siesta/simulate/Types.js"
+import { Rect } from "../util/Rect.js"
 import { isString } from "../util/Typeguards.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -17,7 +18,7 @@ const evaluateOffsetExpression  = (baseValue : number, expression : string) : nu
 
     if (!match) throw new Error(`Invalid offset expression: ${ expression }`)
 
-    return Number(match[ 1 ]) * baseValue + Number(match[ 2 ] || 0)
+    return Number(match[ 1 ]) / 100 * baseValue + Number(match[ 2 ] || 0)
 }
 
 export const normalizeOffset = (el : Element, offset : ActionTargetOffset = [ '50%', '50%' ]) : Point => {
@@ -31,10 +32,26 @@ export const normalizeOffset = (el : Element, offset : ActionTargetOffset = [ '5
 
 
 //---------------------------------------------------------------------------------------------------------------------
-const isOffsetInsideElementBox = (el : Element, offset : ActionTargetOffset) : boolean => {
+export const isOffsetInsideElementBox = (el : Element, offset : ActionTargetOffset) : boolean => {
     const rect              = el.getBoundingClientRect()
     const [ dx, dy ]        = normalizeOffset(el, offset)
 
     return dx >= 0 && dx <= rect.width && dy >= 0 && dy <= rect.height
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const getBoundingPageRect = (el : Element) : Rect => {
+    const doc               = el.ownerDocument
+    const win               = doc.defaultView
+
+    const rect              = el.getBoundingClientRect()
+
+    return Rect.new({
+        left        : rect.left + win.scrollX,
+        top         : rect.top + win.scrollY,
+        width       : rect.width,
+        height      : rect.height
+    })
 }
 

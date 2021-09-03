@@ -39,8 +39,6 @@ export class SimulatorPlaywrightServer extends Mixin(
 
         @local()
         async simulateClick (target : Point, options? : PointerClickOptions) : Promise<any> {
-            console.log("CLICKING", target)
-
             await this.page.mouse.click(target[ 0 ], target[ 1 ], options)
         }
 

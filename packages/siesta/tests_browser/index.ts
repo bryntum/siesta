@@ -22,6 +22,19 @@ project.plan(
         items       : [
             'click.t.js',
         ]
+    },
+    {
+        filename       : 'util',
+
+        items       : [
+            {
+                filename       : 'scroll',
+
+                items       : [
+                    'is_element_point_scrolled_out.t.js',
+                ]
+            }
+        ]
     }
 )
 
