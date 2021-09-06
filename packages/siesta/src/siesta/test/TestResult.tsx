@@ -367,12 +367,12 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        $childResultsIndex : ChildResultsIndex          = undefined
+        $childResultsIndex : ChildResultsIndex<TestNodeResult>      = undefined
 
-        get childResultsIndex () : ChildResultsIndex {
+        get childResultsIndex () : this[ '$childResultsIndex' ] {
             if (this.$childResultsIndex !== undefined) return this.$childResultsIndex
 
-            const index : ChildResultsIndex     = {
+            const index : ChildResultsIndex<TestNodeResult>   = {
                 idToChild       : new Map(),
                 childToId       : new Map()
             }
@@ -461,9 +461,9 @@ export class TestNodeResult extends Mixin(
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export type ChildResultsIndex = {
-    idToChild       : Map<string, TestNodeResult>,
-    childToId       : Map<TestNodeResult, string>
+export type ChildResultsIndex<T extends TestNodeResult> = {
+    idToChild       : Map<string, T>,
+    childToId       : Map<T, string>
 }
 
 
@@ -474,7 +474,8 @@ export class TestNodeResultReactive extends Mixin(
     (base : ClassUnion<typeof TestNodeResult, typeof Entity>) =>
 
     class TestNodeResultReactive extends base {
-        override parentNode      : TestNodeResultReactive    = undefined
+        override $childResultsIndex : ChildResultsIndex<TestNodeResultReactive>
+        override parentNode      : TestNodeResultReactive
 
         previous        : this          = undefined
 
