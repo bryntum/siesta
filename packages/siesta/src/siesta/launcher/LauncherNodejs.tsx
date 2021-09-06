@@ -190,10 +190,10 @@ export class LauncherNodejs extends Mixin(
             page.on('close', async () => {
                 await this.dispatcher.cleanupQueue.clearAll()
 
-                await Promise.all([
+                await Promise.allSettled([
                     browser.close(),
                     webServer.stop(),
-                    connectedPort?.disconnect() ?? Promise.resolve()
+                    connectedPort?.disconnect(true) ?? Promise.resolve()
                 ])
 
                 await wsServer.stopWebSocketServer()

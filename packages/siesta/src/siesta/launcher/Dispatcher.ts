@@ -353,7 +353,7 @@ export class Dispatcher extends Mixin(
                 this.setDashboardLaunchState(item, 'completed')
 
                 await slot.setTask(async () => {
-                    await testLauncher.disconnect()
+                    await testLauncher.disconnect(true)
                     await context.destroy()
                 })
             }
