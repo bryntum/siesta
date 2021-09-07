@@ -112,10 +112,10 @@ it('Should support wrapped remote calls', async t => {
     const client            = new Client()
 
     const serverMedia       = server.media = new MediaSameContext()
-    const workerMedia       = client.media = new MediaSameContext()
+    const clientMedia       = client.media = new MediaSameContext()
 
-    serverMedia.targetMedia = workerMedia
-    workerMedia.targetMedia = serverMedia
+    serverMedia.targetMedia = clientMedia
+    clientMedia.targetMedia = serverMedia
 
     await server.connect()
     await client.connect()

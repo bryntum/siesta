@@ -6,14 +6,9 @@ import { isNumber } from "../../src/util/Typeguards.js"
 type RecursiveNumberArray       = (number | RecursiveNumberArray)[]
 
 it('Same context channel should work', async t => {
-    class Server extends Port {
-        @remote()
-        sum : (array : RecursiveNumberArray) => Promise<number>
-    }
-
     let received    = undefined
 
-    class Worker extends Port {
+    class Server extends Port {
         @local()
         async sum (array : RecursiveNumberArray) : Promise<number> {
             received        = array
@@ -35,29 +30,34 @@ it('Same context channel should work', async t => {
         }
     }
 
+    class Client extends Port {
+        @remote()
+        sum : (array : RecursiveNumberArray) => Promise<number>
+    }
+
+    const client            = new Client()
     const server            = new Server()
-    const worker            = new Worker()
 
     const serverMedia       = server.media = new MediaSameContextScoped()
-    const workerMedia       = worker.media = new MediaSameContextScoped()
+    const clientMedia       = client.media = new MediaSameContextScoped()
 
-    serverMedia.targetMedia = workerMedia
-    workerMedia.targetMedia = serverMedia
+    serverMedia.targetMedia = clientMedia
+    clientMedia.targetMedia = serverMedia
 
     await server.connect()
-    await worker.connect()
+    await client.connect()
 
     //--------------------------
     const arr1      = [ 1, 1 ]
 
-    t.is(await worker.sum(arr1), 2)
+    t.is(await client.sum(arr1), 2)
 
     const received1 = received
 
     //--------------------------
     const arr2      = [ 1, arr1 ]
 
-    t.is(await worker.sum(arr2), 3)
+    t.is(await client.sum(arr2), 3)
 
     const received2 = received
 
