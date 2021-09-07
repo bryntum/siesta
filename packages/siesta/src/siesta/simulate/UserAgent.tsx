@@ -215,7 +215,7 @@ export class UserAgentOnPage extends Mixin(
 
                 await this.simulator.simulateMouseMove(point, { precision : action.movePrecision })
 
-                return { success : false, failedChecks : [], actionPoint : point }
+                return { success : true, failedChecks : [], actionPoint : point }
 
             } else {
                 const target            = action.target
