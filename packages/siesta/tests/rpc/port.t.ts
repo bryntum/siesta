@@ -1,6 +1,6 @@
 import { it } from "../../index.js"
 import { MediaSameContext } from "../../src/rpc/media/MediaSameContext.js"
-import { local, Port, remote } from "../../src/rpc/port/Port.js"
+import { local, Port, remote, remote_wrapped } from "../../src/rpc/port/Port.js"
 
 it('Same context channel should work', async t => {
     class Server extends Port {
@@ -90,4 +90,38 @@ it('Should handle exceptions in remote calls', async t => {
         // `Error` in Firefox, `exception` elsewhere
         t.like(e + '', /exception|Error/)
     }
+})
+
+
+it('Should support wrapped remote calls', async t => {
+    class Server extends Port {
+        @local()
+        async multiply (arg1 : number, arg2 : number) : Promise<number> {
+            return arg1 * arg2
+        }
+    }
+
+    class Client extends Port {
+        @remote_wrapped()
+        async multiply (arg1 : number, arg2 : number) : Promise<number> {
+            return this.remotes.multiply(arg1 + 1, arg2 + 1)
+        }
+    }
+
+    const server            = new Server()
+    const client            = new Client()
+
+    const serverMedia       = server.media = new MediaSameContext()
+    const workerMedia       = client.media = new MediaSameContext()
+
+    serverMedia.targetMedia = workerMedia
+    workerMedia.targetMedia = serverMedia
+
+    await server.connect()
+    await client.connect()
+
+    t.is(await client.multiply(1, 3), 8)
+
+    await server.disconnect()
+    await client.disconnect()
 })

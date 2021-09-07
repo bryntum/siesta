@@ -37,11 +37,22 @@ export class EnvelopResult extends Base {
 //---------------------------------------------------------------------------------------------------------------------
 const ensureMessagesStorage = (target : Port) => {
     if (!target.hasOwnProperty('localMessages')) {
-        target.localMessages    = Object.create(target.localMessages || null)
-        target.remoteMessages   = Object.create(target.remoteMessages || null)
+        target.localMessages            = Object.create(target.localMessages || null)
+        target.remoteMessages           = Object.create(target.remoteMessages || null)
+        target.remoteWrappedMessages    = Object.create(target.remoteWrappedMessages || null)
     }
 
     return target
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+const validatePrototype = (target : Port, propertyKey : string, decoratorName : string) => {
+    if (!(target instanceof Port))
+        throw new Error(
+            // @ts-expect-error
+            `The property [${ propertyKey }] of class [${ target.constructor.name }] is decorated with @${ decoratorName }, but class does not include the Port mixin.`
+        )
 }
 
 
@@ -51,21 +62,16 @@ export const remote = (messageDesc : Partial<Message> = Message.new()) : Propert
     const message       = Message.maybeNew(messageDesc)
 
     return function (target : Port, propertyKey : string) : void {
-        if (!(target instanceof Port))
-            // @ts-ignore
-            throw new Error(`The property [${ propertyKey }] of class [${ target.constructor.name }] is decorated with @remote, but class does not include the Port mixin.`)
+        validatePrototype(target, propertyKey, 'remote')
 
         const { remoteMessages } = ensureMessagesStorage(target)
 
         remoteMessages[ propertyKey ] = message
 
         Object.defineProperty(target, propertyKey, {
-
             value   : function (this : Port, ...args : unknown[]) : Promise<unknown> {
                 return this.callRemote(
-                    EnvelopCall.new({
-                        payload     : [ propertyKey, ...args ]
-                    }),
+                    EnvelopCall.new({ payload : [ propertyKey, ...args ] }),
                     message
                 )
             }
@@ -73,12 +79,37 @@ export const remote = (messageDesc : Partial<Message> = Message.new()) : Propert
     }
 }
 
-export const local = function (message : Partial<Message> = Message.new()) : MethodDecorator {
+//---------------------------------------------------------------------------------------------------------------------
+let flashScopeStorage : Port = undefined
+
+
+export const remote_wrapped = (messageDesc : Partial<Message> = Message.new()) : MethodDecorator => {
+    const message       = Message.maybeNew(messageDesc)
 
     return function (target : Port, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
-        if (!(target instanceof Port))
-            // @ts-ignore
-            throw new Error(`The property [${ propertyKey }] of class [${ target.constructor.name }] is decorated with @local, but class does not include the Port mixin.`)
+        validatePrototype(target, propertyKey, 'remote_wrapped')
+
+        const { remoteWrappedMessages } = ensureMessagesStorage(target)
+
+        remoteWrappedMessages[ propertyKey ] = function (...args : unknown[]) {
+            const scope         = flashScopeStorage
+
+            flashScopeStorage   = undefined
+
+            return scope.callRemote(
+                EnvelopCall.new({ payload : [ propertyKey, ...args ] }),
+                message
+            )
+        }
+    }
+}
+
+
+export const local = function (messageDesc : Partial<Message> = Message.new()) : MethodDecorator {
+    const message       = Message.maybeNew(messageDesc)
+
+    return function (target : Port, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
+        validatePrototype(target, propertyKey, 'local')
 
         const { localMessages } = ensureMessagesStorage(target)
 
@@ -99,6 +130,7 @@ export class Port extends Mixin(
         // prototype values
         localMessages           : object
         remoteMessages          : object
+        remoteWrappedMessages   : object
 
         $logger                 : Logger        = undefined
 
@@ -107,6 +139,13 @@ export class Port extends Mixin(
         connectionInterval      : number        = 500
 
         awaitingResponse        : Map<EnvelopId, [ Function, Function, EnvelopCall, SetTimeoutHandler ]> = new Map()
+
+
+        get remotes () : this {
+            flashScopeStorage       = this
+
+            return this.remoteWrappedMessages as this
+        }
 
 
         get logger () : Logger {
