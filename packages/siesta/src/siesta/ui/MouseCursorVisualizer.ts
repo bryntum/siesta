@@ -66,8 +66,8 @@ export class MouseCursorVisualizer extends Base {
             'position: fixed; pointer-events: none; z-index: 100000; ' +
             'border-radius: 50%; ' +
             'transform: translate(-50%, -50%);' +
-            'background: rgba(187, 187, 187, 0.7);' +
-            'transition: all 1s ease-in-out;' +
+            'background: rgba(215, 187, 187, 0.7);' +
+            'transition: all 1.2s ease-in-out;' +
             `width: 0px; height: 0px; left: ${ e.clientX }; top: ${ e.clientY };`
 
         document.body.appendChild(clickEl)
