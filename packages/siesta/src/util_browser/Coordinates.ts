@@ -55,3 +55,17 @@ export const getBoundingPageRect = (el : Element) : Rect => {
     })
 }
 
+
+//---------------------------------------------------------------------------------------------------------------------
+export const getViewportPageRect = (el : Element) : Rect => {
+    const doc               = el.ownerDocument
+    const win               = doc.defaultView
+
+    return Rect.new({
+        left        : win.scrollX,
+        top         : win.scrollY,
+        width       : win.innerWidth,
+        height      : win.innerHeight
+    })
+}
+

@@ -35,10 +35,18 @@ project.plan(
 
         items       : [
             {
+                filename       : 'dom',
+
+                items       : [
+                    'element_from_point.t.js'
+                ]
+            },
+            {
                 filename       : 'scroll',
 
                 items       : [
-                    'is_element_point_scrolled_out.t.js',
+                    'is_element_point_cropped.t.js',
+                    'scroll_element_into_view.t.js'
                 ]
             }
         ]

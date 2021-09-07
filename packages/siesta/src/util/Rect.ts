@@ -88,7 +88,7 @@ export class Rect extends Base {
     }
 
 
-    equalsTo (rect : Rect) : boolean {
+    isEqual (rect : Rect) : boolean {
         return this.left === rect.left && this.right === rect.right && this.top === rect.top && this.bottom === rect.bottom
     }
 }
