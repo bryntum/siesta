@@ -68,7 +68,9 @@ export class LauncherNodejs extends Mixin(
         projectDescriptorClass  : typeof ProjectDescriptorNodejs    = ProjectDescriptorNodejs
         testDescriptorClass     : typeof TestDescriptorNodejs       = TestDescriptorNodejs
 
-        dashboardPage           : Page  = undefined
+        dashboardPage           : Page          = undefined
+
+        isClosingDashboard      : boolean       = false
 
 
         getMaxLen () : number {
@@ -188,6 +190,8 @@ export class LauncherNodejs extends Mixin(
             let connectedPort : DashboardConnectorServer   = undefined
 
             page.on('close', async () => {
+                this.isClosingDashboard     = true
+
                 await this.dispatcher.cleanupQueue.clearAll()
 
                 await Promise.allSettled([

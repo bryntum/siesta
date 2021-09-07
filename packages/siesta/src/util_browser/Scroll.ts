@@ -17,7 +17,7 @@ export const isElementPointCropped = (el : Element, offset : ActionTargetOffset 
 
     for (let parent : Element = el; parent; parent = parent.parentElement) parents.push(parent)
 
-    let currentRect         = getViewportPageRect(el)
+    let currentRect         = getViewportPageRect(win)
 
     for (let i = parents.length - 1; i >= 0; i--) {
         const parent        = parents[ i ]
@@ -89,33 +89,28 @@ export const scrollElementPointIntoView = (el : Element, offsetArg : ActionTarge
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const scrollPagePointIntoView = (point : Point, referenceEl : Element) : boolean => {
-    // const doc               = referenceEl.ownerDocument
-    // const win               = doc.defaultView
-    //
-    // let leftVisible     = this.getPageScrollX()
-    // let rightVisible    = leftVisible + this.$(win).width()
-    //
-    // let topVisible      = this.getPageScrollY()
-    // let bottomVisible   = topVisible + this.$(win).height()
-    //
-    // if (
-    //     leftVisible <= point[ 0 ] && point[ 0 ] <= rightVisible
-    //     && topVisible <= point[ 1 ] && point[ 1 ] <= bottomVisible
-    // ) {
-    //     // no need to scroll, target point is within visible viewport area
-    //     return false
-    // }
-    //
-    // let div             = this.getDivBox(doc, point[ 0 ], point[ 1 ], 1, 1)
-    //
-    // doc.body.appendChild(div)
-    //
-    // this.maintainScrollPositionDuring(function () {
-    //     div.scrollIntoView()
-    // })
-    //
-    // doc.body.removeChild(div)
+export const scrollPagePointIntoView = (point : Point, win : Window) : boolean => {
+    const doc           = win.document
+
+    const visiblePageRect = getViewportPageRect(win)
+
+    if (visiblePageRect.containsPoint(point)) {
+        // no need to scroll, target point is within visible viewport area
+        return false
+    }
+
+    const div           = doc.createElement('div')
+
+    div.style.cssText   =
+        `position: absolute !important; left: ${ point[ 0 ] }px !important; top: ${ point[ 1 ] }px !important;` +
+        'border-width: 0 !important; padding: 0 !important; margin: 0 !important;' +
+        'width: 1px !important; height: 1px !important;'
+
+    doc.body.appendChild(div)
+
+    div.scrollIntoView()
+
+    doc.body.removeChild(div)
 
     return true
 }

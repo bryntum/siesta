@@ -4,30 +4,33 @@ import { MouseButton, Point } from "./Types.js"
 //---------------------------------------------------------------------------------------------------------------------
 export type PointerUpDownOptions    = {
     button?     : MouseButton
-    clickCount? : number
 }
 
 export type PointerClickOptions    = {
     button?     : MouseButton
-    clickCount? : number
-    delay?      : number
 }
 
 
 export type PointerMovePrecision      =
     | {
+        // fixed number of steps, divided equally along the path
         kind            : 'fixed'
         precision       : number
     }
     | {
+        // simulate a move event every N-th point along the path
         kind            : 'every_nth'
         precision       : number
     }
     | {
+        // simulate a move event for the specified number of points in the beginning of the path and at the end
         kind            : 'first_and_last'
+        precision       : number
     }
     | {
+        // simulate a move event for the specified number of points at the end of the path
         kind            : 'last_only'
+        precision       : number
     }
 
 
@@ -47,9 +50,9 @@ interface SimulatorMouse {
 
     simulateMouseMove (target : Point, options? : PointerMoveOptions) : Promise<any>
 
-    simulateClick (target : Point, options? : PointerClickOptions) : Promise<any>
+    simulateClick (options? : PointerClickOptions) : Promise<any>
 
-    simulateDblClick (target : Point, options? : PointerClickOptions) : Promise<any>
+    simulateDblClick (options? : PointerClickOptions) : Promise<any>
 }
 
 

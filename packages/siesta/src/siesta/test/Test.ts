@@ -125,6 +125,19 @@ export class Test extends TestPre {
         return this.$rootTest = rootTest
     }
 
+
+    get defaultTimeout () : number {
+        return this.descriptor.defaultTimeout
+    }
+
+    get waitForTimeout () : number {
+        return this.descriptor.waitForTimeout
+    }
+
+    get waitForPollInterval () : number {
+        return this.descriptor.waitForPollInterval
+    }
+
     /**
      *
      * This method returns an "expectation" instance, which can be used to check various assertions about the passed value.

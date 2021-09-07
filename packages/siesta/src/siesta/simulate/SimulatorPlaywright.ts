@@ -1,9 +1,10 @@
 import { Page } from "playwright"
-import { AnyConstructor, Base, ClassUnion, Mixin } from "typescript-mixin-class/index.js"
-import { local, remote } from "../../rpc/port/Port.js"
+import { Base, ClassUnion, Mixin } from "typescript-mixin-class/index.js"
+import { local, remote, remote_wrapped } from "../../rpc/port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
+import { filterPathAccordingToPrecision, getPathBetweenPoints } from "../../util_browser/Coordinates.js"
 import { PointerClickOptions, PointerMoveOptions, PointerUpDownOptions, Simulator } from "./Simulator.js"
-import { MouseButton, Point } from "./Types.js"
+import { Point, sumPoints } from "./Types.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -16,7 +17,14 @@ export class SimulatorPlaywrightServer extends Mixin(
 
         currentPosition     : Point     = [ 0, 0 ]
 
-        offset              : Point     = [ 0, 0 ]
+
+        // wrapper for `mouse.move` which tracks cursor position
+        async pageMouseMove (x : number, y : number, options? : { steps? : number }) : Promise<void> {
+            await this.page.mouse.move(x, y, options)
+
+            this.currentPosition[ 0 ] = x
+            this.currentPosition[ 1 ] = y
+        }
 
 
         @local()
@@ -32,19 +40,45 @@ export class SimulatorPlaywrightServer extends Mixin(
 
 
         @local()
-        async simulateMouseMove (target : Point, options? : PointerMoveOptions) : Promise<any> {
-            await this.page.mouse.move(target[ 0 ], target[ 1 ], { steps : 10 })
+        async simulateMouseMove (
+            target : Point, options : PointerMoveOptions = { precision : { kind : 'every_nth', precision : 30 } }
+        ) : Promise<any> {
+            const precision     = options.precision
+
+            if (precision.kind === 'fixed') {
+                await this.page.mouse.move(target[ 0 ], target[ 1 ], { steps : precision.precision })
+            }
+            else {
+                const filtered  = filterPathAccordingToPrecision(
+                    getPathBetweenPoints(this.currentPosition, target),
+                    precision
+                )
+
+                for (const point of filtered) {
+                    await this.pageMouseMove(point[ 0 ], point[ 1 ])
+                }
+            }
         }
 
 
         @local()
-        async simulateClick (target : Point, options? : PointerClickOptions) : Promise<any> {
-            await this.page.mouse.click(target[ 0 ], target[ 1 ], options)
+        async simulateClick (options? : PointerClickOptions) : Promise<any> {
+            const mouse     = this.page.mouse
+
+            await mouse.down({ button : options?.button ?? 'left', clickCount : 1 })
+            await mouse.up({ button : options?.button ?? 'left', clickCount : 1 })
         }
 
 
         @local()
-        async simulateDblClick (target : Point, options? : PointerClickOptions) : Promise<any> {
+        async simulateDblClick (options? : PointerClickOptions) : Promise<any> {
+            const mouse     = this.page.mouse
+
+            await mouse.down({ button : options?.button ?? 'left', clickCount : 1 })
+            await mouse.up({ button : options?.button ?? 'left', clickCount : 1 })
+
+            await mouse.down({ button : options?.button ?? 'left', clickCount : 2 })
+            await mouse.up({ button : options?.button ?? 'left', clickCount : 2 })
         }
     }
 ) {}
@@ -67,13 +101,18 @@ export class SimulatorPlaywrightClient extends Mixin(
         @remote()
         simulateMouseDown : (options? : Partial<PointerUpDownOptions>) => Promise<any>
 
-        @remote()
-        simulateMouseMove : (target : Point, options? : PointerMoveOptions) => Promise<any>
+        @remote_wrapped()
+        async simulateMouseMove (target : Point, options? : PointerMoveOptions) : Promise<any> {
+            await this.remotes.simulateMouseMove(sumPoints(target, this.offset), options)
+
+            this.currentPosition[ 0 ]   = target[ 0 ]
+            this.currentPosition[ 1 ]   = target[ 1 ]
+        }
 
         @remote()
-        simulateClick : (target : Point, options? : PointerClickOptions) => Promise<any>
+        simulateClick : (options? : PointerClickOptions) => Promise<any>
 
         @remote()
-        simulateDblClick : (target : Point, options? : PointerClickOptions) => Promise<any>
+        simulateDblClick : (options? : PointerClickOptions) => Promise<any>
     }
 ) {}

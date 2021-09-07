@@ -1,6 +1,6 @@
 import { ActionTargetOffset, Point } from "../siesta/simulate/Types.js"
 import { Rect } from "../util/Rect.js"
-import { normalizeOffset } from "./Coordinates.js"
+import { getViewportActionPoint, getViewportRect, normalizeOffset } from "./Coordinates.js"
 import { isHTMLIFrameElement } from "./Typeguards.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ export const isElementConnected = (el : Element) : boolean => {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const isElementVisible = (el : Element) : boolean => {
+export const isElementAccessible = (el : Element) : boolean => {
     if (!isElementConnected(el)) return false
 
     const style     = getComputedStyle(el)
@@ -59,84 +59,85 @@ export const isElementVisible = (el : Element) : boolean => {
 
     const rect      = el.getBoundingClientRect()
 
-    return rect.width > 0 || rect.height > 0
+    return rect.width > 0 && rect.height > 0
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const waitForElementStable = async (el : Element, timeout : number) : Promise<boolean> => {
+export const isElementVisible = (el : Element) : boolean => {
+    if (!isElementAccessible(el)) return false
+
+    const elViewportRect        = Rect.new(el.getBoundingClientRect())
+    const visibleViewportRect   = getViewportRect(el.ownerDocument.defaultView)
+
+    const intersection          = visibleViewportRect.intersect(elViewportRect)
+
+    return !intersection.isEmpty() && intersection.width > 0 && intersection.height > 0
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+// export const waitForElementStable = async (el : Element, timeout : number) : Promise<boolean> => {
+//     const doc               = el.ownerDocument
+//     const win               = doc.defaultView
+//
+//     let prevRect : Rect     = undefined
+//     let counter : number    = 0
+//
+//     const start             = Date.now()
+//
+//     return new Promise(resolve => {
+//
+//         const checkForStability = () => {
+//             const elapsed   = Date.now() - start
+//
+//             if (elapsed >= timeout) {
+//                 resolve(false)
+//
+//                 return
+//             }
+//
+//             //-----------------
+//             const rect      = Rect.new(el.getBoundingClientRect())
+//
+//             if (!prevRect || !prevRect.isEqual(rect)) {
+//                 prevRect    = rect
+//                 counter     = 0
+//             } else {
+//                 counter++
+//
+//                 if (counter >= 1) {
+//                     resolve(true)
+//                 } else {
+//                     win.requestAnimationFrame(checkForStability)
+//                 }
+//             }
+//         }
+//
+//         win.requestAnimationFrame(checkForStability)
+//     })
+// }
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const isElementPointReachable = (
+    el : Element, offset : ActionTargetOffset, allowChild : boolean = false
+)
+    : { reachable : boolean, point : Point, elAtPoint : Element } =>
+{
     const doc               = el.ownerDocument
-    const win               = doc.defaultView
 
-    let prevRect : Rect     = undefined
-    let counter : number    = 0
+    const point             = getViewportActionPoint(el, offset)
 
-    const start             = Date.now()
+    const elAtPoint         = doc.elementFromPoint(...point)
 
-    return new Promise(resolve => {
+    const reachable         = elAtPoint === el || allowChild && el.contains(elAtPoint)
 
-        const checkForStability = () => {
-            const elapsed   = Date.now() - start
-
-            if (elapsed >= timeout) {
-                resolve(false)
-
-                return
-            }
-
-            //-----------------
-            const rect      = Rect.new(el.getBoundingClientRect())
-
-            if (!prevRect || !prevRect.isEqual(rect)) {
-                prevRect    = rect
-                counter     = 0
-            } else {
-                counter++
-
-                if (counter >= 1) {
-                    resolve(true)
-                } else {
-                    win.requestAnimationFrame(checkForStability)
-                }
-            }
-        }
-
-        win.requestAnimationFrame(checkForStability)
-    })
+    return { reachable, point, elAtPoint }
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const isElementPointReachable = (el : Element, offsetArg : ActionTargetOffset, allowChild : boolean = false) : boolean => {
-    const doc               = el.ownerDocument
-    const win               = doc.defaultView
-
-    const offset            = normalizeOffset(el, offsetArg)
-
-    const rect              = el.getBoundingClientRect()
-
-    // TODO should check that point is within visible viewport?
-
-    const elAtPoint         = doc.elementFromPoint(rect.left + offset[ 0 ], rect.top + offset[ 1 ])
-
-    return elAtPoint === el || allowChild && el.contains(elAtPoint)
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-
-
-/**
- * This method will return the top-most DOM element at the specified coordinates from the test page. If
- * the resulting element is an iframe and `shallow` argument is not passed as `true`
- * it'll query the iframe for its element from the local point inside it.
- *
- * @param {Number} x The X coordinate, relative to the viewport area (currently visible part of the page)
- * @param {Number} y The Y coordinate, relative to the viewport area (currently visible part of the page)
- * @param {Boolean} [shallow] Pass `true` to _not_ check nested iframes if an element at the original coordinates is an iframe.
- *
- * @return {HTMLElement} The top-most element at the specified position on the test page
- */
 export const elementFromPoint = (queryRoot : DocumentOrShadowRoot, viewportX : number, viewportY : number, shallow : boolean = true)
     :
         { el : Element, localXY : Point } =>

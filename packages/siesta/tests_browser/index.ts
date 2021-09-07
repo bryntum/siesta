@@ -35,6 +35,13 @@ project.plan(
 
         items       : [
             {
+                filename       : 'coordinates',
+
+                items       : [
+                    'filter_path.t.js'
+                ]
+            },
+            {
                 filename       : 'dom',
 
                 items       : [

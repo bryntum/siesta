@@ -32,5 +32,12 @@ export class DispatcherNodejs extends Mixin(
                 }
                 : super.getLauncherConnectorInfo(desc)
         }
+
+
+        reportLaunchFailure (descriptor : TestDescriptor, exception : any) {
+            console.log("this.launcher.isClosingDashboard", this.launcher.isClosingDashboard)
+
+            if (!this.launcher.isClosingDashboard) super.reportLaunchFailure(descriptor, exception)
+        }
     }
 ) {}

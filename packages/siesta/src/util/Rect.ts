@@ -1,4 +1,5 @@
 import { Base } from "typescript-mixin-class"
+import { Point } from "../siesta/simulate/Types.js"
 
 export class Rect extends Base {
 
@@ -64,6 +65,11 @@ export class Rect extends Base {
     }
 
 
+    containsPoint (point : Point) : boolean {
+        return this.contains(point[ 0 ], point[ 1 ])
+    }
+
+
     cropLeftRight (rect : Rect) : Rect {
         const cls       = this.constructor as typeof Rect
 
@@ -85,6 +91,11 @@ export class Rect extends Base {
             top         : rect.top,
             bottom      : rect.bottom
         }))
+    }
+
+
+    centerPoint () : Point {
+        return [ this.left + this.width / 2, this.top + this.height / 2 ]
     }
 
 
