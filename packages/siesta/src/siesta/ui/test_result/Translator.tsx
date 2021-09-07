@@ -2,7 +2,7 @@
 
 import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
-import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
+import { AnyFunction, ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { calculate, field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { ChronoGraphJSX } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
@@ -32,6 +32,8 @@ export class Translator extends Mixin(
         targetElement           : HTMLElement           = undefined
 
         previousStyles          : { left : string, top : string, height : string, width : string }  = undefined
+
+        resizeListener          : AnyFunction           = undefined
 
         resizeObserver          : ResizeObserver        = undefined
 
@@ -160,6 +162,10 @@ export class Translator extends Mixin(
         connectedCallback () {
             this.connected = true
 
+            this.resizeListener     = () => this.syncPosition()
+
+            window.addEventListener('resize', this.resizeListener)
+
             this.startTranslation()
         }
 
@@ -219,6 +225,9 @@ export class Translator extends Mixin(
 
         disconnectedCallback () {
             this.stopTranslation()
+
+            window.removeEventListener('resize', this.resizeListener)
+
             this.resizeObserver.disconnect()
         }
     }
