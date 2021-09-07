@@ -13,7 +13,7 @@ it('Compacting arrays should work', async t => {
 
     compact(elements)
 
-    t.isDeeply(elements, [ el1, el2, el3 ])
+    t.equal(elements, [ el1, el2, el3 ])
 
     //--------------------------
     // trying to compact the same array
@@ -21,5 +21,5 @@ it('Compacting arrays should work', async t => {
 
     compact(elements)
 
-    t.isDeeply(elements, [ el1, el2, el3 ])
+    t.equal(elements, [ el1, el2, el3 ])
 })

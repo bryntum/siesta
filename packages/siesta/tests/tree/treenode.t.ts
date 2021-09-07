@@ -44,7 +44,7 @@ it('Better promise resolution detection should work', async t => {
 
     const mappedRoot    = Tree1Mapped.fromTreeNode(root, source => Tree1Mapped.new({ mapped : `mapped-${ source.name }` }))
 
-    t.isDeeply(
+    t.equal(
         CI(mappedRoot.traverseGen()).map(node => node.mapped).toArray(),
         [ 'mapped-root', 'mapped-parent1', 'mapped-child1', 'mapped-child2' ]
     )

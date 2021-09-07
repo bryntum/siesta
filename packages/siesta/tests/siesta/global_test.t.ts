@@ -77,7 +77,7 @@ describe('Should be possible to use global `before/afterEach`', t => {
     })
 
 }).finishHook.on(t => {
-    t.isDeeply(log2,
+    t.equal(log2,
         [
             'Root',
                 'Root-beforeEach1',

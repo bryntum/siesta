@@ -54,7 +54,7 @@ it('Listening to hook should work', t => {
         t.is(array, arr)
         t.is(pos, 0)
         t.is(howManyToRemove, 0)
-        t.isDeeply(newElements, [ 11 ])
+        t.equal(newElements, [ 11 ])
     })
 
     //-----------------

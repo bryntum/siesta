@@ -31,7 +31,7 @@ describe('Before/after should work #1', t => {
         })
     })
 }).finishHook.on(t => {
-    t.isDeeply(log,
+    t.equal(log,
         [
             'Root',
                 'Root-beforeEach1',
@@ -95,7 +95,7 @@ describe('Before/after should work #2', t => {
     })
 
 }).finishHook.on(t => {
-    t.isDeeply(log2,
+    t.equal(log2,
         [
             'Root',
                 'Root-beforeEach1',

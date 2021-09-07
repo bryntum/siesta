@@ -11,7 +11,7 @@ it('Should be able to parse options', async t => {
         input   : [ 'argv1', '--string=str', 'argv2', '--number', '123', '--boolean', 'true', 'argv3' ]
     })
 
-    t.isDeeply(
+    t.equal(
         bag.extractOptions([ string, number, boolean ]),
         {
             errors      : [],
@@ -32,7 +32,7 @@ it('Should detect errors in invalid input', async t => {
         input   : [ '--number', 'foo', '--boolean', 'bar', '--string' ]
     })
 
-    t.isDeeply(
+    t.equal(
         bag2.extractOptions([ string, number, boolean ]),
         {
             errors      : [
@@ -53,7 +53,7 @@ it('Should set boolean options w/o value to true', async t => {
         input   : [ '--string=str', 'argv2', '--number', '123', '--boolean' ]
     })
 
-    t.isDeeply(
+    t.equal(
         bag2.extractOptions([ boolean ]),
         {
             errors      : [],
@@ -71,7 +71,7 @@ it('Should detect overwritten values', async t => {
         input   : [ '--string=string', '--string=strung' ]
     })
 
-    t.isDeeply(
+    t.equal(
         bag2.extractOptions([ string ]),
         {
             errors      : [],
@@ -85,7 +85,7 @@ it('Should detect overwritten values', async t => {
         'Should detect invalid input'
     )
 
-    t.isDeeply(bag2.entries, [], 'Should remove all duplicated entries')
+    t.equal(bag2.entries, [], 'Should remove all duplicated entries')
 })
 
 
