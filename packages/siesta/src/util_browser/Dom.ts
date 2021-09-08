@@ -67,7 +67,7 @@ export const isElementAccessible = (el : Element) : boolean => {
 export const isElementVisible = (el : Element) : boolean => {
     if (!isElementAccessible(el)) return false
 
-    const elViewportRect        = Rect.new(el.getBoundingClientRect())
+    const elViewportRect        = Rect.fromElement(el)
     const visibleViewportRect   = getViewportRect(el.ownerDocument.defaultView)
 
     const intersection          = visibleViewportRect.intersect(elViewportRect)
