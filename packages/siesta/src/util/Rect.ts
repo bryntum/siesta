@@ -102,4 +102,16 @@ export class Rect extends Base {
     isEqual (rect : Rect) : boolean {
         return this.left === rect.left && this.right === rect.right && this.top === rect.top && this.bottom === rect.bottom
     }
+
+
+    static fromElement<T extends typeof Rect> (this : T, el : Element) : InstanceType<T> {
+        const rect      = el.getBoundingClientRect()
+
+        return this.new({
+            left        : rect.left,
+            top         : rect.top,
+            width       : rect.width,
+            height      : rect.height
+        } as Partial<InstanceType<T>>)
+    }
 }
