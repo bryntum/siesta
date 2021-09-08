@@ -534,8 +534,9 @@ export class Test extends TestPre {
             // the test structure is defined
             subTest.connector    = this.connector
 
-            if (checkInfo) {
-                const currentCheckInfo  = checkInfo.childNodes?.[ currentCheckInfoIndex ]
+            // if `checkInfo` does not have any child nodes it denotes the bottom-most sub-test, every sub-test of which should be launched
+            if (checkInfo && checkInfo.childNodes) {
+                const currentCheckInfo  = checkInfo.childNodes[ currentCheckInfoIndex ]
 
                 if (currentCheckInfo && this.childResultsIndex.childToId.get(subTest) === currentCheckInfo.titleId) {
                     await subTest.start(currentCheckInfo)
