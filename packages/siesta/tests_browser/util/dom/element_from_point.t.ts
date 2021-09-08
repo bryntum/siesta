@@ -26,13 +26,13 @@ it('Element from point should work for nested iframes', async t => {
     div1.style.backgroundColor      = 'blue'
     iframe2.contentDocument.body.appendChild(div1)
 
-    t.equal(elementFromPoint(document, 60, 60, true), { el : iframe1, localXY : [ 60, 60 ] })
+    t.equal(elementFromPoint(document, 60, 60, false), { el : iframe1, localXY : [ 60, 60 ] })
 
-    t.equal(elementFromPoint(document, 60, 60, false), { el : iframe1.contentDocument.body, localXY : [ 10, 10 ] })
+    t.equal(elementFromPoint(document, 60, 60, true), { el : iframe1.contentDocument.body, localXY : [ 10, 10 ] })
 
-    t.equal(elementFromPoint(document, 110, 110, false), { el : iframe2.contentDocument.body, localXY : [ 10, 10 ] })
+    t.equal(elementFromPoint(document, 110, 110, true), { el : iframe2.contentDocument.body, localXY : [ 10, 10 ] })
 
-    t.equal(elementFromPoint(document, 150, 150, false), { el : div1, localXY : [ 50, 50 ] })
+    t.equal(elementFromPoint(document, 150, 150, true), { el : div1, localXY : [ 50, 50 ] })
 })
 
 // it seems the `elementFromPoint` method of the shadow root instance does not work (at all) as intuitively expected

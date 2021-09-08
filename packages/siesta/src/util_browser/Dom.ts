@@ -138,15 +138,15 @@ export const isElementPointReachable = (
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const elementFromPoint = (queryRoot : DocumentOrShadowRoot, viewportX : number, viewportY : number, shallow : boolean = true)
+export const elementFromPoint = (queryRoot : DocumentOrShadowRoot, viewportX : number, viewportY : number, deep : boolean = false)
     :
         { el : Element, localXY : Point } =>
 {
     const el            = queryRoot.elementFromPoint(viewportX, viewportY)
     const rect          = el.getBoundingClientRect()
 
-    if (!shallow && isHTMLIFrameElement(el) && isSameDomainIframe(el)) {
-        return elementFromPoint(el.contentDocument, viewportX - rect.left, viewportY - rect.top, false)
+    if (deep && isHTMLIFrameElement(el) && isSameDomainIframe(el)) {
+        return elementFromPoint(el.contentDocument, viewportX - rect.left, viewportY - rect.top, true)
     }
     // else if (!shallow && el.shadowRoot) {
     //     return elementFromPoint(el.shadowRoot, viewportX - rect.left, viewportY - rect.top, false)
