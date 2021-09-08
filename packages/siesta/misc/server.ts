@@ -1,8 +1,8 @@
 import playwright from "playwright"
 import ws from "ws"
-import { MediaNodeWebSocketParent } from "./rpc/media/MediaNodeWebSocketParent.js"
-import { ServerNodeWebSocket } from "./rpc/server/ServerNodeWebSocket.js"
-import { SimulatorPlaywrightServer } from "./siesta/simulate/SimulatorPlaywright.js"
+import { MediaNodeWebSocketParent } from "../src/rpc/media/MediaNodeWebSocketParent.js"
+import { ServerNodeWebSocket } from "../src/rpc/server/ServerNodeWebSocket.js"
+import { SimulatorPlaywrightServer } from "../src/siesta/simulate/SimulatorPlaywright.js"
 
 
 const run = async () => {
