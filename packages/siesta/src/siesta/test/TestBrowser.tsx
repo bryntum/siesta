@@ -1,14 +1,18 @@
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
+import { TextJSX } from "../../jsx/TextJSX.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { Simulator } from "../simulate/Simulator.js"
+import { ActionTarget } from "../simulate/Types.js"
 import { UserAgentOnPage } from "../simulate/UserAgent.js"
 import { MouseCursorVisualizer } from "../ui/MouseCursorVisualizer.js"
+import { AssertionObservable } from "./assertion/AssertionObservable.js"
 import { TestLauncherBrowserChild } from "./port/TestLauncherBrowser.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
+import { Assertion } from "./TestResult.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -18,10 +22,12 @@ import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
 export class TestBrowser extends Mixin(
     [
         UserAgentOnPage,
+        AssertionObservable,
         Test
     ],
     (base : ClassUnion<
         typeof UserAgentOnPage,
+        typeof AssertionObservable,
         typeof Test
     >) =>
 
@@ -35,6 +41,22 @@ export class TestBrowser extends Mixin(
         connector           : TestLauncherBrowserChild
 
         mouseCursorVisualizer   : MouseCursorVisualizer     = MouseCursorVisualizer.new()
+
+
+        addListenerToObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
+            observable.addEventListener(event, listener)
+        }
+
+
+        removeListenerFromObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
+            observable.removeEventListener(event, listener)
+        }
+
+
+        resolveObservable (source : ActionTarget) : Element {
+            return this.resolveActionTarget(source)
+        }
+
 
         // @ts-expect-error
         get simulator () : Simulator {

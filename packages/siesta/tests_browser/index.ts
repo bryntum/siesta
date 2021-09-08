@@ -57,6 +57,19 @@ project.plan(
                 ]
             }
         ]
+    },
+    {
+        filename    : 'siesta',
+
+        items       : [
+            {
+                filename    : 'assertions',
+
+                items       : [
+                    'assertion_observable.t.js',
+                ]
+            },
+        ]
     }
 )
 

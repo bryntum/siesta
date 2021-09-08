@@ -4,7 +4,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { Rect } from "../../util/Rect.js"
 import { isArray, isString } from "../../util/Typeguards.js"
 import { clientXtoPageX, clientYtoPageY, getViewportActionPoint, getViewportRect } from "../../util_browser/Coordinates.js"
-import { isElementAccessible, isElementConnected, isElementPointReachable, isElementVisible } from "../../util_browser/Dom.js"
+import { elementFromPoint, isElementAccessible, isElementConnected, isElementPointReachable, isElementVisible } from "../../util_browser/Dom.js"
 import { Test } from "../test/Test.js"
 import { Assertion, SourcePoint } from "../test/TestResult.js"
 import { PointerMovePrecision, Simulator } from "./Simulator.js"
@@ -76,30 +76,22 @@ export class UserAgentOnPage extends Mixin(
 
         mouseMovePrecision       : PointerMovePrecision          = { kind : 'last_only', precision : 1 }
 
-        actionTargetResolvedToMultipleMode  : 'first' | 'warn' | 'throw'    = 'warn'
+        actionTargetResolvedToMultipleMode  : 'ignore' | 'warn' | 'throw'    = 'warn'
 
         // coordinatesSystem   : 'page' | 'viewport'           = 'viewport'
 
 
-        // resolveActionTarget (action : MouseActionOptions) : Point {
-        //     const target        = action.target
-        //
-        //     if (target instanceof Array) {
-        //         if (target.length === 0)
-        //             return this.getCursorPagePosition()
-        //         else
-        //             return target
-        //     }
-        //     else if (target instanceof Element) {
-        //
-        //     }
-        //     else {
-        //         target
-        //     }
-        // }
+        resolveActionTarget (target : ActionTarget) : Element {
+            if (target instanceof Array) {
+                return elementFromPoint(this.window.document, ...(target.length === 0 ? this.getCursorViewportPosition() : target), true).el
+            }
+            else {
+                return this.normalizeElement(target)
+            }
+        }
 
 
-        normalizeElement (el : string | Element, onResolvedToMultiple : 'first' | 'warn' | 'throw' = this.actionTargetResolvedToMultipleMode) : Element | undefined {
+        normalizeElement (el : string | Element, onResolvedToMultiple : 'ignore' | 'warn' | 'throw' = this.actionTargetResolvedToMultipleMode) : Element | undefined {
             if (isString(el)) {
                 const resolved      = this.query(el)
 
@@ -118,7 +110,7 @@ export class UserAgentOnPage extends Mixin(
 
 
         normalizeElementDetailed (
-            el : string | Element, onResolvedToMultiple : 'first' | 'warn' | 'throw' = this.actionTargetResolvedToMultipleMode
+            el : string | Element, onResolvedToMultiple : 'ignore' | 'warn' | 'throw' = this.actionTargetResolvedToMultipleMode
         )
             : { el : Element, multiple : boolean }
         {
@@ -179,6 +171,11 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        getCursorViewportPosition () : Point {
+            return this.simulator.currentPosition.slice() as Point
+        }
+
+
         reportActionabilityCheckFailures (action : MouseActionOptions, checks : ActionableCheck[], options : WaitForTargetActionableOptions) {
             // TODO
             // 1) should list detailed failed checks (like for "reachable" for example, it should say
@@ -189,7 +186,8 @@ export class UserAgentOnPage extends Mixin(
                 name        : 'waitForElementActionable',
                 passed      : false,
                 annotation  : <div>
-                    Waited too long for { options.actionName } target <span>{ action.target }</span> to become actionable
+                    <div>Waited too long for { options.actionName } target <span>{ action.target }</span> to become actionable</div>
+                    <div>Failed checks: `{ checks.join(" ") }`</div>
                 </div>
             }))
         }

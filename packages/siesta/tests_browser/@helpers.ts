@@ -1,3 +1,5 @@
+import { isString, isObject } from "../src/util/Typeguards.js"
+
 export type Position = { left : number, top : number, width : number, height : number }
 
 
@@ -30,4 +32,31 @@ export const createPositionedIframe = async (doc : Document, url : string = 'abo
 
         doc.body.appendChild(iframe)
     })
+}
+
+
+export const createElement = (
+    doc : Document, tag : string, options? : { id? : string, style? : string | object, class? : string, text? : string, attributes? : object }
+)
+    : HTMLElement =>
+{
+    const el            = document.createElement(tag)
+
+    const style         = options?.style
+
+    if (isString(style)) {
+        el.style.cssText    = style
+    } else if (isObject(style)) {
+        Object.assign(el.style, style)
+    }
+
+    if (options?.id !== undefined) el.id = options?.id
+
+    if (options?.attributes) Object.assign(el, options.attributes)
+
+    if (isString(options?.class)) el.className = options.class
+
+    if (isString(options?.text)) el.innerText = options.text
+
+    return el
 }
