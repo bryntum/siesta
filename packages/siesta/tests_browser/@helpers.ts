@@ -14,7 +14,7 @@ export const createPositionedElement = (doc : Document, tag : string, pos : Posi
 }
 
 
-export const createIframe = async (doc : Document, url : string = 'about:blank', pos : Position) : Promise<HTMLIFrameElement> => {
+export const createPositionedIframe = async (doc : Document, url : string = 'about:blank', pos : Position) : Promise<HTMLIFrameElement> => {
     const iframe        = createPositionedElement(doc, 'iframe', pos) as HTMLIFrameElement
 
     iframe.style.border = '0 solid'
