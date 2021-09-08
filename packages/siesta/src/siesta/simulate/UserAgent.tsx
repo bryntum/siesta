@@ -297,7 +297,7 @@ export class UserAgentOnPage extends Mixin(
                         }
 
                         //-----------------
-                        const rect      = Rect.new(el.getBoundingClientRect())
+                        const rect      = Rect.fromElement(el)
 
                         if (!prevRect || !prevRect.isEqual(rect)) {
                             prevRect    = rect
