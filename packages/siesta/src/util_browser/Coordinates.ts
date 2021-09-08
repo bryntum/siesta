@@ -39,7 +39,7 @@ export const normalizeOffset = (el : Element, offset : ActionTargetOffset = [ '5
 
 //---------------------------------------------------------------------------------------------------------------------
 export const getViewportActionPoint = (el : Element, offset? : ActionTargetOffset) : Point | undefined => {
-    const rect              = Rect.new(el.getBoundingClientRect())
+    const rect              = Rect.fromElement(el)
 
     if (offset) {
         const [ dx, dy ]    = normalizeOffset(el, offset)
@@ -50,7 +50,7 @@ export const getViewportActionPoint = (el : Element, offset? : ActionTargetOffse
 
         const intersection          = visibleViewportRect.intersect(rect)
 
-        if (intersection.isEmpty() || intersection.width > 0 || intersection.height > 0) return undefined
+        if (intersection.isEmpty() || intersection.width === 0 || intersection.height === 0) return undefined
 
         return intersection.centerPoint()
     }
