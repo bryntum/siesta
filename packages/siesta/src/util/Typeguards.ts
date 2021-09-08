@@ -18,6 +18,8 @@ export const isString = (a : any) : a is string => typeOf(a) === 'String'
 
 export const isArray = (a : any) : a is unknown[] => typeOf(a) === 'Array'
 
+export const isObject = (a : any) : a is unknown[] => typeOf(a) === 'Object'
+
 export const isRegExp = (a : any) : a is RegExp => typeOf(a) === 'RegExp'
 
 export const isDate = (a : any) : a is Date => typeOf(a) === 'Date'
