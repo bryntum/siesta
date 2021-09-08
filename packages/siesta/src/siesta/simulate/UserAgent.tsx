@@ -320,7 +320,7 @@ export class UserAgentOnPage extends Mixin(
                             const point         = getViewportActionPoint(el, action.offset)
                             const current       = this.simulator.currentPosition
 
-                            if (!equalPoints(point, current)) {
+                            if (!point || !equalPoints(point, current)) {
                                 await this.simulator.simulateMouseMove(point, { precision : action.movePrecision })
 
                                 checks.push('reachable')
