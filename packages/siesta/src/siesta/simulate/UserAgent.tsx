@@ -74,7 +74,7 @@ export class UserAgentOnPage extends Mixin(
 
         simulator           : SimulatorPlaywrightClient     = undefined
 
-        mouseMovePrecision       : PointerMovePrecision          = { kind : 'every_nth', precision : 30 }
+        mouseMovePrecision       : PointerMovePrecision          = { kind : 'last_only', precision : 1 }
 
         actionTargetResolvedToMultipleMode  : 'first' | 'warn' | 'throw'    = 'warn'
 
@@ -210,6 +210,8 @@ export class UserAgentOnPage extends Mixin(
                 const isVisible         = getViewportRect(this.window).containsPoint(point)
 
                 if (!isVisible) {
+                    if (!silent) this.reportActionabilityCheckFailures(action, [ 'visible' ], options)
+
                     return { success : false, failedChecks : [ 'visible' ], actionPoint : point }
                 }
 
