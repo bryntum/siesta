@@ -1,4 +1,4 @@
-import { ClassUnion, Mixin } from "../../../class/Mixin.js"
+import { AnyFunction, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { serializable } from "../../../serializable/Serializable.js"
 import { MAX_SMI, OrPromise, SetTimeoutHandler } from "../../../util/Helpers.js"
@@ -17,7 +17,13 @@ export type WaitForArg<R> = {
      * A condition checker function. Can be `async`. Should return some "truthy" value, indicating the condition has been met.
      * This value will be returned from the [[Test.waitFor|waitFor]] assertion itself.
      */
-    condition       : () => OrPromise<R>,
+    condition?      : () => OrPromise<R>,
+
+    /**
+     * A trigger function. This function is called once the waiting has started. It allows to avoid race conditions
+     * and more verbose syntax
+     */
+    trigger?        : AnyFunction,
 
     /**
      * Maximum amount of time, to wait for condition, in milliseconds. After that time, assertion will be marked as failed.
@@ -205,9 +211,10 @@ export class AssertionAsync extends Mixin(
          */
         async waitFor <R> (waiting : (() => OrPromise<R>) | WaitForArg<R>, description? : string) : Promise<R> {
             let condition : () => OrPromise<R>
-            let timeout : number    = this.waitForTimeout || this.defaultTimeout
+            let timeout : number    = this.waitForTimeout
             let desc : string       = description
             let pollInterval        = this.waitForPollInterval
+            let trigger             = undefined
 
             if (isFunction(waiting)) {
                 condition           = waiting
@@ -216,6 +223,7 @@ export class AssertionAsync extends Mixin(
                 timeout             = waiting.timeout ?? timeout
                 desc                = waiting.description
                 pollInterval        = waiting.interval ?? pollInterval
+                trigger             = waiting.trigger
             }
 
             const creation = this.addResult(AssertionWaitForCreation.new({
@@ -223,7 +231,11 @@ export class AssertionAsync extends Mixin(
                 description     : desc
             }))
 
-            const res       = await this.keepAlive(waitFor(condition, timeout, pollInterval))
+            const promise   = this.keepAlive(waitFor(condition, timeout, pollInterval))
+
+            trigger?.()
+
+            const res       = await promise
 
             if (res.conditionIsMet) {
                 this.addAsyncResolution(AssertionWaitForResolution.new({

@@ -86,3 +86,15 @@ it('`waitFor` should prevent the test from stopping, even w/o `await`', async t 
         t.true(waitCompleted, 'Wait completed before test finalization')
     })
 })
+
+
+//-------------------------------------------------------
+it('`waitFor` should support `trigger` option', async t => {
+
+    let done = false
+
+    await t.waitFor({
+        condition   : () => done,
+        trigger     : () => done = true
+    })
+})
