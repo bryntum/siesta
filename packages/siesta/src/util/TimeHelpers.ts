@@ -6,7 +6,7 @@ export const delay = (timeout : number) : Promise<any> => new Promise(resolve =>
 //---------------------------------------------------------------------------------------------------------------------
 // it is recommended, that the error instance, to throw on timeout, to be provided from the call site of this method
 // this way, the stack trace will point to the `timeout` call, instead of the `timeout` internals
-export const timeout = <T>(promise : Promise<T>, timeout : number, error : Error = new Error(`Timeout of ${ timeout }ms exceeded`)) : Promise<T> => {
+export const timeout = <T>(promise : Promise<T>, timeout : number, error : any = new Error(`Timeout of ${ timeout }ms exceeded`)) : Promise<T> => {
 
     return new Promise((resolve, reject) => {
         let timeOutHappened     = false
