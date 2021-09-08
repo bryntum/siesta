@@ -73,3 +73,16 @@ it('`beginAsync/endAsync` assertion should work', async t => {
 })
 
 
+//-------------------------------------------------------
+it('`waitFor` should prevent the test from stopping, even w/o `await`', async t => {
+
+    let waitCompleted   = false
+
+    t.it('internal', async t => {
+
+        t.waitFor(async () => { await delay(10); waitCompleted = true; return true })
+
+    }).postFinishHook.on(test => {
+        t.true(waitCompleted, 'Wait completed before test finalization')
+    })
+})

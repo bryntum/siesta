@@ -1,8 +1,8 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { serializable } from "../../../serializable/Serializable.js"
-import { OrPromise, SetTimeoutHandler } from "../../../util/Helpers.js"
-import { delay, waitFor } from "../../../util/TimeHelpers.js"
+import { MAX_SMI, OrPromise, SetTimeoutHandler } from "../../../util/Helpers.js"
+import { waitFor } from "../../../util/TimeHelpers.js"
 import { isFunction } from "../../../util/Typeguards.js"
 import { luid, LUID } from "../../common/LUID.js"
 import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, TestNodeResult } from "../TestResult.js"
@@ -163,9 +163,14 @@ export class AssertionAsync extends Mixin(
         }
 
 
-        // not needed?
-        keepAlive <R> (during : Promise<R>) : Promise<R> {
-            return during
+        async keepAlive <R> (during : Promise<R>) : Promise<R> {
+            const async     = this.beginAsync(MAX_SMI)
+
+            try {
+                return await during
+            } finally {
+                this.endAsync(async)
+            }
         }
 
         /**

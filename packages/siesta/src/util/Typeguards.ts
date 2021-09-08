@@ -1,6 +1,10 @@
 import { AnyFunction } from "../class/Mixin.js"
 import { typeOf } from "./Helpers.js"
 
+// TODO should use `typeOfRaw` strings for comparison (like `[object Object]`) avoiding slice
+// this should make the typeguard pretty much instant
+
+
 //---------------------------------------------------------------------------------------------------------------------
 export const isFunction = (a : any) : a is AnyFunction => /Function$/.test(typeOf(a))
 
@@ -23,3 +27,5 @@ export const isObject = (a : any) : a is unknown[] => typeOf(a) === 'Object'
 export const isRegExp = (a : any) : a is RegExp => typeOf(a) === 'RegExp'
 
 export const isDate = (a : any) : a is Date => typeOf(a) === 'Date'
+
+export const isPromise = (a : any) : a is Promise<unknown> => typeOf(a) === 'Promise'

@@ -1,4 +1,5 @@
 import { OrPromise, SetTimeoutHandler } from "./Helpers.js"
+import { isPromise } from "./Typeguards.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export const delay = (timeout : number) : Promise<any> => new Promise(resolve => setTimeout(resolve, timeout))
@@ -50,31 +51,42 @@ export const buffer = <Args extends unknown[]>(func : (...args : Args) => unknow
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const waitFor  = async <R> (condition : () => OrPromise<R>, timeout : number, interval : number)
+export const waitFor  = async <R> (condition : () => OrPromise<R>, waitTimeout : number, interval : number)
     : Promise<{ conditionIsMet : boolean, result : R, exception : unknown, elapsedTime : number }> =>
 {
     const start             = Date.now()
+    const end               = start + waitTimeout
 
-    let result : R
+    const timeoutSymbol     = Symbol()
+
+    let result  : OrPromise<R>
+    let value   : R
 
     do {
         try {
-            result = await condition()
+            result      = condition()
+
+            value       = isPromise(result) ? await timeout(result, Math.max(0, end - Date.now()), timeoutSymbol) : result
         } catch (e) {
-            return { conditionIsMet : false, result : undefined, exception : e, elapsedTime : Date.now() - start }
+            return {
+                conditionIsMet  : false,
+                result          : undefined,
+                exception       : e === timeoutSymbol ? undefined : e,
+                elapsedTime     : Date.now() - start
+            }
         }
 
-        if (result)
+        if (value)
             break
         else {
-            if (Date.now() - start >= timeout) {
+            if (Date.now() - start >= waitTimeout) {
                 return { conditionIsMet : false, result : undefined, exception : undefined, elapsedTime : Date.now() - start }
             }
 
             await delay(interval)
         }
 
-    } while (!result)
+    } while (!value)
 
-    return { conditionIsMet : true, result, exception : undefined, elapsedTime : Date.now() - start }
+    return { conditionIsMet : true, result : value, exception : undefined, elapsedTime : Date.now() - start }
 }
