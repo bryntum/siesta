@@ -129,7 +129,12 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        $ (query : string) : Element[] {
+        $ (query : string) : Element {
+            return this.query(query)[ 0 ]
+        }
+
+
+        $$ (query : string) : Element[] {
             return this.query(query)
         }
 
