@@ -27,7 +27,13 @@ project.plan(
         filename       : 'simulation',
 
         items       : [
-            'click.t.js',
+            {
+                filename    : 'mouse',
+
+                items       : [
+                    'click.t.js',
+                ]
+            }
         ]
     },
     {
