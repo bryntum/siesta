@@ -456,6 +456,9 @@ export class Dashboard extends Mixin(
 
 
         async launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
+            // this method will fetch the fresh test sources, among other things
+            this.getTestLaunchInfo(desc).schedulePendingTestLaunch()
+
             this.connector.launchContinuouslyWithCheckInfo(desc, checkInfo)
         }
 

@@ -88,6 +88,10 @@ export class TestLaunchInfo extends Mixin(
             this.launchState        = 'pending'
 
             try {
+                // do not should possibly outdated sources
+                this.testSources    = undefined
+
+                // should always fetch the fresh test sources, might change anytime
                 this.testSources    = await this.dashboard.connector.fetchSources(this.descriptor.urlAbs)
             } catch (e) {
             }
