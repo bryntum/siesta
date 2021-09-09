@@ -422,14 +422,14 @@ export class Test extends TestPre {
     async start (checkInfo : SubTestCheckInfo = undefined, dashboardLaunchInfo : DashboardLaunchInfo = undefined) {
         this.dashboardLaunchInfo        = dashboardLaunchInfo
 
-        // extra-early start hook, test is not yet marked as active in the reporter
+        // extra-early start hook, can not add assertions in it
         this.preStartHook.trigger(this)
 
         globalTestEnv.currentTest       = this
 
         this.connector.onSubTestStart(this.rootTest.descriptor.guid, this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
-        // start hook, test is marked as active in the reporter
+        // start hook, can add assertions in it
         this.startHook.trigger(this)
 
         if (this.isRoot) {
@@ -444,14 +444,14 @@ export class Test extends TestPre {
             await this.tearDownRootTest()
         }
 
-        // finish hook, test is still marked as active in the reporter
+        // finish hook, can add assertions
         this.finishHook.trigger(this)
 
         this.connector.onSubTestFinish(this.rootTest.descriptor.guid, this.localId, false)
 
         globalTestEnv.currentTest       = this.parentNode
 
-        // extra-late finish hook, test is already not marked as active in the reporter
+        // extra-late finish hook, can not add assertions in it
         this.postFinishHook.trigger(this)
 
         this.cleanup()
