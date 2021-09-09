@@ -9,7 +9,7 @@ import { Test } from "../test/Test.js"
 import { Assertion, SourcePoint } from "../test/TestResult.js"
 import { PointerMovePrecision, Simulator } from "./Simulator.js"
 import { SimulatorPlaywrightClient } from "./SimulatorPlaywright.js"
-import { ActionableCheck, ActionTarget, ActionTargetOffset, equalPoints, MouseButton, Point } from "./Types.js"
+import { ActionableCheck, ActionTarget, ActionTargetOffset, equalPoints, MouseButton, Point, sumPoints } from "./Types.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type MouseActionOptions      = {
@@ -27,17 +27,19 @@ export type MouseActionOptions      = {
 
 //---------------------------------------------------------------------------------------------------------------------
 export interface UserAgent {
-    click (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    click (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
 
-    rightClick (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    rightClick (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
 
-    doubleClick (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    doubleClick (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
 
-    mouseDown (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    mouseDown (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
 
-    mouseUp (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    mouseUp (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
 
-    mouseMove (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    moveMouse (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+
+    moveMouseBy (delta : Point) : Promise<any>
 }
 
 
@@ -361,8 +363,8 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async click (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target, offset)
+        async click (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -373,8 +375,8 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async rightClick (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target, offset)
+        async rightClick (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -385,8 +387,8 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async doubleClick (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target, offset)
+        async doubleClick (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -397,8 +399,8 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async mouseDown (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target, offset)
+        async mouseDown (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -409,8 +411,8 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async mouseUp (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target, offset)
+        async mouseUp (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -421,13 +423,18 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async mouseMove (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async moveMouse (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
                 actionName      : 'mouse move'
             })
+        }
+
+
+        async moveMouseBy (delta : Point) {
+            await this.moveMouse(sumPoints(this.simulator.currentPosition, delta))
         }
     }
 ) {}
@@ -473,8 +480,13 @@ export class UserAgentExternal extends Mixin(
         }
 
 
-        async mouseMove (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async moveMouse (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
 
+        }
+
+
+        async moveMouseBy (delta : Point) {
+            await this.moveMouse(sumPoints(this.simulator.currentPosition, delta))
         }
     }
 ) {}
