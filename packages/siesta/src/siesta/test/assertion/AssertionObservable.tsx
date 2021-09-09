@@ -1,8 +1,23 @@
 import { AnyFunction, ClassUnion, Mixin } from "typescript-mixin-class"
+import { Hook } from "../../../hook/Hook.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
-import { timeout } from "../../../util/TimeHelpers.js"
+import { delay, timeout } from "../../../util/TimeHelpers.js"
+import { isFunction, isNumber, isObject, isPromise, isString } from "../../../util/Typeguards.js"
 import { Assertion } from "../TestResult.js"
 import { AssertionAsync, WaitForArg } from "./AssertionAsync.js"
+import { GotExpectTemplate, verifyExpectedNumber } from "./AssertionCompare.js"
+
+
+export type FiresOkOptions<O> = {
+    observable      : O,
+    events          : Record<string, string | number>,
+    during?         : number | AnyFunction,
+
+    description?    : string
+
+    // deprecated, do not document
+    desc?           : string
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 export class AssertionObservable extends Mixin(
@@ -11,7 +26,11 @@ export class AssertionObservable extends Mixin(
 
     class AssertionObservable extends base {
 
+        ObservableSourceT   : Parameters<this[ 'resolveObservable' ]>[ 0 ]
         ObservableT         : ReturnType<this[ 'resolveObservable' ]>
+
+        // TODO this hook is defined in Test, can we do better than this?
+        finishHook          : Hook<[ this ]>        = new Hook()
 
 
         addListenerToObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
@@ -46,7 +65,7 @@ export class AssertionObservable extends Mixin(
          * @param event
          * @param options
          */
-        async waitForEvent (source : Parameters<this[ 'resolveObservable' ]>[ 0 ], event : string, options? : WaitForArg<unknown>) {
+        async waitForEvent (source : this[ 'ObservableSourceT' ], event : string, options? : WaitForArg<unknown>) {
             const observable            = this.resolveObservable(source)
 
             let listener : AnyFunction
@@ -69,8 +88,6 @@ export class AssertionObservable extends Mixin(
 
                 await promise
 
-                this.removeListenerFromObservable(observable, event, listener)
-
                 this.addResult(Assertion.new({
                     name        : 'waitForEvent',
                     passed      : true,
@@ -78,6 +95,8 @@ export class AssertionObservable extends Mixin(
                 }))
 
             } catch (e) {
+                this.removeListenerFromObservable(observable, event, listener)
+
                 if (e === timeoutError) {
                     this.addResult(Assertion.new({
                         name        : 'waitForEvent',
@@ -95,7 +114,7 @@ export class AssertionObservable extends Mixin(
 
 
         /**
-         * This assertion verifies the number of events, triggered by the provided observable instance during provided
+         * This assertion verifies the number of events, triggered by the provided observable instance during execution of the provided
          * function (which can possibly `async`), time period or during the rest of the test.
          *
          * For example:
@@ -175,209 +194,231 @@ export class AssertionObservable extends Mixin(
          * @param {Function} [options.callback] A callback to call after this assertion has been checked. Only used if `during` value is provided.
          * @param {String} [options.desc] A description for this assertion
          */
-        firesOk (options, events, n, timeOut, func, desc, callback) {
-            //                    |        backward compat arguments        |
-            let me              = this
-            let sourceLine      = me.getSourceLine()
-            let R               = Siesta.Resource('Siesta.Test.Browser')
-            let nbrArgs         = arguments.length
-            let observable, during
+        async firesOk (
+            ...args : [
+                options         : FiresOkOptions<this[ 'ObservableSourceT' ]>
+            ] | [
+                observable      : this[ 'ObservableSourceT' ],
+                events          : string,
+                expected        : number | string,
+                description?    : string
+            ] | [
+                observable      : this[ 'ObservableSourceT' ],
+                events          : string,
+                expected        : number | string,
+                during          : number | AnyFunction,
+                description?    : string
+            ] | [
+                observable      : this[ 'ObservableSourceT' ],
+                events          : Record<string, string | number>,
+                description?    : string
+            ] | [
+                observable      : this[ 'ObservableSourceT' ],
+                events          : Record<string, string | number>,
+                during          : number | AnyFunction,
+                description?    : string
+            ]
+        ) {
+            const sourcePoint       = this.getSourcePoint()
 
-            if (nbrArgs == 1) {
-                observable      = options.observable
-                events          = options.events
-                during          = options.during
-                desc            = options.desc || options.description
-                callback        = options.callback
+            let source              : this[ 'ObservableSourceT' ]
+            let events              : string | Record<string, string | number>
+            let expected            : string | number
+            let during              : number | AnyFunction
+            let description         : string
 
-                timeOut         = this.typeOf(during) == 'Number' ? during : null
-                func            = /Function/.test(this.typeOf(during)) ? during : null
+            if (args.length === 1) {
+                const options       = args[ 0 ]
 
-            } else if (nbrArgs >= 5) {
-                // old signature, backward compat
-                observable      = options
-
-                if (this.typeOf(events) == 'String') {
-                    let obj         = {}
-                    obj[ events ]   = n
-
-                    events          = obj
+                if (isObject(options)) {
+                    source          = options.observable
+                    events          = options.events
+                    during          = options.during
+                    description     = options.description || options.desc
+                } else {
+                    throw new Error("1 argument overload form for `firesOk` accept object")
                 }
-            } else if (nbrArgs <= 3 && this.typeOf(events) == 'Object') {
-                // shortcut form 1
-                observable      = options
-                desc            = n
-            } else if (nbrArgs <= 4 && this.typeOf(events) == 'String') {
-                // shortcut form 2
-                observable      = options
+            } else {
+                source              = args[ 0 ]
+                events              = args[ 1 ]
 
-                let obj         = {}
-                obj[ events ]   = n
-                events          = obj
+                if (isString(args[ 1 ])) {
+                    // @ts-expect-error
+                    expected        = args[ 2 ]
 
-                desc            = timeOut
-                timeOut         = null
-            } else
-                throw new Error(R.get('unrecognizedSignature'))
-
-            // start recording
-            let counters    = {}
-            let countFuncs  = {}
-
-            Joose.O.each(events, function (expected, eventName) {
-                counters[ eventName ]   = 0
-
-                let countFunc   = countFuncs[ eventName ] = function () {
-                    counters[ eventName ]++
+                    if (isNumber(args[ 3 ]) || isFunction(args[ 3 ])) {
+                        during          = args[ 3 ]
+                        description     = args[ 4 ]
+                    }
+                    else {
+                        description     = args[ 3 ]
+                    }
+                } else {
+                    if (isNumber(args[ 2 ]) || isFunction(args[ 2 ])) {
+                        during          = args[ 2 ]
+                        // @ts-expect-error
+                        description     = args[ 3 ]
+                    }
+                    else {
+                        description     = args[ 2 ]
+                    }
                 }
-
-                me.addListenerToObservable(observable, eventName, countFunc)
-            })
-
-
-            // stop recording and verify the results
-            let stopRecording   = function () {
-                Joose.O.each(events, function (expected, eventName) {
-                    me.removeListenerFromObservable(observable, eventName, countFuncs[ eventName ])
-
-                    let actualNumber    = counters[ eventName ]
-
-                    if (me.verifyExpectedNumber(actualNumber, expected))
-                        me.pass(desc, {
-                            descTpl         : R.get('observableFired') + ' ' + actualNumber + ' `' + eventName + '` ' + R.get('events')
-                        })
-                    else
-                        me.fail(desc, {
-                            assertionName   : 'firesOk',
-                            sourceLine      : sourceLine,
-                            descTpl         : R.get('observableFiredOk') + ' `' + eventName + '` ' + R.get('events'),
-                            got             : actualNumber,
-                            gotDesc         : R.get('actualNbrEvents'),
-                            need            : expected,
-                            needDesc        : R.get('expectedNbrEvents')
-                        })
-                })
             }
 
-            if (timeOut) {
-                let async               = this.beginAsync(timeOut + 100)
+            const observable        = this.resolveObservable(source)
+            const expectedEvents    = isString(events) ? { [ events ] : expected } : events
 
-                let originalSetTimeout  = this.originalSetTimeout
 
-                originalSetTimeout(function () {
-                    me.endAsync(async)
+            // start recording
+            const counters          = {}
+            const listeners         = {}
 
+            Object.entries(expectedEvents).forEach(([ event, expected ]) => {
+                counters[ event ]   = 0
+
+                const listener      = listeners[ event ] = () => {
+                    console.log("INCREASE ", event)
+                    counters[event]++
+                }
+
+                this.addListenerToObservable(observable, event, listener)
+            })
+
+            // stop recording and verify the results
+            const stopRecording     = () => {
+                const failedEvents : { event : string, actual : number, expected : string | number }[] = []
+
+                Object.entries(expectedEvents).forEach(([ event, expected ]) => {
+                    this.removeListenerFromObservable(observable, event, listeners[ event ])
+
+                    const actual        = counters[ event ]
+
+                    if (!verifyExpectedNumber(actual, expected)) failedEvents.push({ event, actual, expected })
+                })
+
+                if (failedEvents.length > 0)
+                    this.addResult(Assertion.new({
+                        name        : 'firesOk',
+                        passed      : false,
+                        sourcePoint,
+                        description,
+                        annotation  : <div>{
+                            failedEvents.map(desc => GotExpectTemplate.el({
+                                description         : `Observable fired wrong number of events '${ desc.event }'`,
+                                gotTitle            : 'Actual',
+                                got                 : desc.actual,
+                                expect              : desc.expected,
+                                t                   : this
+                            }))
+                        }</div>
+                    }))
+                else
+                    this.addResult(Assertion.new({
+                        name        : 'firesOk',
+                        passed      : true,
+                        sourcePoint,
+                        description
+                    }))
+            }
+
+            if (isNumber(during)) {
+                await this.keepAlive(delay(during))
+
+                stopRecording()
+            }
+            else if (isFunction(during)) {
+                try {
+                    const res       = during()
+
+                    if (isPromise(res)) await this.keepAlive(res)
+                } finally {
                     stopRecording()
-
-                    me.processCallbackFromTest(callback)
-                }, timeOut)
-            } else if (func) {
-                let typeOf  = this.typeOf(func)
-
-                let cont = function () {
-                    stopRecording()
-
-                    me.processCallbackFromTest(callback)
                 }
-
-                if (typeOf === 'Function') {
-                    let res = func()
-
-                    if (me.typeOf(res) === 'Promise' || me.global.Promise && (res instanceof me.global.Promise)) {
-                        return res.then(cont, cont)
-                    } else
-                        cont()
-                }
-                else if (typeOf === 'AsyncFunction') {
-                    return func().then(cont, cont)
-                }
-
             } else {
-                this.on('beforetestfinalizeearly', stopRecording)
+                this.finishHook.once(stopRecording)
             }
         }
 
 
-    //     /**
-    //      * This assertion passes if the observable fires the specified event exactly (n) times during the test execution.
-    //      *
-    //      * @param {Ext.util.Observable/Ext.Element/HTMLElement} observable The observable instance
-    //      * @param {String} event The name of event
-    //      * @param {Number} n The expected number of events to be fired
-    //      * @param {String} [desc] The description of the assertion.
-    //      */
-    //     willFireNTimes: function (observable, event, n, desc, isGreaterEqual) {
-    //         this.firesOk(observable, event, isGreaterEqual ? '>=' + n : n, desc)
-    //     },
-    //
-    //
-    //     getObjectWithExpectedEvents : function (event, expected) {
-    //         var events      = {}
-    //
-    //         if (this.typeOf(event) == 'Array')
-    //             Joose.A.each(event, function (eventName) {
-    //                 events[ eventName ] = expected
-    //             })
-    //         else
-    //             events[ event ]         = expected
-    //
-    //         return events
-    //     },
-    //
-    //
-    //     /**
-    //      * This assertion passes if the observable does not fire the specified event(s) after calling this method.
-    //      *
-    //      * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
-    //      * @param {String/Array[String]} event The name of event or array of such
-    //      * @param {String} [desc] The description of the assertion.
-    //      */
-    //     wontFire : function(observable, event, desc) {
-    //         this.firesOk({
-    //             observable      : observable,
-    //             events          : this.getObjectWithExpectedEvents(event, 0),
-    //             desc            : desc
-    //         });
-    //     },
-    //
-    //     /**
-    //      * This assertion passes if the observable fires the specified event exactly once after calling this method.
-    //      *
-    //      * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
-    //      * @param {String/Array[String]} event The name of event or array of such
-    //      * @param {String} [desc] The description of the assertion.
-    //      */
-    //     firesOnce : function(observable, event, desc) {
-    //         this.firesOk({
-    //             observable      : observable,
-    //             events          : this.getObjectWithExpectedEvents(event, 1),
-    //             desc            : desc
-    //         });
-    //     },
-    //
-    //     /**
-    //      * Alias for {@link #wontFire} method
-    //      *
-    //      * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
-    //      * @param {String/Array[String]} event The name of event or array of such
-    //      * @param {String} [desc] The description of the assertion.
-    //      */
-    //     isntFired : function() {
-    //         this.wontFire.apply(this, arguments);
-    //     },
-    //
-    //     /**
-    //      * This assertion passes if the observable fires the specified event at least `n` times after calling this method.
-    //      *
-    //      * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
-    //      * @param {String} event The name of event
-    //      * @param {Number} n The minimum number of events to be fired
-    //      * @param {String} [desc] The description of the assertion.
-    //      */
-    //     firesAtLeastNTimes : function(observable, event, n, desc) {
-    //         this.firesOk(observable, event, '>=' + n, desc);
-    //     },
-    //
+        /**
+         * This assertion passes if the observable fires the specified event(s) exactly (n) times during the test execution.
+         *
+         * @param {Ext.util.Observable/Ext.Element/HTMLElement} observable The observable instance
+         * @param {String} event The name of event
+         * @param {Number} expected The expected number of events to be fired
+         * @param {String} [desc] The description of the assertion.
+         */
+        willFireNTimes (observable : this[ 'ObservableSourceT'], event : string | string[], expected : string | number, description? : string) {
+            this.firesOk({
+                observable,
+                events          : this.getObjectWithExpectedEvents(event, expected),
+                description
+            })
+        }
+
+
+        getObjectWithExpectedEvents (event : string | string[], expected : string | number) : Record<string, string | number> {
+            return (isString(event) ? [ event ] : event).reduce((acc, event) => acc[ event ] = expected, {})
+        }
+
+
+        /**
+         * This assertion passes if the observable does not fire the specified event(s) after calling this method.
+         *
+         * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
+         * @param {String/Array[String]} event The name of event or array of such
+         * @param {String} [desc] The description of the assertion.
+         */
+        wontFire (observable : this[ 'ObservableSourceT' ], event : string | string[], description? : string) {
+            this.firesOk({
+                observable      : observable,
+                events          : this.getObjectWithExpectedEvents(event, 0),
+                description
+            })
+        }
+
+        /**
+         * This assertion passes if the observable fires the specified event exactly once after calling this method.
+         *
+         * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
+         * @param {String/Array[String]} event The name of event or array of such
+         * @param {String} [desc] The description of the assertion.
+         */
+        firesOnce (observable : this[ 'ObservableSourceT' ], event : string | string[], description? : string) {
+            this.firesOk({
+                observable      : observable,
+                events          : this.getObjectWithExpectedEvents(event, 1),
+                description
+            })
+        }
+
+        /**
+         * Alias for {@link #wontFire} method
+         *
+         * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
+         * @param {String/Array[String]} event The name of event or array of such
+         * @param {String} [desc] The description of the assertion.
+         */
+        isntFired (observable : this[ 'ObservableSourceT' ], event : string | string[], description? : string) {
+            this.wontFire(observable, event, description)
+        }
+
+        /**
+         * This assertion passes if the observable fires the specified event at least `n` times after calling this method.
+         *
+         * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
+         * @param {String} event The name of event
+         * @param {Number} n The minimum number of events to be fired
+         * @param {String} [desc] The description of the assertion.
+         */
+        firesAtLeastNTimes (observable : this[ 'ObservableSourceT' ], event : string | string[], n : number, description? : string) {
+            this.firesOk({
+                observable      : observable,
+                events          : this.getObjectWithExpectedEvents(event, '>=' + n),
+                description
+            })
+        }
+
     //     /**
     //      * This assertion will verify that the observable fires the specified event and supplies the correct parameters to the listener function.
     //      * A checker method should be supplied that verifies the arguments passed to the listener function, and then returns true or false depending on the result.
