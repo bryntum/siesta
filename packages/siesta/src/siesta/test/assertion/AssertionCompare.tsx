@@ -661,6 +661,7 @@ export class AnnotationTemplate extends Base {
         this.$serializerConfig = value
     }
 
+
     toXmlElement () : XmlElement {
         throw new Error("Abstract method")
     }
@@ -674,9 +675,9 @@ export class AnnotationTemplate extends Base {
 
 //---------------------------------------------------------------------------------------------------------------------
 export class GotExpectTemplate extends AnnotationTemplate {
-    description         : XmlNode       = ''
+    description         : XmlNode       = undefined
 
-    description2        : XmlNode       = ''
+    description2        : XmlNode       = undefined
 
     got                 : unknown
 
@@ -698,14 +699,14 @@ export class GotExpectTemplate extends AnnotationTemplate {
 
     toXmlElement () : XmlElement {
         return <div class="got_expected">
-            { this.description || false }
+            { this.description }
             {
                 this.hasOwnProperty('got') && <div class='got'>
                     <div class="underlined got_title">{ this.gotTitle }:</div>
                     <div class="indented got_value">{ SerializerXml.serialize(this.got, this.serializerConfig) }</div>
                 </div>
             }
-            { this.description2 || false }
+            { this.description2 }
             {
                 this.hasOwnProperty('expect') && <div class='expect'>
                     <div class="underlined expect_title">{ this.expectTitle }:</div>
