@@ -569,6 +569,8 @@ export class Test extends TestPre {
 
             try {
                 await this.ongoing
+                // wait extra event loop cycle
+                await Promise.resolve()
             } catch (exception) {
                 this.addResult(Exception.new({ exception }))
             }

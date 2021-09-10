@@ -201,6 +201,11 @@ export class UserAgentOnPage extends Mixin(
 
 
         async waitForTargetActionable (action : MouseActionOptions, options? : WaitForTargetActionableOptions) : Promise<WaitForTargetActionableResult> {
+            return await this.keepAlive(this.doWaitForTargetActionable(action, options))
+        }
+
+
+        async doWaitForTargetActionable (action : MouseActionOptions, options? : WaitForTargetActionableOptions) : Promise<WaitForTargetActionableResult> {
             const timeout               = options?.timeout ?? this.defaultTimeout
             const syncCursor            = options?.syncCursor ?? true
             const silent                = options?.silent ?? false
@@ -371,7 +376,7 @@ export class UserAgentOnPage extends Mixin(
                 actionName      : 'click'
             })
 
-            if (waitRes.success) await this.simulator.simulateClick({ button : action.button })
+            if (waitRes.success) await this.keepAlive(this.simulator.simulateClick({ button : action.button }))
         }
 
 
@@ -383,7 +388,7 @@ export class UserAgentOnPage extends Mixin(
                 actionName      : 'right click'
             })
 
-            if (waitRes.success) await this.simulator.simulateClick({ button : 'right' })
+            if (waitRes.success) await this.keepAlive(this.simulator.simulateClick({ button : 'right' }))
         }
 
 
@@ -395,7 +400,7 @@ export class UserAgentOnPage extends Mixin(
                 actionName      : 'double click'
             })
 
-            if (waitRes.success) await this.simulator.simulateDblClick({ button : action.button })
+            if (waitRes.success) await this.keepAlive(this.simulator.simulateDblClick({ button : action.button }))
         }
 
 
@@ -407,7 +412,7 @@ export class UserAgentOnPage extends Mixin(
                 actionName      : 'mouse down'
             })
 
-            if (waitRes.success) await this.simulator.simulateMouseDown({ button : action.button })
+            if (waitRes.success) await this.keepAlive(this.simulator.simulateMouseDown({ button : action.button }))
         }
 
 
@@ -419,7 +424,7 @@ export class UserAgentOnPage extends Mixin(
                 actionName      : 'mouse up'
             })
 
-            if (waitRes.success) await this.simulator.simulateMouseUp({ button : action.button })
+            if (waitRes.success) await this.keepAlive(this.simulator.simulateMouseUp({ button : action.button }))
         }
 
 
