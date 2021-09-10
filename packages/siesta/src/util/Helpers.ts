@@ -128,17 +128,16 @@ export const matchAll = function* (regexp : RegExp, testStr : string) : Generato
 
 //---------------------------------------------------------------------------------------------------------------------
 export const isNodejs = function () : boolean {
-    return typeof process !== 'undefined'
-        && process.release && process.release.name === 'node'
-        && typeof global !== 'undefined'
-        // @ts-ignore
-        && typeof window === 'undefined'
+    return typeOf(globalThis.process) === 'process'
 }
 
 export const isDeno = function () : boolean {
     return globalThis.Deno !== undefined && Boolean(globalThis.Deno.build)
 }
 
+export const isBrowser = function () : boolean {
+    return typeOf(globalThis.window) === 'Window'
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 export const saneSplit = (str : string, split : string | RegExp) : string[] => str === '' ? [] : str.split(split)
