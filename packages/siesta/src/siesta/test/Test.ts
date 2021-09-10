@@ -131,7 +131,7 @@ export class Test extends TestPre {
     get env () : Environment {
         if (this.$env !== undefined) return this.$env
 
-        return this.$env = Environment.detect()
+        return this.$env = this.isRoot ? Environment.detect() : this.rootTest.env
     }
 
 
