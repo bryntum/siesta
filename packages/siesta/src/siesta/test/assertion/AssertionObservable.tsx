@@ -355,7 +355,7 @@ export class AssertionObservable extends Mixin(
 
 
         getObjectWithExpectedEvents (event : string | string[], expected : string | number) : Record<string, string | number> {
-            return (isString(event) ? [ event ] : event).reduce((acc, event) => acc[ event ] = expected, {})
+            return (isString(event) ? [ event ] : event).reduce((acc, event) => (acc[ event ] = expected, acc), {})
         }
 
 
