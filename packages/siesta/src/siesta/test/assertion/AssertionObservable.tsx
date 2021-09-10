@@ -276,10 +276,7 @@ export class AssertionObservable extends Mixin(
             Object.entries(expectedEvents).forEach(([ event, expected ]) => {
                 counters[ event ]   = 0
 
-                const listener      = listeners[ event ] = () => {
-                    console.log("INCREASE ", event)
-                    counters[event]++
-                }
+                const listener      = listeners[ event ] = () => counters[ event ]++
 
                 this.addListenerToObservable(observable, event, listener)
             })
