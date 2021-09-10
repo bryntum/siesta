@@ -3,6 +3,7 @@ import { delay } from "../../../src/util/TimeHelpers.js"
 import { createElement } from "../../@helpers.js"
 
 
+//-------------------------------------------------------
 it('Verify check box click works', async t => {
     document.body.innerHTML = '<input type="checkbox" />'
 
@@ -14,7 +15,7 @@ it('Verify check box click works', async t => {
 
 //-------------------------------------------------------
 it('Click should prevent the test from stopping, even w/o `await`', async t => {
-    const div = document.body.appendChild(createElement(document, 'div', {
+    const div = document.body.appendChild(createElement('div', {
         style   : 'width : 40px;',
         text    : 'testing click'
     }))
@@ -33,9 +34,9 @@ it('Click should prevent the test from stopping, even w/o `await`', async t => {
 })
 
 
-
+//-------------------------------------------------------
 it('plain simple clicks', async t => {
-    const clickDiv = document.body.appendChild(createElement(document, 'div', {
+    const clickDiv = document.body.appendChild(createElement('div', {
         style   : 'width : 40px;',
         text    : 'testing click'
     }))
@@ -61,8 +62,9 @@ it('plain simple clicks', async t => {
 })
 
 
+//-------------------------------------------------------
 it('mousedown + mouseup abstraction should fire same event as regular click', async t => {
-    const div   = document.body.appendChild(createElement(document, 'div', {
+    const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: red;',
         text    : 'testing click'
     }))
@@ -77,8 +79,9 @@ it('mousedown + mouseup abstraction should fire same event as regular click', as
 })
 
 
+//-------------------------------------------------------
 it('mousedown + mouseup abstraction should NOT fire click event if mouseup is not in same parent el as the mousedown source', async t => {
-    const div   = document.body.appendChild(createElement(document, 'div', {
+    const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background:green;',
         text    : 'testing click'
     }))
@@ -97,8 +100,9 @@ it('mousedown + mouseup abstraction should NOT fire click event if mouseup is no
 })
 
 
+//-------------------------------------------------------
 it('right clicks', async t => {
-    const div   = document.body.appendChild(createElement(document, 'div', {
+    const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: yellow;',
         text    : 'testing right click'
     }))
@@ -124,48 +128,45 @@ it('right clicks', async t => {
 })
 
 
-// it('double clicks', async t => {
-//
-//     let doubleClickDiv = Ext.getBody().createChild({
-//         tag     : 'div',
-//         style   : 'width : 40px;',
-//         html    : 'testing double click'
-//     })
-//
-//     t.willFireNTimes(doubleClickDiv, 'mousedown', 2,  'double click is ok #1')
-//     t.willFireNTimes(doubleClickDiv, 'mouseup', 2,  'double click is ok #2')
-//     t.willFireNTimes(doubleClickDiv, 'click', 2,  'double click is ok #3')
-//     t.willFireNTimes(doubleClickDiv, 'dblclick', 1,  'double click is ok #4')
-//
-//     // now clicking in the center of the outer (bigger) div
-//     // but the click should happen on the top-most element at that position in the DOM
-//     let div2 = Ext.getBody().createChild({
-//         tag     : 'div',
-//         style   : 'width : 100px; height : 100px; background: blue',
-//
-//         children    : {
-//             tag     : 'div',
-//             style   : 'width : 50px; height : 50px; background: yellow; position : relative; top : 25px; left : 25px',
-//             html    : '&nbsp'
-//         }
-//     })
-//
-//     let innerDiv    = div2.child('div')
-//
-//     t.willFireNTimes(innerDiv, 'mousedown', 1,  'top click is ok #1')
-//     t.willFireNTimes(innerDiv, 'mouseup', 1,  'top click is ok #2')
-//     t.willFireNTimes(innerDiv, 'click', 1,  'top click is ok #3')
-//
-//     t.chain(
-//         {
-//             doubleclick      : doubleClickDiv
-//         },
-//         {
-//             click      : div2
-//         }
-//     )
-// })
-//
+it('Clicking the element should interact with the top-most element', async t => {
+    // now clicking in the center of the outer (bigger) div
+    // but the click should happen on the top-most element at that position in the DOM
+    let div2 = createElement('div', {
+        parent  : document.body,
+
+        style   : 'width : 100px; height : 100px; background: blue',
+
+        children    : [ {
+            tag     : 'div',
+            style   : 'width : 50px; height : 50px; background: yellow; position : relative; top : 25px; left : 25px',
+            html    : '&nbsp'
+        } ]
+    })
+
+    const innerDiv    = div2.querySelector('div')
+
+    t.willFireNTimes(innerDiv, 'mousedown', 1,  'top click is ok #1')
+    t.willFireNTimes(innerDiv, 'mouseup', 1,  'top click is ok #2')
+    t.willFireNTimes(innerDiv, 'click', 1,  'top click is ok #3')
+
+    await t.click(div2)
+})
+
+
+it('Double click', async t => {
+    const div   = document.body.appendChild(createElement('div', {
+        style   : 'width : 40px; background: green;',
+        text    : 'testing double click'
+    }))
+
+    t.willFireNTimes(div, 'mousedown', 2,  'double click is ok #1')
+    t.willFireNTimes(div, 'mouseup', 2,  'double click is ok #2')
+    t.willFireNTimes(div, 'click', 2,  'double click is ok #3')
+    t.willFireNTimes(div, 'dblclick', 1,  'double click is ok #4')
+
+    await t.doubleClick(div)
+})
+
 // !Ext.isIE10m && it("should support clicking SVG element with float values", async t => {
 //     document.body.innerHTML =
 //         '<svg width="800px" height="800px"><rect id="myrect" x="50.5" y="50.5" width="100.2" height="100.1"></rect></svg>'

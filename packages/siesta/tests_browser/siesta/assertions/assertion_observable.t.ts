@@ -7,7 +7,7 @@ import { createElement } from "../../@helpers.js"
 //-------------------------------------------------------
 it('`waitForEvent` assertion should work', async t => {
 
-    const clickDiv = document.body.appendChild(createElement(document, 'div', {
+    const clickDiv = document.body.appendChild(createElement('div', {
         id      : 'div',
         style   : 'width : 40px;',
         text    : 'testing 1'
@@ -33,7 +33,7 @@ it('`waitForEvent` assertion should work', async t => {
 //-------------------------------------------------------
 it('`firesOk` assertion should work', async t => {
 
-    const clickDiv = document.body.appendChild(createElement(document, 'div', {
+    const clickDiv = document.body.appendChild(createElement('div', {
         id      : 'div2',
         style   : 'width : 40px;',
         text    : 'testing 2'

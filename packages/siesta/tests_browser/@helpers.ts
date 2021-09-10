@@ -35,14 +35,29 @@ export const createPositionedIframe = async (doc : Document, url : string = 'abo
 }
 
 
-export const createElement = (
-    doc : Document, tag : string, options? : { id? : string, style? : string | object, class? : string, text? : string, attributes? : object }
-)
-    : HTMLElement =>
-{
-    const el            = document.createElement(tag)
+export type CreateElementDesc = {
+    tag?                : string,
+    id?                 : string,
+    style?              : string | object,
+    class?              : string,
+    text?               : string,
+    html?               : string,
+    attributes?         : object,
+    children?           : CreateElementDesc[]
+    doc?                : Document,
+    parent?             : Element
+}
 
-    const style         = options?.style
+export function createElement (desc : CreateElementDesc) : HTMLElement
+export function createElement (tag : string, desc? : CreateElementDesc) : HTMLElement
+export function createElement (...args : [ desc : CreateElementDesc ] | [ tag : string, desc? : CreateElementDesc ]) : HTMLElement {
+    const desc          = args.length === 2 ? args[ 1 ] : isString(args[ 0 ]) ? { tag : args[ 0 ] } : args[ 0 ]
+    const tag           = args.length === 2 ? args[ 0 ] : desc.tag
+
+    const doc           = desc?.doc || document
+    const el            = doc.createElement(tag)
+
+    const style         = desc?.style
 
     if (isString(style)) {
         el.style.cssText    = style
@@ -50,13 +65,17 @@ export const createElement = (
         Object.assign(el.style, style)
     }
 
-    if (options?.id !== undefined) el.id = options?.id
+    if (desc?.id !== undefined) el.id = desc?.id
 
-    if (options?.attributes) Object.assign(el, options.attributes)
+    if (desc?.attributes) Object.assign(el, desc.attributes)
 
-    if (isString(options?.class)) el.className = options.class
+    if (isString(desc?.class)) el.className = desc.class
 
-    if (isString(options?.text)) el.innerText = options.text
+    if (isString(desc?.text)) el.innerText = desc.text
+
+    desc?.children?.forEach(childDesc => el.appendChild(createElement(childDesc)))
+
+    desc?.parent?.appendChild(el)
 
     return el
 }
