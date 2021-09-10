@@ -63,7 +63,7 @@ it('plain simple clicks', async t => {
 
 it('mousedown + mouseup abstraction should fire same event as regular click', async t => {
     const div   = document.body.appendChild(createElement(document, 'div', {
-        style   : 'width : 40px; background:red;',
+        style   : 'width : 40px; background: red;',
         text    : 'testing click'
     }))
 
@@ -97,39 +97,33 @@ it('mousedown + mouseup abstraction should NOT fire click event if mouseup is no
 })
 
 
-// it('right clicks', async t => {
-//
-//     let rightClickDiv = Ext.getBody().createChild({
-//         tag     : 'div',
-//         style   : 'width : 40px;',
-//         html    : 'testing right click'
-//     })
-//
-//     t.willFireNTimes(rightClickDiv, 'mousedown', 1,  'right click is ok #1')
-//
-//     // Mac doesn't fire mouseup for right click
-//     if (!Ext.isMac) {
-//         t.willFireNTimes(rightClickDiv, 'mouseup', 1,  'right click is ok #2')
-//     }
-//
-//     t.willFireNTimes(rightClickDiv, 'contextmenu', 1,  'right click is ok #3')
-//
-//     rightClickDiv.on('contextmenu', function (event) {
-//         event.preventDefault()
-//
-//         t.is(event.button, 2, 'button to 2 for contextmenu')
-//         // chrome on windows with native fails to set the "buttons" for right click it seems
-//         if (!Ext.isIE && !Ext.isSafari && !(t.simulator.type == 'native' && t.bowser.windows)) t.is(event.buttons, 2, 'buttons to 2 for contextmenu')
-//     })
-//
-//     t.chain(
-//         {
-//             rightClick      : rightClickDiv
-//         }
-//     )
-// })
-//
-//
+it('right clicks', async t => {
+    const div   = document.body.appendChild(createElement(document, 'div', {
+        style   : 'width : 40px; background: yellow;',
+        text    : 'testing right click'
+    }))
+
+    t.willFireNTimes(div, 'mousedown', 1,  'right click is ok #1')
+
+    // Mac doesn't fire mouseup for right click
+    if (!t.env.isMac) t.willFireNTimes(div, 'mouseup', 1,  'right click is ok #2')
+
+    t.willFireNTimes(div, 'contextmenu', 1,  'right click is ok #3')
+
+    div.addEventListener('mousedown', event => {
+        t.is(event.buttons, 2, '`buttons` set to 2 for `mousedown` of right click')
+    })
+
+    div.addEventListener('contextmenu', event => {
+        event.preventDefault()
+
+        t.is(event.buttons, 2, '`buttons` set to 2 for `contextmenu` of right click')
+    })
+
+    await t.rightClick(div)
+})
+
+
 // it('double clicks', async t => {
 //
 //     let doubleClickDiv = Ext.getBody().createChild({
