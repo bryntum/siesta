@@ -21,7 +21,9 @@ it('`waitForEvent` assertion should work', async t => {
 
     //------------------
     t.todo('Should all fail', async t => {
+
         await t.waitForEvent(clickDiv, 'click', { timeout : 1 })
+
     }).postFinishHook.on(todoTest => {
         verifyAllFailed(todoTest, t)
 
@@ -42,10 +44,7 @@ it('`firesOk` assertion should work', async t => {
     await t.firesOk({
         observable  : '#div2',
         events      : { click : 1, mick : 0 },
-
-        during      : async () => {
-            await t.click(clickDiv)
-        }
+        during      : async () => await t.click(clickDiv)
     })
 
 
@@ -55,10 +54,7 @@ it('`firesOk` assertion should work', async t => {
         t.firesOk({
             observable  : '#div2',
             events      : { click : 0, mick : 1 },
-
-            during      : async () => {
-                await t.click(clickDiv)
-            }
+            during      : async () => await t.click(clickDiv)
         })
 
     }).postFinishHook.on(todoTest => {
