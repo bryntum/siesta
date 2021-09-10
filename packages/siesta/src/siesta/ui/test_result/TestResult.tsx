@@ -277,7 +277,7 @@ export class ExceptionComponent extends Mixin(
 
             return <div class="exception">
                 <span class='exception_icon'>EXCEPTION </span>
-                <pre>{ exception.stack || exception }</pre>
+                <pre>{ exception.stack || String(exception.exception) }</pre>
             </div>
         }
     }

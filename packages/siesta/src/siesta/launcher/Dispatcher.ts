@@ -292,7 +292,8 @@ export class Dispatcher extends Mixin(
 
             const context           = await this.chooseContextProviderFor(normalized).createContext(normalized)
 
-            const dashboardLaunchInfo = await this.setDashboardLaunchState(item, 'started')
+            const dashboardLaunchInfo   = await this.setDashboardLaunchState(item, 'started')
+            const dashboardConnector    = this.launcher.dashboardConnector
 
             let preLaunchRes : boolean
 
@@ -305,8 +306,13 @@ export class Dispatcher extends Mixin(
                 const testNode      = TestNodeResultReactive.new({ descriptor : normalized })
 
                 this.reporter.onSubTestStart(testNode)
-                testNode.addResult(Exception.new({ exception : e }))
+                dashboardConnector?.onSubTestStart(item.guid, testNode.localId, undefined, normalized)
+
+                const exception     = testNode.addResult(Exception.new({ exception : e }))
+                dashboardConnector?.onResult(item.guid, testNode.localId, exception)
+
                 this.reporter.onSubTestFinish(testNode)
+                dashboardConnector?.onSubTestFinish(item.guid, testNode.localId, false)
 
                 this.setDashboardLaunchState(item, 'completed')
 
@@ -323,7 +329,10 @@ export class Dispatcher extends Mixin(
                 const testNode      = TestNodeResultReactive.new({ descriptor : normalized })
 
                 this.reporter.onSubTestStart(testNode)
+                dashboardConnector?.onSubTestStart(item.guid, testNode.localId, undefined, normalized)
+
                 this.reporter.onSubTestFinish(testNode)
+                dashboardConnector?.onSubTestFinish(item.guid, testNode.localId, false)
 
                 this.setDashboardLaunchState(item, 'completed')
 
