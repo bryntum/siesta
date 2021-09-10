@@ -126,6 +126,15 @@ export class Test extends TestPre {
     }
 
 
+    $env           : Environment    = undefined
+
+    get env () : Environment {
+        if (this.$env !== undefined) return this.$env
+
+        return this.$env = Environment.detect()
+    }
+
+
     get defaultTimeout () : number {
         return this.descriptor.defaultTimeout
     }
