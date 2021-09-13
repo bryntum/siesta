@@ -22,7 +22,7 @@ it('Element from point should work for nested iframes', async t => {
     const iframe2       = await createPositionedIframe(iframe1.contentDocument, 'about:blank', { left : 50, top : 50, width : 100, height : 100 })
     iframe2.style.backgroundColor   = 'green'
 
-    const div1          = createPositionedElement(iframe2.contentDocument, 'div', { left : 40, top : 40, width : 20, height : 20 })
+    const div1          = createPositionedElement('div', { left : 40, top : 40, width : 20, height : 20 }, iframe2.contentDocument)
     div1.style.backgroundColor      = 'blue'
     iframe2.contentDocument.body.appendChild(div1)
 

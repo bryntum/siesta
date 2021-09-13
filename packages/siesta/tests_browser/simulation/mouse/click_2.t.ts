@@ -22,7 +22,7 @@ let box1 : HTMLElement, box2 : HTMLElement, box3 : HTMLElement
 const setupBox = id => {
     let el              = document.getElementById(id)
 
-    let handler         = e => log.push(e.type + "/" + id)
+    let handler         = (e : MouseEvent) => log.push(e.type + "/" + id)
 
     el.addEventListener('mousedown', handler)
     el.addEventListener('mouseup', handler)

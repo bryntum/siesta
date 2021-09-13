@@ -3,8 +3,8 @@ import { isString, isObject } from "../src/util/Typeguards.js"
 export type Position = { left : number, top : number, width : number, height : number }
 
 
-export const createPositionedElement = (doc : Document, tag : string, pos : Position) : HTMLElement => {
-    const el            = document.createElement(tag)
+export const createPositionedElement = (tag : string, pos : Position, doc : Document = document) : HTMLElement => {
+    const el            = doc.createElement(tag)
 
     el.style.position   = 'absolute'
     el.style.left       = pos.left + 'px'
@@ -17,7 +17,7 @@ export const createPositionedElement = (doc : Document, tag : string, pos : Posi
 
 
 export const createPositionedIframe = async (doc : Document, url : string = 'about:blank', pos : Position) : Promise<HTMLIFrameElement> => {
-    const iframe        = createPositionedElement(doc, 'iframe', pos) as HTMLIFrameElement
+    const iframe        = createPositionedElement('iframe', pos, doc) as HTMLIFrameElement
 
     iframe.style.border = '0 solid'
 
