@@ -1,30 +1,24 @@
-import { it } from "../../../browser.js"
+import { beforeEach, it } from "../../../browser.js"
 import { delay } from "../../../src/util/TimeHelpers.js"
 import { createElement } from "../../@helpers.js"
 
 
-//-------------------------------------------------------
-it('Verify check box click works', async t => {
-    document.body.innerHTML = '<input type="checkbox" />'
-
-    await t.click('input')
-
-    t.selectorExists('input:checked', 'Checkbox should be checked after clicking it')
+beforeEach(() => {
+    document.body.innerHTML = ''
 })
-
 
 //-------------------------------------------------------
 it('Click should prevent the test from stopping, even w/o `await`', async t => {
-    const div = document.body.appendChild(createElement('div', {
-        style   : 'width : 40px;',
-        text    : 'testing click'
-    }))
-
     let clicked   = false
 
-    div.addEventListener('click', () => clicked = true)
-
     t.it('internal', async t => {
+
+        const div = document.body.appendChild(createElement('div', {
+            style   : 'width : 40px;',
+            text    : 'testing click'
+        }))
+
+        div.addEventListener('click', () => clicked = true)
 
         t.click(div)
 
@@ -35,7 +29,7 @@ it('Click should prevent the test from stopping, even w/o `await`', async t => {
 
 
 //-------------------------------------------------------
-it('plain simple clicks', async t => {
+it('Left click', async t => {
     const clickDiv = document.body.appendChild(createElement('div', {
         style   : 'width : 40px;',
         text    : 'testing click'
@@ -53,9 +47,14 @@ it('plain simple clicks', async t => {
         t.is(event.buttons, 1, 'buttons to 1 for left click')
     })
 
+    clickDiv.addEventListener('mouseup', event => {
+        t.is(event.button, 0, 'button to 0 for left click')
+        t.is(event.buttons, 0, 'buttons to 0 for left click')
+    })
+
     clickDiv.addEventListener('click', event => {
         t.is(event.button, 0, 'button to 0 for left click')
-        t.is(event.buttons, 0, 'buttons to 1 for left click')
+        t.is(event.buttons, 0, 'buttons to 0 for left click')
     })
 
     await t.click(clickDiv)
@@ -100,7 +99,7 @@ it('mousedown + mouseup abstraction should NOT fire click event if mouseup is no
 
 
 //-------------------------------------------------------
-it('right clicks', async t => {
+it('Right click', async t => {
     const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: yellow;',
         text    : 'testing right click'
@@ -114,6 +113,7 @@ it('right clicks', async t => {
     t.willFireNTimes(div, 'contextmenu', 1,  'right click is ok #3')
 
     div.addEventListener('mousedown', event => {
+        t.is(event.button, 2, '`buttons` set to 2 for `mousedown` of right click')
         t.is(event.buttons, 2, '`buttons` set to 2 for `mousedown` of right click')
     })
 
@@ -121,12 +121,14 @@ it('right clicks', async t => {
         event.preventDefault()
 
         t.is(event.buttons, 2, '`buttons` set to 2 for `contextmenu` of right click')
+        t.is(event.buttons, 2, '`buttons` set to 2 for `contextmenu` of right click')
     })
 
     await t.rightClick(div)
 })
 
 
+//-------------------------------------------------------
 it('Clicking the element should interact with the top-most element', async t => {
     // now clicking in the center of the outer (bigger) div
     // but the click should happen on the top-most element at that position in the DOM
@@ -152,6 +154,7 @@ it('Clicking the element should interact with the top-most element', async t => 
 })
 
 
+//-------------------------------------------------------
 it('Double click', async t => {
     const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: green;',
@@ -271,6 +274,7 @@ it("should support clicking a polyline", async t => {
 })
 
 
+//-------------------------------------------------------
 it('moving mouse to svg element should work', async t => {
     document.body.innerHTML = [
         '<svg>',
@@ -286,3 +290,15 @@ it('moving mouse to svg element should work', async t => {
 
     await t.click('.target-line')
 })
+
+
+//-------------------------------------------------------
+it('Verify check box click works', async t => {
+    document.body.innerHTML = '<input type="checkbox" />'
+
+    await t.click('input')
+
+    t.selectorExists('input:checked', 'Checkbox should be checked after clicking it')
+})
+
+
