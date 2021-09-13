@@ -20,11 +20,11 @@ export const clientPointToPagePoint = (point : Point, win : Window) : Point => [
 
 //---------------------------------------------------------------------------------------------------------------------
 const evaluateOffsetExpression  = (baseValue : number, expression : string) : number => {
-    const match         = /^\s*([+-]?\d+(?:\.\d+)?)\s*%\s*([+-]\s*\d+(?:\.\d+)?)?\s*$/.exec(expression)
+    const match         = /^\s*([+-]?\d+(?:\.\d+)?)\s*%\s*(?:([+-])\s*(\d+(?:\.\d+)?))?\s*$/.exec(expression)
 
     if (!match) throw new Error(`Invalid offset expression: ${ expression }`)
 
-    return Number(match[ 1 ]) / 100 * baseValue + Number(match[ 2 ] || 0)
+    return Number(match[ 1 ]) / 100 * baseValue + Number((match[ 2 ] ?? '') + (match[ 3 ] ?? 0))
 }
 
 export const normalizeOffset = (el : Element, offset : ActionTargetOffset = [ '50%', '50%' ]) : Point => {

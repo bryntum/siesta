@@ -45,7 +45,8 @@ project.plan(
                 filename       : 'coordinates',
 
                 items       : [
-                    'filter_path.t.js'
+                    'filter_path.t.js',
+                    'offset.t.js'
                 ]
             },
             {
