@@ -150,15 +150,6 @@ it('Should fire pointer events for mouse movements', async t => {
     await t.moveMouseBy([ -20, 0 ])
     await t.moveMouseBy([ 20, 0 ])
 
-    // if (t.simulator.type == 'synthetic' || t.browser.msie || t.browser.edge)
-    //     t.equal(log, [
-    //         "pointerover/box1", "mouseover/box1", "pointerenter/box1", "mouseenter/box1",
-    //         "pointerout/box1", "mouseout/box1", "pointerleave/box1", "mouseleave/box1"
-    //     ])
-    // else
-
-    // natively, Chrome simulates first pointer events, then mouse events, grouped,
-    // synthetic and MS groups by event type - pointer over + mouse over, etc
     t.equal(log, [
         "pointerover/box1",
         "pointerenter/box1",

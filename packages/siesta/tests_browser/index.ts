@@ -32,7 +32,8 @@ project.plan(
 
                 items       : [
                     'click.t.js',
-                    'click_2.t.js',
+                    'click_change_target.t.js',
+                    'click_svg.t.js',
                     'pointer_events.t.js'
                 ]
             }

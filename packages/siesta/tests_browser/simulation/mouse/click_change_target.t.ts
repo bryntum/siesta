@@ -151,7 +151,7 @@ it('Should fire click event on common ancestor of pointerup element + element-at
     // if (t.bowser.gecko || (t.bowser.safari && this.bowser.version >= 13)) {
     //     t.wontFire(outer, 'click', 'outer should not trigger click in Safari/FF')
     // } else {
-        t.firesOnce(outer, 'click', 'outer should trigger click in Chrome/IE')
+    t.firesOnce(outer, 'click', 'outer should trigger click in Chrome/IE')
     // }
 
     await t.click(inner)
