@@ -259,13 +259,14 @@ export class UserAgentOnPage extends Mixin(
                         //-----------------
                         const res       = this.normalizeElementDetailed(target)
 
-                        if (!silent && res.multiple && this.actionTargetResolvedToMultipleMode === 'throw')
-                            throw new Error(`Query resolved to multiple elements: ${ target }`)
-
-                        // warn about ambiguous target only once
-                        if (!silent && res.multiple && this.actionTargetResolvedToMultipleMode === 'warn' && !warned) {
-                            warned      = true
-                            this.warn(`Query resolved to multiple elements: ${ target }`)
+                        if (!silent && res.multiple) {
+                            if (this.actionTargetResolvedToMultipleMode === 'throw')
+                                throw new Error(`Query resolved to multiple elements: ${ target }`)
+                            else if (this.actionTargetResolvedToMultipleMode === 'warn' && !warned) {
+                                // warn about ambiguous target only once
+                                warned      = true
+                                this.warn(`Query resolved to multiple elements: ${ target }`)
+                            }
                         }
 
                         //-----------------
