@@ -121,3 +121,38 @@ it('Changing the target in the 2nd phase of dblclick should still cancel the `cl
         'mouseup/box3'
     ])
 })
+
+
+it('Should fire click event on common ancestor of pointerup element + element-at-cursor if pointerup triggers another element to become visible', async t => {
+    document.body.innerHTML =
+        '<div id="outer" style="position:absolute; left: 0; top: 0px; height:250px; width:250px;background:red;">' +
+            '<div id="inner" style="background:blue;">Inner Element' +
+                '<div id="inner-inner" style="background:#fff;width:100px">Innermost Element</div>' +
+            '</div>' +
+        '</div>'
+
+    const outer = t.$('#outer') as HTMLElement
+    const inner = t.$('#inner') as HTMLElement
+
+    outer.addEventListener('pointerdown', e => {
+        // Now element is not reachable with elementFromPoint
+        inner.style.visibility = 'hidden'
+        e.preventDefault()
+    })
+
+    outer.addEventListener('pointerup', e => {
+        inner.style.visibility = 'visible'
+    })
+
+    t.wontFire(inner, [ 'mouseup', 'click' ], 'inner should not trigger mouseup and click events')
+
+    t.wontFire(outer, 'mouseup', 'outer should not trigger mouseup')
+
+    // if (t.bowser.gecko || (t.bowser.safari && this.bowser.version >= 13)) {
+    //     t.wontFire(outer, 'click', 'outer should not trigger click in Safari/FF')
+    // } else {
+        t.firesOnce(outer, 'click', 'outer should trigger click in Chrome/IE')
+    // }
+
+    await t.click(inner)
+})
