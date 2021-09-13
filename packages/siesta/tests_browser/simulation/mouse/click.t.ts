@@ -1,4 +1,6 @@
 import { beforeEach, it } from "../../../browser.js"
+import { Assertion } from "../../../src/siesta/test/TestResult.js"
+import { verifyAllFailed } from "../../../tests/siesta/@helpers.js"
 import { createElement } from "../../@helpers.js"
 
 
@@ -189,6 +191,32 @@ it('Should be possible to click an offset point outside the element', async t =>
     t.willFireNTimes(document.body, 'click', 1,  'Click event is fired')
 
     await t.click(div, [ '100% + 1', '50%' ])
+})
+
+
+//-------------------------------------------------------
+it('Failed clicks (due to element not actionable) should create failing assertion', async t => {
+    const async = t.beginAsync()
+
+    t.todo('internal', async t => {
+        const div = document.body.appendChild(createElement('div', {
+            style   : 'width : 40px; display: none',
+            text    : 'testing click'
+        }))
+
+        await t.click({ target : div, timeout : 30 })
+
+    }).postFinishHook.on(todoTest => {
+        verifyAllFailed(todoTest, t)
+
+        const assertions        = Array.from(todoTest.eachResultOfClassDeep(Assertion))
+
+        t.is(assertions.length, 1)
+
+        t.is(assertions[ 0 ].name, 'waitForElementActionable')
+
+        t.endAsync(async)
+    })
 })
 
 

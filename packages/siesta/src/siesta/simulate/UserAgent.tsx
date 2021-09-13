@@ -20,6 +20,8 @@ export type MouseActionOptions      = {
     movePrecision       : PointerMovePrecision
     allowChild          : boolean
 
+    timeout             : number
+
     callback            : Function
     scope               : any
 }
@@ -27,17 +29,17 @@ export type MouseActionOptions      = {
 
 //---------------------------------------------------------------------------------------------------------------------
 export interface UserAgent {
-    click (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    click (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
-    rightClick (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    rightClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
-    doubleClick (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    doubleClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
-    mouseDown (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    mouseDown (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
-    mouseUp (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    mouseUp (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
-    moveMouse (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : Promise<any>
+    moveMouse (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
     moveMouseBy (delta : Point) : Promise<any>
 }
@@ -72,13 +74,13 @@ export class UserAgentOnPage extends Mixin(
 
     class UserAgentOnPage extends base implements UserAgent {
 
-        window              : Window                        = window
+        window                  : Window                        = window
 
-        simulator           : SimulatorPlaywrightClient     = undefined
+        simulator               : SimulatorPlaywrightClient     = undefined
 
-        mouseMovePrecision       : PointerMovePrecision          = { kind : 'last_only', precision : 1 }
+        mouseMovePrecision      : PointerMovePrecision          = { kind : 'last_only', precision : 1 }
 
-        actionTargetResolvedToMultipleMode  : 'ignore' | 'warn' | 'throw'    = 'warn'
+        onAmbiguousQuery        : 'use_first' | 'warn' | 'throw'   = 'warn'
 
         // coordinatesSystem   : 'page' | 'viewport'           = 'viewport'
 
@@ -93,14 +95,14 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        normalizeElement (el : string | Element, onResolvedToMultiple : 'ignore' | 'warn' | 'throw' = this.actionTargetResolvedToMultipleMode) : Element | undefined {
+        normalizeElement (el : string | Element, onAmbiguousQuery : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery) : Element | undefined {
             if (isString(el)) {
                 const resolved      = this.query(el)
 
                 if (resolved.length > 1) {
-                    if (onResolvedToMultiple === 'warn')
+                    if (onAmbiguousQuery === 'warn')
                         this.warn(`Query resolved to multiple elements: ${ el }`)
-                    else if (onResolvedToMultiple === 'throw')
+                    else if (onAmbiguousQuery === 'throw')
                         throw new Error(`Query resolved to multiple elements: ${ el }`)
                 }
 
@@ -112,7 +114,7 @@ export class UserAgentOnPage extends Mixin(
 
 
         normalizeElementDetailed (
-            el : string | Element, onResolvedToMultiple : 'ignore' | 'warn' | 'throw' = this.actionTargetResolvedToMultipleMode
+            el : string | Element, onResolvedToMultiple : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery
         )
             : { el : Element, multiple : boolean }
         {
@@ -141,7 +143,7 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        normalizeMouseActionOptions (targetOrOptions : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) : MouseActionOptions {
+        normalizeMouseActionOptions (targetOrOptions : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : MouseActionOptions {
             if (isString(targetOrOptions) || isArray(targetOrOptions) || (targetOrOptions instanceof Element)) {
                 return {
                     target              : targetOrOptions,
@@ -150,6 +152,8 @@ export class UserAgentOnPage extends Mixin(
 
                     movePrecision       : this.mouseMovePrecision,
                     allowChild          : true,
+
+                    timeout             : this.defaultTimeout,
 
                     callback            : undefined,
                     scope               : undefined
@@ -162,6 +166,8 @@ export class UserAgentOnPage extends Mixin(
 
                     movePrecision       : this.mouseMovePrecision,
                     allowChild          : true,
+
+                    timeout             : this.defaultTimeout,
 
                     callback            : undefined,
                     scope               : undefined
@@ -206,7 +212,7 @@ export class UserAgentOnPage extends Mixin(
 
 
         async doWaitForTargetActionable (action : MouseActionOptions, options? : WaitForTargetActionableOptions) : Promise<WaitForTargetActionableResult> {
-            const timeout               = options?.timeout ?? this.defaultTimeout
+            const timeout               = options?.timeout ?? action.timeout ?? this.defaultTimeout
             const syncCursor            = options?.syncCursor ?? true
             const silent                = options?.silent ?? false
             const stabilityFrames       = options?.stabilityFrames ?? 2
@@ -237,7 +243,7 @@ export class UserAgentOnPage extends Mixin(
                 let counter : number    = 0
                 let warned : boolean    = false
 
-                let failedChecks : ActionableCheck[]
+                let failedChecks : ActionableCheck[]    = []
 
                 const win               = this.window
 
@@ -260,9 +266,9 @@ export class UserAgentOnPage extends Mixin(
                         const res       = this.normalizeElementDetailed(target)
 
                         if (!silent && res.multiple) {
-                            if (this.actionTargetResolvedToMultipleMode === 'throw')
+                            if (this.onAmbiguousQuery === 'throw')
                                 throw new Error(`Query resolved to multiple elements: ${ target }`)
-                            else if (this.actionTargetResolvedToMultipleMode === 'warn' && !warned) {
+                            else if (this.onAmbiguousQuery === 'warn' && !warned) {
                                 // warn about ambiguous target only once
                                 warned      = true
                                 this.warn(`Query resolved to multiple elements: ${ target }`)
@@ -369,72 +375,78 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async click (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async click (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
-                actionName      : 'click'
+                actionName      : 'click',
+                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(this.simulator.simulateClick({ button : action.button }))
         }
 
 
-        async rightClick (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async rightClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
-                actionName      : 'right click'
+                actionName      : 'right click',
+                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(this.simulator.simulateClick({ button : 'right' }))
         }
 
 
-        async doubleClick (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async doubleClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
-                actionName      : 'double click'
+                actionName      : 'double click',
+                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(this.simulator.simulateDblClick({ button : action.button }))
         }
 
 
-        async mouseDown (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async mouseDown (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
-                actionName      : 'mouse down'
+                actionName      : 'mouse down',
+                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(this.simulator.simulateMouseDown({ button : action.button }))
         }
 
 
-        async mouseUp (target? : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async mouseUp (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
-                actionName      : 'mouse up'
+                actionName      : 'mouse up',
+                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(this.simulator.simulateMouseUp({ button : action.button }))
         }
 
 
-        async moveMouse (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async moveMouse (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
-                actionName      : 'mouse move'
+                actionName      : 'mouse move',
+                timeout         : action.timeout
             })
         }
 
@@ -462,22 +474,22 @@ export class UserAgentExternal extends Mixin(
         simulator           : Simulator     = undefined
 
 
-        async click (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async click (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
 
         }
 
 
-        async rightClick (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async rightClick (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
 
         }
 
 
-        async doubleClick (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async doubleClick (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
 
         }
 
 
-        async mouseDown (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async mouseDown (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
         }
 
 
@@ -486,7 +498,7 @@ export class UserAgentExternal extends Mixin(
         }
 
 
-        async moveMouse (target : ActionTarget | MouseActionOptions, offset? : ActionTargetOffset) {
+        async moveMouse (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
 
         }
 
