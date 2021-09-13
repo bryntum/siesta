@@ -1,6 +1,6 @@
 import { ActionTargetOffset, Point } from "../siesta/simulate/Types.js"
 import { Rect } from "../util/Rect.js"
-import { getViewportActionPoint, getViewportRect, normalizeOffset } from "./Coordinates.js"
+import { getViewportActionPoint, getViewportRect, isOffsetInsideElementBox, normalizeOffset } from "./Coordinates.js"
 import { isHTMLIFrameElement } from "./Typeguards.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -127,11 +127,15 @@ export const isElementPointReachable = (
 {
     const doc               = el.ownerDocument
 
+    const isInside          = isOffsetInsideElementBox(el, offset)
+
     const point             = getViewportActionPoint(el, offset)
 
     const elAtPoint         = doc.elementFromPoint(...point)
 
-    const reachable         = elAtPoint === el || allowChild && el.contains(elAtPoint)
+    // if the offset specifies a point outside of the element, this check
+    // always succeeds
+    const reachable         = !isInside || elAtPoint === el || allowChild && el.contains(elAtPoint)
 
     return { reachable, point, elAtPoint }
 }
