@@ -13,7 +13,8 @@ project.plan(
         items       : [
             'queued.t.js',
             'uniqable.t.js',
-            'promise_sync.t.js'
+            'promise_sync.t.js',
+            'rect.t.js'
         ]
     },
     {
