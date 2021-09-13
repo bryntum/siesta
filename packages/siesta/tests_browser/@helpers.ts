@@ -73,6 +73,8 @@ export function createElement (...args : [ desc : CreateElementDesc ] | [ tag : 
 
     if (isString(desc?.text)) el.innerText = desc.text
 
+    if (isString(desc?.html)) el.innerHTML = desc.html
+
     desc?.children?.forEach(childDesc => el.appendChild(createElement(childDesc)))
 
     desc?.parent?.appendChild(el)

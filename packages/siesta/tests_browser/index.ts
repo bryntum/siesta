@@ -32,6 +32,7 @@ project.plan(
 
                 items       : [
                     'click.t.js',
+                    'click_2.t.js'
                 ]
             }
         ]

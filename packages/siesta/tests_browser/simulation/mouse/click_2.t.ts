@@ -1,0 +1,123 @@
+import { it } from "../../../browser.js"
+import { awaitDomInteractive } from "../../../src/util_browser/Dom.js"
+import { createElement } from "../../@helpers.js"
+
+awaitDomInteractive().then(() =>
+    createElement('style', {
+        html :
+`.box {                
+    position    : absolute;
+    width       : 200px;
+    height      : 200px;
+    border      : 1px solid green;
+}
+`,
+        parent  : document.head
+    })
+)
+
+let log : string[]
+let box1 : HTMLElement, box2 : HTMLElement, box3 : HTMLElement
+
+const setupBox = id => {
+    let el              = document.getElementById(id)
+
+    let handler         = e => log.push(e.type + "/" + id)
+
+    el.addEventListener('mousedown', handler)
+    el.addEventListener('mouseup', handler)
+    el.addEventListener('click', handler)
+    el.addEventListener('contextmenu', handler)
+    el.addEventListener('dblclick', handler)
+
+    return el
+}
+
+
+const doSetup     = () => {
+    document.body.innerHTML =
+        '<div class="box" id="box1" style="left: 0px;top:0px"></div>' +
+        '<div class="box" id="box2" style="border-color:blue; left: 300px;top:0px"></div>' +
+        '<div class="box" id="box3" style="border-color:red; left: 600px;top:0px"></div>'
+
+    box1    = setupBox('box1')
+    box2    = setupBox('box2')
+    box3    = setupBox('box3')
+
+    log     = []
+}
+
+
+it('Changing the target should cancel the `click` event', async t => {
+    doSetup()
+
+    box1.addEventListener('mousedown', e => box2.style.left = '50px')
+
+    await t.click('#box1')
+
+    t.equal(log, [
+        'mousedown/box1',
+        'mouseup/box2'
+    ])
+})
+
+
+it('Changing the target to the child el should not cancel the `click` event', async t => {
+    document.body.innerHTML =
+        '<div class="box" id="box1" style="left: 0px;top:0px; height: 100px; width:100px">' +
+            '<div class="box" id="box2" style="border-color:blue; left: 0px;top:0px; height: 50px; width:50px"></div>' +
+        '</div>'
+
+
+    box1    = setupBox('box1')
+    box2    = setupBox('box2')
+
+    log     = []
+
+    box1.addEventListener('mousedown', e => box2.style.width = '0px')
+
+    await t.click('#box2')
+
+    t.equal(log, [
+        'mousedown/box2',
+        'mousedown/box1',
+        'mouseup/box1',
+        'click/box1'
+    ])
+})
+
+
+it('Changing the target should cancel the `click` event but not the 2nd one in the dblclick', async t => {
+    doSetup()
+
+    box1.addEventListener('mousedown', e => box2.style.left = '50px')
+
+    await t.doubleClick('#box1')
+
+    t.equal(log, [
+        'mousedown/box1',
+        'mouseup/box2',
+        'mousedown/box2',
+        'mouseup/box2',
+        'click/box2',
+        'dblclick/box2'
+    ])
+})
+
+
+it('Changing the target in the 2nd phase of dblclick should still cancel the `click` and `dblclick`', async t => {
+    doSetup()
+
+    box1.addEventListener('mousedown', e => box2.style.left = '50px')
+
+    box2.addEventListener('mousedown', e => box3.style.left = '100px')
+
+    await t.doubleClick('#box1', [ '90%', '50%' ])
+
+    t.equal(log, [
+        'mousedown/box1',
+        'mouseup/box2',
+        'mousedown/box2',
+        'mouseup/box3'
+    ])
+})
