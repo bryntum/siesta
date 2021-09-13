@@ -770,19 +770,25 @@ export class Test extends TestPre {
         if (!globalTestEnv.topTest) {
 
             if (globalTestEnv.hasPendingTest) {
-
                 // launched from the outside, by the Launcher
                 globalTestEnv.topTest   = this.new({
-                    descriptor      : parse(globalTestEnv.topTestDescriptorStr)
+                    descriptor          : parse(globalTestEnv.topTestDescriptorStr),
+                    beforeEachHooks     : globalTestEnv.pendingBeforeEachHooks,
+                    afterEachHooks      : globalTestEnv.pendingAfterEachHooks
                 } as Partial<InstanceType<T>>)
             } else {
                 // launched standalone, by user executing the test file
                 globalTestEnv.topTest   = this.new({
-                    descriptor      : this.prototype.testDescriptorClass.new()
+                    descriptor          : this.prototype.testDescriptorClass.new(),
+                    beforeEachHooks     : globalTestEnv.pendingBeforeEachHooks,
+                    afterEachHooks      : globalTestEnv.pendingAfterEachHooks
                 } as Partial<InstanceType<T>>)
 
                 this.launchStandalone()
             }
+
+            globalTestEnv.pendingBeforeEachHooks    = []
+            globalTestEnv.pendingAfterEachHooks     = []
         }
 
         const currentTest       = globalTestEnv.currentTest || globalTestEnv.topTest
@@ -970,6 +976,9 @@ export class GlobalTestEnvironment extends Base {
 
     currentTest             : Test              = undefined
 
+    pendingBeforeEachHooks  : ((t : Test) => any)[]     = []
+    pendingAfterEachHooks   : ((t : Test) => any)[]     = []
+
 
     get hasPendingTest () : boolean {
         return Boolean(this.topTestDescriptorStr)
@@ -1044,18 +1053,24 @@ export const {
  * Alias for {@link Test.beforeEach | beforeEach} method.
  */
 export const beforeEach = (code : (t : Test) => any) => {
-    if (!globalTestEnv.currentTest) throw new Error("Global `beforeEach` call used outside of the scope of any test")
+    const currentTest       = globalTestEnv.currentTest || globalTestEnv.topTest
 
-    globalTestEnv.currentTest.beforeEach(code)
+    if (currentTest)
+        currentTest.beforeEach(code)
+    else
+        globalTestEnv.pendingBeforeEachHooks.push(code)
 }
 
 /**
  * Alias for {@link Test.afterEach | afterEach} method.
  */
 export const afterEach = (code : (t : Test) => any) => {
-    if (!globalTestEnv.currentTest) throw new Error("Global `afterEach` call used outside of the scope of any test")
+    const currentTest       = globalTestEnv.currentTest || globalTestEnv.topTest
 
-    globalTestEnv.currentTest.afterEach(code)
+    if (currentTest)
+        currentTest.afterEach(code)
+    else
+        globalTestEnv.pendingAfterEachHooks.push(code)
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -1065,7 +1080,9 @@ export const afterEach = (code : (t : Test) => any) => {
  * @param received
  */
 export const expect = (received : unknown) : Expectation => {
-    if (!globalTestEnv.currentTest) throw new Error("Global `expect` call used outside of the scope of any test")
+    const currentTest       = globalTestEnv.currentTest || globalTestEnv.topTest
 
-    return Expectation.new({ value: received, t : globalTestEnv.currentTest })
+    if (!currentTest) throw new Error("Global `expect` call used outside of the scope of any test")
+
+    return Expectation.new({ value: received, t : currentTest })
 }
