@@ -196,8 +196,6 @@ it('Should be possible to click an offset point outside the element', async t =>
 
 //-------------------------------------------------------
 it('Failed clicks (due to element not actionable) should create failing assertion', async t => {
-    const async = t.beginAsync()
-
     t.todo('internal', async t => {
         const div = document.body.appendChild(createElement('div', {
             style   : 'width : 40px; display: none',
@@ -214,8 +212,6 @@ it('Failed clicks (due to element not actionable) should create failing assertio
         t.is(assertions.length, 1)
 
         t.is(assertions[ 0 ].name, 'waitForElementActionable')
-
-        t.endAsync(async)
     })
 })
 

@@ -249,9 +249,17 @@ export class UserAgentOnPage extends Mixin(
 
                 const start             = Date.now()
 
-                return new Promise(resolve => {
+                return new Promise((resolve, reject) => {
 
                     const step = async () => {
+                        try {
+                            await doStep()
+                        } catch (e) {
+                            reject(e)
+                        }
+                    }
+
+                    const doStep = async () => {
                         const elapsed   = Date.now() - start
 
                         if (elapsed >= timeout) {
