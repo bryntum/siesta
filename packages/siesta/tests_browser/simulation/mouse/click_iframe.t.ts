@@ -1,6 +1,9 @@
-import { it } from "../../../browser.js"
+import { beforeEach, it } from "../../../browser.js"
 import { createPositionedElement, createPositionedIframe } from "../../@helpers.js"
 
+beforeEach(() => {
+    document.body.innerHTML = ''
+})
 
 it('Clicking on the elements inside of the iframe should work', async t => {
     const iframe            = await createPositionedIframe('about:blank', { left : 50, top : 50, width : 300, height : 300 })
