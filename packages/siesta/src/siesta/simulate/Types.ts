@@ -2,7 +2,7 @@ import { Base } from "../../class/Base.js"
 import { isFunction } from "../../util/Typeguards.js"
 
 //---------------------------------------------------------------------------------------------------------------------
-export type Point                   = [ number, number ]
+export type Point                   = [ x : number, y : number ]
 
 export type MouseButton             = 'left' | 'right' | 'middle'
 
@@ -10,7 +10,7 @@ export type ActionTarget            = Element | string | Point | []
 
 // export type ActionTargetElement     = Element | string | Point | []
 
-export type ActionTargetOffset      = [ number | string, number | string ]
+export type ActionTargetOffset      = [ dx : number | string, dy : number | string ]
 
 // export type ActionTarget            = ActionTargetElement | { target : ActionTargetElement, offset : ActionTargetOffset } | (() => ActionTarget)
 //
