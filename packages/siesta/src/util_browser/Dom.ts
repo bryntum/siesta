@@ -40,6 +40,13 @@ export function * parentElements (el : Element, includeSelf : boolean = false) :
     }
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+export const isTopWindow = (win : Window) : boolean => {
+    // @ts-ignore
+    return !win.parent || win.parent.SIESTA_DASHBOARD
+}
+
+
 
 //---------------------------------------------------------------------------------------------------------------------
 // TODO not clear if this property returns `true` for element,

@@ -276,6 +276,9 @@ export class Dashboard extends Mixin(
 
             document.body.appendChild(this.el)
 
+            // @ts-ignore
+            window.SIESTA_DASHBOARD = true
+
             if (this.currentTest) {
                 globalGraph.commit()
 
