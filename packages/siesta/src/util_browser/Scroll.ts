@@ -89,31 +89,31 @@ export const scrollElementPointIntoView = (el : Element, offsetArg : ActionTarge
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const scrollPagePointIntoView = (point : Point, win : Window) : boolean => {
-    const doc           = win.document
-
-    const visiblePageRect = getViewportPageRect(win)
-
-    if (visiblePageRect.containsPoint(point)) {
-        // no need to scroll, target point is within visible viewport area
-        return false
-    }
-
-    const div           = doc.createElement('div')
-
-    div.style.cssText   =
-        `position: absolute !important; left: ${ point[ 0 ] }px !important; top: ${ point[ 1 ] }px !important;` +
-        'border-width: 0 !important; padding: 0 !important; margin: 0 !important;' +
-        'width: 1px !important; height: 1px !important;'
-
-    doc.body.appendChild(div)
-
-    div.scrollIntoView()
-
-    doc.body.removeChild(div)
-
-    return true
-}
+// export const scrollPagePointIntoView = (point : Point, win : Window) : boolean => {
+//     const doc           = win.document
+//
+//     const visiblePageRect = getViewportPageRect(win)
+//
+//     if (visiblePageRect.containsPoint(point)) {
+//         // no need to scroll, target point is within visible viewport area
+//         return false
+//     }
+//
+//     const div           = doc.createElement('div')
+//
+//     div.style.cssText   =
+//         `position: absolute !important; left: ${ point[ 0 ] }px !important; top: ${ point[ 1 ] }px !important;` +
+//         'border-width: 0 !important; padding: 0 !important; margin: 0 !important;' +
+//         'width: 1px !important; height: 1px !important;'
+//
+//     doc.body.appendChild(div)
+//
+//     div.scrollIntoView()
+//
+//     doc.body.removeChild(div)
+//
+//     return true
+// }
 
 
 
@@ -121,8 +121,7 @@ export const scrollPagePointIntoView = (point : Point, win : Window) : boolean =
 // element is considered "scrollable" by this method if its `overflow-x` style is `auto` or `scroll`
 // and `scrollWidth` is bigger than `clientWidth` (same for Y-axis and height)
 export const isElementScrollable = (el : Element, axis : 'x' | 'y') : boolean => {
-    const doc               = el.ownerDocument
-    const win               = doc.defaultView
+    const win               = el.ownerDocument.defaultView
 
     const style             = win.getComputedStyle(el)
 

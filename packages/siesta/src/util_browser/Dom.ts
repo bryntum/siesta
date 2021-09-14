@@ -175,11 +175,5 @@ export const elementFromPoint = (queryRoot : DocumentOrShadowRoot, viewportX : n
 export const isSameDomainIframe = (el : HTMLIFrameElement) : boolean => {
     // according to MDN no try/catch is needed:
     // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/contentDocument
-
-    // try {
-        return Boolean(el.contentDocument)
-    // }
-    // catch (e) {
-    //     return false
-    // }
+    return Boolean(el.contentDocument)
 }

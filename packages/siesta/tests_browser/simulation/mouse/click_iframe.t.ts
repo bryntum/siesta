@@ -16,8 +16,6 @@ it('Clicking on the elements inside of the iframe should work', async t => {
 
     iframeDoc.body.appendChild(div)
 
-    debugger
-
     let counter         = 0
 
     div.addEventListener('click', e => {
