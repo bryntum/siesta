@@ -31,8 +31,14 @@ export class Rect extends Base {
     }
 
 
+    // rect is empty when it does not have any of the coords to form a rect, or its width or height <= 0
     isEmpty () : boolean {
         return this.left === undefined || this.top === undefined || this.left >= this.right || this.top >= this.bottom
+    }
+
+
+    get leftTop () : Point {
+        return [ this.left, this.top ]
     }
 
 
@@ -102,12 +108,12 @@ export class Rect extends Base {
 
         const cls       = this.constructor as typeof Rect
 
-        return this.intersect(cls.new({
+        return cls.new({
             left        : frameRect.left + this.left,
             top         : frameRect.top + this.top,
             width       : this.width,
             height      : this.height
-        }))
+        })
     }
 
 

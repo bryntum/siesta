@@ -43,7 +43,7 @@ export function * parentElements (el : Element, includeSelf : boolean = false) :
 //---------------------------------------------------------------------------------------------------------------------
 export const isTopWindow = (win : Window) : boolean => {
     // @ts-ignore
-    return !win.parent || win.parent.SIESTA_DASHBOARD
+    return !win.parent || Boolean(win.parent.SIESTA_DASHBOARD)
 }
 
 
@@ -71,50 +71,68 @@ export const isElementAccessible = (el : Element) : boolean => {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const isElementVisible = (el : Element, globally : boolean = false) : boolean => {
-    if (!isElementAccessible(el)) return false
-
-    let currentWin : Window     = el.ownerDocument.defaultView
-    let currentRect : Rect      = Rect.fromElement(el)
-
-    while (true) {
-        const visibleViewportRect   = getViewportRect(currentWin)
-
-        const intersection          = visibleViewportRect.intersect(currentRect)
-
-        if (intersection.isEmpty() || intersection.width === 0 || intersection.height === 0)
-            return false
-        else
-            if (!globally || currentWin === currentWin.top) return true
-
-        currentRect             = intersection.translateToParentViewport(currentWin)
-        currentWin              = currentWin.parent
-    }
-}
+// export const isElementVisible = (el : Element, globally : boolean = false) : boolean => {
+//     if (!isElementAccessible(el)) return false
+//
+//     let currentWin : Window     = el.ownerDocument.defaultView
+//     let currentRect : Rect      = Rect.fromElement(el)
+//
+//     while (true) {
+//         const visibleViewportRect   = getViewportRect(currentWin)
+//
+//         const intersection          = visibleViewportRect.intersect(currentRect)
+//
+//         if (intersection.isEmpty() || intersection.width === 0 || intersection.height === 0)
+//             return false
+//         else
+//             if (!globally || currentWin === currentWin.top) return true
+//
+//         currentRect             = intersection.translateToParentViewport(currentWin)
+//         currentWin              = currentWin.parent
+//     }
+// }
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const isElementPointVisible = (el : Element, offset : ActionTargetOffset | undefined, globally : boolean = false) : boolean => {
-    if (!isElementAccessible(el)) return false
+export const isElementPointVisible = (el : Element, offset : ActionTargetOffset | undefined = undefined, globally : boolean = false)
+    : { visible : false } | { visible : true, globalXY : Point } =>
+{
+    if (!isOffsetInsideElementBox(el, offset)) throw new Error("For `isElementPointVisible` offset should be inside the element's box")
+
+    if (!isElementAccessible(el)) return { visible : false }
 
     let currentWin : Window     = el.ownerDocument.defaultView
     let currentEl : Element     = el
     let currentRect : Rect      = Rect.fromElement(el)
-    let currentPoint : Point    = sumPoints([ currentRect.left, currentRect.top ], normalizeOffset(el, offset))
+    let currentPoint : Point    = sumPoints(currentRect.leftTop, normalizeOffset(el, offset))
 
     while (true) {
-        const visibleViewportRect   = getViewportRect(currentWin)
+        const parentEl          = currentEl.parentElement
+        const isTop             = (!globally || isTopWindow(currentWin)) && !parentEl.parentElement
+        const parentRect        = Rect.fromElement(parentEl)
 
-        const intersection          = visibleViewportRect.intersect(currentRect)
+        const parentStyle       = currentWin.getComputedStyle(parentEl)
+        const overflowX         = parentStyle[ 'overflow-x' ]
+        const overflowY         = parentStyle[ 'overflow-y' ]
 
-        // no offset mean - any visible point is suitable
-        const isPointVisible    = (!offset && !intersection.isEmpty()) || intersection.containsPoint(currentPoint)
+        if (overflowX !== 'visible') currentRect = currentRect.cropLeftRight(parentRect)
+        if (overflowY !== 'visible') currentRect = currentRect.cropTopBottom(parentRect)
 
-        if (!isPointVisible || isTopWindow(currentWin)) return isPointVisible
+        const isPointVisible    = (!offset && !currentRect.isEmpty()) || currentRect.containsPoint(currentPoint)
 
-        currentPoint            = translatePointToParentViewport(currentPoint, currentWin)
-        currentRect             = intersection.translateToParentViewport(currentWin)
-        currentWin              = currentWin.parent
+        if (!isPointVisible)
+            return { visible : false }
+        else
+            if (isTop) return { visible : true, globalXY : currentPoint }
+
+        if (parentEl.parentElement) {
+            currentEl           = parentEl
+        } else {
+            currentEl           = currentWin.frameElement
+            currentPoint        = translatePointToParentViewport(currentPoint, currentWin)
+            currentRect         = currentRect.translateToParentViewport(currentWin)
+            currentWin          = currentWin.parent
+        }
     }
 }
 

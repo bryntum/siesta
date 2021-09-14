@@ -71,7 +71,6 @@ project.plan(
                 filename       : 'scroll',
 
                 items       : [
-                    'is_element_point_cropped.t.js',
                     'scroll_element_into_view.t.js'
                 ]
             }

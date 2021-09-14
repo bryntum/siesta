@@ -1,6 +1,6 @@
 import { describe } from "../../../browser.js"
-import { isElementPointReachable } from "../../../src/util_browser/Dom.js"
-import { isElementPointCropped, scrollElementPointIntoView } from "../../../src/util_browser/Scroll.js"
+import { isElementPointReachable, isElementPointVisible } from "../../../src/util_browser/Dom.js"
+import { scrollElementPointIntoView } from "../../../src/util_browser/Scroll.js"
 
 describe('Scroll target into view should work', async t => {
     let scrollable
@@ -17,11 +17,11 @@ describe('Scroll target into view should work', async t => {
     })
 
     t.it('Should be able to click on target with offset supplied', async t => {
-        t.true(isElementPointCropped(inner, [ 400, 200 ]), 'Click point is initially scrolled out')
+        t.true(!isElementPointVisible(inner, [ 400, 200 ]).visible, 'Click point is initially scrolled out')
 
         scrollElementPointIntoView(inner, [ 400, 200 ])
 
-        t.false(isElementPointCropped(inner, [ 400, 200 ]), 'Click point is initially scrolled out')
+        t.false(!isElementPointVisible(inner, [ 400, 200 ]).visible, 'Click point is initially scrolled out')
         t.true(isElementPointReachable(inner, [ 400, 200 ]))
 
         t.is(scrollable.scrollLeft, 399)
@@ -49,11 +49,11 @@ describe('Scroll target into view should work #2', async t => {
     })
 
     t.it('Should be able to click on target with offset supplied', async t => {
-        t.true(isElementPointCropped(inner, [ 400, 200 ]), 'Click point is initially scrolled out')
+        t.true(!isElementPointVisible(inner, [ 400, 200 ]).visible, 'Click point is initially scrolled out')
 
         scrollElementPointIntoView(inner, [ 400, 200 ])
 
-        t.false(isElementPointCropped(inner, [ 400, 200 ]), 'Click point is initially scrolled out')
+        t.false(!isElementPointVisible(inner, [ 400, 200 ]).visible, 'Click point is initially scrolled out')
         t.true(isElementPointReachable(inner, [ 400, 200 ]))
     })
 })

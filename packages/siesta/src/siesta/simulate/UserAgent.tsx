@@ -4,7 +4,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { Rect } from "../../util/Rect.js"
 import { isArray, isString } from "../../util/Typeguards.js"
 import { clientXtoPageX, clientYtoPageY, getViewportActionPoint, getViewportRect } from "../../util_browser/Coordinates.js"
-import { elementFromPoint, isElementAccessible, isElementConnected, isElementPointReachable, isElementVisible } from "../../util_browser/Dom.js"
+import { elementFromPoint, isElementAccessible, isElementConnected, isElementPointReachable, isElementPointVisible } from "../../util_browser/Dom.js"
 import { isHTMLElement, isSVGElement } from "../../util_browser/Typeguards.js"
 import { Test } from "../test/Test.js"
 import { Assertion, SourcePoint } from "../test/TestResult.js"
@@ -309,7 +309,7 @@ export class UserAgentOnPage extends Mixin(
 
                         // element is completely invisible - outside of the viewport
                         // we'll try to scroll it into view
-                        if (!isElementVisible(el)) {
+                        if (!isElementPointVisible(el, action.offset, true)) {
                             checks.push('visible')
                             continueWaiting(true, checks)
                             return
