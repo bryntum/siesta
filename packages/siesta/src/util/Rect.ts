@@ -1,5 +1,6 @@
 import { Base } from "typescript-mixin-class"
 import { Point } from "../siesta/simulate/Types.js"
+import { getScrollbarWidth } from "../util_browser/Scroll.js"
 
 export class Rect extends Base {
     left            : number        = undefined
@@ -135,6 +136,25 @@ export class Rect extends Base {
             top         : rect.top,
             width       : rect.width,
             height      : rect.height
+        } as Partial<InstanceType<T>>)
+    }
+
+
+    static fromElementContent<T extends typeof Rect> (this : T, el : HTMLElement) : InstanceType<T> {
+        const win       = el.ownerDocument.defaultView
+        const style     = win.getComputedStyle(el)
+        const rect      = el.getBoundingClientRect()
+
+        const borderLeftWidth   = Number.parseFloat(style.borderLeftWidth)
+        const borderRightWidth  = Number.parseFloat(style.borderRightWidth)
+        const borderTopWidth    = Number.parseFloat(style.borderTopWidth)
+        const borderBottomWidth = Number.parseFloat(style.borderBottomWidth)
+
+        return this.new({
+            left        : rect.left + borderLeftWidth,
+            top         : rect.top + borderTopWidth,
+            width       : rect.width - borderLeftWidth - borderRightWidth - getScrollbarWidth(el, 'x'),
+            height      : rect.height - borderTopWidth - borderBottomWidth - getScrollbarWidth(el, 'y')
         } as Partial<InstanceType<T>>)
     }
 }

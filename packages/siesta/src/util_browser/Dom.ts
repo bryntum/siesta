@@ -71,29 +71,6 @@ export const isElementAccessible = (el : Element) : boolean => {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// export const isElementVisible = (el : Element, globally : boolean = false) : boolean => {
-//     if (!isElementAccessible(el)) return false
-//
-//     let currentWin : Window     = el.ownerDocument.defaultView
-//     let currentRect : Rect      = Rect.fromElement(el)
-//
-//     while (true) {
-//         const visibleViewportRect   = getViewportRect(currentWin)
-//
-//         const intersection          = visibleViewportRect.intersect(currentRect)
-//
-//         if (intersection.isEmpty() || intersection.width === 0 || intersection.height === 0)
-//             return false
-//         else
-//             if (!globally || currentWin === currentWin.top) return true
-//
-//         currentRect             = intersection.translateToParentViewport(currentWin)
-//         currentWin              = currentWin.parent
-//     }
-// }
-
-
-//---------------------------------------------------------------------------------------------------------------------
 export const isElementPointVisible = (el : Element, offset : ActionTargetOffset | undefined = undefined, globally : boolean = false)
     : { visible : false } | { visible : true, globalXY : Point } =>
 {
@@ -109,7 +86,7 @@ export const isElementPointVisible = (el : Element, offset : ActionTargetOffset 
     while (true) {
         const parentEl          = currentEl.parentElement
         const isTop             = (!globally || isTopWindow(currentWin)) && !parentEl.parentElement
-        const parentRect        = Rect.fromElement(parentEl)
+        const parentRect        = Rect.fromElementContent(parentEl)
 
         const parentStyle       = currentWin.getComputedStyle(parentEl)
         const overflowX         = parentStyle[ 'overflow-x' ]

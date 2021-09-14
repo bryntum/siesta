@@ -143,6 +143,17 @@ it('`isElementPointVisible` should work for elements inside iframe', async t => 
 })
 
 
+it('Determine that element is hidden behind the scrollbar', t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; left: 0; top: 0; background: blue; width: 200px; height: 200px; overflow: auto">' +
+            '<div style="position: absolute; background: green; left: 100px; top: 100px; width: 200px; height: 200px" id="inner"></div>' +
+        '</div>'
+
+    t.false(isElementPointVisible(id('inner'), [ 0, 99 ]).visible, 'Point hidden by the scrollbar')
+    t.false(isElementPointVisible(id('inner'), [ 99, 0 ]).visible, 'Point hidden by the scrollbar')
+})
+
+
 it('Determine that element is scrolled out of the view', t => {
     document.body.innerHTML =
         '<div style="position:absolute; left:100px; border:1px solid #ddd; width:200px; height:200px; overflow:auto">' +

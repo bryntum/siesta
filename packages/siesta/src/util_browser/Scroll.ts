@@ -137,3 +137,16 @@ export const isElementScrollable = (el : Element, axis : 'x' | 'y') : boolean =>
         return el.scrollHeight > el.clientHeight
     }
 }
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export const getScrollbarWidth = (el : HTMLElement, axis : 'x' | 'y') : number => {
+    const win               = el.ownerDocument.defaultView
+    const style             = win.getComputedStyle(el)
+
+    if (axis === 'x') {
+        return el.offsetWidth - el.clientWidth - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth)
+    } else {
+        return el.offsetHeight - el.clientHeight - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth)
+    }
+}
