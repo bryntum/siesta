@@ -1,48 +1,7 @@
-import { ActionTargetOffset } from "../siesta/simulate/Types.js"
-
-
-//---------------------------------------------------------------------------------------------------------------------
-// this method assumes offset is within the element! see `isOffsetInsideElementBox`
-
-// export const isElementPointCropped = (el : Element, offset : ActionTargetOffset = [ '50%', '50%' ]) : boolean => {
-//     if (!isOffsetInsideElementBox(el, offset)) throw new Error("Can not use this method for offset outside of the element")
-//
-//     const doc               = el.ownerDocument
-//     const win               = doc.defaultView
-//
-//     let parents : Element[] = []
-//
-//     for (let parent : Element = el; parent; parent = parent.parentElement) parents.push(parent)
-//
-//     let currentRect         = getViewportPageRect(win)
-//
-//     for (let i = parents.length - 1; i >= 0; i--) {
-//         const parent        = parents[ i ]
-//
-//         const overflowX     = win.getComputedStyle(parent)[ 'overflow-x' ]
-//         const overflowY     = win.getComputedStyle(parent)[ 'overflow-y' ]
-//
-//         if (overflowX !== 'visible' || overflowY !== 'visible') {
-//             let parentRect  = getBoundingPageRect(parent)
-//
-//             if (overflowX !== 'visible') {
-//                 currentRect     = currentRect.cropLeftRight(parentRect)
-//                 if (currentRect.isEmpty()) return true
-//             }
-//
-//             if (overflowY !== 'visible') {
-//                 currentRect     = currentRect.cropTopBottom(parentRect)
-//
-//                 if (currentRect.isEmpty()) return true
-//             }
-//         }
-//     }
-//
-//     const elPageRect        = getBoundingPageRect(el)
-//     const offsetPoint       = normalizeOffset(el, offset)
-//
-//     return !currentRect.contains(elPageRect.left + offsetPoint[ 0 ], elPageRect.top + offsetPoint[ 1 ])
-// }
+import { ActionTargetOffset, Point, sumPoints } from "../siesta/simulate/Types.js"
+import { Rect } from "../util/Rect.js"
+import { isOffsetInsideElementBox, normalizeOffset, translatePointToParentViewport } from "./Coordinates.js"
+import { isElementAccessible, isTopWindow } from "./Dom.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -52,36 +11,116 @@ import { ActionTargetOffset } from "../siesta/simulate/Types.js"
 // based on that, first need to scroll the target point into view of the scrollable parent
 // then, treat that point as the point of that parent itself, and recursively continue to the top
 // just porting from version 5 for now
-export const scrollElementPointIntoView = (el : Element, offsetArg : ActionTargetOffset) : boolean => {
-    // // const doc               = el.ownerDocument
-    // // const win               = doc.defaultView
-    //
-    // const offset            = normalizeOffset(el, offsetArg)
-    // const isInside          = isOffsetInsideElementBox(el, offset)
-    //
-    // // If element isn't visible, try to bring it into view
-    // if (isElementVisible(el) && isInside && isElementPointCropped(el, offset)) {
-    //     el.scrollIntoView()
-    //
-    //     // If element is still out of view, try manually scrolling first scrollable parent found
-    //     if (isElementPointCropped(el, offset)) {
-    //
-    //         const scrollableParent  = CI(parentElements(el)).filter(el => isElementScrollable(el, 'x') || isElementScrollable(el, 'y')).take(1)[ 0 ]
-    //
-    //         if (scrollableParent) {
-    //             let parentBox       = scrollableParent.getBoundingClientRect()
-    //             let targetBox       = el.getBoundingClientRect()
-    //
-    //             scrollableParent.scrollLeft = Math.max(0, scrollableParent.scrollLeft + targetBox.left - parentBox.left + offset[ 0 ] - 1)
-    //             scrollableParent.scrollTop  = Math.max(0, scrollableParent.scrollTop + targetBox.top - parentBox.top + offset[ 1 ] - 1)
-    //         }
-    //     }
-    //
-    //     return true
-    // } else {
-    //     return false
-    // }
-    return
+export const scrollElementPointIntoView = (
+    el : Element, offset : ActionTargetOffset = undefined, globally : boolean = false
+)
+    : boolean =>
+{
+    if (!isOffsetInsideElementBox(el, offset)) throw new Error("For `isElementPointVisible` offset should be inside the element's box")
+
+    if (!isElementAccessible(el)) return false
+
+    let currentWin : Window     = el.ownerDocument.defaultView
+    let currentEl : Element     = el
+    let currentRect : Rect      = Rect.fromElement(el)
+    let currentPoint : Point    = sumPoints(currentRect.leftTop, normalizeOffset(el, offset))
+
+    while (true) {
+        const parentEl          = currentEl.parentElement
+        const isTop             = (!globally || isTopWindow(currentWin)) && !parentEl.parentElement
+        const parentRect        = Rect.fromElement(parentEl)
+
+        const parentStyle       = currentWin.getComputedStyle(parentEl)
+        const overflowX         = parentStyle[ 'overflow-x' ]
+        const overflowY         = parentStyle[ 'overflow-y' ]
+        const scrollableX       = overflowX === 'scroll' || overflowX === 'auto'
+        const scrollableY       = overflowY === 'scroll' || overflowY === 'auto'
+
+        if (overflowX !== 'visible') {
+            const croppedXRect  = currentRect.cropLeftRight(parentRect)
+
+            if (scrollableX) {
+                if (croppedXRect.right < currentPoint[ 0 ]) {
+                    const dx        = currentPoint[ 0 ] - croppedXRect.right
+
+                    parentEl.scrollLeft += dx
+                    currentPoint[ 0 ]   -= dx
+
+                    currentRect.shiftHorizontally(-dx)
+                }
+                else if (croppedXRect.left > currentPoint[ 0 ]) {
+                    const dx        = croppedXRect.left - currentPoint[ 0 ]
+
+                    parentEl.scrollLeft -= dx
+                    currentPoint[ 0 ]   += dx
+
+                    currentRect.shiftHorizontally(dx)
+                } else {
+                    currentRect     = croppedXRect
+                }
+            }
+            else {
+                return false
+            }
+        }
+
+        if (overflowY !== 'visible') {
+            const croppedYRect  = currentRect.cropLeftRight(parentRect)
+
+            if (scrollableY) {
+                if (croppedYRect.bottom < currentPoint[ 1 ]) {
+                    const dy        = currentPoint[ 1 ] - croppedYRect.bottom
+
+                    parentEl.scrollTop  += dy
+                    currentPoint[ 1 ]   -= dy
+
+                    currentRect.shiftVertically(-dy)
+                }
+                else if (croppedYRect.top > currentPoint[ 1 ]) {
+                    const dy        = croppedYRect.top - currentPoint[ 1 ]
+
+                    parentEl.scrollTop  -= dy
+                    currentPoint[ 1 ]   += dy
+
+                    currentRect.shiftVertically(dy)
+                } else {
+                    currentRect     = croppedYRect
+                }
+            }
+            else {
+                return false
+            }
+        }
+
+        // // const checkPoint        = offset ? currentPoint : currentRect.center
+        //
+        // const isPointVisible    = (!offset && !currentRect.isEmpty()) || currentRect.containsPoint(currentPoint)
+        //
+        // if (!isPointVisible) {
+        //     if (overflowX === 'auto' || overflowX === 'scroll') {
+        //         parentEl.scrollLeft = Math.max(0, parentEl.scrollLeft + currentRect.left - parentRect.left + offset[ 0 ] - 1)
+        //     }
+        //
+        //     if (overflowY === 'auto' || overflowY === 'scroll') {
+        //         parentEl.scrollTop  = Math.max(0, parentEl.scrollTop + currentRect.top - parentRect.top + offset[ 1 ] - 1)
+        //     }
+        //
+        //     return { visible : false }
+        // }
+        // else
+        //     if (isTop) return { visible : true, globalXY : currentPoint }
+
+        if (parentEl.parentElement) {
+            currentEl           = parentEl
+        } else {
+            if (!globally || isTopWindow(currentWin)) return true
+
+            currentEl           = currentWin.frameElement
+            currentPoint        = translatePointToParentViewport(currentPoint, currentWin)
+            currentRect         = currentRect.translateToParentViewport(currentWin)
+            currentWin          = currentWin.parent
+        }
+    }
 }
 
 
