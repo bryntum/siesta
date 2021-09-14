@@ -1,6 +1,6 @@
-import { ActionTargetOffset, Point } from "../siesta/simulate/Types.js"
+import { ActionTargetOffset, Point, sumPoints } from "../siesta/simulate/Types.js"
 import { Rect } from "../util/Rect.js"
-import { getViewportActionPoint, getViewportRect, isOffsetInsideElementBox, normalizeOffset } from "./Coordinates.js"
+import { getViewportActionPoint, getViewportRect, isOffsetInsideElementBox, normalizeOffset, translatePointToParentViewport } from "./Coordinates.js"
 import { isHTMLIFrameElement } from "./Typeguards.js"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -71,59 +71,52 @@ export const isElementAccessible = (el : Element) : boolean => {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const isElementVisible = (el : Element) : boolean => {
+export const isElementVisible = (el : Element, globally : boolean = false) : boolean => {
     if (!isElementAccessible(el)) return false
 
-    const elViewportRect        = Rect.fromElement(el)
-    const visibleViewportRect   = getViewportRect(el.ownerDocument.defaultView)
+    let currentWin : Window     = el.ownerDocument.defaultView
+    let currentRect : Rect      = Rect.fromElement(el)
 
-    const intersection          = visibleViewportRect.intersect(elViewportRect)
+    while (true) {
+        const visibleViewportRect   = getViewportRect(currentWin)
 
-    return !intersection.isEmpty() && intersection.width > 0 && intersection.height > 0
+        const intersection          = visibleViewportRect.intersect(currentRect)
+
+        if (intersection.isEmpty() || intersection.width === 0 || intersection.height === 0)
+            return false
+        else
+            if (!globally || currentWin === currentWin.top) return true
+
+        currentRect             = intersection.translateToParentViewport(currentWin)
+        currentWin              = currentWin.parent
+    }
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// export const waitForElementStable = async (el : Element, timeout : number) : Promise<boolean> => {
-//     const doc               = el.ownerDocument
-//     const win               = doc.defaultView
-//
-//     let prevRect : Rect     = undefined
-//     let counter : number    = 0
-//
-//     const start             = Date.now()
-//
-//     return new Promise(resolve => {
-//
-//         const checkForStability = () => {
-//             const elapsed   = Date.now() - start
-//
-//             if (elapsed >= timeout) {
-//                 resolve(false)
-//
-//                 return
-//             }
-//
-//             //-----------------
-//             const rect      = Rect.new(el.getBoundingClientRect())
-//
-//             if (!prevRect || !prevRect.isEqual(rect)) {
-//                 prevRect    = rect
-//                 counter     = 0
-//             } else {
-//                 counter++
-//
-//                 if (counter >= 1) {
-//                     resolve(true)
-//                 } else {
-//                     win.requestAnimationFrame(checkForStability)
-//                 }
-//             }
-//         }
-//
-//         win.requestAnimationFrame(checkForStability)
-//     })
-// }
+export const isElementPointVisible = (el : Element, offset : ActionTargetOffset | undefined, globally : boolean = false) : boolean => {
+    if (!isElementAccessible(el)) return false
+
+    let currentWin : Window     = el.ownerDocument.defaultView
+    let currentEl : Element     = el
+    let currentRect : Rect      = Rect.fromElement(el)
+    let currentPoint : Point    = sumPoints([ currentRect.left, currentRect.top ], normalizeOffset(el, offset))
+
+    while (true) {
+        const visibleViewportRect   = getViewportRect(currentWin)
+
+        const intersection          = visibleViewportRect.intersect(currentRect)
+
+        // no offset mean - any visible point is suitable
+        const isPointVisible    = (!offset && !intersection.isEmpty()) || intersection.containsPoint(currentPoint)
+
+        if (!isPointVisible || isTopWindow(currentWin)) return isPointVisible
+
+        currentPoint            = translatePointToParentViewport(currentPoint, currentWin)
+        currentRect             = intersection.translateToParentViewport(currentWin)
+        currentWin              = currentWin.parent
+    }
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------

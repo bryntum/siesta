@@ -2,7 +2,6 @@ import { Base } from "typescript-mixin-class"
 import { Point } from "../siesta/simulate/Types.js"
 
 export class Rect extends Base {
-
     left            : number        = undefined
     top             : number        = undefined
 
@@ -32,8 +31,8 @@ export class Rect extends Base {
     }
 
 
-    isEmpty () {
-        return this.left === undefined
+    isEmpty () : boolean {
+        return this.left === undefined || this.top === undefined || this.left >= this.right || this.top >= this.bottom
     }
 
 
@@ -90,6 +89,24 @@ export class Rect extends Base {
             right       : this.right,
             top         : rect.top,
             bottom      : rect.bottom
+        }))
+    }
+
+
+    translateToParentViewport (win : Window) : Rect {
+        const frame     = win.frameElement
+
+        if (!frame) throw new Error('Window is already top')
+
+        const frameRect = frame.getBoundingClientRect()
+
+        const cls       = this.constructor as typeof Rect
+
+        return this.intersect(cls.new({
+            left        : frameRect.left + this.left,
+            top         : frameRect.top + this.top,
+            width       : this.width,
+            height      : this.height
         }))
     }
 

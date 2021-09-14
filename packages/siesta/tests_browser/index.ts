@@ -44,7 +44,8 @@ project.plan(
                     'click_svg.t.js',
                     'pointer_events.t.js'
                 ]
-            }
+            },
+            'actionability_checks.t.js'
         ]
     },
     {

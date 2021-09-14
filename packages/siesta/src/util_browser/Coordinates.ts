@@ -101,6 +101,18 @@ export const getViewportRect = (win : Window) : Rect => Rect.new({
 
 
 //---------------------------------------------------------------------------------------------------------------------
+export const translatePointToParentViewport = (point : Point, win : Window) : Point => {
+    const frame     = win.frameElement
+
+    if (!frame) throw new Error('Window is already top')
+
+    const frameRect = frame.getBoundingClientRect()
+
+    return [ frameRect.left + point[ 0 ], frameRect.top + point[ 1 ] ]
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
 export const getPathBetweenPoints = function (from : Point, to : Point) : Point[] {
     if (
         typeof from[ 0 ] !== 'number' || typeof from[ 1 ] !== 'number'
