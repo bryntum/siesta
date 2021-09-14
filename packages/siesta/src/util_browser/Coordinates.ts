@@ -52,7 +52,7 @@ export const getViewportActionPoint = (el : Element, offset? : ActionTargetOffse
 
         if (intersection.isEmpty() || intersection.width === 0 || intersection.height === 0) return undefined
 
-        return intersection.centerPoint()
+        return intersection.center
     }
 }
 

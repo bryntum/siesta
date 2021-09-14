@@ -43,6 +43,11 @@ export class Rect extends Base {
     }
 
 
+    get center () : Point {
+        return [ this.left + this.width / 2, this.top + this.height / 2 ]
+    }
+
+
     intersect (rect : Rect) : Rect {
         if (
             rect.isEmpty() || this.isEmpty()
