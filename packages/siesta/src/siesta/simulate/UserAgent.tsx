@@ -5,6 +5,7 @@ import { Rect } from "../../util/Rect.js"
 import { isArray, isString } from "../../util/Typeguards.js"
 import { clientXtoPageX, clientYtoPageY, getViewportActionPoint, getViewportRect } from "../../util_browser/Coordinates.js"
 import { elementFromPoint, isElementAccessible, isElementConnected, isElementPointReachable, isElementVisible } from "../../util_browser/Dom.js"
+import { isHTMLElement, isSVGElement } from "../../util_browser/Typeguards.js"
 import { Test } from "../test/Test.js"
 import { Assertion, SourcePoint } from "../test/TestResult.js"
 import { PointerMovePrecision, Simulator } from "./Simulator.js"
@@ -144,7 +145,7 @@ export class UserAgentOnPage extends Mixin(
 
 
         normalizeMouseActionOptions (targetOrOptions : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : MouseActionOptions {
-            if (isString(targetOrOptions) || isArray(targetOrOptions) || (targetOrOptions instanceof Element)) {
+            if (isString(targetOrOptions) || isArray(targetOrOptions) || isHTMLElement(targetOrOptions) || isSVGElement(targetOrOptions)) {
                 return {
                     target              : targetOrOptions,
                     offset              : offset,

@@ -16,10 +16,10 @@ customElements.define('web-comp', WebComponent)
 it('Element from point should work for nested iframes', async t => {
     document.body.innerHTML     = ''
 
-    const iframe1       = await createPositionedIframe(document, 'about:blank', { left : 50, top : 50, width : 200, height : 200 })
+    const iframe1       = await createPositionedIframe('about:blank', { left : 50, top : 50, width : 200, height : 200 })
     iframe1.style.backgroundColor   = 'red'
 
-    const iframe2       = await createPositionedIframe(iframe1.contentDocument, 'about:blank', { left : 50, top : 50, width : 100, height : 100 })
+    const iframe2       = await createPositionedIframe('about:blank', { left : 50, top : 50, width : 100, height : 100 }, iframe1.contentDocument)
     iframe2.style.backgroundColor   = 'green'
 
     const div1          = createPositionedElement('div', { left : 40, top : 40, width : 20, height : 20 }, iframe2.contentDocument)

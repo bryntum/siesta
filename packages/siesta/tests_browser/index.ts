@@ -28,10 +28,18 @@ project.plan(
 
         items       : [
             {
+                filename    : 'keyboard',
+
+                items       : [
+                    'type_iframe.t.js',
+                ]
+            },
+            {
                 filename    : 'mouse',
 
                 items       : [
                     'click.t.js',
+                    'click_iframe.t.js',
                     'click_change_target.t.js',
                     'click_svg.t.js',
                     'pointer_events.t.js'
