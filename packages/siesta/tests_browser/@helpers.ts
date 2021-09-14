@@ -52,7 +52,7 @@ export function createElement (desc : CreateElementDesc) : HTMLElement
 export function createElement (tag : string, desc? : CreateElementDesc) : HTMLElement
 export function createElement (...args : [ desc : CreateElementDesc ] | [ tag : string, desc? : CreateElementDesc ]) : HTMLElement {
     const desc          = args.length === 2 ? args[ 1 ] : isString(args[ 0 ]) ? { tag : args[ 0 ] } : args[ 0 ]
-    const tag           = args.length === 2 ? args[ 0 ] : desc.tag
+    const tag           = (args.length === 2 ? args[ 0 ] : desc.tag) ?? 'div'
 
     const doc           = desc?.doc || document
     const el            = doc.createElement(tag)
