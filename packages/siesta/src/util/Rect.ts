@@ -34,7 +34,7 @@ export class Rect extends Base {
 
     // rect is empty when it does not have any of the coords to form a rect, or its width or height <= 0
     isEmpty () : boolean {
-        return this.left === undefined || this.top === undefined || this.left >= this.right || this.top >= this.bottom
+        return this.left === undefined || this.top === undefined || this.width === 0 || this.height === 0
     }
 
 

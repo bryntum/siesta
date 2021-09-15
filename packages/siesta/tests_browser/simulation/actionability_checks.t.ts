@@ -99,6 +99,27 @@ it('`isElementPointVisible` should work', t => {
 })
 
 
+it('`isElementPointVisible` without offset should work for any element point', t => {
+    const div       = createElement({
+        parent      : document.body,
+
+        id          : 'div1',
+        style       : 'overflow: hidden; background-color: blue; position: absolute; left: 0px; top: 0px; width: 100px; height: 100px;',
+        children    : [
+            {
+                id      : 'inner1',
+                style   : 'background-color: red; position: absolute; left: 99px; top: 99px; width: 40px; height: 40px;'
+            }
+        ]
+    })
+
+    const inner1        = div.querySelector('#inner1')
+
+    t.true(isElementPointVisible(inner1, [ 0, 0 ]).visible)
+    t.true(isElementPointVisible(inner1).visible)
+})
+
+
 it('`isElementPointVisible` should work for elements inside iframe', async t => {
     const div       = createElement({
         parent      : document.body,
