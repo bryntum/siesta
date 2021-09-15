@@ -27,8 +27,7 @@ export const scrollElementPointIntoView = (
 
     while (true) {
         const parentEl          = currentEl.parentElement
-        const isTop             = (!globally || isTopWindow(currentWin)) && !parentEl.parentElement
-        const parentRect        = Rect.fromElement(parentEl)
+        const parentRect        = Rect.fromElementContent(parentEl)
 
         const parentStyle       = currentWin.getComputedStyle(parentEl)
         const overflowX         = parentStyle[ 'overflow-x' ]
@@ -37,78 +36,60 @@ export const scrollElementPointIntoView = (
         const scrollableY       = overflowY === 'scroll' || overflowY === 'auto'
 
         if (overflowX !== 'visible') {
-            const croppedXRect  = currentRect.cropLeftRight(parentRect)
+            const currentX      = currentPoint[ 0 ]
 
-            if (scrollableX) {
-                if (croppedXRect.right < currentPoint[ 0 ]) {
-                    const dx        = currentPoint[ 0 ] - croppedXRect.right
+            if (parentRect.left <= currentX && currentX <= parentRect.right) {
+                // point is within parent area already, do nothing
+                // TODO should check the "reachable" parent area, since not whole
+                // area of the parent might be visible
+            } else {
+                if (scrollableX) {
+                    if (parentRect.right < currentPoint[ 0 ]) {
+                        const dx        = currentPoint[ 0 ] - parentRect.right
 
-                    parentEl.scrollLeft += dx
-                    currentPoint[ 0 ]   -= dx
+                        parentEl.scrollLeft += dx
+                        currentPoint[ 0 ]   -= dx
+                    }
+                    else if (parentRect.left > currentPoint[ 0 ]) {
+                        const dx        = parentRect.left - currentPoint[ 0 ]
 
-                    currentRect.shiftHorizontally(-dx)
+                        parentEl.scrollLeft -= dx
+                        currentPoint[ 0 ]   += dx
+                    }
                 }
-                else if (croppedXRect.left > currentPoint[ 0 ]) {
-                    const dx        = croppedXRect.left - currentPoint[ 0 ]
-
-                    parentEl.scrollLeft -= dx
-                    currentPoint[ 0 ]   += dx
-
-                    currentRect.shiftHorizontally(dx)
-                } else {
-                    currentRect     = croppedXRect
+                else {
+                    return false
                 }
-            }
-            else {
-                return false
             }
         }
 
         if (overflowY !== 'visible') {
-            const croppedYRect  = currentRect.cropLeftRight(parentRect)
+            const currentY      = currentPoint[ 1 ]
 
-            if (scrollableY) {
-                if (croppedYRect.bottom < currentPoint[ 1 ]) {
-                    const dy        = currentPoint[ 1 ] - croppedYRect.bottom
+            if (parentRect.top <= currentY && currentY <= parentRect.bottom) {
+                // point is within parent area already, do nothing
+                // TODO should check the "reachable" parent area, since not whole
+                // area of the parent might be visible
+            } else {
+                if (scrollableY) {
+                    if (parentRect.bottom < currentPoint[ 1 ]) {
+                        const dy        = currentPoint[ 1 ] - parentRect.bottom
 
-                    parentEl.scrollTop  += dy
-                    currentPoint[ 1 ]   -= dy
+                        parentEl.scrollTop  += dy
+                        currentPoint[ 1 ]   -= dy
+                    }
+                    else if (parentRect.top > currentPoint[ 1 ]) {
+                        const dy        = parentRect.top - currentPoint[ 1 ]
 
-                    currentRect.shiftVertically(-dy)
+                        parentEl.scrollTop  -= dy
+                        currentPoint[ 1 ]   += dy
+                    }
                 }
-                else if (croppedYRect.top > currentPoint[ 1 ]) {
-                    const dy        = croppedYRect.top - currentPoint[ 1 ]
-
-                    parentEl.scrollTop  -= dy
-                    currentPoint[ 1 ]   += dy
-
-                    currentRect.shiftVertically(dy)
-                } else {
-                    currentRect     = croppedYRect
+                else {
+                    return false
                 }
-            }
-            else {
-                return false
             }
         }
-
-        // // const checkPoint        = offset ? currentPoint : currentRect.center
-        //
-        // const isPointVisible    = (!offset && !currentRect.isEmpty()) || currentRect.containsPoint(currentPoint)
-        //
-        // if (!isPointVisible) {
-        //     if (overflowX === 'auto' || overflowX === 'scroll') {
-        //         parentEl.scrollLeft = Math.max(0, parentEl.scrollLeft + currentRect.left - parentRect.left + offset[ 0 ] - 1)
-        //     }
-        //
-        //     if (overflowY === 'auto' || overflowY === 'scroll') {
-        //         parentEl.scrollTop  = Math.max(0, parentEl.scrollTop + currentRect.top - parentRect.top + offset[ 1 ] - 1)
-        //     }
-        //
-        //     return { visible : false }
-        // }
-        // else
-        //     if (isTop) return { visible : true, globalXY : currentPoint }
 
         if (parentEl.parentElement) {
             currentEl           = parentEl
@@ -117,7 +98,7 @@ export const scrollElementPointIntoView = (
 
             currentEl           = currentWin.frameElement
             currentPoint        = translatePointToParentViewport(currentPoint, currentWin)
-            currentRect         = currentRect.translateToParentViewport(currentWin)
+            // currentRect         = currentRect.translateToParentViewport(currentWin)
             currentWin          = currentWin.parent
         }
     }
