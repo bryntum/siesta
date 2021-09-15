@@ -38,7 +38,7 @@ it("`Contains` should work", t => {
 
     t.true(rect2.contains(105, 108))
 
-    t.notOk(rect2.contains(110, 108))
+    t.false(rect2.contains(110, 108))
 })
 
 
@@ -46,8 +46,8 @@ it("`intersect` should work", t => {
     let result1         = rect1.intersect(rect2)
     let result2         = rect2.intersect(rect1)
 
-    t.isaOk(result1, Rect, "Result of interesection is a new rectangle instance")
-    t.isaOk(result2, Rect, "Result of interesection is a new rectangle instance")
+    t.isInstanceOf(result1, Rect, "Result of interesection is a new rectangle instance")
+    t.isInstanceOf(result2, Rect, "Result of interesection is a new rectangle instance")
 
     t.true(result1.isEmpty(), "And its empty")
     t.true(result2.isEmpty(), "And its empty")
@@ -68,7 +68,7 @@ it("`intersect` should work", t => {
 it("`cropLeftRight` should work", t => {
     let result1         = rect2.cropLeftRight(rect3)
 
-    t.isaOk(result1, Rect, "Result of `cropLeftRight` is a new rectangle instance")
+    t.isInstanceOf(result1, Rect, "Result of `cropLeftRight` is a new rectangle instance")
 
     t.is(result1.left, 105)
     t.is(result1.right, 107)
@@ -80,7 +80,7 @@ it("`cropLeftRight` should work", t => {
 it("`cropTopBottom` should work", t => {
     let result1         = rect2.cropTopBottom(rect3)
 
-    t.isaOk(result1, Rect, "Result of `cropTopBottom` is a new rectangle instance")
+    t.isInstanceOf(result1, Rect, "Result of `cropTopBottom` is a new rectangle instance")
 
     t.is(result1.left, 100)
     t.is(result1.right, 109)
