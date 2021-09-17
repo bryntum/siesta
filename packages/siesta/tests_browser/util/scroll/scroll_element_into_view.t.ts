@@ -88,13 +88,11 @@ it('Should be able to scroll element point into view, with partially visible par
     const scrollable    = t.$('#scrollable')
     const inner         = t.$('#inner')
 
-    // inner.scrollIntoView()
+    t.false(isElementPointVisible(inner, [ 50, 50 ]).visible, 'Point is initially scrolled out')
 
-    // t.false(isElementPointVisible(inner, [ 50, 50 ]).visible, 'Point is initially scrolled out')
-    //
-    // scrollElementPointIntoView(inner, [ 50, 50 ])
-    //
-    // t.true(isElementPointVisible(inner, [ 50, 50 ]).visible, 'Point was scrolled in')
+    scrollElementPointIntoView(inner, [ 50, 50 ])
+
+    t.true(isElementPointVisible(inner, [ 50, 50 ]).visible, 'Point was scrolled in')
 })
 
 
