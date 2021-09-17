@@ -1,16 +1,12 @@
+import { Base } from "typescript-mixin-class"
+import { CI } from "chained-iterator"
 import { ActionTargetOffset, Point, sumPoints } from "../siesta/simulate/Types.js"
 import { Rect } from "../util/Rect.js"
-import { isOffsetInsideElementBox, normalizeOffset, translatePointToParentViewport } from "./Coordinates.js"
-import { isElementAccessible, isTopWindow } from "./Dom.js"
+import { getViewportRect, isOffsetInsideElementBox, normalizeOffset, translatePointToParentViewport } from "./Coordinates.js"
+import { isElementAccessible, isTopWindow, parentElements } from "./Dom.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
-// A quite rough scroll-into-view functionality, does not take into account many things
-// ideally, should go from bottom to top, scrolling the elements so that the target point becomes visible
-// key consideration is that scrollable parent, by definition, can display any point of its (supposedly un-scrollable) children
-// based on that, first need to scroll the target point into view of the scrollable parent
-// then, treat that point as the point of that parent itself, and recursively continue to the top
-// just porting from version 5 for now
 export const scrollElementPointIntoView = (
     el : Element, offset : ActionTargetOffset = undefined, globally : boolean = false
 )
@@ -20,119 +16,42 @@ export const scrollElementPointIntoView = (
 
     if (!isElementAccessible(el)) return false
 
-    let currentWin : Window     = el.ownerDocument.defaultView
-    let currentEl : Element     = el
+    // let currentWin : Window     = el.ownerDocument.defaultView
+    // let currentEl : Element     = el
     let currentRect : Rect      = Rect.fromElement(el)
     let currentPoint : Point    = sumPoints(currentRect.leftTop, normalizeOffset(el, offset))
 
-    while (true) {
-        const parentEl          = currentEl.parentElement
-        const parentRect        = Rect.fromElementContent(parentEl)
+    let currentDimensionX       = ElementDimension.new({ el, rect : Rect.fromElement(el), type : 'width' })
+    let currentDimensionY       = ElementDimension.new({ el, rect : Rect.fromElement(el), type : 'height' })
 
-        const parentStyle       = currentWin.getComputedStyle(parentEl)
-        const overflowX         = parentStyle[ 'overflow-x' ]
-        const overflowY         = parentStyle[ 'overflow-y' ]
-        const scrollableX       = overflowX === 'scroll' || overflowX === 'auto'
-        const scrollableY       = overflowY === 'scroll' || overflowY === 'auto'
+    const elDimensionX          = currentDimensionX
+    const elDimensionY          = currentDimensionY
 
-        if (overflowX !== 'visible') {
-            const currentX      = currentPoint[ 0 ]
+    CI(parentElements(el)).forEach(el => {
+        const parentDimensionX      = ElementDimension.new({ el, type : 'width' })
+        const parentDimensionY      = ElementDimension.new({ el, type : 'height' })
 
-            if (parentRect.left <= currentX && currentX <= parentRect.right) {
-                // point is within parent area already, do nothing
-                // TODO should check the "reachable" parent area, since not whole
-                // area of the parent might be visible
-            } else {
-                if (scrollableX) {
-                    if (parentRect.right < currentPoint[ 0 ]) {
-                        const dx        = currentPoint[ 0 ] - parentRect.right
+        currentDimensionX.parent    = parentDimensionX
+        currentDimensionY.parent    = parentDimensionY
 
-                        parentEl.scrollLeft += dx
-                        currentPoint[ 0 ]   -= dx
-                    }
-                    else if (parentRect.left > currentPoint[ 0 ]) {
-                        const dx        = parentRect.left - currentPoint[ 0 ]
+        currentDimensionX           = parentDimensionX
+        currentDimensionY           = parentDimensionY
+    })
 
-                        parentEl.scrollLeft -= dx
-                        currentPoint[ 0 ]   += dx
-                    }
-                }
-                else {
-                    return false
-                }
-            }
-        }
+    const horizontalRes             = elDimensionX.scrollContentPointIntoView(currentPoint[ 0 ])
+    const verticalRes               = elDimensionY.scrollContentPointIntoView(currentPoint[ 1 ])
 
-        if (overflowY !== 'visible') {
-            const currentY      = currentPoint[ 1 ]
+    return horizontalRes || verticalRes
 
-            if (parentRect.top <= currentY && currentY <= parentRect.bottom) {
-                // point is within parent area already, do nothing
-                // TODO should check the "reachable" parent area, since not whole
-                // area of the parent might be visible
-            } else {
-                if (scrollableY) {
-                    if (parentRect.bottom < currentPoint[ 1 ]) {
-                        const dy        = currentPoint[ 1 ] - parentRect.bottom
-
-                        parentEl.scrollTop  += dy
-                        currentPoint[ 1 ]   -= dy
-                    }
-                    else if (parentRect.top > currentPoint[ 1 ]) {
-                        const dy        = parentRect.top - currentPoint[ 1 ]
-
-                        parentEl.scrollTop  -= dy
-                        currentPoint[ 1 ]   += dy
-                    }
-                }
-                else {
-                    return false
-                }
-            }
-        }
-
-        if (parentEl.parentElement) {
-            currentEl           = parentEl
-        } else {
-            if (!globally || isTopWindow(currentWin)) return true
-
-            currentEl           = currentWin.frameElement
-            currentPoint        = translatePointToParentViewport(currentPoint, currentWin)
-            // currentRect         = currentRect.translateToParentViewport(currentWin)
-            currentWin          = currentWin.parent
-        }
-    }
+    // if (
+    //     !elDimensionX.scrollContentPointIntoView(currentPoint[ 0 ])
+    //     || !elDimensionY.scrollContentPointIntoView(currentPoint[ 1 ])
+    // ) {
+    //     return false
+    // }
+    //
+    // return true
 }
-
-
-
-//---------------------------------------------------------------------------------------------------------------------
-// export const scrollPagePointIntoView = (point : Point, win : Window) : boolean => {
-//     const doc           = win.document
-//
-//     const visiblePageRect = getViewportPageRect(win)
-//
-//     if (visiblePageRect.containsPoint(point)) {
-//         // no need to scroll, target point is within visible viewport area
-//         return false
-//     }
-//
-//     const div           = doc.createElement('div')
-//
-//     div.style.cssText   =
-//         `position: absolute !important; left: ${ point[ 0 ] }px !important; top: ${ point[ 1 ] }px !important;` +
-//         'border-width: 0 !important; padding: 0 !important; margin: 0 !important;' +
-//         'width: 1px !important; height: 1px !important;'
-//
-//     doc.body.appendChild(div)
-//
-//     div.scrollIntoView()
-//
-//     doc.body.removeChild(div)
-//
-//     return true
-// }
-
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -168,5 +87,226 @@ export const getScrollbarWidth = (el : HTMLElement, axis : 'x' | 'y') : number =
         return el.offsetWidth - el.clientWidth - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth)
     } else {
         return el.offsetHeight - el.clientHeight - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth)
+    }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------
+export class Segment extends Base {
+    start           : number        = undefined
+    end             : number        = undefined
+
+    length          : number        = undefined
+
+
+    initialize (props? : Partial<Segment>) {
+        super.initialize(props)
+
+        const start         = this.start
+        const end           = this.end
+        const length        = this.length
+
+        if (start === undefined && end !== undefined && length !== undefined) this.start    = end - length
+        if (end === undefined && start !== undefined && length !== undefined) this.end      = start + length
+        if (end !== undefined && start !== undefined && length === undefined) this.length   = end - start
+    }
+
+
+    get center () : number {
+        return this.start + this.length / 2
+    }
+
+
+    isEmpty () : boolean {
+        return this.start === undefined || this.end === undefined || this.length === undefined || this.length === 0
+    }
+
+
+    intersect (another : Segment) : Segment {
+        const cls       = this.constructor as typeof Segment
+
+        if (this.isEmpty() || another.isEmpty() || another.start >= this.end || this.end <= another.start) return cls.new()
+
+        return cls.new({
+            start   : Math.max(this.start, another.start),
+            end     : Math.min(this.end, another.end),
+        })
+    }
+
+
+    contains (point : number) : boolean {
+        return this.start <= point && point < this.end
+    }
+}
+
+
+export class ElementDimension extends Segment {
+    el              : Element               = undefined
+    type            : 'width' | 'height'    = 'width'
+
+    rect            : Rect                  = undefined
+    style           : CSSStyleDeclaration   = undefined
+
+    parent          : ElementDimension      = undefined
+
+
+    initialize (props? : Partial<ElementDimension>) {
+        Object.assign(this, props)
+
+        if (!this.rect)
+            this.rect   = this.el.parentElement ? Rect.fromElementContent(this.el as HTMLElement) : getViewportRect(this.el.ownerDocument.defaultView)
+
+        super.initialize(...arguments)
+
+        this.style      = this.el.ownerDocument.defaultView.getComputedStyle(this.el)
+    }
+
+
+    // @ts-expect-error
+    get start () : number {
+        return this.type === 'width' ? this.rect.left : this.rect.top
+    }
+    set start (value : number) {
+    }
+
+
+    // @ts-expect-error
+    get end () : number {
+        return this.type === 'width' ? this.rect.right : this.rect.bottom
+    }
+    set end (value : number) {
+    }
+
+
+    // @ts-expect-error
+    get length () : number {
+        return this.type === 'width' ? this.rect.width : this.rect.height
+    }
+    set length (value : number) {
+    }
+
+
+    get scrollLength () : number {
+        return this.type === 'width' ? this.el.scrollWidth : this.el.scrollHeight
+    }
+
+
+    get scroll () : number {
+        return this.type === 'width' ? this.el.scrollLeft : this.el.scrollTop
+    }
+    set scroll (value : number) {
+        this.type === 'width' ? this.el.scrollLeft = value : this.el.scrollTop = value
+    }
+
+
+    get overflowVisible () : boolean {
+        const style     = this.type === 'width' ? this.style[ 'overflow-x' ] : this.style[ 'overflow-y' ]
+
+        return style === 'visible'
+    }
+
+    get scrollable () : boolean {
+        const style     = this.type === 'width' ? this.style[ 'overflow-x' ] : this.style[ 'overflow-y' ]
+
+        /*
+            from the: https://www.w3.org/TR/CSS22/visufx.html
+            UAs must apply the 'overflow' property set on the root element to the viewport. When the root element
+            is an HTML "HTML" element or an XHTML "html" element, and that element has an HTML "BODY" element
+            or an XHTML "body" element as a child, user agents must instead apply the 'overflow' property from
+            the first such child element to the viewport, if the value on the root element is 'visible'.
+        ->> The 'visible' value when used for the viewport must be interpreted as 'auto'. <<-
+            The element from which the value is propagated must have a used value for 'overflow' of 'visible'.
+         */
+        return (style === 'scroll' || style === 'auto' || (style === 'visible' && !this.parent)) && this.maxScroll > 0
+    }
+
+
+    get maxScroll () : number {
+        return this.scrollLength - this.length
+    }
+
+
+    get rootViewport () : Segment {
+        const rect      = getViewportRect(this.el.ownerDocument.defaultView)
+
+        return this.parent
+            ?
+                this.parent.scrollable ? this.parent.rootViewport : this.parent.rootViewport.intersect(this)
+            :
+                Segment.new({ start : this.start, length : this.length })
+    }
+
+
+    get scrollSegment () : Segment {
+        return Segment.new({ start : this.start - this.scroll, length : this.scrollLength })
+    }
+
+
+    get viewport () : Segment {
+        const parent        = this.parent
+
+        if (!parent) return this.rootViewport
+
+        if (parent.scrollable || parent.overflowVisible) {
+            return Segment.new({ start : this.start, length : this.length })
+        }
+        else {
+            return parent.viewport.intersect(this)
+        }
+    }
+
+
+    scrollScrollPointIntoView (sourcePoint : number) : boolean {
+        if (!this.scrollable) {
+            if (!this.overflowVisible && !this.contains(sourcePoint)) return false
+
+            if (this.parent)
+                return this.parent.scrollScrollPointIntoView(sourcePoint)
+            else {
+                return this.contains(sourcePoint)
+            }
+        }
+
+        // this is area we _can_ scroll to
+        const thisVisibleArea       = this.viewport
+        // this is the point, we'd _like_ to scroll to
+        const rootViewportCenter    = this.rootViewport.center
+
+        const targetPoint       = thisVisibleArea.contains(rootViewportCenter)
+            ? rootViewportCenter
+            : thisVisibleArea.start > rootViewportCenter
+                ? thisVisibleArea.start
+                : thisVisibleArea.end
+
+        const delta             = sourcePoint - targetPoint
+        const needScroll        = this.scroll + delta
+
+        if (0 <= needScroll && needScroll <= this.maxScroll) {
+            this.scroll       += delta
+
+            return true
+        }
+        else if (needScroll < 0) {
+            const delta         = -this.scroll
+
+            this.scroll         = 0
+
+            return this.parent ? this.parent.scrollScrollPointIntoView(sourcePoint + delta) : this.contains(sourcePoint + delta)
+        }
+        else if (needScroll > this.maxScroll) {
+            const delta         = this.maxScroll - this.scroll
+
+            this.scroll         = this.maxScroll
+
+            return this.parent ? this.parent.scrollScrollPointIntoView(sourcePoint - delta) : this.contains(sourcePoint - delta)
+        }
+
+    }
+
+
+    scrollContentPointIntoView (sourcePoint : number) : boolean {
+        if (!this.contains(sourcePoint)) throw new Error("Can only scroll points within own content area")
+
+        return this.scrollScrollPointIntoView(sourcePoint)
     }
 }
