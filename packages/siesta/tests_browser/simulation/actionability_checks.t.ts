@@ -207,3 +207,13 @@ it('Determine that element is scrolled out of the view #2', t => {
     t.false(isElementPointVisible(id('inner2'), [ 5, 0 ]).visible, "Works with offset #1")
     t.true(isElementPointVisible(id('inner2'), [ 4, 0 ]).visible, "Works with offset #2")
 })
+
+
+it('`isElementPointVisible` should work for direct child of <body>', async t => {
+    document.body.innerHTML =
+        '<div id="inner" style="position: absolute; left: 150px; top: 2000px; width: 100px; height: 100px; background: red"></div>'
+
+    const inner         = t.$('#inner')
+
+    t.false(isElementPointVisible(inner, [ 50, 50 ]).visible, 'Point is initially scrolled out')
+})

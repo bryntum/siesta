@@ -85,15 +85,16 @@ export const isElementPointVisible = (el : Element, offset : ActionTargetOffset 
 
     while (true) {
         const parentEl          = currentEl.parentElement
-        const isTop             = (!globally || isTopWindow(currentWin)) && !parentEl.parentElement
-        const parentRect        = Rect.fromElementContent(parentEl)
+        const isTopEl           = !parentEl.parentElement
+        const isTop             = (!globally || isTopWindow(currentWin)) && isTopEl
+        const parentRect        = isTopEl ? getViewportRect(currentWin) : Rect.fromElementContent(parentEl)
 
         const parentStyle       = currentWin.getComputedStyle(parentEl)
         const overflowX         = parentStyle[ 'overflow-x' ]
         const overflowY         = parentStyle[ 'overflow-y' ]
 
-        if (overflowX !== 'visible') currentRect = currentRect.cropLeftRight(parentRect)
-        if (overflowY !== 'visible') currentRect = currentRect.cropTopBottom(parentRect)
+        if (overflowX !== 'visible' || isTopEl) currentRect = currentRect.cropLeftRight(parentRect)
+        if (overflowY !== 'visible' || isTopEl) currentRect = currentRect.cropTopBottom(parentRect)
 
         const isPointVisible    = (!offset && !currentRect.isEmpty()) || currentRect.containsPoint(currentPoint)
 
