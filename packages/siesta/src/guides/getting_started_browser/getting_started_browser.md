@@ -5,7 +5,7 @@ Siesta is a stress-free JavaScript/TypeScript testing tool. It is ubiquitous - t
 
 In this guide, we assume a setup, pointed toward running tests in browsers.
 
-Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Chromium Edge. IE and legacy Edge are not supported.
+Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Chromium Edge. IE, legacy Edge and quirks mode are not supported.
 
 Currently, targeting browser environment in Siesta is work in progress. You can run tests in browsers just fine, however Siesta does not support yet the Web-specific functionality, like simulating the user actions. We'll be adding this functionality in the future releases. 
 

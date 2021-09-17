@@ -25,7 +25,7 @@ Supported target environments
 
 Siesta can run the test in browsers, Node.js and Deno. 
 
-Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Edge Chromium. IE and legacy Edge are not supported.
+Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Edge Chromium. IE, legacy Edge and quirks mode are not supported.
 
 Siesta supports all maintained LTS releases of Node.js. 
 
