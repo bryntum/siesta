@@ -18,18 +18,19 @@ export const scrollElementPointIntoView = (
 
     // let currentWin : Window     = el.ownerDocument.defaultView
     // let currentEl : Element     = el
-    let currentRect : Rect      = Rect.fromElement(el)
-    let currentPoint : Point    = sumPoints(currentRect.leftTop, normalizeOffset(el, offset))
+    let rect : Rect             = Rect.fromElement(el)
+    let point : Point           = sumPoints(rect.leftTop, normalizeOffset(el, offset))
 
-    let currentDimensionX       = ElementDimension.new({ el, rect : Rect.fromElement(el), type : 'width' })
-    let currentDimensionY       = ElementDimension.new({ el, rect : Rect.fromElement(el), type : 'height' })
+    const elDimensionX          = ElementDimension.new({ el, type : 'width', rect })
+    const elDimensionY          = ElementDimension.new({ el, type : 'height', rect, style : elDimensionX.style })
 
-    const elDimensionX          = currentDimensionX
-    const elDimensionY          = currentDimensionY
+    let currentDimensionX       = elDimensionX
+    let currentDimensionY       = elDimensionY
 
     CI(parentElements(el)).forEach(el => {
         const parentDimensionX      = ElementDimension.new({ el, type : 'width' })
-        const parentDimensionY      = ElementDimension.new({ el, type : 'height' })
+        // micro-opt - re-use the `rect` and `style` properties from the sibling dimension
+        const parentDimensionY      = ElementDimension.new({ el, type : 'height', rect : parentDimensionX.rect, style : parentDimensionX.style })
 
         currentDimensionX.parent    = parentDimensionX
         currentDimensionY.parent    = parentDimensionY
@@ -38,19 +39,10 @@ export const scrollElementPointIntoView = (
         currentDimensionY           = parentDimensionY
     })
 
-    const horizontalRes             = elDimensionX.scrollContentPointIntoView(currentPoint[ 0 ])
-    const verticalRes               = elDimensionY.scrollContentPointIntoView(currentPoint[ 1 ])
+    const horizontalRes             = elDimensionX.scrollContentPointIntoView(point[ 0 ])
+    const verticalRes               = elDimensionY.scrollContentPointIntoView(point[ 1 ])
 
-    return horizontalRes || verticalRes
-
-    // if (
-    //     !elDimensionX.scrollContentPointIntoView(currentPoint[ 0 ])
-    //     || !elDimensionY.scrollContentPointIntoView(currentPoint[ 1 ])
-    // ) {
-    //     return false
-    // }
-    //
-    // return true
+    return horizontalRes && verticalRes
 }
 
 
@@ -158,7 +150,7 @@ export class ElementDimension extends Segment {
 
         super.initialize(...arguments)
 
-        this.style      = this.el.ownerDocument.defaultView.getComputedStyle(this.el)
+        if (!this.style) this.style = this.el.ownerDocument.defaultView.getComputedStyle(this.el)
     }
 
 
@@ -210,6 +202,7 @@ export class ElementDimension extends Segment {
 
         /*
             from the: https://www.w3.org/TR/CSS22/visufx.html
+
             UAs must apply the 'overflow' property set on the root element to the viewport. When the root element
             is an HTML "HTML" element or an XHTML "html" element, and that element has an HTML "BODY" element
             or an XHTML "body" element as a child, user agents must instead apply the 'overflow' property from

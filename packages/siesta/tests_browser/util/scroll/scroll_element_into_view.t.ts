@@ -119,7 +119,9 @@ it('Should be able to scroll element point into view #2', async t => {
             'Some text<br><br><br>' +
             '<div id="wrapper">' +
                 'Some text<br><br><br>' +
-                '<div id="inner" style="width: 2000px; height: 400px; background: #F00">INNER</div>' +
+                '<div id="inner" style="width: 2000px; height: 400px; background: red; position: relative">' +
+                    '<div style="background: black; position: absolute; left: 399px; top: 199px; width: 3px; height: 3px; border-radius: 50%"></div>' +
+                '</div>' +
             '</div>' +
         '</div>'
 
