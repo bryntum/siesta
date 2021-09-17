@@ -290,23 +290,9 @@ export class ElementDimension extends Segment {
     }
 
 
-    // get scrollSegment () : Segment {
-    //     return Segment.new({ start : this.start - this.scroll, length : this.scrollLength })
-    // }
-
-
     get clientSegment () : Segment {
         return Segment.new({ start : this.start, length : this.length })
     }
-
-
-    // get rootViewport () : Segment {
-    //     const parent        = this.parent
-    //
-    //     if (!parent) return this.clientSegment
-    //
-    //     return parent.scrollable || parent.overflowVisible ? this.clientSegment : parent.rootViewport.intersect(this)
-    // }
 
 
     get viewport () : Segment {
@@ -328,17 +314,6 @@ export class ElementDimension extends Segment {
                 return this.contains(sourcePoint)
             }
         }
-
-        // // this is area we _can_ scroll to
-        // const thisVisibleArea       = this.viewport
-        // // this is the point, we'd _like_ to scroll to
-        // const rootViewportCenter    = this.rootViewport.center
-        //
-        // const targetPoint       = thisVisibleArea.contains(rootViewportCenter)
-        //     ? rootViewportCenter
-        //     : thisVisibleArea.start > rootViewportCenter
-        //         ? thisVisibleArea.start
-        //         : thisVisibleArea.end
 
         const delta             = sourcePoint - this.viewport.center
         const needScroll        = this.scroll + delta
