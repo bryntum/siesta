@@ -1,6 +1,7 @@
 import { beforeEach, it } from "../../../browser.js"
-import { isElementPointReachable, isElementPointVisible } from "../../../src/util_browser/Dom.js"
+import { elementFromPoint, isElementPointReachable, isElementPointVisible } from "../../../src/util_browser/Dom.js"
 import { scrollElementPointIntoView } from "../../../src/util_browser/Scroll.js"
+import { createPositionedElement, createPositionedIframe } from "../../@helpers.js"
 
 beforeEach(() => {
     document.body.innerHTML = ''
@@ -132,5 +133,25 @@ it('Should be able to scroll element point into view #2', async t => {
     scrollElementPointIntoView(inner, [ 400, 200 ])
 
     t.true(isElementPointVisible(inner, [ 400, 200 ]).visible, 'Click point was scrolled in')
-    t.true(isElementPointReachable(inner, [ 400, 200 ]).reachable)
+    t.true(isElementPointReachable(inner, [ 400, 200 ], true).reachable)
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`scrollElementPointIntoView` should work for elements inside the iframes', async t => {
+    const iframe1       = await createPositionedIframe('about:blank', { left : 50, top : 2000, width : 300, height : 300 })
+    iframe1.style.backgroundColor   = 'red'
+
+    const div1          = createPositionedElement('div', { left : 100, top : 1000, width : 100, height : 100 }, iframe1.contentDocument)
+    div1.style.backgroundColor      = 'blue'
+
+    iframe1.contentDocument.body.appendChild(div1)
+
+    // t.equal(elementFromPoint(document, 60, 60, false), { el : iframe1, localXY : [ 60, 60 ] })
+    //
+    // t.equal(elementFromPoint(document, 60, 60, true), { el : iframe1.contentDocument.body, localXY : [ 10, 10 ] })
+    //
+    // t.equal(elementFromPoint(document, 110, 110, true), { el : iframe2.contentDocument.body, localXY : [ 10, 10 ] })
+    //
+    // t.equal(elementFromPoint(document, 150, 150, true), { el : div1, localXY : [ 50, 50 ] })
 })

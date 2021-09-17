@@ -1,8 +1,9 @@
-import { it } from "../../../browser.js"
+import { beforeEach, it } from "../../../browser.js"
 import { elementFromPoint } from "../../../src/util_browser/Dom.js"
 import { createPositionedIframe, createPositionedElement } from "../../@helpers.js"
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 class WebComponent extends HTMLElement {
     constructor () {
         super()
@@ -11,6 +12,11 @@ class WebComponent extends HTMLElement {
 }
 
 customElements.define('web-comp', WebComponent)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+beforeEach(() => {
+    document.body.innerHTML = ''
+})
 
 
 it('Element from point should work for nested iframes', async t => {
@@ -34,6 +40,7 @@ it('Element from point should work for nested iframes', async t => {
 
     t.equal(elementFromPoint(document, 150, 150, true), { el : div1, localXY : [ 50, 50 ] })
 })
+
 
 // it seems the `elementFromPoint` method of the shadow root instance does not work (at all) as intuitively expected
 // see https://github.com/canonic-epicure/chrome_element_from_point_bug_repro

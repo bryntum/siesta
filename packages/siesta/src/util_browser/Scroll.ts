@@ -210,7 +210,12 @@ export class ElementDimension extends Segment {
         ->> The 'visible' value when used for the viewport must be interpreted as 'auto'. <<-
             The element from which the value is propagated must have a used value for 'overflow' of 'visible'.
          */
-        return (style === 'scroll' || style === 'auto' || (style === 'visible' && !this.parent)) && this.maxScroll > 0
+        return (style === 'scroll' || style === 'auto' || (style === 'visible' && this.isHtmlElement)) && this.maxScroll > 0
+    }
+
+
+    get isHtmlElement () : boolean {
+        return !this.el.parentElement
     }
 
 

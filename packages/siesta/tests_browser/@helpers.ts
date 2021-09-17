@@ -16,6 +16,25 @@ export const createPositionedElement = (tag : string, pos : Position, doc : Docu
 }
 
 
+const forceStandardsMode = (iframe : HTMLIFrameElement) => {
+    const doc           = iframe.contentDocument
+
+    doc.open()
+
+    doc.write([
+        '<!DOCTYPE html>',
+        '<html style="width: 100%; height: 100%; margin: 0; padding: 0;">',
+            '<head>',
+            '</head>',
+            '<body style="width: 100%; height: 100%; margin: 0; padding: 0;">',
+            '</body>',
+        '</html>'
+    ].join(''))
+
+    doc.close()
+}
+
+
 export const createPositionedIframe = async (url : string = 'about:blank', pos : Position, doc : Document = document) : Promise<HTMLIFrameElement> => {
     const iframe        = createPositionedElement('iframe', pos, doc) as HTMLIFrameElement
 
@@ -23,7 +42,7 @@ export const createPositionedIframe = async (url : string = 'about:blank', pos :
 
     return new Promise(resolve => {
         iframe.addEventListener('load', () => {
-            iframe.contentDocument.body.style.margin = '0'
+            forceStandardsMode(iframe)
 
             resolve(iframe)
         }, { once : true })
