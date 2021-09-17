@@ -16,8 +16,10 @@ export const scrollElementPointIntoView = (
 
     if (!isElementAccessible(el)) return false
 
+    //-----------------------
     let currentWin : Window     = el.ownerDocument.defaultView
 
+    //-----------------------
     const offsets               = new Map<Window, Point>()
     const windows               = Array.from(parentWindows(currentWin, true))
 
@@ -54,7 +56,8 @@ export const scrollElementPointIntoView = (
                 el,
                 type        : 'width'
             })
-            // delegate the creation
+            // delegate the creation of the rectangle to the ElementDimension, since it uses special logic for
+            // root <html> element
             parentDimensionX.rect       = parentDimensionX.rect.shift(...offset)
             // micro-opt - re-use the `rect` and `style` properties from the sibling dimension
             const parentDimensionY      = ElementDimension.new({
@@ -212,7 +215,9 @@ export class ElementDimension extends Segment {
         Object.assign(this, props)
 
         if (!this.rect)
-            this.rect   = this.el.parentElement ? Rect.fromElementContent(this.el as HTMLElement) : getViewportRect(this.el.ownerDocument.defaultView)
+            this.rect   = this.el.parentElement
+                ? Rect.fromElementContent(this.el as HTMLElement)
+                : getViewportRect(this.el.ownerDocument.defaultView)
 
         super.initialize(...arguments)
 
@@ -312,39 +317,32 @@ export class ElementDimension extends Segment {
     }
 
 
-    scrollScrollPointIntoView (sourcePoint : number) : boolean {
-        if (!this.scrollable) {
-            if (!this.overflowVisible && !this.contains(sourcePoint)) return false
-
-            if (this.parent)
-                return this.parent.scrollScrollPointIntoView(sourcePoint)
-            else {
-                return this.contains(sourcePoint)
-            }
-        }
-
-        const delta             = sourcePoint - this.viewport.center
+    calculateScrollDelta (sourcePoint : number, targetPoint : number) : number {
+        const delta             = sourcePoint - targetPoint
         const needScroll        = this.scroll + delta
 
-        if (0 <= needScroll && needScroll <= this.maxScroll) {
-            this.scroll         += delta
+        const maxScroll         = this.maxScroll
 
-            return true
+        if (0 <= needScroll && needScroll <= maxScroll) {
+            return delta
         }
         else if (needScroll < 0) {
-            const delta         = -this.scroll
-
-            this.scroll         = 0
-
-            return this.parent ? this.parent.scrollScrollPointIntoView(sourcePoint + delta) : this.contains(sourcePoint + delta)
+            return -this.scroll
         }
-        else if (needScroll > this.maxScroll) {
-            const delta         = this.maxScroll - this.scroll
-
-            this.scroll         = this.maxScroll
-
-            return this.parent ? this.parent.scrollScrollPointIntoView(sourcePoint - delta) : this.contains(sourcePoint - delta)
+        else if (needScroll > maxScroll) {
+            return maxScroll - this.scroll
         }
+    }
+
+
+    scrollScrollPointIntoView (sourcePoint : number) : boolean {
+        if (this.viewport.isEmpty() || !this.scrollable && !this.overflowVisible && !this.contains(sourcePoint)) return false
+
+        const delta     = this.scrollable ? this.calculateScrollDelta(sourcePoint, this.viewport.center) : 0
+
+        this.scroll     += delta
+
+        return this.parent ? this.parent.scrollScrollPointIntoView(sourcePoint - delta) : this.contains(sourcePoint - delta)
     }
 
 
