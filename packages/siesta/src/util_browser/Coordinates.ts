@@ -3,6 +3,7 @@ import { ActionTargetOffset, Point } from "../siesta/simulate/Types.js"
 import { lastElement } from "../util/Helpers.js"
 import { Rect } from "../util/Rect.js"
 import { isString } from "../util/Typeguards.js"
+import { getScrollbarWidth } from "./Scroll.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export const clientXtoPageX = (x : number, win : Window) : number => x + win.scrollX
@@ -83,20 +84,20 @@ export const getBoundingPageRect = (el : Element) : Rect => {
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const getViewportPageRect = (win : Window) : Rect => Rect.new({
-    left        : win.scrollX,
-    top         : win.scrollY,
-    width       : win.innerWidth,
-    height      : win.innerHeight
-})
+// export const getViewportPageRect = (win : Window) : Rect => Rect.new({
+//     left        : win.scrollX,
+//     top         : win.scrollY,
+//     width       : win.innerWidth,
+//     height      : win.innerHeight
+// })
 
 
 //---------------------------------------------------------------------------------------------------------------------
 export const getViewportRect = (win : Window) : Rect => Rect.new({
     left        : 0,
     top         : 0,
-    width       : win.innerWidth,
-    height      : win.innerHeight
+    width       : win.innerWidth - getScrollbarWidth(win.document.documentElement, 'x'),
+    height      : win.innerHeight - getScrollbarWidth(win.document.documentElement, 'y')
 })
 
 

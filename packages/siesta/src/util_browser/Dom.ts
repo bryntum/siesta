@@ -40,6 +40,21 @@ export function * parentElements (el : Element, includeSelf : boolean = false) :
     }
 }
 
+
+//---------------------------------------------------------------------------------------------------------------------
+export function * parentWindows (win : Window, includeSelf : boolean = false) : Generator<Window> {
+    let current             = win
+
+    while (current) {
+        if (current !== win || includeSelf) yield current
+
+        if (isTopWindow(current)) return
+
+        current             = current.parent
+    }
+}
+
+
 //---------------------------------------------------------------------------------------------------------------------
 export const isTopWindow = (win : Window) : boolean => {
     // @ts-ignore

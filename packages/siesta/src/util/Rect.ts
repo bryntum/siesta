@@ -81,24 +81,12 @@ export class Rect extends Base {
     }
 
 
-    shiftHorizontally (dx : number) : Rect {
+    shift (dx : number, dy : number) : Rect {
         const cls       = this.constructor as typeof Rect
 
         return cls.new({
             left        : this.left + dx,
-            top         : this.top,
-            width       : this.width,
-            height      : this.height
-        })
-    }
-
-
-    shiftVertically (dy : number) : Rect {
-        const cls       = this.constructor as typeof Rect
-
-        return cls.new({
-            left        : this.left,
-            top         : this.top  + dy,
+            top         : this.top + dy,
             width       : this.width,
             height      : this.height
         })

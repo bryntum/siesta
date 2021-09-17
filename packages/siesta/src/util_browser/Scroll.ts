@@ -3,7 +3,7 @@ import { CI } from "chained-iterator"
 import { ActionTargetOffset, Point, sumPoints } from "../siesta/simulate/Types.js"
 import { Rect } from "../util/Rect.js"
 import { getViewportRect, isOffsetInsideElementBox, normalizeOffset, translatePointToParentViewport } from "./Coordinates.js"
-import { isElementAccessible, isTopWindow, parentElements } from "./Dom.js"
+import { isElementAccessible, isTopWindow, parentElements, parentWindows } from "./Dom.js"
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -16,9 +16,26 @@ export const scrollElementPointIntoView = (
 
     if (!isElementAccessible(el)) return false
 
-    // let currentWin : Window     = el.ownerDocument.defaultView
-    // let currentEl : Element     = el
-    let rect : Rect             = Rect.fromElement(el)
+    let currentWin : Window     = el.ownerDocument.defaultView
+
+    const offsets               = new Map<Window, Point>()
+    const windows               = Array.from(parentWindows(currentWin, true))
+
+    for (let i = windows.length - 1; i >= 0; i--) {
+        const win       = windows[ i ]
+
+        if (i === windows.length - 1)
+            offsets.set(win, [ 0, 0 ])
+        else {
+            const rect              = Rect.fromElement(win.frameElement)
+            const previousOffset    = offsets.get(windows[ i + 1 ])
+
+            offsets.set(win, sumPoints(rect.leftTop, previousOffset))
+        }
+    }
+
+    //-----------------------
+    let rect : Rect             = Rect.fromElement(el).shift(...offsets.get(currentWin))
     let point : Point           = sumPoints(rect.leftTop, normalizeOffset(el, offset))
 
     const elDimensionX          = ElementDimension.new({ el, type : 'width', rect })
@@ -27,20 +44,59 @@ export const scrollElementPointIntoView = (
     let currentDimensionX       = elDimensionX
     let currentDimensionY       = elDimensionY
 
-    CI(parentElements(el)).forEach(el => {
-        const parentDimensionX      = ElementDimension.new({ el, type : 'width' })
-        // micro-opt - re-use the `rect` and `style` properties from the sibling dimension
-        const parentDimensionY      = ElementDimension.new({ el, type : 'height', rect : parentDimensionX.rect, style : parentDimensionX.style })
+    let currentEl               = el
 
-        currentDimensionX.parent    = parentDimensionX
-        currentDimensionY.parent    = parentDimensionY
+    do {
+        const offset            = offsets.get(currentWin)
 
-        currentDimensionX           = parentDimensionX
-        currentDimensionY           = parentDimensionY
-    })
+        CI(parentElements(currentEl)).forEach(el => {
+            const parentDimensionX      = ElementDimension.new({
+                el,
+                type        : 'width'
+            })
+            // delegate the creation
+            parentDimensionX.rect       = parentDimensionX.rect.shift(...offset)
+            // micro-opt - re-use the `rect` and `style` properties from the sibling dimension
+            const parentDimensionY      = ElementDimension.new({
+                el,
+                type        : 'height',
+                rect        : parentDimensionX.rect,
+                style       : parentDimensionX.style
+            })
 
-    const horizontalRes             = elDimensionX.scrollContentPointIntoView(point[ 0 ])
-    const verticalRes               = elDimensionY.scrollContentPointIntoView(point[ 1 ])
+            currentDimensionX.parent    = parentDimensionX
+            currentDimensionY.parent    = parentDimensionY
+
+            currentDimensionX           = parentDimensionX
+            currentDimensionY           = parentDimensionY
+        })
+
+        if (!globally || isTopWindow(currentWin)) break
+
+        currentEl                       = currentWin.frameElement
+        currentWin                      = currentWin.parent
+
+        const frameElDimensionX         = ElementDimension.new({
+            el          : currentEl,
+            type        : 'width',
+            rect        : Rect.fromElementContent(currentEl as HTMLElement).shift(...offsets.get(currentWin))
+        })
+        const frameElDimensionY         = ElementDimension.new({
+            el          : currentEl,
+            type        : 'height',
+            rect        : frameElDimensionX.rect,
+            style       : frameElDimensionX.style
+        })
+
+        currentDimensionX.parent        = frameElDimensionX
+        currentDimensionY.parent        = frameElDimensionY
+
+        currentDimensionX               = frameElDimensionX
+        currentDimensionY               = frameElDimensionY
+    } while (true)
+
+    const horizontalRes         = elDimensionX.scrollContentPointIntoView(point[ 0 ])
+    const verticalRes           = elDimensionY.scrollContentPointIntoView(point[ 1 ])
 
     return horizontalRes && verticalRes
 }
@@ -225,11 +281,11 @@ export class ElementDimension extends Segment {
 
 
     get rootViewport () : Segment {
-        const rect      = getViewportRect(this.el.ownerDocument.defaultView)
+        const parent        = this.parent
 
-        return this.parent
+        return parent
             ?
-                this.parent.scrollable ? this.parent.rootViewport : this.parent.rootViewport.intersect(this)
+                parent.scrollable || parent.overflowVisible ? parent.rootViewport : parent.rootViewport.intersect(this)
             :
                 Segment.new({ start : this.start, length : this.length })
     }
