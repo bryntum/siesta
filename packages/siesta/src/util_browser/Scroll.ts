@@ -286,7 +286,15 @@ export class ElementDimension extends Segment {
 
 
     get maxScroll () : number {
-        return this.scrollLength - (this.length - getScrollbarWidth(this.el as HTMLElement, this.type === 'width' ? 'x' : 'y'))
+        // this is a hack, since on the <html> element the scroll bar is not included into the `getBoundingClientRect`
+        // results, plus we don't use `getBoundingClientRect` for <html>, instead we use `getViewportRect`
+        // ideally, we need one more element on top of the ElementDimension, that would represent `getViewportRect`
+        // but applying this hack is easier for now
+        const length        = this.isHtmlElement
+            ? this.type === 'width' ? this.el.getBoundingClientRect().width : this.el.getBoundingClientRect().height
+            : this.length
+
+        return this.scrollLength - (length - getScrollbarWidth(this.el as HTMLElement, this.type === 'width' ? 'x' : 'y'))
     }
 
 
