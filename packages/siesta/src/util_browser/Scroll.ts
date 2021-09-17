@@ -6,7 +6,7 @@ import { getViewportRect, isOffsetInsideElementBox, normalizeOffset, translatePo
 import { isElementAccessible, isTopWindow, parentElements, parentWindows } from "./Dom.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const scrollElementPointIntoView = (
     el : Element, offset : ActionTargetOffset = undefined, globally : boolean = false
 )
@@ -102,7 +102,7 @@ export const scrollElementPointIntoView = (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // element is considered "scrollable" by this method if its `overflow-x` style is `auto` or `scroll`
 // and `scrollWidth` is bigger than `clientWidth` (same for Y-axis and height)
 export const isElementScrollable = (el : Element, axis : 'x' | 'y') : boolean => {
@@ -126,7 +126,7 @@ export const isElementScrollable = (el : Element, axis : 'x' | 'y') : boolean =>
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const getScrollbarWidth = (el : HTMLElement, axis : 'x' | 'y') : number => {
     const win               = el.ownerDocument.defaultView
     const style             = win.getComputedStyle(el)
@@ -139,7 +139,17 @@ export const getScrollbarWidth = (el : HTMLElement, axis : 'x' | 'y') : number =
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const getMaxScroll = (el : HTMLElement, axis : 'x' | 'y') : number => {
+    if (axis === 'x') {
+        return el.scrollWidth - (el.getBoundingClientRect().width - getScrollbarWidth(el, 'x'))
+    } else {
+        return el.scrollHeight - (el.getBoundingClientRect().height - getScrollbarWidth(el, 'y'))
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Segment extends Base {
     start           : number        = undefined
     end             : number        = undefined
@@ -276,37 +286,35 @@ export class ElementDimension extends Segment {
 
 
     get maxScroll () : number {
-        return this.scrollLength - this.length
+        return this.scrollLength - (this.length - getScrollbarWidth(this.el as HTMLElement, this.type === 'width' ? 'x' : 'y'))
     }
 
 
-    get rootViewport () : Segment {
-        const parent        = this.parent
+    // get scrollSegment () : Segment {
+    //     return Segment.new({ start : this.start - this.scroll, length : this.scrollLength })
+    // }
 
-        return parent
-            ?
-                parent.scrollable || parent.overflowVisible ? parent.rootViewport : parent.rootViewport.intersect(this)
-            :
-                Segment.new({ start : this.start, length : this.length })
+
+    get clientSegment () : Segment {
+        return Segment.new({ start : this.start, length : this.length })
     }
 
 
-    get scrollSegment () : Segment {
-        return Segment.new({ start : this.start - this.scroll, length : this.scrollLength })
-    }
+    // get rootViewport () : Segment {
+    //     const parent        = this.parent
+    //
+    //     if (!parent) return this.clientSegment
+    //
+    //     return parent.scrollable || parent.overflowVisible ? this.clientSegment : parent.rootViewport.intersect(this)
+    // }
 
 
     get viewport () : Segment {
         const parent        = this.parent
 
-        if (!parent) return this.rootViewport
+        if (!parent) return this.clientSegment
 
-        if (parent.scrollable || parent.overflowVisible) {
-            return Segment.new({ start : this.start, length : this.length })
-        }
-        else {
-            return parent.viewport.intersect(this)
-        }
+        return parent.scrollable || parent.overflowVisible ? this.clientSegment : parent.viewport.intersect(this)
     }
 
 
@@ -321,22 +329,22 @@ export class ElementDimension extends Segment {
             }
         }
 
-        // this is area we _can_ scroll to
-        const thisVisibleArea       = this.viewport
-        // this is the point, we'd _like_ to scroll to
-        const rootViewportCenter    = this.rootViewport.center
+        // // this is area we _can_ scroll to
+        // const thisVisibleArea       = this.viewport
+        // // this is the point, we'd _like_ to scroll to
+        // const rootViewportCenter    = this.rootViewport.center
+        //
+        // const targetPoint       = thisVisibleArea.contains(rootViewportCenter)
+        //     ? rootViewportCenter
+        //     : thisVisibleArea.start > rootViewportCenter
+        //         ? thisVisibleArea.start
+        //         : thisVisibleArea.end
 
-        const targetPoint       = thisVisibleArea.contains(rootViewportCenter)
-            ? rootViewportCenter
-            : thisVisibleArea.start > rootViewportCenter
-                ? thisVisibleArea.start
-                : thisVisibleArea.end
-
-        const delta             = sourcePoint - targetPoint
+        const delta             = sourcePoint - this.viewport.center
         const needScroll        = this.scroll + delta
 
         if (0 <= needScroll && needScroll <= this.maxScroll) {
-            this.scroll       += delta
+            this.scroll         += delta
 
             return true
         }
@@ -354,13 +362,12 @@ export class ElementDimension extends Segment {
 
             return this.parent ? this.parent.scrollScrollPointIntoView(sourcePoint - delta) : this.contains(sourcePoint - delta)
         }
-
     }
 
 
     scrollContentPointIntoView (sourcePoint : number) : boolean {
         if (!this.contains(sourcePoint)) throw new Error("Can only scroll points within own content area")
 
-        return this.scrollScrollPointIntoView(sourcePoint)
+        return this.parent.scrollScrollPointIntoView(sourcePoint)
     }
 }
