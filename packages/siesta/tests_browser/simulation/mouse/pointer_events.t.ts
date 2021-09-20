@@ -118,7 +118,7 @@ it('Preventing the `pointerdown` should skip mouse events from firing', async t 
     ])
 })
 
-
+// TODO
 // it('Preventing the `pointerdown` should skip `mouse` events from firing when dragging', async t => {
 //     doSetup()
 //
