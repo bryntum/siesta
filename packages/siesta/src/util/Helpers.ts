@@ -41,7 +41,20 @@ export const constructorNameOf = (value : any) : string => {
 export type PartialWOC<T>       = Omit<Partial<T>, 'constructor'>
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type DowngradePrimitives<T>       =
+    T extends Number
+        ? number
+        : String extends T
+            ? string
+            : Boolean extends T
+                ? boolean
+                : Object extends T
+                    ? Object
+                    : T
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type OrPromise<T>        = T | Promise<T>
 
 export type UnwrapPromise<T>    = T extends Promise<infer P> ? P : T

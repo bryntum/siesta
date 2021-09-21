@@ -2,7 +2,7 @@ import { Base } from "../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../class/Mixin.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { serializationVisitSymbol, SerializerXml } from "../serializer/SerializerXml.js"
-import { typeOf } from "../util/Helpers.js"
+import { DowngradePrimitives, typeOf } from "../util/Helpers.js"
 import { isNumber, isRegExp } from "../util/Typeguards.js"
 import { Visitor } from "typescript-serializable-mixin"
 import { DeepCompareOptions, DeepCompareState, Difference, DifferenceAtomic, DifferenceHeterogeneous, valueAsDifference } from "./CompareDeepDiff.js"
@@ -450,6 +450,6 @@ export class FuzzyMatcherAny extends FuzzyMatcher {
  * @param args
  */
 export const any = <T extends [] | [ AnyConstructor ]>(...args : T)
-    : T extends [] ? any : T extends [ AnyConstructor<infer I> ] ? I : never =>
+    : T extends [] ? any : T extends [ AnyConstructor<infer I> ] ? DowngradePrimitives<T> : never =>
     // @ts-ignore
     args.length === 0 ?  FuzzyMatcherAny.new() : FuzzyMatcherInstance.new({ cls : args[ 0 ] })

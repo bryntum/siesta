@@ -15,6 +15,7 @@ import { CI } from "../../../iterator/Iterator.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../../jsx/XmlElement.js"
 import { SerializerXml } from "../../../serializer/SerializerXml.js"
+import { DowngradePrimitives } from "../../../util/Helpers.js"
 import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
 
@@ -615,7 +616,7 @@ export class AssertionCompare extends Mixin(
          *
          * @param args
          */
-        any<T extends [] | [ AnyConstructor ]> (...args : T) : T extends [] ? any : T extends [ AnyConstructor<infer I> ] ? I : never {
+        any<T extends [] | [ AnyConstructor ]> (...args : T) : T extends [] ? any : T extends [ AnyConstructor<infer I> ] ? DowngradePrimitives<I> : never {
             // @ts-ignore
             return any(...args)
         }
