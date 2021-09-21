@@ -1,3 +1,4 @@
+import { delay } from "../../../src/util/TimeHelpers.js"
 import { isString } from "../../../src/util/Typeguards.js"
 import { beforeEach, it } from "../../../browser.js"
 import { createElement } from "../../@helpers.js"
@@ -172,4 +173,31 @@ it('Triggering `mouseover` events should work for <span> elements', async t => {
 
     t.equal(firedChild, { mouseover : 1, mouseout : 1, mouseenter : 1, mouseleave : 1 }, 'Correct events detected for child')
     t.equal(firedParent, { mouseover : 3, mouseout : 3, mouseenter : 1, mouseleave : 1 }, 'Correct events detected for parent')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it("After mouse interactions, the target el must be re-evaluated", async t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; left: 5px; top: 5px; border: 1px solid black; width: 50px; height: 50px" id="outer">' +
+            '<div style="background: #aaa; position: absolute; top: 0; left: 0; width: 40px; height: 40px" id="inner">' +
+            '</div>' +
+        '</div>'
+
+    const inner     = document.getElementById('inner')
+    const outer     = document.getElementById('outer')
+
+    outer.addEventListener('click', () => inner.style.display = 'none')
+
+    await t.moveMouseTo('#outer')
+
+    t.firesOnce(inner, 'mouseleave', 'inner mouseleave')
+    t.firesOnce(outer, 'mouseover', 'outer mouseover')
+
+    // this click hides the `#inner` element, so it should trigger `mouseleave`
+    // the cursor then becomes positioned on the `#outer`, which should trigger `mouseover`
+    await t.click([])
+
+    // the events above are triggered in the next tick, so need to wait a bit
+    await delay(10)
 })
