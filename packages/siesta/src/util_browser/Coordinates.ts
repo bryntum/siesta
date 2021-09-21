@@ -2,7 +2,7 @@ import { PointerMovePrecision } from "../siesta/simulate/Simulator.js"
 import { ActionTargetOffset, Point, sumPoints, sumPoints3 } from "../siesta/simulate/Types.js"
 import { lastElement } from "../util/Helpers.js"
 import { Rect } from "../util/Rect.js"
-import { isString } from "../util/Typeguards.js"
+import { isNumber, isString } from "../util/Typeguards.js"
 import { elementFromPoint, parentWindows } from "./Dom.js"
 import { getOffsetsMap, getScrollbarWidth } from "./Scroll.js"
 
@@ -186,8 +186,11 @@ export const getPathBetweenPoints = function (from : Point, to : Point) : Point[
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const filterPathAccordingToPrecision = (path : Point[], { kind, precision } : PointerMovePrecision) : Point[] => {
+export const filterPathAccordingToPrecision = (path : Point[], movePrecision : PointerMovePrecision) : Point[] => {
     const pathLength    = path.length
+
+    const kind          = isNumber(movePrecision) ? 'every_nth' : movePrecision.kind
+    const precision     = isNumber(movePrecision) ? movePrecision : movePrecision.precision
 
     if (kind === 'fixed') {
         if (precision === 1) return path.slice(-1)

@@ -12,6 +12,7 @@ export type PointerClickOptions    = {
 
 
 export type PointerMovePrecision      =
+    | number
     | {
         // fixed number of steps, divided equally along the path
         kind            : 'fixed'
