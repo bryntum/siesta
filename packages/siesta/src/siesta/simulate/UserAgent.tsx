@@ -42,7 +42,15 @@ import {
 export type MouseActionOptions      = {
     target              : ActionTarget
     offset              : ActionTargetOffset
+
     button              : MouseButton
+
+    options             : {
+        shiftKey?       : boolean
+        ctrlKey?        : boolean
+        altKey?         : boolean
+        metaKey?        : boolean
+    }
 
     mouseMovePrecision  : PointerMovePrecision
     allowChild          : boolean
@@ -179,7 +187,9 @@ export class UserAgentOnPage extends Mixin(
                 return {
                     target              : targetOrOptions,
                     offset              : offset,
+
                     button              : 'left',
+                    options             : {},
 
                     mouseMovePrecision  : this.mouseMovePrecision,
                     allowChild          : true,
@@ -193,7 +203,9 @@ export class UserAgentOnPage extends Mixin(
                 return Object.assign({
                     target              : undefined,
                     offset              : undefined,
+
                     button              : 'left',
+                    options             : {},
 
                     mouseMovePrecision  : this.mouseMovePrecision,
                     allowChild          : true,

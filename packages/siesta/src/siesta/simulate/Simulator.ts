@@ -35,9 +35,13 @@ export type PointerMovePrecision      =
     }
 
 
-
 export type PointerMoveOptions      = {
     precision       : PointerMovePrecision
+}
+
+
+export type TypeOptions      = {
+    delay           : number
 }
 
 
@@ -58,6 +62,18 @@ interface SimulatorMouse {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export interface Simulator extends SimulatorMouse {
+interface SimulatorKeyboard {
+    keyPress (key : string, options? : TypeOptions) : Promise<any>
+
+    keyDown (key : string) : Promise<any>
+
+    keyUp (key : string) : Promise<any>
+
+    type (text : string, options? : TypeOptions) : Promise<any>
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export interface Simulator extends SimulatorMouse, SimulatorKeyboard {
 }
 
