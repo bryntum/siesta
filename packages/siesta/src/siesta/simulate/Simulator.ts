@@ -36,7 +36,7 @@ export type PointerMovePrecision      =
 
 
 export type PointerMoveOptions      = {
-    precision       : PointerMovePrecision
+    mouseMovePrecision      : PointerMovePrecision
 }
 
 

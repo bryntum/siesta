@@ -83,7 +83,7 @@ export class TestBrowser extends Mixin(
                 // @ts-expect-error
                 this.simulator.offset   = this.dashboardLaunchInfo.offset
 
-                await this.simulator.simulateMouseMove([ 0, 0 ], { precision : { kind : 'last_only', precision : 1 } })
+                await this.simulator.simulateMouseMove([ 0, 0 ], { mouseMovePrecision : { kind : 'last_only', precision : 1 } })
             }
         }
 

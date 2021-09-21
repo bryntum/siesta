@@ -41,9 +41,9 @@ export class SimulatorPlaywrightServer extends Mixin(
 
         @local()
         async simulateMouseMove (
-            target : Point, options : PointerMoveOptions = { precision : { kind : 'every_nth', precision : 30 } }
+            target : Point, options : PointerMoveOptions = { mouseMovePrecision : { kind : 'every_nth', precision : 30 } }
         ) : Promise<any> {
-            const precision     = options.precision
+            const precision     = options.mouseMovePrecision
 
             const filtered  = filterPathAccordingToPrecision(
                 getPathBetweenPoints(this.currentPosition, target),

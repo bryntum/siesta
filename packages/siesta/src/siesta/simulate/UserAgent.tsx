@@ -273,7 +273,7 @@ export class UserAgentOnPage extends Mixin(
                     return { success : false, failedChecks : [ 'visible' ], actionPoint : point }
                 }
 
-                await this.simulator.simulateMouseMove(point, { precision : action.mouseMovePrecision })
+                await this.simulator.simulateMouseMove(point, { mouseMovePrecision : action.mouseMovePrecision })
 
                 return { success : true, failedChecks : [], actionPoint : point }
 
@@ -450,7 +450,7 @@ export class UserAgentOnPage extends Mixin(
                         const globalPoint   = sumPoints(offsets.get(win), point)
 
                         if (!equalPoints(globalPoint, this.simulator.currentPosition)) {
-                            await this.simulator.simulateMouseMove(globalPoint, { precision : action.mouseMovePrecision })
+                            await this.simulator.simulateMouseMove(globalPoint, { mouseMovePrecision : action.mouseMovePrecision })
 
                             checks.push('reachable')
                             continueWaiting(false, checks)
