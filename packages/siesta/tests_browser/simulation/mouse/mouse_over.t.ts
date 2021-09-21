@@ -1,5 +1,5 @@
 import { isString } from "../../../src/util/Typeguards.js"
-import { it } from "../../../browser.js"
+import { beforeEach, it } from "../../../browser.js"
 import { createElement } from "../../@helpers.js"
 
 const logEvent = (
@@ -25,6 +25,13 @@ const logEvent = (
 }
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+beforeEach(() => {
+    document.body.innerHTML = ''
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should trigger `mouseover/mouseout/mouseenter/mouseleave/mousemove` events when moving mouse', async t => {
     const parent    = createElement({
         parent      : document.body,
@@ -115,6 +122,7 @@ it('Should trigger `mouseover/mouseout/mouseenter/mouseleave/mousemove` events w
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Triggering `mouseenter/leave` events should work correctly', async t => {
     document.body.innerHTML =
         '<div id="outer" style="background: blue; position: absolute; width: 100px; height: 100px; left: 0; top: 0;">' +
@@ -133,3 +141,35 @@ it('Triggering `mouseenter/leave` events should work correctly', async t => {
     await t.moveMouseTo([ 50, 50 ])
 })
 
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Triggering `mouseover` events should work for <span> elements', async t => {
+    const parent        = createElement({
+        parent      : document.body,
+        id          : 'parent',
+        style       : 'width: 200px; height: 200px; background: #ccc; margin: 20px;',
+        html        : '<br><br><span id="child" style="background:#666;">Some wide content, yes, real wide</span>'
+    })
+
+    const child         = t.$('#child')
+
+    const firedParent   = { mouseover : 0, mouseout : 0, mouseenter : 0, mouseleave : 0 }
+    const firedChild    = { mouseover : 0, mouseout : 0, mouseenter : 0, mouseleave : 0 }
+
+    await t.moveMouseTo([ 100, 0 ])
+
+    parent.addEventListener('mouseover', () => firedParent.mouseover++)
+    parent.addEventListener('mouseout', () => firedParent.mouseout++)
+    parent.addEventListener('mouseenter', () => firedParent.mouseenter++)
+    parent.addEventListener('mouseleave', () => firedParent.mouseleave++)
+
+    child.addEventListener('mouseover', () => firedChild.mouseover++)
+    child.addEventListener('mouseout', () => firedChild.mouseout++)
+    child.addEventListener('mouseenter', () => firedChild.mouseenter++)
+    child.addEventListener('mouseleave', () => firedChild.mouseleave++)
+
+    await t.moveMouseTo({ target : [ 100, 250 ], movePrecision : 1 })
+
+    t.equal(firedChild, { mouseover : 1, mouseout : 1, mouseenter : 1, mouseleave : 1 }, 'Correct events detected for child')
+    t.equal(firedParent, { mouseover : 3, mouseout : 3, mouseenter : 1, mouseleave : 1 }, 'Correct events detected for parent')
+})
