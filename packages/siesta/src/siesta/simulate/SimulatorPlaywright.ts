@@ -45,18 +45,13 @@ export class SimulatorPlaywrightServer extends Mixin(
         ) : Promise<any> {
             const precision     = options.precision
 
-            if (precision.kind === 'fixed') {
-                await this.page.mouse.move(target[ 0 ], target[ 1 ], { steps : precision.precision })
-            }
-            else {
-                const filtered  = filterPathAccordingToPrecision(
-                    getPathBetweenPoints(this.currentPosition, target),
-                    precision
-                )
+            const filtered  = filterPathAccordingToPrecision(
+                getPathBetweenPoints(this.currentPosition, target),
+                precision
+            )
 
-                for (const point of filtered) {
-                    await this.pageMouseMove(point[ 0 ], point[ 1 ])
-                }
+            for (const point of filtered) {
+                await this.pageMouseMove(point[ 0 ], point[ 1 ])
             }
         }
 
