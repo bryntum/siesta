@@ -45,7 +45,13 @@ project.plan(
                     'pointer_events.t.js'
                 ]
             },
-            'actionability_checks.t.js'
+            {
+                filename    : 'targeting',
+
+                items       : [
+                    'actionability_checks.t.js'
+                ]
+            },
         ]
     },
     {

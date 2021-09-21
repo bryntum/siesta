@@ -1,6 +1,6 @@
-import { beforeEach, it } from "../../browser.js"
-import { isElementAccessible, isElementConnected, isElementPointVisible } from "../../src/util_browser/Dom.js"
-import { createElement } from "../@helpers.js"
+import { beforeEach, it } from "../../../browser.js"
+import { isElementAccessible, isElementConnected, isElementPointVisible } from "../../../src/util_browser/Dom.js"
+import { createElement } from "../../@helpers.js"
 
 const id    = id => document.getElementById(id)
 
