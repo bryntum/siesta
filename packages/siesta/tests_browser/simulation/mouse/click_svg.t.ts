@@ -1,11 +1,12 @@
 import { beforeEach, it } from "../../../browser.js"
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
     document.body.innerHTML = ''
 })
 
-
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it("should support clicking SVG element with float values", async t => {
     document.body.innerHTML =
         '<svg width="800px" height="800px">' +
@@ -31,6 +32,7 @@ it("should support clicking SVG element with float values", async t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it("should support clicking SVG element with translate values", async t => {
     document.body.innerHTML =
         '<svg width="800px" height="800px">' +
@@ -56,6 +58,7 @@ it("should support clicking SVG element with translate values", async t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // OLD code: !bowser.msie && !bowser.msedge && !bowser.gecko && it("should
 // seems not supposed to work in Firefox?
 it("should support clicking SVG element with scaled values", async t => {
@@ -84,6 +87,7 @@ it("should support clicking SVG element with scaled values", async t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it("should support clicking a polyline", async t => {
     document.body.innerHTML =
         '<svg style="width: 1px;height: 1px;overflow: visible;position: absolute;pointer-events: none;">' +
@@ -110,6 +114,7 @@ it("should support clicking a polyline", async t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('moving mouse to svg element should work', async t => {
     document.body.innerHTML = [
         '<svg>',
@@ -124,4 +129,25 @@ it('moving mouse to svg element should work', async t => {
     t.firesOnce('.target-line', [ 'mouseover', 'mouseenter', 'click' ])
 
     await t.click('.target-line')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it("Should support moving mouse to SVG element and clicking it", async t => {
+    document.body.innerHTML =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="150" height="100" viewBox="0 0 3 2">' +
+            '<rect width="1" height="2" x="0" fill="#008d46"/>' +
+            '<rect width="1" height="2" x="1" fill="#ffffff"/>' +
+            '<rect width="1" height="2" x="2" fill="#d2232c"/>' +
+        '</svg>'
+
+    const firstRect = document.querySelector('svg > rect')
+
+    t.firesOnce(firstRect, [ 'mouseover', 'mouseout', 'mouseenter', 'mouseleave', 'mousedown', 'mouseup', 'click' ])
+
+    await t.moveMouseTo('rect')
+
+    await t.click('rect')
+
+    await t.moveMouseTo([ 2, 150 ])
 })
