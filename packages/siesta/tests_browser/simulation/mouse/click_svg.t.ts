@@ -136,7 +136,7 @@ it('moving mouse to svg element should work', async t => {
 it("Should support moving mouse to SVG element and clicking it", async t => {
     document.body.innerHTML =
         '<svg xmlns="http://www.w3.org/2000/svg" width="150" height="100" viewBox="0 0 3 2">' +
-            '<rect width="1" height="2" x="0" fill="#008d46"/>' +
+            '<rect id="target" width="1" height="2" x="0" fill="#008d46"/>' +
             '<rect width="1" height="2" x="1" fill="#ffffff"/>' +
             '<rect width="1" height="2" x="2" fill="#d2232c"/>' +
         '</svg>'
@@ -145,9 +145,9 @@ it("Should support moving mouse to SVG element and clicking it", async t => {
 
     t.firesOnce(firstRect, [ 'mouseover', 'mouseout', 'mouseenter', 'mouseleave', 'mousedown', 'mouseup', 'click' ])
 
-    await t.moveMouseTo('rect')
+    await t.moveMouseTo('#target')
 
-    await t.click('rect')
+    await t.click('#target')
 
     await t.moveMouseTo([ 2, 150 ])
 })
