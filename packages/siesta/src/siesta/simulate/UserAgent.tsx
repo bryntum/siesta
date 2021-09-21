@@ -44,7 +44,7 @@ export type MouseActionOptions      = {
     offset              : ActionTargetOffset
     button              : MouseButton
 
-    movePrecision       : PointerMovePrecision
+    mouseMovePrecision  : PointerMovePrecision
     allowChild          : boolean
 
     timeout             : number
@@ -69,6 +69,8 @@ export interface UserAgent {
     moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
     moveMouseBy (delta : Point) : Promise<any>
+
+    // dragTo (source : ActionTarget, target : ActionTarget) : Promise<any>
 }
 
 
@@ -179,7 +181,7 @@ export class UserAgentOnPage extends Mixin(
                     offset              : offset,
                     button              : 'left',
 
-                    movePrecision       : this.mouseMovePrecision,
+                    mouseMovePrecision  : this.mouseMovePrecision,
                     allowChild          : true,
 
                     timeout             : this.defaultTimeout,
@@ -193,7 +195,7 @@ export class UserAgentOnPage extends Mixin(
                     offset              : undefined,
                     button              : 'left',
 
-                    movePrecision       : this.mouseMovePrecision,
+                    mouseMovePrecision  : this.mouseMovePrecision,
                     allowChild          : true,
 
                     timeout             : this.defaultTimeout,
@@ -259,7 +261,7 @@ export class UserAgentOnPage extends Mixin(
                     return { success : false, failedChecks : [ 'visible' ], actionPoint : point }
                 }
 
-                await this.simulator.simulateMouseMove(point, { precision : action.movePrecision })
+                await this.simulator.simulateMouseMove(point, { precision : action.mouseMovePrecision })
 
                 return { success : true, failedChecks : [], actionPoint : point }
 
@@ -436,7 +438,7 @@ export class UserAgentOnPage extends Mixin(
                         const globalPoint   = sumPoints(offsets.get(win), point)
 
                         if (!equalPoints(globalPoint, this.simulator.currentPosition)) {
-                            await this.simulator.simulateMouseMove(globalPoint, { precision : action.movePrecision })
+                            await this.simulator.simulateMouseMove(globalPoint, { precision : action.mouseMovePrecision })
 
                             checks.push('reachable')
                             continueWaiting(false, checks)

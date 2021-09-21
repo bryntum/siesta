@@ -170,7 +170,7 @@ it('Triggering `mouseover` events should work for <span> elements', async t => {
     child.addEventListener('mouseenter', () => firedChild.mouseenter++)
     child.addEventListener('mouseleave', () => firedChild.mouseleave++)
 
-    await t.moveMouseTo({ target : [ 100, 250 ], movePrecision : 1 })
+    await t.moveMouseTo({ target : [ 100, 250 ], mouseMovePrecision : 1 })
 
     t.equal(firedChild, { mouseover : 1, mouseout : 1, mouseenter : 1, mouseleave : 1 }, 'Correct events detected for child')
     t.equal(firedParent, { mouseover : 3, mouseout : 3, mouseenter : 1, mouseleave : 1 }, 'Correct events detected for parent')
