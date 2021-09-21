@@ -48,6 +48,7 @@ const doSetup     = () => {
 }
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Changing the target should cancel the `click` event', async t => {
     doSetup()
 
@@ -62,6 +63,7 @@ it('Changing the target should cancel the `click` event', async t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Changing the target to the child el should not cancel the `click` event', async t => {
     document.body.innerHTML =
         '<div class="box" id="box1" style="left: 0px;top:0px; height: 100px; width:100px">' +
@@ -87,6 +89,7 @@ it('Changing the target to the child el should not cancel the `click` event', as
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Changing the target should cancel the `click` event but not the 2nd one in the dblclick', async t => {
     doSetup()
 
@@ -105,6 +108,7 @@ it('Changing the target should cancel the `click` event but not the 2nd one in t
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Changing the target in the 2nd phase of dblclick should still cancel the `click` and `dblclick`', async t => {
     doSetup()
 
@@ -123,6 +127,7 @@ it('Changing the target in the 2nd phase of dblclick should still cancel the `cl
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should fire click event on common ancestor of pointerup element + element-at-cursor if pointerup triggers another element to become visible', async t => {
     document.body.innerHTML =
         '<div id="outer" style="position:absolute; left: 0; top: 0px; height:250px; width:250px;background:red;">' +

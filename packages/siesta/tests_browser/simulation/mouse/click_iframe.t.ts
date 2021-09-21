@@ -1,10 +1,13 @@
 import { beforeEach, it } from "../../../browser.js"
 import { createPositionedElement, createPositionedIframe } from "../../@helpers.js"
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
     document.body.innerHTML = ''
 })
 
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Clicking on the elements inside of the iframe should work', async t => {
     const iframe                    = await createPositionedIframe('about:blank', { left : 50, top : 50, width : 300, height : 300 })
     iframe.style.backgroundColor    = 'blue'
@@ -34,6 +37,7 @@ it('Clicking on the elements inside of the iframe should work', async t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // // TODO https://github.com/microsoft/playwright/issues/9029
 // it({ title : 'Should not freeze when moving mouse above foreign-domain iframe', isTodo : true }, async t => {
 //     document.body.innerHTML = '<iframe></iframe>'
