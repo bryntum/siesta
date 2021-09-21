@@ -143,7 +143,7 @@ it('Preventing the `pointerdown` should skip mouse events from firing', async t 
 it('Should fire pointer events for mouse movements', async t => {
     doSetup()
 
-    await t.moveMouse('#box1', [ '100% + 10', '50%' ])
+    await t.moveMouseTo('#box1', [ '100% + 10', '50%' ])
 
     setupBoxForPointerMove('box1', true)
 

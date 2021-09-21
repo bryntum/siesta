@@ -66,7 +66,7 @@ export interface UserAgent {
 
     mouseUp (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
-    moveMouse (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
+    moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
     moveMouseBy (delta : Point) : Promise<any>
 }
@@ -542,7 +542,7 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async moveMouse (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
+        async moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target, offset)
 
             const waitRes       = await this.waitForTargetActionable(action, {
@@ -554,7 +554,7 @@ export class UserAgentOnPage extends Mixin(
 
 
         async moveMouseBy (delta : Point) {
-            await this.moveMouse(sumPoints(this.simulator.currentPosition, delta))
+            await this.moveMouseTo(sumPoints(this.simulator.currentPosition, delta))
         }
     }
 ) {}
@@ -600,13 +600,13 @@ export class UserAgentExternal extends Mixin(
         }
 
 
-        async moveMouse (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
+        async moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
 
         }
 
 
         async moveMouseBy (delta : Point) {
-            await this.moveMouse(sumPoints(this.simulator.currentPosition, delta))
+            await this.moveMouseTo(sumPoints(this.simulator.currentPosition, delta))
         }
     }
 ) {}

@@ -27,7 +27,7 @@ it("should support clicking SVG element with float values", async t => {
     await t.click('#myrect')
 
     // Should trigger inner element 'mouseout' event + 'mouseleave' event
-    await t.moveMouse([ 2, 150 ])
+    await t.moveMouseTo([ 2, 150 ])
 })
 
 
@@ -52,7 +52,7 @@ it("should support clicking SVG element with translate values", async t => {
     await t.click('#myrect')
 
     // Should trigger inner element 'mouseout' event + 'mouseleave' event
-    await t.moveMouse([ 2, 150 ])
+    await t.moveMouseTo([ 2, 150 ])
 })
 
 
@@ -80,7 +80,7 @@ it("should support clicking SVG element with scaled values", async t => {
     await t.click('#myrect')
 
     // Should trigger inner element 'mouseout' event + 'mouseleave' event
-    await t.moveMouse([ 2, 150 ])
+    await t.moveMouseTo([ 2, 150 ])
 })
 
 
