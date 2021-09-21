@@ -46,6 +46,8 @@ export class MouseCursorVisualizer extends Base {
 
 
     onPointerMove (e : PointerEvent) {
+        if (!this.pointerEl.isConnected) document.body.appendChild(this.pointerEl)
+
         this.pointerEl.style.left   = e.clientX + 'px'
         this.pointerEl.style.top    = e.clientY + 'px'
     }
@@ -68,7 +70,7 @@ export class MouseCursorVisualizer extends Base {
             'transform: translate(-50%, -50%);' +
             'background: rgba(215, 187, 187, 0.7);' +
             'transition: all 1.2s ease-in-out;' +
-            `width: 0px; height: 0px; left: ${ e.clientX }; top: ${ e.clientY };`
+            `width: 0px; height: 0px; left: ${ e.clientX }px; top: ${ e.clientY }px;`
 
         document.body.appendChild(clickEl)
 
