@@ -4,11 +4,13 @@ import { createElement } from "../../@helpers.js"
 
 const id    = id => document.getElementById(id)
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
     document.body.innerHTML = ''
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`isElementConnected` should work', t => {
     const div       = createElement({
         children : [ { id : 'inner' } ]
@@ -19,6 +21,7 @@ it('`isElementConnected` should work', t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`isElementConnected` should work', t => {
     const div       = createElement({
         parent      : document.body,
@@ -30,6 +33,7 @@ it('`isElementConnected` should work', t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`isElementAccessible` should work', t => {
     const div       = createElement({
         parent      : document.body,
@@ -73,6 +77,7 @@ it('`isElementAccessible` should work', t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`isElementPointVisible` should work', t => {
     const div       = createElement({
         parent      : document.body,
@@ -99,6 +104,7 @@ it('`isElementPointVisible` should work', t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`isElementPointVisible` without offset should work for any element point', t => {
     const div       = createElement({
         parent      : document.body,
@@ -120,6 +126,7 @@ it('`isElementPointVisible` without offset should work for any element point', t
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`isElementPointVisible` should work for elements inside iframe', async t => {
     const div       = createElement({
         parent      : document.body,
@@ -164,6 +171,7 @@ it('`isElementPointVisible` should work for elements inside iframe', async t => 
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Determine that element is hidden behind the scrollbar', t => {
     document.body.innerHTML =
         '<div style="position: absolute; left: 0; top: 0; background: blue; width: 200px; height: 200px; overflow: auto">' +
@@ -175,6 +183,7 @@ it('Determine that element is hidden behind the scrollbar', t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Determine that element is scrolled out of the view', t => {
     document.body.innerHTML =
         '<div style="position: absolute; left:100px; border:1px solid #ddd; width: 200px; height: 200px; overflow: auto">' +
@@ -185,6 +194,7 @@ it('Determine that element is scrolled out of the view', t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Determine that element is not scrolled out of the view', t => {
     document.body.innerHTML =
         '<div style="position: absolute; left:100px; border:1px solid #ddd; width: 200px; height: 200px; overflow: auto">' +
@@ -195,6 +205,7 @@ it('Determine that element is not scrolled out of the view', t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Determine that element is scrolled out of the view #2', t => {
     document.body.innerHTML =
         '<div style="position: absolute; left:100px; border:1px solid #ddd; width: 200px; height: 200px; overflow: auto">' +
@@ -209,6 +220,7 @@ it('Determine that element is scrolled out of the view #2', t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`isElementPointVisible` should work for direct child of <body>', async t => {
     document.body.innerHTML =
         '<div id="inner" style="position: absolute; left: 150px; top: 2000px; width: 100px; height: 100px; background: red"></div>'
