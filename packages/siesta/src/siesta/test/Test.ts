@@ -381,7 +381,7 @@ export class Test extends TestPre {
      * @param code The test function. Can be `async` if needed or return `Promise`.
      */
     it (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
-        const descriptor : TestDescriptor   = TestDescriptor.fromTestDescriptorArgument(name)
+        const descriptor : TestDescriptor   = this.testDescriptorClass.fromTestDescriptorArgument(name)
 
         // if (this.isTodo) descriptor.isTodo  = true
 
