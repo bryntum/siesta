@@ -42,7 +42,7 @@ export const createPositionedIframe = async (url : string = 'about:blank', pos :
 
     return new Promise(resolve => {
         iframe.addEventListener('load', () => {
-            forceStandardsMode(iframe)
+            if (url === 'about:blank') forceStandardsMode(iframe)
 
             resolve(iframe)
         }, { once : true })

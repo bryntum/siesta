@@ -1,6 +1,3 @@
-import { Base } from "../../class/Base.js"
-import { isFunction } from "../../util/Typeguards.js"
-
 //---------------------------------------------------------------------------------------------------------------------
 export type Point                   = [ x : number, y : number ]
 
@@ -50,8 +47,16 @@ export type ActionableCheck         =
 
 
 //---------------------------------------------------------------------------------------------------------------------
-export const sumPoints    = (point1 : Point, point2 : Point) : Point =>
+export const sumPoints      = (point1 : Point, point2 : Point) : Point =>
     [ point1[ 0 ] + point2[ 0 ], point1[ 1 ] + point2[ 1 ] ]
+
+//---------------------------------------------------------------------------------------------------------------------
+export const sumPoints3     = (point1 : Point, point2 : Point, point3 : Point) : Point =>
+    [ point1[ 0 ] + point2[ 0 ] + point3[ 0 ], point1[ 1 ] + point2[ 1 ] + point3[ 1 ] ]
+
+//---------------------------------------------------------------------------------------------------------------------
+export const minusPoints    = (point1 : Point, point2 : Point) : Point =>
+    [ point1[ 0 ] - point2[ 0 ], point1[ 1 ] - point2[ 1 ] ]
 
 //---------------------------------------------------------------------------------------------------------------------
 export const equalPoints    = (point1 : Point, point2 : Point) : boolean =>

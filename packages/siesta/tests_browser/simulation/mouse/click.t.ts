@@ -8,7 +8,7 @@ beforeEach(() => {
     document.body.innerHTML = ''
 })
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Click should prevent the test from stopping, even w/o `await`', async t => {
     let clicked   = false
 
@@ -29,7 +29,7 @@ it('Click should prevent the test from stopping, even w/o `await`', async t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Left click', async t => {
     const clickDiv = document.body.appendChild(createElement('div', {
         style   : 'width : 40px;',
@@ -62,7 +62,7 @@ it('Left click', async t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('mousedown + mouseup on the same element should fire same event as regular click', async t => {
     const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: red;',
@@ -79,7 +79,7 @@ it('mousedown + mouseup on the same element should fire same event as regular cl
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('mousedown + mouseup should NOT fire click event if mouseup is not on the same el as the mousedown', async t => {
     const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background:green;',
@@ -99,7 +99,7 @@ it('mousedown + mouseup should NOT fire click event if mouseup is not on the sam
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Right click', async t => {
     const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: yellow;',
@@ -129,7 +129,7 @@ it('Right click', async t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Clicking the element should interact with the top-most element', async t => {
     // now clicking in the center of the outer (bigger) div
     // but the click should happen on the top-most element at that position in the DOM
@@ -155,7 +155,7 @@ it('Clicking the element should interact with the top-most element', async t => 
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Double click', async t => {
     const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: green;',
@@ -171,7 +171,7 @@ it('Double click', async t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Verify check box click works', async t => {
     document.body.innerHTML = '<input type="checkbox" />'
 
@@ -181,7 +181,7 @@ it('Verify check box click works', async t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be possible to click an offset point outside the element', async t => {
     const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: yellow;',
@@ -194,7 +194,7 @@ it('Should be possible to click an offset point outside the element', async t =>
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Failed clicks (due to element not actionable) should create failing assertion', async t => {
     t.todo('internal', async t => {
         const div = document.body.appendChild(createElement('div', {

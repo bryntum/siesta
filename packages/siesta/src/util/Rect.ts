@@ -1,6 +1,6 @@
 import { Base } from "typescript-mixin-class"
 import { Point } from "../siesta/simulate/Types.js"
-import { getScrollbarWidth } from "../util_browser/Scroll.js"
+import { getOffsetsMap, getScrollbarWidth } from "../util_browser/Scroll.js"
 
 export class Rect extends Base {
     left            : number        = undefined
@@ -140,19 +140,28 @@ export class Rect extends Base {
     }
 
 
-    static fromElement<T extends typeof Rect> (this : T, el : Element) : InstanceType<T> {
+    static fromElement<T extends typeof Rect> (this : T, el : Element, global : boolean = false) : InstanceType<T> {
         const rect      = el.getBoundingClientRect()
 
-        return this.new({
+        let instance    = this.new({
             left        : rect.left,
             top         : rect.top,
             width       : rect.width,
             height      : rect.height
         } as Partial<InstanceType<T>>)
+
+        if (global) {
+            const win           = el.ownerDocument.defaultView
+            const offsets       = getOffsetsMap(win)
+
+            instance            = instance.shift(...offsets.get(win)) as InstanceType<T>
+        }
+
+        return instance
     }
 
 
-    static fromElementContent<T extends typeof Rect> (this : T, el : HTMLElement) : InstanceType<T> {
+    static fromElementContent<T extends typeof Rect> (this : T, el : HTMLElement, global : boolean = false) : InstanceType<T> {
         const win       = el.ownerDocument.defaultView
         const style     = win.getComputedStyle(el)
         const rect      = el.getBoundingClientRect()
@@ -162,11 +171,20 @@ export class Rect extends Base {
         const borderTopWidth    = Number.parseFloat(style.borderTopWidth)
         const borderBottomWidth = Number.parseFloat(style.borderBottomWidth)
 
-        return this.new({
+        let instance    = this.new({
             left        : rect.left + borderLeftWidth,
             top         : rect.top + borderTopWidth,
             width       : rect.width - borderLeftWidth - borderRightWidth - getScrollbarWidth(el, 'x'),
             height      : rect.height - borderTopWidth - borderBottomWidth - getScrollbarWidth(el, 'y')
         } as Partial<InstanceType<T>>)
+
+        if (global) {
+            const win           = el.ownerDocument.defaultView
+            const offsets       = getOffsetsMap(win)
+
+            instance            = instance.shift(...offsets.get(win)) as InstanceType<T>
+        }
+
+        return instance
     }
 }

@@ -1,11 +1,12 @@
 import { PointerMovePrecision } from "../siesta/simulate/Simulator.js"
-import { ActionTargetOffset, Point } from "../siesta/simulate/Types.js"
+import { ActionTargetOffset, Point, sumPoints, sumPoints3 } from "../siesta/simulate/Types.js"
 import { lastElement } from "../util/Helpers.js"
 import { Rect } from "../util/Rect.js"
 import { isString } from "../util/Typeguards.js"
-import { getScrollbarWidth } from "./Scroll.js"
+import { elementFromPoint, parentWindows } from "./Dom.js"
+import { getOffsetsMap, getScrollbarWidth } from "./Scroll.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const clientXtoPageX = (x : number, win : Window) : number => x + win.scrollX
 
 export const clientYtoPageY = (y : number, win : Window) : number => y + win.scrollY
@@ -19,7 +20,7 @@ export const pagePointToClientPoint = (point : Point, win : Window) : Point => [
 export const clientPointToPagePoint = (point : Point, win : Window) : Point => [ point[ 0 ] + win.scrollX, point[ 1 ] + win.scrollY ]
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const evaluateOffsetExpression  = (baseValue : number, expression : string) : number => {
     const match         = /^\s*([+-]?\d+(?:\.\d+)?)\s*%\s*(?:([+-])\s*(\d+(?:\.\d+)?))?\s*$/.exec(expression)
 
@@ -38,27 +39,42 @@ export const normalizeOffset = (el : Element, offset : ActionTargetOffset = [ '5
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const getViewportActionPoint = (el : Element, offset? : ActionTargetOffset) : Point | undefined => {
-    const rect              = Rect.fromElement(el)
+    const rect                  = Rect.fromElement(el)
+    const visibleViewportRect   = getViewportRect(el.ownerDocument.defaultView)
 
     if (offset) {
-        const [ dx, dy ]    = normalizeOffset(el, offset)
+        const point             = sumPoints(rect.leftTop, normalizeOffset(el, offset))
 
-        return [ rect.left + dx, rect.top + dy ]
+        return visibleViewportRect.containsPoint(point) ? point : undefined
     } else {
-        const visibleViewportRect   = getViewportRect(el.ownerDocument.defaultView)
 
-        const intersection          = visibleViewportRect.intersect(rect)
+        const intersection      = visibleViewportRect.intersect(rect)
 
-        if (intersection.isEmpty() || intersection.width === 0 || intersection.height === 0) return undefined
-
-        return intersection.center
+        return intersection.isEmpty() ? undefined : intersection.center
     }
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type ActionPointData = {
+    topElementData  : { el : Element, localXY : Point }
+    globalXY        : Point
+}
+
+export const getActionPointData = (el : Element, offset? : ActionTargetOffset) : ActionPointData => {
+    const win           = el.ownerDocument.defaultView
+    const topWin        = lastElement(Array.from(parentWindows(win, true)))
+    const offsets       = getOffsetsMap(win)
+
+    const globalXY      = sumPoints3(offsets.get(win), Rect.fromElement(el).leftTop, normalizeOffset(el, offset))
+
+    return { topElementData : elementFromPoint(topWin.document, ...globalXY, true), globalXY }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isOffsetInsideElementBox = (el : Element, offset : ActionTargetOffset) : boolean => {
     const rect              = el.getBoundingClientRect()
     const [ dx, dy ]        = normalizeOffset(el, offset)
@@ -67,7 +83,7 @@ export const isOffsetInsideElementBox = (el : Element, offset : ActionTargetOffs
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const getBoundingPageRect = (el : Element) : Rect => {
     const doc               = el.ownerDocument
     const win               = doc.defaultView
@@ -83,7 +99,7 @@ export const getBoundingPageRect = (el : Element) : Rect => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // export const getViewportPageRect = (win : Window) : Rect => Rect.new({
 //     left        : win.scrollX,
 //     top         : win.scrollY,
@@ -92,16 +108,17 @@ export const getBoundingPageRect = (el : Element) : Rect => {
 // })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const getViewportRect = (win : Window) : Rect => Rect.new({
     left        : 0,
     top         : 0,
+    // TODO `getScrollbarWidth` will always return 0 for root <html> element
     width       : win.innerWidth - getScrollbarWidth(win.document.documentElement, 'x'),
     height      : win.innerHeight - getScrollbarWidth(win.document.documentElement, 'y')
 })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const translatePointToParentViewport = (point : Point, win : Window) : Point => {
     const frame     = win.frameElement
 
@@ -113,7 +130,7 @@ export const translatePointToParentViewport = (point : Point, win : Window) : Po
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const getPathBetweenPoints = function (from : Point, to : Point) : Point[] {
     if (
         typeof from[ 0 ] !== 'number' || typeof from[ 1 ] !== 'number'
@@ -168,7 +185,7 @@ export const getPathBetweenPoints = function (from : Point, to : Point) : Point[
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const filterPathAccordingToPrecision = (path : Point[], { kind, precision } : PointerMovePrecision) : Point[] => {
     const pathLength    = path.length
 

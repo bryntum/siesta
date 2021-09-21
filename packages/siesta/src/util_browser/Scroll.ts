@@ -7,21 +7,9 @@ import { isElementAccessible, isTopWindow, parentElements, parentWindows } from 
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const scrollElementPointIntoView = (
-    el : Element, offset : ActionTargetOffset = undefined, globally : boolean = false
-)
-    : boolean =>
-{
-    if (!isOffsetInsideElementBox(el, offset)) throw new Error("For `isElementPointVisible` offset should be inside the element's box")
-
-    if (!isElementAccessible(el)) return false
-
-    //-----------------------
-    let currentWin : Window     = el.ownerDocument.defaultView
-
-    //-----------------------
+export const getOffsetsMap = (win : Window) : Map<Window, Point> => {
     const offsets               = new Map<Window, Point>()
-    const windows               = Array.from(parentWindows(currentWin, true))
+    const windows               = Array.from(parentWindows(win, true))
 
     for (let i = windows.length - 1; i >= 0; i--) {
         const win       = windows[ i ]
@@ -36,9 +24,29 @@ export const scrollElementPointIntoView = (
         }
     }
 
+    return offsets
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const scrollElementPointIntoView = (
+    el : Element, offset : ActionTargetOffset = undefined, globally : boolean = false
+)
+    : boolean =>
+{
+    if (!isOffsetInsideElementBox(el, offset)) throw new Error("For `isElementPointVisible` offset should be inside the element's box")
+
+    if (!isElementAccessible(el)) return false
+
     //-----------------------
-    let rect : Rect             = Rect.fromElement(el).shift(...offsets.get(currentWin))
-    let point : Point           = sumPoints(rect.leftTop, normalizeOffset(el, offset))
+    const win                   = el.ownerDocument.defaultView
+    const offsets               = getOffsetsMap(win)
+
+    //-----------------------
+    let currentWin : Window     = win
+
+    const rect : Rect           = Rect.fromElement(el).shift(...offsets.get(currentWin))
+    const point : Point         = sumPoints(rect.leftTop, normalizeOffset(el, offset))
 
     const elDimensionX          = ElementDimension.new({ el, type : 'width', rect })
     const elDimensionY          = ElementDimension.new({ el, type : 'height', rect, style : elDimensionX.style })

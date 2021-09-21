@@ -3,7 +3,7 @@ import { Rect } from "../util/Rect.js"
 import { getViewportActionPoint, getViewportRect, isOffsetInsideElementBox, normalizeOffset, translatePointToParentViewport } from "./Coordinates.js"
 import { isHTMLIFrameElement } from "./Typeguards.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const awaitDomReady = async () : Promise<void> => {
     if (document.readyState === 'complete') return
 
@@ -11,7 +11,7 @@ export const awaitDomReady = async () : Promise<void> => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const awaitDomInteractive = async () : Promise<void> => {
     if (document.readyState === 'interactive' || document.readyState === 'complete') return
 
@@ -27,7 +27,7 @@ export const awaitDomInteractive = async () : Promise<void> => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export function * parentElements (el : Element, includeSelf : boolean = false) : Generator<Element> {
     if (includeSelf) yield el
 
@@ -41,7 +41,7 @@ export function * parentElements (el : Element, includeSelf : boolean = false) :
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export function * parentWindows (win : Window, includeSelf : boolean = false) : Generator<Window> {
     let current             = win
 
@@ -55,7 +55,21 @@ export function * parentWindows (win : Window, includeSelf : boolean = false) : 
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// export function * allParents (el : Element, includeSelf : boolean = false) : Generator<{ el : Element, isTop : boolean, isFrame : boolean }> {
+//     let current             = el
+//
+//     while (current) {
+//         if (current !== win || includeSelf) yield current
+//
+//         if (isTopWindow(current)) return
+//
+//         current             = current.parent
+//     }
+// }
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isTopWindow = (win : Window) : boolean => {
     // @ts-ignore
     return !win.parent || Boolean(win.parent.SIESTA_DASHBOARD)
@@ -63,7 +77,7 @@ export const isTopWindow = (win : Window) : boolean => {
 
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // TODO not clear if this property returns `true` for element,
 // connected to the shadow root of the unconnected web component el
 export const isElementConnected = (el : Element) : boolean => {
@@ -71,7 +85,7 @@ export const isElementConnected = (el : Element) : boolean => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isElementAccessible = (el : Element) : boolean => {
     if (!isElementConnected(el)) return false
 
@@ -85,7 +99,7 @@ export const isElementAccessible = (el : Element) : boolean => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isElementPointVisible = (el : Element, offset : ActionTargetOffset | undefined = undefined, globally : boolean = false)
     : { visible : false } | { visible : true, globalXY : Point } =>
 {
@@ -130,29 +144,27 @@ export const isElementPointVisible = (el : Element, offset : ActionTargetOffset 
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isElementPointReachable = (
     el : Element, offset : ActionTargetOffset, allowChild : boolean = false
 )
     : { reachable : boolean, point : Point, elAtPoint : Element } =>
 {
-    const doc               = el.ownerDocument
-
-    const isInside          = isOffsetInsideElementBox(el, offset)
+    if (!isOffsetInsideElementBox(el, offset)) throw new Error("Can only check inside offsets for reachability")
 
     const point             = getViewportActionPoint(el, offset)
 
-    const elAtPoint         = doc.elementFromPoint(...point)
+    if (!point) return { reachable : false, point, elAtPoint : undefined }
 
-    // if the offset specifies a point outside of the element, this check
-    // always succeeds
-    const reachable         = !isInside || elAtPoint === el || allowChild && el.contains(elAtPoint)
+    const elAtPoint         = elementFromPoint(el.ownerDocument, ...point, true).el
+
+    const reachable         = elAtPoint === el || allowChild && el.contains(elAtPoint)
 
     return { reachable, point, elAtPoint }
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const elementFromPoint = (queryRoot : DocumentOrShadowRoot, viewportX : number, viewportY : number, deep : boolean = false)
     :
         { el : Element, localXY : Point } =>
@@ -175,7 +187,7 @@ export const elementFromPoint = (queryRoot : DocumentOrShadowRoot, viewportX : n
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isSameDomainIframe = (el : HTMLIFrameElement) : boolean => {
     // according to MDN no try/catch is needed:
     // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/contentDocument

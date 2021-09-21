@@ -1,16 +1,42 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
+import { lastElement } from "../../util/Helpers.js"
 import { Rect } from "../../util/Rect.js"
 import { isArray, isString } from "../../util/Typeguards.js"
-import { clientXtoPageX, clientYtoPageY, getViewportActionPoint, getViewportRect } from "../../util_browser/Coordinates.js"
-import { elementFromPoint, isElementAccessible, isElementConnected, isElementPointReachable, isElementPointVisible } from "../../util_browser/Dom.js"
-import { isHTMLElement, isSVGElement } from "../../util_browser/Typeguards.js"
+import {
+    ActionPointData,
+    clientXtoPageX,
+    clientYtoPageY,
+    getActionPointData,
+    getViewportActionPoint,
+    getViewportRect,
+    isOffsetInsideElementBox
+} from "../../util_browser/Coordinates.js"
+import {
+    elementFromPoint,
+    isElementAccessible,
+    isElementConnected,
+    isElementPointVisible,
+    isSameDomainIframe,
+    parentWindows
+} from "../../util_browser/Dom.js"
+import { getOffsetsMap, scrollElementPointIntoView } from "../../util_browser/Scroll.js"
+import { isHTMLElement, isHTMLIFrameElement, isSVGElement } from "../../util_browser/Typeguards.js"
 import { Test } from "../test/Test.js"
 import { Assertion, SourcePoint } from "../test/TestResult.js"
 import { PointerMovePrecision, Simulator } from "./Simulator.js"
 import { SimulatorPlaywrightClient } from "./SimulatorPlaywright.js"
-import { ActionableCheck, ActionTarget, ActionTargetOffset, equalPoints, MouseButton, Point, sumPoints } from "./Types.js"
+import {
+    ActionableCheck,
+    ActionTarget,
+    ActionTargetOffset,
+    equalPoints,
+    minusPoints,
+    MouseButton,
+    Point,
+    sumPoints
+} from "./Types.js"
 
 //---------------------------------------------------------------------------------------------------------------------
 export type MouseActionOptions      = {
@@ -63,7 +89,6 @@ export type WaitForTargetActionableOptions = {
     silent?                 : boolean
     timeout?                : number
     stabilityFrames?        : number
-    syncCursor?             : boolean
 }
 
 
@@ -214,7 +239,6 @@ export class UserAgentOnPage extends Mixin(
 
         async doWaitForTargetActionable (action : MouseActionOptions, options? : WaitForTargetActionableOptions) : Promise<WaitForTargetActionableResult> {
             const timeout               = options?.timeout ?? action.timeout ?? this.defaultTimeout
-            const syncCursor            = options?.syncCursor ?? true
             const silent                = options?.silent ?? false
             const stabilityFrames       = options?.stabilityFrames ?? 2
 
@@ -240,8 +264,13 @@ export class UserAgentOnPage extends Mixin(
                 const target            = action.target
 
                 let el : Element        = undefined
+
                 let prevRect : Rect     = undefined
+                let prevRect2 : Rect    = undefined
+
                 let counter : number    = 0
+                let counter2 : number   = 0
+
                 let warned : boolean    = false
 
                 let failedChecks : ActionableCheck[]    = []
@@ -307,69 +336,133 @@ export class UserAgentOnPage extends Mixin(
                             return
                         }
 
-                        // element is completely invisible - outside of the viewport
-                        // we'll try to scroll it into view
-                        if (!isElementPointVisible(el, action.offset, true)) {
-                            checks.push('visible')
-                            continueWaiting(true, checks)
-                            return
+                        //-----------------
+                        const isInside  = isOffsetInsideElementBox(el, action.offset)
 
-                            //
-                            // if (isInside) {
-                            //     scrollElementPointIntoView(el, action.offset)
-                            // } else {
-                            //
-                            // }
+                        let offset : ActionTargetOffset = action.offset
+
+                        let actionPointData : ActionPointData = undefined
+
+                        // if offset point is outside of the element, we take an element from that point
+                        // and wait for it stability
+                        if (!isInside) {
+                            actionPointData         = getActionPointData(el, action.offset)
+
+                            const rect2             = Rect.fromElement(actionPointData.topElementData.el, true)
+
+                            if (!prevRect2 || !prevRect2.isEqual(rect2)) {
+                                prevRect2   = rect2
+                                counter2    = 0
+
+                                checks.push('stable')
+                            } else {
+                                counter2++
+
+                                if (counter2 < stabilityFrames - 1) {
+                                    checks.push('stable')
+                                }
+                            }
                         }
 
-                        //-----------------
-                        const rect      = Rect.fromElement(el)
+                        // the `true` argument returns a rect in global (top-level window) coordinates
+                        // and handles the case when the iframe itself is moving
+                        const rect      = Rect.fromElement(el, true)
 
+                        // waiting for stability of the element itself (above we possibly waited for
+                        // stability of the outside point)
                         if (!prevRect || !prevRect.isEqual(rect)) {
                             prevRect    = rect
                             counter     = 0
 
                             checks.push('stable')
-                            continueWaiting(false, checks)
-                            return
                         } else {
                             counter++
 
                             if (counter < stabilityFrames - 1) {
                                 checks.push('stable')
-                                continueWaiting(false, checks)
-                                return
                             }
                         }
 
-                        if (syncCursor) {
-                            const point         = getViewportActionPoint(el, action.offset)
-                            const current       = this.simulator.currentPosition
+                        if (lastElement(checks) === 'stable') {
+                            continueWaiting(false, checks)
+                            return
+                        }
 
-                            if (!point || !equalPoints(point, current)) {
-                                await this.simulator.simulateMouseMove(point, { precision : action.movePrecision })
+                        if (isInside) {
+                            if (!isElementPointVisible(el, action.offset, true)) {
+                                const scrolled  = scrollElementPointIntoView(el, action.offset, true)
 
+                                // TODO should save the rect for the repeated stability check here?
+                                // stability check will be repeated because of scroll
+
+                                if (!scrolled || !isElementPointVisible(el, action.offset, true)) {
+                                    checks.push('visible')
+                                    continueWaiting(true, checks)
+                                    return
+                                }
+                            }
+                        } else {
+                            const el        = actionPointData.topElementData.el
+                            const rect      = Rect.fromElement(el)
+
+                            offset          = minusPoints(actionPointData.topElementData.localXY, rect.leftTop)
+
+                            if (!isElementPointVisible(el, offset, true)) {
+                                const scrolled  = scrollElementPointIntoView(el, offset, true)
+
+                                if (!scrolled || !isElementPointVisible(el, offset, true)) {
+                                    checks.push('visible')
+                                    continueWaiting(true, checks)
+                                    return
+                                }
+                            }
+                        }
+
+                        // local action point - if offset is not specified its a center of the element's visible area
+                        const point         = getViewportActionPoint(el, offset)
+
+                        if (!point) {
+                            checks.push('reachable')
+                            continueWaiting(false, checks)
+                            return
+                        }
+
+                        const win           = el.ownerDocument.defaultView
+                        const offsets       = getOffsetsMap(win)
+
+                        const globalPoint   = sumPoints(offsets.get(win), point)
+
+                        if (!equalPoints(globalPoint, this.simulator.currentPosition)) {
+                            await this.simulator.simulateMouseMove(globalPoint, { precision : action.movePrecision })
+
+                            checks.push('reachable')
+                            continueWaiting(false, checks)
+                            return
+                        }
+
+                        if (isInside) {
+                            const topWin        = lastElement(Array.from(parentWindows(win, true)))
+                            const elAtPoint     = elementFromPoint(topWin.document, ...point, true).el
+
+                            const reachability  = elAtPoint === el || action.allowChild && (el.contains(elAtPoint) || (
+                                isHTMLIFrameElement(el) && isSameDomainIframe(el) && el.contentDocument.documentElement.contains(elAtPoint)
+                            ))
+
+                            if (!reachability) {
                                 checks.push('reachable')
                                 continueWaiting(false, checks)
                                 return
                             }
                         }
 
-                        const reachability  = isElementPointReachable(el, action.offset, action.allowChild)
-
-                        if (!reachability.reachable) {
-                            checks.push('reachable')
-                            continueWaiting(false, checks)
-                            return
-                        }
-
-                        resolve({ success : true, failedChecks : [], actionPoint : reachability.point, actionElement : reachability.elAtPoint })
+                        resolve({ success : true, failedChecks : [], actionPoint : globalPoint, actionElement : el })
                     }
 
                     const continueWaiting = (reset : boolean, checks : ActionableCheck[]) => {
                         if (reset) {
                             // prevEl      = undefined
                             prevRect    = undefined
+                            prevRect2   = undefined
                         }
 
                         failedChecks        = checks
