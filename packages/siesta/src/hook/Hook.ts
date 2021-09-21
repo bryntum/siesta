@@ -16,12 +16,12 @@
 //   create higher-level "delay" function and use: `hook.on(delay(listener))` instead of
 //   `event.on(listener, { delay })`
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type Listener<Payload extends unknown[]> = (...payload : Payload) => any
 
 export type Disposer = () => any
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Hook<Payload extends unknown[] = []> extends Array<Listener<Payload>> {
 
     // when doing `this.slice()` we want the regular array, instead of the Hook instance

@@ -13,14 +13,14 @@ import { TestDescriptor } from "./TestDescriptor.js"
  */
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * Test descriptor class for tests running in the [Node.js](https://nodejs.org/) environment.
  */
 @serializable({ id : 'TestDescriptorNodejs' })
 export class TestDescriptorNodejs extends Mixin(
     [ TestDescriptor ],
-    (base : ClassUnion<typeof TestDescriptor>) => 
+    (base : ClassUnion<typeof TestDescriptor>) =>
 
     class TestDescriptorNodejs extends base {
         type            : EnvironmentType               = 'nodejs'

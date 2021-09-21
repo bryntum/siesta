@@ -2,7 +2,7 @@ import { AnyFunction } from "../class/Mixin.js"
 import { ExecutionContext } from "./ExecutionContext.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ExecutionContextNode extends ExecutionContext {
 
     overrideConsole     : boolean       = true

@@ -8,7 +8,7 @@ import { TextBlock } from "./TextBlock.js"
 import { XmlElement, XmlNode } from "./XmlElement.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // TODO rename to XmlRenderingStaticContext
 export class XmlRenderer extends Mixin(
     [ Base ],
@@ -74,7 +74,7 @@ export class XmlRenderer extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class XmlRenderingDynamicContext extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>

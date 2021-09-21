@@ -4,13 +4,13 @@ import { fileURLToPath } from "url"
 import { siestaPackageRootUrl } from "../../index.js"
 import { Test } from "../../src/siesta/test/Test.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const SIESTA_PACKAGE_ROOT_WEB_PATH = process.env.SIESTA_PACKAGE_ROOT_WEB_PATH
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type LaunchResult    = { exitCode : number, error? : Error, stdout : string, stderr : string }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const runProjectDirectly = async (projectUrl : string, options : object = {}, inDeno : boolean = false) : Promise<LaunchResult> => {
     return new Promise((resolve, reject) => {
 
@@ -33,7 +33,7 @@ export const runProjectDirectly = async (projectUrl : string, options : object =
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const runProjectViaLauncher = async (projectUrl : string, options : object = {}, inDeno : boolean = false) : Promise<LaunchResult> => {
     return new Promise((resolve, reject) => {
 
@@ -56,7 +56,7 @@ export const runProjectViaLauncher = async (projectUrl : string, options : objec
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const runTestDirectly = async (testUrl : string, options : object = {}, inDeno : boolean = false) : Promise<LaunchResult> => {
     return new Promise((resolve, reject) => {
 
@@ -80,7 +80,7 @@ export const runTestDirectly = async (testUrl : string, options : object = {}, i
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const runTestViaLauncher = async (testUrl : string, options : object = {}, inDeno : boolean = false) : Promise<LaunchResult> => {
     return new Promise((resolve, reject) => {
 
@@ -104,7 +104,7 @@ export const runTestViaLauncher = async (testUrl : string, options : object = {}
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const verifySampleProjectLaunch = async (t : Test, launchRes : LaunchResult) => {
     t.like(launchRes.stdout, `Launching test suite project:`)
 
@@ -119,7 +119,7 @@ export const verifySampleProjectLaunch = async (t : Test, launchRes : LaunchResu
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const verifySampleTestLaunch = async (t : Test, launchRes : LaunchResult) => {
     t.like(launchRes.stdout, `Launching test file:`)
 
@@ -132,10 +132,10 @@ export const verifySampleTestLaunch = async (t : Test, launchRes : LaunchResult)
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const stringifyOptions = (options : object) : string[] =>
     Object.entries(options).map(([ key, value ]) => `${ key.replace(/^(--)?/, '--') }='${ value }'`)
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const isHttpUrl = (urlOrPath : string) : boolean => /https?:/i.test(urlOrPath)

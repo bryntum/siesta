@@ -1,10 +1,10 @@
 import { OrPromise, SetTimeoutHandler } from "./Helpers.js"
 import { isPromise } from "./Typeguards.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const delay = (timeout : number) : Promise<any> => new Promise(resolve => setTimeout(resolve, timeout))
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // it is recommended, that the error instance, to throw on timeout, to be provided from the call site of this method
 // this way, the stack trace will point to the `timeout` call, instead of the `timeout` internals
 export const timeout = <T>(promise : Promise<T>, timeout : number, error : any = new Error(`Timeout of ${ timeout }ms exceeded`)) : Promise<T> => {
@@ -38,7 +38,7 @@ export const timeout = <T>(promise : Promise<T>, timeout : number, error : any =
     })
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const buffer = <Args extends unknown[]>(func : (...args : Args) => unknown, timeout : number) : (...args : Args) => void => {
     let timeoutHandler : SetTimeoutHandler  = undefined
 
@@ -50,7 +50,7 @@ export const buffer = <Args extends unknown[]>(func : (...args : Args) => unknow
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const waitFor  = async <R> (condition : () => OrPromise<R>, waitTimeout : number, interval : number)
     : Promise<{ conditionIsMet : boolean, result : R, exception : unknown, elapsedTime : number }> =>
 {

@@ -3,11 +3,11 @@ import * as path from "https://deno.land/std@0.94.0/path/mod.ts"
 import { iit, it, ProjectDeno } from "../../deno.js"
 import { TestDescriptor } from "../../src/siesta/test/TestDescriptor.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const __filename    = path.fromFileUrl(import.meta.url)
 const __dirname     = path.dirname(__filename)
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const extract   = (desc : TestDescriptor) => {
     return {
         url         : desc.url,
@@ -16,7 +16,7 @@ const extract   = (desc : TestDescriptor) => {
     }
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be able to plan individual files inside the project directory', async t => {
 
     const project       = ProjectDeno.new({
@@ -51,7 +51,7 @@ it('Should be able to plan individual files inside the project directory', async
 })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be able to plan individual files outside the project directory', async t => {
 
     const project       = ProjectDeno.new({
@@ -103,7 +103,7 @@ it('Should be able to plan individual files outside the project directory', asyn
 })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should plan the project file directory by default', async t => {
 
     const project       = ProjectDeno.new({
@@ -134,7 +134,7 @@ it('Should plan the project file directory by default', async t => {
 })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be able to plan the glob pattern', async t => {
 
     const project       = ProjectDeno.new({
@@ -167,7 +167,7 @@ it('Should be able to plan the glob pattern', async t => {
 })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be able to exclude files by the glob pattern', async t => {
 
     const project       = ProjectDeno.new({

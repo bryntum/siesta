@@ -5,7 +5,7 @@ import { ColoredString, ColoredStringPlain, ColoredStringSum, ColoredStringToken
 import { Colorer } from "./Colorer.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TextBlock extends Base {
     maxLen                  : number            = Number.MAX_SAFE_INTEGER
 

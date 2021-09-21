@@ -2,7 +2,7 @@ import { clearLine, clearLeft, clearRight, goDown, goLeft, goRight, goUp, hideCu
 import { Terminal } from "./Terminal.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TerminalDeno extends Terminal {
 
     showCursor () {

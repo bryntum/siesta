@@ -11,7 +11,7 @@ import { TextJSX } from "../../../jsx/TextJSX.js"
 
 ChronoGraphJSX
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // TODO extract `ResizeObserverComponent` from this component with `connectCallback/disconnectedCallback/resizeCallback`
 // methods
 

@@ -36,7 +36,7 @@ ChronoGraphJSX
 TestReporterParent
 LauncherDescriptorNodejs
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type DashboardPersistentData = {
     currentTestUrl      : string
     filterValue         : string
@@ -52,7 +52,7 @@ type ProjectPlanItemPersistentData = {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DashboardRenderer extends Mixin(
     [ ConsoleXmlRenderer ],
     (base : ClassUnion<typeof ConsoleXmlRenderer>) =>
@@ -73,7 +73,7 @@ export class DashboardRenderer extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Dashboard extends Mixin(
     [ Component ],
     (base : ClassUnion<typeof Component>) =>
@@ -495,7 +495,7 @@ export class Dashboard extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type TestDescriptorFiltered = {
     descriptor          : TestDescriptor,
     filteredChildren?   : TestDescriptorFiltered[]

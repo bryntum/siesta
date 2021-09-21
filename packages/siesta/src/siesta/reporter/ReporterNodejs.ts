@@ -4,7 +4,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { Reporter } from "./Reporter.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ReporterNodejs extends Mixin(
     [ Reporter ],
     (base : ClassUnion<typeof Reporter>) => 

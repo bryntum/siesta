@@ -5,7 +5,7 @@ import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Dispatcher, LauncherConnectorClassLocator } from "./Dispatcher.js"
 import { LauncherNodejs } from "./LauncherNodejs.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DispatcherNodejs extends Mixin(
     [ Dispatcher ],
     (base : ClassUnion<typeof Dispatcher>) =>

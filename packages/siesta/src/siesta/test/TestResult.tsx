@@ -19,7 +19,7 @@ import { escapeRegExp } from "../../util/Helpers.js"
 import { LUID, luid } from "../common/LUID.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Result extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
@@ -30,7 +30,7 @@ export class Result extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'LogMessage' })
 export class LogMessage extends Mixin(
     [ Serializable, Result ],
@@ -76,7 +76,7 @@ export class LogMessage extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'Exception' })
 export class Exception extends Mixin(
     [ Serializable, Result ],
@@ -97,7 +97,7 @@ export class Exception extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type SourcePoint = { line : number, char : number }
 
 
@@ -120,7 +120,7 @@ export class Assertion extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'AssertionAsyncCreation' })
 export class AssertionAsyncCreation extends Mixin(
     [ Assertion, Entity ],
@@ -169,7 +169,7 @@ export class AssertionAsyncCreation extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'AssertionAsyncResolution' })
 export class AssertionAsyncResolution extends Mixin(
     [ Serializable, Result ],
@@ -186,7 +186,7 @@ export class AssertionAsyncResolution extends Mixin(
 
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type TestNodeState   = 'created' | 'running' | 'completed' | 'ignored'
 
 // serializable leaf nodes
@@ -194,13 +194,13 @@ export type TestResultLeaf              = Exception | LogMessage | Assertion | A
 
 export type TestResultLeafConstructor   = typeof Exception | typeof LogMessage | typeof Assertion | typeof AssertionAsyncCreation
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type TestResult                  = TestNodeResult | TestResultLeaf
 
 export type TestResultConstructor       = typeof TestNodeResult | TestResultLeafConstructor
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestNodeResult extends Mixin(
     [ Result ],
     (base : ClassUnion<typeof Result>) =>
@@ -460,14 +460,14 @@ export class TestNodeResult extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type ChildResultsIndex<T extends TestNodeResult> = {
     idToChild       : Map<string, T>,
     childToId       : Map<T, string>
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @entity()
 export class TestNodeResultReactive extends Mixin(
     [ TestNodeResult, Entity ],

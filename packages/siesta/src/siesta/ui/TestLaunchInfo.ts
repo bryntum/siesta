@@ -9,7 +9,7 @@ import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Exception, TestNodeResultReactive } from "../test/TestResult.js"
 import { Dashboard } from "./Dashboard.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type LaunchState =
     | 'noinfo'          // no previous/future launches
     | 'pending'         // has future launch scheduled
@@ -22,7 +22,7 @@ export type TestViewState           = 'noinfo' | 'pending' | 'started' | 'runnin
 export type TestGroupViewState      = 'noinfo' | 'pending' | 'running' | 'failed' | 'passed'
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestLaunchInfo extends Mixin(
     [ Entity, Base ],
     (base : ClassUnion<typeof Entity, typeof Base>) =>
@@ -120,7 +120,7 @@ export class TestLaunchInfo extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestGroupLaunchInfo extends Mixin(
     [ Entity, Base ],
     (base : ClassUnion<typeof Entity, typeof Base>) =>

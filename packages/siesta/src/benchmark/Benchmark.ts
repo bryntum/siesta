@@ -2,7 +2,7 @@ import { Base } from "../class/Base.js"
 
 const performance : { now : () => number }  = globalThis.performance || Date
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type RunInfo<StateT, InfoT> = {
     samples             : number[]
 
@@ -19,7 +19,7 @@ export type RunInfo<StateT, InfoT> = {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const average   = (samples : number[]) : number => samples.reduce((acc, current) => acc + current, 0) / samples.length
 
 const unbiasedSampleVariance  = (samples : number[]) : number => {
@@ -30,7 +30,7 @@ const unbiasedSampleVariance  = (samples : number[]) : number => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /*
  * T-Distribution two-tailed critical values for 95% confidence
  * http://www.itl.nist.gov/div898/handbook/eda/section3/eda3672.htm
@@ -57,12 +57,12 @@ const getStudentCriticalValue = (size : number) : number => size <= 30 ? student
 // ])
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const fmt           = new Intl.NumberFormat([], { maximumFractionDigits : 3, useGrouping : false })
 
 const format        = num => fmt.format(num)
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Benchmark<StateT, InfoT = any> extends Base {
     name                    : string    = 'Noname benchmark'
 

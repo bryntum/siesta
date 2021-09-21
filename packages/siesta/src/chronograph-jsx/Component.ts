@@ -8,7 +8,7 @@ import { categorizeProperties, ElementSource, Listener, PropertiesCategorization
 import { ElementReactivity, ReactiveElement } from "./ElementReactivity.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ComponentCommon extends Mixin(
     [],
     (base : ClassUnion) =>
@@ -35,7 +35,7 @@ export class ComponentCommon extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Component extends Mixin(
     [ ComponentCommon, Entity, ElementReactivity, Base ],
     (base : ClassUnion<typeof ComponentCommon, typeof Entity, typeof ElementReactivity, typeof Base>) =>
@@ -109,7 +109,7 @@ export class Component extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class WebComponent extends Mixin(
     [ ComponentCommon, Entity, HTMLElement ],
     (base : ClassUnion<typeof ComponentCommon, typeof HTMLElement, typeof Entity>) =>

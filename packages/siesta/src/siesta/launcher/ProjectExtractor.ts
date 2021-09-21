@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type ProjectExtractionState  = 'extraction_requested' | 'project_created' | 'project_ready'
 
 export type SiestaProjectExtraction  = {
@@ -7,7 +7,7 @@ export type SiestaProjectExtraction  = {
     resolve     : (projectData : string) => any
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const extractProjectInfo     = async (projectUrl : string) : Promise<string> => {
 
     Object.defineProperty(globalThis, '__SIESTA_PROJECT_EXTRACTION__', {

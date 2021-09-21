@@ -1,7 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { Launcher } from "../launcher/Launcher.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Terminal extends Base {
 
     // TODO probably should be the opposite - Launcher should have reference to Terminal

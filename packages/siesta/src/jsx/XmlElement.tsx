@@ -7,7 +7,7 @@ import { TextBlock } from "./TextBlock.js"
 import { TextJSX } from "./TextJSX.js"
 import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type XmlNode = string | XmlElement
 
 // TODO extend the TreeNode ? TreeNode needs to handle the heterogeneous child list then
@@ -276,7 +276,7 @@ export class XmlElement extends Mixin(
     }
 ){}
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const escapeTable = {
     '&'     : '&amp;',
     '<'     : '&lt;',
@@ -288,7 +288,7 @@ const escapeTable = {
 export const escapeXml = (xmlStr : string) : string => xmlStr.replace(/[&<>"']/g, match => escapeTable[ match ])
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // TODO should probably be the opposite - Element should extend Fragment
 //  (fragment only has child nodes, element adds the "shell" - tag name and attributes)
 export class XmlFragment extends Mixin(

@@ -8,7 +8,7 @@ import { Visitor } from "typescript-serializable-mixin"
 import { DeepCompareOptions, DeepCompareState, Difference, DifferenceAtomic, DifferenceHeterogeneous, valueAsDifference } from "./CompareDeepDiff.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class FuzzyMatcher extends Base {
 
     toString () : string {
@@ -31,7 +31,7 @@ export class FuzzyMatcher extends Base {
 
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * Class that represent the number approximation. It is basically a sum type (often cryptically called "discriminated union")
  * with 3 options, determined by the property, set on the instance creation. See the [[percent]], [[threshold]] and [[digits]]
@@ -89,7 +89,7 @@ export class NumberApproximation extends Base {
 export type Approximation   = number | Partial<NumberApproximation> | NumberApproximation
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * The instance of this fuzzy matcher will match any number, which is approximately equal to the [[value|expected value]],
  * with the notion of "approximate equality" defined by the [[approx]] configuration property.
@@ -174,7 +174,7 @@ export const anyNumberApprox = (value : number, approx : Approximation = { thres
     FuzzyMatcherNumberApproximation.new({ value, approx : NumberApproximation.fromApproximation(approx) })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * The instance of this fuzzy matcher will match any number, which is in the interval between
  * the [[min]]/[[max]] configuration properties. An [[inclusive]] flag defines if boundaries
@@ -257,7 +257,7 @@ export const anyNumberBetween = (min : number, max : number, inclusive : boolean
     FuzzyMatcherNumberBetween.new({ min, max, inclusive })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * The instance of this fuzzy matcher will match any string, matching the [[pattern]] configuration property.
  *
@@ -328,7 +328,7 @@ export class FuzzyMatcherString extends FuzzyMatcher {
 export const anyStringLike = (pattern : string | RegExp) : FuzzyMatcherString => FuzzyMatcherString.new({ pattern })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * The instance of this fuzzy matcher will match any instance of the class, specified with the [[cls]] configuration property.
  *
@@ -393,7 +393,7 @@ export class FuzzyMatcherInstance extends FuzzyMatcher {
 export const anyInstanceOf = (cls : AnyConstructor) : FuzzyMatcherInstance => FuzzyMatcherInstance.new({ cls })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * An instance of this matcher class will match anything.
  *

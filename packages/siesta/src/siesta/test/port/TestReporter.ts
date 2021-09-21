@@ -17,7 +17,7 @@ import {
     TestResultLeaf
 } from "../TestResult.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // make sure we actually import these class symbols (and not just types),
 // so that their `@serializable()` decorator calls are made
 
@@ -30,7 +30,7 @@ Exception
 LogMessage
 XmlElement
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export interface TestReporter {
     onSubTestStart (rootTestId : LUID, testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) : Promise<any>
 
@@ -41,7 +41,7 @@ export interface TestReporter {
     onAssertionFinish (rootTestId : LUID, testNodeId : LUID, assertion : AssertionAsyncResolution) : Promise<any>
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestReporterParent extends Mixin(
     [ Port ],
     (base : ClassUnion<typeof Port>) =>
@@ -159,7 +159,7 @@ export class TestReporterParent extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestReporterChild extends Mixin(
     [ Port ],
     (base : ClassUnion<typeof Port>) =>

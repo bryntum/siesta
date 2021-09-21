@@ -22,7 +22,7 @@ import {
 import { FuzzyMatcher } from "./FuzzyMatcherDiff.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const Missing           = Symbol('Missing')
 type Missing            = typeof Missing
 
@@ -30,7 +30,7 @@ type Missing            = typeof Missing
 const MissingInternal   = Symbol('Missing')
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type DifferenceType = 'both' | 'onlyIn1' | 'onlyIn2'
 
 export class Difference extends Base {
@@ -90,7 +90,7 @@ export class Difference extends Base {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceAtomic extends Difference {
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
@@ -104,14 +104,14 @@ export class DifferenceAtomic extends Difference {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceReferenceable extends Difference {
     refId1          : number                    = undefined
     refId2          : number                    = undefined
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceReferenceableAtomic extends DifferenceReferenceable {
 
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
@@ -125,7 +125,7 @@ export class DifferenceReferenceableAtomic extends DifferenceReferenceable {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceArray extends DifferenceReferenceable {
     value1          : unknown[]
     value2          : unknown[]
@@ -165,7 +165,7 @@ export class DifferenceArray extends DifferenceReferenceable {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceObject extends DifferenceReferenceable {
     value1          : object | Missing
     value2          : object | Missing
@@ -218,7 +218,7 @@ export class DifferenceObject extends DifferenceReferenceable {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceSet extends DifferenceReferenceable {
     value1          : Set<unknown>
     value2          : Set<unknown>
@@ -260,7 +260,7 @@ export class DifferenceSet extends DifferenceReferenceable {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceMap extends DifferenceReferenceable {
     value1          : Map<unknown, unknown>
     value2          : Map<unknown, unknown>
@@ -309,7 +309,7 @@ export class DifferenceMap extends DifferenceReferenceable {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceReference extends Difference {
     value1      : number
     value2      : number
@@ -322,7 +322,7 @@ export class DifferenceReference extends Difference {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceHeterogeneous extends Difference {
     // heterogeneous values (values of different type) are pretty much always unequal
     // however, they can be equal in the case of comparing with fuzzy matcher (like `anyInstanceOf/any`)
@@ -340,7 +340,7 @@ export class DifferenceHeterogeneous extends Difference {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const valueAsDifference = (value : unknown, valueProp : 'value1' | 'value2', options : DeepCompareOptions, state : DeepCompareState) : Difference => {
     if (value === Missing) value = MissingInternal
 
@@ -352,7 +352,7 @@ export const valueAsDifference = (value : unknown, valueProp : 'value1' | 'value
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DeepCompareState extends Base {
     idSource        : number                    = 1
 
@@ -400,7 +400,7 @@ export class DeepCompareState extends Base {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // none of these options are implemented yet
 export type DeepCompareOptions = {
     omitEqual                   : boolean,
@@ -419,7 +419,7 @@ const defaultDeepCompareOptions : DeepCompareOptions = {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // TODO should stop at 1st difference
 export const equalDeep = (
     v1          : unknown,
@@ -429,7 +429,7 @@ export const equalDeep = (
     compareDeepDiff(v1, v2, options).same
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const compareDeepDiff = function (
     v1                  : unknown,
     v2                  : unknown,
@@ -565,7 +565,7 @@ export const compareDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareArrayDeepDiff = function (
     array1 : unknown[], array2 : unknown[],
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
@@ -598,7 +598,7 @@ const compareArrayDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareKeys = function <K, V>(
     setMap1                 : Set<K> | Map<K, V>,
     setMap2                 : Set<K> | Map<K, V>,
@@ -653,7 +653,7 @@ const compareKeys = function <K, V>(
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareSetDeepDiff = function (
     set1 : Set<unknown>, set2 : Set<unknown>,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
@@ -677,7 +677,7 @@ const compareSetDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareMapDeepDiff = function (
     map1 : Map<unknown, unknown>, map2 : Map<unknown, unknown>,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
@@ -714,7 +714,7 @@ const compareMapDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareObjectDeepDiff = function (
     object1 : ArbitraryObject, object2 : ArbitraryObject,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
@@ -747,7 +747,7 @@ const compareObjectDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareErrorDeepDiff = function (
     object1 : Error, object2 : Error,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
@@ -782,7 +782,7 @@ const compareErrorDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareFunctionDeepDiff = function (
     func1 : Function, func2 : Function,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
@@ -795,7 +795,7 @@ const compareFunctionDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareRegExpDeepDiff = function (
     regexp1 : RegExp, regexp2 : RegExp,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
@@ -814,7 +814,7 @@ const compareRegExpDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareDateDeepDiff = function (
     date1 : Date, date2 : Date,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
@@ -827,7 +827,7 @@ const compareDateDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareFuzzyMatchersDeepDiff = function (
     v1                  : unknown,
     v2                  : unknown,
@@ -853,11 +853,11 @@ const compareFuzzyMatchersDeepDiff = function (
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareAtomic = (v1 : unknown, v2 : unknown) : boolean => v1 === v2 || (Number.isNaN(v1) && Number.isNaN(v2))
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const comparePrimitiveAndFuzzyMatchers = function (
     v1                  : unknown,
     v2                  : unknown,

@@ -2,7 +2,7 @@ import { isString } from "../util/Typeguards.js"
 import { XmlElement, XmlFragment, XmlNode } from "./XmlElement.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const FragmentSymbol  = Symbol('Fragment')
 
 const normalizeXmlStream    = (stream : (XmlNode | false)[]) : XmlNode[] => {
@@ -51,7 +51,7 @@ export namespace TextJSX {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export declare namespace TextJSX {
     namespace JSX {
         type Element        = XmlElement

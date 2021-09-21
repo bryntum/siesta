@@ -20,7 +20,7 @@ import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.j
 import { Assertion, TestNodeResult } from "../TestResult.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type ComparisonTypeName = 'Equal' | 'Greater' | 'GreaterOrEqual' | 'Less' | 'LessOrEqual'
 
 export const ComparisonType : { [ key in ComparisonTypeName ] : [ (a, b) => boolean, string ] } = {
@@ -59,7 +59,7 @@ export const verifyExpectedNumber = (actual : number, expected : number | string
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class AssertionCompare extends Mixin(
     [ TestNodeResult ],
     (base : ClassUnion<typeof TestNodeResult>) =>
@@ -645,7 +645,7 @@ export class AssertionCompare extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class AnnotationTemplate extends Base {
     t                   : TestNodeResult            = undefined
 
@@ -674,7 +674,7 @@ export class AnnotationTemplate extends Base {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class GotExpectTemplate extends AnnotationTemplate {
     description         : XmlNode       = undefined
 
@@ -719,7 +719,7 @@ export class GotExpectTemplate extends AnnotationTemplate {
 }
 
 
-// //---------------------------------------------------------------------------------------------------------------------
+// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // export class DeepEqualAnnotationTemplate extends AnnotationTemplate {
 //     differences         : Difference[]              = []
 //
@@ -747,7 +747,7 @@ export class GotExpectTemplate extends AnnotationTemplate {
 // }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class NotEqualAnnotationTemplate extends AnnotationTemplate {
     value           : unknown           = undefined
 

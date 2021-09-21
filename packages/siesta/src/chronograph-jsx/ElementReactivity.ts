@@ -16,7 +16,7 @@ import {
 import { Component } from "./Component.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ElementReactivity extends Mixin(
     [],
     (base : ClassUnion) =>
@@ -309,7 +309,7 @@ export interface ComponentHTMLElement<C extends Component> extends ReactiveHTMLE
     comp            : C
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Slightly modified version of: https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/reconcile.js
 export function reconcileChildNodes (parentNode : Element, newNodes : Node[]) {
     const prevNodes     = Array.from(parentNode.childNodes)

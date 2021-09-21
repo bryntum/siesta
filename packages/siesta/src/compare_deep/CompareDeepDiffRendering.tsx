@@ -29,7 +29,7 @@ import { stripAnsiControlCharacters } from "../util_nodejs/Terminal.js"
 import { DifferenceType } from "./CompareDeepDiff.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class XmlRendererDifference extends Mixin(
     [ XmlRendererSerialization ],
     (base : ClassUnion<typeof XmlRendererSerialization>) =>
@@ -50,7 +50,7 @@ export class XmlRendererDifference extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class XmlRenderingDynamicContextDifference extends Mixin(
     [ XmlRenderingDynamicContext ],
     (base : ClassUnion<typeof XmlRenderingDynamicContext>) =>
@@ -61,13 +61,13 @@ export class XmlRenderingDynamicContextDifference extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MissingValue extends XmlElement {
     tagName             : 'missing_value'           = 'missing_value'
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // this class renders the children directly to its own output textblock
 // regular styling/indentation/etc does not apply
 export class DifferenceTemplateElement extends XmlElement {
@@ -108,7 +108,7 @@ export class DifferenceTemplateElement extends XmlElement {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceTemplateReferenceable extends Mixin(
     [ SerializationReferenceable, DifferenceTemplateElement ],
     (base : ClassUnion<typeof SerializationReferenceable, typeof DifferenceTemplateElement>) =>
@@ -126,7 +126,7 @@ export class DifferenceTemplateReferenceable extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateStreamed' })
 export class DifferenceTemplateStreamed extends DifferenceTemplateElement {
 
@@ -176,7 +176,7 @@ export class DifferenceTemplateStreamed extends DifferenceTemplateElement {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceTemplateComposite extends Mixin(
     [ SerializationComposite, DifferenceTemplateReferenceable ],
     (base : ClassUnion<typeof SerializationComposite, typeof DifferenceTemplateReferenceable>) =>
@@ -312,7 +312,7 @@ export class DifferenceTemplateComposite extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateAtomic' })
 export class DifferenceTemplateAtomic extends Mixin(
     [ DifferenceTemplateStreamed ],
@@ -353,7 +353,7 @@ export class DifferenceTemplateAtomic extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateReferenceableAtomic' })
 export class DifferenceTemplateReferenceableAtomic extends Mixin(
     [ DifferenceTemplateReferenceable, DifferenceTemplateAtomic ],
@@ -365,7 +365,7 @@ export class DifferenceTemplateReferenceableAtomic extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateReference' })
 export class DifferenceTemplateReference extends DifferenceTemplateStreamed {
     props   : DifferenceTemplateElement[ 'props' ] & {
@@ -393,7 +393,7 @@ export class DifferenceTemplateReference extends DifferenceTemplateStreamed {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateHeterogeneous' })
 export class DifferenceTemplateHeterogeneous extends DifferenceTemplateStreamed {
     tagName         : 'difference_template_heterogeneous'           = 'difference_template_heterogeneous'
@@ -434,7 +434,7 @@ export class DifferenceTemplateHeterogeneous extends DifferenceTemplateStreamed 
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateRoot' })
 export class DifferenceTemplateRoot extends DifferenceTemplateElement {
     tagName         : 'difference_template_root'           = 'difference_template_root'
@@ -553,7 +553,7 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateArray' })
 export class DifferenceTemplateArray extends Mixin(
     [ SerializationArray, DifferenceTemplateComposite ],
@@ -593,7 +593,7 @@ export class DifferenceTemplateArray extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateArrayEntry' })
 export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
     props           : DifferenceTemplateElement[ 'props' ] & {
@@ -618,7 +618,7 @@ export class DifferenceTemplateArrayEntry extends DifferenceTemplateElement {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateObject' })
 export class DifferenceTemplateObject extends Mixin(
     // note, that `SerializationObject` and `DifferenceTemplateComposite` are not ordered
@@ -656,7 +656,7 @@ export class DifferenceTemplateObject extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateObjectEntry' })
 export class DifferenceTemplateObjectEntry extends Mixin(
     [ SerializationObjectEntry, DifferenceTemplateElement ],
@@ -689,7 +689,7 @@ export class DifferenceTemplateObjectEntry extends Mixin(
     }
 ){}
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateSet' })
 export class DifferenceTemplateSet extends Mixin(
     [ SerializationSet, DifferenceTemplateComposite ],
@@ -719,7 +719,7 @@ export class DifferenceTemplateSet extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateSetEntry' })
 export class DifferenceTemplateSetEntry extends DifferenceTemplateElement {
     tagName         : string                = 'difference_template_set_entry'
@@ -741,7 +741,7 @@ export class DifferenceTemplateSetEntry extends DifferenceTemplateElement {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateMap' })
 export class DifferenceTemplateMap extends Mixin(
     [ SerializationMap, DifferenceTemplateComposite ],
@@ -771,7 +771,7 @@ export class DifferenceTemplateMap extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceTemplateMapEntry' })
 export class DifferenceTemplateMapEntry extends Mixin(
     [ SerializationMapEntry, DifferenceTemplateElement ],

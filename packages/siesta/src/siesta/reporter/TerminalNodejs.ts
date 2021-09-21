@@ -3,7 +3,7 @@ import { hideCursor, showCursor } from "../../util_nodejs/Terminal.js"
 import { Terminal } from "./Terminal.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TerminalNodejs extends Terminal {
 
     getMaxLen () : number {

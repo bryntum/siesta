@@ -6,10 +6,10 @@ import { XmlElement } from "../../jsx/XmlElement.js"
 import { ArbitraryObject } from "../../util/Helpers.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ConsoleXmlRenderer extends Mixin(
     [ XmlRendererDifference ],
-    (base : ClassUnion<typeof XmlRendererDifference>) => 
+    (base : ClassUnion<typeof XmlRendererDifference>) =>
 
     class ConsoleXmlRenderer extends base {
 

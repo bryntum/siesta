@@ -7,7 +7,7 @@ import { isString } from "../util/Typeguards.js"
 import { SerializerXml } from "./SerializerXml.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class XmlRendererSerialization extends Mixin(
     [ XmlRenderer ],
     (base : ClassUnion<typeof XmlRenderer>) =>
@@ -32,7 +32,7 @@ export class XmlRendererSerialization extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type SerializationChildNode = XmlElement
 
 
@@ -43,7 +43,7 @@ export class Serialization extends XmlElement {
     childNodes      : [ SerializationChildNode ]
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class SerializationReferenceable extends Mixin(
     [ XmlElement ],
     (base : ClassUnion<typeof XmlElement>) =>
@@ -70,7 +70,7 @@ export class SerializationReferenceable extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class SerializationComposite extends Mixin(
     [ SerializationReferenceable ],
     (base : ClassUnion<typeof SerializationReferenceable>) =>
@@ -169,7 +169,7 @@ export class SerializationComposite extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'SerializationArray' })
 export class SerializationArray extends Mixin(
     [ SerializationComposite ],
@@ -223,7 +223,7 @@ export class SerializationArray extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'SerializationObject' })
 export class SerializationObject extends Mixin(
     [ SerializationComposite ],
@@ -293,7 +293,7 @@ export class SerializationObject extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'SerializationObjectEntry' })
 export class SerializationObjectEntry extends Mixin(
     [ XmlElement ],
@@ -337,7 +337,7 @@ export class SerializationObjectEntry extends Mixin(
 
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'SerializationSet' })
 export class SerializationSet extends Mixin(
     [ SerializationComposite ],
@@ -396,7 +396,7 @@ export class SerializationSet extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'SerializationMap' })
 export class SerializationMap extends Mixin(
     [ SerializationComposite ],
@@ -458,7 +458,7 @@ export class SerializationMap extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'SerializationMapEntry' })
 export class SerializationMapEntry extends Mixin(
     [ XmlElement ],
@@ -501,7 +501,7 @@ export class SerializationMapEntry extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'SerializationOutOfDepth' })
 export class SerializationOutOfDepth extends Mixin(
     [ SerializationReferenceable ],
@@ -526,7 +526,7 @@ export class SerializationOutOfDepth extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'SerializationReference' })
 export class SerializationReference extends Mixin(
     [ XmlElement ],

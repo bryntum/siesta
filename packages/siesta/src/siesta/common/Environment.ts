@@ -4,7 +4,7 @@ import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { isDeno, isNodejs } from "../../util/Helpers.js"
 import { isArray, isFunction, isRegExp } from "../../util/Typeguards.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const Environments = {
     isomorphic      : 'Isomorphic',
     browser         : 'Browser',
@@ -15,7 +15,7 @@ export const Environments = {
 export type EnvironmentType = keyof typeof Environments
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const OperationSystems = {
     linux           : 'Linux',
     macos           : 'macOS',
@@ -27,7 +27,7 @@ export const OperationSystems = {
 export type OperationSystemType = keyof typeof OperationSystems
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const Browsers = {
     chrome          : 'Chrome',
     firefox         : 'Firefox',
@@ -38,7 +38,7 @@ export const Browsers = {
 export type BrowserType = keyof typeof Browsers
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const RenderingEngines = {
     blink           : 'Blink',
     gecko           : 'Gecko',
@@ -48,7 +48,7 @@ export const RenderingEngines = {
 export type RenderingEngineType = keyof typeof RenderingEngines
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 class EnvironmentPre extends Mixin(
     [ Serializable, Base ],
     (base : ClassUnion<typeof Serializable, typeof Base>) =>
@@ -177,7 +177,7 @@ export class Environment extends EnvironmentPre {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const getFirstMatch = (regexp : RegExp, text : string) : string | undefined => {
     const match = text.match(regexp)
 
@@ -185,7 +185,7 @@ const getFirstMatch = (regexp : RegExp, text : string) : string | undefined => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const getWindowsVersionName = (version : string) : string => {
     switch (version) {
         case 'NT': return 'NT'
@@ -202,7 +202,7 @@ const getWindowsVersionName = (version : string) : string => {
     }
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const getMacOSVersionName = (version : string) : string => {
     const v = version.split('.').splice(0, 2).map(s => parseInt(s, 10) || 0)
 
@@ -226,7 +226,7 @@ const getMacOSVersionName = (version : string) : string => {
     }
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const getAndroidVersionName = (version : string) : string => {
     const v = version.split('.').splice(0, 2).map(s => parseInt(s, 10) || 0)
 
@@ -252,7 +252,7 @@ const getAndroidVersionName = (version : string) : string => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type OSDescriptor   = { os : OperationSystemType, name : string, version : string }
 
 type OSTester = {
@@ -260,7 +260,7 @@ type OSTester = {
     describe        : (ua : string) => OSDescriptor
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const detectBrowserOS = (ua : string) : OSDescriptor => {
     const testers : OSTester[] = [
         /* Linux */
@@ -346,7 +346,7 @@ const detectBrowserOS = (ua : string) : OSDescriptor => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type EngineDescriptor   = { engine : RenderingEngineType, version : string }
 
 type EngineTester = {
@@ -355,7 +355,7 @@ type EngineTester = {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const detectRenderingEngine = (ua : string) : EngineDescriptor => {
 
     const testers : EngineTester[] = [

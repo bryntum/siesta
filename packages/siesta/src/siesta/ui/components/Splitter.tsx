@@ -7,7 +7,7 @@ import { ComponentElement } from "../../../chronograph-jsx/ElementReactivity.js"
 
 ChronoGraphJSX
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Splitter extends Component {
     props : Component[ 'props' ] & {
         mode?           : Splitter[ 'mode' ]

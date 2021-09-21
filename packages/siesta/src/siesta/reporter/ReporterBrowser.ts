@@ -3,7 +3,7 @@ import { saneSplit } from "../../util/Helpers.js"
 import { TestNodeResultReactive } from "../test/TestResult.js"
 import { Reporter } from "./Reporter.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ReporterBrowser extends Mixin(
     [ Reporter ],
     (base : ClassUnion<typeof Reporter>) =>

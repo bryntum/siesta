@@ -2,7 +2,7 @@ import { Base } from "../class/Base.js"
 
 // XXX does not work with `super` calls! which makes it not so useful...
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class QueuedCall extends Base {
     host            : any               = undefined
     prop            : string            = ''

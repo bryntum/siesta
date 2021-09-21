@@ -1,7 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSerializableJSONScoped, MediaSerializablePlain } from "./MediaSerializable.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaSameContext extends Mixin(
     [ MediaSerializablePlain ],
     (base : ClassUnion<typeof MediaSerializablePlain>) =>
@@ -25,7 +25,7 @@ export class MediaSameContext extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaSameContextScoped extends Mixin(
     [ MediaSerializableJSONScoped ],
     (base : ClassUnion<typeof MediaSerializableJSONScoped>) =>

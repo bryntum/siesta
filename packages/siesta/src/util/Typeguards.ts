@@ -5,7 +5,7 @@ import { typeOf } from "./Helpers.js"
 // this should make the typeguard pretty much instant
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isFunction = (a : any) : a is AnyFunction => /Function$/.test(typeOf(a))
 
 export const isSyncFunction = (a : any) : a is AnyFunction => typeOf(a) === 'Function'

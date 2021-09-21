@@ -38,7 +38,7 @@ import {
     sumPoints
 } from "./Types.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type MouseActionOptions      = {
     target              : ActionTarget
     offset              : ActionTargetOffset
@@ -54,7 +54,7 @@ export type MouseActionOptions      = {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export interface UserAgent {
     click (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
@@ -74,7 +74,7 @@ export interface UserAgent {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type WaitForTargetActionableResult = {
     success                 : boolean
 
@@ -94,7 +94,7 @@ export type WaitForTargetActionableOptions = {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // user agent for Siesta's on-page tests
 export class UserAgentOnPage extends Mixin(
     [ Test ],
@@ -565,7 +565,7 @@ export class UserAgentOnPage extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // this is user agent for classic browser automation tests,
 // where the test itself is running in the OS process (like Node.js)
 // and it operates on the browser page, usually using `page.evaluate()`

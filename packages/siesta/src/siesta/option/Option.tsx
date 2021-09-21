@@ -4,13 +4,13 @@ import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type OptionAtomType         = 'boolean' | 'string' | 'number' | 'object'
 
 export type OptionStructureType    = 'map' | 'array' | 'set' | 'atom' | 'enum'
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class OptionGroup extends Base {
     name            : string        = ''
     title           : string        = ''
@@ -18,7 +18,7 @@ export class OptionGroup extends Base {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Option extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
@@ -213,7 +213,7 @@ export class Option extends Mixin(
 ){}
 
 
-// //---------------------------------------------------------------------------------------------------------------------
+// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // export class OptionArray extends Mixin(
 //     [ Option ],
 //     (base : ClassUnion<typeof Option>) =>
@@ -224,7 +224,7 @@ export class Option extends Mixin(
 // ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export enum OptionsParseWarningCodes {
     UnknownOption               = 'UnknownOption',
     ExistingValueOverwritten    = 'ExistingValueOverwritten'
@@ -255,7 +255,7 @@ export type OptionParseWarning = {
 
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class HasOptions extends Mixin(
     [],
     (base : AnyConstructor) =>
@@ -267,13 +267,13 @@ export class HasOptions extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const initOptionsStorage = (proto : HasOptions) => {
     if (!proto.hasOwnProperty('$options')) proto.$options = Object.create(proto.$options || null)
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const option = (config? : Partial<Option>, optionCls : typeof Option = Option) : PropertyDecorator => {
 
     return (proto : HasOptions, propertyKey : string) : void => {
@@ -287,7 +287,7 @@ export const option = (config? : Partial<Option>, optionCls : typeof Option = Op
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type OptionValueEntry = { key : string, value : string }
 
 type OptionsTokenizingResult = {
@@ -345,7 +345,7 @@ function parseOptions (input : string[]) : OptionsTokenizingResult {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type ExtractOptionsResult = { values : Map<Option, unknown>, errors : OptionParseError[], warnings : OptionParseWarning[] }
 
 export class OptionsBag extends Base {
@@ -425,7 +425,7 @@ export class OptionsBag extends Base {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const unknownOption = (warning : OptionParseWarning) : XmlElement => <div>
     <span class="log_message_warn"> WARNING </span> Unknown option: <span class="accented">--{ warning.option.name }</span>
 </div>
@@ -441,7 +441,7 @@ export const optionWarningTemplateByCode = new Map<OptionsParseWarningCodes, (wa
 ])
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const optionDoesNotHaveValue = (error : OptionParseError) : XmlElement => <div>
     <span class="log_message_error"> ERROR </span> Missing value for option <span class="accented">--{ error.option.name }</span>
 </div>
@@ -472,6 +472,6 @@ export const optionErrorTemplateByCode = new Map<OptionsParseErrorCodes, (warnin
 ])
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const camelCaseToSnakeCase = (str : string, snakeChar : string = '_') : string =>
     str.replace(/([A-Z])/g, (match : string, p1 : string) => snakeChar + p1.toLowerCase())

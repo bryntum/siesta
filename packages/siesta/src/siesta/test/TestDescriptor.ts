@@ -16,7 +16,7 @@ import { HasOptions, option, OptionGroup } from "../option/Option.js"
 import { Test } from "./Test.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const OptionsGroupTestDescriptor  = OptionGroup.new({
     name        : 'test',
     title       : 'Test descriptor',
@@ -24,7 +24,7 @@ export const OptionsGroupTestDescriptor  = OptionGroup.new({
 })
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestDescriptorPre extends Mixin(
     [ Serializable, HasOptions, TreeNode, Base ],
     (base : ClassUnion<typeof Serializable, typeof HasOptions, typeof TreeNode, typeof Base>) =>

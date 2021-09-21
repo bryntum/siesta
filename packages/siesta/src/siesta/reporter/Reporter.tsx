@@ -26,11 +26,11 @@ import {
 import { ConsoleXmlRenderer } from "./ConsoleXmlRenderer.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type ReporterDetailing   = 'file' | 'subtest' | 'assertion'
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Reporter extends Mixin(
     [ ConsoleXmlRenderer, Base ],
     (base : ClassUnion<typeof ConsoleXmlRenderer, typeof Base>) =>
@@ -392,7 +392,7 @@ export class Reporter extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const humanReadableDuration = (milliSeconds : number) : string => {
     if (milliSeconds >= 1000) {
         const seconds       = Math.floor(milliSeconds / 100) / 10
@@ -416,7 +416,7 @@ export const humanReadableDuration = (milliSeconds : number) : string => {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const lineNumberTemplate = (isHighlighted : boolean, line : string) : XmlElement => {
     return <span>
         <span class="primary_fail">{ isHighlighted ? '➤' : ' ' }</span>
@@ -425,7 +425,7 @@ export const lineNumberTemplate = (isHighlighted : boolean, line : string) : Xml
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const sourcePointTemplate = ({ line, char } : SourcePoint, sources : string[], sourceContext : number) : XmlElement => {
     const template              = <div class="source_point"></div>
 

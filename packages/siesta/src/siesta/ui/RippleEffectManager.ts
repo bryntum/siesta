@@ -1,7 +1,7 @@
 import { Base } from "../../class/Mixin.js"
 import { awaitDomInteractive } from "../../util_browser/Dom.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class RippleEffectManager extends Base {
 
     listenerDown    : (e : PointerEvent) => void        = undefined

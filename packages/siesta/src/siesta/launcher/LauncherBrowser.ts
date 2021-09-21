@@ -14,7 +14,7 @@ import { DashboardConnectorServer } from "./DashboardConnector.js"
 import { Launcher } from "./Launcher.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class LauncherBrowser extends Mixin(
     [ Launcher ],
     (base : ClassUnion<typeof Launcher>) =>

@@ -4,7 +4,7 @@ import { ContextSameContext } from "../ContextSameContext.js"
 import { ContextProvider } from "./ContextProvider.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ContextProviderSameContext extends Mixin(
     [ ContextProvider ],
     (base : ClassUnion<typeof ContextProvider>) =>

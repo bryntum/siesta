@@ -5,7 +5,7 @@ import { Assertion, SourcePoint, TestNodeResult } from "../TestResult.js"
 import { GotExpectTemplate } from "./AssertionCompare.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class AssertionException extends Mixin(
     [ TestNodeResult ],
     (base : ClassUnion<typeof TestNodeResult>) =>

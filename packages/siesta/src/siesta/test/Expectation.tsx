@@ -10,7 +10,7 @@ import { Test } from "./Test.js"
 import { Assertion } from "./TestResult.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
 This class is the central point for writing assertions in the BDD style. Instances of this class can be generated with the
 {@link Test.expect|expect} method or with the [["src/siesta/test/Test".expect|expect]] alias.

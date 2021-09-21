@@ -37,7 +37,7 @@ import { LauncherDescriptorNodejs } from "./LauncherDescriptorNodejs.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [ process.stdout, process.stderr ].forEach((stream : any) => stream._handle?.setBlocking(true))
 
 

@@ -2,7 +2,7 @@ import { ChildProcess, Serializable } from "child_process"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSerializableJSON } from "./MediaSerializable.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaNodeIpcParent extends Mixin(
     [ MediaSerializableJSON ],
     (base : ClassUnion<typeof MediaSerializableJSON>) =>
@@ -45,7 +45,7 @@ export class MediaNodeIpcParent extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaNodeIpcChild extends Mixin(
     [ MediaSerializableJSON ],
     (base : ClassUnion<typeof MediaSerializableJSON>) =>

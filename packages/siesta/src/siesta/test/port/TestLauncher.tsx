@@ -11,12 +11,12 @@ import { SubTestCheckInfo } from "../TestResult.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 interface TestLauncher {
     launchTest (testDescriptorStr : string, checkInfo : SubTestCheckInfo, dashboardLaunchInfo : DashboardLaunchInfo) : Promise<any>
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestLauncherParent extends Mixin(
     [ TestReporterParent, PortHandshakeParent, Base ],
     (base : ClassUnion<typeof TestReporterParent, typeof PortHandshakeParent, typeof Base>) =>
@@ -30,7 +30,7 @@ export class TestLauncherParent extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestLauncherChild extends Mixin(
     [ TestReporterChild, PortHandshakeChild, Base ],
     (base : ClassUnion<typeof TestReporterChild, typeof PortHandshakeChild, typeof Base>) =>

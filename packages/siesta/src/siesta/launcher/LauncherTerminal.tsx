@@ -19,7 +19,7 @@ import { extractProjectInfo } from "./ProjectExtractor.js"
 // generic sever-side, cross Node/Deno functionality
 // DO NOT USE THE NODE.JS/NPM/DENO MODULES HERE
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class LauncherDescriptorTerminal extends Mixin(
     [ LauncherDescriptor ],
     (base : ClassUnion<typeof LauncherDescriptor>) =>

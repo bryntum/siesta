@@ -6,7 +6,7 @@ import { luid, LUID } from "../common/LUID.js"
 import { Context, seedChildPort } from "./Context.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ContextBrowserIframe extends Mixin(
     [ Context ],
     (base : ClassUnion<typeof Context>) =>

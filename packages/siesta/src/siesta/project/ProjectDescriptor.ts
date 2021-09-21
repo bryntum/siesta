@@ -9,7 +9,7 @@ import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // need to use `optIn` mode for serialization of ProjectOptions, because
 // we have a creation of `ProjectOptions` instance from the `Project` instance
 // (which contains extra properties which all will be applied to the `ProjectOptions` instance,
@@ -32,7 +32,7 @@ export class ProjectDescriptor extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'ProjectDescriptorBrowser', mode : 'optIn' })
 export class ProjectDescriptorBrowser extends Mixin(
     [ ProjectDescriptor ],
@@ -44,7 +44,7 @@ export class ProjectDescriptorBrowser extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'ProjectDescriptorNodejs', mode : 'optIn' })
 export class ProjectDescriptorNodejs extends Mixin(
     [ ProjectDescriptor ],
@@ -56,7 +56,7 @@ export class ProjectDescriptorNodejs extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'ProjectDescriptorDeno', mode : 'optIn' })
 export class ProjectDescriptorDeno extends Mixin(
     [ ProjectDescriptor ],
@@ -68,7 +68,7 @@ export class ProjectDescriptorDeno extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'ProjectSerializableData' })
 export class ProjectSerializableData extends Mixin(
     [ Serializable, Base ],

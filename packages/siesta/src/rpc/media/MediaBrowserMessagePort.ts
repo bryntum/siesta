@@ -1,7 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSerializableJSON } from "./MediaSerializable.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaBrowserMessagePortChild extends Mixin(
     [ MediaSerializableJSON ],
     (base : ClassUnion<typeof MediaSerializableJSON>) =>
@@ -37,7 +37,7 @@ export class MediaBrowserMessagePortChild extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaBrowserMessagePortParent extends Mixin(
     [ MediaBrowserMessagePortChild ],
     (base : ClassUnion<typeof MediaBrowserMessagePortChild>) =>

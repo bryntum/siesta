@@ -6,10 +6,10 @@ import { ReporterTerminal } from "./ReporterTerminal.js"
 import { Terminal } from "./Terminal.js"
 import { TerminalDeno } from "./TerminalDeno.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 declare const Deno : any
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ReporterDenoTerminal extends Mixin(
     [ ReporterTerminal, ReporterDeno ],
     (base : ClassUnion<typeof ReporterTerminal, typeof ReporterDeno>) => 

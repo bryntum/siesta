@@ -2,7 +2,7 @@ import { siestaPackageRootUrl } from "../../../index.js"
 import { Base } from "../../class/Mixin.js"
 import { awaitDomInteractive } from "../../util_browser/Dom.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MouseCursorVisualizer extends Base {
 
     listenerDown    : (e : PointerEvent) => void        = undefined

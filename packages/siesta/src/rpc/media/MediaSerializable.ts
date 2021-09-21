@@ -3,7 +3,7 @@ import { parse, SerializationScope, stringify } from "../../serializable/Seriali
 import { EnvelopCall, EnvelopResult } from "../port/Port.js"
 import { Media } from "./Media.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaSerializableJSON extends Mixin(
     [ Media ],
     (base : ClassUnion<typeof Media>) =>
@@ -27,7 +27,7 @@ export class MediaSerializableJSON extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // TODO this serializer is not ready for production yet
 // it can mix the local and remote ids, providing very unexpected results
 // need to either split local/remote ids in different namespaces,
@@ -57,7 +57,7 @@ export class MediaSerializableJSONScoped extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaSerializablePlain extends Mixin(
     [ Media ],
     (base : ClassUnion<typeof Media>) =>

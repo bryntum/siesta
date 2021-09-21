@@ -5,7 +5,7 @@ import { SimulatorPlaywrightClient, SimulatorPlaywrightServer } from "../../simu
 import { TestLauncherChild, TestLauncherParent } from "./TestLauncher.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestLauncherBrowserParent extends Mixin(
     [ TestLauncherParent, SimulatorPlaywrightServer ],
     (base : ClassUnion<typeof TestLauncherParent, typeof SimulatorPlaywrightServer>) =>
@@ -23,7 +23,7 @@ export class TestLauncherBrowserParent extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestLauncherBrowserChild extends Mixin(
     [ TestLauncherChild, SimulatorPlaywrightClient ],
     (base : ClassUnion<typeof TestLauncherChild, typeof SimulatorPlaywrightClient>) =>

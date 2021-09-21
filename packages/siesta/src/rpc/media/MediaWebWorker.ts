@@ -3,7 +3,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { MediaSerializableJSON } from "./MediaSerializable.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // this type is declared in TS definitions lib, called `webworker`:
 // {
 //     "compilerOptions" : {
@@ -17,7 +17,7 @@ type DedicatedWorkerGlobalScope = any
 
 declare const self : DedicatedWorkerGlobalScope
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaWebWorkerChild extends Mixin(
     [ MediaSerializableJSON, Base ],
     (base : ClassUnion<typeof MediaSerializableJSON, typeof Base>) =>
@@ -52,7 +52,7 @@ export class MediaWebWorkerChild extends Mixin(
 ){}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class MediaWebWorkerParent extends Mixin(
     [ MediaSerializableJSON, Base ],
     (base : ClassUnion<typeof MediaSerializableJSON, typeof Base>) =>

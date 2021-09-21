@@ -28,7 +28,7 @@ import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
 import { Assertion, AssertionAsyncResolution, Exception, LogMessage, SubTestCheckInfo, TestNodeResult, TestResult } from "./TestResult.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 class TestPre extends Mixin(
     [
         TestNodeResult,
@@ -965,7 +965,7 @@ export class Test extends TestPre {
 
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class GlobalTestEnvironment extends Base {
     // the test instance, representing the whole current test file
     // not directly accessible by user, but every global `it/describe` section
@@ -1001,7 +1001,7 @@ Object.defineProperty(globalThis, '__SIESTA_GLOBAL_TEST_ENV__', {
 
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type TestSectionConstructor<TestClass extends Test>  = (name : TestDescriptorArgument<TestClass>, code : (t : TestClass) => any) => TestClass
 
 export const createTestSectionConstructors = <T extends typeof Test>(testClass : T) => {
@@ -1048,7 +1048,7 @@ export const {
 } = createTestSectionConstructors(Test)
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * Alias for {@link Test.beforeEach | beforeEach} method.
  */
@@ -1073,7 +1073,7 @@ export const afterEach = (code : (t : Test) => any) => {
         globalTestEnv.pendingAfterEachHooks.push(code)
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * An alias for the [[Test.expect|expect]] method of the test class.
  *

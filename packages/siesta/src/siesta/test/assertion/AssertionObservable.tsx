@@ -19,7 +19,7 @@ export type FiresOkOptions<O> = {
     desc?           : string
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class AssertionObservable extends Mixin(
     [ AssertionAsync ],
     (base : ClassUnion<typeof AssertionAsync>) =>

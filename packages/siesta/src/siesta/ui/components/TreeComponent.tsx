@@ -8,7 +8,7 @@ import { Component } from "../../../chronograph-jsx/Component.js"
 
 ChronoGraphJSX
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TreeComponent extends Mixin(
     [ Component ],
     (base : ClassUnion<typeof Component>) =>

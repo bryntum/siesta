@@ -7,7 +7,7 @@ import { PointerClickOptions, PointerMoveOptions, PointerUpDownOptions, Simulato
 import { Point, sumPoints } from "./Types.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class SimulatorPlaywrightServer extends Mixin(
     [ PortHandshakeParent, Base ],
     (base : ClassUnion<typeof PortHandshakeParent, typeof Base>) =>
@@ -79,7 +79,7 @@ export class SimulatorPlaywrightServer extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class SimulatorPlaywrightClient extends Mixin(
     [ PortHandshakeChild, Base ],
     (base : ClassUnion<typeof PortHandshakeChild, typeof Base>) =>

@@ -1,7 +1,7 @@
 import { AnyConstructor, Mixin } from "../../class/Mixin.js"
 import { EnvelopCall, EnvelopResult, Port } from "../port/Port.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Media extends Mixin(
     [],
     (base : AnyConstructor) =>

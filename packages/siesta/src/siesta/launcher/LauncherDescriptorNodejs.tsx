@@ -6,7 +6,7 @@ import { LauncherDescriptor, OptionsGroupPrimary } from "./Launcher.js"
 import { LauncherDescriptorTerminal } from "./LauncherTerminal.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const OptionsGroupBrowser  = OptionGroup.new({
     name        : 'browser',
     title       : 'Browser',
@@ -17,7 +17,7 @@ export const OptionsGroupBrowser  = OptionGroup.new({
 export type SupportedBrowsers   = 'chrome' | 'firefox' | 'edge' | 'safari'
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'LauncherDescriptorNodejs' })
 export class LauncherDescriptorNodejs extends Mixin(
     [ LauncherDescriptor, LauncherDescriptorTerminal ],

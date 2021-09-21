@@ -2,14 +2,14 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { saneSplit } from "../../util/Helpers.js"
 import { Reporter } from "./Reporter.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 declare const Deno : any
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ReporterDeno extends Mixin(
     [ Reporter ],
-    (base : ClassUnion<typeof Reporter>) => 
+    (base : ClassUnion<typeof Reporter>) =>
 
     class ReporterDeno extends base {
 

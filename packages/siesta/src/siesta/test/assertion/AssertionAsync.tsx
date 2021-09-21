@@ -8,7 +8,7 @@ import { luid, LUID } from "../../common/LUID.js"
 import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, TestNodeResult } from "../TestResult.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * An argument for the [[Test.waitFor|waitFor]] test class method, denoting the "waiting"
  */
@@ -43,7 +43,7 @@ export type WaitForArg<R> = {
     description?    : string
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type AsyncGapId = number
 
 type AsyncGapInfo       = {
@@ -51,7 +51,7 @@ type AsyncGapInfo       = {
     finalize        : Function
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class AssertionAsync extends Mixin(
     [ TestNodeResult ],
     (base : ClassUnion<typeof TestNodeResult>) =>
@@ -274,7 +274,7 @@ export class AssertionAsync extends Mixin(
 ) {}
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // we use the final class as Mixin class here, (even that a simple plain class would be enough)
 // for the purpose of declaration files generation
 

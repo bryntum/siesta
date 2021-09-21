@@ -5,7 +5,7 @@ import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestNodeResultReactive } from "../test/TestResult.js"
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class TestLaunchResult extends Mixin(
     [ TreeNodeMapped, Base ],
     (base : ClassUnion<typeof TreeNodeMapped, typeof Base>) =>

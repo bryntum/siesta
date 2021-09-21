@@ -5,7 +5,7 @@ import { isArray, isFunction, isNumber, isString, isSyncFunction } from "../util
 import { Component, ComponentCommon, WebComponent } from "./Component.js"
 import { ComponentElement, ElementReactivity, ReactiveElement, ReactiveNode } from "./ElementReactivity.js"
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type Listener = (event : Event) => any
 
 export type PropertySource<V> =
@@ -20,7 +20,7 @@ export type PropertySourceNormalized<V> =
     | BoxUnbound<V>
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const resolvePropertySource = <V>(src : PropertySourceNormalized<V>) : V => {
     let source : PropertySourceNormalized<V>        = src
 
@@ -38,7 +38,7 @@ export const resolvePropertySource = <V>(src : PropertySourceNormalized<V>) : V 
     return source
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type PropertiesCategorizationResult = {
     events                  : [ string, Listener ][],
 
@@ -143,7 +143,7 @@ export const categorizeProperties = <V>(properties  : Record<string, PropertySou
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const addEventListener = (element : Element, name : string, listener : (even : Event) => any) => {
     let eventHandlerMatch : EventHandlerMatch = matchEventHandler(name)
 
@@ -152,7 +152,7 @@ export const addEventListener = (element : Element, name : string, listener : (e
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const setProperty = (element : Element, name : string, value : unknown) => {
     const specialProperty  = matchSpecialProperty(name)
 
@@ -172,7 +172,7 @@ export const setProperty = (element : Element, name : string, value : unknown) =
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const applyStaticProperties = (element : Element, categorizedProperties : PropertiesCategorizationResult) => {
     if (categorizedProperties.reactiveCounter > 0) throw new Error("Should only be called for static-only properties")
 
@@ -200,7 +200,7 @@ export const applyStaticChildren = (element : Element, children : ReactiveNode[]
     element.append(...children)
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type ElementSource =
     | XmlElement
     | Node
@@ -213,7 +213,7 @@ export type ElementSource =
     | BoxUnbound<ElementSource>
     | ElementSource[]
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type ElementSourceNormalized =
     | Node
     | (() => ElementSource)
@@ -312,10 +312,10 @@ export const convertXmlElement = (source : XmlElement) : Element => {
     return el
 }
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const querySelector = <C extends Component>(el : Element, selector : string) : ComponentElement<C> => el.querySelector(selector)
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export namespace ChronoGraphJSX {
 
     export const FragmentSymbol  = Symbol('FragmentSymbol')
@@ -370,7 +370,7 @@ export namespace ChronoGraphJSX {
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type DOMElement = Element
 
 export declare namespace ChronoGraphJSX {
