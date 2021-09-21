@@ -338,24 +338,24 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        // // does not take `isTodo` into account
-        // $passedRaw   : boolean       = undefined
-        //
-        // get passedRaw () : boolean {
-        //     if (this.$passedRaw !== undefined) return this.$passedRaw
-        //
-        //     let passedRaw : boolean    = true
-        //
-        //     this.resultLog.forEach(result => {
-        //         if ((result instanceof Exception)) passedRaw = false
-        //
-        //         if ((result instanceof Assertion) && !result.passed) passedRaw = false
-        //
-        //         if ((result instanceof TestNodeResult) && !result.passedRaw) passedRaw = false
-        //     })
-        //
-        //     return this.$passedRaw     = passedRaw
-        // }
+        // does not take `isTodo` into account
+        $passedRaw   : boolean       = undefined
+
+        get passedRaw () : boolean {
+            if (this.$passedRaw !== undefined) return this.$passedRaw
+
+            let passedRaw : boolean    = true
+
+            this.resultLog.forEach(result => {
+                if ((result instanceof Exception)) passedRaw = false
+
+                if ((result instanceof Assertion) && (!(result instanceof AssertionAsyncCreation) || !result.isRunning) && !result.passed) passedRaw = false
+
+                if ((result instanceof TestNodeResult) && !result.passedRaw) passedRaw = false
+            })
+
+            return this.$passedRaw     = passedRaw
+        }
 
 
         $childNodes   : TestNodeResult[]       = undefined
