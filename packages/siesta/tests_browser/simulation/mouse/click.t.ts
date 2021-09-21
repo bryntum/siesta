@@ -195,7 +195,20 @@ it('Should be possible to click an offset point outside the element', async t =>
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Failed clicks (due to element not actionable) should create failing assertion', async t => {
+it('Intentionally clicking outside an element should NOT issue a warning', async t => {
+    document.body.innerHTML =
+        '<div id="clickel" style="margin: 10px; width: 100px; height: 100px; background: gray"></div>'
+
+    t.firesOk(document.body, 'click', 2)
+    t.wontFire('#clickel', 'click')
+
+    await t.click('#clickel', [ '100% + 1', '100%' ])
+    await t.click('#clickel', [ -5, '100%' ])
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Failed clicks (due to element not actionable) should create failing assertion #1', async t => {
     t.todo('internal', async t => {
         const div = document.body.appendChild(createElement('div', {
             style   : 'width : 40px; display: none',
@@ -216,3 +229,25 @@ it('Failed clicks (due to element not actionable) should create failing assertio
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Failed clicks (due to element not actionable) should create failing assertion #2', async t => {
+    t.todo('internal', async t => {
+        document.body.innerHTML =
+            '<div style="border: 1px solid #ddd; width: 100px; height: 100px; overflow: hidden">' +
+                '<div style="width: 500px; height: 100px" id="inner">FOO</div>' +
+            '</div>'
+
+        t.wontFire('#inner', 'click')
+
+        await t.click({ target : '#inner', offset : [ 101, 90 ], timeout : 30 })
+
+    }).postFinishHook.on(todoTest => {
+        t.false(todoTest.passedRaw, 'Test is failed (not taking into account `isTodo` flag')
+
+        const assertions        = Array.from(todoTest.eachResultOfClassDeep(Assertion))
+
+        t.is(assertions.length, 2)
+
+        t.is(assertions[ 0 ].name, 'waitForElementActionable')
+    })
+})
