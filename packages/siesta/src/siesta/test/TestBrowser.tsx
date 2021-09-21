@@ -4,7 +4,7 @@ import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.j
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
-import { Simulator } from "../simulate/Simulator.js"
+import { PointerMovePrecision, Simulator } from "../simulate/Simulator.js"
 import { ActionTarget } from "../simulate/Types.js"
 import { UserAgentOnPage } from "../simulate/UserAgent.js"
 import { MouseCursorVisualizer } from "../ui/MouseCursorVisualizer.js"
@@ -35,6 +35,8 @@ export class TestBrowser extends Mixin(
         @prototypeValue(TestDescriptorBrowser)
         testDescriptorClass     : typeof TestDescriptorBrowser
 
+        descriptor          : TestDescriptorBrowser
+
         // @prototypeValue(ExecutionContextBrowser)
         // executionContextClass   : typeof ExecutionContext
 
@@ -55,6 +57,11 @@ export class TestBrowser extends Mixin(
 
         resolveObservable (source : ActionTarget) : Element {
             return this.resolveActionTarget(source)
+        }
+
+
+        get mouseMovePrecision () : PointerMovePrecision {
+            return this.descriptor.mouseMovePrecision
         }
 
 

@@ -104,11 +104,14 @@ export class UserAgentOnPage extends Mixin(
 
         simulator               : SimulatorPlaywrightClient     = undefined
 
-        mouseMovePrecision      : PointerMovePrecision          = { kind : 'last_only', precision : 1 }
-
         onAmbiguousQuery        : 'use_first' | 'warn' | 'throw'   = 'warn'
 
         // coordinatesSystem   : 'page' | 'viewport'           = 'viewport'
+
+
+        get mouseMovePrecision () : PointerMovePrecision {
+            return { kind : 'last_only', precision : 1 }
+        }
 
 
         resolveActionTarget (target : ActionTarget) : Element {

@@ -3,6 +3,7 @@ import { serializable } from "../../serializable/Serializable.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { IsolationLevel, SimulationType } from "../common/IsolationLevel.js"
 import { option } from "../option/Option.js"
+import { PointerMovePrecision } from "../simulate/Simulator.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
 /**
@@ -51,6 +52,8 @@ export class TestDescriptorBrowser extends Mixin(
 
         viewportWidth       : number                    = 1024
         viewportHeight      : number                    = 768
+
+        mouseMovePrecision  : PointerMovePrecision      = { kind : 'last_only', precision : 1 }
     }
 ){}
 
