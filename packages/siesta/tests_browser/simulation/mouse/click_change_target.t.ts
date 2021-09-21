@@ -1,7 +1,9 @@
 import { it } from "../../../browser.js"
+import { delay } from "../../../src/util/TimeHelpers.js"
 import { awaitDomInteractive } from "../../../src/util_browser/Dom.js"
 import { createElement } from "../../@helpers.js"
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 awaitDomInteractive().then(() =>
     createElement('style', {
         html :
@@ -20,9 +22,9 @@ let log : string[]
 let box1 : HTMLElement, box2 : HTMLElement, box3 : HTMLElement
 
 const setupBox = id => {
-    let el              = document.getElementById(id)
+    const el            = document.getElementById(id)
 
-    let handler         = (e : MouseEvent) => log.push(e.type + "/" + id)
+    const handler       = (e : MouseEvent) => log.push(e.type + "/" + id)
 
     el.addEventListener('mousedown', handler)
     el.addEventListener('mouseup', handler)
@@ -130,9 +132,9 @@ it('Changing the target in the 2nd phase of dblclick should still cancel the `cl
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should fire click event on common ancestor of pointerup element + element-at-cursor if pointerup triggers another element to become visible', async t => {
     document.body.innerHTML =
-        '<div id="outer" style="position:absolute; left: 0; top: 0px; height:250px; width:250px;background:red;">' +
-            '<div id="inner" style="background:blue;">Inner Element' +
-                '<div id="inner-inner" style="background:#fff;width:100px">Innermost Element</div>' +
+        '<div id="outer" style="position: absolute; left: 0; top: 0; height: 250px; width: 250px; background: red;">' +
+            '<div id="inner" style="background: blue;">Inner Element' +
+                '<div id="inner-inner" style="background: #fff; width: 100px">Innermost Element</div>' +
             '</div>' +
         '</div>'
 
@@ -160,4 +162,68 @@ it('Should fire click event on common ancestor of pointerup element + element-at
     // }
 
     await t.click(inner)
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it("After mousedown, we should fire mouseleave if target moved", async t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; top: 0; left: 10px; border: 1px solid black; width: 10px; height: 10px" id="outer"></div>'
+
+    const outer         = document.getElementById('outer')
+
+    outer.addEventListener('mousedown', () => outer.style.left = '20px')
+
+    await t.waitForEvent('#outer', 'mouseleave', { trigger : () => t.click('#outer') })
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it("After mouseup, we should fire mouseleave if target moved", async t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; top: 10px; left: 10px; border: 1px solid black; width: 10px; height: 10px" id="outer"></div>'
+
+    const outer         = document.getElementById('outer')
+
+    outer.addEventListener('mouseup', () => outer.style.left = '20px')
+
+    await t.waitForEvent('#outer', 'mouseleave', { trigger : () => t.click('#outer') })
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it("After click, we should fire mouseleave if target moved", async t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; top: 10px; left: 10px; border: 1px solid black; width: 10px; height: 10px" id="outer"></div>'
+
+    const outer         = document.getElementById('outer')
+
+    outer.addEventListener('click', () => outer.style.left = '20px')
+
+    await t.waitForEvent('#outer', 'mouseleave', { trigger : () => t.click('#outer') })
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it("should fire mouseleave if target was removed from DOM after mouseup", async t => {
+    await t.moveMouseTo([ 0, 0 ])
+
+    document.body.innerHTML =
+        '<div style="position: absolute; top: 0; left: 10px; border: 1px solid black; width: 10px; height: 10px" id="outer"></div>'
+
+    const outer         = document.getElementById('outer')
+
+    outer.addEventListener('mouseup', () => outer.remove())
+
+    t.willFireNTimes(outer, 'mouseenter', 1, 'outer mouseenter')
+    t.willFireNTimes(outer, 'mouseout', 0, 'outer mouseout not fired')
+    t.willFireNTimes(outer, 'mouseleave', 0, 'outer mouseleave')
+
+    // 1 mouseover is 'outer' bubbling
+    // 1 mouseover is when 'outer' is removed
+    t.willFireNTimes(document.body, 'mouseover', 2, 'body mouseover')
+
+    await t.click(outer)
+
+    await delay(10)
 })

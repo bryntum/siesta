@@ -3,6 +3,7 @@ import { isString } from "../../../src/util/Typeguards.js"
 import { beforeEach, it } from "../../../browser.js"
 import { createElement } from "../../@helpers.js"
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const logEvent = (
     el              : Element,
     eventNames      : string | string[],
@@ -201,3 +202,25 @@ it("After mouse interactions, the target el must be re-evaluated", async t => {
     // the events above are triggered in the next tick, so need to wait a bit
     await delay(10)
 })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it("mouseenter should be fired for underlying (usually parent) elements too", async t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; top: 0; left: 50px; border: 1px solid black; width: 50px; height: 50px" id="outer1">' +
+            '<div style="background: #aaa; position: absolute; top: 0; left: 0; width: 40px; height: 40px" id="inner1">' +
+            '</div>' +
+        '</div>'
+
+    const inner = document.getElementById('inner1')
+    const outer = document.getElementById('outer1')
+
+    await t.moveMouseTo([ 0, 0 ])
+
+    t.firesOnce(outer, 'mouseenter', 'outer mouseenter')
+    t.firesOnce(inner, 'mouseenter', 'inner mouseenter')
+
+    await t.moveMouseTo('#inner1')
+})
+
+
