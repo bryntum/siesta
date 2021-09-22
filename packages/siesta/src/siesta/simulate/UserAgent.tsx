@@ -96,6 +96,7 @@ export type WaitForTargetActionableOptions = {
     sourcePoint?            : SourcePoint
     actionName?             : string
 
+    syncCursor?             : boolean
     silent?                 : boolean
     timeout?                : number
     stabilityFrames?        : number
@@ -256,6 +257,7 @@ export class UserAgentOnPage extends Mixin(
 
         async doWaitForTargetActionable (action : MouseActionOptions, options? : WaitForTargetActionableOptions) : Promise<WaitForTargetActionableResult> {
             const timeout               = options?.timeout ?? action.timeout ?? this.defaultTimeout
+            const syncCursor            = options?.syncCursor ?? true
             const silent                = options?.silent ?? false
             const stabilityFrames       = options?.stabilityFrames ?? 2
 
@@ -449,7 +451,7 @@ export class UserAgentOnPage extends Mixin(
 
                         const globalPoint   = sumPoints(offsets.get(win), point)
 
-                        if (!equalPoints(globalPoint, this.simulator.currentPosition)) {
+                        if (syncCursor && !equalPoints(globalPoint, this.simulator.currentPosition)) {
                             await this.simulator.simulateMouseMove(globalPoint, { mouseMovePrecision : action.mouseMovePrecision })
 
                             checks.push('reachable')
