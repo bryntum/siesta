@@ -1,4 +1,7 @@
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { SimulatorKeyboard } from "./SimulatorKeyboard.js"
+import { SimulatorMouse } from "./SimulatorMouse.js"
+
 export type Point                   = [ x : number, y : number ]
 
 export type MouseButton             = 'left' | 'right' | 'middle'
@@ -61,3 +64,9 @@ export const minusPoints    = (point1 : Point, point2 : Point) : Point =>
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const equalPoints    = (point1 : Point, point2 : Point) : boolean =>
     point1[ 0 ] === point2[ 0 ] && point1[ 1 ] === point2[ 1 ]
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export interface Simulator extends SimulatorMouse, SimulatorKeyboard {
+}
+

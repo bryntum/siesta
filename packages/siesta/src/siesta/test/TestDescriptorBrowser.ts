@@ -3,7 +3,7 @@ import { serializable } from "../../serializable/Serializable.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { IsolationLevel, SimulationType } from "../common/IsolationLevel.js"
 import { option } from "../option/Option.js"
-import { PointerMovePrecision } from "../simulate/Simulator.js"
+import { PointerMovePrecision } from "../simulate/SimulatorMouse.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
 /**

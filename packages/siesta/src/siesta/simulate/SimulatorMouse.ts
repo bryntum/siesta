@@ -40,13 +40,8 @@ export type PointerMoveOptions      = {
 }
 
 
-export type TypeOptions      = {
-    delay           : number
-}
-
-
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-interface SimulatorMouse {
+export interface SimulatorMouse {
     currentPosition     : Point
 
     simulateMouseUp (options? : Partial<PointerUpDownOptions>) : Promise<any>
@@ -59,21 +54,3 @@ interface SimulatorMouse {
 
     simulateDblClick (options? : PointerClickOptions) : Promise<any>
 }
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-interface SimulatorKeyboard {
-    keyPress (key : string, options? : TypeOptions) : Promise<any>
-
-    keyDown (key : string) : Promise<any>
-
-    keyUp (key : string) : Promise<any>
-
-    type (text : string, options? : TypeOptions) : Promise<any>
-}
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export interface Simulator extends SimulatorMouse, SimulatorKeyboard {
-}
-

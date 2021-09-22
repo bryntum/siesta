@@ -25,7 +25,8 @@ import { getOffsetsMap, scrollElementPointIntoView } from "../../util_browser/Sc
 import { isHTMLElement, isHTMLIFrameElement, isSVGElement } from "../../util_browser/Typeguards.js"
 import { Test } from "../test/Test.js"
 import { Assertion, SourcePoint } from "../test/TestResult.js"
-import { PointerMovePrecision, Simulator } from "./Simulator.js"
+import { SiestaModifierKey, SiestaTypeString, TypeOptions } from "./SimulatorKeyboard.js"
+import { PointerMovePrecision } from "./SimulatorMouse.js"
 import { SimulatorPlaywrightClient } from "./SimulatorPlaywright.js"
 import {
     ActionableCheck,
@@ -34,9 +35,10 @@ import {
     equalPoints,
     minusPoints,
     MouseButton,
-    Point,
+    Point, Simulator,
     sumPoints
 } from "./Types.js"
+
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type MouseActionOptions      = {
@@ -45,20 +47,53 @@ export type MouseActionOptions      = {
 
     button              : MouseButton
 
-    options             : {
-        shiftKey?       : boolean
-        ctrlKey?        : boolean
-        altKey?         : boolean
-        metaKey?        : boolean
-    }
+    shiftKey?           : boolean
+    ctrlKey?            : boolean
+    altKey?             : boolean
+    metaKey?            : boolean
 
     mouseMovePrecision  : PointerMovePrecision
     allowChild          : boolean
 
     timeout             : number
+}
 
-    callback            : Function
-    scope               : any
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type KeyboardActionOptions   = {
+    target              : ActionTarget
+    text                : SiestaTypeString
+
+    waitForTarget       : boolean
+    clearExisting       : boolean
+
+    shiftKey?           : boolean
+    ctrlKey?            : boolean
+    altKey?             : boolean
+    metaKey?            : boolean
+
+    timeout             : number
+    // delay between the key down / key up events
+    delay               : number
+}
+
+
+const extractModifierKeys = (
+    options : {
+        shiftKey?           : boolean
+        ctrlKey?            : boolean
+        altKey?             : boolean
+        metaKey?            : boolean
+    }
+) : SiestaModifierKey[] => {
+    const res   : SiestaModifierKey[]       = []
+
+    if (options.shiftKey) res.push('SHIFT')
+    if (options.ctrlKey) res.push('CTRL')
+    if (options.altKey) res.push('ALT')
+    if (options.metaKey) res.push('CMD')
+
+    return res
 }
 
 
@@ -79,11 +114,20 @@ export interface UserAgent {
     moveMouseBy (delta : Point) : Promise<any>
 
     // dragTo (source : ActionTarget, target : ActionTarget) : Promise<any>
+    // dragBy (source : ActionTarget, target : ActionTarget) : Promise<any>
+
+    type (target : ActionTarget, text : SiestaTypeString, options? : Partial<KeyboardActionOptions>) : Promise<any>
+
+    keyPress (target : ActionTarget, key : SiestaTypeString, options? : Partial<KeyboardActionOptions>) : Promise<any>
+
+    keyDown (target : ActionTarget, key : SiestaTypeString) : Promise<any>
+
+    keyUp (target : ActionTarget, key : SiestaTypeString) : Promise<any>
 }
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export type WaitForTargetActionableResult = {
+export type WaitForMouseTargetActionableResult = {
     success                 : boolean
 
     actionElement?          : Element
@@ -92,7 +136,7 @@ export type WaitForTargetActionableResult = {
     failedChecks            : ActionableCheck[]
 }
 
-export type WaitForTargetActionableOptions = {
+export type WaitForMouseTargetActionableOptions = {
     sourcePoint?            : SourcePoint
     actionName?             : string
 
@@ -100,6 +144,24 @@ export type WaitForTargetActionableOptions = {
     silent?                 : boolean
     timeout?                : number
     stabilityFrames?        : number
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type WaitForKeyboardTargetActionableResult = {
+    success                 : boolean
+
+    actionElement?          : Element
+
+    failedChecks            : ActionableCheck[]
+}
+
+export type WaitForKeyboardTargetActionableOptions = {
+    sourcePoint?            : SourcePoint
+    actionName?             : string
+
+    silent?                 : boolean
+    timeout?                : number
 }
 
 
@@ -190,15 +252,16 @@ export class UserAgentOnPage extends Mixin(
                     offset              : offset,
 
                     button              : 'left',
-                    options             : {},
+
+                    shiftKey            : false,
+                    ctrlKey             : false,
+                    altKey              : false,
+                    metaKey             : false,
 
                     mouseMovePrecision  : this.mouseMovePrecision,
                     allowChild          : true,
 
                     timeout             : this.defaultTimeout,
-
-                    callback            : undefined,
-                    scope               : undefined
                 }
             } else {
                 return Object.assign({
@@ -206,17 +269,37 @@ export class UserAgentOnPage extends Mixin(
                     offset              : undefined,
 
                     button              : 'left',
-                    options             : {},
+
+                    shiftKey            : false,
+                    ctrlKey             : false,
+                    altKey              : false,
+                    metaKey             : false,
 
                     mouseMovePrecision  : this.mouseMovePrecision,
                     allowChild          : true,
 
                     timeout             : this.defaultTimeout,
-
-                    callback            : undefined,
-                    scope               : undefined
                 } as MouseActionOptions, targetOrOptions)
             }
+        }
+
+
+        normalizeKeyboardActionOptions (target : ActionTarget, text : string, options? : Partial<KeyboardActionOptions>) : KeyboardActionOptions {
+            return Object.assign({
+                target,
+                text,
+
+                waitForTarget       : true,
+                clearExisting       : false,
+
+                shiftKey            : false,
+                ctrlKey             : false,
+                altKey              : false,
+                metaKey             : false,
+
+                timeout             : this.defaultTimeout,
+                delay               : 0,
+            } as KeyboardActionOptions, options)
         }
 
 
@@ -233,7 +316,7 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        reportActionabilityCheckFailures (action : MouseActionOptions, checks : ActionableCheck[], options : WaitForTargetActionableOptions) {
+        reportActionabilityCheckFailures (target : ActionTarget, checks : ActionableCheck[], options : WaitForMouseTargetActionableOptions) {
             // TODO
             // 1) should list detailed failed checks (like for "reachable" for example, it should say
             //    with what other element the target is overlayed, etc
@@ -243,25 +326,120 @@ export class UserAgentOnPage extends Mixin(
                 name        : 'waitForElementActionable',
                 passed      : false,
                 annotation  : <div>
-                    <div>Waited too long for { options.actionName } target <span>{ action.target }</span> to become actionable</div>
+                    <div>Waited too long for { options.actionName } target <span>{ target }</span> to become actionable</div>
                     <div>Failed checks: `{ checks.join(" ") }`</div>
                 </div>
             }))
         }
 
 
-        async waitForTargetActionable (action : MouseActionOptions, options? : WaitForTargetActionableOptions) : Promise<WaitForTargetActionableResult> {
-            return await this.keepAlive(this.doWaitForTargetActionable(action, options))
+        async waitForKeyboardTargetActionable (action : KeyboardActionOptions, options? : WaitForKeyboardTargetActionableOptions) : Promise<WaitForKeyboardTargetActionableResult> {
+            return await this.keepAlive(this.doWaitForKeyboardTargetActionable(action, options))
         }
 
 
-        async doWaitForTargetActionable (action : MouseActionOptions, options? : WaitForTargetActionableOptions) : Promise<WaitForTargetActionableResult> {
+        async doWaitForKeyboardTargetActionable (action : KeyboardActionOptions, options? : WaitForKeyboardTargetActionableOptions) : Promise<WaitForKeyboardTargetActionableResult> {
+            const timeout               = options?.timeout ?? action.timeout ?? this.defaultTimeout
+            const silent                = options?.silent ?? false
+
+            if (!silent && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForKeyboardTargetActionable`')
+
+            if (isArray(action.target)) {
+                throw new Error("Coordinates as target are not supported for keyboard actions")
+            }
+            else {
+                const win               = this.window
+                const target            = action.target
+
+                let el : Element        = undefined
+
+                let warned : boolean    = false
+
+                let failedChecks : ActionableCheck[]    = []
+
+                const start             = Date.now()
+
+                return new Promise((resolve, reject) => {
+
+                    const step = async () => {
+                        try {
+                            await doStep()
+                        } catch (e) {
+                            reject(e)
+                        }
+                    }
+
+                    const doStep = async () => {
+                        const elapsed   = Date.now() - start
+
+                        if (elapsed >= timeout) {
+                            if (!silent) this.reportActionabilityCheckFailures(action.target, failedChecks, options)
+
+                            resolve({ success : false, actionElement : el, failedChecks })
+
+                            return
+                        }
+
+                        //-----------------
+                        const res       = this.normalizeElementDetailed(target)
+
+                        if (!silent && res.multiple) {
+                            if (this.onAmbiguousQuery === 'throw')
+                                throw new Error(`Query resolved to multiple elements: ${ target }`)
+                            else if (this.onAmbiguousQuery === 'warn' && !warned) {
+                                // warn about ambiguous target only once
+                                warned      = true
+                                this.warn(`Query resolved to multiple elements: ${ target }`)
+                            }
+                        }
+
+                        //-----------------
+                        const checks : ActionableCheck[]  = []
+
+                        el              = res.el
+
+                        if (!el) {
+                            checks.push('present')
+                            continueWaiting(checks)
+                            return
+                        }
+
+                        if (!isElementConnected(el)) {
+                            checks.push('connected')
+                            continueWaiting(checks)
+                            return
+                        }
+
+                        (el as HTMLElement).focus({ preventScroll : true })
+
+                        resolve({ success : true, actionElement : el, failedChecks })
+                    }
+
+                    const continueWaiting = (checks : ActionableCheck[]) => {
+                        failedChecks        = checks
+
+                        win.requestAnimationFrame(step)
+                    }
+
+                    step()
+                })
+            }
+        }
+
+
+
+        async waitForMouseTargetActionable (action : MouseActionOptions, options? : WaitForMouseTargetActionableOptions) : Promise<WaitForMouseTargetActionableResult> {
+            return await this.keepAlive(this.doWaitForMouseTargetActionable(action, options))
+        }
+
+
+        async doWaitForMouseTargetActionable (action : MouseActionOptions, options? : WaitForMouseTargetActionableOptions) : Promise<WaitForMouseTargetActionableResult> {
             const timeout               = options?.timeout ?? action.timeout ?? this.defaultTimeout
             const syncCursor            = options?.syncCursor ?? true
             const silent                = options?.silent ?? false
             const stabilityFrames       = options?.stabilityFrames ?? 2
 
-            if (!silent && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForTargetActionable`')
+            if (!silent && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForMouseTargetActionable`')
 
             if (isArray(action.target)) {
                 // if we are given a coordinate system point, check that it is
@@ -270,7 +448,7 @@ export class UserAgentOnPage extends Mixin(
                 const isVisible         = getViewportRect(this.window).containsPoint(point)
 
                 if (!isVisible) {
-                    if (!silent) this.reportActionabilityCheckFailures(action, [ 'visible' ], options)
+                    if (!silent) this.reportActionabilityCheckFailures(action.target, [ 'visible' ], options)
 
                     return { success : false, failedChecks : [ 'visible' ], actionPoint : point }
                 }
@@ -278,8 +456,8 @@ export class UserAgentOnPage extends Mixin(
                 await this.simulator.simulateMouseMove(point, { mouseMovePrecision : action.mouseMovePrecision })
 
                 return { success : true, failedChecks : [], actionPoint : point }
-
-            } else {
+            }
+            else {
                 const target            = action.target
 
                 let el : Element        = undefined
@@ -312,7 +490,7 @@ export class UserAgentOnPage extends Mixin(
                         const elapsed   = Date.now() - start
 
                         if (elapsed >= timeout) {
-                            if (!silent) this.reportActionabilityCheckFailures(action, failedChecks, options)
+                            if (!silent) this.reportActionabilityCheckFailures(action.target, failedChecks, options)
 
                             resolve({ success : false, failedChecks, actionElement : el, actionPoint : undefined })
 
@@ -437,7 +615,7 @@ export class UserAgentOnPage extends Mixin(
                             }
                         }
 
-                        // local action point - if offset is not specified its a center of the element's visible area
+                        // local action point - if offset is not specified it is set to a center of the element's visible area
                         const point         = getViewportActionPoint(el, offset)
 
                         if (!point) {
@@ -499,7 +677,7 @@ export class UserAgentOnPage extends Mixin(
         async click (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
-            const waitRes       = await this.waitForTargetActionable(action, {
+            const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
                 actionName      : 'click',
                 timeout         : action.timeout
@@ -512,7 +690,7 @@ export class UserAgentOnPage extends Mixin(
         async rightClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
-            const waitRes       = await this.waitForTargetActionable(action, {
+            const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
                 actionName      : 'right click',
                 timeout         : action.timeout
@@ -525,7 +703,7 @@ export class UserAgentOnPage extends Mixin(
         async doubleClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
-            const waitRes       = await this.waitForTargetActionable(action, {
+            const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
                 actionName      : 'double click',
                 timeout         : action.timeout
@@ -538,7 +716,7 @@ export class UserAgentOnPage extends Mixin(
         async mouseDown (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
-            const waitRes       = await this.waitForTargetActionable(action, {
+            const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
                 actionName      : 'mouse down',
                 timeout         : action.timeout
@@ -551,7 +729,7 @@ export class UserAgentOnPage extends Mixin(
         async mouseUp (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
 
-            const waitRes       = await this.waitForTargetActionable(action, {
+            const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
                 actionName      : 'mouse up',
                 timeout         : action.timeout
@@ -564,7 +742,7 @@ export class UserAgentOnPage extends Mixin(
         async moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
             const action        = this.normalizeMouseActionOptions(target, offset)
 
-            const waitRes       = await this.waitForTargetActionable(action, {
+            const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
                 actionName      : 'mouse move',
                 timeout         : action.timeout
@@ -574,6 +752,69 @@ export class UserAgentOnPage extends Mixin(
 
         async moveMouseBy (delta : Point) {
             await this.moveMouseTo(sumPoints(this.simulator.currentPosition, delta))
+        }
+
+
+        get activeElement () : Element {
+            return this.window.document.activeElement
+        }
+
+
+        async type (target : ActionTarget, text : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
+            const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, text, options)
+
+            const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
+                sourcePoint     : this.getSourcePoint(),
+                actionName      : 'type',
+                timeout         : keyboardAction.timeout
+            })
+
+            if (waitRes.success)
+                await this.keepAlive(
+                    this.simulator.simulateType(text, { delay : options?.delay, modifierKeys : extractModifierKeys(keyboardAction) })
+                )
+        }
+
+
+        async keyPress (target : ActionTarget, key : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
+            const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key, options)
+
+            const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
+                sourcePoint     : this.getSourcePoint(),
+                actionName      : 'keyPress',
+                timeout         : keyboardAction.timeout
+            })
+
+            if (waitRes.success)
+                await this.keepAlive(
+                    this.simulator.simulateKeyPress(key, { delay : options?.delay, modifierKeys : extractModifierKeys(keyboardAction) })
+                )
+        }
+
+
+        async keyDown (target : ActionTarget, key : string) : Promise<any> {
+            const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key)
+
+            const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
+                sourcePoint     : this.getSourcePoint(),
+                actionName      : 'keyDown'
+            })
+
+            if (waitRes.success)
+                await this.keepAlive(this.simulator.simulateKeyDown(key))
+        }
+
+
+        async keyUp (target : ActionTarget, key : string) : Promise<any> {
+            const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key)
+
+            const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
+                sourcePoint     : this.getSourcePoint(),
+                actionName      : 'keyUp'
+            })
+
+            if (waitRes.success)
+                await this.keepAlive(this.simulator.simulateKeyUp(key))
         }
     }
 ) {}
@@ -626,6 +867,22 @@ export class UserAgentExternal extends Mixin(
 
         async moveMouseBy (delta : Point) {
             await this.moveMouseTo(sumPoints(this.simulator.currentPosition, delta))
+        }
+
+
+        async type (target : ActionTarget, text : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
+        }
+
+
+        async keyPress (target : ActionTarget, key : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
+        }
+
+
+        async keyDown (target : ActionTarget, key : string) : Promise<any> {
+        }
+
+
+        async keyUp (target : ActionTarget, key : string) : Promise<any> {
         }
     }
 ) {}

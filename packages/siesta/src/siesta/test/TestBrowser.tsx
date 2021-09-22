@@ -4,7 +4,7 @@ import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.j
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
-import { PointerMovePrecision, Simulator } from "../simulate/Simulator.js"
+import { PointerMovePrecision } from "../simulate/SimulatorMouse.js"
 import { ActionTarget } from "../simulate/Types.js"
 import { UserAgentOnPage } from "../simulate/UserAgent.js"
 import { MouseCursorVisualizer } from "../ui/MouseCursorVisualizer.js"
@@ -80,7 +80,7 @@ export class TestBrowser extends Mixin(
             await this.mouseCursorVisualizer.start()
 
             if (this.dashboardLaunchInfo) {
-                // @ts-expect-error
+                // //@ts-expect-error
                 this.simulator.offset   = this.dashboardLaunchInfo.offset
 
                 await this.simulator.simulateMouseMove([ 0, 0 ], { mouseMovePrecision : { kind : 'last_only', precision : 1 } })

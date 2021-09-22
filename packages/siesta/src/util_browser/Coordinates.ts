@@ -1,4 +1,4 @@
-import { PointerMovePrecision } from "../siesta/simulate/Simulator.js"
+import { PointerMovePrecision } from "../siesta/simulate/SimulatorMouse.js"
 import { ActionTargetOffset, Point, sumPoints, sumPoints3 } from "../siesta/simulate/Types.js"
 import { lastElement } from "../util/Helpers.js"
 import { Rect } from "../util/Rect.js"
