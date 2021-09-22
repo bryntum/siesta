@@ -344,86 +344,85 @@ export class UserAgentOnPage extends Mixin(
 
             if (!silent && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForKeyboardTargetActionable`')
 
-            if (isArray(action.target)) {
+            if (isArray(action.target) && action.target.length > 0) {
                 throw new Error("Coordinates as target are not supported for keyboard actions")
             }
-            else {
-                const win               = this.window
-                const target            = action.target
 
-                let el : Element        = undefined
+            const win               = this.window
+            const target            = isArray(action.target) ? this.activeElement : action.target
 
-                let warned : boolean    = false
+            let el : Element        = undefined
 
-                let failedChecks : ActionableCheck[]    = []
+            let warned : boolean    = false
 
-                const start             = Date.now()
+            let failedChecks : ActionableCheck[]    = []
 
-                return new Promise((resolve, reject) => {
+            const start             = Date.now()
 
-                    const step = async () => {
-                        try {
-                            await doStep()
-                        } catch (e) {
-                            reject(e)
+            return new Promise((resolve, reject) => {
+
+                const step = async () => {
+                    try {
+                        await doStep()
+                    } catch (e) {
+                        reject(e)
+                    }
+                }
+
+                const doStep = async () => {
+                    const elapsed   = Date.now() - start
+
+                    if (elapsed >= timeout) {
+                        if (!silent) this.reportActionabilityCheckFailures(action.target, failedChecks, options)
+
+                        resolve({ success : false, actionElement : el, failedChecks })
+
+                        return
+                    }
+
+                    //-----------------
+                    const res       = this.normalizeElementDetailed(target)
+
+                    if (!silent && res.multiple) {
+                        if (this.onAmbiguousQuery === 'throw')
+                            throw new Error(`Query resolved to multiple elements: ${ target }`)
+                        else if (this.onAmbiguousQuery === 'warn' && !warned) {
+                            // warn about ambiguous target only once
+                            warned      = true
+                            this.warn(`Query resolved to multiple elements: ${ target }`)
                         }
                     }
 
-                    const doStep = async () => {
-                        const elapsed   = Date.now() - start
+                    //-----------------
+                    const checks : ActionableCheck[]  = []
 
-                        if (elapsed >= timeout) {
-                            if (!silent) this.reportActionabilityCheckFailures(action.target, failedChecks, options)
+                    el              = res.el
 
-                            resolve({ success : false, actionElement : el, failedChecks })
-
-                            return
-                        }
-
-                        //-----------------
-                        const res       = this.normalizeElementDetailed(target)
-
-                        if (!silent && res.multiple) {
-                            if (this.onAmbiguousQuery === 'throw')
-                                throw new Error(`Query resolved to multiple elements: ${ target }`)
-                            else if (this.onAmbiguousQuery === 'warn' && !warned) {
-                                // warn about ambiguous target only once
-                                warned      = true
-                                this.warn(`Query resolved to multiple elements: ${ target }`)
-                            }
-                        }
-
-                        //-----------------
-                        const checks : ActionableCheck[]  = []
-
-                        el              = res.el
-
-                        if (!el) {
-                            checks.push('present')
-                            continueWaiting(checks)
-                            return
-                        }
-
-                        if (!isElementConnected(el)) {
-                            checks.push('connected')
-                            continueWaiting(checks)
-                            return
-                        }
-
-                        (el as HTMLElement).focus({ preventScroll : true })
-
-                        resolve({ success : true, actionElement : el, failedChecks })
+                    if (!el) {
+                        checks.push('present')
+                        continueWaiting(checks)
+                        return
                     }
 
-                    const continueWaiting = (checks : ActionableCheck[]) => {
-                        failedChecks        = checks
-
-                        win.requestAnimationFrame(step)
+                    if (!isElementConnected(el)) {
+                        checks.push('connected')
+                        continueWaiting(checks)
+                        return
                     }
 
-                    step()
-                })
-            }
+                    (el as HTMLElement).focus({ preventScroll : true })
+
+                    resolve({ success : true, actionElement : el, failedChecks })
+                }
+
+                const continueWaiting = (checks : ActionableCheck[]) => {
+                    failedChecks        = checks
+
+                    win.requestAnimationFrame(step)
+                }
+
+                step()
+            })
         }
 
 

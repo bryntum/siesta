@@ -9,6 +9,7 @@ import { ActionTarget } from "../simulate/Types.js"
 import { UserAgentOnPage } from "../simulate/UserAgent.js"
 import { MouseCursorVisualizer } from "../ui/MouseCursorVisualizer.js"
 import { AssertionObservable } from "./assertion/AssertionObservable.js"
+import { TextSelectionHelpers } from "./browser/TextSelectionHelpers.js"
 import { TestLauncherBrowserChild } from "./port/TestLauncherBrowser.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
@@ -23,11 +24,13 @@ export class TestBrowser extends Mixin(
     [
         UserAgentOnPage,
         AssertionObservable,
+        TextSelectionHelpers,
         Test
     ],
     (base : ClassUnion<
         typeof UserAgentOnPage,
         typeof AssertionObservable,
+        typeof TextSelectionHelpers,
         typeof Test
     >) =>
 

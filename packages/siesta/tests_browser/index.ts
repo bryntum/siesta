@@ -31,6 +31,7 @@ project.plan(
                 filename    : 'keyboard',
 
                 items       : [
+                    'type.t.js',
                     'type_iframe.t.js',
                 ]
             },

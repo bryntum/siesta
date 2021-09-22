@@ -13,6 +13,7 @@ export type FiresOkOptions<O> = {
     events          : Record<string, string | number>,
     during?         : number | AnyFunction,
 
+    assertionName?  : string
     description?    : string
 
     // deprecated, do not document
@@ -227,6 +228,8 @@ export class AssertionObservable extends Mixin(
             let during              : number | AnyFunction
             let description         : string
 
+            let assertionName       = 'firesOk'
+
             if (args.length === 1) {
                 const options       = args[ 0 ]
 
@@ -235,6 +238,7 @@ export class AssertionObservable extends Mixin(
                     events          = options.events
                     during          = options.during
                     description     = options.description || options.desc
+                    assertionName   = options.assertionName || 'firesOk'
                 } else {
                     throw new Error("1 argument overload form for `firesOk` accept object")
                 }
@@ -266,8 +270,21 @@ export class AssertionObservable extends Mixin(
             }
 
             const observable        = this.resolveObservable(source)
-            const expectedEvents    = isString(events) ? { [ events ] : expected } : events
 
+            if (!observable) {
+                this.addResult(Assertion.new({
+                    name        : assertionName,
+                    passed      : false,
+                    sourcePoint,
+                    description,
+                    annotation  : <div>Observable <span>{ source }</span> resolved to `null` or `undefined`</div>
+                }))
+
+                return
+            }
+
+            //----------------------------
+            const expectedEvents    = isString(events) ? { [ events ] : expected } : events
 
             // start recording
             const counters          = {}
@@ -295,7 +312,7 @@ export class AssertionObservable extends Mixin(
 
                 if (failedEvents.length > 0)
                     this.addResult(Assertion.new({
-                        name        : 'firesOk',
+                        name        : assertionName,
                         passed      : false,
                         sourcePoint,
                         description,
@@ -311,7 +328,7 @@ export class AssertionObservable extends Mixin(
                     }))
                 else
                     this.addResult(Assertion.new({
-                        name        : 'firesOk',
+                        name        : assertionName,
                         passed      : true,
                         sourcePoint,
                         description
@@ -347,6 +364,7 @@ export class AssertionObservable extends Mixin(
          */
         willFireNTimes (observable : this[ 'ObservableSourceT'], event : string | string[], expected : string | number, description? : string) {
             this.firesOk({
+                assertionName   : 'willFireNTimes',
                 observable,
                 events          : this.getObjectWithExpectedEvents(event, expected),
                 description
@@ -368,6 +386,7 @@ export class AssertionObservable extends Mixin(
          */
         wontFire (observable : this[ 'ObservableSourceT' ], event : string | string[], description? : string) {
             this.firesOk({
+                assertionName   : 'wontFire',
                 observable      : observable,
                 events          : this.getObjectWithExpectedEvents(event, 0),
                 description
@@ -383,6 +402,7 @@ export class AssertionObservable extends Mixin(
          */
         firesOnce (observable : this[ 'ObservableSourceT' ], event : string | string[], description? : string) {
             this.firesOk({
+                assertionName   : 'firesOnce',
                 observable      : observable,
                 events          : this.getObjectWithExpectedEvents(event, 1),
                 description
@@ -397,7 +417,7 @@ export class AssertionObservable extends Mixin(
          * @param {String} [desc] The description of the assertion.
          */
         isntFired (observable : this[ 'ObservableSourceT' ], event : string | string[], description? : string) {
-            this.wontFire(observable, event, description)
+            return this.wontFire(observable, event, description)
         }
 
         /**
@@ -410,6 +430,7 @@ export class AssertionObservable extends Mixin(
          */
         firesAtLeastNTimes (observable : this[ 'ObservableSourceT' ], event : string | string[], n : number, description? : string) {
             this.firesOk({
+                assertionName   : 'firesAtLeastNTimes',
                 observable      : observable,
                 events          : this.getObjectWithExpectedEvents(event, '>=' + n),
                 description
