@@ -225,3 +225,18 @@ it('Should not change the field value if `keypress` event has prevented the defa
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should be possible to clear existing value when typing', async t => {
+    document.body.innerHTML =
+        '<input id="txt2" type="text" value="bar">' +
+        '<input id="txt3" type="text" value="bar">'
+
+    await t.type('#txt2', 'foo', { clearExisting : true })
+    await t.type('#txt3', '', { clearExisting : true })
+
+    const txt2      = t.$('#txt2') as HTMLInputElement
+    const txt3      = t.$('#txt3') as HTMLInputElement
+
+    t.expect(txt2.value).toBe('foo')
+    t.expect(txt3.value).toBe('')
+})

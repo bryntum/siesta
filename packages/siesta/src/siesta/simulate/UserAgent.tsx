@@ -412,6 +412,12 @@ export class UserAgentOnPage extends Mixin(
 
                     (el as HTMLElement).focus({ preventScroll : true })
 
+                    if (action.clearExisting) {
+                        if ('value' in el) {
+                            (el as HTMLInputElement).value  = ''
+                        }
+                    }
+
                     resolve({ success : true, actionElement : el, failedChecks })
                 }
 
