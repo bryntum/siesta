@@ -66,6 +66,26 @@ it('Changing the target should cancel the `click` event', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('mousedown + mouseup should NOT fire click event if mouseup is not on the same el as the mousedown', async t => {
+    const div   = document.body.appendChild(createElement('div', {
+        style   : 'width : 40px; background:green;',
+        text    : 'testing click'
+    }))
+
+    div.addEventListener('mousedown', () => div.style.display = 'none')
+
+    t.firesOk({
+        observable  : div,
+        events      : { 'mousedown' : 1, 'mouseup' : 0, 'click' : 0 }
+    })
+    t.willFireNTimes(document.body, [ 'mouseup', 'click' ], 1)
+
+    await t.mouseDown(div)
+    await t.mouseUp()
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Changing the target to the child el should not cancel the `click` event', async t => {
     document.body.innerHTML =
         '<div class="box" id="box1" style="left: 0px;top:0px; height: 100px; width:100px">' +

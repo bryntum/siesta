@@ -69,33 +69,11 @@ it('mousedown + mouseup on the same element should fire same event as regular cl
         text    : 'testing click'
     }))
 
-    t.willFireNTimes(div, 'mousedown', 1)
-    t.willFireNTimes(div, 'mouseup', 1)
-    t.willFireNTimes(div, 'click', 1)
+    t.firesOnce(div, [ 'mousedown', 'mouseup', 'click' ])
 
     await t.mouseDown(div)
     await t.moveMouseBy([ 2, 2 ])
     await t.mouseUp(div)
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('mousedown + mouseup should NOT fire click event if mouseup is not on the same el as the mousedown', async t => {
-    const div   = document.body.appendChild(createElement('div', {
-        style   : 'width : 40px; background:green;',
-        text    : 'testing click'
-    }))
-
-    div.addEventListener('mousedown', () => div.style.display = 'none')
-
-    t.firesOk({
-        observable  : div,
-        events      : { 'mousedown' : 1, 'mouseup' : 0, 'click' : 0 }
-    })
-    t.willFireNTimes(document.body, [ 'mouseup', 'click' ], 1)
-
-    await t.mouseDown(div)
-    await t.mouseUp()
 })
 
 

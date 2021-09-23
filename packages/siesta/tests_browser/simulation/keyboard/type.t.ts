@@ -159,10 +159,10 @@ it('Should handle a focus change on "keydown" event', async t => {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should fire keydown, keypress, keyup for all keys', async t => {
-    document.body.innerHTML = '<input id="inp1" type="text"/>'
+    document.body.innerHTML = '<input id="inp1" style="width: 800px" type="text"/>'
 
     const box       = t.$('#inp1')
-    const keys      = " ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toLowerCase()
+    const keys      = "~!@#$%^&*()_+`-={}[]:\";',./<>? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
     t.willFireNTimes(box, [ 'keydown', 'keyup', 'keypress' ], keys.length)
 
