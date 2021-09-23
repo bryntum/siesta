@@ -32,6 +32,11 @@ it('Should fire all type of key/input events', async t => {
     t.firesOnce(field, 'keypress')
     t.firesOnce(field, 'keyup')
     t.firesOnce(field, 'input')
+    t.firesOnce(field, 'beforeinput')
+    // there's also `textInput` event which has been removed from the spec more than 10 years ago, ignoring it
+
+    // DOM "value" property should not be set yet, at the point when 'beforeinput' is fired
+    field.addEventListener('beforeinput', () => t.expect(field.value).toBe(''))
 
     // DOM "value" property should be set at the point when 'input' is fired
     field.addEventListener('input', () => t.expect(field.value).toBe('a'))
@@ -161,12 +166,34 @@ it('Should handle a focus change on "keydown" event', async t => {
 it('Should fire keydown, keypress, keyup for all keys', async t => {
     document.body.innerHTML = '<input id="inp1" style="width: 800px" type="text"/>'
 
-    const box       = t.$('#inp1')
+    const inp1      = t.$('#inp1') as HTMLInputElement
     const keys      = "~!@#$%^&*()_+`-={}[]:\";',./<>? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
-    t.willFireNTimes(box, [ 'keydown', 'keyup', 'keypress' ], keys.length)
+    const keysSet   = new Set(keys.split(''))
 
-    await t.type(box, keys)
+    inp1.addEventListener('keypress', event => keysSet.delete(event.key))
+
+    t.willFireNTimes(inp1, [ 'keydown', 'keyup', 'keypress' ], keys.length)
+
+    await t.type(inp1, keys)
+
+    t.expect(inp1.value).toBe(keys)
+
+    t.equal(keysSet, new Set(), 'Should be no unpressed keys')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should not fire keypress for certain special characters, like BACKSPACE', async t => {
+    document.body.innerHTML = '<input id="inp1" style="width: 800px" type="text"/>'
+
+    const inp1      = t.$('#inp1') as HTMLInputElement
+
+    t.firesOk(inp1, { 'keydown' : 4, 'keyup' : 4, 'keypress' : 3 })
+
+    await t.type(inp1, 'abc[BACKSPACE]')
+
+    t.expect(inp1.value).toBe("ab")
 })
 
 
