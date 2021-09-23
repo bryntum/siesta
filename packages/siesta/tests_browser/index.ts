@@ -33,6 +33,7 @@ project.plan(
                 items       : [
                     'caret_position.t.js',
                     'readonly.t.js',
+                    'text_selection.t.js',
                     'type.t.js',
                     'type_iframe.t.js',
                 ]

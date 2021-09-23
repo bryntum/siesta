@@ -1,4 +1,5 @@
 import { beforeEach, it } from "../../../browser.js"
+import { extractKeysAndSpecialKeys } from "../../../src/siesta/simulate/SimulatorKeyboard.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
@@ -37,6 +38,10 @@ it('Should fire all type of key/input events', async t => {
 
     // DOM "value" property should not be set yet, at the point when 'beforeinput' is fired
     field.addEventListener('beforeinput', () => t.expect(field.value).toBe(''))
+
+    field.addEventListener('keydown', () => t.expect(field.value).toBe(''))
+    field.addEventListener('keypress', () => t.expect(field.value).toBe(''))
+    field.addEventListener('keyup', () => t.expect(field.value).toBe('a'))
 
     // DOM "value" property should be set at the point when 'input' is fired
     field.addEventListener('input', () => t.expect(field.value).toBe('a'))
@@ -184,14 +189,17 @@ it('Should fire keydown, keypress, keyup for all keys', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should not fire keypress for certain special characters, like BACKSPACE', async t => {
+it('Should not fire keypress for certain special characters, like BACKSPACE, ESCAPE, etc', async t => {
     document.body.innerHTML = '<input id="inp1" type="text"/>'
 
     const inp1      = t.$('#inp1') as HTMLInputElement
 
-    t.firesOk(inp1, { 'keydown' : 4, 'keyup' : 4, 'keypress' : 3 })
+    const text      = 'abc[BACKSPACE][ESCAPE][SHIFT][CTRL][ALT][META]'
+    const split     = extractKeysAndSpecialKeys(text)
 
-    await t.type(inp1, 'abc[BACKSPACE]')
+    t.firesOk(inp1, { 'keydown' : split.length, 'keyup' : split.length, 'keypress' : 3 })
+
+    await t.type(inp1, text)
 
     t.expect(inp1.value).toBe("ab")
 })
@@ -209,3 +217,78 @@ it('Should handle UP, DOWN on a NumberField', async t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should provide "key" property for special key', async t => {
+    document.body.innerHTML = '<input type="text" id="foo"/>'
+
+    const input             = t.$('#foo') as HTMLInputElement
+
+    const assertKeyValue    = (e : KeyboardEvent) => t.expect(e.key).toBe('Escape')
+
+    input.addEventListener('keydown', assertKeyValue)
+    input.addEventListener('keyup', assertKeyValue)
+
+    t.firesOnce(input, [ 'keydown', 'keyup' ])
+
+    await t.type('#foo', '[ESCAPE]')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should provide "key" property for regular key', async t => {
+    document.body.innerHTML = '<input type="text" id="foo"/>'
+
+    const input             = t.$('#foo') as HTMLInputElement
+
+    const assertKeyValue    = (e : KeyboardEvent) => t.expect(e.key).toBe('a')
+
+    input.addEventListener('keydown', assertKeyValue)
+    input.addEventListener('keyup', assertKeyValue)
+    input.addEventListener('keypress', assertKeyValue)
+
+    t.firesOnce(input, [ 'keydown', 'keyup', 'keypress' ])
+
+    await t.type('#foo', 'a')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should honor the `maxlength` attribute and still trigger the events for rejected characters', async t => {
+    document.body.innerHTML = '<input type="text" maxlength="8" id="foo"/>'
+
+    const input             = t.$('#foo') as HTMLInputElement
+
+    t.willFireNTimes(input, [ 'keydown', 'keyup', 'keypress' ], 10)
+
+    await t.type('#foo', '1234567890')
+
+    t.is(input.value, '12345678', "`maxlength` attribute was honored")
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should not change the field value if `keydown` event has prevented the default action', async t => {
+    document.body.innerHTML = '<input type="text" id="foo"/>'
+
+    const input             = t.$('#foo') as HTMLInputElement
+
+    input.addEventListener('keydown', e => e.preventDefault())
+
+    await t.type('#foo', '123')
+
+    t.is(input.value, '', "Field value did not change")
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should not change the field value if `keypress` event has prevented the default action', async t => {
+    document.body.innerHTML = '<input type="text" id="foo"/>'
+
+    const input             = t.$('#foo') as HTMLInputElement
+
+    input.addEventListener('keypress', e => e.preventDefault())
+
+    await t.type('#foo', '123')
+
+    t.is(input.value, '', "Field value did not change")
+})

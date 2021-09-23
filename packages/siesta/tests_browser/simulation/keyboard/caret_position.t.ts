@@ -59,22 +59,3 @@ it('Should move caret position on HOME/END keys', async t => {
 
     t.expect(input.value).toBe('nerdy')
 })
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should select all on SHIFT/CMD + LEFT/RIGHT keys', async t => {
-    document.body.innerHTML = '<input type="text" id="foo" value="rde"/>'
-
-    const isMac = t.env.isMac
-
-    await t.click('#foo')
-
-    await t.type('#foo', '[LEFT]', { shiftKey : true, [ isMac ? 'metaKey' : 'ctrlKey' ] : true } )
-
-    t.expect(t.getSelectedText('#foo')).toBe('rde')
-    t.setCaretPosition('#foo', 1)
-
-    await t.type('#foo', '[RIGHT]', { shiftKey : true, [ isMac ? 'metaKey' : 'ctrlKey' ] : true } )
-
-    t.expect(t.getSelectedText('#foo')).toBe('de')
-})
