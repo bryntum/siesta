@@ -125,7 +125,7 @@ it('Should not fire keypress for certain special characters, like BACKSPACE, ESC
 
     const inp1      = t.$('#inp1') as HTMLInputElement
 
-    const text      = 'abc[BACKSPACE][DELETE][ESCAPE][SHIFT][CTRL][ALT][META][ARROWLEFT][ARROWRIGHT][ARROWUP][ARROWDOWN][HOME][END]'
+    const text      = 'abc[BACKSPACE][DELETE][ESCAPE][SHIFT][CTRL][ALT][META][ARROWLEFT][ARROWRIGHT][ARROWUP][ARROWDOWN][HOME][END][F4]'
     const split     = extractKeysAndSpecialKeys(text)
 
     t.firesOk(inp1, { 'keydown' : split.length, 'keyup' : split.length, 'keypress' : 3 })
@@ -240,3 +240,27 @@ it('Should be possible to clear existing value when typing', async t => {
     t.expect(txt2.value).toBe('foo')
     t.expect(txt3.value).toBe('')
 })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should be possible to type regular text in square brackets', async t => {
+    document.body.innerHTML = '<input type="text" id="inp"/>'
+
+    const input      = t.$('#inp') as HTMLInputElement
+
+    await t.type(input, '[test]')
+    t.expect(input.value).toBe('[test]')
+
+    await t.type(input, '[[something]]', { clearExisting : true })
+    t.expect(input.value).toBe('[[something]]')
+
+    await t.type(input, '[[F3]]', { clearExisting : true })
+    t.expect(input.value).toBe('[F3]')
+
+    await t.type(input, '[[[F3]]]', { clearExisting : true })
+    t.expect(input.value).toBe('[[F3]]')
+
+    await t.type(input, '[[[BACKSPACE]]', { clearExisting : true })
+    t.expect(input.value).toBe('[[BACKSPACE]')
+})
+
