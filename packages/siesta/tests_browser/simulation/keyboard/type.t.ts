@@ -1,5 +1,5 @@
 import { beforeEach, it } from "../../../browser.js"
-import { extractKeysAndSpecialKeys } from "../../../src/siesta/simulate/SimulatorKeyboard.js"
+import { extractKeysAndSpecialKeys, keyCodes } from "../../../src/siesta/simulate/SimulatorKeyboard.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
@@ -149,12 +149,16 @@ it('Should handle UP, DOWN on a NumberField', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should provide "key" property for special key', async t => {
+it('Should provide `KeyboardEvent` properties for special key', async t => {
     document.body.innerHTML = '<input type="text" id="foo"/>'
 
     const input             = t.$('#foo') as HTMLInputElement
 
-    const assertKeyValue    = (e : KeyboardEvent) => t.expect(e.key).toBe('Escape')
+    const assertKeyValue    = (e : KeyboardEvent) => {
+        t.is(e.key, 'Escape', `${ e.type }: 'key' property is correct `)
+        t.is(e.code, 'Escape', `${ e.type }: 'code' property is correct `)
+        t.is(e.keyCode, keyCodes.ESCAPE, `${ e.type }: 'keyCode' property is correct `)
+    }
 
     input.addEventListener('keydown', assertKeyValue)
     input.addEventListener('keyup', assertKeyValue)
@@ -166,12 +170,20 @@ it('Should provide "key" property for special key', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should provide "key" property for regular key', async t => {
+it('Should provide `KeyboardEvent` properties for regular key', async t => {
     document.body.innerHTML = '<input type="text" id="foo"/>'
 
     const input             = t.$('#foo') as HTMLInputElement
 
-    const assertKeyValue    = (e : KeyboardEvent) => t.expect(e.key).toBe('a')
+    const assertKeyValue    = (e : KeyboardEvent) => {
+        t.is(e.key, 'a', `${ e.type }: 'key' property is correct `)
+        t.is(e.code, 'KeyA', `${ e.type }: 'code' property is correct `)
+
+        if (e.type === 'keypress')
+            t.is(e.keyCode, 'a'.charCodeAt(0), `${ e.type }: 'keyCode' property is correct `)
+        else
+            t.is(e.keyCode, keyCodes.A, `${ e.type }: 'keyCode' property is correct `)
+    }
 
     input.addEventListener('keydown', assertKeyValue)
     input.addEventListener('keyup', assertKeyValue)
