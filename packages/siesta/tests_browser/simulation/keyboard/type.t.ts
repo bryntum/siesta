@@ -264,3 +264,16 @@ it('Should be possible to type regular text in square brackets', async t => {
     t.expect(input.value).toBe('[[BACKSPACE]')
 })
 
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should wait for target before typing', async t => {
+    setTimeout(() => {
+        document.body.innerHTML = '<input id="field1" type="text"/>'
+    }, 100)
+
+    await t.type('#field1', 'value')
+
+    const field1      = t.$('#field1') as HTMLInputElement
+
+    t.is(field1.value, "value")
+})

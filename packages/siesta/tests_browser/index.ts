@@ -34,6 +34,7 @@ project.plan(
                     'backspace_delete.t.js',
                     'caret_position.t.js',
                     'change_event.t.js',
+                    'enter_in_form.t.js',
                     'modifier_keys.t.js',
                     'readonly.t.js',
                     'text_selection.t.js',
