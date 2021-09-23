@@ -1,4 +1,5 @@
-import { beforeEach, it } from "../../../browser.js"
+import { beforeEach, describe, it } from "../../../browser.js"
+import { createPositionedIframe } from "../../@helpers.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
@@ -68,4 +69,93 @@ it('Should fire change event after field changed and field is blurred programmat
     await t.type(field, 'foo')
 
     field.blur()
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should fire change after tabbing out of field after value changed using BACKSPACE', async t => {
+    document.body.innerHTML = '<input value="foo"/>'
+
+    const input     = t.$('input') as HTMLInputElement
+
+    t.firesOnce('input', 'change')
+
+    await t.click('input')
+
+    await t.type('input', '[BACKSPACE][TAB]')
+
+    t.is(input.value, 'fo')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should fire change after tabbing out of field after value changed using DELETE', async t => {
+    document.body.innerHTML = '<input value="foo"/>'
+
+    const input     = t.$('input') as HTMLInputElement
+
+    t.firesOnce('input', 'change')
+
+    t.setCaretPosition(input, 0)
+
+    await t.type('input', '[DELETE][TAB]')
+
+    t.is(input.value, 'oo')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+describe('Should fire `change` event on focus move, for nested iframe', async t => {
+    let DOC : Document
+
+    t.beforeEach(async t => {
+        const iframe  = await createPositionedIframe('about:blank', { left : 0, top : 0, width : 300, height : 200 })
+
+        DOC           = iframe.contentWindow.document
+    })
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    t.it('Should fire `change` event on regular blur', async t => {
+        DOC.body.innerHTML  = '<input id="input" value=""/>'
+
+        const input         = DOC.getElementById('input') as HTMLInputElement
+
+        t.firesOnce(input, 'change')
+
+        await t.type(input, 'some[TAB]')
+
+        t.is(input.value, 'some')
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    t.it('Should fire `change` event after tabbing out of field after value changed using BACKSPACE', async t => {
+        DOC.body.innerHTML  = '<input id="input" value="foo"/>'
+
+        const input         = DOC.getElementById('input') as HTMLInputElement
+
+        t.firesOnce(input, 'change')
+
+        await t.click(input)
+
+        await t.type(input, '[BACKSPACE][TAB]')
+
+        t.is(input.value, 'fo')
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    t.it('Should fire `change` event after tabbing out of field after value changed using DELETE', async t => {
+        DOC.body.innerHTML  = '<input id="input" value="foo"/>'
+
+        const input         = DOC.getElementById('input') as HTMLInputElement
+
+        t.firesOnce(input, 'change')
+
+        t.setCaretPosition(input, 0)
+
+        await t.type(input, '[DELETE][TAB]')
+
+        t.is(input.value, 'oo')
+    })
 })
