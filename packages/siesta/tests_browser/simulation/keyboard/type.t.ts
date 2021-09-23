@@ -185,7 +185,7 @@ it('Should fire keydown, keypress, keyup for all keys', async t => {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should not fire keypress for certain special characters, like BACKSPACE', async t => {
-    document.body.innerHTML = '<input id="inp1" style="width: 800px" type="text"/>'
+    document.body.innerHTML = '<input id="inp1" type="text"/>'
 
     const inp1      = t.$('#inp1') as HTMLInputElement
 
@@ -206,4 +206,32 @@ it('Should handle UP, DOWN on a NumberField', async t => {
     await t.type('#inp1', "[UP][UP][DOWN][UP]")
 
     t.expect(field1.value).toBe("12")
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should handle `readonly` state', async t => {
+    document.body.innerHTML = '<input id="inp1" type="text" readonly/>'
+
+    const inp1      = t.$('#inp1') as HTMLInputElement
+
+    t.firesOnce(inp1, [ 'keydown', 'keypress', 'keyup' ])
+
+    await t.type('#inp1', "a")
+
+    t.is(inp1.value, '')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should handle `disabled` state', async t => {
+    document.body.innerHTML = '<input id="inp1" type="text" disabled/>'
+
+    const inp1      = t.$('#inp1') as HTMLInputElement
+
+    t.wontFire(inp1, [ 'keydown', 'keypress', 'keyup' ])
+
+    await t.type('#inp1', "a")
+
+    t.is(inp1.value, '')
 })
