@@ -31,6 +31,7 @@ project.plan(
                 filename    : 'keyboard',
 
                 items       : [
+                    'backspace_delete.t.js',
                     'caret_position.t.js',
                     'change_event.t.js',
                     'modifier_keys.t.js',

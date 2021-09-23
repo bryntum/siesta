@@ -95,12 +95,21 @@ export class SimulatorPlaywrightServer extends Mixin(
 
 
         //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        getSingleKeyToPress (key : SiestaTypeString) : string {
+            const tokens        = extractKeysAndSpecialKeys(key)
+
+            if (tokens.length > 1 || tokens.length === 0) throw new Error("Should provide a single key")
+
+            return siestaKeyToSimulatorKey(tokens[ 0 ])
+        }
+
+
         @local()
         async simulateKeyPress (key : SiestaTypeString, options? : TypeOptions) : Promise<any> {
             const keyboard      = this.page.keyboard
 
             await this.doWithModifierKeys(async () => {
-                await keyboard.press(siestaKeyToSimulatorKey(key), { delay : options?.delay })
+                await keyboard.press(this.getSingleKeyToPress(key), { delay : options?.delay })
             }, options?.modifierKeys)
         }
 
@@ -109,7 +118,7 @@ export class SimulatorPlaywrightServer extends Mixin(
         async simulateKeyDown (key : SiestaTypeString) : Promise<any> {
             const keyboard      = this.page.keyboard
 
-            await keyboard.down(siestaKeyToSimulatorKey(key))
+            await keyboard.down(this.getSingleKeyToPress(key))
         }
 
 
@@ -117,17 +126,18 @@ export class SimulatorPlaywrightServer extends Mixin(
         async simulateKeyUp (key : SiestaTypeString) : Promise<any> {
             const keyboard      = this.page.keyboard
 
-            await keyboard.up(siestaKeyToSimulatorKey(key))
+            await keyboard.up(this.getSingleKeyToPress(key))
         }
 
 
         @local()
         async simulateType (text : SiestaTypeString, options? : TypeOptions) : Promise<any> {
-            const tokens    = extractKeysAndSpecialKeys(text)
+            const keyboard      = this.page.keyboard
+            const tokens        = extractKeysAndSpecialKeys(text)
 
             await this.doWithModifierKeys(async () => {
                 for (const token of tokens)
-                    await this.simulateKeyPress(token, { delay : options?.delay })
+                    await keyboard.press(siestaKeyToSimulatorKey(token), { delay : options?.delay })
             }, options?.modifierKeys)
         }
     }

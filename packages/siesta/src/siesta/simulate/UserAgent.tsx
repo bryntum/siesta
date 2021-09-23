@@ -802,7 +802,8 @@ export class UserAgentOnPage extends Mixin(
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
                 sourcePoint     : this.getSourcePoint(),
-                actionName      : 'keyDown'
+                actionName      : 'keyDown',
+                timeout         : keyboardAction.timeout
             })
 
             if (waitRes.success)
@@ -815,7 +816,8 @@ export class UserAgentOnPage extends Mixin(
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
                 sourcePoint     : this.getSourcePoint(),
-                actionName      : 'keyUp'
+                actionName      : 'keyUp',
+                timeout         : keyboardAction.timeout
             })
 
             if (waitRes.success)
