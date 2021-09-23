@@ -195,6 +195,7 @@ const siestaToPuppeteerKeys : Record<SiestaTypeString, string> = {
     'CTRL'          : 'Control',
     'ALT'           : 'Alt',
     'CMD'           : 'Meta', // Mac
+    'META'          : 'Meta', // Mac
 
     // //weird
     'PAUSE-BREAK'   : 'Pause',

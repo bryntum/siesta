@@ -109,6 +109,7 @@ export const keyCodes : Record<string, number> = {
     'CTRL'          : 17,
     'ALT'           : 18,
     'CMD'           : 91, // Mac
+    'META'          : 91, // Mac
 
     //weird
     'PAUSE-BREAK'   : 19,
