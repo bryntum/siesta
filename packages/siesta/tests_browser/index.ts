@@ -31,6 +31,7 @@ project.plan(
                 filename    : 'keyboard',
 
                 items       : [
+                    'caret_position.t.js',
                     'type.t.js',
                     'type_iframe.t.js',
                 ]

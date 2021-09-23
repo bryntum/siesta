@@ -108,49 +108,6 @@ it('Should fire change event after field changed and field is blurred programmat
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should move caret when using arrow keys', async t => {
-    document.body.innerHTML = '<input id="inp" type="text"/>'
-
-    const field = document.getElementById('inp') as HTMLInputElement
-
-    await t.type(field, 'faa[LEFT][LEFT]')
-
-    t.is(t.getCaretPosition(field), 1, 'LEFT key stepped left')
-
-    await t.type([], '[RIGHT][RIGHT]')
-
-    t.is(t.getCaretPosition(field), 3, 'RIGHT key stepped right')
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should move caret to edge of text selection when using arrow keys, if text is selected', async t => {
-    document.body.innerHTML = '<input id="inp" type="text" value="aXXa"/>'
-
-    const field = document.getElementById('inp') as HTMLInputElement
-
-    //------------------
-    t.selectText('#inp', 1, 4)
-
-    t.is(t.getSelectedText(field), 'aXXa', 'Text selected correctly')
-
-    await t.type('#inp', '[LEFT]')
-
-    t.false(t.getSelectedText(field), 'Text no longer selected')
-    t.is(t.getCaretPosition(field), 0, 'LEFT key stepped to beginning of selection')
-
-    //------------------
-    t.selectText('#inp', 1, 4)
-
-    await t.type('#inp', '[RIGHT]')
-
-    t.false(t.getSelectedText(field), 'Text no longer selected')
-
-    t.is(t.getCaretPosition(field), 4, 'RIGHT key stepped to end of selection')
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should fire click when hitting ENTER on a link', async t => {
     document.body.innerHTML = '<a href="#" tabindex="1">testing link</a>'
 
