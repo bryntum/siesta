@@ -205,6 +205,8 @@ it('Should not change the field value if `keydown` event has prevented the defau
 
     input.addEventListener('keydown', e => e.preventDefault())
 
+    t.firesOk(input, { 'keydown' : 3, 'keyup' : 3, 'keypress' : 0 }, 'Should not fire `keypress` is keydown is prevented')
+
     await t.type('#foo', '123')
 
     t.is(input.value, '', "Field value did not change")
@@ -218,6 +220,8 @@ it('Should not change the field value if `keypress` event has prevented the defa
     const input             = t.$('#foo') as HTMLInputElement
 
     input.addEventListener('keypress', e => e.preventDefault())
+
+    t.firesOk(input, { 'keydown' : 3, 'keyup' : 3, 'keypress' : 3 }, 'Should fire `keyup` is `keypress` is prevented')
 
     await t.type('#foo', '123')
 

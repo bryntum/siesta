@@ -37,6 +37,7 @@ project.plan(
                     'enter_in_form.t.js',
                     'modifier_keys.t.js',
                     'readonly.t.js',
+                    'tabbing.t.js',
                     'text_selection.t.js',
                     'type.t.js',
                     'type_iframe.t.js',
