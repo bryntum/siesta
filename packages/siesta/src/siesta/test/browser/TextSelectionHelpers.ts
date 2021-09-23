@@ -29,7 +29,7 @@ export class TextSelectionHelpers extends Mixin(
         selectText (target : ActionTarget, start? : number, end? : number) {
             const el        = this.resolveActionTarget(target) as HTMLInputElement
 
-            return selectText(el)
+            return selectText(el, start, end)
         }
 
 
