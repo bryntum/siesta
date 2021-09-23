@@ -29,11 +29,7 @@ it('Should fire all type of key/input events', async t => {
 
     const field = document.getElementById('inp') as HTMLInputElement
 
-    t.firesOnce(field, 'keydown')
-    t.firesOnce(field, 'keypress')
-    t.firesOnce(field, 'keyup')
-    t.firesOnce(field, 'input')
-    t.firesOnce(field, 'beforeinput')
+    t.firesOnce(field, [ 'keydown', 'keypress', 'keyup', 'input', 'beforeinput' ])
     // there's also `textInput` event which has been removed from the spec more than 10 years ago, ignoring it
 
     // DOM "value" property should not be set yet, at the point when 'beforeinput' is fired
@@ -49,71 +45,6 @@ it('Should fire all type of key/input events', async t => {
     await t.type(field, 'a')
 
     t.expect(field.value).toBe('a')
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should fire change event after field changed + ENTER key', async t => {
-    document.body.innerHTML = '<input id="inp1" type="text" value=""/>'
-
-    const field = document.getElementById('inp1')
-
-    t.firesOnce(field, 'change')
-
-    await t.type(field, 'foo[ENTER]')
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should NOT fire change event after key input and field has not changed + ENTER key', async t => {
-    document.body.innerHTML = '<input id="inp2" type="text" value="quix"/>'
-
-    const field = document.getElementById('inp2') as HTMLInputElement
-
-    t.wontFire(field, 'change')
-
-    await t.type(field, 'f[BACKSPACE][ENTER]')
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should fire change event after field changed and mouse clicks outside field', async t => {
-    document.body.innerHTML = '<input id="inp1" type="text" value=""/>'
-
-    const field = document.getElementById('inp1') as HTMLInputElement
-
-    t.firesOnce(field, 'change')
-
-    await t.type(field, 'foo')
-
-    await t.click(field, [ '100% + 10', '50%' ])
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should fire change event after field changed by TAB', async t => {
-    document.body.innerHTML = '<input id="inp1" type="text" value=""/>'
-
-    const field = document.getElementById('inp1') as HTMLInputElement
-
-    t.firesOnce(field, 'change')
-
-    await t.type(field, 'foo[TAB]')
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// !bowser.gecko &&
-it('Should fire change event after field changed and field is blurred programmatically', async t => {
-    document.body.innerHTML = '<input id="inp1" type="text" value=""/>'
-
-    const field = document.getElementById('inp1') as HTMLInputElement
-
-    t.firesOnce(field, 'change')
-
-    await t.type(field, 'foo')
-
-    field.blur()
 })
 
 

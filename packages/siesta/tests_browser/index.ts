@@ -32,6 +32,7 @@ project.plan(
 
                 items       : [
                     'caret_position.t.js',
+                    'change_event.t.js',
                     'readonly.t.js',
                     'text_selection.t.js',
                     'type.t.js',
