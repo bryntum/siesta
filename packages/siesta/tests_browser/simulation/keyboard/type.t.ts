@@ -168,11 +168,11 @@ it('Should handle a focus change on "keydown" event', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should fire keydown, keypress, keyup for all keys', async t => {
+it('Should be able to type printable non-letters chars', async t => {
     document.body.innerHTML = '<input id="inp1" style="width: 800px" type="text"/>'
 
     const inp1      = t.$('#inp1') as HTMLInputElement
-    const keys      = "~!@#$%^&*()_+`-={}[]:\";',./<>? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+    const keys      = "~!@#$%^&*()_+`-={}[]|\\:\";',./<>? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
     const keysSet   = new Set(keys.split(''))
 
