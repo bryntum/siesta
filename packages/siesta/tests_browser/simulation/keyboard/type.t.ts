@@ -125,7 +125,7 @@ it('Should not fire keypress for certain special characters, like BACKSPACE, ESC
 
     const inp1      = t.$('#inp1') as HTMLInputElement
 
-    const text      = 'abc[BACKSPACE][ESCAPE][SHIFT][CTRL][ALT][META]'
+    const text      = 'abc[BACKSPACE][DELETE][ESCAPE][SHIFT][CTRL][ALT][META][ARROWLEFT][ARROWRIGHT][ARROWUP][ARROWDOWN][HOME][END]'
     const split     = extractKeysAndSpecialKeys(text)
 
     t.firesOk(inp1, { 'keydown' : split.length, 'keyup' : split.length, 'keypress' : 3 })
@@ -223,3 +223,5 @@ it('Should not change the field value if `keypress` event has prevented the defa
 
     t.is(input.value, '', "Field value did not change")
 })
+
+
