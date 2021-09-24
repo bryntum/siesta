@@ -65,7 +65,7 @@ it('Right click', async t => {
     div.addEventListener('contextmenu', event => {
         event.preventDefault()
 
-        t.is(event.buttons, 2, '`buttons` set to 2 for `contextmenu` of right click')
+        t.is(event.button, 2, '`button` set to 0 for `contextmenu` of right click')
         t.is(event.buttons, 2, '`buttons` set to 2 for `contextmenu` of right click')
     })
 
