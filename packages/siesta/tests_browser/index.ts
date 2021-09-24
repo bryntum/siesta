@@ -51,10 +51,12 @@ project.plan(
                     'click_change_target.t.js',
                     'click_iframe.t.js',
                     'click_svg.t.js',
+                    'drag.t.js',
                     'modifier_keys.t.js',
                     'mouse_move.t.js',
                     'mouse_over.t.js',
-                    'pointer_events.t.js'
+                    'pointer_events.t.js',
+                    'scroll_into_view.t.js'
                 ]
             },
             {

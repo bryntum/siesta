@@ -1,5 +1,4 @@
-import { Base } from "../../class/Base.js"
-import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
+import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { lastElement } from "../../util/Helpers.js"
 import { Rect } from "../../util/Rect.js"
@@ -22,20 +21,21 @@ import {
     parentWindows
 } from "../../util_browser/Dom.js"
 import { getOffsetsMap, scrollElementPointIntoView } from "../../util_browser/Scroll.js"
-import { isHTMLElement, isHTMLIFrameElement, isSVGElement } from "../../util_browser/Typeguards.js"
+import { isHTMLIFrameElement } from "../../util_browser/Typeguards.js"
 import { Test } from "../test/Test.js"
 import { Assertion, SourcePoint } from "../test/TestResult.js"
-import { SiestaModifierKey, SiestaTypeString, TypeOptions } from "./SimulatorKeyboard.js"
+import { SiestaModifierKey, SiestaTypeString } from "./SimulatorKeyboard.js"
 import { PointerMovePrecision } from "./SimulatorMouse.js"
 import { SimulatorPlaywrightClient } from "./SimulatorPlaywright.js"
 import {
     ActionableCheck,
     ActionTarget,
     ActionTargetOffset,
-    equalPoints, isActionTarget,
+    equalPoints,
+    isActionTarget,
     minusPoints,
     MouseButton,
-    Point, Simulator,
+    Point,
     sumPoints
 } from "./Types.js"
 
@@ -57,6 +57,24 @@ export type MouseActionOptions      = {
 
     timeout             : number
 }
+
+
+// export interface DragActionOptions extends MouseActionOptions {
+//     target              : ActionTarget
+//     offset              : ActionTargetOffset
+//
+//     button              : MouseButton
+//
+//     shiftKey?           : boolean
+//     ctrlKey?            : boolean
+//     altKey?             : boolean
+//     metaKey?            : boolean
+//
+//     mouseMovePrecision  : PointerMovePrecision
+//     allowChild          : boolean
+//
+//     timeout             : number
+// }
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
