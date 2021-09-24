@@ -50,13 +50,17 @@ export class SimulatorPlaywrightServer extends Mixin(
 
         @local()
         async simulateMouseUp (options? : Partial<PointerUpDownOptions>) : Promise<any> {
-            await this.page.mouse.up(options)
+            await this.doWithModifierKeys(async () => {
+                await this.page.mouse.up(options)
+            }, options?.modifierKeys)
         }
 
 
         @local()
         async simulateMouseDown (options? : Partial<PointerUpDownOptions>) : Promise<any> {
-            await this.page.mouse.down(options)
+            await this.doWithModifierKeys(async () => {
+                await this.page.mouse.down(options)
+            }, options?.modifierKeys)
         }
 
 
@@ -69,7 +73,9 @@ export class SimulatorPlaywrightServer extends Mixin(
                 options.mouseMovePrecision
             )
 
-            for (const point of filtered) await this.pageMouseMove(point[ 0 ], point[ 1 ])
+            await this.doWithModifierKeys(async () => {
+                for (const point of filtered) await this.pageMouseMove(point[ 0 ], point[ 1 ])
+            }, options?.modifierKeys)
         }
 
 
@@ -77,8 +83,10 @@ export class SimulatorPlaywrightServer extends Mixin(
         async simulateClick (options? : PointerClickOptions) : Promise<any> {
             const mouse     = this.page.mouse
 
-            await mouse.down({ button : options?.button ?? 'left', clickCount : 1 })
-            await mouse.up({ button : options?.button ?? 'left', clickCount : 1 })
+            await this.doWithModifierKeys(async () => {
+                await mouse.down({ button : options?.button ?? 'left', clickCount : 1 })
+                await mouse.up({ button : options?.button ?? 'left', clickCount : 1 })
+            }, options?.modifierKeys)
         }
 
 
@@ -86,11 +94,13 @@ export class SimulatorPlaywrightServer extends Mixin(
         async simulateDblClick (options? : PointerClickOptions) : Promise<any> {
             const mouse     = this.page.mouse
 
-            await mouse.down({ button : options?.button ?? 'left', clickCount : 1 })
-            await mouse.up({ button : options?.button ?? 'left', clickCount : 1 })
+            await this.doWithModifierKeys(async () => {
+                await mouse.down({ button : options?.button ?? 'left', clickCount : 1 })
+                await mouse.up({ button : options?.button ?? 'left', clickCount : 1 })
 
-            await mouse.down({ button : options?.button ?? 'left', clickCount : 2 })
-            await mouse.up({ button : options?.button ?? 'left', clickCount : 2 })
+                await mouse.down({ button : options?.button ?? 'left', clickCount : 2 })
+                await mouse.up({ button : options?.button ?? 'left', clickCount : 2 })
+            }, options?.modifierKeys)
         }
 
 

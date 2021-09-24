@@ -1,7 +1,9 @@
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { isArray, isString } from "../../util/Typeguards.js"
+import { isHTMLElement, isSVGElement } from "../../util_browser/Typeguards.js"
 import { SimulatorKeyboard } from "./SimulatorKeyboard.js"
 import { SimulatorMouse } from "./SimulatorMouse.js"
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type Point                   = [ x : number, y : number ]
 
 export type MouseButton             = 'left' | 'right' | 'middle'
@@ -21,6 +23,9 @@ export type ActionTargetOffset      = [ dx : number | string, dy : number | stri
 //     target : ActionTargetElement    = undefined
 //     offset : ActionTargetOffset     = undefined
 // }
+
+export const isActionTarget         = (a : any) : a is ActionTarget =>
+    isString(a) || isArray(a) || isHTMLElement(a) || isSVGElement(a)
 
 
 export type ActionableCheck         =

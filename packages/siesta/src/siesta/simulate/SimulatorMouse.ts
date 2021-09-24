@@ -1,16 +1,8 @@
+import { SiestaModifierKey } from "./SimulatorKeyboard.js"
 import { MouseButton, Point } from "./Types.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export type PointerUpDownOptions    = {
-    button?     : MouseButton
-}
-
-export type PointerClickOptions    = {
-    button?     : MouseButton
-}
-
-
 export type PointerMovePrecision      =
     | number
     | {
@@ -35,8 +27,20 @@ export type PointerMovePrecision      =
     }
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type PointerUpDownOptions    = {
+    button?             : MouseButton
+    modifierKeys?       : SiestaModifierKey[]
+}
+
+export type PointerClickOptions    = {
+    button?             : MouseButton
+    modifierKeys?       : SiestaModifierKey[]
+}
+
 export type PointerMoveOptions      = {
-    mouseMovePrecision      : PointerMovePrecision
+    modifierKeys?       : SiestaModifierKey[]
+    mouseMovePrecision? : PointerMovePrecision
 }
 
 

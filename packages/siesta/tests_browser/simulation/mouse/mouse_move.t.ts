@@ -150,66 +150,55 @@ it('Should set `buttons` property in mouse move events during right-button drag'
 })
 
 
-// it('should support passing options object to moveMouseTo method', async t => {
-//     document.body.innerHTML = '<div id="div" style="width:50px;height:50px;background:#ccc;"></div>'
-//
-//     let parent = Ext.get('div')
-//
-//     parent.on({
-//         mousemove : function (e) {
-//             t.ok(e.shiftKey, 'mousemove event has options')
-//         },
-//
-//         single  : true
-//     })
-//
-//     parent.on({
-//         mouseover : function (e) {
-//             t.ok(e.shiftKey, 'mouseover event has options')
-//         },
-//
-//         single  : true
-//     })
-//
-//     t.chain(
-//         { moveMouseTo : [ 5, 5 ], options : { shiftKey : true }},
-//
-//         function (next) {
-//             t.isDeeply(t.currentPosition, [ 5, 5 ], 'moveMouseTo Input: Array - Cursor moved to correct place')
-//
-//             next()
-//         }
-//     )
-// })
-//
-// it('should support passing options object to moveMouseBy method', async t => {
-//     document.body.innerHTML = '<div id="div2" style="width:50px;height:50px;background:#ccc;"></div>'
-//
-//     let parent = Ext.get('div2')
-//
-//     parent.on({
-//         mousemove : function (e) {
-//             t.ok(e.shiftKey, 'mousemove event has options')
-//         },
-//
-//         single  : true
-//     })
-//
-//     parent.on({
-//         mouseover : function (e) {
-//             t.ok(e.shiftKey, 'mouseover event has options')
-//         },
-//
-//         single  : true
-//     })
-//
-//     t.chain(
-//         { moveMouseTo : [ 5, 5 ], options : { shiftKey : true }},
-//
-//         function (next) {
-//             t.isDeeply(t.currentPosition, [ 5, 5 ], 'moveMouseTo Input: Array - Cursor moved to correct place')
-//
-//             next()
-//         }
-//     )
-// })
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should support passing options object to moveMouseTo method', async t => {
+    document.body.innerHTML = '<div id="box" style="position: absolute; left : 50px; top: 50px; width: 50px; height: 50px; background: #ccc;"></div>'
+
+    await t.moveMouseTo('#box', [ -1, '50%' ])
+
+    await t.mouseDown()
+
+    t.firesOk('#box', { mousemove : '>=1', mouseover : 1, mouseout : 1, mouseenter : 1, mouseleave : 1 });
+
+    [ 'mousemove', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave' ].forEach(eventName => {
+        t.$('#box').addEventListener(eventName, (e : MouseEvent) => {
+            t.silent.true(e.ctrlKey, e.type + ': Ctrl key detected')
+            t.silent.true(e.shiftKey, e.type + ': Shift key detected')
+            t.silent.true(e.altKey, e.type + ': Alt key detected')
+            t.silent.true(e.metaKey, e.type + ': Meta key detected')
+        }, { once : true })
+    })
+
+    await t.moveMouseTo({ target : '#box', shiftKey : true, altKey : true, ctrlKey : true, metaKey : true })
+
+    await t.moveMouseTo({ target : '#box', offset : [ '100% + 1', '50%' ], shiftKey : true, altKey : true, ctrlKey : true, metaKey : true })
+
+    await t.mouseUp()
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should support passing options object to moveMouseBy method', async t => {
+    document.body.innerHTML = '<div id="box" style="position: absolute; left : 50px; top: 50px; width: 50px; height: 50px; background: #ccc;"></div>'
+
+    await t.moveMouseTo('#box', [ -1, '50%' ])
+
+    await t.mouseDown()
+
+    t.firesOk('#box', { mousemove : '>=1', mouseover : 1, mouseout : 1, mouseenter : 1, mouseleave : 1 });
+
+    [ 'mousemove', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave' ].forEach(eventName => {
+        t.$('#box').addEventListener(eventName, (e : MouseEvent) => {
+            t.silent.true(e.ctrlKey, e.type + ': Ctrl key detected')
+            t.silent.true(e.shiftKey, e.type + ': Shift key detected')
+            t.silent.true(e.altKey, e.type + ': Alt key detected')
+            t.silent.true(e.metaKey, e.type + ': Meta key detected')
+        }, { once : true })
+    })
+
+    await t.moveMouseBy(30, 0, { shiftKey : true, altKey : true, ctrlKey : true, metaKey : true })
+
+    await t.moveMouseBy(30, 0, { shiftKey : true, altKey : true, ctrlKey : true, metaKey : true })
+
+    await t.mouseUp()
+})

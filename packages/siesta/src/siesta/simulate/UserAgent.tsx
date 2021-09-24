@@ -32,7 +32,7 @@ import {
     ActionableCheck,
     ActionTarget,
     ActionTargetOffset,
-    equalPoints,
+    equalPoints, isActionTarget,
     minusPoints,
     MouseButton,
     Point, Simulator,
@@ -99,21 +99,27 @@ const extractModifierKeys = (
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export interface UserAgent {
-    click (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
+    click (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+    click (options : Partial<MouseActionOptions>) : Promise<any>
 
-    rightClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
+    rightClick (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+    rightClick (options : Partial<MouseActionOptions>) : Promise<any>
 
-    doubleClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
+    doubleClick (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+    doubleClick (options : Partial<MouseActionOptions>) : Promise<any>
 
-    mouseDown (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
+    mouseDown (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+    mouseDown (options : Partial<MouseActionOptions>) : Promise<any>
 
-    mouseUp (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
+    mouseUp (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+    mouseUp (options : Partial<MouseActionOptions>) : Promise<any>
 
-    moveMouseTo (x : number, y : number) : Promise<any>
-    moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
+    moveMouseTo (x : number, y : number, options? : Partial<MouseActionOptions>) : Promise<any>
+    moveMouseTo (target : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+    moveMouseTo (options : Partial<MouseActionOptions>) : Promise<any>
 
-    moveMouseBy (dx : number, dy : number) : Promise<any>
-    moveMouseBy (delta : Point) : Promise<any>
+    moveMouseBy (dx : number, dy : number, options? : Partial<MouseActionOptions>) : Promise<any>
+    moveMouseBy (delta : Point, options? : Partial<MouseActionOptions>) : Promise<any>
 
     // dragTo (source : ActionTarget, target : ActionTarget) : Promise<any>
     // dragBy (source : ActionTarget, target : ActionTarget) : Promise<any>
@@ -247,42 +253,37 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        normalizeMouseActionOptions (targetOrOptions : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : MouseActionOptions {
-            if (isString(targetOrOptions) || isArray(targetOrOptions) || isHTMLElement(targetOrOptions) || isSVGElement(targetOrOptions)) {
-                return {
-                    target              : targetOrOptions,
-                    offset              : offset,
+        normalizeMouseActionOptions (
+            ...args :
+                | [ target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
+                | [ options : Partial<MouseActionOptions> ]
+        ) : MouseActionOptions {
+            const target        = isActionTarget(args[ 0 ]) ? args[ 0 ] : undefined
+            const offset        = isActionTarget(args[ 0 ]) || args.length === 2 ? args[ 1 ] : args[ 0 ]
 
-                    button              : 'left',
+            const defaults : MouseActionOptions = {
+                target,
+                offset              : undefined,
 
-                    shiftKey            : false,
-                    ctrlKey             : false,
-                    altKey              : false,
-                    metaKey             : false,
+                button              : 'left',
 
-                    mouseMovePrecision  : this.mouseMovePrecision,
-                    allowChild          : true,
+                shiftKey            : false,
+                ctrlKey             : false,
+                altKey              : false,
+                metaKey             : false,
 
-                    timeout             : this.defaultTimeout,
-                }
-            } else {
-                return Object.assign({
-                    target              : undefined,
-                    offset              : undefined,
+                mouseMovePrecision  : this.mouseMovePrecision,
+                allowChild          : true,
 
-                    button              : 'left',
-
-                    shiftKey            : false,
-                    ctrlKey             : false,
-                    altKey              : false,
-                    metaKey             : false,
-
-                    mouseMovePrecision  : this.mouseMovePrecision,
-                    allowChild          : true,
-
-                    timeout             : this.defaultTimeout,
-                } as MouseActionOptions, targetOrOptions)
+                timeout             : this.defaultTimeout,
             }
+
+            if (isArray(offset))
+                defaults.offset     = offset
+            else
+                Object.assign(defaults, offset)
+
+            return defaults
         }
 
 
@@ -463,7 +464,7 @@ export class UserAgentOnPage extends Mixin(
                     return { success : false, failedChecks : [ 'visible' ], actionPoint : point }
                 }
 
-                await this.simulator.simulateMouseMove(point, { mouseMovePrecision : action.mouseMovePrecision })
+                await this.simulator.simulateMouseMove(point, { mouseMovePrecision : action.mouseMovePrecision, modifierKeys : extractModifierKeys(action) })
 
                 return { success : true, failedChecks : [], actionPoint : point }
             }
@@ -640,7 +641,10 @@ export class UserAgentOnPage extends Mixin(
                         const globalPoint   = sumPoints(offsets.get(win), point)
 
                         if (syncCursor && !equalPoints(globalPoint, this.simulator.currentPosition)) {
-                            await this.simulator.simulateMouseMove(globalPoint, { mouseMovePrecision : action.mouseMovePrecision })
+                            await this.simulator.simulateMouseMove(globalPoint, {
+                                mouseMovePrecision  : action.mouseMovePrecision,
+                                modifierKeys        : extractModifierKeys(action)
+                            })
 
                             checks.push('reachable')
                             continueWaiting(false, checks)
@@ -684,8 +688,14 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async click (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
+        async click (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+        async click (options : Partial<MouseActionOptions>) : Promise<any>
+        async click (
+            ...args :
+                | [ target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
+                | [ options : Partial<MouseActionOptions> ]
+        ) {
+            const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -693,12 +703,20 @@ export class UserAgentOnPage extends Mixin(
                 timeout         : action.timeout
             })
 
-            if (waitRes.success) await this.keepAlive(this.simulator.simulateClick({ button : action.button }))
+            if (waitRes.success) await this.keepAlive(
+                this.simulator.simulateClick({ button : action.button, modifierKeys : extractModifierKeys(action) })
+            )
         }
 
 
-        async rightClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
+        async rightClick (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+        async rightClick (options : Partial<MouseActionOptions>) : Promise<any>
+        async rightClick (
+            ...args :
+                | [ target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
+                | [ options : Partial<MouseActionOptions> ]
+        ) {
+            const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -706,12 +724,20 @@ export class UserAgentOnPage extends Mixin(
                 timeout         : action.timeout
             })
 
-            if (waitRes.success) await this.keepAlive(this.simulator.simulateClick({ button : 'right' }))
+            if (waitRes.success) await this.keepAlive(
+                this.simulator.simulateClick({ button : 'right', modifierKeys : extractModifierKeys(action) })
+            )
         }
 
 
-        async doubleClick (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
+        async doubleClick (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+        async doubleClick (options : Partial<MouseActionOptions>) : Promise<any>
+        async doubleClick (
+            ...args :
+                | [ target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
+                | [ options : Partial<MouseActionOptions> ]
+        ) {
+            const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -719,12 +745,20 @@ export class UserAgentOnPage extends Mixin(
                 timeout         : action.timeout
             })
 
-            if (waitRes.success) await this.keepAlive(this.simulator.simulateDblClick({ button : action.button }))
+            if (waitRes.success) await this.keepAlive(
+                this.simulator.simulateDblClick({ button : action.button, modifierKeys : extractModifierKeys(action) })
+            )
         }
 
 
-        async mouseDown (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
+        async mouseDown (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+        async mouseDown (options : Partial<MouseActionOptions>) : Promise<any>
+        async mouseDown (
+            ...args :
+                | [ target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
+                | [ options : Partial<MouseActionOptions> ]
+        ) {
+            const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -732,12 +766,20 @@ export class UserAgentOnPage extends Mixin(
                 timeout         : action.timeout
             })
 
-            if (waitRes.success) await this.keepAlive(this.simulator.simulateMouseDown({ button : action.button }))
+            if (waitRes.success) await this.keepAlive(
+                this.simulator.simulateMouseDown({ button : action.button, modifierKeys : extractModifierKeys(action) })
+            )
         }
 
 
-        async mouseUp (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-            const action        = this.normalizeMouseActionOptions(target ?? this.simulator.currentPosition, offset)
+        async mouseUp (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
+        async mouseUp (options : Partial<MouseActionOptions>) : Promise<any>
+        async mouseUp (
+            ...args :
+                | [ target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
+                | [ options : Partial<MouseActionOptions> ]
+        ) {
+            const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -745,19 +787,28 @@ export class UserAgentOnPage extends Mixin(
                 timeout         : action.timeout
             })
 
-            if (waitRes.success) await this.keepAlive(this.simulator.simulateMouseUp({ button : action.button }))
+            if (waitRes.success) await this.keepAlive(
+                this.simulator.simulateMouseUp({ button : action.button, modifierKeys : extractModifierKeys(action) })
+            )
         }
 
 
-        async moveMouseTo (x : number, y : number) : Promise<any>
-        async moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset)
+        async moveMouseTo (x : number, y : number, options? : Partial<MouseActionOptions>) : Promise<any>
+        async moveMouseTo (target : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>)
+        async moveMouseTo (options : Partial<MouseActionOptions>)
         async moveMouseTo (
             ...args :
-                | [ x : number, y : number ]
-                | [ target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset ]
+                | [ x : number, y : number, options? : Partial<MouseActionOptions> ]
+                | [ target : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
+                | [ options : Partial<MouseActionOptions> ]
         ) {
-            const target        = isNumber(args[ 0 ]) ? args as Point : args[ 0 ]
-            const offset        = isNumber(args[ 1 ]) ? undefined : args[ 1 ]
+            const target        = isActionTarget(args[ 0 ])
+                ? args[ 0 ]
+                : isNumber(args[ 0 ]) ? [ args[ 0 ], args[ 1 ] ] as Point : undefined
+
+            const offset        = (isNumber(args[ 0 ]) && isNumber(args[ 1 ])
+                ? args[ 2 ]
+                : isActionTarget(args[ 0 ]) ? args[ 1 ] : args[ 0 ]) as ActionTargetOffset | Partial<MouseActionOptions>
 
             const action        = this.normalizeMouseActionOptions(target, offset)
 
@@ -769,14 +820,17 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async moveMouseBy (dx : number, dy : number) : Promise<any>
-        async moveMouseBy (delta : Point)
+        async moveMouseBy (dx : number, dy : number, options? : Partial<MouseActionOptions>) : Promise<any>
+        async moveMouseBy (delta : Point, options? : Partial<MouseActionOptions>)
         async moveMouseBy (
-            ...args : [ dx : number, dy : number ] | [ delta : Point ]
+            ...args :
+                | [ dx : number, dy : number, options? : Partial<MouseActionOptions> ]
+                | [ delta : Point, options? : Partial<MouseActionOptions> ]
         ) {
-            const delta     = args.length === 2 ? args : args[ 0 ]
+            const delta     = isNumber(args[ 0 ]) ? [ args[ 0 ], args[ 1 ] ] as Point : args[ 0 ]
+            const options   = isNumber(args[ 1 ]) ? args[ 2 ] : args[ 1 ]
 
-            await this.moveMouseTo(sumPoints(this.simulator.currentPosition, delta))
+            await this.moveMouseTo(sumPoints(this.simulator.currentPosition, delta), options)
         }
 
 
@@ -854,71 +908,69 @@ export class UserAgentOnPage extends Mixin(
 // this is how Puppeteer, Playwright and Selenium works
 
 // idea is that the user actions API should be identical
-export class UserAgentExternal extends Mixin(
-    [ Base ],
-    (base : AnyConstructor<Base, typeof Base>) =>
-
-    class UserAgentExternal extends base implements UserAgent {
-
-        simulator           : Simulator     = undefined
-
-
-        async click (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-
-        }
-
-
-        async rightClick (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-
-        }
-
-
-        async doubleClick (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-
-        }
-
-
-        async mouseDown (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-        }
-
-
-        async mouseUp () {
-
-        }
-
-
-        async moveMouseTo (x : number, y : number) : Promise<any>
-        async moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset)
-        async moveMouseTo (
-            ...args :
-                | [ x : number, y : number ]
-                | [ target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset ]
-        ) {
-        }
-
-
-        async moveMouseBy (dx : number, dy : number) : Promise<any>
-        async moveMouseBy (delta : Point)
-        async moveMouseBy (
-            ...args : [ dx : number, dy : number ] | [ delta : Point ]
-        ) {
-        }
-
-
-        async type (target : ActionTarget, text : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
-        }
-
-
-        async keyPress (target : ActionTarget, key : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
-        }
-
-
-        async keyDown (target : ActionTarget, key : string) : Promise<any> {
-        }
-
-
-        async keyUp (target : ActionTarget, key : string) : Promise<any> {
-        }
-    }
-) {}
-
+// export class UserAgentExternal extends Mixin(
+//     [ Base ],
+//     (base : AnyConstructor<Base, typeof Base>) =>
+//
+//     class UserAgentExternal extends base implements UserAgent {
+//
+//         simulator           : Simulator     = undefined
+//
+//
+//         async click () {
+//         }
+//
+//
+//         async rightClick () {
+//         }
+//
+//
+//         async doubleClick () {
+//         }
+//
+//
+//         async mouseDown () {
+//         }
+//
+//
+//         async mouseUp () {
+//         }
+//
+//
+//         async moveMouseTo (x : number, y : number, options? : Partial<MouseActionOptions>) : Promise<any>
+//         async moveMouseTo (target : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>)
+//         async moveMouseTo (
+//             ...args :
+//                 | [ x : number, y : number, options? : Partial<MouseActionOptions> ]
+//                 | [ target : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
+//         ) {
+//         }
+//
+//
+//         async moveMouseBy (dx : number, dy : number, options? : Partial<MouseActionOptions>) : Promise<any>
+//         async moveMouseBy (delta : Point, options? : Partial<MouseActionOptions>)
+//         async moveMouseBy (
+//             ...args :
+//                 | [ dx : number, dy : number, options? : Partial<MouseActionOptions> ]
+//                 | [ delta : Point, options? : Partial<MouseActionOptions> ]
+//         ) {
+//         }
+//
+//
+//         async type (target : ActionTarget, text : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
+//         }
+//
+//
+//         async keyPress (target : ActionTarget, key : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
+//         }
+//
+//
+//         async keyDown (target : ActionTarget, key : string) : Promise<any> {
+//         }
+//
+//
+//         async keyUp (target : ActionTarget, key : string) : Promise<any> {
+//         }
+//     }
+// ) {}
+//
