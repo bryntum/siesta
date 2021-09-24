@@ -456,6 +456,11 @@ export class TestNodeResult extends Mixin(
                 yield* parentNode.eachParent()
             }
         }
+
+
+        get assertions () : Assertion[] {
+            return Array.from(this.eachResultOfClass(Assertion))
+        }
     }
 ) {}
 
