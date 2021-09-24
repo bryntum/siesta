@@ -57,6 +57,8 @@ class TestPre extends Mixin(
 ){}
 
 
+let isSilentAssertionAddition : boolean = false
+
 /**
  * The test class for the isomorphic code. The instances of this class are usually created with the [[Test.it|it]] call:
  *
@@ -250,12 +252,39 @@ export class Test extends TestPre {
     }
 
 
+    get silent () : this {
+        // the small joys of JavaScript programming
+        return new Proxy(this, {
+            get : (target : Test, property : string) => {
+                if (property === 'addResult') {
+                    return (...args) => {
+                        const prev      = isSilentAssertionAddition
+
+                        isSilentAssertionAddition   = true
+
+                        // @ts-ignore
+                        const res       = target[ property ](...args)
+
+                        isSilentAssertionAddition   = prev
+
+                        return res
+                    }
+                } else {
+                    return target[ property ]
+                }
+            }
+        }) as this
+    }
+
+
     addResult<T extends TestResult> (result : T) : T {
-        if ((result instanceof Assertion) && result.sourcePoint === undefined) result.sourcePoint = this.getSourcePoint()
+        if (!isSilentAssertionAddition || (!(result instanceof Assertion) || !result.passed)) {
+            if ((result instanceof Assertion) && result.sourcePoint === undefined) result.sourcePoint = this.getSourcePoint()
 
-        super.addResult(result)
+            super.addResult(result)
 
-        if (!(result instanceof TestNodeResult)) this.connector.onResult(this.rootTest.descriptor.guid, this.localId, result)
+            if (!(result instanceof TestNodeResult)) this.connector.onResult(this.rootTest.descriptor.guid, this.localId, result)
+        }
 
         return result
     }
@@ -381,11 +410,23 @@ export class Test extends TestPre {
      * @param code The test function. Can be `async` if needed or return `Promise`.
      */
     it (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
+        const descriptor : TestDescriptor   = this.createChildDescriptor(name)
+
+        const cls       = this.constructor as typeof Test
+
+        const test      = cls.new({ descriptor, code, parentNode : this, connector : this.connector })
+
+        this.pendingSubTests.push(test)
+
+        return test as this
+    }
+
+
+    createChildDescriptor (name : TestDescriptorArgument<this>) : TestDescriptor {
         const descriptor : TestDescriptor   = this.testDescriptorClass.fromTestDescriptorArgument(name)
 
-        // if (this.isTodo) descriptor.isTodo  = true
-
         // TODO I promise to myself to clean this up
+
         // mess
         this.descriptor.planItem(descriptor)
         const flatten   = descriptor.flatten
@@ -394,13 +435,7 @@ export class Test extends TestPre {
         this.descriptor.childNodes = undefined
         // eof mess
 
-        const cls       = this.constructor as typeof Test
-
-        const test      = cls.new({ descriptor : flatten, code, parentNode : this, connector : this.connector })
-
-        this.pendingSubTests.push(test)
-
-        return test as this
+        return flatten
     }
 
 

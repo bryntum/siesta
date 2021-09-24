@@ -76,7 +76,8 @@ project.plan(
                     'assertion_compare.t.js',
                     'assertion_exception.t.js',
                     'assertion_type.t.js',
-                    'expectation.t.js'
+                    'expectation.t.js',
+                    'silent.t.js'
                 ]
             },
             {
