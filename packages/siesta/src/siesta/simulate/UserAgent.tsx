@@ -327,6 +327,7 @@ export class UserAgentOnPage extends Mixin(
             this.addResult(Assertion.new({
                 name        : 'waitForElementActionable',
                 passed      : false,
+                sourcePoint : options.sourcePoint,
                 annotation  : <div>
                     <div>Waited too long for { options.actionName } target <span>{ target }</span> to become actionable</div>
                     <div>Failed checks: `{ checks.join(" ") }`</div>
