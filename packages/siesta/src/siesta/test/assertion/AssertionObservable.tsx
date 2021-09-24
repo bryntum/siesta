@@ -13,9 +13,10 @@ export type FiresOkOptions<O> = {
     events          : Record<string, string | number>,
     during?         : number | AnyFunction,
 
-    assertionName?  : string
     description?    : string
 
+    // internal, do not document
+    assertionName?  : string
     // deprecated, do not document
     desc?           : string
 }
@@ -195,6 +196,31 @@ export class AssertionObservable extends Mixin(
          * @param {Function} [options.callback] A callback to call after this assertion has been checked. Only used if `during` value is provided.
          * @param {String} [options.desc] A description for this assertion
          */
+        async firesOk (options : FiresOkOptions<this[ 'ObservableSourceT' ]>)
+        async firesOk (
+            observable      : this[ 'ObservableSourceT' ],
+            events          : string,
+            expected        : number | string,
+            description?    : string
+        )
+        async firesOk (
+            observable      : this[ 'ObservableSourceT' ],
+            events          : string,
+            expected        : number | string,
+            during          : number | AnyFunction,
+            description?    : string
+        )
+        async firesOk (
+            observable      : this[ 'ObservableSourceT' ],
+            events          : Record<string, string | number>,
+            description?    : string
+        )
+        async firesOk (
+            observable      : this[ 'ObservableSourceT' ],
+            events          : Record<string, string | number>,
+            during          : number | AnyFunction,
+            description?    : string
+        )
         async firesOk (
             ...args : [
                 options         : FiresOkOptions<this[ 'ObservableSourceT' ]>
