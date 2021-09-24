@@ -26,7 +26,7 @@ import { individualCheckInfoForTestResult, SubTestCheckInfo, TestNodeResultReact
 import { Splitter } from "./components/Splitter.js"
 import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComponent.js"
 import { RippleEffectManager } from "./RippleEffectManager.js"
-import { LaunchInfoComponent } from "./test_result/LaunchInfoComponent.js"
+import { DomContainerPosition, LaunchInfoComponent } from "./test_result/LaunchInfoComponent.js"
 import { TestOverlay } from "./test_result/TestOverlay.js"
 import { TestNodeResultComponent } from "./test_result/TestResult.js"
 import { TestGroupLaunchInfo, TestLaunchInfo } from "./TestLaunchInfo.js"
@@ -40,7 +40,11 @@ LauncherDescriptorNodejs
 type DashboardPersistentData = {
     currentTestUrl      : string
     filterValue         : string
+
     domContainerWidth   : number
+    domContainerHeight  : number
+    domContainerPosition : DomContainerPosition
+
     projectPlanWidth    : number
 
     projectPlanItems    : Map<string, ProjectPlanItemPersistentData>
@@ -89,6 +93,8 @@ export class Dashboard extends Mixin(
         testDescriptorFiltered      : TestDescriptorFiltered    = undefined
 
         domContainerWidthBox        : Box<number>               = Box.new(400)
+        domContainerHeightBox       : Box<number>               = Box.new(300)
+        domContainerPositionBox     : Box<DomContainerPosition> = Box.new({ orientation : 'horizontal', reverse : false })
         projectPlanWidthBox         : Box<number>               = Box.new(300)
 
         triggerSavePersistentData   : () => void                = buffer(() => this.savePersistentState(), 150)
@@ -118,6 +124,8 @@ export class Dashboard extends Mixin(
                 filterValue         : this.filterBox,
 
                 domContainerWidth   : this.domContainerWidthBox.read(),
+                domContainerHeight  : this.domContainerHeightBox.read(),
+                domContainerPosition : this.domContainerPositionBox.read(),
                 projectPlanWidth    : this.projectPlanWidthBox.read(),
 
                 projectPlanItems    : CI(this.projectPlan.traverseGen(true))
@@ -148,6 +156,8 @@ export class Dashboard extends Mixin(
             this.filterBox      = state.filterValue || ''
 
             state.domContainerWidth && this.domContainerWidthBox.write(state.domContainerWidth)
+            state.domContainerHeight && this.domContainerHeightBox.write(state.domContainerHeight)
+            state.domContainerPosition && this.domContainerPositionBox.write(state.domContainerPosition)
             state.projectPlanWidth && this.projectPlanWidthBox.write(state.projectPlanWidth)
 
             if (state.currentTestUrl) {
@@ -201,6 +211,8 @@ export class Dashboard extends Mixin(
                 this.$.filterBox,
                 this.$.currentTest,
                 this.domContainerWidthBox,
+                this.domContainerHeightBox,
+                this.domContainerPositionBox,
                 this.projectPlanWidthBox
             ].forEach(box => box.commitValueOptimisticHook.on(this.triggerSavePersistentData))
 
@@ -364,6 +376,8 @@ export class Dashboard extends Mixin(
                             dashboard               = { this }
                             launchInfo              = { launchInfo }
                             domContainerWidthBox    = { this.domContainerWidthBox }
+                            domContainerHeightBox   = { this.domContainerHeightBox }
+                            domContainerPositionBox = { this.domContainerPositionBox }
                         ></LaunchInfoComponent>
                     }
                 }

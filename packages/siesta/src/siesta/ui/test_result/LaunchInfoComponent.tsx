@@ -19,6 +19,10 @@ import { Translator } from "./Translator.js"
 ChronoGraphJSX
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type DomContainerPosition = { orientation : 'horizontal' | 'vertical', reverse : boolean }
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @entity()
 export class LaunchInfoComponent extends Mixin(
     [ Component ],
@@ -29,6 +33,8 @@ export class LaunchInfoComponent extends Mixin(
             dashboard               : LaunchInfoComponent[ 'dashboard' ]
             launchInfo              : LaunchInfoComponent[ 'launchInfo' ]
             domContainerWidthBox?   : LaunchInfoComponent[ 'domContainerWidthBox' ]
+            domContainerHeightBox?  : LaunchInfoComponent[ 'domContainerHeightBox' ]
+            domContainerPositionBox? : LaunchInfoComponent[ 'domContainerPositionBox']
         }
 
         launchInfo              : TestLaunchInfo    = undefined
@@ -38,6 +44,9 @@ export class LaunchInfoComponent extends Mixin(
         scaleMode               : 'none' | 'fit_full' | 'fit_width' | 'fit_height'   = 'fit_full'
 
         domContainerWidthBox    : Box<number>       = Box.new(400)
+        domContainerHeightBox   : Box<number>       = Box.new(300)
+
+        domContainerPositionBox : Box<DomContainerPosition> = Box.new({ orientation : 'horizontal', reverse : false })
 
 
         topToolbar () : ElementSource {
@@ -55,6 +64,9 @@ export class LaunchInfoComponent extends Mixin(
                                     <span class="icon is-small"><i class="fas fs-sm fa-check"></i></span>
                                 </span>
                                 <span style='flex:1'></span>
+                                <span class="icon ripple is-large" onclick={ () => this.rotate() }>
+                                    <i class="fas fa-lg fa-retweet"></i>
+                                </span>
                                 <span class="icon ripple is-large" onclick={ () => this.scaleMode = 'fit_width' }>
                                     <i class="fas fa-lg fa-arrows-alt-h"></i>
                                 </span>
@@ -75,6 +87,24 @@ export class LaunchInfoComponent extends Mixin(
         }
 
 
+        rotate () {
+            const { orientation, reverse } = this.domContainerPositionBox.read()
+
+            let newPosition : DomContainerPosition
+
+            if (orientation === 'horizontal' && !reverse)
+                newPosition     = { orientation : 'vertical', reverse : false }
+            else if (orientation === 'vertical' && !reverse)
+                newPosition     = { orientation : 'horizontal', reverse : true }
+            else if (orientation === 'horizontal' && reverse)
+                newPosition     = { orientation : 'vertical', reverse : true }
+            else if (orientation === 'vertical' && reverse)
+                newPosition     = { orientation : 'horizontal', reverse : false }
+
+            this.domContainerPositionBox.write(newPosition)
+        }
+
+
         render () : ReactiveElement {
             const launchInfo            = this.launchInfo
 
@@ -84,7 +114,15 @@ export class LaunchInfoComponent extends Mixin(
             return <div class="test-results-area is-flex is-flex-direction-column" style="flex: 1; min-width: 0">
                 { () => this.topToolbar() }
 
-                <div class="is-flex is-flex-direction-row is-align-items-stretch" style="flex: 1;overflow: hidden">
+                <div
+                    class = "is-flex is-align-items-stretch"
+                    style = "flex: 1; overflow: hidden"
+                    style:flex-direction = { () => {
+                        const { orientation, reverse } = this.domContainerPositionBox.read()
+
+                        return `${ orientation === 'horizontal' ? 'row' : 'column' }${ reverse ? '-reverse' : '' }`
+                    } }
+                >
                     {
                         () => {
                             const mostRecentResult      = launchInfo.mostRecentResult
@@ -106,21 +144,23 @@ export class LaunchInfoComponent extends Mixin(
                         () => {
                             if (!this.shouldShowDomContainer(launchInfo)) return null
 
+                            const { orientation, reverse } = this.domContainerPositionBox.read()
+
                             return <>
                                 <Splitter
                                     resizeTarget    = 'next'
-                                    mode            = "horizontal"
-                                    style           = "min-width: 8px; width: 8px"
+                                    mode            = { orientation }
+                                    style           = { orientation === 'horizontal' ? "min-width: 8px; width: 8px" : "min-height: 8px; height: 8px" }
                                     companionsFunc  = {
                                         el => launchInfo?.context?.wrapper
                                             ? [ el.previousElementSibling, el.nextElementSibling, launchInfo.context.wrapper ] as HTMLElement[]
                                             : [ el.previousElementSibling, el.nextElementSibling ] as HTMLElement[]
                                     }
-                                    sizeBox         = { this.domContainerWidthBox }
+                                    sizeBox         = { orientation === 'horizontal' ? this.domContainerWidthBox : this.domContainerHeightBox }
                                 ></Splitter>
                                 <div
                                     class={ () => `is-flex ${ launchInfo?.context?.wrapper ? 'is-align-items-stretch' : 'is-justify-content-center is-align-items-center' }` }
-                                    style:width={ () => this.domContainerWidthBox.read() + 'px' }
+                                    style={ () => orientation === 'horizontal' ? `width: ${ this.domContainerWidthBox.read() + 'px' }` : `height: ${ this.domContainerHeightBox.read() + 'px' }`}
                                 >
                                     {
                                         launchInfo?.context?.wrapper
