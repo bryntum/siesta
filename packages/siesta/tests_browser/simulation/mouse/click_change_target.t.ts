@@ -1,4 +1,4 @@
-import { it } from "../../../browser.js"
+import { beforeEach, it } from "../../../browser.js"
 import { delay } from "../../../src/util/TimeHelpers.js"
 import { awaitDomInteractive } from "../../../src/util_browser/Dom.js"
 import { createElement } from "../../@helpers.js"
@@ -51,6 +51,12 @@ const doSetup     = () => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+beforeEach(() => {
+    document.body.innerHTML = ''
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Changing the target should cancel the `click` event', async t => {
     doSetup()
 
@@ -68,7 +74,7 @@ it('Changing the target should cancel the `click` event', async t => {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('mousedown + mouseup should NOT fire click event if mouseup is not on the same el as the mousedown', async t => {
     const div   = document.body.appendChild(createElement('div', {
-        style   : 'width : 40px; background:green;',
+        style   : 'width : 40px; background: green;',
         text    : 'testing click'
     }))
 
