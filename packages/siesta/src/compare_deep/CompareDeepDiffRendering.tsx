@@ -456,13 +456,13 @@ export class DifferenceTemplateRoot extends DifferenceTemplateElement {
             super.renderSelf(renderer, output, shadowContext(stream))
         }
 
-        //----------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // first render the middle stream to determine the remaining available with for left/right streams
         const middle        = TextBlock.new()
 
         stream('middle', middle, ' ')
 
-        //----------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // the wrapper for content in the middle stream ` |CONTENT| ` is 4 chars length
         const available     = output.maxLen - (middle.maxLineLength + 4)
 

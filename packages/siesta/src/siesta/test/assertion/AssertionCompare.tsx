@@ -69,7 +69,7 @@ export class AssertionCompare extends Mixin(
         // maxEqualityDifferences          : number        = 5
 
 
-        //----------------------------------------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region truthy assertions
 
         assertTrueInternal (
@@ -137,7 +137,7 @@ export class AssertionCompare extends Mixin(
         // endregion
 
 
-        //----------------------------------------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region equality assertions
 
         assertEqualToConstant (
@@ -284,7 +284,7 @@ export class AssertionCompare extends Mixin(
         // endregion
 
 
-        //----------------------------------------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region pattern matching
 
         assertMatchInternal (
@@ -337,7 +337,7 @@ export class AssertionCompare extends Mixin(
         // endregion
 
 
-        //----------------------------------------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region "is" comparison
 
         comparePrimitives (value1 : unknown, value2 : unknown) : boolean {
@@ -401,7 +401,7 @@ export class AssertionCompare extends Mixin(
         // endregion
 
 
-        //----------------------------------------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region iterable contains
 
         assertIterableContainInternal<V> (
@@ -457,7 +457,7 @@ export class AssertionCompare extends Mixin(
         // endregion
 
 
-        //----------------------------------------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region compare
 
         assertCompareInternal<V> (
@@ -554,7 +554,7 @@ export class AssertionCompare extends Mixin(
         // endregion
 
 
-        //----------------------------------------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region compare approx
 
         assertCompareApproxInternal<V> (

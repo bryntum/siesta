@@ -11,7 +11,7 @@ export class AssertionType extends Mixin(
 
     class AssertionType extends base {
 
-        //----------------------------------------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         assertDefinedInternal (
             assertionName   : string,
             negated         : boolean,
@@ -39,7 +39,7 @@ export class AssertionType extends Mixin(
         }
 
 
-        //----------------------------------------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region truthy assertions
         assertInstanceOfInternal (
             assertionName   : string,

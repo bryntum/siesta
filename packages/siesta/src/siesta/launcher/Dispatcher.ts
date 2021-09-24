@@ -299,7 +299,7 @@ export class Dispatcher extends Mixin(
 
             const stringifiedDesc   = stringify(normalized)
 
-            //---------------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             try {
                 preLaunchRes        = await context.preLaunchTest(normalized.urlAbs, stringifiedDesc, this.getTestLaunchDelay())
             } catch (e) {
@@ -421,7 +421,7 @@ export class Dispatcher extends Mixin(
             testLauncherChild.connect()
             await testLauncher.connect()
 
-            //---------------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             topTest.connector            = testLauncherChild
 
             await topTest.start()

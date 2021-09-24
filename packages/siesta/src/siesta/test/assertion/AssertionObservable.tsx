@@ -283,7 +283,7 @@ export class AssertionObservable extends Mixin(
                 return
             }
 
-            //----------------------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const expectedEvents    = isString(events) ? { [ events ] : expected } : events
 
             // start recording

@@ -220,7 +220,7 @@ export class Dashboard extends Mixin(
                 document.head.appendChild(meta)
             }
 
-            //------------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const links         = Array.from(document.head.getElementsByTagName('link'))
 
             if (!links.some(link => /resources\/styling\/browser\/css\/styling\.css/.test(link.href))) {
@@ -259,19 +259,19 @@ export class Dashboard extends Mixin(
         async start () {
             await this.setup()
 
-            //-----------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const persistentState       = this.loadPersistentState()
 
             persistentState && this.applyPersistentState(persistentState)
 
             this.bindStatePersistence()
 
-            //-----------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const rippleEffectManager   = RippleEffectManager.new()
 
             rippleEffectManager.start()
 
-            //-----------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             this.tweakTheHead()
 
             document.body.appendChild(this.el)

@@ -268,12 +268,12 @@ export class Launcher extends Mixin(
 
         $logger                 : Logger                    = LoggerConsole.new({ logLevel : LogLevel.warn })
 
-        //------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         inputArguments          : string[]                  = []
 
         optionsBag              : OptionsBag                = undefined
 
-        //------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         dispatcherClass         : typeof Dispatcher         = Dispatcher
 
         projectDescriptorClass  : typeof ProjectDescriptor  = ProjectDescriptor
@@ -282,22 +282,22 @@ export class Launcher extends Mixin(
 
         reporterClass           : typeof Reporter           = undefined
 
-        //------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         includeMatches          : IMinimatch[]              = []
         excludeMatches          : IMinimatch[]              = []
 
-        //------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         dispatcher              : Dispatcher                = undefined
 
         reporter                : Reporter                  = undefined
 
         dashboardConnector      : DashboardConnectorServer  = undefined
 
-        //------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         setupDone               : boolean                   = false
         setupPromise            : Promise<any>              = undefined
 
-        //------------------
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         contextProviderConstructors : (typeof ContextProvider)[]    = []
 
         contextProviders            : ContextProvider[]             = []
@@ -445,7 +445,7 @@ export class Launcher extends Mixin(
         async onLauncherOptionsAvailable () {
             this.logger.logLevel        = this.logLevel
 
-            //--------------------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             if (this.help) {
                 this.write(this.helpScreenTemplate(
                     [
@@ -462,7 +462,7 @@ export class Launcher extends Mixin(
 
             if (this.help || this.version) throw LauncherError.new({ exitCode : ExitCodes.DRY_RUN })
 
-            //--------------------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             this.contextProviders               = this.contextProviderConstructors.map(cls => cls.new({ launcher : this }))
 
             this.contextProviderSameContext     = ContextProviderSameContext.new({ launcher : this })
@@ -533,7 +533,7 @@ export class Launcher extends Mixin(
 
             const prepareTestDescriptorOptions  = this.prepareTestDescriptorOptions()
 
-            //-----------------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const errors : XmlElement[]     = [].concat(
                 prepareLauncherOptions.extractResult.errors,
                 prepareProjectOptions.extractResult.errors,
@@ -546,7 +546,7 @@ export class Launcher extends Mixin(
 
             errors.forEach(error => this.write(error))
 
-            //-----------------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const warnings                  = [
                 ...prepareLauncherOptions.extractResult.warnings,
                 ...prepareProjectOptions.extractResult.warnings,
@@ -563,7 +563,7 @@ export class Launcher extends Mixin(
 
             if (errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
-            //-----------------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const contextProviders          = this.getSuitableContextProviders(
                 this.projectData.type,
                 this.getEnvironmentByUrl(this.project)

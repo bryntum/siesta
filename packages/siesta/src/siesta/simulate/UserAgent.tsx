@@ -384,7 +384,7 @@ export class UserAgentOnPage extends Mixin(
                         return
                     }
 
-                    //-----------------
+                    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
                     const res       = this.normalizeElementDetailed(target)
 
                     if (!silent && res.multiple) {
@@ -397,7 +397,7 @@ export class UserAgentOnPage extends Mixin(
                         }
                     }
 
-                    //-----------------
+                    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
                     const checks : ActionableCheck[]  = []
 
                     el              = res.el
@@ -508,7 +508,7 @@ export class UserAgentOnPage extends Mixin(
                             return
                         }
 
-                        //-----------------
+                        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
                         const res       = this.normalizeElementDetailed(target)
 
                         if (!silent && res.multiple) {
@@ -521,7 +521,7 @@ export class UserAgentOnPage extends Mixin(
                             }
                         }
 
-                        //-----------------
+                        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
                         const checks : ActionableCheck[]  = []
 
                         el              = res.el
@@ -544,7 +544,7 @@ export class UserAgentOnPage extends Mixin(
                             return
                         }
 
-                        //-----------------
+                        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
                         const isInside  = isOffsetInsideElementBox(el, action.offset)
 
                         let offset : ActionTargetOffset = action.offset

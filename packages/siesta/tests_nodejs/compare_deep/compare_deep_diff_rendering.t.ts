@@ -1,4 +1,4 @@
-import { iit, it } from "../../nodejs.js"
+import { it } from "../../nodejs.js"
 import { compareDeepDiff, DifferenceReference } from "../../src/compare_deep/CompareDeepDiff.js"
 import { XmlRendererDifference } from "../../src/compare_deep/CompareDeepDiffRendering.js"
 import { any, anyInstanceOf, anyNumberApprox, anyStringLike } from "../../src/compare_deep/FuzzyMatcherDiff.js"
@@ -466,7 +466,6 @@ it('Should render the set diff correctly #4', async t => {
 
 
 it('Should render the map diff correctly #1', async t => {
-    //------------------
     const difference0   = compareDeepDiff(new Map([]), new Map([]))
 
     t.is(
@@ -690,7 +689,6 @@ it('Should render the diff of circular data structures correctly #1', async t =>
     const a2    = { a : undefined }
     a2.a        = a2
 
-    //------------------
     const difference0   = compareDeepDiff(a1, a2)
 
     t.is(
@@ -718,7 +716,6 @@ it('Should render the diff of circular data structures correctly #2', async t =>
     const a2    = { a : undefined }
     a2.a        = a2
 
-    //------------------
     const difference0   = compareDeepDiff([ a1, a2 ], [ a1, false])
 
     t.is(
@@ -753,7 +750,6 @@ it('Should render the diff of circular data structures correctly #3', async t =>
 
     const a3    = { a : a2 }
 
-    //------------------
     const difference0   = compareDeepDiff(a1, a3)
 
     t.is(

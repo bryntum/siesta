@@ -20,13 +20,13 @@ export class ContextProviderBrowserIframe extends Mixin(
 
             wrapper.setAttribute('style', 'position: absolute; left:-10000px; top: -10000px;')
 
-            //-------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const wrapperInner  = document.createElement('div')
             wrapperInner.className = 's-iframe-wrapper-inner'
 
             wrapper.appendChild(wrapperInner)
 
-            //-------------
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const iframe        = document.createElement('iframe')
 
             iframe.src          = 'about:blank'

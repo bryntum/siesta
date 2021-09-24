@@ -38,11 +38,11 @@ export const scrollElementPointIntoView = (
 
     if (!isElementAccessible(el)) return false
 
-    //-----------------------
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
     const win                   = el.ownerDocument.defaultView
     const offsets               = getOffsetsMap(win)
 
-    //-----------------------
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
     let currentWin : Window     = win
 
     const rect : Rect           = Rect.fromElement(el).shift(...offsets.get(currentWin))
