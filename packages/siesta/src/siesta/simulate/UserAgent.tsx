@@ -3,7 +3,7 @@ import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { lastElement } from "../../util/Helpers.js"
 import { Rect } from "../../util/Rect.js"
-import { isArray, isString } from "../../util/Typeguards.js"
+import { isArray, isNumber, isString } from "../../util/Typeguards.js"
 import {
     ActionPointData,
     clientXtoPageX,
@@ -109,8 +109,10 @@ export interface UserAgent {
 
     mouseUp (target? : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
+    moveMouseTo (x : number, y : number) : Promise<any>
     moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) : Promise<any>
 
+    moveMouseBy (dx : number, dy : number) : Promise<any>
     moveMouseBy (delta : Point) : Promise<any>
 
     // dragTo (source : ActionTarget, target : ActionTarget) : Promise<any>
@@ -744,7 +746,16 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
+        async moveMouseTo (x : number, y : number) : Promise<any>
+        async moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset)
+        async moveMouseTo (
+            ...args :
+                | [ x : number, y : number ]
+                | [ target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset ]
+        ) {
+            const target        = isNumber(args[ 0 ]) ? args as Point : args[ 0 ]
+            const offset        = isNumber(args[ 1 ]) ? undefined : args[ 1 ]
+
             const action        = this.normalizeMouseActionOptions(target, offset)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
@@ -755,7 +766,13 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        async moveMouseBy (delta : Point) {
+        async moveMouseBy (dx : number, dy : number) : Promise<any>
+        async moveMouseBy (delta : Point)
+        async moveMouseBy (
+            ...args : [ dx : number, dy : number ] | [ delta : Point ]
+        ) {
+            const delta     = args.length === 2 ? args : args[ 0 ]
+
             await this.moveMouseTo(sumPoints(this.simulator.currentPosition, delta))
         }
 
@@ -867,13 +884,21 @@ export class UserAgentExternal extends Mixin(
         }
 
 
-        async moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset) {
-
+        async moveMouseTo (x : number, y : number) : Promise<any>
+        async moveMouseTo (target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset)
+        async moveMouseTo (
+            ...args :
+                | [ x : number, y : number ]
+                | [ target : ActionTarget | Partial<MouseActionOptions>, offset? : ActionTargetOffset ]
+        ) {
         }
 
 
-        async moveMouseBy (delta : Point) {
-            await this.moveMouseTo(sumPoints(this.simulator.currentPosition, delta))
+        async moveMouseBy (dx : number, dy : number) : Promise<any>
+        async moveMouseBy (delta : Point)
+        async moveMouseBy (
+            ...args : [ dx : number, dy : number ] | [ delta : Point ]
+        ) {
         }
 
 
