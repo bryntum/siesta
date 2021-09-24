@@ -30,6 +30,38 @@ it('`isElementConnected` should work', t => {
 
     t.true(isElementConnected(div))
     t.true(isElementConnected(div.querySelector('#inner')))
+
+    t.true(isElementConnected(document.documentElement), 'document.documentElement is connected')
+    t.true(isElementConnected(document.body), 'body is connected')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`isElementConnected` should work for web component elements', t => {
+    const template      = document.createElement('template')
+    template.innerHTML  = '<div></div>'
+
+    class TodoApp extends HTMLElement {
+        constructor () {
+            super()
+
+            this.attachShadow({ 'mode': 'open' })
+
+            this.shadowRoot.appendChild(template.content.cloneNode(true))
+        }
+    }
+
+    window.customElements.define('todo-app', TodoApp)
+
+    const app           = document.createElement('todo-app')
+
+    t.false(isElementConnected(app), 'Detached web component host element is not connected')
+    t.false(isElementConnected(app.shadowRoot.querySelector('div')), 'Inner element of the detached web component el is not connected')
+
+    document.body.appendChild(app)
+
+    t.true(isElementConnected(app))
+    t.true(isElementConnected(app.shadowRoot.querySelector('div')))
 })
 
 

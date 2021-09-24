@@ -78,8 +78,6 @@ export const isTopWindow = (win : Window) : boolean => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// TODO not clear if this property returns `true` for element,
-// connected to the shadow root of the unconnected web component el
 export const isElementConnected = (el : Element) : boolean => {
     return el.isConnected
 }
