@@ -9,27 +9,6 @@ beforeEach(() => {
 })
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Click should prevent the test from stopping, even w/o `await`', async t => {
-    let clicked   = false
-
-    t.it('internal', async t => {
-
-        const div = document.body.appendChild(createElement('div', {
-            style   : 'width : 40px;',
-            text    : 'testing click'
-        }))
-
-        div.addEventListener('click', () => clicked = true)
-
-        t.click(div)
-
-    }).postFinishHook.on(test => {
-        t.true(clicked, 'Click completed before test finalization')
-    })
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Left click', async t => {
     const clickDiv = document.body.appendChild(createElement('div', {
         style   : 'width : 40px;',
@@ -63,21 +42,6 @@ it('Left click', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('mousedown + mouseup on the same element should fire same event as regular click', async t => {
-    const div   = document.body.appendChild(createElement('div', {
-        style   : 'width : 40px; background: red;',
-        text    : 'testing click'
-    }))
-
-    t.firesOnce(div, [ 'mousedown', 'mouseup', 'click' ])
-
-    await t.mouseDown(div)
-    await t.moveMouseBy([ 2, 2 ])
-    await t.mouseUp(div)
-})
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Right click', async t => {
     const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: yellow;',
@@ -104,6 +68,37 @@ it('Right click', async t => {
     })
 
     await t.rightClick(div)
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should use the current cursor position for action, if its provided as `[]` or not provided', async t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; left: 50px; top: 50px; width: 1px; height: 1px; background: red;" id="marker"></div>'
+
+    await t.moveMouseTo('#marker')
+
+    t.firesOk('#marker', 'click', 3)
+
+    await t.click()
+    await t.click([])
+    // options form, empty target
+    await t.click({})
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('mousedown + mouseup on the same element should fire same event as regular click', async t => {
+    const div   = document.body.appendChild(createElement('div', {
+        style   : 'width : 40px; background: red;',
+        text    : 'testing click'
+    }))
+
+    t.firesOnce(div, [ 'mousedown', 'mouseup', 'click' ])
+
+    await t.mouseDown(div)
+    await t.moveMouseBy(2, 2)
+    await t.mouseUp(div)
 })
 
 
@@ -229,3 +224,27 @@ it('Failed clicks (due to element not actionable) should create failing assertio
         t.is(assertions[ 0 ].name, 'waitForElementActionable')
     })
 })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Click should prevent the test from stopping, even w/o `await`', async t => {
+    let clicked   = false
+
+    t.it('internal', async t => {
+
+        const div = document.body.appendChild(createElement('div', {
+            style   : 'width : 40px;',
+            text    : 'testing click'
+        }))
+
+        div.addEventListener('click', () => clicked = true)
+
+        // intentionally do not `await` here
+        t.click(div)
+
+    }).postFinishHook.on(test => {
+        t.true(clicked, 'Click completed before test finalization')
+    })
+})
+
+

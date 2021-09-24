@@ -448,14 +448,16 @@ export class UserAgentOnPage extends Mixin(
 
             if (!silent && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForMouseTargetActionable`')
 
-            if (isArray(action.target)) {
+            const actionTarget          = action.target ?? this.simulator.currentPosition.slice() as Point
+
+            if (isArray(actionTarget)) {
                 // if we are given a coordinate system point, check that it is
-                const point             = action.target.length === 0 ? this.simulator.currentPosition.slice() as Point : action.target
+                const point             = actionTarget.length === 0 ? this.simulator.currentPosition.slice() as Point : actionTarget
 
                 const isVisible         = getViewportRect(this.window).containsPoint(point)
 
                 if (!isVisible) {
-                    if (!silent) this.reportActionabilityCheckFailures(action.target, [ 'visible' ], options)
+                    if (!silent) this.reportActionabilityCheckFailures(actionTarget, [ 'visible' ], options)
 
                     return { success : false, failedChecks : [ 'visible' ], actionPoint : point }
                 }
@@ -465,7 +467,7 @@ export class UserAgentOnPage extends Mixin(
                 return { success : true, failedChecks : [], actionPoint : point }
             }
             else {
-                const target            = action.target
+                const target            = actionTarget
 
                 let el : Element        = undefined
 
@@ -497,7 +499,7 @@ export class UserAgentOnPage extends Mixin(
                         const elapsed   = Date.now() - start
 
                         if (elapsed >= timeout) {
-                            if (!silent) this.reportActionabilityCheckFailures(action.target, failedChecks, options)
+                            if (!silent) this.reportActionabilityCheckFailures(actionTarget, failedChecks, options)
 
                             resolve({ success : false, failedChecks, actionElement : el, actionPoint : undefined })
 
