@@ -79,7 +79,7 @@ export const isOffsetInsideElementBox = (el : Element, offset : ActionTargetOffs
     const rect              = el.getBoundingClientRect()
     const [ dx, dy ]        = normalizeOffset(el, offset)
 
-    return dx >= 0 && dx <= rect.width && dy >= 0 && dy <= rect.height
+    return dx >= 0 && dx < rect.width && dy >= 0 && dy < rect.height
 }
 
 

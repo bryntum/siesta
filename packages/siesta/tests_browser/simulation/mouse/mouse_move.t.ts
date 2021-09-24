@@ -33,48 +33,183 @@ it('Moving mouse to element should work', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should set `buttons` property in `mousemove` events during left-button drag', async t => {
-    document.body.innerHTML = '<div style="width: 50px; height: 50px; background: #ccc;"></div>'
+it('Should be able to move cursor to the element with offset, inside the element', async t => {
+    document.body.innerHTML = '<div id="box" style="position: absolute; left : 50px; top: 50px; width: 50px; height: 50px; background: #ccc;"></div>'
 
-    await t.moveMouseTo('div')
+    t.firesOk('#box', 'click', 4)
 
-    await t.mouseDown()
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    await t.moveMouseTo('#box', [ 0, 0 ])
+    await t.click()
 
-    let listener
+    t.equal(t.simulator.currentPosition, [ 50, 50 ])
 
-    t.$('div').addEventListener('mousemove', listener = (e : MouseEvent) => {
-        t.is(e.button, 0, '`button` property set correctly')
-        t.is(e.buttons, 1, '`buttons` property set correctly')
-    })
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    await t.moveMouseTo('#box', [ 0, '100% - 1' ])
+    await t.click()
 
-    await t.moveMouseTo(10, 10)
+    t.equal(t.simulator.currentPosition, [ 50, 99 ])
 
-    await t.mouseUp()
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    await t.moveMouseTo('#box', [ '100% - 1', '100% - 1' ])
+    await t.click()
 
-    t.$('div').removeEventListener('mousemove', listener)
+    t.equal(t.simulator.currentPosition, [ 99, 99 ])
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    await t.moveMouseTo('#box', [ '100% - 1', 0 ])
+    await t.click()
+
+    t.equal(t.simulator.currentPosition, [ 99, 50 ])
 })
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should set `buttons` property in `mousemove` events during right-button drag', async t => {
-    document.body.innerHTML = '<div style="width: 50px; height: 50px; background: #ccc;"></div>'
+it('Should be able to move cursor to the element with offset, outside the element', async t => {
+    document.body.innerHTML = '<div id="box" style="position: absolute; left : 50px; top: 50px; width: 50px; height: 50px; background: #ccc;"></div>'
+
+    t.firesOk('#box', 'click', 0)
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    await t.moveMouseTo('#box', [ 0, -1 ])
+    await t.click()
+
+    t.equal(t.simulator.currentPosition, [ 50, 49 ])
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    await t.moveMouseTo('#box', [ 0, '100%' ])
+    await t.click()
+
+    t.equal(t.simulator.currentPosition, [ 50, 100 ])
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    await t.moveMouseTo('#box', [ '100%', '100%' ])
+    await t.click()
+
+    t.equal(t.simulator.currentPosition, [ 100, 100 ])
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    await t.moveMouseTo('#box', [ '100%', 0 ])
+    await t.click()
+
+    t.equal(t.simulator.currentPosition, [ 100, 50 ])
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should set `buttons` property in `mousemove` events during left-button drag', async t => {
+    document.body.innerHTML = '<div id="box" style="position: absolute; left : 50px; top: 50px; width: 50px; height: 50px; background: #ccc;"></div>'
+
+    await t.moveMouseTo('#box', [ -1, '50%' ])
+
+    document.body.addEventListener('contextmenu', (e : MouseEvent) => e.preventDefault())
+
+    await t.mouseDown()
+
+    t.firesOk('div', { mousemove : '>=1', mouseover : 1, mouseout : 1, mouseenter : 1, mouseleave : 1 });
+
+    [ 'mousemove', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave' ].forEach(eventName => {
+        t.$('div').addEventListener(eventName, (e : MouseEvent) => {
+            t.silent.is(e.button, 0, `${ e.type }: 'button' property set correctly`)
+            t.silent.is(e.buttons, 1, `${ e.type }: 'buttons' property set correctly`)
+        }, { once : true })
+    })
 
     await t.moveMouseTo('div')
 
-    t.$('div').addEventListener('contextmenu', (e : MouseEvent) => e.preventDefault())
+    await t.moveMouseTo('div', [ '100% + 1', '50%' ])
+
+    await t.mouseUp()
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should set `buttons` property in mouse move events during right-button drag', async t => {
+    document.body.innerHTML = '<div id="box" style="position: absolute; left : 50px; top: 50px; width: 50px; height: 50px; background: #ccc;"></div>'
+
+    await t.moveMouseTo('#box', [ -1, '50%' ])
+
+    document.body.addEventListener('contextmenu', (e : MouseEvent) => e.preventDefault())
 
     await t.mouseDown({ button : 'right' })
 
-    let listener
+    t.firesOk('div', { mousemove : '>=1', mouseover : 1, mouseout : 1, mouseenter : 1, mouseleave : 1 });
 
-    t.$('div').addEventListener('mousemove', listener = (e : MouseEvent) => {
-        t.is(e.button, 0, '`button` property set correctly')
-        t.is(e.buttons, 2, '`buttons` property set correctly')
+    [ 'mousemove', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave' ].forEach(eventName => {
+        t.$('div').addEventListener(eventName, (e : MouseEvent) => {
+            t.silent.is(e.button, 0, `${ e.type }: 'button' property set correctly`)
+            t.silent.is(e.buttons, 2, `${ e.type }: 'buttons' property set correctly`)
+        }, { once : true })
     })
 
-    await t.moveMouseTo(10, 10)
+    await t.moveMouseTo('div')
+
+    await t.moveMouseTo('div', [ '100% + 1', '50%' ])
 
     await t.mouseUp({ button : 'right' })
-
-    t.$('div').removeEventListener('mousemove', listener)
 })
+
+
+// it('should support passing options object to moveMouseTo method', async t => {
+//     document.body.innerHTML = '<div id="div" style="width:50px;height:50px;background:#ccc;"></div>'
+//
+//     let parent = Ext.get('div')
+//
+//     parent.on({
+//         mousemove : function (e) {
+//             t.ok(e.shiftKey, 'mousemove event has options')
+//         },
+//
+//         single  : true
+//     })
+//
+//     parent.on({
+//         mouseover : function (e) {
+//             t.ok(e.shiftKey, 'mouseover event has options')
+//         },
+//
+//         single  : true
+//     })
+//
+//     t.chain(
+//         { moveMouseTo : [ 5, 5 ], options : { shiftKey : true }},
+//
+//         function (next) {
+//             t.isDeeply(t.currentPosition, [ 5, 5 ], 'moveMouseTo Input: Array - Cursor moved to correct place')
+//
+//             next()
+//         }
+//     )
+// })
+//
+// it('should support passing options object to moveMouseBy method', async t => {
+//     document.body.innerHTML = '<div id="div2" style="width:50px;height:50px;background:#ccc;"></div>'
+//
+//     let parent = Ext.get('div2')
+//
+//     parent.on({
+//         mousemove : function (e) {
+//             t.ok(e.shiftKey, 'mousemove event has options')
+//         },
+//
+//         single  : true
+//     })
+//
+//     parent.on({
+//         mouseover : function (e) {
+//             t.ok(e.shiftKey, 'mouseover event has options')
+//         },
+//
+//         single  : true
+//     })
+//
+//     t.chain(
+//         { moveMouseTo : [ 5, 5 ], options : { shiftKey : true }},
+//
+//         function (next) {
+//             t.isDeeply(t.currentPosition, [ 5, 5 ], 'moveMouseTo Input: Array - Cursor moved to correct place')
+//
+//             next()
+//         }
+//     )
+// })

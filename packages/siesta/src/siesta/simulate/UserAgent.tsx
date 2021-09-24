@@ -609,7 +609,7 @@ export class UserAgentOnPage extends Mixin(
                                 }
                             }
                         } else {
-                            const el        = actionPointData.topElementData.el
+                            el              = actionPointData.topElementData.el
                             const rect      = Rect.fromElement(el)
 
                             offset          = minusPoints(actionPointData.topElementData.localXY, rect.leftTop)
