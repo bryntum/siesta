@@ -38,14 +38,13 @@ it('Clicking on the elements inside of the iframe should work', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// // TODO https://github.com/microsoft/playwright/issues/9029
-// it({ title : 'Should not freeze when moving mouse above foreign-domain iframe', isTodo : true }, async t => {
-//     document.body.innerHTML = '<iframe></iframe>'
-//
-//     const frame = document.querySelector('iframe')
-//     frame.setAttribute('src', "https://www.theworldsworstwebsiteever.com/")
-//
-//     t.firesOnce(document.documentElement, 'click')
-//
-//     await t.click('iframe')
-// })
+it('Should not freeze when moving mouse above foreign-domain iframe', async t => {
+    document.body.innerHTML = '<iframe></iframe>'
+
+    const frame = document.querySelector('iframe')
+    frame.setAttribute('src', "https://www.theworldsworstwebsiteever.com/")
+
+    t.firesOnce(document.documentElement, 'click')
+
+    await t.click('iframe')
+})
