@@ -2,7 +2,7 @@ import { describe } from "../../index.js"
 import { Assertion } from "../../src/siesta/test/TestResult.js"
 import { delay } from "../../src/util/TimeHelpers.js"
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 let log : string[]      = []
 
 describe('Before/after should work #1', t => {
@@ -50,7 +50,7 @@ describe('Before/after should work #1', t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 let log2 : string[]      = []
 
 describe('Before/after should work #2', t => {
@@ -116,7 +116,7 @@ describe('Before/after should work #2', t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 describe('Should be possible to add assertions in the `before/afterEach`', t => {
 
     t.it('Root', t => {

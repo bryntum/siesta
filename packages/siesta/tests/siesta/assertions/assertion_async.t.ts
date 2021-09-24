@@ -4,7 +4,7 @@ import { Assertion } from "../../../src/siesta/test/TestResult.js"
 import { delay } from "../../../src/util/TimeHelpers.js"
 import { verifyAllFailed } from "../@helpers.js"
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`waitFor` assertion should work', async t => {
 
     //------------------
@@ -33,7 +33,7 @@ it('`waitFor` assertion should work', async t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`beginAsync/endAsync` assertion should work', async t => {
 
     t.it('Should be able to chain `beginAsync`', async t => {
@@ -73,7 +73,7 @@ it('`beginAsync/endAsync` assertion should work', async t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`waitFor` should prevent the test from stopping, even w/o `await`', async t => {
 
     let waitCompleted   = false
@@ -88,7 +88,7 @@ it('`waitFor` should prevent the test from stopping, even w/o `await`', async t 
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`waitFor` should support `trigger` option', async t => {
 
     let done = false

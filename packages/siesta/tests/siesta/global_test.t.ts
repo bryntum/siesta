@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it } from "../../index.js"
 import { delay } from "../../src/util/TimeHelpers.js"
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 describe('Should be possible to nest calls to global `it/describe``', t => {
 
     it('Root', async t => {
@@ -32,7 +32,7 @@ describe('Should be possible to nest calls to global `it/describe``', t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 let log2 : string[]      = []
 
 describe('Should be possible to use global `before/afterEach`', t => {

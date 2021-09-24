@@ -1,7 +1,7 @@
 import { it } from "../../index.js"
 import { Assertion } from "../../src/siesta/test/TestResult.js"
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Todo tests should not fail', t => {
     t.todo('Todo test', t => {
         t.is(1, 1, 'todo1')

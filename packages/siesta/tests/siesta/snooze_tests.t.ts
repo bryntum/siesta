@@ -1,7 +1,7 @@
 import { describe } from "../../index.js"
 import { Assertion } from "../../src/siesta/test/TestResult.js"
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 describe('Snoozed tests should not fail', t => {
     t.it({
         title   : 'Snoozed test',
@@ -31,7 +31,7 @@ describe('Snoozed tests should not fail', t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 describe('Unsnoozed tests', t => {
     t.it({
         title   : 'Unsnoozed test',

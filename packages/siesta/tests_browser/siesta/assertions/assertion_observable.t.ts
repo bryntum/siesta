@@ -4,7 +4,7 @@ import { Assertion } from "../../../src/siesta/test/TestResult.js"
 import { verifyAllFailed } from "../../../tests/siesta/@helpers.js"
 import { createElement } from "../../@helpers.js"
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`waitForEvent` assertion should work', async t => {
 
     const clickDiv = document.body.appendChild(createElement('div', {
@@ -32,7 +32,7 @@ it('`waitForEvent` assertion should work', async t => {
 })
 
 
-//-------------------------------------------------------
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`firesOk` assertion should work', async t => {
 
     const clickDiv = document.body.appendChild(createElement('div', {
