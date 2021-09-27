@@ -147,3 +147,86 @@ it('drag should NOT fire click event if mouseup removes the node from DOM', asyn
 
     await t.dragBy(div, [ 20, 0 ])
 })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should fire mouseleave if target moved after drag -> mouseup', async t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; top: 0; left: 50px; border: 1px solid black; width: 100px; height: 100px" id="outer"></div>'
+
+    await t.moveMouseTo(1, 1)
+
+    const outer = document.getElementById('outer')
+
+    outer.addEventListener('mouseup', () => outer.style.left = '200px')
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    let mouseLeaveCounter = 0
+
+    outer.addEventListener('mouseleave', () => mouseLeaveCounter++)
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    let mouseOverCounter    = 0
+
+    document.body.addEventListener('mouseover', () => mouseOverCounter++)
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    t.firesOk(outer, 'mouseenter', 1, 'outer mouseenter')
+    t.firesOk(outer, 'mouseleave', /*isNativeFF ? 0 :*/ 1, 'outer mouseleave')
+
+    // NOTE: Firefox doesn't fire mouseover after the DIV is moved, Chrome does
+    // 1 mouseover is 'outer' bubbling
+    // 1 mouseover is when 'outer' is removed
+    t.firesOk(document.body, 'mouseover', /*isNativeFF ? 1 :*/ 2, 'body mouseover')
+
+    // the events from above are fired asynchronously, already after the mouseup is complete
+    // there's no reliable way to wait for both of them, except explicit `waitFor` custom condition
+    await t.waitFor({
+        condition   : () => mouseLeaveCounter === 1 && mouseOverCounter === 2,
+        trigger     : () => t.dragTo([], '#outer')
+    })
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should fire mouseout/mouseover when dragging target that hides on mousedown and reappears after mouseup', async t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; top: 0; left: 100px; border: 1px solid black; width: 100px; height: 100px;" id="outer">' +
+            '<div style="position: absolute; top: 40px; left: 40px; border: 1px solid green; width: 40px; height: 40px;" id="inner">' +
+                '<div style="margin: 5px; background: red; width: 80%; height: 80%" id="inner-content">' +
+                '</div>' +
+            '</div>' +
+        '</div>'
+
+    await t.moveMouseTo(1, 1)
+
+    const inner         = t.$('#inner') as HTMLElement
+    const outer         = t.$('#outer') as HTMLElement
+    const innerContent  = t.$('#inner-content') as HTMLElement
+
+    inner.addEventListener('mousedown', () => {
+        // if (t.bowser.linux)
+        //     inner.style.display = 'none'
+        // else
+            inner.style.visibility = 'hidden'
+    })
+
+    document.body.addEventListener('mouseup', e => {
+        // if (t.bowser.linux)
+        //     inner.style.display = 'block'
+        // else
+            inner.style.visibility = ''
+    })
+
+
+    t.willFireNTimes(innerContent, 'mouseout', 1, 'inner is mouseout')
+
+    await t.dragBy('#inner', [ 5, 0 ], { dragOnly : true })
+
+    const waitForMouseout       = t.waitForEvent(outer, 'mouseout')
+    const waitForMouseover      = t.waitForEvent(inner, 'mouseover')
+
+    await t.mouseUp()
+
+    await Promise.all([ waitForMouseout, waitForMouseover ])
+})

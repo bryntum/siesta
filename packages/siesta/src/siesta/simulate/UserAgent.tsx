@@ -56,6 +56,8 @@ export type MouseActionOptions      = {
     allowChild          : boolean
 
     timeout             : number
+
+    sourcePoint         : SourcePoint
 }
 
 
@@ -67,6 +69,8 @@ export interface DragActionOptions extends MouseActionOptions {
     targetOffset        : ActionTargetOffset
 
     dragOnly            : boolean
+
+    sourcePoint         : SourcePoint
 }
 
 
@@ -86,6 +90,8 @@ export type KeyboardActionOptions   = {
     timeout             : number
     // delay between the key down / key up events
     delay               : number
+
+    sourcePoint         : SourcePoint
 }
 
 
@@ -160,9 +166,10 @@ export type WaitForMouseTargetActionableOptions = {
     sourcePoint?            : SourcePoint
     actionName?             : string
 
-    syncCursor?             : boolean
     silent?                 : boolean
     timeout?                : number
+
+    syncCursor?             : boolean
     stabilityFrames?        : number
 }
 
@@ -288,6 +295,7 @@ export class UserAgentOnPage extends Mixin(
                 allowChild          : true,
 
                 timeout             : this.defaultTimeout,
+                sourcePoint         : this.getSourcePoint()
             }
 
             if (isArray(offset))
@@ -329,6 +337,8 @@ export class UserAgentOnPage extends Mixin(
                 allowChild          : true,
 
                 timeout             : this.defaultTimeout,
+
+                sourcePoint         : this.getSourcePoint(),
             } as DragActionOptions, options)
         }
 
@@ -348,6 +358,8 @@ export class UserAgentOnPage extends Mixin(
 
                 timeout             : this.defaultTimeout,
                 delay               : 0,
+
+                sourcePoint         : this.getSourcePoint(),
             } as KeyboardActionOptions, options)
         }
 
@@ -365,7 +377,12 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        reportActionabilityCheckFailures (target : ActionTarget, checks : ActionableCheck[], options : WaitForMouseTargetActionableOptions) {
+        reportActionabilityCheckFailures (
+            target          : ActionTarget,
+            checks          : ActionableCheck[],
+            waitOptions     : WaitForMouseTargetActionableOptions,
+            actionOptions   : { sourcePoint : SourcePoint }
+        ) {
             // TODO
             // 1) should list detailed failed checks (like for "reachable" for example, it should say
             //    with what other element the target is overlayed, etc
@@ -374,9 +391,9 @@ export class UserAgentOnPage extends Mixin(
             this.addResult(Assertion.new({
                 name        : 'waitForElementActionable',
                 passed      : false,
-                sourcePoint : options.sourcePoint,
+                sourcePoint : actionOptions.sourcePoint ?? waitOptions.sourcePoint,
                 annotation  : <div>
-                    <div>Waited too long for { options.actionName } target <span>{ target }</span> to become actionable</div>
+                    <div>Waited too long for { waitOptions.actionName } target <span>{ target }</span> to become actionable</div>
                     <div>Failed checks: `{ checks.join(" ") }`</div>
                 </div>
             }))
@@ -392,7 +409,7 @@ export class UserAgentOnPage extends Mixin(
             const timeout               = options?.timeout ?? action.timeout ?? this.defaultTimeout
             const silent                = options?.silent ?? false
 
-            if (!silent && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForKeyboardTargetActionable`')
+            if (!silent && !action.sourcePoint && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForKeyboardTargetActionable`')
 
             if (isArray(action.target) && action.target.length > 0) {
                 throw new Error("Coordinates as target are not supported for keyboard actions")
@@ -423,7 +440,7 @@ export class UserAgentOnPage extends Mixin(
                     const elapsed   = Date.now() - start
 
                     if (elapsed >= timeout) {
-                        if (!silent) this.reportActionabilityCheckFailures(action.target, failedChecks, options)
+                        if (!silent) this.reportActionabilityCheckFailures(action.target, failedChecks, options, action)
 
                         resolve({ success : false, actionElement : el, failedChecks })
 
@@ -494,7 +511,7 @@ export class UserAgentOnPage extends Mixin(
             const silent                = options?.silent ?? false
             const stabilityFrames       = options?.stabilityFrames ?? 2
 
-            if (!silent && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForMouseTargetActionable`')
+            if (!silent && !action.sourcePoint && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForMouseTargetActionable`')
 
             const actionTarget          = action.target ?? this.simulator.currentPosition.slice() as Point
 
@@ -505,7 +522,7 @@ export class UserAgentOnPage extends Mixin(
                 const isVisible         = getViewportRect(this.window).containsPoint(point)
 
                 if (!isVisible) {
-                    if (!silent) this.reportActionabilityCheckFailures(actionTarget, [ 'visible' ], options)
+                    if (!silent) this.reportActionabilityCheckFailures(actionTarget, [ 'visible' ], options, action)
 
                     return { success : false, failedChecks : [ 'visible' ], actionPoint : point }
                 }
@@ -547,7 +564,7 @@ export class UserAgentOnPage extends Mixin(
                         const elapsed   = Date.now() - start
 
                         if (elapsed >= timeout) {
-                            if (!silent) this.reportActionabilityCheckFailures(actionTarget, failedChecks, options)
+                            if (!silent) this.reportActionabilityCheckFailures(actionTarget, failedChecks, options, action)
 
                             resolve({ success : false, failedChecks, actionElement : el, actionPoint : undefined })
 
@@ -744,7 +761,6 @@ export class UserAgentOnPage extends Mixin(
             const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'click',
                 timeout         : action.timeout
             })
@@ -765,7 +781,6 @@ export class UserAgentOnPage extends Mixin(
             const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'right click',
                 timeout         : action.timeout
             })
@@ -786,7 +801,6 @@ export class UserAgentOnPage extends Mixin(
             const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'double click',
                 timeout         : action.timeout
             })
@@ -807,7 +821,6 @@ export class UserAgentOnPage extends Mixin(
             const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'mouse down',
                 timeout         : action.timeout
             })
@@ -828,7 +841,6 @@ export class UserAgentOnPage extends Mixin(
             const action        = this.normalizeMouseActionOptions(...args)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'mouse up',
                 timeout         : action.timeout
             })
@@ -856,12 +868,11 @@ export class UserAgentOnPage extends Mixin(
                 ? args[ 2 ]
                 : isActionTarget(args[ 0 ]) ? args[ 1 ] : args[ 0 ]) as ActionTargetOffset | Partial<MouseActionOptions>
 
-            if (target !== undefined && !isArray(offsetOrOptions)) offsetOrOptions.target = target
+            if (target !== undefined && offsetOrOptions && !isArray(offsetOrOptions)) offsetOrOptions.target = target
 
             const action        = this.normalizeMouseActionOptions(target, offsetOrOptions)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'mouse move',
                 timeout         : action.timeout
             })
@@ -912,14 +923,16 @@ export class UserAgentOnPage extends Mixin(
         async dragBy (source : ActionTarget, delta : Point, options? : Partial<DragActionOptions>) : Promise<any> {
             if (!delta) throw new Error("No drag delta provided")
 
-            const sourceMouseAction = Object.assign({}, options, { target : source, offset : options?.sourceOffset ?? options?.offset })
+            const normalized        = Object.assign({}, options, { sourcePoint : this.getSourcePoint() })
+
+            const sourceMouseAction = Object.assign({}, normalized, { target : source, offset : options?.sourceOffset ?? options?.offset })
 
             await this.mouseDown(sourceMouseAction)
 
-            await this.moveMouseBy(delta, Object.assign({}, options, { target : undefined }))
+            await this.moveMouseBy(delta, Object.assign({}, normalized, { target : undefined }))
 
             if (!options?.dragOnly) await this.mouseUp(
-                Object.assign({}, options, { target : [] })
+                Object.assign({}, normalized, { target : [] })
             )
         }
 
@@ -934,7 +947,6 @@ export class UserAgentOnPage extends Mixin(
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, text, options)
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'type',
                 timeout         : keyboardAction.timeout
             })
@@ -950,7 +962,6 @@ export class UserAgentOnPage extends Mixin(
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key, options)
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'keyPress',
                 timeout         : keyboardAction.timeout
             })
@@ -966,7 +977,6 @@ export class UserAgentOnPage extends Mixin(
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key)
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'keyDown',
                 timeout         : keyboardAction.timeout
             })
@@ -980,7 +990,6 @@ export class UserAgentOnPage extends Mixin(
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key)
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
-                sourcePoint     : this.getSourcePoint(),
                 actionName      : 'keyUp',
                 timeout         : keyboardAction.timeout
             })
