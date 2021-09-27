@@ -3,6 +3,7 @@ import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
+import { elementFromPoint } from "../../util_browser/Dom.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { PointerMovePrecision } from "../simulate/SimulatorMouse.js"
 import { ActionTarget, Simulator } from "../simulate/Types.js"
@@ -125,6 +126,11 @@ export class TestBrowser extends Mixin(
                     description
                 }))
             }
+        }
+
+
+        getElementAtCursor (deep : boolean = true) : Element {
+            return elementFromPoint(this.window.document, ...this.simulator.currentPosition, deep).el
         }
 
 
