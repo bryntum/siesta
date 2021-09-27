@@ -215,8 +215,11 @@ export class UserAgentOnPage extends Mixin(
 
 
         resolveActionTarget (target : ActionTarget) : Element {
-            if (target instanceof Array) {
-                return elementFromPoint(this.window.document, ...(target.length === 0 ? this.getCursorViewportPosition() : target), true).el
+            if (!target) {
+                return elementFromPoint(this.window.document, ...this.simulator.currentPosition, true).el
+            }
+            else if (target instanceof Array) {
+                return elementFromPoint(this.window.document, ...(target.length === 0 ? this.simulator.currentPosition : target), true).el
             }
             else {
                 return this.normalizeElement(target)
@@ -364,7 +367,7 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        getCursorPagePosition () : Point {
+        get cursorPagePosition () : Point {
             return [
                 clientXtoPageX(this.simulator.currentPosition[ 0 ], this.window),
                 clientYtoPageY(this.simulator.currentPosition[ 1 ], this.window)
@@ -372,7 +375,7 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        getCursorViewportPosition () : Point {
+        get cursorViewportPosition () : Point {
             return this.simulator.currentPosition.slice() as Point
         }
 
@@ -660,13 +663,13 @@ export class UserAgentOnPage extends Mixin(
                         }
 
                         if (isInside) {
-                            if (!isElementPointVisible(el, action.offset, true)) {
+                            if (!isElementPointVisible(el, action.offset, true).visible) {
                                 const scrolled  = scrollElementPointIntoView(el, action.offset, true)
 
                                 // TODO should save the rect for the repeated stability check here?
                                 // stability check will be repeated because of scroll
 
-                                if (!scrolled || !isElementPointVisible(el, action.offset, true)) {
+                                if (!scrolled || !isElementPointVisible(el, action.offset, true).visible) {
                                     checks.push('visible')
                                     continueWaiting(true, checks)
                                     return
@@ -678,10 +681,10 @@ export class UserAgentOnPage extends Mixin(
 
                             offset          = minusPoints(actionPointData.topElementData.localXY, rect.leftTop)
 
-                            if (!isElementPointVisible(el, offset, true)) {
+                            if (!isElementPointVisible(el, offset, true).visible) {
                                 const scrolled  = scrollElementPointIntoView(el, offset, true)
 
-                                if (!scrolled || !isElementPointVisible(el, offset, true)) {
+                                if (!scrolled || !isElementPointVisible(el, offset, true).visible) {
                                     checks.push('visible')
                                     continueWaiting(true, checks)
                                     return

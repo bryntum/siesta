@@ -1,48 +1,179 @@
 import { beforeEach, it } from "../../../browser.js"
-import { Assertion } from "../../../src/siesta/test/TestResult.js"
-import { verifyAllFailed } from "../../../tests/siesta/@helpers.js"
-import { createElement } from "../../@helpers.js"
+
+// the default style `height: 100%` limits the size of the body
+document.body.style.height = ''
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-beforeEach(() => {
+it('Mouse action should work if page is scrolled', async t => {
+    beforeEach(() => {
+        document.body.innerHTML =
+            '<div style="position: relative; width: 10px; height: 2500px; background: blue;">scroller</div>' +
+            '<div id="clicker" style="position: absolute; left: 100px; top: 1100px; width: 50px; height: 200px; background: red;"></div>'
+
+        document.scrollingElement.scrollTop = 1000
+    })
+
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    it('Click on element should work correctly when page is scrolled', async t => {
+        t.firesOnce('#clicker', 'click')
+
+        await t.click('#clicker')
+    })
+
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    it('Click on coordinates should work correctly when page is scrolled', async t => {
+        t.firesOnce('#clicker', 'click')
+
+        await t.click([ 110, 110 ])
+    })
+
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    it('`getElementAtCursor`', async t => {
+        await t.moveMouseTo('#clicker')
+
+        t.is(t.getElementAtCursor(), t.$('#clicker'))
+    })
+
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    it('`Move mouse to - need to scroll target point into view`', async t => {
+        document.scrollingElement.scrollTop = 0
+
+        t.firesOnce('#clicker', 'click')
+
+        await t.click('#clicker')
+    })
+
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    it('`Drag from coordinates should work correctly when page is scrolled`', async t => {
+        t.firesOnce('#clicker', 'mousedown')
+        t.firesOnce(document.body, 'mouseup')
+
+        await t.dragBy([ 110, 110 ], [ 50, 50 ])
+    })
+
+
+    //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+    it('`Drag from el to other el`', async t => {
+        t.firesOnce('#clicker', 'mousedown')
+        t.firesOnce(document.body, 'mouseup')
+
+        await t.dragTo({
+            source          : '#clicker',
+            target          : document.body,
+            targetOffset    : [ 160, 1250 ]
+        })
+    })
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('should scroll element into view 1', async t => {
+    setTimeout(() => {
+        document.body.innerHTML =
+            '<div style="border: 1px solid #ddd; width: 200px; height: 200px; overflow: auto">' +
+                '<div style="background: #aaa; margin-top: 240px; width: 40px; height: 40px" id="inner">FOO</div>' +
+            '</div>'
+
+        t.willFireNTimes("#inner", 'click', 1)
+    }, 200)
+
+    await t.click('#inner')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('should scroll element into view 2', async t => {
     document.body.innerHTML =
-        '<div style="position: relative; width: 10px; height: 1500px; border: 1px solid;">scroller</div>' +
-        '<div id="clicker" style="position: absolute; left: 100px; top: 600px; height: 200px; background: red;">clicker</div>'
+        '<div style="border: 1px solid #ddd; width: 200px; height: 150px; overflow: auto">' +
+            '<div style="background: #aaa; margin-top: 160px; width: 40px; height: 100px">' +
+                '<div id="inner2" style="height: 40px; width: 40px; background: #666">FOO</div>' +
+            '</div>' +
+        '</div>'
 
-    document.scrollingElement.scrollTop = 500
+    t.willFireNTimes("#inner2", 'click', 1)
+
+    await t.click('#inner2')
 })
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Left click', async t => {
-    // const clickDiv = document.body.appendChild(createElement('div', {
-    //     style   : 'width : 40px;',
-    //     text    : 'testing click'
-    // }))
-    //
-    // t.willFireNTimes(clickDiv, 'mousedown', 1,  'left click is ok #1')
-    // t.willFireNTimes(clickDiv, 'mouseup', 1,  'left click is ok #2')
-    // t.willFireNTimes(clickDiv, 'click', 1,  'left click is ok #3')
-    //
-    // clickDiv.addEventListener('mousedown', event => {
-    //     t.is(event.button, 0, 'button to 0 for left click')
-    //
-    //     // Siesta5 comment: IE and Safari does not support "event.buttons" property
-    //     // but according to MDN Safari supports it since 11.1
-    //     t.is(event.buttons, 1, 'buttons to 1 for left click')
-    // })
-    //
-    // clickDiv.addEventListener('mouseup', event => {
-    //     t.is(event.button, 0, 'button to 0 for left click')
-    //     t.is(event.buttons, 0, 'buttons to 0 for left click')
-    // })
-    //
-    // clickDiv.addEventListener('click', event => {
-    //     t.is(event.button, 0, 'button to 0 for left click')
-    //     t.is(event.buttons, 0, 'buttons to 0 for left click')
-    // })
-    //
-    // await t.click(clickDiv)
+it('should scroll element into view 1', async t => {
+    document.body.innerHTML =
+        '<div style="margin: 20px; border: 1px solid #ddd; width: 200px; height: 200px; overflow: auto">' +
+            '<div style="background: #aaa; margin-top: 240px; width: 40px; height: 40px" id="inner">FOO</div>' +
+        '</div>'
+
+    await t.dragBy('#inner', [ 10, 10 ])
+
+    t.elementIsTopElement('#inner', true, "Element has been scrolled into view")
 })
 
+
+// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// it('should scroll element into view 2', async t => {
+//     document.body.innerHTML = '<div id="container1"></div>'
+//
+//     let resetDOM = function () {
+//         t.$('#container1').innerHTML =
+//             '<div style="margin:20px; border:1px solid #ddd;width:200px;height:200px;overflow:auto">' +
+//                 '<div style="background:#aaa;margin-top:240px;width:40px;height:40px" id="inner">FOO</div>' +
+//             '</div>'
+//     }
+//
+//     resetDOM()
+//
+//     t.chain(
+//         { drag : '#inner', by : [10, 10] },
+//         function (next) {
+//             t.elementIsTopElement('#inner', true, "Element has been scrolled into view")
+//
+//             resetDOM()
+//
+//             next()
+//         },
+//         { drag : '#inner', to : '#inner', toOffset : [ '100%+50', '100%+50' ] },
+//         function (next) {
+//             t.elementIsTopElement('#inner', true, "Element has been scrolled into view")
+//
+//             next()
+//         }
+//     )
+// })
+
+
+// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// it('should scroll element into view 2', async t => {
+//     document.body.innerHTML += '<div id="container2"></div>'
+//
+//     let resetDOM = function () {
+//         t.$('#container2').innerHTML =
+//             '<div style="margin:20px; border:1px solid #ddd;width:200px;height:150px;overflow:auto">' +
+//             '<div style="background:#aaa;margin-top:160px;width:40px;height:100px"><div id="inner2" style="height:40px;width:40px;background:#666">FOO</div></div>' +
+//             '</div>'
+//     }
+//
+//     resetDOM()
+//
+//     t.chain(
+//         { drag : '#inner2', by : [10, 10] },
+//         function (next) {
+//             t.elementIsTopElement('#inner2', true, "Element has been scrolled into view")
+//
+//             resetDOM()
+//
+//             next()
+//         },
+//         { drag : '#inner2', to : '#inner2', toOffset : [ '100%+50', '100%+50' ] },
+//         function (next) {
+//             t.elementIsTopElement('#inner2', true, "Element has been scrolled into view")
+//
+//             next()
+//         }
+//     )
+// })
