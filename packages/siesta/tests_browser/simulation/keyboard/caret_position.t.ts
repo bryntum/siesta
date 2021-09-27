@@ -29,7 +29,7 @@ it('Should move caret to edge of text selection when using arrow keys, if text i
     const field = document.getElementById('inp') as HTMLInputElement
 
     //------------------
-    t.selectText('#inp', 1, 4)
+    t.selectText('#inp', 0, 4)
 
     t.is(t.getSelectedText(field), 'aXXa', 'Text selected correctly')
 
