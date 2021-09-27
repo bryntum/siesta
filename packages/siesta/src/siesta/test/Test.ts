@@ -90,6 +90,9 @@ export class Test extends TestPre {
     // "upgrade" types from TreeNode
     parentNode          : Test
 
+    startTime           : Date                  = undefined
+    endTime             : Date                  = undefined
+
     code                : (t : this) => any     = t => {}
 
     pendingSubTests     : Test[]                = []
@@ -454,13 +457,9 @@ export class Test extends TestPre {
     }
 
 
-    // failOnExceptionDuringImport (exception : unknown) {
-    //     this.reporter.onSubTestStart(this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
-    //
-    //     this.addResult(Exception.new({ exception }))
-    //
-    //     this.reporter.onSubTestFinish(this.localId)
-    // }
+    get isFinished () : boolean {
+        return this.endTime !== undefined
+    }
 
 
     async start (checkInfo : SubTestCheckInfo = undefined, dashboardLaunchInfo : DashboardLaunchInfo = undefined) {
@@ -470,6 +469,8 @@ export class Test extends TestPre {
         this.preStartHook.trigger(this)
 
         globalTestEnv.currentTest       = this
+
+        this.startTime                  = new Date()
 
         this.connector.onSubTestStart(this.rootTest.descriptor.guid, this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
@@ -492,6 +493,8 @@ export class Test extends TestPre {
         this.finishHook.trigger(this)
 
         this.connector.onSubTestFinish(this.rootTest.descriptor.guid, this.localId, false)
+
+        this.endTime                    = new Date()
 
         globalTestEnv.currentTest       = this.parentNode
 

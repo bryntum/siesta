@@ -59,22 +59,15 @@ export type MouseActionOptions      = {
 }
 
 
-// export interface DragActionOptions extends MouseActionOptions {
-//     target              : ActionTarget
-//     offset              : ActionTargetOffset
-//
-//     button              : MouseButton
-//
-//     shiftKey?           : boolean
-//     ctrlKey?            : boolean
-//     altKey?             : boolean
-//     metaKey?            : boolean
-//
-//     mouseMovePrecision  : PointerMovePrecision
-//     allowChild          : boolean
-//
-//     timeout             : number
-// }
+export interface DragActionOptions extends MouseActionOptions {
+    source              : ActionTarget
+    sourceOffset        : ActionTargetOffset
+
+    target              : ActionTarget
+    targetOffset        : ActionTargetOffset
+
+    dragOnly            : boolean
+}
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -139,8 +132,9 @@ export interface UserAgent {
     moveMouseBy (dx : number, dy : number, options? : Partial<MouseActionOptions>) : Promise<any>
     moveMouseBy (delta : Point, options? : Partial<MouseActionOptions>) : Promise<any>
 
-    // dragTo (source : ActionTarget, target : ActionTarget) : Promise<any>
-    // dragBy (source : ActionTarget, target : ActionTarget) : Promise<any>
+    dragTo (options : Partial<DragActionOptions>) : Promise<any>
+    dragTo (source : ActionTarget, target : ActionTarget, options? : Partial<DragActionOptions>) : Promise<any>
+    dragBy (source : ActionTarget, delta : Point, options? : Partial<DragActionOptions>) : Promise<any>
 
     type (target : ActionTarget, text : SiestaTypeString, options? : Partial<KeyboardActionOptions>) : Promise<any>
 
@@ -302,6 +296,40 @@ export class UserAgentOnPage extends Mixin(
                 Object.assign(defaults, offset)
 
             return defaults
+        }
+
+
+        normalizeDragActionOptions (
+            ...args :
+                | [ options : Partial<DragActionOptions> ]
+                | [ source : ActionTarget, target : ActionTarget, options? : Partial<DragActionOptions> ]
+        ) : DragActionOptions {
+            const source        = args.length === 1 ? undefined : args[ 0 ]
+            const target        = args.length === 1 ? undefined : args[ 1 ]
+            const options       = args.length === 1 ? args[ 0 ] : args[ 2 ]
+
+            return Object.assign({
+                source,
+                sourceOffset        : undefined,
+
+                target,
+                targetOffset        : undefined,
+                offset              : undefined,
+
+                button              : 'left',
+
+                shiftKey            : false,
+                ctrlKey             : false,
+                altKey              : false,
+                metaKey             : false,
+
+                dragOnly            : false,
+
+                mouseMovePrecision  : this.mouseMovePrecision,
+                allowChild          : true,
+
+                timeout             : this.defaultTimeout,
+            } as DragActionOptions, options)
         }
 
 
@@ -824,11 +852,13 @@ export class UserAgentOnPage extends Mixin(
                 ? args[ 0 ]
                 : isNumber(args[ 0 ]) ? [ args[ 0 ], args[ 1 ] ] as Point : undefined
 
-            const offset        = (isNumber(args[ 0 ]) && isNumber(args[ 1 ])
+            const offsetOrOptions = (isNumber(args[ 0 ]) && isNumber(args[ 1 ])
                 ? args[ 2 ]
                 : isActionTarget(args[ 0 ]) ? args[ 1 ] : args[ 0 ]) as ActionTargetOffset | Partial<MouseActionOptions>
 
-            const action        = this.normalizeMouseActionOptions(target, offset)
+            if (target !== undefined && !isArray(offsetOrOptions)) offsetOrOptions.target = target
+
+            const action        = this.normalizeMouseActionOptions(target, offsetOrOptions)
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 sourcePoint     : this.getSourcePoint(),
@@ -852,6 +882,49 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        async dragTo (options : Partial<DragActionOptions>) : Promise<any>
+        async dragTo (source : ActionTarget, target : ActionTarget, options? : Partial<DragActionOptions>) : Promise<any>
+        async dragTo (
+            ...args :
+                | [ options : Partial<DragActionOptions> ]
+                | [ source : ActionTarget, target : ActionTarget, options? : Partial<DragActionOptions> ]
+        )
+            : Promise<any>
+        {
+            const dragAction        = this.normalizeDragActionOptions(...args)
+
+            if (!dragAction.target) throw new Error("No drag target provided")
+
+            const sourceMouseAction = Object.assign({}, dragAction, { target : dragAction.source, offset : dragAction.sourceOffset })
+
+            await this.mouseDown(sourceMouseAction)
+
+            const targetMouseAction = Object.assign({}, dragAction, { target : dragAction.target, offset : dragAction.targetOffset })
+
+            await this.moveMouseTo(targetMouseAction)
+
+            if (!dragAction.dragOnly) await this.mouseUp(
+                Object.assign({}, dragAction, { target : [] })
+            )
+        }
+
+
+        async dragBy (source : ActionTarget, delta : Point, options? : Partial<DragActionOptions>) : Promise<any> {
+            if (!delta) throw new Error("No drag delta provided")
+
+            const sourceMouseAction = Object.assign({}, options, { target : source, offset : options?.sourceOffset ?? options?.offset })
+
+            await this.mouseDown(sourceMouseAction)
+
+            await this.moveMouseBy(delta, Object.assign({}, options, { target : undefined }))
+
+            if (!options?.dragOnly) await this.mouseUp(
+                Object.assign({}, options, { target : [] })
+            )
+        }
+
+
+        //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         get activeElement () : Element {
             return this.window.document.activeElement
         }
