@@ -33,7 +33,7 @@ export class Expectation extends Base {
 
     value           : unknown           = undefined
 
-    isNot           : boolean           = false
+    negated         : boolean           = false
 
     t               : Test              = undefined
 
@@ -48,7 +48,7 @@ export class Expectation extends Base {
     get not () : Expectation {
         const cls       = this.constructor as typeof Expectation
 
-        return cls.new({ value : this.value, isNot : !this.isNot, t : this.t })
+        return cls.new({ value : this.value, negated : !this.negated, t : this.t })
     }
 
     /**
@@ -66,7 +66,7 @@ export class Expectation extends Base {
         this.t.assertEqualityInternal(
             'expect(received).toBe(expected)',
             this.t.comparePrimitives(this.value, expectedValue),
-            this.isNot,
+            this.negated,
             this.value,
             expectedValue
         )
@@ -77,7 +77,7 @@ export class Expectation extends Base {
      * An alias for [[toEqual]]
      */
     toBeEqual (expectedValue : unknown) {
-        this.t.assertStructuralEqualityInternal('expect(received).toBeEqual(expected)', this.isNot, this.value, expectedValue)
+        this.t.assertStructuralEqualityInternal('expect(received).toBeEqual(expected)', this.negated, this.value, expectedValue)
     }
 
 
@@ -91,7 +91,7 @@ export class Expectation extends Base {
      * @param expectedValue An expected value
      */
     toEqual (expectedValue : unknown) {
-        this.t.assertStructuralEqualityInternal('expect(received).toEqual(expected)', this.isNot, this.value, expectedValue)
+        this.t.assertStructuralEqualityInternal('expect(received).toEqual(expected)', this.negated, this.value, expectedValue)
     }
 
 
@@ -99,7 +99,7 @@ export class Expectation extends Base {
      * This assertion passes, when value provided to the {@link Test.expect|expect} method is `null`.
      */
     toBeNull () {
-        this.t.assertEqualToConstant('expect(received).toBeNull()', this.value === null, this.isNot, this.value, null)
+        this.t.assertEqualToConstant('expect(received).toBeNull()', this.value === null, this.negated, this.value, null)
     }
 
 
@@ -107,7 +107,7 @@ export class Expectation extends Base {
      * This assertion passes, when value provided to the {@link Test.expect|expect} method is `NaN`.
      */
     toBeNaN () {
-        this.t.assertEqualToConstant('expect(received).toBeNaN()', Number.isNaN(this.value), this.isNot, this.value, NaN)
+        this.t.assertEqualToConstant('expect(received).toBeNaN()', Number.isNaN(this.value), this.negated, this.value, NaN)
     }
 
 
@@ -115,7 +115,7 @@ export class Expectation extends Base {
      * This assertion passes, when value provided to the {@link Test.expect|expect} method is not the `undefined` value.
      */
     toBeDefined () {
-        this.t.assertDefinedInternal('expect(received).toBeDefined()', this.isNot, false, this.value)
+        this.t.assertDefinedInternal('expect(received).toBeDefined()', this.negated, false, this.value)
     }
 
 
@@ -123,7 +123,7 @@ export class Expectation extends Base {
      * This assertion passes, when value provided to the {@link Test.expect|expect} method is the `undefined` value.
      */
     toBeUndefined () {
-        this.t.assertDefinedInternal('expect(received).toBeUndefined()', this.isNot, true, this.value)
+        this.t.assertDefinedInternal('expect(received).toBeUndefined()', this.negated, true, this.value)
     }
 
 
@@ -132,7 +132,7 @@ export class Expectation extends Base {
      * For example - non empty strings, numbers except the 0, objects, arrays etc.
      */
     toBeTruthy () {
-        this.t.assertTrueInternal('expect(received).toBeTruthy()', this.isNot, false, this.value)
+        this.t.assertTrueInternal('expect(received).toBeTruthy()', this.negated, false, this.value)
     }
 
 
@@ -141,7 +141,7 @@ export class Expectation extends Base {
      * For example - empty strings, number 0, `null`, `undefined`, etc.
      */
     toBeFalsy () {
-        this.t.assertTrueInternal('expect(received).toBeFalsy()', this.isNot, true, this.value)
+        this.t.assertTrueInternal('expect(received).toBeFalsy()', this.negated, true, this.value)
     }
 
 
@@ -151,7 +151,7 @@ export class Expectation extends Base {
      * @param regexp The regular expression to match the string against
      */
     toMatch (regexp : RegExp) {
-        this.t.assertMatchInternal('expect(received).toMatch(expected)', this.isNot, this.value as string, regexp)
+        this.t.assertMatchInternal('expect(received).toMatch(expected)', this.negated, this.value as string, regexp)
     }
 
 
@@ -167,9 +167,9 @@ export class Expectation extends Base {
         const value       = this.value
 
         if (isString(value)) {
-            this.t.assertMatchInternal('expect(received).toContain(expected)', this.isNot, value, element as string | RegExp)
+            this.t.assertMatchInternal('expect(received).toContain(expected)', this.negated, value, element as string | RegExp)
         } else {
-            this.t.assertIterableContainInternal('expect(received).toContain(expected)', this.isNot, value as Iterable<unknown>, element)
+            this.t.assertIterableContainInternal('expect(received).toContain(expected)', this.negated, value as Iterable<unknown>, element)
         }
     }
 
@@ -228,7 +228,7 @@ export class Expectation extends Base {
     toBeCloseTo (expectedValue : number, approx : Approximation = { digits : 2 }) {
         this.t.assertCompareApproxInternal(
             'expect(received).toBeCloseTo(expected)',
-            this.isNot,
+            this.negated,
             this.value as number,
             expectedValue,
             NumberApproximation.fromApproximation(approx)
@@ -247,7 +247,7 @@ export class Expectation extends Base {
      * ```
      */
     async toThrow (pattern? : string | RegExp) {
-        return this.t.assertThrowInternal('expect(func).toThrow()', this.isNot, this.value as AnyFunction, this.t.getSourcePoint(), pattern)
+        return this.t.assertThrowInternal('expect(func).toThrow()', this.negated, this.value as AnyFunction, this.t.getSourcePoint(), pattern)
     }
 
 
@@ -289,12 +289,12 @@ export class Expectation extends Base {
         if (!(spy instanceof Spy)) throw new Error("This method can be called on spy instance or spy wrapper function")
 
         const condition     = verifyExpectedNumber(spy.callsLog.length, expectedNumber)
-        const passed        = this.isNot ? !condition : condition
+        const passed        = this.negated ? !condition : condition
 
         const name          = 'expect(spy).toHaveBeenCalled(expected)'
 
         this.t.addResult(Assertion.new({
-            name            : this.isNot ? this.t.negateExpectationName(name) : name,
+            name            : this.negated ? this.t.negateExpectationName(name) : name,
             passed,
 
             annotation      : passed ? undefined : GotExpectTemplate.el({
@@ -342,12 +342,12 @@ export class Expectation extends Base {
         if (!(spy instanceof Spy)) throw new Error("This method can be called on spy instance or spy wrapper function")
 
         const condition     = spy.callsLog.some(callInfo => equalDeep(callInfo.args, args))
-        const passed        = this.isNot ? !condition : condition
+        const passed        = this.negated ? !condition : condition
 
         const name          = 'expect(spy).toHaveBeenCalledWith(...arguments)'
 
         this.t.addResult(Assertion.new({
-            name            : this.isNot ? this.t.negateExpectationName(name) : name,
+            name            : this.negated ? this.t.negateExpectationName(name) : name,
             passed,
 
             annotation      : passed ? undefined : GotExpectTemplate.el({
