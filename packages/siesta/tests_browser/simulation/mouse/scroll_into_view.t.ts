@@ -157,3 +157,24 @@ it('should scroll element into view 4', async t => {
 
     t.isElementPointReachable('#inner2', "Element has been scrolled into view")
 })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Click should not trigger scroll on any parent, if target is already visible', async t => {
+    document.body.innerHTML =
+        '<div id="cont" style="width: 100px; height: 400px; background: #333; overflow: scroll">' +
+            '<div style="width: 80px; height: 1000px; background: #888;">' +
+                '<div id="div" style="width: 50px; height: 150px; background: #444"></div>' +
+            '</div>' +
+        '</div>'
+
+    const scrolledContainer = document.getElementById('cont')
+
+    scrolledContainer.scrollTop = 100
+
+    t.firesOnce('#div', 'mousedown')
+
+    await t.mouseDown('#div', [ 30, 140 ])
+
+    t.expect(scrolledContainer.scrollTop).toBe(100)
+})

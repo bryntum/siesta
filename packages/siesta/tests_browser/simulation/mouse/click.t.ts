@@ -90,6 +90,18 @@ it('Should use the current cursor position for action, if its provided as `[]` o
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`mousedown` and `mouseup` should resolve target as other methods', async t => {
+    document.body.innerHTML =
+        '<div style="position: absolute; left: 50px; top: 50px; width: 100px; height: 100px; background: red;" id="div" class="div"></div>'
+
+    t.firesOnce('#div', [ 'mousedown', 'mouseup', 'click' ])
+
+    await t.mouseDown('#div')
+    await t.mouseUp('.div')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('mousedown + mouseup on the same element should fire same event as regular click', async t => {
     const div   = document.body.appendChild(createElement('div', {
         style   : 'width : 40px; background: red;',

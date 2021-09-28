@@ -52,6 +52,7 @@ project.plan(
                     'click_iframe.t.js',
                     'click_svg.t.js',
                     'drag.t.js',
+                    'focus.t.js',
                     'modifier_keys.t.js',
                     'mouse_move.t.js',
                     'mouse_over.t.js',
