@@ -70,6 +70,19 @@ export class AssertionObservable extends Mixin(
         async waitForEvent (source : this[ 'ObservableSourceT' ], event : string, options? : WaitForArg<unknown>) {
             const observable            = this.resolveObservable(source)
 
+            if (!observable) {
+                this.addResult(Assertion.new({
+                    name        : 'waitForEvent',
+                    passed      : false,
+                    description : options?.description,
+                    annotation  : <div>
+                        <div>Could not resolve action target `<span class="accented">{ source }</span>` to observable</div>
+                    </div>
+                }))
+
+                return
+            }
+
             let listener : AnyFunction
 
             const eventFiredPromise     = new Promise<void>(resolve => {
