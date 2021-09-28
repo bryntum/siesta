@@ -20,8 +20,11 @@ export class MouseCursorVisualizer extends Base {
         const pointerEl             = this.pointerEl = document.createElement('img')
 
         pointerEl.src               = `${ siestaPackageRootUrl }resources/styling/browser/images/mouse-pointer-solid.svg`
+        // need to disable pointer events for obvious reasons
+        // and user selection too (cursor el may be selected in certain
+        // drag scenarios)
         pointerEl.style.cssText     =
-            'position: fixed; pointer-events: none; width: 10px; left: 0; top: 0; z-index: 100000; transition: all 0.2s'
+            'position: fixed; user-select: none; pointer-events: none; width: 10px; left: 0; top: 0; z-index: 100000; transition: all 0.2s'
 
         document.body.appendChild(pointerEl)
 
