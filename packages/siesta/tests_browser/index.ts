@@ -57,14 +57,15 @@ project.plan(
                     'mouse_move.t.js',
                     'mouse_over.t.js',
                     'pointer_events.t.js',
-                    'scroll_into_view.t.js'
+                    'scroll_into_view.t.js',
+                    'wait_for_target.t.js'
                 ]
             },
             {
                 filename    : 'targeting',
 
                 items       : [
-                    'actionability_checks.t.js'
+                    'actionability_checks.t.js',
                 ]
             },
         ]
