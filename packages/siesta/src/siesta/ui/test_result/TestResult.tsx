@@ -178,7 +178,7 @@ export class AssertionComponent extends Mixin(
                         return [
                             <span class={ `icon assertion_icon ${ cls }` }><i class={ assertion.passed ? 'far fa-check-circle' : 'far fa-times-circle' }></i></span>,
                             ' ' ,
-                            <span class="assertion_name">{ assertion.name }</span>,
+                            assertion.negated ? <span class="assertion_name_negation">not: </span> : null, <span class="assertion_name">{ assertion.name }</span>,
                             <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>,
                             sourcePoint && !shouldShowSourceContext
                                 ? [ ' at line ', <span class="assertion_source_line">{ sourcePoint.line }</span> ]

@@ -111,6 +111,8 @@ export class Assertion extends Mixin(
 
         passed          : boolean           = true
 
+        negated         : boolean           = false
+
         description     : string            = ''
 
         sourcePoint     : SourcePoint       = undefined
