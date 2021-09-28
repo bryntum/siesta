@@ -280,6 +280,23 @@ export class Test extends TestPre {
     }
 
 
+    $isAssertionNegated : boolean       = false
+
+    get isAssertionNegated () : boolean {
+        const value                 = this.$isAssertionNegated
+
+        this.$isAssertionNegated    = false
+
+        return value
+    }
+
+    get not () : this {
+        this.$isAssertionNegated    = true
+
+        return this
+    }
+
+
     addResult<T extends TestResult> (result : T) : T {
         if (!isSilentAssertionAddition || (!(result instanceof Assertion) || !result.passed)) {
             if ((result instanceof Assertion) && result.sourcePoint === undefined) result.sourcePoint = this.getSourcePoint()
