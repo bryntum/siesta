@@ -27,6 +27,7 @@ export class AssertionElement extends Mixin(
                 | [ target : ActionTarget, description? : string ]
                 | [ target : ActionTarget, options : { offset : ActionTargetOffset, allowChildren : boolean } | ActionTargetOffset, description? : string ]
         ) {
+            const negated       = this.isAssertionNegated
             const target        = args[ 0 ]
             const description   = isString(args[ 1 ]) ? args[ 1 ] : args[ 2 ]
             const options       = isString(args[ 1 ]) ? undefined : args[ 1 ]
@@ -49,23 +50,30 @@ export class AssertionElement extends Mixin(
             }
 
             const res           = isElementPointReachable(el, offset, allowChildren)
-            const passed        = res.reachable
+            const passed        = negated ? !res.reachable : res.reachable
 
             const offsetValue   = normalizeOffset(el, offset)
 
             this.addResult(Assertion.new({
                 name        : 'isElementPointReachable',
                 passed,
+                negated,
                 description,
 
-                annotation  : passed ? undefined : <div>
-                    Element <span class="element">{ el }</span> is not reachable at offset { offsetValue }.
-                    {
-                        res.elAtPoint
-                            ? <div>It is covered with the <span class="element">{ res.elAtPoint }</span></div>
-                            : <div>The point is outside of the visible viewport</div>
-                    }
-                </div>
+                annotation  : passed
+                    ? undefined
+                    : negated
+                        ? <div>
+                            Element <span class="element">{ el }</span> is reachable at offset { offsetValue }.
+                        </div>
+                        : <div>
+                            Element <span class="element">{ el }</span> is not reachable at offset { offsetValue }.
+                            {
+                                res.elAtPoint
+                                    ? <div>It is covered with the <span class="element">{ res.elAtPoint }</span></div>
+                                    : <div>The point is outside of the visible viewport</div>
+                            }
+                        </div>
             }))
         }
 
