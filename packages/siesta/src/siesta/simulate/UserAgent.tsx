@@ -168,6 +168,7 @@ export type WaitForMouseTargetActionableOptions = {
 
     silent?                 : boolean
     timeout?                : number
+    waitForTargetReachable? : boolean
 
     syncCursor?             : boolean
     stabilityFrames?        : number
@@ -513,6 +514,7 @@ export class UserAgentOnPage extends Mixin(
             const syncCursor            = options?.syncCursor ?? true
             const silent                = options?.silent ?? false
             const stabilityFrames       = options?.stabilityFrames ?? 2
+            const waitForTargetReachable = options?.waitForTargetReachable ?? true
 
             if (!silent && !action.sourcePoint && !options?.sourcePoint) throw new Error('Need `sourcePoint` option for non-silent usage of `waitForMouseTargetActionable`')
 
@@ -717,7 +719,7 @@ export class UserAgentOnPage extends Mixin(
                             return
                         }
 
-                        if (isInside) {
+                        if (waitForTargetReachable && isInside) {
                             const topWin        = lastElement(Array.from(parentWindows(win, true)))
                             const elAtPoint     = elementFromPoint(topWin.document, ...point, true).el
 
@@ -765,7 +767,6 @@ export class UserAgentOnPage extends Mixin(
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 actionName      : 'click',
-                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(
@@ -785,7 +786,6 @@ export class UserAgentOnPage extends Mixin(
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 actionName      : 'right click',
-                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(
@@ -805,7 +805,6 @@ export class UserAgentOnPage extends Mixin(
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 actionName      : 'double click',
-                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(
@@ -825,7 +824,6 @@ export class UserAgentOnPage extends Mixin(
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 actionName      : 'mouse down',
-                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(
@@ -845,7 +843,6 @@ export class UserAgentOnPage extends Mixin(
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 actionName      : 'mouse up',
-                timeout         : action.timeout
             })
 
             if (waitRes.success) await this.keepAlive(
@@ -877,7 +874,7 @@ export class UserAgentOnPage extends Mixin(
 
             const waitRes       = await this.waitForMouseTargetActionable(action, {
                 actionName      : 'mouse move',
-                timeout         : action.timeout
+                waitForTargetReachable : false
             })
         }
 
