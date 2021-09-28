@@ -98,9 +98,12 @@ export const isElementAccessible = (el : Element) : boolean => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TODO rewrite to the ElementDimension mechanism
 export const isElementPointVisible = (el : Element, offset : ActionTargetOffset | undefined = undefined, globally : boolean = false)
     : { visible : false } | { visible : true, globalXY : Point } =>
 {
+    if (!el) throw new Error("Element argument is required for `isElementPointVisible`")
+
     if (!isOffsetInsideElementBox(el, offset)) throw new Error("For `isElementPointVisible` offset should be inside the element's box")
 
     if (!isElementAccessible(el)) return { visible : false }
@@ -112,16 +115,21 @@ export const isElementPointVisible = (el : Element, offset : ActionTargetOffset 
 
     while (true) {
         const parentEl          = currentEl.parentElement
-        const isTopEl           = !parentEl.parentElement
+        const isTopEl           = !parentEl || !parentEl.parentElement
         const isTop             = (!globally || isTopWindow(currentWin)) && isTopEl
-        const parentRect        = isTopEl ? getViewportRect(currentWin) : Rect.fromElementContent(parentEl)
 
-        const parentStyle       = currentWin.getComputedStyle(parentEl)
-        const overflowX         = parentStyle[ 'overflow-x' ]
-        const overflowY         = parentStyle[ 'overflow-y' ]
+        if (parentEl) {
+            const parentRect        = isTopEl ? getViewportRect(currentWin) : Rect.fromElementContent(parentEl)
 
-        if (overflowX !== 'visible' || isTopEl) currentRect = currentRect.cropLeftRight(parentRect)
-        if (overflowY !== 'visible' || isTopEl) currentRect = currentRect.cropTopBottom(parentRect)
+            const parentStyle       = currentWin.getComputedStyle(parentEl)
+            const overflowX         = parentStyle[ 'overflow-x' ]
+            const overflowY         = parentStyle[ 'overflow-y' ]
+
+            if (overflowX !== 'visible' || isTopEl) currentRect = currentRect.cropLeftRight(parentRect)
+            if (overflowY !== 'visible' || isTopEl) currentRect = currentRect.cropTopBottom(parentRect)
+        } else {
+            currentRect         = currentRect.intersect(getViewportRect(currentWin))
+        }
 
         const isPointVisible    = (!offset && !currentRect.isEmpty()) || currentRect.containsPoint(currentPoint)
 

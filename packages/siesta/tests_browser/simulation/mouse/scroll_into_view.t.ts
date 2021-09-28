@@ -111,69 +111,49 @@ it('should scroll element into view 1', async t => {
 
     await t.dragBy('#inner', [ 10, 10 ])
 
-    t.elementIsTopElement('#inner', true, "Element has been scrolled into view")
+    t.isElementPointReachable('#inner', "Element has been scrolled into view")
 })
 
 
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// it('should scroll element into view 2', async t => {
-//     document.body.innerHTML = '<div id="container1"></div>'
-//
-//     let resetDOM = function () {
-//         t.$('#container1').innerHTML =
-//             '<div style="margin:20px; border:1px solid #ddd;width:200px;height:200px;overflow:auto">' +
-//                 '<div style="background:#aaa;margin-top:240px;width:40px;height:40px" id="inner">FOO</div>' +
-//             '</div>'
-//     }
-//
-//     resetDOM()
-//
-//     t.chain(
-//         { drag : '#inner', by : [10, 10] },
-//         function (next) {
-//             t.elementIsTopElement('#inner', true, "Element has been scrolled into view")
-//
-//             resetDOM()
-//
-//             next()
-//         },
-//         { drag : '#inner', to : '#inner', toOffset : [ '100%+50', '100%+50' ] },
-//         function (next) {
-//             t.elementIsTopElement('#inner', true, "Element has been scrolled into view")
-//
-//             next()
-//         }
-//     )
-// })
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('should scroll element into view 2', async t => {
+    document.body.innerHTML =
+        '<div style="margin: 20px; border: 1px solid #ddd; width: 200px; height: 200px; overflow: auto">' +
+            '<div style="background: #aaa; margin-top: 240px; width: 40px; height: 40px" id="inner">FOO</div>' +
+        '</div>'
+
+    await t.dragTo({ source : '#inner', target : '#inner', targetOffset : [ '100% + 50', '50%' ] })
+
+    t.isElementPointReachable('#inner', "Element has been scrolled into view")
+})
 
 
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// it('should scroll element into view 2', async t => {
-//     document.body.innerHTML += '<div id="container2"></div>'
-//
-//     let resetDOM = function () {
-//         t.$('#container2').innerHTML =
-//             '<div style="margin:20px; border:1px solid #ddd;width:200px;height:150px;overflow:auto">' +
-//             '<div style="background:#aaa;margin-top:160px;width:40px;height:100px"><div id="inner2" style="height:40px;width:40px;background:#666">FOO</div></div>' +
-//             '</div>'
-//     }
-//
-//     resetDOM()
-//
-//     t.chain(
-//         { drag : '#inner2', by : [10, 10] },
-//         function (next) {
-//             t.elementIsTopElement('#inner2', true, "Element has been scrolled into view")
-//
-//             resetDOM()
-//
-//             next()
-//         },
-//         { drag : '#inner2', to : '#inner2', toOffset : [ '100%+50', '100%+50' ] },
-//         function (next) {
-//             t.elementIsTopElement('#inner2', true, "Element has been scrolled into view")
-//
-//             next()
-//         }
-//     )
-// })
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('should scroll element into view 3', async t => {
+    document.body.innerHTML =
+        '<div style="margin: 20px; border: 1px solid #ddd; width: 200px; height: 150px; overflow: auto">' +
+            '<div style="background: #aaa; margin-top: 160px; width: 40px; height: 100px">' +
+                '<div id="inner2" style="height: 40px; width: 40px; background: #666">FOO</div>' +
+            '</div>' +
+        '</div>'
+
+    await t.dragBy('#inner2', [ 10, 10 ])
+
+    t.isElementPointReachable('#inner2', "Element has been scrolled into view")
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('should scroll element into view 4', async t => {
+    document.body.innerHTML =
+        '<div style="margin: 20px; border: 1px solid #ddd; width: 200px; height: 150px; overflow: auto">' +
+            '<div style="background: #aaa; margin-top: 160px; width: 40px; height: 100px">' +
+                '<div id="inner2" style="height: 40px; width: 40px; background: #666">FOO</div>' +
+            '</div>' +
+        '</div>'
+
+    await t.dragTo({ source : '#inner2', target : '#inner2', targetOffset : [ '100% + 50', '50%' ] })
+
+    t.isElementPointReachable('#inner2', "Element has been scrolled into view")
+})

@@ -9,6 +9,7 @@ import { PointerMovePrecision } from "../simulate/SimulatorMouse.js"
 import { ActionTarget, Simulator } from "../simulate/Types.js"
 import { UserAgentOnPage } from "../simulate/UserAgent.js"
 import { MouseCursorVisualizer } from "../ui/MouseCursorVisualizer.js"
+import { AssertionElement } from "./assertion/AssertionElement.js"
 import { AssertionObservable } from "./assertion/AssertionObservable.js"
 import { TextSelectionHelpers } from "./browser/TextSelectionHelpers.js"
 import { TestLauncherBrowserChild } from "./port/TestLauncherBrowser.js"
@@ -25,12 +26,14 @@ export class TestBrowser extends Mixin(
     [
         UserAgentOnPage,
         AssertionObservable,
+        AssertionElement,
         TextSelectionHelpers,
         Test
     ],
     (base : ClassUnion<
         typeof UserAgentOnPage,
         typeof AssertionObservable,
+        typeof AssertionElement,
         typeof TextSelectionHelpers,
         typeof Test
     >) =>
