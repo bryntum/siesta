@@ -58,6 +58,7 @@ project.plan(
                     'mouse_over.t.js',
                     'pointer_events.t.js',
                     'scroll_into_view.t.js',
+                    'transformed_element.t.js',
                     'wait_for_target.t.js'
                 ]
             },
