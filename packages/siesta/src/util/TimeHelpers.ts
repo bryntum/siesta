@@ -2,7 +2,10 @@ import { OrPromise, SetTimeoutHandler } from "./Helpers.js"
 import { isPromise } from "./Typeguards.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const delay = (timeout : number) : Promise<any> => new Promise(resolve => setTimeout(resolve, timeout))
+// Promise<void> is more typesafe than Promise<any> and more convenient than Promise<unknown>
+// setTimeout calls the scheduled function with the elapsed time argument, because of that
+// we wrap the call to `resolve` to another function
+export const delay = (timeout : number) : Promise<void> => new Promise(resolve => setTimeout(() => resolve(), timeout))
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // it is recommended, that the error instance, to throw on timeout, to be provided from the call site of this method
@@ -51,8 +54,10 @@ export const buffer = <Args extends unknown[]>(func : (...args : Args) => unknow
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type WaitForResult<R> = { conditionIsMet : boolean, result : R, exception : unknown, elapsedTime : number }
+
 export const waitFor  = async <R> (condition : () => OrPromise<R>, waitTimeout : number, interval : number)
-    : Promise<{ conditionIsMet : boolean, result : R, exception : unknown, elapsedTime : number }> =>
+    : Promise<WaitForResult<R>> =>
 {
     const start             = Date.now()
     const end               = start + waitTimeout
@@ -79,8 +84,10 @@ export const waitFor  = async <R> (condition : () => OrPromise<R>, waitTimeout :
         if (value)
             break
         else {
-            if (Date.now() - start >= waitTimeout) {
-                return { conditionIsMet : false, result : undefined, exception : undefined, elapsedTime : Date.now() - start }
+            const elapsedTime   = Date.now() - start
+
+            if (elapsedTime >= waitTimeout) {
+                return { conditionIsMet : false, result : undefined, exception : undefined, elapsedTime }
             }
 
             await delay(interval)
