@@ -67,7 +67,7 @@ export class AssertionObservable extends Mixin(
          * @param event
          * @param options
          */
-        async waitForEvent (source : this[ 'ObservableSourceT' ], event : string, options? : WaitForOptions<unknown>) {
+        async waitForEvent (source : this[ 'ObservableSourceT' ], event : string, options? : Partial<WaitForOptions<unknown>>) {
             const observable            = this.resolveObservable(source)
 
             if (!observable) {
