@@ -28,8 +28,6 @@ export class EnvelopResult extends Base {
     inResponseOf        : EnvelopId     = MIN_SMI
 
     isRejection         : boolean       = false
-    rejectionMessage    : string        = undefined
-    rejectionStack      : string        = undefined
 
     payload             : unknown       = undefined
 }
@@ -214,11 +212,7 @@ export class Port extends Mixin(
                     this.awaitingResponse.delete(inResponseOf)
 
                     if (envelop.isRejection) {
-                        const rejection     = this.recreateRejection(envelop)
-
-                        // console.log("REJECTION: ", rejection)
-
-                        handler[ 1 ](rejection)
+                        handler[ 1 ](envelop.payload)
                     } else {
                         handler[ 0 ](envelop.payload)
                     }
@@ -243,11 +237,6 @@ export class Port extends Mixin(
                         inResponseOf        : envelop.id,
                         isRejection         : true,
                         payload             : e,
-                        // the `message` and `stack` properties of the `Error` instances
-                        // seems to be non-serializable with `JSON.stringify` by default, need to process
-                        // them manually
-                        rejectionMessage    : e ? e.message : undefined,
-                        rejectionStack      : e ? e.stack : undefined
                     })
                 }
 
@@ -278,16 +267,6 @@ export class Port extends Mixin(
 
                 if (!message.requiresResult) resolve()
             })
-        }
-
-
-        recreateRejection (envelop : EnvelopResult) : unknown {
-            const rejection     = envelop.payload as any
-
-            if (envelop.rejectionMessage) rejection.message = envelop.rejectionMessage
-            if (envelop.rejectionStack) rejection.message = envelop.rejectionStack
-
-            return rejection
         }
     }
 ){}

@@ -61,7 +61,7 @@ it('Should handle exceptions in remote calls', async t => {
     class Server extends Port {
         @local()
         async multiply (arg1 : number, arg2 : number) : Promise<number> {
-            throw new Error("exception")
+            throw new Error('oopsy')
         }
     }
 
@@ -87,8 +87,9 @@ it('Should handle exceptions in remote calls', async t => {
 
         t.fail("Should not reach here")
     } catch (e) {
-        // `Error` in Firefox, `exception` elsewhere
-        t.like(e + '', /exception|Error/)
+        t.like(e.message, 'oopsy')
+
+        t.like(e.stack, 'oopsy')
     }
 })
 
