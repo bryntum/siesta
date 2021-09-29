@@ -49,6 +49,7 @@ it('Serialization should work for objects', async t => {
     )
 })
 
+
 it('Serialization should work for arrays', async t => {
     t.equal(
         SerializerXml.serialize([ 1, 2 ]),
