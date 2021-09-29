@@ -95,6 +95,19 @@ it('`waitFor` should support `trigger` option', async t => {
 
     await t.waitFor({
         condition   : () => done,
-        trigger     : () => done = true
+        trigger     : async () => {
+            await delay(10)
+            done = true
+        }
     })
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`waitFor` should support number option', async t => {
+    const start     = Date.now()
+
+    await t.waitFor(50)
+
+    t.isGreaterOrEqual(Date.now() - start, 50)
 })

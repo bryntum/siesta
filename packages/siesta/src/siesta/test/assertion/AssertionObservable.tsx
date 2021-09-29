@@ -4,7 +4,7 @@ import { TextJSX } from "../../../jsx/TextJSX.js"
 import { delay, timeout } from "../../../util/TimeHelpers.js"
 import { isFunction, isNumber, isObject, isPromise, isString } from "../../../util/Typeguards.js"
 import { Assertion } from "../TestResult.js"
-import { AssertionAsync, WaitForArg } from "./AssertionAsync.js"
+import { AssertionAsync, WaitForOptions } from "./AssertionAsync.js"
 import { GotExpectTemplate, verifyExpectedNumber } from "./AssertionCompare.js"
 
 
@@ -67,7 +67,7 @@ export class AssertionObservable extends Mixin(
          * @param event
          * @param options
          */
-        async waitForEvent (source : this[ 'ObservableSourceT' ], event : string, options? : WaitForArg<unknown>) {
+        async waitForEvent (source : this[ 'ObservableSourceT' ], event : string, options? : WaitForOptions<unknown>) {
             const observable            = this.resolveObservable(source)
 
             if (!observable) {

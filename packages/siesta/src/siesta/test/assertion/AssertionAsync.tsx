@@ -1,9 +1,10 @@
 import { AnyFunction, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
+import { XmlElement } from "../../../jsx/XmlElement.js"
 import { serializable } from "../../../serializable/Serializable.js"
 import { MAX_SMI, OrPromise, SetTimeoutHandler } from "../../../util/Helpers.js"
-import { waitFor } from "../../../util/TimeHelpers.js"
-import { isFunction } from "../../../util/Typeguards.js"
+import { delay, waitFor, WaitForResult } from "../../../util/TimeHelpers.js"
+import { isFunction, isNumber, isString } from "../../../util/Typeguards.js"
 import { luid, LUID } from "../../common/LUID.js"
 import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, TestNodeResult } from "../TestResult.js"
 
@@ -12,36 +13,66 @@ import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, TestNodeRe
 /**
  * An argument for the [[Test.waitFor|waitFor]] test class method, denoting the "waiting"
  */
-export type WaitForArg<R> = {
+export type WaitForOptions<R> = {
     /**
      * A condition checker function. Can be `async`. Should return some "truthy" value, indicating the condition has been met.
      * This value will be returned from the [[Test.waitFor|waitFor]] assertion itself.
      */
-    condition?      : () => OrPromise<R>,
+    condition       : () => OrPromise<R>,
 
     /**
      * A trigger function. This function is called once the waiting has started. It allows to avoid race conditions
      * and more verbose syntax
      */
-    trigger?        : AnyFunction,
+    trigger         : AnyFunction,
 
     /**
      * Maximum amount of time, to wait for condition, in milliseconds. After that time, assertion will be marked as failed.
      * If not provided the [[TestDescriptor.waitForTimeout|waitForTimeout]] will be used.
      */
-    timeout?        : number,
+    timeout         : number,
 
     /**
      * The polling interval, in milliseconds. The condition checker function is called once for each interval.
      * If not provided the [[TestDescriptor.waitForPollInterval|waitForPollInterval]] will be used.
      */
-    interval?       : number,
+    interval        : number,
 
     /**
      * The description for the assertion
      */
-    description?    : string
+    description     : string
+
+    reporting       : WaitForReporting<R>
 }
+
+export type WaitForReporting<R> = {
+    assertionName           : string,
+
+    onConditionMet?         : (waitRes : WaitForResult<R>, waitOptions : WaitForOptions<R>) => XmlElement,
+    onException?            : (waitRes : WaitForResult<R>, waitOptions : WaitForOptions<R>) => XmlElement,
+    onTimeout?              : (waitRes : WaitForResult<R>, waitOptions : WaitForOptions<R>) => XmlElement
+}
+
+const defaultWaitForReporting : WaitForReporting<unknown> = {
+    assertionName           : 'waitFor',
+
+    onConditionMet          : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) => {
+        return <div>
+            Waited { waitRes.elapsedTime }ms to fulfill the condition
+        </div>
+    },
+    onException             : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) => {
+        return <div>
+            <div>Exception thrown from condition checker function:</div>
+            <div>{ String(waitRes.exception) }</div>
+        </div>
+    },
+    onTimeout               : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) => {
+        return <div>Waiting for condition aborted by timeout ({ waitOptions.timeout }ms)</div>
+    }
+}
+
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type AsyncGapId = number
@@ -209,29 +240,44 @@ export class AssertionAsync extends Mixin(
          * @param waiting
          * @param description
          */
-        async waitFor <R> (waiting : (() => OrPromise<R>) | WaitForArg<R>, description? : string) : Promise<R> {
-            let condition : () => OrPromise<R>
-            let timeout : number    = this.waitForTimeout
-            let desc : string       = description
-            let pollInterval        = this.waitForPollInterval
-            let trigger             = undefined
+        async waitFor <R> (waiting : number, description? : string) : Promise<R>
+        async waitFor <R> (waiting : () => OrPromise<R>, description? : string) : Promise<R>
+        async waitFor <R> (waiting : Partial<WaitForOptions<R>>) : Promise<R>
+        async waitFor <R> (
+            ...args :
+                | [ waiting : number, description? : string ]
+                | [ waiting : () => OrPromise<R>, description? : string ]
+                | [ waiting : Partial<WaitForOptions<R>> ]
+        ) : Promise<R> {
+            const waitForTime       = isNumber(args[ 0 ]) ? args[ 0 ] : undefined
+            const options           = isFunction(args[ 0 ]) || isNumber(args[ 0 ]) ? undefined : args[ 0 ]
+            const condition         = isFunction(args[ 0 ]) ? args[ 0 ] : options?.condition
+            const timeout           = options?.timeout ?? this.waitForTimeout
+            const description       = isString(args[ 1 ]) ? args[ 1 ] : options?.description
+            const interval          = options?.interval ?? this.waitForPollInterval
+            const trigger           = options?.trigger
 
-            if (isFunction(waiting)) {
-                condition           = waiting
-            } else {
-                condition           = waiting.condition
-                timeout             = waiting.timeout ?? timeout
-                desc                = waiting.description
-                pollInterval        = waiting.interval ?? pollInterval
-                trigger             = waiting.trigger
+            const normalizedOptions : WaitForOptions<R> = {
+                condition,
+                timeout,
+                description,
+                interval,
+                trigger,
+                reporting : options?.reporting ?? defaultWaitForReporting
             }
 
             const creation = this.addResult(AssertionWaitForCreation.new({
-                name            : 'waitFor',
-                description     : desc
+                name            : normalizedOptions.reporting.assertionName,
+                description
             }))
 
-            const promise   = this.keepAlive(waitFor(condition, timeout, pollInterval))
+            const promise : Promise<WaitForResult<R>>  = waitForTime !== undefined
+                ? this.keepAlive(
+                    delay(waitForTime).then(() => {
+                        return { conditionIsMet : true, result : undefined, exception : undefined, elapsedTime : waitForTime }
+                    })
+                )
+                : this.keepAlive(waitFor(condition, timeout, interval))
 
             trigger?.()
 
@@ -243,9 +289,7 @@ export class AssertionAsync extends Mixin(
                     passed      : true,
                     elapsedTime : res.elapsedTime,
 
-                    annotation  : <div>
-                        Waited { res.elapsedTime }ms to fulfill the condition
-                    </div>
+                    annotation  : (normalizedOptions.reporting.onConditionMet ?? defaultWaitForReporting.onConditionMet)(res, normalizedOptions)
                 }))
 
                 return res.result
@@ -259,12 +303,8 @@ export class AssertionAsync extends Mixin(
                     exception       : res.exception,
 
                     annotation      : res.exception
-                        ?
-                            <div>
-                                <div>Exception thrown from condition checker function:</div>
-                                <div>{ String(res.exception) }</div>
-                            </div>
-                        : <div>Waiting for condition aborted by timeout ({ timeout }ms)</div>
+                        ? (normalizedOptions.reporting.onException ?? defaultWaitForReporting.onException)(res, normalizedOptions)
+                        : (normalizedOptions.reporting.onTimeout ?? defaultWaitForReporting.onTimeout)(res, normalizedOptions)
                 }))
 
                 return undefined
