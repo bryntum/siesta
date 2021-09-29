@@ -109,6 +109,7 @@ project.plan(
                 filename    : 'assertions',
 
                 items       : [
+                    'assertion_element.t.js',
                     'assertion_observable.t.js',
                     'silent.t.js',
                 ]
