@@ -1,4 +1,5 @@
 import { beforeEach, it } from "../../../browser.js"
+import { createPositionedIframe } from "../../@helpers.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -76,4 +77,32 @@ it('Should not trigger extra blur event when clicking on another text input', as
 
     await t.click('#inp1')
     await t.click('#inp2')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`click` should focus body', async t => {
+    await t.click([ 1, 1 ])
+
+    t.is(t.activeElement, document.body)
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`click` should focus input element', async t => {
+    document.body.innerHTML = '<input id="inp" type="text" />'
+
+    await t.click('#inp')
+
+    t.is(t.activeElement, t.$('#inp'))
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it("Clicking inside iframe should focus iframe's body", async t => {
+    const iframe    = await createPositionedIframe('about:blank', { left : 50, top : 50, width : 100, height : 100 })
+
+    await t.click('iframe')
+
+    t.is(t.activeElement, iframe.contentDocument.body)
 })

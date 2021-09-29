@@ -13,6 +13,7 @@ import {
     isOffsetInsideElementBox
 } from "../../util_browser/Coordinates.js"
 import {
+    activeElement,
     elementFromPoint,
     isElementAccessible,
     isElementConnected,
@@ -939,7 +940,7 @@ export class UserAgentOnPage extends Mixin(
 
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         get activeElement () : Element {
-            return this.window.document.activeElement
+            return activeElement(this.window.document)
         }
 
 

@@ -1,7 +1,7 @@
 import { ActionTargetOffset, Point, sumPoints } from "../siesta/simulate/Types.js"
 import { Rect } from "../util/Rect.js"
 import { getViewportActionPoint, getViewportRect, isOffsetInsideElementBox, normalizeOffset, translatePointToParentViewport } from "./Coordinates.js"
-import { isHTMLIFrameElement } from "./Typeguards.js"
+import { isHTMLIFrameElement, isShadowRoot } from "./Typeguards.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const awaitDomReady = async () : Promise<void> => {
@@ -199,3 +199,19 @@ export const isSameDomainIframe = (el : HTMLIFrameElement) : boolean => {
     // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/contentDocument
     return Boolean(el.contentDocument)
 }
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const activeElement = (doc : DocumentOrShadowRoot = document, deep : boolean = true) : Element => {
+    let focusedEl       = doc.activeElement
+
+    if (deep && focusedEl) {
+        if (isHTMLIFrameElement(focusedEl) && isSameDomainIframe(focusedEl))
+            focusedEl = activeElement(focusedEl.contentDocument, true)
+        else if (focusedEl.shadowRoot)
+            focusedEl = activeElement(focusedEl.shadowRoot, true)
+    }
+
+    return focusedEl || (isShadowRoot(doc) ? doc.host : (doc as Document).body)
+}
+
