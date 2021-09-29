@@ -947,8 +947,7 @@ export class UserAgentOnPage extends Mixin(
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, text, options)
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
-                actionName      : 'type',
-                timeout         : keyboardAction.timeout
+                actionName      : 'type'
             })
 
             if (waitRes.success)
@@ -962,8 +961,7 @@ export class UserAgentOnPage extends Mixin(
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key, options)
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
-                actionName      : 'keyPress',
-                timeout         : keyboardAction.timeout
+                actionName      : 'keyPress'
             })
 
             if (waitRes.success)
@@ -977,8 +975,7 @@ export class UserAgentOnPage extends Mixin(
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key)
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
-                actionName      : 'keyDown',
-                timeout         : keyboardAction.timeout
+                actionName      : 'keyDown'
             })
 
             if (waitRes.success)
@@ -990,8 +987,7 @@ export class UserAgentOnPage extends Mixin(
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key)
 
             const waitRes       = await this.waitForKeyboardTargetActionable(keyboardAction, {
-                actionName      : 'keyUp',
-                timeout         : keyboardAction.timeout
+                actionName      : 'keyUp'
             })
 
             if (waitRes.success)
