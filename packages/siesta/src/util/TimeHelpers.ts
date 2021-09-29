@@ -7,6 +7,16 @@ import { isPromise } from "./Typeguards.js"
 // we wrap the call to `resolve` to another function
 export const delay = (timeout : number) : Promise<void> => new Promise(resolve => setTimeout(() => resolve(), timeout))
 
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const measure = async <T>(promise : Promise<T>) : Promise<{ elapsed : number, resolved : T }> => {
+    const start     = Date.now()
+    const resolved  = await promise
+
+    return { elapsed : Date.now() - start, resolved }
+}
+
+
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // it is recommended, that the error instance, to throw on timeout, to be provided from the call site of this method
 // this way, the stack trace will point to the `timeout` call, instead of the `timeout` internals

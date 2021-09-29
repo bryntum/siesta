@@ -1,5 +1,5 @@
 import { beforeEach, it, TestBrowser } from "../../../browser.js"
-import { delay } from "../../../src/util/TimeHelpers.js"
+import { delay, measure } from "../../../src/util/TimeHelpers.js"
 import { createPositionedElement } from "../../@helpers.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -8,17 +8,6 @@ beforeEach(async (t : TestBrowser) => {
 
     await t.moveMouseTo(0, 0)
 })
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// this measuring verifies that some waiting actually happened
-const measure = async <T>(promise : Promise<T>) : Promise<{ elapsed : number, resolved : T }> => {
-    const start     = Date.now()
-
-    const resolved  = await promise
-
-    return { elapsed : Date.now() - start, resolved }
-}
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
