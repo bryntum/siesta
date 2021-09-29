@@ -216,7 +216,7 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        resolveActionTarget (target : ActionTarget) : Element {
+        resolveActionTarget (target : ActionTarget, onAmbiguousQuery : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery) : Element {
             if (!target) {
                 return elementFromPoint(this.window.document, ...this.simulator.currentPosition, true).el
             }
@@ -224,7 +224,7 @@ export class UserAgentOnPage extends Mixin(
                 return elementFromPoint(this.window.document, ...(target.length === 0 ? this.simulator.currentPosition : target), true).el
             }
             else {
-                return this.normalizeElement(target)
+                return this.normalizeElement(target, onAmbiguousQuery)
             }
         }
 
