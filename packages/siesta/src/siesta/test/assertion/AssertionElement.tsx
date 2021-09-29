@@ -1,12 +1,13 @@
 import { ClassUnion, Mixin } from "typescript-mixin-class"
 import { TextJSX } from "../../../jsx/TextJSX.js"
+import { WaitForResult } from "../../../util/TimeHelpers.js"
 import { isArray, isString } from "../../../util/Typeguards.js"
 import { normalizeOffset } from "../../../util_browser/Coordinates.js"
 import { isElementPointReachable } from "../../../util_browser/Dom.js"
-import { ActionTarget, ActionTargetOffset } from "../../simulate/Types.js"
+import { ActionTarget, ActionTargetOffset, isActionTarget } from "../../simulate/Types.js"
 import { UserAgentOnPage } from "../../simulate/UserAgent.js"
 import { Assertion } from "../TestResult.js"
-import { AssertionAsync } from "./AssertionAsync.js"
+import { AssertionAsync, WaitForOptions } from "./AssertionAsync.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -90,6 +91,44 @@ export class AssertionElement extends Mixin(
             } else {
                 this.isElementPointReachable(el, { offset : [ '50%', '50%' ], allowChildren }, `${ description }`)
             }
+        }
+
+
+        async waitForSelector (selector : string, root : ActionTarget)
+        async waitForSelector (selector : string, options? : { root? : ActionTarget, timeout? : number })
+        async waitForSelector (
+            ...args :
+                | [ selector : string, root : ActionTarget ]
+                | [ selector : string, options? : { root? : ActionTarget, timeout? : number } ]
+        )
+            : Promise<Element[] | undefined>
+        {
+            const selector  = args[ 0 ]
+            const options   = isActionTarget(args[ 1 ]) ? undefined : args[ 1 ]
+            const root      = isActionTarget(args[ 1 ]) ? args[ 1 ] : options?.root
+            const timeout   = options?.timeout ?? this.waitForTimeout
+
+            if (!selector) throw new Error("Need `selector` argument for the `waitForSelector` assertion")
+
+            return this.waitFor<Element[]>({
+                condition : () => {
+                    const resolvedRoot  = root ? this.resolveActionTarget(root, 'throw') : undefined
+                    const res           = this.query(selector, resolvedRoot)
+
+                    return res.length > 0 ? res : undefined
+                },
+                timeout,
+
+                reporting   : {
+                    assertionName   : 'waitForSelector',
+                    onConditionMet          : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) =>
+                        <div>
+                            Waited { waitRes.elapsedTime }ms for matching elements to appear in DOM
+                        </div>,
+                    onTimeout               : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) =>
+                        <div>Waiting for selector aborted by timeout ({ waitOptions.timeout }ms)</div>
+                }
+            })
         }
     }
 ) {}
