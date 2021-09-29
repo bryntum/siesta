@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { lastElement } from "../../util/Helpers.js"
+import { lastElement, saneSplit } from "../../util/Helpers.js"
 import { Rect } from "../../util/Rect.js"
 import { isArray, isNumber, isString } from "../../util/Typeguards.js"
 import {
@@ -22,7 +22,7 @@ import {
     parentWindows
 } from "../../util_browser/Dom.js"
 import { getOffsetsMap, scrollElementPointIntoView } from "../../util_browser/Scroll.js"
-import { isHTMLIFrameElement } from "../../util_browser/Typeguards.js"
+import { isHTMLIFrameElement, isSameDomainHTMLIFrameElement } from "../../util_browser/Typeguards.js"
 import { Test } from "../test/Test.js"
 import { Assertion, SourcePoint } from "../test/TestResult.js"
 import { SiestaModifierKey, SiestaTypeString } from "./SimulatorKeyboard.js"
@@ -262,18 +262,44 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
-        query (query : string) : Element[] {
-            return Array.from(this.window.document.querySelectorAll(query))
+        query (query : string, root : Element | Document = this.window.document) : Element[] {
+            if (!query) throw new Error("The provided selector is empty")
+            if (!isString(query)) throw new Error("The provided selector is not a string")
+
+            const segments  = saneSplit(query, /\s*->\s*/)
+
+            let currentRoots : Element[] = Array.from(root.querySelectorAll(segments[ 0 ]))
+
+            for (let i = 1; i < segments.length; i++) {
+                const segment   = segments[ i ]
+
+                const newRoots : Element[] = []
+
+                for (let j = 0; j < currentRoots.length; j++) {
+                    const currentRoot   = currentRoots[ j ]
+
+                    if (isSameDomainHTMLIFrameElement(currentRoot)) {
+                        newRoots.push(...Array.from(currentRoot.contentDocument.querySelectorAll(segment)))
+                    }
+                    else if (currentRoot.shadowRoot) {
+                        newRoots.push(...Array.from(currentRoot.shadowRoot.querySelectorAll(segment)))
+                    }
+                }
+
+                currentRoots    = newRoots
+            }
+
+            return currentRoots
         }
 
 
-        $ (query : string) : Element {
-            return this.query(query)[ 0 ]
+        $ (query : string, root : Element | Document = this.window.document) : Element {
+            return this.query(query, root)[ 0 ]
         }
 
 
-        $$ (query : string) : Element[] {
-            return this.query(query)
+        $$ (query : string, root : Element | Document = this.window.document) : Element[] {
+            return this.query(query, root)
         }
 
 

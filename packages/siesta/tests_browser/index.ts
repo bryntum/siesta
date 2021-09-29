@@ -67,6 +67,7 @@ project.plan(
 
                 items       : [
                     'actionability_checks.t.js',
+                    'query.t.js'
                 ]
             },
         ]
