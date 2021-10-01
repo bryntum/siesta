@@ -127,3 +127,9 @@ it('`query` method should support `->` symbol for targeting elements inside the 
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should not pick up matching elements w/o appropriate web component', async t => {
+    document.body.innerHTML = '<button>foo</button>'
+
+    t.equal(t.query('foo-bar -> button'), [])
+})

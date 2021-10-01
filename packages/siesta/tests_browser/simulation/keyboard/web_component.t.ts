@@ -45,7 +45,7 @@ it('Should support typing on the element inside of the web component', async t =
     const text      = 'Sure does'
 
     t.firesOk(document.documentElement, { 'keydown' : text.length, 'keyup' : text.length, keypress : text.length })
-    t.firesOk('web-comp -> input', { 'keydown' : text.length, 'keyup' : text.length, keypress : text.length })
+    t.firesOk(input, { 'keydown' : text.length, 'keyup' : text.length, keypress : text.length })
 
     await t.type('web-comp -> input', text)
 

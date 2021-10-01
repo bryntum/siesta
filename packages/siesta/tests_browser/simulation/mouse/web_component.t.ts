@@ -45,7 +45,7 @@ it('Should support clicking on the element inside of the web component', async t
     document.documentElement.addEventListener('click', verifyEvent)
 
     t.firesOnce(document.documentElement, 'click')
-    t.firesOnce('web-comp -> #marker', 'click')
+    t.firesOnce(div, 'click')
 
     await t.click('web-comp -> #marker')
 })
@@ -61,8 +61,42 @@ it('Should support clicking pure text web component', async t => {
     document.body.appendChild(comp)
 
     t.firesOnce(document.documentElement, 'click')
-    t.firesOnce('web-comp', 'click')
+    t.firesOnce(comp, 'click')
 
     await t.click('web-comp')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should support clicking nested web component', async t => {
+    const createComponent   = (id : string) : [ WebComp, HTMLDivElement ] => {
+        const comp          = new WebComp()
+        comp.id             = id
+
+        comp.shadowRoot.appendChild(document.createTextNode(`WebComponent-${ id }`))
+
+        const div           = comp.shadowRoot.appendChild(document.createElement('div'))
+        div.style.cssText   = 'width: 50px; height: 50px;'
+        div.innerText       = `div-${ id }`
+
+        return [ comp, div ]
+    }
+
+    const [ comp1, div1 ]   = createComponent('w1')
+    const [ comp2, div2 ]   = createComponent('w2')
+    const [ comp3, div3 ]   = createComponent('w3')
+
+    comp1.shadowRoot.appendChild(comp2)
+    comp2.shadowRoot.appendChild(comp3)
+
+    document.body.appendChild(comp1)
+
+    t.firesOnce(div1, 'click')
+    t.firesOnce(div2, 'click')
+    t.firesOnce(div3, 'click')
+
+    await t.click('web-comp -> div')
+    await t.click('web-comp -> web-comp -> div')
+    await t.click('web-comp -> #w2 -> web-comp -> div')
 })
 
