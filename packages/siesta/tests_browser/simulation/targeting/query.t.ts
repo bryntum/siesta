@@ -90,7 +90,7 @@ window.customElements.define('web-comp2', WebComp2)
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('`query` method should support `->` symbol for targeting elements inside the web component', async t => {
+it('`query` method should support `->` symbol for targeting elements inside the shadow dom of web components', async t => {
     const webComp1  = new WebComp()
     const div1      = webComp1.shadowRoot.appendChild(createElement({}))
 
@@ -106,7 +106,7 @@ it('`query` method should support `->` symbol for targeting elements inside the 
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('`query` method should support `->` symbol for targeting elements inside the web component, nested', async t => {
+it('`query` method should support `->` symbol for targeting elements inside the shadow dom of web components, nested', async t => {
     const webComp1      = new WebComp()
     webComp1.className  = 'web-comp'
 
