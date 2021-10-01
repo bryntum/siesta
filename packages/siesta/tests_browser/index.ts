@@ -57,6 +57,7 @@ project.plan(
                     'modifier_keys.t.js',
                     'mouse_move.t.js',
                     'mouse_over.t.js',
+                    'offset.t.js',
                     'pointer_events.t.js',
                     'scroll_into_view.t.js',
                     'transformed_element.t.js',

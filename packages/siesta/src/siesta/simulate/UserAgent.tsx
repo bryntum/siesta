@@ -63,11 +63,17 @@ export type MouseActionOptions      = {
 
 
 export interface DragActionOptions extends MouseActionOptions {
+    from                : ActionTarget
     source              : ActionTarget
+
+    fromOffset          : ActionTargetOffset
     sourceOffset        : ActionTargetOffset
 
     target              : ActionTarget
+    to                  : ActionTarget
+
     targetOffset        : ActionTargetOffset
+    toOffset            : ActionTargetOffset
 
     dragOnly            : boolean
 
@@ -348,11 +354,11 @@ export class UserAgentOnPage extends Mixin(
             const options       = args.length === 1 ? args[ 0 ] : args[ 2 ]
 
             return Object.assign({
-                source,
-                sourceOffset        : undefined,
+                source              : source ?? options?.source ?? options?.from,
+                sourceOffset        : options?.sourceOffset ?? options?.fromOffset ?? options?.offset,
 
-                target,
-                targetOffset        : undefined,
+                target              : target ?? options?.target ?? options?.to,
+                targetOffset        : options?.targetOffset ?? options?.toOffset,
                 offset              : undefined,
 
                 button              : 'left',
