@@ -42,6 +42,7 @@ project.plan(
                     'text_selection.t.js',
                     'type.t.js',
                     'type_iframe.t.js',
+                    'web_component.t.js'
                 ]
             },
             {
@@ -61,7 +62,8 @@ project.plan(
                     'pointer_events.t.js',
                     'scroll_into_view.t.js',
                     'transformed_element.t.js',
-                    'wait_for_target.t.js'
+                    'wait_for_target.t.js',
+                    'web_component.t.js'
                 ]
             },
             {
