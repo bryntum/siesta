@@ -55,20 +55,6 @@ export function * parentWindows (win : Window, includeSelf : boolean = false) : 
 }
 
 
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// export function * allParents (el : Element, includeSelf : boolean = false) : Generator<{ el : Element, isTop : boolean, isFrame : boolean }> {
-//     let current             = el
-//
-//     while (current) {
-//         if (current !== win || includeSelf) yield current
-//
-//         if (isTopWindow(current)) return
-//
-//         current             = current.parent
-//     }
-// }
-
-
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isTopWindow = (win : Window) : boolean => {
     // @ts-ignore
@@ -176,14 +162,21 @@ export const elementFromPoint = (queryRoot : DocumentOrShadowRoot, viewportX : n
         { el : Element, localXY : Point } =>
 {
     const el            = queryRoot.elementFromPoint(viewportX, viewportY)
-    const rect          = el.getBoundingClientRect()
 
     if (deep && isHTMLIFrameElement(el) && isSameDomainIframe(el)) {
+        const rect      = el.getBoundingClientRect()
+
         return elementFromPoint(el.contentDocument, viewportX - rect.left, viewportY - rect.top, true)
     }
-    // else if (!shallow && el.shadowRoot) {
-    //     return elementFromPoint(el.shadowRoot, viewportX - rect.left, viewportY - rect.top, false)
-    // }
+    else if (deep && el.shadowRoot) {
+        const testSelf  = el.shadowRoot.elementFromPoint(viewportX, viewportY)
+
+        // possibly the shadow root query will return the web component itself
+        // in such case we should not recurse
+        return testSelf === el
+            ? { el, localXY : [ viewportX, viewportY ] }
+            : elementFromPoint(el.shadowRoot, viewportX, viewportY, true)
+    }
     else {
         return {
             el,

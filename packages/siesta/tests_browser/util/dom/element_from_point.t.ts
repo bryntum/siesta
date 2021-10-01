@@ -19,6 +19,7 @@ beforeEach(() => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Element from point should work for nested iframes', async t => {
     document.body.innerHTML     = ''
 
@@ -42,25 +43,23 @@ it('Element from point should work for nested iframes', async t => {
 })
 
 
-// it seems the `elementFromPoint` method of the shadow root instance does not work (at all) as intuitively expected
-// see https://github.com/canonic-epicure/chrome_element_from_point_bug_repro
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Element from point should work for web components', async t => {
+    document.body.innerHTML     = ''
 
-// it('Element from point should work for web components', async t => {
-//     document.body.innerHTML     = ''
-//
-//     const webComp1      = await createPositionedElement(document, 'web-comp', { left : 50, top : 50, width : 200, height : 200 })
-//
-//     webComp1.style.backgroundColor   = 'red'
-//     document.body.appendChild(webComp1)
-//
-//     const webComp2      = await createPositionedElement(document, 'web-comp', { left : 50, top : 50, width : 100, height : 100 })
-//
-//     webComp2.style.backgroundColor   = 'green'
-//     webComp1.shadowRoot.appendChild(webComp2)
-//
-//     t.equal(elementFromPoint(document, 60, 60, true), { el : webComp1, localXY : [ 60, 60 ] })
-//
-//     t.equal(elementFromPoint(document, 60, 60, false), { el : webComp1.shadowRoot.firstElementChild, localXY : [ 10, 10 ] })
-//
-//     // t.equal(elementFromPoint(document, 150, 150, false), { el : webComp2.shadowRoot.firstElementChild, localXY : [ 50, 50 ] })
-// })
+    const webComp1      = await createPositionedElement('web-comp', { left : 50, top : 50, width : 200, height : 200 })
+
+    webComp1.style.backgroundColor   = 'red'
+    document.body.appendChild(webComp1)
+
+    const webComp2      = await createPositionedElement('web-comp', { left : 50, top : 50, width : 100, height : 100 })
+
+    webComp2.style.backgroundColor   = 'green'
+    webComp1.shadowRoot.appendChild(webComp2)
+
+    t.equal(elementFromPoint(document, 60, 60, false), { el : webComp1, localXY : [ 60, 60 ] })
+    t.equal(elementFromPoint(document, 60, 60, true), { el : webComp1, localXY : [ 60, 60 ] })
+
+    t.equal(elementFromPoint(document, 100, 100, false), { el : webComp1, localXY : [ 100, 100 ] })
+    t.equal(elementFromPoint(document, 100, 100, true), { el : webComp2, localXY : [ 100, 100 ] })
+})
