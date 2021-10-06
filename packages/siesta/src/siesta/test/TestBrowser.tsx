@@ -12,7 +12,7 @@ import { MouseCursorVisualizer } from "../ui/MouseCursorVisualizer.js"
 import { AssertionElement } from "./assertion/AssertionElement.js"
 import { AssertionObservable } from "./assertion/AssertionObservable.js"
 import { TextSelectionHelpers } from "./browser/TextSelectionHelpers.js"
-import { TestLauncherBrowserChild } from "./port/TestLauncherBrowser.js"
+import { TestLauncherChild } from "./port/TestLauncher.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
 import { Assertion } from "./TestResult.js"
@@ -47,7 +47,7 @@ export class TestBrowser extends Mixin(
         // @prototypeValue(ExecutionContextBrowser)
         // executionContextClass   : typeof ExecutionContext
 
-        connector           : TestLauncherBrowserChild
+        connector           : TestLauncherChild & Simulator
 
         mouseCursorVisualizer   : MouseCursorVisualizer     = MouseCursorVisualizer.new()
 
@@ -76,7 +76,6 @@ export class TestBrowser extends Mixin(
         get simulator () : Simulator {
             return this.connector
         }
-        // @ts-expect-error
         set simulator (value : Simulator) {
         }
 

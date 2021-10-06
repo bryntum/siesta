@@ -5,6 +5,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { local, remote } from "../../rpc/port/Port.js"
 import { PortHandshakeChild, PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
+import { IsolationLevel } from "../common/IsolationLevel.js"
 import { LUID } from "../common/LUID.js"
 import { ContextProviderBrowserIframe } from "../context/context_provider/ContextProviderBrowserIframe.js"
 import { ContextBrowserIframe } from "../context/ContextBrowserIframe.js"
@@ -31,7 +32,7 @@ export interface DashboardConnectorInterface {
 
     setLaunchState (rootTestId : LUID, launchState : LaunchState) : Promise<DashboardLaunchInfo | undefined>
 
-    launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<any>
+    launchContinuously (projectPlanItemsToLaunch : TestDescriptor[], isolationOverride? : IsolationLevel) : Promise<any>
 
     launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) : Promise<any>
 
@@ -64,11 +65,12 @@ export class DashboardConnectorServer extends Mixin(
 
 
         @local()
-        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) {
+        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[], isolationOverride? : IsolationLevel) {
             this.launcher.launchContinuously(
                 projectPlanItemsToLaunch
                     // TODO remove after scoped serialization will be back
-                    .map(desc => this.launcher.dispatcher.resultsMappingById.get(desc.guid).descriptor)
+                    .map(desc => this.launcher.dispatcher.resultsMappingById.get(desc.guid).descriptor),
+                isolationOverride
             )
         }
 
@@ -172,7 +174,7 @@ export class DashboardConnectorClient extends Mixin(
 
 
         @remote()
-        launchContinuously : (projectPlanItemsToLaunch : TestDescriptor[]) => Promise<any>
+        launchContinuously : (projectPlanItemsToLaunch : TestDescriptor[], isolationOverride? : IsolationLevel) => Promise<any>
 
 
         @remote()

@@ -10,6 +10,7 @@ import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { objectEntriesDeep } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
+import { IsolationLevel } from "../common/IsolationLevel.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderSameContext } from "../context/context_provider/ContextProviderSameContext.js"
 import { ContextProviderTargetBrowser } from "../context/context_provider/ContextProviderTargetBrowser.js"
@@ -608,10 +609,10 @@ export class Launcher extends Mixin(
         }
 
 
-        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) {
+        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[], isolationOverride? : IsolationLevel) {
             await this.performSetupOnce()
 
-            projectPlanItemsToLaunch.forEach(desc => this.dispatcher.addPendingTest(desc))
+            projectPlanItemsToLaunch.forEach(desc => this.dispatcher.addPendingTest(desc, undefined, isolationOverride))
         }
 
 

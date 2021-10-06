@@ -5,6 +5,7 @@ import { importer } from "../../importer/Importer.js"
 import { Logger } from "../../logger/Logger.js"
 import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
 import { stringify } from "../../serializable/Serializable.js"
+import { IsolationLevel } from "../common/IsolationLevel.js"
 import { LUID, luid } from "../common/LUID.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
@@ -134,13 +135,13 @@ export class Dispatcher extends Mixin(
 
         pendingQueue                : {
             order       : TestDescriptor[],
-            presence    : Map<TestDescriptor, SubTestCheckInfo | undefined>
+            presence    : Map<TestDescriptor, { checkInfo : SubTestCheckInfo | undefined, isolationOverride : IsolationLevel }>
         }                                                       = { order : [], presence : new Map() }
 
         projectPlanLaunchResult     : TestLaunchResult          = undefined
 
         resultsMappingById          : Map<LUID, TestLaunchResult>               = new Map()
-        resultsMapping              : Map<TestDescriptor, TestLaunchResult>     = new Map()
+        // resultsMapping              : Map<TestDescriptor, TestLaunchResult>     = new Map()
 
         projectPlanItemsToLaunch    : TestDescriptor[]          = []
 
@@ -170,7 +171,7 @@ export class Dispatcher extends Mixin(
             this.runningQueue.onFreeSlotAvailableHook.on(queue => {
                 const desc      = this.shiftPendingTest()
 
-                if (desc) queue.push(desc[ 0 ], this.launchProjectPlanItem(...desc))
+                if (desc) queue.push(desc[ 0 ], this.launchProjectPlanItem(desc[ 0 ], desc[ 1 ].checkInfo, desc[ 1 ].isolationOverride))
             })
 
             this.runningQueue.onSlotSettledHook.on((queue, descriptor : TestDescriptor, result) => {
@@ -186,7 +187,7 @@ export class Dispatcher extends Mixin(
 
                     const result        = TestLaunchResult.new({ descriptor })
 
-                    this.resultsMapping.set(descriptor, result)
+                    // this.resultsMapping.set(descriptor, result)
                     this.resultsMappingById.set(descriptor.guid, result)
 
                     return result
@@ -212,9 +213,9 @@ export class Dispatcher extends Mixin(
         }
 
 
-        getTestLaunchInfo (desc : TestDescriptor) : TestLaunchResult {
-            return this.resultsMapping.get(desc)
-        }
+        // getTestLaunchInfo (desc : TestDescriptor) : TestLaunchResult {
+        //     return this.resultsMapping.get(desc)
+        // }
 
 
         isCompleted () : boolean {
@@ -229,19 +230,19 @@ export class Dispatcher extends Mixin(
         }
 
 
-        addPendingTest (desc : TestDescriptor, checkInfo : SubTestCheckInfo = undefined) {
+        addPendingTest (desc : TestDescriptor, checkInfo : SubTestCheckInfo = undefined, isolationOverride : IsolationLevel = undefined) {
             const pendingQueue  = this.pendingQueue
 
             if (pendingQueue.presence.has(desc)) return
 
             pendingQueue.order.push(desc)
-            pendingQueue.presence.set(desc, checkInfo)
+            pendingQueue.presence.set(desc, { checkInfo, isolationOverride })
 
             this.runningQueue.pull()
         }
 
 
-        shiftPendingTest () : [ TestDescriptor, SubTestCheckInfo | undefined ] | undefined {
+        shiftPendingTest () : [ TestDescriptor, { checkInfo : SubTestCheckInfo | undefined, isolationOverride : IsolationLevel } ] | undefined {
             const pendingQueue  = this.pendingQueue
 
             if (pendingQueue.order.length === 0) return undefined
@@ -271,7 +272,7 @@ export class Dispatcher extends Mixin(
 
 
         chooseContextProviderFor (desc : TestDescriptor) : ContextProvider {
-            if (desc.type === 'browser' && (desc.isolation === 'iframe' || desc.isolation === 'context')) {
+            if (this.launcher.dashboardConnector && desc.type === 'browser' && (desc.isolation === 'iframe' || desc.isolation === 'context')) {
                 return this.contextProviders[ 1 ]
             } else {
                 return this.contextProviders[ 0 ]
@@ -279,10 +280,11 @@ export class Dispatcher extends Mixin(
         }
 
 
-        async launchProjectPlanItem (item : TestDescriptor, checkInfo : SubTestCheckInfo = undefined) {
+        async launchProjectPlanItem (item : TestDescriptor, checkInfo : SubTestCheckInfo = undefined, isolationOverride : IsolationLevel = undefined) {
             const slot              = await this.cleanupQueue.reserveCleanupSlot(item)
 
             const normalized        = item.flatten
+            if (isolationOverride) normalized.isolation = isolationOverride
 
             this.logger.debug("Launching project item: ", normalized.url)
 
@@ -349,7 +351,8 @@ export class Dispatcher extends Mixin(
                 launcher            : this.launcher,
                 logger              : this.logger,
                 reporter            : this.reporter,
-                launchInfo
+                launchInfo,
+                context
             })
 
             try {

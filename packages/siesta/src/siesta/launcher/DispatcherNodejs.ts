@@ -1,5 +1,8 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { TestLauncherBrowserParent } from "../test/port/TestLauncherBrowser.js"
+import {
+    TestLauncherBrowserDashboardParent,
+    TestLauncherBrowserPlaywrightParent
+} from "../test/port/TestLauncherBrowser.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Dispatcher, LauncherConnectorClassLocator } from "./Dispatcher.js"
@@ -22,15 +25,26 @@ export class DispatcherNodejs extends Mixin(
 
 
         getLauncherConnectorInfo (desc : TestDescriptor) : LauncherConnectorClassLocator {
-            return (desc instanceof TestDescriptorBrowser) && desc.simulation === 'native'
-                ? {
-                    server  : { launcherConnectorClass : TestLauncherBrowserParent },
-                    client  : {
-                        importerUrl     : 'src/siesta/test/port/TestLauncherBrowser.js',
-                        symbol          : 'TestLauncherBrowserChild'
+            if ((desc instanceof TestDescriptorBrowser) && desc.simulation === 'native') {
+                if (this.launcher.dashboardConnector && desc.isolation === 'iframe' || desc.isolation === 'context')
+                    return {
+                        server  : { launcherConnectorClass : TestLauncherBrowserDashboardParent },
+                        client  : {
+                            importerUrl     : 'src/siesta/test/port/TestLauncherBrowser.js',
+                            symbol          : 'TestLauncherBrowserDashboardChild'
+                        }
                     }
-                }
-                : super.getLauncherConnectorInfo(desc)
+                else
+                    return {
+                        server  : { launcherConnectorClass : TestLauncherBrowserPlaywrightParent },
+                        client  : {
+                            importerUrl     : 'src/siesta/test/port/TestLauncherBrowser.js',
+                            symbol          : 'TestLauncherBrowserPlaywrightChild'
+                        }
+                    }
+            }
+            else
+                super.getLauncherConnectorInfo(desc)
         }
 
 

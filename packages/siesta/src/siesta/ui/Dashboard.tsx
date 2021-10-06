@@ -14,6 +14,7 @@ import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { buffer } from "../../util/TimeHelpers.js"
 import { awaitDomInteractive } from "../../util_browser/Dom.js"
+import { IsolationLevel } from "../common/IsolationLevel.js"
 import { LUID } from "../common/LUID.js"
 import { DashboardConnectorClient } from "../launcher/DashboardConnector.js"
 import { LauncherDescriptor } from "../launcher/Launcher.js"
@@ -436,7 +437,7 @@ export class Dashboard extends Mixin(
             const desc      = this.getTestDescriptorComponentFromMouseEvent(e)
 
             if (desc) {
-                this.launchContinuously(desc.leavesAxis())
+                this.launchContinuously(desc.leavesAxis(), e.ctrlKey ? 'page' : undefined)
             }
 
             // TODO move this to `LaunchInfoComponent`
@@ -465,10 +466,10 @@ export class Dashboard extends Mixin(
         }
 
 
-        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[]) : Promise<any> {
+        async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[], isolationOverride? : IsolationLevel) : Promise<any> {
             projectPlanItemsToLaunch.forEach(desc => this.getTestLaunchInfo(desc).schedulePendingTestLaunch())
 
-            this.connector.launchContinuously(projectPlanItemsToLaunch)
+            this.connector.launchContinuously(projectPlanItemsToLaunch, isolationOverride)
         }
 
 

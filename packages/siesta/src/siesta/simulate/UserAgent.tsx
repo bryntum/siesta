@@ -27,7 +27,6 @@ import { Test } from "../test/Test.js"
 import { Assertion, SourcePoint } from "../test/TestResult.js"
 import { SiestaModifierKey, SiestaTypeString } from "./SimulatorKeyboard.js"
 import { PointerMovePrecision } from "./SimulatorMouse.js"
-import { SimulatorPlaywrightClient } from "./SimulatorPlaywright.js"
 import {
     ActionableCheck,
     ActionTarget,
@@ -37,6 +36,7 @@ import {
     minusPoints,
     MouseButton,
     Point,
+    Simulator,
     sumPoints
 } from "./Types.js"
 
@@ -210,7 +210,7 @@ export class UserAgentOnPage extends Mixin(
 
         window                  : Window                        = window
 
-        simulator               : SimulatorPlaywrightClient     = undefined
+        simulator               : Simulator                     = undefined
 
         onAmbiguousQuery        : 'use_first' | 'warn' | 'throw'   = 'warn'
 
