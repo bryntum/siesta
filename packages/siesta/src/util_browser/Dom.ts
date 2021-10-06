@@ -57,8 +57,9 @@ export function * parentWindows (win : Window, includeSelf : boolean = false) : 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isTopWindow = (win : Window) : boolean => {
-    // @ts-ignore
-    return !win.parent || Boolean(win.parent.SIESTA_DASHBOARD)
+    return win.parent === win
+        // @ts-ignore
+        || Boolean(win.parent.SIESTA_DASHBOARD)
 }
 
 
