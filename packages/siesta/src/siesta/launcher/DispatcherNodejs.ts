@@ -35,7 +35,7 @@ export class DispatcherNodejs extends Mixin(
 
 
         reportLaunchFailure (descriptor : TestDescriptor, exception : any) {
-            console.log("this.launcher.isClosingDashboard", this.launcher.isClosingDashboard)
+            // console.log("this.launcher.isClosingDashboard", this.launcher.isClosingDashboard)
 
             if (!this.launcher.isClosingDashboard) super.reportLaunchFailure(descriptor, exception)
         }
