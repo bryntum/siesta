@@ -1,4 +1,5 @@
 import playwright from "playwright"
+import { LaunchOptions } from "playwright/types/types.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { browserType } from "../../../util_browser/PlaywrightHelpers.js"
 import { LauncherNodejs } from "../../launcher/LauncherNodejs.js"
@@ -73,15 +74,20 @@ export class ContextProviderNodePlaywright extends Mixin(
                 ...this.launcher.browserArg.map(arg => arg.replace(/^(--)?/, '--'))
             ]
 
-            return await this.browserType.launch({
+            const launchOptions : LaunchOptions = {
                 args,
                 headless                : this.launcher.headless,
-                devtools                : !this.launcher.headless,
                 // TODO should enable `slowMo` for non-headless?
                 // at least provide an option to enable it
                 // slowMo                  : 250,
                 timeout                 : 60000
-            })
+            }
+
+            if (this.launcher.browser === 'chrome') {
+                launchOptions.devtools  = !this.launcher.headless
+            }
+
+            return await this.browserType.launch(launchOptions)
         }
 
         static providerName : string = 'playwright'
