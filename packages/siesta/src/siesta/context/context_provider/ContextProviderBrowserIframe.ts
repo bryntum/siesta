@@ -48,20 +48,25 @@ export class ContextProviderBrowserIframe extends Mixin(
         }
 
 
-        forceStandardsMode (iframe : HTMLIFrameElement) {
+        forceStandardsMode (iframe : HTMLIFrameElement, doReset : boolean) {
             const doc           = iframe.contentDocument
 
             doc.open()
 
             doc.write([
                 '<!DOCTYPE html>',
-                '<html style="width: 100%; height: 100%; margin: 0; padding: 0;">',
+                doReset
+                    ? '<html style="width: 100%; height: 100%; margin: 0; padding: 0;">'
+                    : '<html>',
+
                     '<head>',
                         // this.innerHtmlHead || '',
                         // html.join(''),
                     '</head>',
 
-                    '<body style="width: 100%; height: 100%; margin: 0; padding: 0;">',
+                    doReset
+                        ? '<body style="width: 100%; height: 100%; margin: 0; padding: 0;">'
+                        : '<body>',
                         // this.innerHtmlBody || '',
                     '</body>',
                 '</html>'
@@ -79,7 +84,7 @@ export class ContextProviderBrowserIframe extends Mixin(
 
                 document.body.appendChild(wrapper)
 
-                this.forceStandardsMode(iframe)
+                this.forceStandardsMode(iframe, desc.expandBody)
             })
 
             return this.contextClass.new({ iframe, wrapper }) as InstanceType<this[ 'contextClass' ]>

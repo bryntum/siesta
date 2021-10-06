@@ -54,6 +54,10 @@ export class TestDescriptorBrowser extends Mixin(
         viewportHeight      : number                    = 768
 
         mouseMovePrecision  : PointerMovePrecision      = { kind : 'last_only', precision : 1 }
+
+        // TODO rename or may be even replace with more generic option
+        // like `cssReset` which will accept a CSS text
+        expandBody          : boolean                   = true
     }
 ){}
 

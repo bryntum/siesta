@@ -85,6 +85,15 @@ export class TestBrowser extends Mixin(
 
             await this.mouseCursorVisualizer.start()
 
+            if (this.descriptor.expandBody) {
+                const html      = document.documentElement
+                const body      = document.body
+
+                body.style.width    = html.style.width  = '100%'
+                body.style.height   = html.style.height = '100%'
+                body.style.margin   = body.style.padding = '0'
+            }
+
             if (this.dashboardLaunchInfo) {
                 //@ts-expect-error
                 this.simulator.offset   = this.dashboardLaunchInfo.offset
