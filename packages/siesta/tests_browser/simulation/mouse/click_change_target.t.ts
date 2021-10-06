@@ -249,7 +249,8 @@ it("should fire mouseleave if target was removed from DOM after mouseup", async 
     // 1 mouseover is when 'outer' is removed
     t.willFireNTimes(document.body, 'mouseover', 2, 'body mouseover')
 
-    await t.click(outer)
+    // this will trigger the 1st `mouseover` on `body`
+    await t.moveMouseTo(outer)
 
-    await delay(10)
+    await t.waitForEvent(document.body, 'mouseover', { trigger : () => t.click() })
 })
