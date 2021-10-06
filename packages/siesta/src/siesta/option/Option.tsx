@@ -450,7 +450,7 @@ const unknownEnumMember = (error : OptionParseError) : XmlElement => <div>
     <p><span class="log_message_error"> ERROR </span> Unknown value <span class="accented_value">{ error.input }</span> for enumeration option <span class="accented">--{ error.option.name }</span></p>
     <ul>
         Known values are:
-        { error.option.enumeration.map(enumEntry => <li><span class="accented_value">{ enumEntry }</span></li>) }
+        { error.option.enumeration.map(enumEntry => <li>- <span class="accented_value">{ enumEntry }</span></li>) }
     </ul>
 </div>
 
