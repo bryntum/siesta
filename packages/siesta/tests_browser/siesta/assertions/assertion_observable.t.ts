@@ -1,9 +1,14 @@
 import { CI } from "../../../../chained-iterator"
-import { it } from "../../../browser.js"
+import { beforeEach, it } from "../../../browser.js"
 import { Assertion } from "../../../src/siesta/test/TestResult.js"
 import { delay, measure } from "../../../src/util/TimeHelpers.js"
 import { verifyAllFailed } from "../../../tests/siesta/@helpers.js"
 import { createElement } from "../../@helpers.js"
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+beforeEach(() => {
+    document.body.innerHTML = ''
+})
 
 const defaultDelay = 50
 
