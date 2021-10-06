@@ -45,7 +45,7 @@
         "typescript-mixin-class": "^0.0.1",
         "typescript-serializable-mixin": "^0.0.1",
         "@bryntum/chronograph": "^2.0.1",
-        "@web/dev-server": "^0.1.17"
+        "@web/dev-server": "^0.1.24"
     },
     "peerDependencies": {
         "typescript-mixin-class": "^0.0.1",
