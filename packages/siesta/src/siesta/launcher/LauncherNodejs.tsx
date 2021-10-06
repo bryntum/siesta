@@ -170,10 +170,12 @@ export class LauncherNodejs extends Mixin(
         async launchDashboardUI () {
             this.reporter.disabled  = true
 
-            const launchOptions : LaunchOptions  = { headless : false, devtools : true }
+            const launchOptions : LaunchOptions  = { headless : false }
 
             if (this.browser === 'chrome') {
-                launchOptions.args        = [ '--start-maximized', '--allow-file-access-from-files', '--disable-web-security' ]
+                // the `devtools` option seems to be only supported for Chrome
+                launchOptions.devtools  = true
+                launchOptions.args      = [ '--start-maximized' ]
             }
 
             const browser       = await browserType(this.browser).launch(launchOptions)

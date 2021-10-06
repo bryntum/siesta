@@ -520,6 +520,25 @@ export class Launcher extends Mixin(
         }
 
 
+        processPrepareOptionsResult (res : PrepareOptionsResult) {
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+            const errors : XmlElement[]     = res.extractResult.errors.map(
+                error => optionErrorTemplateByCode.get(error.error)(error)
+            ).concat(
+                res.errors
+            )
+
+            errors.forEach(error => this.write(error))
+
+            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+            const warnings                  = res.extractResult.warnings
+
+            warnings.forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
+
+            if (errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
+        }
+
+
         async setup () {
             // extracting the launcher options from the input arguments (command line / URL search params)
             // at this point there might be no `projectData` yet (project is running in remote context)
@@ -527,30 +546,26 @@ export class Launcher extends Mixin(
 
             await this.onLauncherOptionsAvailable()
 
-            await this.setupProjectData()
+            this.processPrepareOptionsResult(prepareLauncherOptions)
+
+            try {
+                await this.setupProjectData()
+            } catch (e) {
+                if (e instanceof LauncherError) throw e
+
+                throw LauncherError.new({
+                    message : 'Could not extract project file information. Dev web server is not running?\n' + e.stack
+                })
+            }
 
             const prepareProjectOptions         = this.prepareProjectOptions()
-
             const prepareTestDescriptorOptions  = this.prepareTestDescriptorOptions()
 
-            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
-            const errors : XmlElement[]     = [].concat(
-                prepareLauncherOptions.extractResult.errors,
-                prepareProjectOptions.extractResult.errors,
-                prepareTestDescriptorOptions.extractResult.errors
-            ).map(error => optionErrorTemplateByCode.get(error.error)(error)).concat(
-                prepareLauncherOptions.errors,
-                prepareProjectOptions.errors,
-                prepareTestDescriptorOptions.errors
-            )
-
-            errors.forEach(error => this.write(error))
+            this.processPrepareOptionsResult(prepareProjectOptions)
+            this.processPrepareOptionsResult(prepareTestDescriptorOptions)
 
             //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const warnings                  = [
-                ...prepareLauncherOptions.extractResult.warnings,
-                ...prepareProjectOptions.extractResult.warnings,
-                ...prepareTestDescriptorOptions.extractResult.warnings,
                 ...CI(this.optionsBag.entries).map(entry => entry.key).uniqueOnly().map(optionName => {
                     return {
                         warning     : OptionsParseWarningCodes.UnknownOption,
@@ -560,8 +575,6 @@ export class Launcher extends Mixin(
             ]
 
             warnings.forEach(warning => this.write(optionWarningTemplateByCode.get(warning.warning)(warning)))
-
-            if (errors.length) throw LauncherError.new({ exitCode : ExitCodes.INCORRECT_ARGUMENTS })
 
             //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const contextProviders          = this.getSuitableContextProviders(
