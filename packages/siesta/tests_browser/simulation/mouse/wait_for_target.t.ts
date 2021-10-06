@@ -278,7 +278,7 @@ it('Stress test: should handle moving targets', async t => {
 
     t.willFireNTimes(target, 'click', 1)
 
-    t.click('#target', { mouseMovePrecision : 1 })
+    t.click('#target', { mouseMovePrecision : 5 })
 
     for (const position of positions) {
         target.style.left   = position[ 0 ] + 'px'
