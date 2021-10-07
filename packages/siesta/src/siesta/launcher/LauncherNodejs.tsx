@@ -256,7 +256,7 @@ export class LauncherNodejs extends Mixin(
                 await Promise.all(forAwait)
 
                 const port              = this.dashboardConnector = connectedPort = DashboardConnectorServer.new({ launcher : this })
-                const media             = MediaNodeWebSocketParent.new()
+                const media             = MediaNodeWebSocketParent.new({ onCloseDisconnectSilently : true })
 
                 port.media              = media
                 media.socket            = socket
