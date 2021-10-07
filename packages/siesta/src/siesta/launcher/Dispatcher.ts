@@ -174,11 +174,13 @@ export class Dispatcher extends Mixin(
                 if (desc) queue.push(desc[ 0 ], this.launchProjectPlanItem(desc[ 0 ], desc[ 1 ].checkInfo, desc[ 1 ].isolationOverride))
             })
 
-            this.runningQueue.onSlotSettledHook.on((queue, descriptor : TestDescriptor, result) => {
-                if (result.status === 'rejected') this.reportLaunchFailure(descriptor, result.reason)
+            this.runningQueue.onSlotSettledHook.on(
+                (queue, descriptor : TestDescriptor, result : PromiseSettledResult<unknown>) => {
+                    if (result.status === 'rejected') this.reportLaunchFailure(descriptor, result.reason)
 
-                queue.pull()
-            })
+                    queue.pull()
+                }
+            )
 
             this.projectPlanLaunchResult    = TestLaunchResult.fromTreeNode(
                 this.launcher.projectData.projectPlan,
