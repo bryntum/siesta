@@ -44,7 +44,7 @@ export class DispatcherNodejs extends Mixin(
                     }
             }
             else
-                super.getLauncherConnectorInfo(desc)
+                return super.getLauncherConnectorInfo(desc)
         }
 
 
