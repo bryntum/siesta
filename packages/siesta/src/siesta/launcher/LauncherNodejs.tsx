@@ -253,6 +253,13 @@ export class LauncherNodejs extends Mixin(
 
                 await Promise.all(forAwait)
 
+                if (counter > 1) {
+                    this.dispatcher         = this.dispatcherClass.new({
+                        launcher            : this,
+                        contextProviders    : this.dispatcher.contextProviders
+                    })
+                }
+
                 const port              = this.dashboardConnector = connectedPort = DashboardConnectorServer.new({ launcher : this })
                 const media             = MediaNodeWebSocketParent.new({ onCloseDisconnectSilently : true })
 
@@ -263,6 +270,8 @@ export class LauncherNodejs extends Mixin(
                 await port.connect()
 
                 this.logger.debug('Launcher connected to dashboard')
+
+                this.isClosingDashboard     = false
 
                 await port.startDashboard(this.projectData, this.getDescriptor())
 

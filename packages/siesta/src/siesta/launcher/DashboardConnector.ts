@@ -46,6 +46,8 @@ export interface DashboardConnectorInterface {
 
     iframeContextDestroy (contextId : LUID) : Promise<any>
 
+    onBeforeUnload () : Promise<any>
+
     // // not used
     // iframeContextDestroyAll () : Promise<any>
 }
@@ -58,6 +60,11 @@ export class DashboardConnectorServer extends Mixin(
 
     class DashboardConnectorServer extends base implements DashboardConnectorInterface {
         launcher            : Launcher          = undefined
+
+        @local()
+        async onBeforeUnload () : Promise<any> {
+            this.launcher.isClosingDashboard = true
+        }
 
 
         @remote()
@@ -179,6 +186,10 @@ export class DashboardConnectorClient extends Mixin(
 
         @remote()
         launchContinuouslyWithCheckInfo : (desc : TestDescriptor, checkInfo : SubTestCheckInfo) => Promise<any>
+
+
+        @remote()
+        onBeforeUnload : () => Promise<any>
 
 
         @remote()

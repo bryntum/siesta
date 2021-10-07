@@ -269,8 +269,15 @@ export class Dashboard extends Mixin(
         }
 
 
+        onBeforeUnload () {
+            this.connector.onBeforeUnload()
+        }
+
+
         async start () {
             await this.setup()
+
+            window.addEventListener('beforeunload', () => this.onBeforeUnload())
 
             //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const persistentState       = this.loadPersistentState()
