@@ -293,6 +293,7 @@ export class Launcher extends Mixin(
         reporter                : Reporter                  = undefined
 
         dashboardConnector      : DashboardConnectorServer  = undefined
+        isClosingDashboard      : boolean                   = false
 
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         setupDone               : boolean                   = false

@@ -70,8 +70,6 @@ export class LauncherNodejs extends Mixin(
 
         dashboardPage           : Page          = undefined
 
-        isClosingDashboard      : boolean       = false
-
 
         getMaxLen () : number {
             return process.stdout.columns ?? Number.MAX_SAFE_INTEGER
