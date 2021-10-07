@@ -112,9 +112,12 @@ export const getBoundingPageRect = (el : Element) : Rect => {
 export const getViewportRect = (win : Window) : Rect => Rect.new({
     left        : 0,
     top         : 0,
-    // TODO `getScrollbarWidth` will always return 0 for root <html> element
-    width       : win.innerWidth - getScrollbarWidth(win.document.documentElement, 'x'),
-    height      : win.innerHeight - getScrollbarWidth(win.document.documentElement, 'y')
+    // TODO should in theory subtract the scrollbar's width/height
+    // however, the `getScrollbarWidth` method does not work correctly
+    // with <html> element, it returns 0 in the best case, or negative
+    // value if the height is > 100%
+    width       : win.innerWidth,
+    height      : win.innerHeight
 })
 
 

@@ -60,7 +60,7 @@ project.plan(
                     'mouse_over.t.js',
                     'offset.t.js',
                     'pointer_events.t.js',
-                    'scroll_into_view.t.js',
+                    { filename : 'scroll_into_view.t.js', expandBody : false },
                     'transformed_element.t.js',
                     'wait_for_target.t.js',
                     'web_component.t.js'
@@ -99,7 +99,9 @@ project.plan(
                 filename       : 'scroll',
 
                 items       : [
-                    'scroll_element_into_view.t.js'
+                    'scroll_element_into_view.t.js',
+                    // TODO move the test itself once we support `export config = {}`
+                    { filename : 'scroll_element_into_view_2.t.js', expandBody : false },
                 ]
             }
         ]
