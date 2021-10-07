@@ -1,5 +1,6 @@
 import { beforeEach, it } from "../../../browser.js"
 import { isElementAccessible, isElementConnected, isElementPointVisible } from "../../../src/util_browser/Dom.js"
+import { getScrollbarWidth } from "../../../src/util_browser/Scroll.js"
 import { createElement } from "../../@helpers.js"
 
 const id    = id => document.getElementById(id)
@@ -206,12 +207,14 @@ it('`isElementPointVisible` should work for elements inside iframe', async t => 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Determine that element is hidden behind the scrollbar', t => {
     document.body.innerHTML =
-        '<div style="position: absolute; left: 0; top: 0; background: blue; width: 200px; height: 200px; overflow: auto">' +
+        '<div id="scroller" style="position: absolute; left: 0; top: 0; background: blue; width: 200px; height: 200px; overflow: auto">' +
             '<div style="position: absolute; background: green; left: 100px; top: 100px; width: 200px; height: 200px" id="inner"></div>' +
         '</div>'
 
-    t.false(isElementPointVisible(id('inner'), [ 0, 99 ]).visible, 'Point hidden by the scrollbar')
-    t.false(isElementPointVisible(id('inner'), [ 99, 0 ]).visible, 'Point hidden by the scrollbar')
+    if (getScrollbarWidth(id('scroller'), 'x') > 0) {
+        t.false(isElementPointVisible(id('inner'), [ 0, 99 ]).visible, 'Point hidden by the scrollbar')
+        t.false(isElementPointVisible(id('inner'), [ 99, 0 ]).visible, 'Point hidden by the scrollbar')
+    }
 })
 
 
