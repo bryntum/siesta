@@ -226,13 +226,34 @@ export class LauncherNodejs extends Mixin(
             const wsServer          = new ServerNodeWebSocket()
             const wsPort            = await wsServer.startWebSocketServer()
 
-            wsServer.onConnectionHook.on(async (self, socket) => {
-                if (connectedPort) {
-                    await this.dispatcher.cleanupQueue.clearAll()
+            let counter             = 0
 
-                    await connectedPort.disconnect()
-                    connectedPort       = undefined
+            wsServer.onConnectionHook.on(async (self, socket) => {
+                const forAwait : Promise<any>[]  = []
+
+                counter++
+
+                if (connectedPort) {
+                    const disconnect = async () => {
+                        await this.dispatcher.cleanupQueue.clearAll()
+
+                        await connectedPort.disconnect()
+                        connectedPort       = undefined
+                    }
+                    forAwait.push(disconnect())
                 }
+
+                if (counter > 1) {
+                    // TODO refactor `setupProjectData` to `retrieveProjectData` or something
+                    // this mutable style is bad
+                    this.projectData    = undefined
+
+                    // this call takes time because launcher spans a new browser instance..
+                    // should have one browser instance "spare" and span a page in it?
+                    forAwait.push(this.setupProjectData())
+                }
+
+                await Promise.all(forAwait)
 
                 const port              = this.dashboardConnector = connectedPort = DashboardConnectorServer.new({ launcher : this })
                 const media             = MediaNodeWebSocketParent.new()
