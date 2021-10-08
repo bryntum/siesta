@@ -1,5 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
+import { prototypeValue } from "../../util/Helpers.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { IsolationLevel, SimulationType } from "../common/IsolationLevel.js"
 import { option } from "../option/Option.js"
@@ -35,29 +36,38 @@ export class TestDescriptorBrowser extends Mixin(
     class TestDescriptorBrowser extends base {
         type                : EnvironmentType           = 'browser'
 
+        @prototypeValue('native')
         @option()
-        simulation          : SimulationType            = 'native'
+        simulation          : SimulationType
 
+        @prototypeValue('iframe')
         @option()
-        isolation           : IsolationLevel            = 'iframe'
+        isolation           : IsolationLevel
 
+        @prototypeValue([])
         @option()
-        preload             : PreloadDescriptor[]       = []
+        preload             : PreloadDescriptor[]
 
+        @prototypeValue([])
         @option()
-        alsoPreload         : PreloadDescriptor[]       = []
+        alsoPreload         : PreloadDescriptor[]
 
+        @prototypeValue('')
         @option()
-        pageUrl             : string                    = ''
+        pageUrl             : string
 
-        viewportWidth       : number                    = 1024
-        viewportHeight      : number                    = 768
+        @prototypeValue(1024)
+        viewportWidth       : number
+        @prototypeValue(768)
+        viewportHeight      : number
 
-        mouseMovePrecision  : PointerMovePrecision      = { kind : 'last_only', precision : 1 }
+        @prototypeValue({ kind : 'last_only', precision : 1 })
+        mouseMovePrecision  : PointerMovePrecision
 
         // TODO rename or may be even replace with more generic option
         // like `cssReset` which will accept a CSS text
-        expandBody          : boolean                   = true
+        @prototypeValue(true)
+        expandBody          : boolean
 
 
         // TODO refactor: Probably need a separate data structure `TestLaunchInfo`
