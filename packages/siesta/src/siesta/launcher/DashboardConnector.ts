@@ -30,7 +30,7 @@ export type DashboardLaunchInfo = {
 export interface DashboardConnectorInterface {
     startDashboard (data : ProjectSerializableData, launcherDescriptor : LauncherDescriptor) : Promise<any>
 
-    setLaunchState (rootTestId : LUID, launchState : LaunchState) : Promise<DashboardLaunchInfo | undefined>
+    setLaunchState (desc : TestDescriptor, launchState : LaunchState) : Promise<DashboardLaunchInfo | undefined>
 
     launchContinuously (projectPlanItemsToLaunch : TestDescriptor[], isolationOverride? : IsolationLevel) : Promise<any>
 
@@ -99,7 +99,7 @@ export class DashboardConnectorServer extends Mixin(
 
 
         @remote()
-        setLaunchState : (rootTestId : LUID, launchState : LaunchState) => Promise<DashboardLaunchInfo | undefined>
+        setLaunchState : (desc : TestDescriptor, launchState : LaunchState) => Promise<DashboardLaunchInfo | undefined>
 
 
         @remote()
@@ -149,33 +149,38 @@ export class DashboardConnectorClient extends Mixin(
 
 
         @local()
-        async setLaunchState (rootTestId : LUID, launchState : LaunchState) : Promise<DashboardLaunchInfo | undefined> {
-            const launchInfo        = this.dashboard.mapping.get(rootTestId)
+        async setLaunchState (desc : TestDescriptor, launchState : LaunchState) : Promise<DashboardLaunchInfo | undefined> {
+            const launchInfo        = this.dashboard.mapping.get(desc.guid)
 
             launchInfo.launchState  = launchState
 
             const context           = this.iframeContextsByDescId.get(launchInfo.descriptor.guid)
 
-            if (launchState === 'started') {
-                if (context) {
-                    this.dashboard.overlay.context = context
+            if (desc.isRunningInDashboard()) {
+                if (launchState === 'started') {
+                    if (context) {
+                        this.dashboard.overlay.context = context
 
-                    globalGraph.commit()
+                        globalGraph.commit()
 
-                    const translatorEl  = this.dashboard.overlay.el.querySelector('.translator') as ComponentElement<Translator>
-                    const translator    = translatorEl.comp
+                        const translatorEl  = this.dashboard.overlay.el.querySelector('.translator') as ComponentElement<Translator>
+                        const translator    = translatorEl.comp
 
-                    translator.syncPosition()
+                        translator.syncPosition()
 
-                    const style         = translator.targetElement.style
+                        const style         = translator.targetElement.style
 
-                    return { offset : [ Number.parseInt(style.left), Number.parseInt(style.top) ] }
+                        return { offset : [ Number.parseInt(style.left), Number.parseInt(style.top) ] }
+                    }
                 }
-            }
-            else if (launchState === 'completed') {
-                this.dashboard.overlay.context      = null
+                else if (launchState === 'completed') {
+                    this.dashboard.overlay.context      = null
 
-                if (context) launchInfo.context  = context
+                    if (context) launchInfo.context  = context
+                }
+            } else {
+                // destroy any possible previous in-dashboard context
+                if (context && launchState === 'started') await this.iframeContextDestroy(context.id)
             }
         }
 
@@ -230,7 +235,7 @@ export class DashboardConnectorClient extends Mixin(
             await data[ 1 ].destroy()
 
             this.iframeContexts.delete(contextId)
-            this.iframeContexts.delete(data[ 0 ])
+            this.iframeContextsByDescId.delete(data[ 0 ])
 
             const launchInfo        = this.dashboard.mapping.get(data[ 0 ])
             launchInfo.context      = undefined

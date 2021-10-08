@@ -58,6 +58,17 @@ export class TestDescriptorBrowser extends Mixin(
         // TODO rename or may be even replace with more generic option
         // like `cssReset` which will accept a CSS text
         expandBody          : boolean                   = true
+
+
+        // TODO refactor: Probably need a separate data structure `TestLaunchInfo`
+        // which will contain the information about how exactly this descriptor is launched
+        // for example an isomorphic descriptor can be launched with Node.js context provider
+        // or browser
+        // browser descriptor can be launched inside of the dashboard or on separate page
+        // etc, may be some other info
+        isRunningInDashboard () : boolean {
+            return this.isolation === 'iframe' || this.isolation === 'context'
+        }
     }
 ){}
 

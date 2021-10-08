@@ -269,7 +269,7 @@ export class Dispatcher extends Mixin(
 
 
         async setDashboardLaunchState (desc : TestDescriptor, launchState : LaunchState) : Promise<DashboardLaunchInfo | undefined> {
-            return this.launcher.dashboardConnector?.setLaunchState(desc.guid, launchState)
+            return this.launcher.dashboardConnector?.setLaunchState(desc, launchState)
         }
 
 
@@ -285,6 +285,8 @@ export class Dispatcher extends Mixin(
         async launchProjectPlanItem (item : TestDescriptor, checkInfo : SubTestCheckInfo = undefined, isolationOverride : IsolationLevel = undefined) {
             const slot              = await this.cleanupQueue.reserveCleanupSlot(item)
 
+            // clear the `flatten` cache, because we modify it below (isolationOverride)
+            item.$flatten           = undefined
             const normalized        = item.flatten
             if (isolationOverride) normalized.isolation = isolationOverride
 
@@ -296,7 +298,7 @@ export class Dispatcher extends Mixin(
 
             const context           = await this.chooseContextProviderFor(normalized).createContext(normalized)
 
-            const dashboardLaunchInfo   = await this.setDashboardLaunchState(item, 'started')
+            const dashboardLaunchInfo   = await this.setDashboardLaunchState(normalized, 'started')
             const dashboardConnector    = this.launcher.dashboardConnector
 
             let preLaunchRes : boolean
@@ -347,7 +349,7 @@ export class Dispatcher extends Mixin(
                 return
             }
 
-            const { server, client } = this.getLauncherConnectorInfo(item)
+            const { server, client } = this.getLauncherConnectorInfo(normalized)
 
             const testLauncher      = server.launcherConnectorClass.new({
                 launcher            : this.launcher,

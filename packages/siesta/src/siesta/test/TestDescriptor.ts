@@ -319,6 +319,11 @@ export class TestDescriptor extends TestDescriptorPre {
         return this.$flatten    = descriptor
     }
 
+    // TODO refactor this, see comment for TestDescriptorBrowser
+    isRunningInDashboard () : boolean {
+        return false
+    }
+
 
     static fromTestDescriptorArgument<T extends typeof TestDescriptor> (this : T, desc : string | Partial<InstanceType<T>>) : InstanceType<T> {
         if (isString(desc)) {
