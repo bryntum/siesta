@@ -246,7 +246,7 @@ export class Port extends Mixin(
 
 
         async callRemote (envelop : EnvelopCall, message : Message) : Promise<void> {
-            if (!this.connected) throw new Error("Not connected to media")
+            if (!this.connected) throw new Error(`Not connected to media, sending envelop: ${ JSON.stringify(envelop) }`)
 
             return new Promise((resolve, reject) => {
                 let timeoutHandler : SetTimeoutHandler  = null
