@@ -45,7 +45,7 @@ const ensureMessagesStorage = (target : Port) => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const validatePrototype = (target : Port, propertyKey : string, decoratorName : string) => {
+const ensurePortMixingAdded = (target : Port, propertyKey : string, decoratorName : string) => {
     if (!(target instanceof Port))
         throw new Error(
             // @ts-expect-error
@@ -60,7 +60,7 @@ export const remote = (messageDesc : Partial<Message> = Message.new()) : Propert
     const message       = Message.maybeNew(messageDesc)
 
     return function (target : Port, propertyKey : string) : void {
-        validatePrototype(target, propertyKey, 'remote')
+        ensurePortMixingAdded(target, propertyKey, 'remote')
 
         const { remoteMessages } = ensureMessagesStorage(target)
 
@@ -80,12 +80,11 @@ export const remote = (messageDesc : Partial<Message> = Message.new()) : Propert
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 let flashScopeStorage : Port = undefined
 
-
 export const remote_wrapped = (messageDesc : Partial<Message> = Message.new()) : MethodDecorator => {
     const message       = Message.maybeNew(messageDesc)
 
     return function (target : Port, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
-        validatePrototype(target, propertyKey, 'remote_wrapped')
+        ensurePortMixingAdded(target, propertyKey, 'remote_wrapped')
 
         const { remoteWrappedMessages } = ensureMessagesStorage(target)
 
@@ -107,7 +106,7 @@ export const local = function (messageDesc : Partial<Message> = Message.new()) :
     const message       = Message.maybeNew(messageDesc)
 
     return function (target : Port, propertyKey : string, _descriptor : TypedPropertyDescriptor<any>) : void {
-        validatePrototype(target, propertyKey, 'local')
+        ensurePortMixingAdded(target, propertyKey, 'local')
 
         const { localMessages } = ensureMessagesStorage(target)
 
