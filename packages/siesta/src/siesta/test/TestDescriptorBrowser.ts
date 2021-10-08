@@ -36,13 +36,18 @@ export class TestDescriptorBrowser extends Mixin(
     class TestDescriptorBrowser extends base {
         type                : EnvironmentType           = 'browser'
 
+        // TODO should use only `prototypeValue`, currently w/o initializer things breaks
+        // but this prevents inheritance
+        // seems need to refactor the descriptor inheritance mechanism
         @prototypeValue('native')
         @option()
-        simulation          : SimulationType
+        simulation          : SimulationType            = 'native'
 
+        // TODO `isolation` is actually inherited from `TestDescriptor`, `@option` should be applied there
+        // TODO see above
         @prototypeValue('iframe')
         @option()
-        isolation           : IsolationLevel
+        isolation           : IsolationLevel            = 'iframe'
 
         @prototypeValue([])
         @option()
