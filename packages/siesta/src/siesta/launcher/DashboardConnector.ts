@@ -63,7 +63,11 @@ export class DashboardConnectorServer extends Mixin(
 
         @local()
         async onBeforeUnload () : Promise<any> {
-            this.launcher.isClosingDashboard = true
+            this.launcher.isClosingDashboard    = true
+            // de-referencing the dashboard connector immediately
+            // so that `TestReporter`s won't try to report any result it
+            // this allows us to reload the dashboard while a test is running
+            this.launcher.dashboardConnector    = undefined
         }
 
 
