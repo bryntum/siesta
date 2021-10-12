@@ -33,6 +33,14 @@ cd "$DIR/.."
 )
 
 (
+    cd packages/chronograph
+    echo ""
+    echo "------------------------------------------"
+    echo "Compiling [chronograph]"
+    npx tsc
+)
+
+(
     cd packages/siesta
     echo ""
     echo "------------------------------------------"
