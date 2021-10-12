@@ -474,6 +474,11 @@ export class Dashboard extends Mixin(
 
 
         async launchContinuously (projectPlanItemsToLaunch : TestDescriptor[], isolationOverride? : IsolationLevel) : Promise<any> {
+            // when launching more than 1 test - run them with "page" isolation to allow
+            // parallelization
+            // TODO need a proper "exclusive" queue in dispatcher too
+            if (projectPlanItemsToLaunch.length > 1) isolationOverride = isolationOverride ?? 'page'
+
             projectPlanItemsToLaunch.forEach(desc => this.getTestLaunchInfo(desc).schedulePendingTestLaunch())
 
             this.connector.launchContinuously(projectPlanItemsToLaunch, isolationOverride)
