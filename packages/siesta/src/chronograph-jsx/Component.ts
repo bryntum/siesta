@@ -1,9 +1,9 @@
 import { CalculableBox } from "@bryntum/chronograph/src/chrono2/data/CalculableBox.js"
 import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
 import { Base } from "@bryntum/chronograph/src/class/Base.js"
-import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
 import { Entity } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { Replica } from "@bryntum/chronograph/src/replica2/Replica.js"
+import { AnyConstructor, ClassUnion, Mixin } from "typescript-mixin-class"
 import { categorizeProperties, ElementSource, Listener, PropertiesCategorizationResult, PropertySourceNormalized } from "./ChronoGraphJSX.js"
 import { ElementReactivity, ReactiveElement } from "./ElementReactivity.js"
 

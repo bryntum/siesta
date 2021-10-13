@@ -1,6 +1,6 @@
 import { BoxUnbound } from '@bryntum/chronograph/src/chrono2/data/Box.js'
 import { CalculableBox } from '@bryntum/chronograph/src/chrono2/data/CalculableBox.js'
-import { ClassUnion, Mixin } from "@bryntum/chronograph/src/class/Mixin.js"
+import { ClassUnion, Mixin } from "typescript-mixin-class/index.js"
 import {
     addEventListener,
     ElementSourceNormalizationResult,
