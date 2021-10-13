@@ -67,7 +67,7 @@ export class ContextBrowserIframe extends Mixin(
 
                         Object.assign(data.seedChildPortArguments[ 5 ], { messagePort : event.ports[ 0 ] })
 
-                        eval(`(${ seedChildPortSource })`)(...data.seedChildPortArguments)
+                        window.eval(`(${ seedChildPortSource })`)(...data.seedChildPortArguments)
                     }
                 })
             }
