@@ -62,7 +62,8 @@ class CleanupSlot extends Base {
     }
 }
 
-class CleanupQueue extends Base {
+// only had to export it because of declarations files generation
+export class CleanupQueue extends Base {
     dispatcher          : Dispatcher                        = undefined
 
     order               : TestDescriptor[]                  = []
