@@ -19,7 +19,7 @@ export class TestNodejs extends Mixin(
     ],
     (base : ClassUnion<
         typeof Test
-    >) => 
+    >) =>
 
     class TestNodejs extends base {
         @prototypeValue(TestDescriptorNodejs)
@@ -49,7 +49,7 @@ export class TestNodejs extends Mixin(
 
 
         static async getLauncherClass () : Promise<typeof Launcher> {
-            return (await import(/* @vite-ignore */''.concat('../launcher/LauncherNodejs.js'))).LauncherNodejs
+            return (await import('../launcher/LauncherNodejs.js')).LauncherNodejs
         }
     }
 

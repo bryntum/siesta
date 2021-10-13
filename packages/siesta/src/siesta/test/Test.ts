@@ -980,9 +980,9 @@ export class Test extends TestPre {
     // TODO remove this method, once the `getSelfUrl` and `getInputArgs` are moved to Launcher
     static async getIsomorphicTestClass () : Promise<typeof Test> {
         if (isNodejs())
-            return (await import(/* @vite-ignore */''.concat('./TestNodejs.js'))).TestNodejs
+            return (await import('./TestNodejs.js')).TestNodejs
         else if (isDeno())
-            return (await import(/* @vite-ignore */''.concat('./TestDeno.js'))).TestDeno
+            return (await import('./TestDeno.js')).TestDeno
         else
             return (await import('./TestBrowser.js')).TestBrowser
     }
@@ -990,9 +990,9 @@ export class Test extends TestPre {
 
     static async getExecutionContextClass () : Promise<typeof ExecutionContext> {
         if (isNodejs())
-            return (await import(/* @vite-ignore */''.concat('../../context/ExecutionContextNode.js'))).ExecutionContextNode
+            return (await import('../../context/ExecutionContextNode.js')).ExecutionContextNode
         else if (isDeno())
-            return (await import(/* @vite-ignore */''.concat('../../context/ExecutionContextDeno.js'))).ExecutionContextDeno
+            return (await import('../../context/ExecutionContextDeno.js')).ExecutionContextDeno
         else
             return (await import('../../context/ExecutionContextBrowser.js')).ExecutionContextBrowser
     }
@@ -1000,9 +1000,9 @@ export class Test extends TestPre {
 
     static async getLauncherClass () : Promise<typeof Launcher> {
         if (isNodejs())
-            return (await import(/* @vite-ignore */''.concat('../launcher/LauncherNodejs.js'))).LauncherNodejs
+            return (await import('../launcher/LauncherNodejs.js')).LauncherNodejs
         else if (isDeno())
-            return (await import(/* @vite-ignore */''.concat('../launcher/LauncherDeno.js'))).LauncherDeno
+            return (await import('../launcher/LauncherDeno.js')).LauncherDeno
         else
             return (await import('../launcher/LauncherBrowser.js')).LauncherBrowser
     }
@@ -1010,9 +1010,9 @@ export class Test extends TestPre {
 
     static async getProjectClass () : Promise<typeof Project> {
         if (isNodejs())
-            return (await import(/* @vite-ignore */''.concat('../project/ProjectNodejs.js'))).ProjectNodejs
+            return (await import('../project/ProjectNodejs.js')).ProjectNodejs
         else if (isDeno())
-            return (await import(/* @vite-ignore */''.concat('../project/ProjectDeno.js'))).ProjectDeno
+            return (await import('../project/ProjectDeno.js')).ProjectDeno
         else
             return (await import('../project/ProjectBrowser.js')).ProjectBrowser
     }
