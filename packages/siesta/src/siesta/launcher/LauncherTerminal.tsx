@@ -1,4 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { importer } from "../../importer/Importer.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel, LogMethod } from "../../logger/Logger.js"
@@ -214,7 +215,8 @@ export class LauncherTerminal extends Mixin(
 
 
         async setupTheme () {
-            this.styles         = (await import(`../reporter/styling/theme_${ this.theme }.js`)).styles
+            // @ts-ignore
+            this.styles         = (await importer.getImporter(`src/siesta/reporter/styling/theme_${ this.theme }.js`)()).styles
         }
 
 

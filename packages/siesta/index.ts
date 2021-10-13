@@ -14,3 +14,8 @@ importer.registerImporter('src/rpc/media/MediaWebWorker.js', async () => import(
 
 importer.registerImporter('src/siesta/test/port/TestLauncher.js', async () => import('./src/siesta/test/port/TestLauncher.js'))
 importer.registerImporter('src/siesta/test/port/TestLauncherBrowser.js', async () => import('./src/siesta/test/port/TestLauncherBrowser.js'))
+
+importer.registerImporter('src/siesta/reporter/styling/theme_accessible.js', async () => import('./src/siesta/reporter/styling/theme_accessible.js'))
+importer.registerImporter('src/siesta/reporter/styling/theme_dark.js', async () => import('./src/siesta/reporter/styling/theme_dark.js'))
+importer.registerImporter('src/siesta/reporter/styling/theme_light.js', async () => import('./src/siesta/reporter/styling/theme_light.js'))
+importer.registerImporter('src/siesta/reporter/styling/theme_universal.js', async () => import('./src/siesta/reporter/styling/theme_universal.js'))
