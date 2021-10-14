@@ -1,7 +1,7 @@
 import { AnyFunction } from "typescript-mixin-class/src/class/Mixin.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { importer } from "../../importer/Importer.js"
+import { importer } from "../../Importer.js"
 import { Logger } from "../../logger/Logger.js"
 import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
 import { stringify } from "../../serializable/Serializable.js"

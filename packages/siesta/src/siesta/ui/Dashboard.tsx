@@ -10,7 +10,7 @@ import { ChronoGraphJSX, ElementSource } from "../../chronograph-jsx/ChronoGraph
 import { Component } from "../../chronograph-jsx/Component.js"
 import { ComponentElement } from "../../chronograph-jsx/ElementReactivity.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { importer } from "../../importer/Importer.js"
+import { importer } from "../../Importer.js"
 import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { buffer } from "../../util/TimeHelpers.js"

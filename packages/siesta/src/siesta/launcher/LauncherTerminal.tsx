@@ -1,5 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { importer } from "../../importer/Importer.js"
+import { importer } from "../../Importer.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel, LogMethod } from "../../logger/Logger.js"

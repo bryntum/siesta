@@ -1,6 +1,6 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { ImporterMap } from "../../importer/Importer.js"
+import { ImporterMap } from "../../Importer.js"
 import { Media } from "../../rpc/media/Media.js"
 import { Port } from "../../rpc/port/Port.js"
 import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
