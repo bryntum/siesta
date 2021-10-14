@@ -22,7 +22,7 @@ export class ContextProviderNodePlaywright extends Mixin(
         launcher                : LauncherNodejs    = undefined
 
         // `true` is a bit slower, seems more robust though
-        separateBrowserForEveryPage : boolean       = true
+        separateBrowserForEveryPage : boolean       = false
 
 
         $primaryBrowser     : playwright.Browser     = undefined
@@ -31,6 +31,15 @@ export class ContextProviderNodePlaywright extends Mixin(
             if (this.$primaryBrowser !== undefined) return this.$primaryBrowser
 
             return this.$primaryBrowser = await this.createBrowser()
+        }
+
+
+        $primaryBrowserContext     : playwright.BrowserContext      = undefined
+
+        async getPrimaryBrowserContext () : Promise<playwright.BrowserContext> {
+            if (this.$primaryBrowserContext !== undefined) return this.$primaryBrowserContext
+
+            return this.$primaryBrowserContext = await (await this.getPrimaryBrowser()).newContext()
         }
 
 
@@ -44,7 +53,8 @@ export class ContextProviderNodePlaywright extends Mixin(
         async doCreateContext (desc? : TestDescriptor) : Promise<InstanceType<this[ 'contextClass' ]>> {
             // this.launcher.logger.debug('Context requested')
 
-            const browser           = this.separateBrowserForEveryPage ? await this.createBrowser() : await this.getPrimaryBrowser()
+            // a bit messy - the `browser` here is actually a `Browser | BrowserContext`
+            const browser           = this.separateBrowserForEveryPage ? await this.createBrowser() : await this.getPrimaryBrowserContext()
 
             // this.launcher.logger.debug('Context has browser')
 
