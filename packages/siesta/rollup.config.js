@@ -22,7 +22,8 @@ export default defineConfig({
 
     output : {
         dir     : 'dist',
-        format  : 'esm'
+        format  : 'esm',
+        chunkFileNames  : 'chunks/[name]-[hash].js'
     },
 
     plugins : [
