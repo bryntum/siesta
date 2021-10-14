@@ -40,7 +40,6 @@
         "minimatch": "^3.0.4",
         "node-fetch": "^3.0.0-beta.9",
         "playwright": "^1.15.2",
-        "puppeteer": "^10.0.0",
         "ws": "^7.4.4",
         "typescript-mixin-class": "^0.0.1",
         "typescript-serializable-mixin": "^0.0.1",

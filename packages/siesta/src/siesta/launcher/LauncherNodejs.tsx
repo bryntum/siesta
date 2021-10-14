@@ -1,8 +1,7 @@
 import { startDevServer } from "@web/dev-server"
 import path from "path"
-import { Page, LaunchOptions } from "playwright/index.js"
+import { LaunchOptions, Page } from "playwright/index.js"
 import { fileURLToPath } from "url"
-import ws from "ws"
 import { siestaPackageRootUrl } from "../../../index.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContextAttachable } from "../../context/ExecutionContext.js"
@@ -14,15 +13,13 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { MediaNodeWebSocketParent } from "../../rpc/media/MediaNodeWebSocketParent.js"
 import { ServerNodeWebSocket } from "../../rpc/server/ServerNodeWebSocket.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
-import { delay } from "../../util/TimeHelpers.js"
 import { isString } from "../../util/Typeguards.js"
-import { EnvironmentType } from "../common/Environment.js"
 import { browserType } from "../../util_browser/PlaywrightHelpers.js"
+import { EnvironmentType } from "../common/Environment.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderDashboardIframe } from "../context/context_provider/ContextProviderDashboardIframe.js"
 import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
 import { ContextProviderNodePlaywright } from "../context/context_provider/ContextProviderNodePlaywright.js"
-import { ContextProviderNodePuppeteer } from "../context/context_provider/ContextProviderNodePuppeteer.js"
 import { ProjectDescriptorNodejs } from "../project/ProjectDescriptor.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
@@ -32,7 +29,7 @@ import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { DashboardConnectorServer } from "./DashboardConnector.js"
 import { Dispatcher } from "./Dispatcher.js"
 import { DispatcherNodejs } from "./DispatcherNodejs.js"
-import { ExitCodes, Launcher} from "./Launcher.js"
+import { ExitCodes, Launcher } from "./Launcher.js"
 import { LauncherDescriptorNodejs } from "./LauncherDescriptorNodejs.js"
 import { LauncherError } from "./LauncherError.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
@@ -56,7 +53,7 @@ export class LauncherNodejs extends Mixin(
         contextProviderConstructors : (typeof ContextProvider)[]    = [
             ContextProviderNodePlaywright,
             ContextProviderDashboardIframe,
-            ContextProviderNodePuppeteer,
+            // ContextProviderNodePuppeteer,
             ContextProviderNodeChildProcess,
         ]
 
