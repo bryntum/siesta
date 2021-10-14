@@ -186,6 +186,8 @@ export class Port extends Mixin(
 
 
         async disconnect (silent : boolean = false) : Promise<any> {
+            if (!this.connected) return
+
             this.awaitingResponse.forEach(value => {
                 !silent && value[ 1 ](new Error(`Channel disconnected during the call ${ JSON.stringify(value[ 2 ]) }`))
             })
