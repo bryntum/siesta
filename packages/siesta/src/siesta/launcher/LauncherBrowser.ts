@@ -73,7 +73,7 @@ export class LauncherBrowser extends Mixin(
 
 
         async setup () {
-            this.styles         = (await import(`../reporter/styling/theme_universal.js`)).styles
+            this.styles         = (await import('../reporter/styling/theme_universal.js')).styles
 
             await super.setup()
         }
