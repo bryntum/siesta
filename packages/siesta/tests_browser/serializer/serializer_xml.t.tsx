@@ -1,4 +1,4 @@
-import { it } from "../../index.js"
+import { it } from "../../browser.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
 import { SerializerXml } from "../../src/serializer/SerializerXml.js"
 
