@@ -10,6 +10,7 @@ import { ChronoGraphJSX, ElementSource } from "../../chronograph-jsx/ChronoGraph
 import { Component } from "../../chronograph-jsx/Component.js"
 import { ComponentElement } from "../../chronograph-jsx/ElementReactivity.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { importer } from "../../importer/Importer.js"
 import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { buffer } from "../../util/TimeHelpers.js"
@@ -17,7 +18,6 @@ import { awaitDomInteractive } from "../../util_browser/Dom.js"
 import { IsolationLevel } from "../common/IsolationLevel.js"
 import { LUID } from "../common/LUID.js"
 import { DashboardConnectorClient } from "../launcher/DashboardConnector.js"
-import { LauncherDescriptor } from "../launcher/Launcher.js"
 import { LauncherDescriptorNodejs } from "../launcher/LauncherDescriptorNodejs.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
@@ -76,7 +76,8 @@ export class DashboardRenderer extends Mixin(
 
 
         async setupTheme () {
-            this.styles         = (await import(`../reporter/styling/theme_${ this.dashboard.launcherDescriptor.theme }.js`)).styles
+            // @ts-ignore
+            this.styles         = (await importer.getImporter(`src/siesta/reporter/styling/theme_${ this.dashboard.launcherDescriptor.theme }.js`)()).styles
         }
     }
 ) {}
