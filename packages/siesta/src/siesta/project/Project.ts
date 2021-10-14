@@ -84,6 +84,11 @@ export class Project extends Mixin(
             // turn the root descriptor into parent, so that it's `leavesAxis` method
             // returns empty array
             this.projectPlan.turnIntoParent()
+
+            // the same code is repeated in `setup`, see below
+            Object.assign(this.projectPlan, this.testDescriptor, {
+                title   : this.title
+            })
         }
 
 
