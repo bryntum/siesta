@@ -93,8 +93,8 @@ export const seedChildPort = async (
     const portModuleImporter            = importer.getImporter(portModuleUrl)
     const mediaModuleImporter           = importer.getImporter(mediaModuleUrl)
 
-    if (!portModuleImporter) throw new Error(`Unknown module url : ${ portModuleUrl }`)
-    if (!mediaModuleImporter) throw new Error(`Unknown module url : ${ mediaModuleUrl }`)
+    if (!portModuleImporter) throw new Error(`Unknown importer module id: ${ portModuleUrl }`)
+    if (!mediaModuleImporter) throw new Error(`Unknown importer module id: ${ mediaModuleUrl }`)
 
     const [ modulePort, moduleMedia ]   = await Promise.all([ portModuleImporter(), mediaModuleImporter() ])
 
