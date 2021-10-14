@@ -1,4 +1,5 @@
 import { ReactiveArray } from "@bryntum/chronograph/src/chrono2/data/Array.js"
+import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
 import { globalGraph } from "@bryntum/chronograph/src/chrono2/graph/Graph.js"
 import { FieldBox } from "@bryntum/chronograph/src/replica2/Atom.js"
 import { calculate, Entity, field } from "@bryntum/chronograph/src/replica2/Entity.js"
@@ -6,10 +7,17 @@ import { Replica } from "@bryntum/chronograph/src/replica2/Replica.js"
 import { Field } from "@bryntum/chronograph/src/schema2/Field.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { Base, ClassUnion, Mixin } from "typescript-mixin-class"
-import { Serializable, serializable } from "typescript-serializable-mixin"
+import { exclude, Serializable, serializable } from "typescript-serializable-mixin"
 import { CI } from "../../iterator/Iterator.js"
 import { TreeNode } from "../../tree/TreeNode.js"
-import { ChildResultsIndex, TestNodeResult, TestNodeState, TestResult } from "./TestResult.js"
+import {
+    AssertionAsyncCreation,
+    AssertionAsyncResolution,
+    ChildResultsIndex,
+    TestNodeResult,
+    TestNodeState,
+    TestResult
+} from "./TestResult.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -181,3 +189,31 @@ globalGraph.historyLimit    = 0
 
 // // @ts-ignore
 // window.globalGraph = globalGraph
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'AssertionAsyncCreationReactive' })
+export class AssertionAsyncCreationReactive extends Mixin(
+    [ AssertionAsyncCreation, Entity ],
+    (base : ClassUnion<typeof AssertionAsyncCreation, typeof Entity>) =>
+
+    class AssertionAsyncCreation extends base {
+        @exclude()
+        $resolutionBox   : Box<AssertionAsyncResolution>    = undefined
+
+        get resolutionBox () : Box<AssertionAsyncResolution> {
+            if (this.$resolutionBox !== undefined) return this.$resolutionBox
+
+            return this.$resolutionBox = Box.new(this.$resolution)
+        }
+
+        // the `resolution` property effectively made reactive _and_ serializable
+        get resolution () : AssertionAsyncResolution | null {
+            return this.resolutionBox.read()
+        }
+        set resolution (value : AssertionAsyncResolution) {
+            this.$resolution    = value
+            this.resolutionBox.write(value)
+        }
+    }
+) {}

@@ -1,5 +1,3 @@
-import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
-import { Entity } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { OutputType } from "../../context/ExecutionContext.js"
@@ -7,7 +5,7 @@ import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
-import { exclude, serializable, Serializable } from "../../serializable/Serializable.js"
+import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { escapeRegExp } from "../../util/Helpers.js"
 import { LUID, luid } from "../common/LUID.js"
 import { TestDescriptor } from "./TestDescriptor.js"
@@ -118,79 +116,18 @@ export class Assertion extends Mixin(
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'AssertionAsyncCreation' })
 export class AssertionAsyncCreation extends Mixin(
-    [ Assertion, Entity ],
-    (base : ClassUnion<typeof Assertion, typeof Entity>) =>
+    [ Assertion ],
+    (base : ClassUnion<typeof Assertion>) =>
 
     class AssertionAsyncCreation extends base {
         $resolution     : AssertionAsyncResolution          = undefined
 
-        @exclude()
-        $resolutionBox   : Box<AssertionAsyncResolution>    = undefined
-
-        get resolutionBox () : Box<AssertionAsyncResolution> {
-            if (this.$resolutionBox !== undefined) return this.$resolutionBox
-
-            return this.$resolutionBox = Box.new(this.$resolution)
-        }
-
-        // the `resolution` property effectively made reactive _and_ serializable
         get resolution () : AssertionAsyncResolution | null {
-            return this.resolutionBox.read()
+            return this.$resolution
         }
         set resolution (value : AssertionAsyncResolution) {
             this.$resolution    = value
-            this.resolutionBox.write(value)
         }
-
-
-        get isRunning () : boolean {
-            return !this.resolution
-        }
-
-        // @ts-ignore
-        get passed () : boolean | undefined {
-            return this.resolution?.passed
-        }
-        set passed (value : boolean) {
-        }
-
-        // @ts-ignore
-        get annotation () : XmlElement {
-            return this.resolution?.annotation
-        }
-        set annotation (value : boolean) {
-        }
-    }
-) {}
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-@serializable({ id : 'AssertionAsyncCreation' })
-export class AssertionAsyncCreationReactive extends Mixin(
-    [ Assertion, Entity ],
-    (base : ClassUnion<typeof Assertion, typeof Entity>) =>
-
-    class AssertionAsyncCreation extends base {
-        $resolution     : AssertionAsyncResolution          = undefined
-
-        @exclude()
-        $resolutionBox   : Box<AssertionAsyncResolution>    = undefined
-
-        get resolutionBox () : Box<AssertionAsyncResolution> {
-            if (this.$resolutionBox !== undefined) return this.$resolutionBox
-
-            return this.$resolutionBox = Box.new(this.$resolution)
-        }
-
-        // the `resolution` property effectively made reactive _and_ serializable
-        get resolution () : AssertionAsyncResolution | null {
-            return this.resolutionBox.read()
-        }
-        set resolution (value : AssertionAsyncResolution) {
-            this.$resolution    = value
-            this.resolutionBox.write(value)
-        }
-
 
         get isRunning () : boolean {
             return !this.resolution

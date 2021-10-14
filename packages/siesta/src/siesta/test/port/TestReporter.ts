@@ -9,13 +9,12 @@ import { AssertionWaitForCreation, AssertionWaitForResolution } from "../asserti
 import { TestDescriptor } from "../TestDescriptor.js"
 import {
     Assertion,
-    AssertionAsyncCreation,
-    AssertionAsyncResolution,
+    AssertionAsyncCreation, AssertionAsyncResolution,
     Exception,
     LogMessage,
     TestResultLeaf
 } from "../TestResult.js"
-import { TestNodeResultReactive } from "../TestResultReactive.js"
+import { AssertionAsyncCreationReactive, TestNodeResultReactive } from "../TestResultReactive.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // make sure we actually import these class symbols (and not just types),
@@ -130,10 +129,13 @@ export class TestReporterParent extends Mixin(
 
 
         @local()
-        async onResult (rootTestId : LUID, testNodeId : LUID, result : TestResultLeaf) {
+        async onResult (rootTestId : LUID, testNodeId : LUID, res : TestResultLeaf) {
             if (!this.currentTestNodeResult || this.currentTestNodeResult.localId !== testNodeId) {
                 throw new Error("Parent node id mismatch for test result")
             }
+
+            // re-create the `AssertionAsyncCreation` in the reactive form
+            const result        = res instanceof AssertionAsyncCreation ? AssertionAsyncCreationReactive.new(res) : res
 
             this.currentTestNodeResult.addResult(result)
 
