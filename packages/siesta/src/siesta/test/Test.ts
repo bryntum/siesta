@@ -2,6 +2,7 @@ import { Base } from "../../class/Base.js"
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext, ExecutionContextAttachable } from "../../context/ExecutionContext.js"
 import { Hook } from "../../hook/Hook.js"
+import { importer } from "../../importer/Importer.js"
 import { XmlNode } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { parse } from "../../serializable/Serializable.js"
@@ -25,9 +26,25 @@ import { Expectation } from "./Expectation.js"
 import { TestLauncherChild } from "./port/TestLauncherChild.js"
 import { Spy, SpyFunction } from "./Spy.js"
 import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
+import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
+import { TestDescriptorDeno } from "./TestDescriptorDeno.js"
+import { TestDescriptorNodejs } from "./TestDescriptorNodejs.js"
 import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResult } from "./TestResult.js"
 import { SubTestCheckInfo } from "./TestResultReactive.js"
 
+// this imports handles the case when a standalone isomorphic test is launched via node launcher
+// in this case, the launcher will create a nodejs project with nodejs test descriptor
+// as the project plan
+// then it is passed to the test realm I guess
+TestDescriptorNodejs
+TestDescriptorBrowser
+TestDescriptorDeno
+SubTestCheckInfo
+
+// When a `it` starter is imported, the `importer` is always expected to be created
+// Launcher, in its `preLaunchTest` verifies that and will end the test prematurely, if `importer`
+// is not found
+importer
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 class TestPre extends Mixin(
