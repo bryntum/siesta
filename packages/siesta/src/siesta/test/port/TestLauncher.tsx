@@ -8,7 +8,7 @@ import { Context } from "../../context/Context.js"
 import { DashboardLaunchInfo } from "../../launcher/DashboardConnector.js"
 import { Launcher } from "../../launcher/Launcher.js"
 import { globalTestEnv, Test } from "../Test.js"
-import { SubTestCheckInfo } from "../TestResult.js"
+import { SubTestCheckInfo } from "../TestResultReactive.js"
 import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
 
 

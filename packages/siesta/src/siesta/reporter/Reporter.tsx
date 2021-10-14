@@ -20,9 +20,9 @@ import {
     Result,
     SourcePoint,
     TestNodeResult,
-    TestNodeResultReactive,
     TestResult
 } from "../test/TestResult.js"
+import { TestNodeResultReactive } from "../test/TestResultReactive.js"
 import { ConsoleXmlRenderer } from "./ConsoleXmlRenderer.js"
 
 

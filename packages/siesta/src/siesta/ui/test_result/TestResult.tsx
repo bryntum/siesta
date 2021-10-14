@@ -20,9 +20,9 @@ import {
     Exception,
     LogMessage,
     TestNodeResult,
-    TestNodeResultReactive,
     TestResult
 } from "../../test/TestResult.js"
+import { TestNodeResultReactive } from "../../test/TestResultReactive.js"
 import { TreeComponent } from "../components/TreeComponent.js"
 import { Dashboard } from "../Dashboard.js"
 import { TestLaunchInfo } from "../TestLaunchInfo.js"

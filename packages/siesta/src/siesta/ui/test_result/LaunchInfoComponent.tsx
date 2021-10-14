@@ -9,7 +9,7 @@ import { ChronoGraphJSX, ElementSource } from "../../../chronograph-jsx/ChronoGr
 import { Component } from "../../../chronograph-jsx/Component.js"
 import { ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
-import { checkInfoFromTestResult } from "../../test/TestResult.js"
+import { checkInfoFromTestResult } from "../../test/TestResultReactive.js"
 import { Splitter } from "../components/Splitter.js"
 import { Dashboard } from "../Dashboard.js"
 import { TestLaunchInfo } from "../TestLaunchInfo.js"

@@ -23,7 +23,11 @@ import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { TestReporterParent } from "../test/port/TestReporter.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { individualCheckInfoForTestResult, SubTestCheckInfo, TestNodeResultReactive } from "../test/TestResult.js"
+import {
+    individualCheckInfoForTestResult,
+    SubTestCheckInfo,
+    TestNodeResultReactive
+} from "../test/TestResultReactive.js"
 import { Splitter } from "./components/Splitter.js"
 import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComponent.js"
 import { RippleEffectManager } from "./RippleEffectManager.js"

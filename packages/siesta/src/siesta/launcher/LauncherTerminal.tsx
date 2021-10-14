@@ -14,7 +14,8 @@ import { option } from "../option/Option.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ProjectTerminal } from "../project/ProjectTerminal.js"
 import { LogMessage } from "../test/TestResult.js"
-import { ExitCodes, Launcher, LauncherDescriptor, LauncherError, OptionsGroupOutput } from "./Launcher.js"
+import { ExitCodes, Launcher, LauncherDescriptor, OptionsGroupOutput } from "./Launcher.js"
+import { LauncherError } from "./LauncherError.js"
 import { extractProjectInfo } from "./ProjectExtractor.js"
 
 // generic sever-side, cross Node/Deno functionality

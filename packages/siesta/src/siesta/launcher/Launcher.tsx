@@ -30,9 +30,10 @@ import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { Reporter, ReporterDetailing } from "../reporter/Reporter.js"
 import { HasRuntimeAccess } from "../runtime/Runtime.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { SubTestCheckInfo } from "../test/TestResult.js"
+import { SubTestCheckInfo } from "../test/TestResultReactive.js"
 import { DashboardConnectorServer } from "./DashboardConnector.js"
 import { Dispatcher } from "./Dispatcher.js"
+import { LauncherError } from "./LauncherError.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -75,21 +76,6 @@ export enum ExitCodes {
     'DRY_RUN'               = 8
 }
 
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-@serializable({ id : 'LauncherError' })
-export class LauncherError extends Mixin(
-    [ Serializable, Base ],
-    (base : ClassUnion<typeof Serializable, typeof Base>) =>
-
-    class LauncherError extends base {
-        message             : string        = undefined
-
-        annotation          : XmlElement    = undefined
-
-        exitCode            : ExitCodes     = undefined
-    }
-) {}
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const OptionsGroupFiltering  = OptionGroup.new({

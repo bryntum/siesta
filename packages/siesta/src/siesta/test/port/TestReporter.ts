@@ -13,9 +13,9 @@ import {
     AssertionAsyncResolution,
     Exception,
     LogMessage,
-    TestNodeResultReactive,
     TestResultLeaf
 } from "../TestResult.js"
+import { TestNodeResultReactive } from "../TestResultReactive.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // make sure we actually import these class symbols (and not just types),

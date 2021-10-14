@@ -2,7 +2,7 @@ import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TreeNodeMapped } from "../../tree/TreeNodeMapped.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { TestNodeResultReactive } from "../test/TestResult.js"
+import { TestNodeResultReactive } from "../test/TestResultReactive.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
