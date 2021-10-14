@@ -1,19 +1,17 @@
 import { Base } from "../../../class/Base.js"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
-import { local, remote } from "../../../rpc/port/Port.js"
-import { PortHandshakeChild, PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
-import { parse } from "../../../serializable/Serializable.js"
+import { remote } from "../../../rpc/port/Port.js"
+import { PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
 import { Context } from "../../context/Context.js"
 import { DashboardLaunchInfo } from "../../launcher/DashboardConnector.js"
 import { Launcher } from "../../launcher/Launcher.js"
-import { globalTestEnv, Test } from "../Test.js"
 import { SubTestCheckInfo } from "../TestResultReactive.js"
-import { TestReporterChild, TestReporterParent } from "./TestReporter.js"
+import { TestReporterParent } from "./TestReporterParent.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-interface TestLauncher {
+export interface TestLauncher {
     launchTest (testDescriptorStr : string, checkInfo : SubTestCheckInfo, dashboardLaunchInfo : DashboardLaunchInfo) : Promise<any>
 }
 
@@ -33,26 +31,3 @@ export class TestLauncherParent extends Mixin(
 ) {}
 
 
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class TestLauncherChild extends Mixin(
-    [ TestReporterChild, PortHandshakeChild, Base ],
-    (base : ClassUnion<typeof TestReporterChild, typeof PortHandshakeChild, typeof Base>) =>
-
-    class TestLauncherChild extends base implements TestLauncher {
-
-        @local()
-        async launchTest (testDescriptorStr : string, checkInfo : SubTestCheckInfo, dashboardLaunchInfo : DashboardLaunchInfo) {
-            // there might be no `topTest` if test file does not contain any calls
-            // to static `it` method of any test class
-            const topTest = globalTestEnv.topTest || Test.new({
-                descriptor      : parse(testDescriptorStr)
-            })
-
-            topTest.connector    = this
-
-            await topTest.start(checkInfo, dashboardLaunchInfo)
-
-            globalTestEnv.clear()
-        }
-    }
-) {}

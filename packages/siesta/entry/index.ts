@@ -8,8 +8,8 @@ importer.registerImporter('src/rpc/media/MediaNodeIpc.js', async () => import('.
 importer.registerImporter('src/rpc/media/MediaSameContext.js', async () => import('../src/rpc/media/MediaSameContext.js'))
 importer.registerImporter('src/rpc/media/MediaWebWorker.js', async () => import('../src/rpc/media/MediaWebWorker.js'))
 
-importer.registerImporter('src/siesta/test/port/TestLauncher.js', async () => import('../src/siesta/test/port/TestLauncher.js'))
-importer.registerImporter('src/siesta/test/port/TestLauncherBrowser.js', async () => import('../src/siesta/test/port/TestLauncherBrowser.js'))
+importer.registerImporter('src/siesta/test/port/TestLauncherChild.js', async () => import('../src/siesta/test/port/TestLauncherChild.js'))
+importer.registerImporter('src/siesta/test/port/TestLauncherBrowserChild.js', async () => import('../src/siesta/test/port/TestLauncherBrowserChild.js'))
 
 importer.registerImporter('src/siesta/reporter/styling/theme_accessible.js', async () => import('../src/siesta/reporter/styling/theme_accessible.js'))
 importer.registerImporter('src/siesta/reporter/styling/theme_dark.js', async () => import('../src/siesta/reporter/styling/theme_dark.js'))

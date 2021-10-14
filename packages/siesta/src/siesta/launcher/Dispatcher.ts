@@ -10,13 +10,14 @@ import { LUID, luid } from "../common/LUID.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
-import { TestLauncherChild, TestLauncherParent } from "../test/port/TestLauncher.js"
+import { TestLauncherChild } from "../test/port/TestLauncherChild.js"
+import { TestLauncherParent } from "../test/port/TestLauncherParent.js"
 import { Test } from "../test/Test.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
-import { Exception} from "../test/TestResult.js"
+import { Exception } from "../test/TestResult.js"
 import { SubTestCheckInfo, TestNodeResultReactive } from "../test/TestResultReactive.js"
 import { LaunchState } from "../ui/TestLaunchInfo.js"
 import { DashboardLaunchInfo } from "./DashboardConnector.js"
@@ -382,7 +383,7 @@ export class Dispatcher extends Mixin(
             return {
                 server  : { launcherConnectorClass : TestLauncherParent },
                 client  : {
-                    importerUrl     : 'src/siesta/test/port/TestLauncher.js',
+                    importerUrl     : 'src/siesta/test/port/TestLauncherChild.js',
                     symbol          : 'TestLauncherChild'
                 }
             }

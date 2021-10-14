@@ -2,7 +2,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import {
     TestLauncherBrowserDashboardParent,
     TestLauncherBrowserPlaywrightParent
-} from "../test/port/TestLauncherBrowser.js"
+} from "../test/port/TestLauncherBrowserParent.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { Dispatcher, LauncherConnectorClassLocator } from "./Dispatcher.js"
@@ -30,7 +30,7 @@ export class DispatcherNodejs extends Mixin(
                     return {
                         server  : { launcherConnectorClass : TestLauncherBrowserDashboardParent },
                         client  : {
-                            importerUrl     : 'src/siesta/test/port/TestLauncherBrowser.js',
+                            importerUrl     : 'src/siesta/test/port/TestLauncherBrowserChild.js',
                             symbol          : 'TestLauncherBrowserDashboardChild'
                         }
                     }
@@ -38,7 +38,7 @@ export class DispatcherNodejs extends Mixin(
                     return {
                         server  : { launcherConnectorClass : TestLauncherBrowserPlaywrightParent },
                         client  : {
-                            importerUrl     : 'src/siesta/test/port/TestLauncherBrowser.js',
+                            importerUrl     : 'src/siesta/test/port/TestLauncherBrowserChild.js',
                             symbol          : 'TestLauncherBrowserPlaywrightChild'
                         }
                     }

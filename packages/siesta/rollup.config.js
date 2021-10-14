@@ -22,7 +22,8 @@ export default defineConfig({
         'tests/**/*.t.js',
         'tests/index.js',
         'tests_browser/**/*.t.js',
-        'tests_browser/index.js'
+        'tests_browser/index.js',
+        'resources/dashboard/index.js'
     ],
 
     output : {

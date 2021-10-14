@@ -21,7 +21,7 @@ import { DashboardConnectorClient } from "../launcher/DashboardConnector.js"
 import { LauncherDescriptorNodejs } from "../launcher/LauncherDescriptorNodejs.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
-import { TestReporterParent } from "../test/port/TestReporter.js"
+import { TestReporterParent } from "../test/port/TestReporterParent.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import {
     individualCheckInfoForTestResult,

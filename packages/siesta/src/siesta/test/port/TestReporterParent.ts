@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { XmlElement } from "../../../jsx/XmlElement.js"
-import { local, Port, remote } from "../../../rpc/port/Port.js"
+import { local, Port } from "../../../rpc/port/Port.js"
 import { LUID } from "../../common/LUID.js"
 import { DashboardConnectorServer } from "../../launcher/DashboardConnector.js"
 import { TestLaunchResult } from "../../launcher/TestLaunchResult.js"
@@ -9,7 +9,8 @@ import { AssertionWaitForCreation, AssertionWaitForResolution } from "../asserti
 import { TestDescriptor } from "../TestDescriptor.js"
 import {
     Assertion,
-    AssertionAsyncCreation, AssertionAsyncResolution,
+    AssertionAsyncCreation,
+    AssertionAsyncResolution,
     Exception,
     LogMessage,
     TestResultLeaf
@@ -157,26 +158,5 @@ export class TestReporterParent extends Mixin(
 
             if (this.connector) this.connector.onAssertionFinish(rootTestId, testNodeId, resolution)
         }
-    }
-) {}
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class TestReporterChild extends Mixin(
-    [ Port ],
-    (base : ClassUnion<typeof Port>) =>
-
-    class TestReporterChild extends base implements TestReporter {
-        @remote()
-        onSubTestStart : (rootTestId : LUID, testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => Promise<any>
-
-        @remote()
-        onSubTestFinish : (rootTestId : LUID, testNodeId : LUID, isIgnored : boolean) => Promise<any>
-
-        @remote()
-        onResult : (rootTestId : LUID, testNodeId : LUID, result : TestResultLeaf) => Promise<any>
-
-        @remote()
-        onAssertionFinish : (rootTestId : LUID, testNodeId : LUID, assertion : AssertionAsyncResolution) => Promise<any>
     }
 ) {}
