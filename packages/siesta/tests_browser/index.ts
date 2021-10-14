@@ -1,4 +1,4 @@
-import { Project } from "../browser.js"
+import { Project } from "../entry/project_browser.js"
 
 const project = Project.new({
     title                   : 'Siesta 6 browser test suite',

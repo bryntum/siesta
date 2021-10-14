@@ -1,6 +1,7 @@
 import path from "path"
 import { fileURLToPath } from "url"
-import { iit, it, ProjectNodejs } from "../../nodejs.js"
+import { ProjectNodejs } from "../../entry/project_nodejs.js"
+import { iit, it } from "../../nodejs.js"
 import { TestDescriptor } from "../../src/siesta/test/TestDescriptor.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

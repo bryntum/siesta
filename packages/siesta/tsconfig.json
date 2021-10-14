@@ -29,7 +29,9 @@
     "include" : [
         "index.ts",
         "nodejs.ts",
+        "deno.ts",
         "browser.ts",
+        "entry/**/*.ts",
         "bin/**/*.ts",
         "build/**/*.ts",
         "src/**/*.ts",

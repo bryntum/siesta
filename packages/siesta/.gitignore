@@ -19,6 +19,9 @@
 /bin/**/*.js
 /bin/**/*.js.map
 /bin/**/*.d.ts
+/entry/**/*.js
+/entry/**/*.js.map
+/entry/**/*.d.ts
 /src/**/*.js
 /src/**/*.jsx
 /src/**/*.js.map

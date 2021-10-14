@@ -1,4 +1,4 @@
-import { Project } from "../../../deno.js"
+import { Project } from "../../../entry/project_deno.js"
 
 const project = Project.new({
     title                   : 'Deno test suite'
