@@ -24,8 +24,8 @@ export class ReporterDenoTerminal extends Mixin(
         onTestSuiteStart () {
             super.onTestSuiteStart()
 
-            this.sigintIterator     = Deno.signal(Deno.Signal.SIGINT)
-            this.sigtermIterator    = Deno.signal(Deno.Signal.SIGTERM)
+            this.sigintIterator     = Deno.signal('SIGINT')
+            this.sigtermIterator    = Deno.signal('SIGTERM')
 
             ; (async () => {
                 for await (const _ of this.sigtermIterator) {
