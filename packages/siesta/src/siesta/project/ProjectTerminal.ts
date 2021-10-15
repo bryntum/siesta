@@ -39,7 +39,7 @@ export class ProjectTerminal extends Mixin(
             }
             else {
                 // if there were no calls to "plan*" methods, plan the whole project directory by default
-                if (!this.hasPlan) this.planDir(stripBasename(this.baseUrl))
+                if (!this.hasPlan) this.planDir(this.baseUrl)
             }
         }
 
