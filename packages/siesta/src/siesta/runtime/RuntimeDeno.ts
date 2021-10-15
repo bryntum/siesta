@@ -1,9 +1,9 @@
 // @ts-ignore
 import glob from "glob"
 // @ts-ignore
-import * as path from "https://deno.land/std@0.94.0/path/mod.ts"
+import * as path from "https://deno.land/std@0.111.0/path/mod.ts"
 // @ts-ignore
-import { expandGlobSync } from "https://deno.land/std@0.95.0/fs/mod.ts"
+import { expandGlobSync } from "https://deno.land/std@0.111.0/fs/mod.ts"
 import { CI } from "../../iterator/Iterator.js"
 import { Runtime } from "./Runtime.js"
 
