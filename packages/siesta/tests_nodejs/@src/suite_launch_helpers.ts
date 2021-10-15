@@ -114,7 +114,7 @@ export const verifySampleProjectLaunch = async (t : Test, launchRes : LaunchResu
     // the order of tests is not defined
     t.like(launchRes.stdout, `PASS  test_1.t.js`)
     t.like(launchRes.stdout, `PASS  test_2.t.js`)
-    t.like(launchRes.stderr, '')
+    t.is(launchRes.stderr, '')
 
     t.like(launchRes.stdout, `Test files : 2 passed, 0 failed, 2 total`)
 
@@ -129,7 +129,7 @@ export const verifySampleTestLaunch = async (t : Test, launchRes : LaunchResult)
     t.like(launchRes.stdout, /PASS.*test_1\.t\.js/)
 
     t.like(launchRes.stdout, `Test files : 1 passed, 0 failed, 1 total`)
-    t.like(launchRes.stderr, '')
+    t.is(launchRes.stderr, '')
 
     t.is(launchRes.exitCode, 0)
 }
