@@ -44,7 +44,7 @@ export const runProjectViaLauncher = async (projectUrl : string, options : objec
             inDeno ? 'deno' : 'node',
             inDeno
                 ?
-                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--no-check', '--quiet', `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta-deno.js`, projectUrl, ...stringifyOptions(options), '--no-color' ]
+                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--no-check', '--quiet', `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta_deno.js`, projectUrl, ...stringifyOptions(options), '--no-color' ]
                 :
                     [ `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta.js`, projectUrl, ...stringifyOptions(options), '--no-color' ],
             {
@@ -91,7 +91,7 @@ export const runTestViaLauncher = async (testUrl : string, options : object = {}
             inDeno ? 'deno' : 'node',
             inDeno
                 ?
-                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--no-check', '--quiet', `deno ${ fileURLToPath(siestaPackageRootUrl) }bin/siesta-deno.js`, testUrl, ...stringifyOptions(options), '--no-color' ]
+                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--no-check', '--quiet', `deno ${ fileURLToPath(siestaPackageRootUrl) }bin/siesta_deno.js`, testUrl, ...stringifyOptions(options), '--no-color' ]
                 :
                     [ `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta.js`, testUrl, ...stringifyOptions(options), '--no-color' ],
             {

@@ -11,7 +11,7 @@ import { importMetaAssets } from "@web/rollup-plugin-import-meta-assets"
 export default defineConfig({
     input : [
         'bin/siesta.js',
-        'bin/siesta-deno.js',
+        'bin/siesta_deno.js',
         'index.js',
         'browser.js',
         'nodejs.js',
