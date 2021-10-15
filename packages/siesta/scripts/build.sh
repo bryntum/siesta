@@ -11,14 +11,17 @@ cd "$DIR/.."
 release=""
 docs=""
 embed_references=""
+bundle=""
 
-while getopts "rde" opt; do
+while getopts "rdeb" opt; do
     case "$opt" in
         r)  release="-d"
             ;;
         d)  docs="true"
             ;;
         e)  embed_references="true"
+            ;;
+        b)  bundle="true"
             ;;
     esac
 done
@@ -66,3 +69,8 @@ if [[ -n $release ]]; then
 fi
 
 
+if [[ -n $bundle ]]; then
+    echo ">> Generating bundles with Rollup"
+
+    rm -rf dist && npx rollup -c
+fi
