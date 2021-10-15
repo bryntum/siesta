@@ -4,7 +4,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import multiInput from 'rollup-plugin-multi-input'
 // import { terser } from 'rollup-plugin-terser'
 import { preserveShebangs } from "rollup-plugin-preserve-shebangs"
-import visualizer from "rollup-plugin-visualizer"
+// import visualizer from "rollup-plugin-visualizer"
 import { importMetaAssets } from "@web/rollup-plugin-import-meta-assets"
 
 
@@ -54,7 +54,7 @@ export default defineConfig({
         // terser(),
         preserveShebangs(),
         importMetaAssets(),
-        visualizer()
+        // visualizer()
     ],
 
     external : [
