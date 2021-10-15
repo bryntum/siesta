@@ -19,7 +19,7 @@ import { ReporterDenoTerminal } from "../reporter/ReporterDenoTerminal.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeDeno } from "../runtime/RuntimeDeno.js"
 import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
-import { Launcher} from "./Launcher.js"
+import { Launcher } from "./Launcher.js"
 import { LauncherError } from "./LauncherError.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
 import { ExitCodes } from "./Types.js"
@@ -158,17 +158,18 @@ export class LauncherDeno extends Mixin(
             await super.setupProjectData()
         }
 
-
-        async extractProjectData (context : Context, projectUrl : string) : Promise<ProjectSerializableData> {
-            // Deno needs to resolve the project url to `file://`, because it might be served from the online repository,
-            // which resides on different domain, so that `/home/user/...` url is resolved to `https://jsdelivr.com/home/user/...`
-            return super.extractProjectData(context, 'file://' + projectUrl)
-        }
+        // TODO recall what use case this override was supposed to solve
+        // async extractProjectData (context : Context, projectUrl : string) : Promise<ProjectSerializableData> {
+        //     // Deno needs to resolve the project url to `file://`, because it might be served from the online repository,
+        //     // which resides on different domain, so that `/home/user/...` url is resolved to `https://jsdelivr.com/home/user/...`
+        //     return super.extractProjectData(context, 'file://' + projectUrl)
+        // }
 
 
         // setup the project plan root as `file://` url
         prepareProjectPlanRoot (dirName : string) : string {
-            return 'file://' + dirName
+            // TODO recall what use case this override was supposed to solve
+            return /*'file://' +*/ dirName
         }
 
         // for Deno, we create a proper separate context for project file
