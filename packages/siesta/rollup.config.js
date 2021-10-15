@@ -29,7 +29,7 @@ export default defineConfig({
         'tests_nodejs/index.js',
         'tests_nodejs/@sample_test_suites/isomorphic/index.js',
         'tests_nodejs/@sample_test_suites/browser/index.js',
-        'tests_nodejs/@sample_test_suites/node/index.js',
+        'tests_nodejs/@sample_test_suites/nodejs/index.js',
         'tests_nodejs/@sample_test_suites/deno/index.js',
     ],
 
