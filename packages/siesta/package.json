@@ -15,7 +15,7 @@
         "bench": "node --expose-gc -r esm benchmarks/chrono2/suite_everything.js",
         "deno": "deno run --allow-all --unstable --quiet",
         "test": "node ./tests/index.js",
-        "docs": "build/build_docs.sh"
+        "docs": "scripts/build_docs.sh"
     },
     "homepage": "https://github.com/bryntum/siesta",
     "bugs": "https://github.com/bryntum/siesta/issues",

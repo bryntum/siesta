@@ -31,9 +31,9 @@ cd $DIST
 #---------------------------------------------------------------------------------
 
 # prepare the dist for release
-build/build.sh -r -d -e
+scripts/build.sh -r -d -e
 
 
 # restart point inside the dist
-build/do_release.sh
+scripts/do_release.sh
 

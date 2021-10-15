@@ -33,7 +33,7 @@
         "browser.ts",
         "entry/**/*.ts",
         "bin/**/*.ts",
-        "build/**/*.ts",
+        "scripts/**/*.ts",
         "src/**/*.ts",
         "src/**/*.tsx",
         "tests/**/*.ts",

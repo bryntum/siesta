@@ -28,7 +28,7 @@ echo ">> Building the distribution"
 npx tsc $release
 
 if [[ -n $docs ]]; then
-    build/build_docs.sh
+    scripts/build_docs.sh
 fi
 
 

@@ -39,7 +39,7 @@ cd "$DIST"
 
 git checkout HEAD
 
-rm -rf "$DIST/.git" "$DIST/build/make_dist.sh"
+rm -rf "$DIST/.git" "$DIST/scripts/make_dist.sh"
 
 ln -s "$DIR/../node_modules" "node_modules"
 )

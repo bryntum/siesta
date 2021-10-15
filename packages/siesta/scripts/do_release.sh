@@ -15,8 +15,8 @@ cd "$DIR/.."
 
 echo ">> Running pre-release tests"
 
-build/run_tests.sh
+scripts/run_tests.sh
 
 echo ">> Starting the publication"
 
-build/publish.sh
+scripts/publish.sh
