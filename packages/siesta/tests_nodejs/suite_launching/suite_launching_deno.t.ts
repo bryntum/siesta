@@ -15,25 +15,26 @@ const __dirname     = path.dirname(__filename)
 
 // TODO refactor this test to launch the individual cases in parallel
 
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// it('Should be able to launch the Node.js project in Node.js directly', async t => {
-//     const launchRes     = await runProjectDirectly(path.resolve(__dirname, '../@sample_test_suites/nodejs/index.js'))
-//
-//     await verifySampleProjectLaunch(t, launchRes)
-// })
-//
-//
-// it('Should be able to launch the Node.js project in Node.js via launcher', async t => {
-//     const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/nodejs/index.js'))
-//
-//     await verifySampleProjectLaunch(t, launchRes)
-// })
-//
-//
-// it('Should be able to launch the Node.js test file in Node.js directly', async t => {
-//     const launchRes     = await runTestDirectly(path.resolve(__dirname, '../@sample_test_suites/nodejs/test_1.t.js'))
-//
-//     await verifySampleTestLaunch(t, launchRes)
-// })
-//
-//
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+if (process.env.BUNDLED) {
+
+    it('Should be able to launch the Deno project in Deno directly', async t => {
+        const launchRes     = await runProjectDirectly(path.resolve(__dirname, '../@sample_test_suites/deno/index.js'), {}, true)
+
+        await verifySampleProjectLaunch(t, launchRes)
+    })
+
+
+    it('Should be able to launch the Deno project in Deno via launcher', async t => {
+        const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/deno/index.js'), {}, true)
+
+        await verifySampleProjectLaunch(t, launchRes)
+    })
+
+
+    it('Should be able to launch the Deno test file in Deno directly', async t => {
+        const launchRes     = await runTestDirectly(path.resolve(__dirname, '../@sample_test_suites/deno/test_1.t.js'), {}, true)
+
+        await verifySampleTestLaunch(t, launchRes)
+    })
+}

@@ -14,7 +14,6 @@ import {
 const __filename    = fileURLToPath(import.meta.url)
 const __dirname     = path.dirname(__filename)
 
-// TODO refactor this test to launch the individual cases in parallel
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be able to launch the isomorphic project in Node.js directly', async t => {
@@ -53,37 +52,41 @@ it('Should be able to launch the isomorphic test file in Node.js via launcher wi
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should be able to launch the isomorphic project in Deno directly', async t => {
-    const launchRes     = await runProjectDirectly(path.resolve(__dirname, '../@sample_test_suites/isomorphic/index.js'), {}, true)
+// Deno tests can run only in bundled build
+if (process.env.BUNDLED) {
 
-    await verifySampleProjectLaunch(t, launchRes)
-})
+    it('Should be able to launch the isomorphic project in Deno directly', async t => {
+        const launchRes     = await runProjectDirectly(path.resolve(__dirname, '../@sample_test_suites/isomorphic/index.js'), {}, true)
 
-
-it('Should be able to launch the isomorphic project in Deno via launcher', async t => {
-    const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/isomorphic/index.js'), {}, true)
-
-    await verifySampleProjectLaunch(t, launchRes)
-})
+        await verifySampleProjectLaunch(t, launchRes)
+    })
 
 
-it('Should be able to launch the isomorphic test file in Deno directly', async t => {
-    const launchRes     = await runTestDirectly(path.resolve(__dirname, '../@sample_test_suites/isomorphic/test_1.t.js'), {}, true)
+    it('Should be able to launch the isomorphic project in Deno via launcher', async t => {
+        const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/isomorphic/index.js'), {}, true)
 
-    await verifySampleTestLaunch(t, launchRes)
-})
+        await verifySampleProjectLaunch(t, launchRes)
+    })
 
-it('Should be able to launch the isomorphic test file in Deno via launcher', async t => {
-    const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/isomorphic/test_1.t.js'), {}, true)
 
-    await verifySampleTestLaunch(t, launchRes)
-})
+    it('Should be able to launch the isomorphic test file in Deno directly', async t => {
+        const launchRes     = await runTestDirectly(path.resolve(__dirname, '../@sample_test_suites/isomorphic/test_1.t.js'), {}, true)
 
-it('Should be able to launch the isomorphic test file in Deno via launcher with glob', async t => {
-    const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/isomo*/t*t_1.t.js'), {}, true)
+        await verifySampleTestLaunch(t, launchRes)
+    })
 
-    await verifySampleTestLaunch(t, launchRes)
-})
+    it('Should be able to launch the isomorphic test file in Deno via launcher', async t => {
+        const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/isomorphic/test_1.t.js'), {}, true)
+
+        await verifySampleTestLaunch(t, launchRes)
+    })
+
+    it('Should be able to launch the isomorphic test file in Deno via launcher with glob', async t => {
+        const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/isomo*/t*t_1.t.js'), {}, true)
+
+        await verifySampleTestLaunch(t, launchRes)
+    })
+}
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -4,6 +4,7 @@ import child_process from 'child_process'
 import path from "path"
 import { fileURLToPath } from "url"
 import { siestaPackageRootUrl } from "../../index.js"
+import { Queue } from "../../src/siesta/launcher/Queue.js"
 import { Test } from "../../src/siesta/test/Test.js"
 import { UnwrapPromise } from "../../src/util/Helpers.js"
 import { isString } from "../../src/util/Typeguards.js"
@@ -156,4 +157,34 @@ export const launchWebServer = async (options : StartDevServerParams = {}) : Pro
     const port              = !isString(address) ? address.port : undefined
 
     return { server, port }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type TestSuiteLaunchDesc = {
+    title       : string
+    launch      : () => Promise<LaunchResult>
+    func        : (t : Test, launchRes : LaunchResult) => Promise<unknown>
+}
+
+export const runTestsQueued = async (t : Test, tests : TestSuiteLaunchDesc[], workers : number = 5) : Promise<void> => {
+    const queue     = Queue.new({ maxWorkers : workers })
+
+    queue.onFreeSlotAvailableHook.on(() => {
+        const test      = tests.shift()
+
+        if (test) queue.push(test, test.launch())
+    })
+
+    queue.onSlotSettledHook.on((queue, test : TestSuiteLaunchDesc, settledRes : PromiseSettledResult<LaunchResult>) => {
+        t.it(test.title, async t => {
+            await test.func(t, settledRes.status === 'fulfilled' ? settledRes.value : undefined)
+        })
+
+        queue.pull()
+    })
+
+    queue.pull()
+
+    await new Promise(resolve => queue.onCompletedHook.on(resolve))
 }
