@@ -1,11 +1,13 @@
+import { startDevServer } from "@web/dev-server"
+import { StartDevServerParams } from "@web/dev-server/dist/startDevServer.js"
 import child_process from 'child_process'
 import path from "path"
 import { fileURLToPath } from "url"
 import { siestaPackageRootUrl } from "../../index.js"
 import { Test } from "../../src/siesta/test/Test.js"
+import { UnwrapPromise } from "../../src/util/Helpers.js"
+import { isString } from "../../src/util/Typeguards.js"
 
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const SIESTA_PACKAGE_ROOT_WEB_PATH = process.env.SIESTA_PACKAGE_ROOT_WEB_PATH
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type LaunchResult    = { exitCode : number, error? : Error, stdout : string, stderr : string }
@@ -139,3 +141,19 @@ const stringifyOptions = (options : object) : string[] =>
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const isHttpUrl = (urlOrPath : string) : boolean => /https?:/i.test(urlOrPath)
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const launchWebServer = async (options : StartDevServerParams = {}) : Promise<{ server : UnwrapPromise<ReturnType<typeof startDevServer>>, port : number }> => {
+    const server    = await startDevServer(Object.assign({
+        config : {
+            nodeResolve : true
+        },
+        logStartMessage     : false
+    }, options))
+
+    const address           = server.server.address()
+    const port              = !isString(address) ? address.port : undefined
+
+    return { server, port }
+}

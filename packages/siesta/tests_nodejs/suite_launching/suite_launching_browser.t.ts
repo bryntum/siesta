@@ -3,10 +3,11 @@ import { fileURLToPath } from "url"
 import { it } from "../../nodejs.js"
 import { ExitCodes } from "../../src/siesta/launcher/Types.js"
 import {
+    launchWebServer,
     runProjectDirectly,
-    runProjectViaLauncher, runTestDirectly,
+    runProjectViaLauncher,
+    runTestDirectly,
     runTestViaLauncher,
-    SIESTA_PACKAGE_ROOT_WEB_PATH,
     verifySampleProjectLaunch,
     verifySampleTestLaunch
 } from "../@src/suite_launch_helpers.js"
@@ -17,22 +18,31 @@ const __dirname     = path.dirname(__filename)
 
 // TODO refactor this test to launch the individual cases in parallel
 
+
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be able to launch the browser project in browser via launcher', async t => {
+    const { server, port } = await launchWebServer({ argv : [ '--root-dir', `${ __dirname }/../..` ] })
+
     const launchRes     = await runProjectViaLauncher(
-        `${ SIESTA_PACKAGE_ROOT_WEB_PATH }/tests_nodejs/@sample_test_suites/browser/index.js`
+        `http://localhost:${ port }/tests_nodejs/@sample_test_suites/browser/index.js`
     )
 
     await verifySampleProjectLaunch(t, launchRes)
+
+    await server.stop()
 })
 
 
 it('Should be able to launch the browser test file in browser via launcher', async t => {
+    const { server, port } = await launchWebServer({ argv : [ '--root-dir', `${ __dirname }/../..` ] })
+
     const launchRes     = await runTestViaLauncher(
-        `${ SIESTA_PACKAGE_ROOT_WEB_PATH }/tests_nodejs/@sample_test_suites/browser/test_1.t.js`
+        `http://localhost:${ port }/tests_nodejs/@sample_test_suites/browser/test_1.t.js`
     )
 
     await verifySampleTestLaunch(t, launchRes)
+
+    await server.stop()
 })
 
 
