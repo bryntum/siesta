@@ -23,14 +23,22 @@ export default defineConfig({
         // package, and seems there's no good way to do that other than create entries for them)
         'tests/**/*.t.js',
         'tests/index.js',
+
         'tests_browser/**/*.t.js',
         'tests_browser/index.js',
+
         'tests_nodejs/**/*.t.js',
         'tests_nodejs/index.js',
         'tests_nodejs/@sample_test_suites/isomorphic/index.js',
         'tests_nodejs/@sample_test_suites/browser/index.js',
         'tests_nodejs/@sample_test_suites/nodejs/index.js',
         'tests_nodejs/@sample_test_suites/deno/index.js',
+
+        'tests_deno/**/*.t.js',
+        'tests_deno/index.js',
+        'tests_deno/@sample_test_suites/isomorphic/index.js',
+        'tests_deno/@sample_test_suites/browser/index.js',
+        'tests_deno/@sample_test_suites/deno/index.js',
     ],
 
     output : {
