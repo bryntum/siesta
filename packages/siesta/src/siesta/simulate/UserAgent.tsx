@@ -207,8 +207,9 @@ export class UserAgentOnPage extends Mixin(
     (base : ClassUnion<typeof Test>) =>
 
     class UserAgentOnPage extends base implements UserAgent {
-
-        window                  : Window                        = window
+        // allow the browser test initialize w/o exception even in Node.js environment
+        // (we'll issue a meaningful error in this case later)
+        window                  : Window                        = typeof window !== 'undefined' ? window : undefined
 
         simulator               : Simulator                     = undefined
 

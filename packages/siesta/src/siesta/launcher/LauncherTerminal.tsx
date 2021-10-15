@@ -14,9 +14,10 @@ import { option } from "../option/Option.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ProjectTerminal } from "../project/ProjectTerminal.js"
 import { LogMessage } from "../test/TestResult.js"
-import { ExitCodes, Launcher, LauncherDescriptor, OptionsGroupOutput } from "./Launcher.js"
+import { Launcher, LauncherDescriptor, OptionsGroupOutput } from "./Launcher.js"
 import { LauncherError } from "./LauncherError.js"
 import { extractProjectInfo } from "./ProjectExtractor.js"
+import { ExitCodes } from "./Types.js"
 
 // generic sever-side, cross Node/Deno functionality
 // DO NOT USE THE NODE.JS/NPM/DENO MODULES HERE

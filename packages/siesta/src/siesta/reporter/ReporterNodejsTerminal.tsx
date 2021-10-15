@@ -1,6 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { ExitCodes } from "../launcher/Launcher.js"
+import { ExitCodes } from "../launcher/Types.js"
 import { ReporterNodejs } from "./ReporterNodejs.js"
 import { ReporterTerminal } from "./ReporterTerminal.js"
 import { Terminal } from "./Terminal.js"

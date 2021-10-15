@@ -1,7 +1,7 @@
 import { Base, ClassUnion, Mixin } from "typescript-mixin-class"
 import { Serializable, serializable } from "typescript-serializable-mixin"
 import { XmlElement } from "../../jsx/XmlElement.js"
-import { ExitCodes } from "./Launcher.js"
+import { ExitCodes } from "./Types.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'LauncherError' })

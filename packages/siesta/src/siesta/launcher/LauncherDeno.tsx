@@ -19,9 +19,10 @@ import { ReporterDenoTerminal } from "../reporter/ReporterDenoTerminal.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeDeno } from "../runtime/RuntimeDeno.js"
 import { TestDescriptorDeno } from "../test/TestDescriptorDeno.js"
-import { ExitCodes, Launcher} from "./Launcher.js"
+import { Launcher} from "./Launcher.js"
 import { LauncherError } from "./LauncherError.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
+import { ExitCodes } from "./Types.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,5 +1,4 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { MediaNodeWebSocketParent } from "../../rpc/media/MediaNodeWebSocketParent.js"
 import { MediaSameContext } from "../../rpc/media/MediaSameContext.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
@@ -47,7 +46,13 @@ export class LauncherBrowser extends Mixin(
 
 
         async launchDashboardUI () {
-            this.dashboard          = Dashboard.new()
+            // IMPORTANT - import dashboard class dynamically (the type import for the `dashboard` property
+            // will be erased by TS)
+            // this excludes UI code from the project bundle and allows us to issue a meaningful error,
+            // when browser project is launched directly as node script
+            const DashBoardCls      = (await import('../ui/Dashboard.js')).Dashboard
+
+            this.dashboard          = DashBoardCls.new()
 
             const dashboardPort     = this.dashboard.connector
             const dashboardMedia    = new MediaSameContext()

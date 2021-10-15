@@ -5,6 +5,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { elementFromPoint } from "../../util_browser/Dom.js"
 import { Launcher } from "../launcher/Launcher.js"
+import { ExitCodes } from "../launcher/Types.js"
 import { PointerMovePrecision } from "../simulate/SimulatorMouse.js"
 import { ActionTarget, Simulator } from "../simulate/Types.js"
 import { UserAgentOnPage } from "../simulate/UserAgent.js"
@@ -173,6 +174,8 @@ export class TestBrowser extends Mixin(
 Please use Siesta launcher instead and web url:
   ${ style('accented').text('npx siesta http://web_path/to/your/test.js') }`
                 )
+
+                process.exitCode            = ExitCodes.INCORRECT_ENVIRONMENT
 
                 return
             } else

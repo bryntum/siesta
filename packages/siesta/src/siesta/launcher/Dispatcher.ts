@@ -21,9 +21,10 @@ import { Exception } from "../test/TestResult.js"
 import { SubTestCheckInfo, TestNodeResultReactive } from "../test/TestResultReactive.js"
 import { LaunchState } from "../ui/TestLaunchInfo.js"
 import { DashboardLaunchInfo } from "./DashboardConnector.js"
-import { ExitCodes, Launcher } from "./Launcher.js"
+import { Launcher } from "./Launcher.js"
 import { Queue } from "./Queue.js"
 import { TestLaunchResult } from "./TestLaunchResult.js"
+import { ExitCodes } from "./Types.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

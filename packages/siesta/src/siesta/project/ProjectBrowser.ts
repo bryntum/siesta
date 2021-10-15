@@ -2,6 +2,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { isNodejs } from "../../util/Helpers.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
+import { ExitCodes } from "../launcher/Types.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeBrowser } from "../runtime/RuntimeBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
@@ -38,6 +39,8 @@ export class ProjectBrowser extends Mixin(
 Please use Siesta launcher instead and web url:
   ${ style('accented').text('npx siesta http://web_path/to/your/project.js') }`
                 )
+
+                process.exitCode            = ExitCodes.INCORRECT_ENVIRONMENT
 
                 return
             }
