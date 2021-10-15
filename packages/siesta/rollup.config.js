@@ -5,6 +5,7 @@ import multiInput from 'rollup-plugin-multi-input'
 // import { terser } from 'rollup-plugin-terser'
 import { preserveShebangs } from "rollup-plugin-preserve-shebangs"
 import visualizer from "rollup-plugin-visualizer"
+import { importMetaAssets } from "@web/rollup-plugin-import-meta-assets"
 
 
 export default defineConfig({
@@ -16,6 +17,7 @@ export default defineConfig({
         'nodejs.js',
         'deno.js',
         'entry/*.js',
+        'resources/dashboard/index.js',
         // TODO ideally, for publishing, we should create a bundle w/o tests as entry points
         // however, how to test the package then? (we would like to run all the tests on the "bundled"
         // package, and seems there's no good way to do that other than create entries for them)
@@ -23,7 +25,12 @@ export default defineConfig({
         'tests/index.js',
         'tests_browser/**/*.t.js',
         'tests_browser/index.js',
-        'resources/dashboard/index.js'
+        'tests_nodejs/**/*.t.js',
+        'tests_nodejs/index.js',
+        'tests_nodejs/@sample_test_suites/isomorphic/index.js',
+        'tests_nodejs/@sample_test_suites/browser/index.js',
+        'tests_nodejs/@sample_test_suites/node/index.js',
+        'tests_nodejs/@sample_test_suites/deno/index.js',
     ],
 
     output : {
@@ -38,6 +45,7 @@ export default defineConfig({
         multiInput(),
         // terser(),
         preserveShebangs(),
+        importMetaAssets(),
         visualizer()
     ],
 
