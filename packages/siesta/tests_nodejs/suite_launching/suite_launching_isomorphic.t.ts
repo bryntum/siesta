@@ -2,10 +2,10 @@ import path from "path"
 import { fileURLToPath } from "url"
 import { it } from "../../nodejs.js"
 import {
+    launchWebServer,
     runProjectDirectly,
     runProjectViaLauncher,
     runTestDirectly,
-    SIESTA_PACKAGE_ROOT_WEB_PATH,
     verifySampleProjectLaunch,
     verifySampleTestLaunch
 } from "../@src/suite_launch_helpers.js"
@@ -88,9 +88,13 @@ it('Should be able to launch the isomorphic test file in Deno via launcher with 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be able to launch the isomorphic project in browser via launcher', async t => {
+    const { server, port } = await launchWebServer({ argv : [ '--root-dir', `${ __dirname }/../..` ] })
+
     const launchRes     = await runProjectViaLauncher(
-        `${ SIESTA_PACKAGE_ROOT_WEB_PATH }/tests_nodejs/@sample_test_suites/isomorphic/index.js`
+        `http://localhost:${ port }/tests_nodejs/@sample_test_suites/isomorphic/index.js`
     )
 
     await verifySampleProjectLaunch(t, launchRes)
+
+    await server.stop()
 })
