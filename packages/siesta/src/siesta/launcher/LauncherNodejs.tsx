@@ -165,6 +165,10 @@ export class LauncherNodejs extends Mixin(
 
 
         async launchDashboardUI () {
+            let done : () => any
+
+            const donePromise       = new Promise<void>(resolve => done = resolve)
+
             this.reporter.disabled  = true
 
             const launchOptions : LaunchOptions  = { headless : false }
@@ -200,6 +204,8 @@ export class LauncherNodejs extends Mixin(
                 ])
 
                 await wsServer.stopWebSocketServer()
+
+                done()
             })
 
             webServer               = await startDevServer({
@@ -279,7 +285,9 @@ export class LauncherNodejs extends Mixin(
 
             const relPath           = path.relative('./', fileURLToPath(`${ siestaPackageRootUrl }resources/dashboard/index.html`))
 
-            page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
+            await page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
+
+            return donePromise
         }
 
 

@@ -21,7 +21,7 @@ export class ContextProviderNodePlaywright extends Mixin(
 
         launcher                : LauncherNodejs    = undefined
 
-        // `true` is a bit slower, seems more robust though
+        // `true` is noticeable slower, seems more robust though
         separateBrowserForEveryPage : boolean       = false
 
 
