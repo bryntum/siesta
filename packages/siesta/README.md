@@ -25,7 +25,7 @@ Supported target environments
 
 Siesta can run the test in browsers, Node.js and Deno. 
 
-Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Edge Chromium. IE and legacy Edge are not supported.
+Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Edge Chromium. IE, legacy Edge and quirks mode are not supported.
 
 Siesta supports all maintained LTS releases of Node.js. 
 
@@ -131,6 +131,14 @@ Ask questions in the [forum](https://bryntum.com/forum/viewforum.php?f=20)
 Chat live at [Discord](https://discord.gg/6mwJZGnwbq)
 
 Follow the [development blog](https://www.bryntum.com/blog/)
+
+
+Attribution
+===========
+
+This software contains icons from the following icon packs (licensed under Creative Common 2.5/3.0 Attribution licenses)
+
+- <https://fontawesome.com/>
 
 
 COPYRIGHT AND LICENSE
