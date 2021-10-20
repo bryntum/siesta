@@ -42,39 +42,113 @@ import {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/**
+ * The options for mouse action
+ */
 export type MouseActionOptions      = {
+    /**
+     * The target of the action.
+     */
     target              : ActionTarget
+
+    /**
+     * Offset for the action. If not provided, the action happens in the center of the visible part of the target element.
+     */
     offset              : ActionTargetOffset
 
     button              : MouseButton
 
-    shiftKey?           : boolean
-    ctrlKey?            : boolean
-    altKey?             : boolean
-    metaKey?            : boolean
+    /**
+     * Set to `true` to simulate `Shift` keypress during the action
+     */
+    shiftKey            : boolean
 
+    /**
+     * Set to `true` to simulate `Ctrl` keypress during the action
+     */
+    ctrlKey             : boolean
+
+    /**
+     * Set to `true` to simulate `Alt` keypress during the action
+     */
+    altKey              : boolean
+
+    /**
+     * Set to `true` to simulate `Meta` keypress during the action.
+     */
+    metaKey             : boolean
+
+    /**
+     * Mouse move precision to use, when moving the mouse cursor from its current location to the target point.
+     */
     mouseMovePrecision  : PointerMovePrecision
+
+    /**
+     * When waiting for the target to [[AutoWaitingGuide|become actionable]], one of the checks that element needs to pass is "reachable".
+     * It defines that the action point should be directly reachable by the user (be the top-most and not covered with
+     * other elements). This setting defines whether to allow that point to be covered with child element of the target.
+     *
+     * Default is `true`.
+     */
     allowChild          : boolean
 
+    /**
+     * The maximum time to wait for target to become actionable. By default its taken from the [[TestDescriptor.defaultTimeout]]
+     */
     timeout             : number
 
     sourcePoint         : SourcePoint
 }
 
-
+/**
+ * The options for the drag action
+ */
 export interface DragActionOptions extends MouseActionOptions {
+    /**
+     * Alias for [[source]]
+     */
     from                : ActionTarget
+
+    /**
+     * The source of the drag action
+     */
     source              : ActionTarget
 
+    /**
+     * Alias for [[sourceOffset]]
+     */
     fromOffset          : ActionTargetOffset
+
+    /**
+     * The offset on the [[source]] element
+     */
     sourceOffset        : ActionTargetOffset
 
+    /**
+     * The target element
+     */
     target              : ActionTarget
+
+    /**
+     * Alias for `target`
+     */
     to                  : ActionTarget
 
+    /**
+     * The offset on the [[target]] element
+     */
     targetOffset        : ActionTargetOffset
+
+    /**
+     * Alias for [[targetOffset]]
+     */
     toOffset            : ActionTargetOffset
 
+    /**
+     * Whether to skip the `mouse up` action in the drag and keep the button pressed, might be useful if you want to perform
+     * a drag action consisting from several segments. In this case, don't forget to manually perform [[mouseUp]] action
+     * later.
+     */
     dragOnly            : boolean
 
     sourcePoint         : SourcePoint
@@ -82,20 +156,53 @@ export interface DragActionOptions extends MouseActionOptions {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/**
+ * The options object for the keyboard action
+ */
 export type KeyboardActionOptions   = {
+    /**
+     * The target element to type at
+     */
     target              : ActionTarget
+
+    /**
+     * The text to type.
+     */
     text                : SiestaTypeString
 
-    waitForTarget       : boolean
+    /**
+     * Whether to clear any existing text in the target `<input>/<textarea>` element before typing.
+     */
     clearExisting       : boolean
 
-    shiftKey?           : boolean
-    ctrlKey?            : boolean
-    altKey?             : boolean
-    metaKey?            : boolean
+    /**
+     * Set to `true` to simulate `Shift` keypress during the action
+     */
+    shiftKey            : boolean
 
+    /**
+     * Set to `true` to simulate `Ctrl` keypress during the action
+     */
+    ctrlKey             : boolean
+
+    /**
+     * Set to `true` to simulate `Alt` keypress during the action
+     */
+    altKey              : boolean
+
+    /**
+     * Set to `true` to simulate `Meta` keypress during the action
+     */
+    metaKey             : boolean
+
+    /**
+     * Maximum time for the target element to [[AutoWaitingGuide|become actionable]].
+     */
     timeout             : number
-    // delay between the key down / key up events
+
+    /**
+     * Delay between the individual key down / key up events. By default 0 (no delay)
+     */
     delay               : number
 
     sourcePoint         : SourcePoint
@@ -270,6 +377,13 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Performs a query in the DOM, by default its CSS query. The query syntax may be enhanced by the addons.
+         *
+         * @param query
+         * @param root The root DOM element (or a `Document`) from which to start the query. Optional, by default
+         * its the `document` of the test context.
+         */
         query (query : string, root : Element | Document = this.window.document) : Element[] {
             if (!query) throw new Error("The provided selector is empty")
             if (!isString(query)) throw new Error("The provided selector is not a string")
@@ -300,12 +414,22 @@ export class UserAgentOnPage extends Mixin(
             return currentRoots
         }
 
-
+        /**
+         * Performs a query in the DOM using [[query]] method and returns the 1st element from the results.
+         *
+         * @param query
+         * @param root
+         */
         $ (query : string, root : Element | Document = this.window.document) : Element {
             return this.query(query, root)[ 0 ]
         }
 
-
+        /**
+         * Synonym for [[query]].
+         *
+         * @param query
+         * @param root
+         */
         $$ (query : string, root : Element | Document = this.window.document) : Element[] {
             return this.query(query, root)
         }
@@ -387,7 +511,6 @@ export class UserAgentOnPage extends Mixin(
                 target,
                 text,
 
-                waitForTarget       : true,
                 clearExisting       : false,
 
                 shiftKey            : false,
@@ -556,6 +679,8 @@ export class UserAgentOnPage extends Mixin(
             const actionTarget          = action.target ?? this.simulator.currentPosition.slice() as Point
 
             if (isArray(actionTarget)) {
+                // TODO should wait for the stability of the element at the point
+
                 // if we are given a coordinate system point, check that it is
                 const point             = actionTarget.length === 0 ? this.simulator.currentPosition.slice() as Point : actionTarget
 
@@ -790,7 +915,33 @@ export class UserAgentOnPage extends Mixin(
             }
         }
 
-
+        /**
+         * Simulates a click on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
+         * the action happens in the center of the visible part of the target element.
+         *
+         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * and synchronize the cursor position.
+         *
+         * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
+         * of the [[MouseActionOptions]] object.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.click('.css-class .another-css.class', [ 30, 40 ])
+         * await t.click('.css-class .another-css.class', { offset : [ 30, 40 ], ctrlKey : true })
+         * await t.click({ target : '.css-class .another-css.class', offset : [ 30, 40 ], ctrlKey : true })
+         * ```
+         *
+         * A special case of
+         * ```javascript
+         * await t.click()
+         * ```
+         * is equivalent to `t.click([])` - clicking at the current cursor location.
+         *
+         * @param target
+         * @param offset
+         */
         async click (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
         async click (options : Partial<MouseActionOptions>) : Promise<any>
         async click (
@@ -810,6 +961,33 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates a right click on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
+         * the action happens in the center of the visible part of the target element.
+         *
+         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * and synchronize the cursor position.
+         *
+         * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
+         * of the [[MouseActionOptions]] object.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.rightClick('.css-class .another-css.class', [ 30, 40 ])
+         * await t.rightClick('.css-class .another-css.class', { offset : [ 30, 40 ], ctrlKey : true })
+         * await t.rightClick({ target : '.css-class .another-css.class', offset : [ 30, 40 ], ctrlKey : true })
+         * ```
+         *
+         * A special case of
+         * ```javascript
+         * await t.rightClick()
+         * ```
+         * is equivalent to `t.rightClick([])` - clicking at the current cursor location.
+         *
+         * @param target
+         * @param offset
+         */
         async rightClick (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
         async rightClick (options : Partial<MouseActionOptions>) : Promise<any>
         async rightClick (
@@ -829,6 +1007,33 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates a double click on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
+         * the action happens in the center of the visible part of the target element.
+         *
+         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * and synchronize the cursor position.
+         *
+         * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
+         * of the [[MouseActionOptions]] object.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.doubleClick('.css-class .another-css.class', [ 30, 40 ])
+         * await t.doubleClick('.css-class .another-css.class', { offset : [ 30, 40 ], ctrlKey : true })
+         * await t.doubleClick({ target : '.css-class .another-css.class', offset : [ 30, 40 ], ctrlKey : true })
+         * ```
+         *
+         * A special case of
+         * ```javascript
+         * await t.doubleClick()
+         * ```
+         * is equivalent to `t.doubleClick([])` - clicking at the current cursor location.
+         *
+         * @param target
+         * @param offset
+         */
         async doubleClick (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
         async doubleClick (options : Partial<MouseActionOptions>) : Promise<any>
         async doubleClick (
@@ -847,7 +1052,33 @@ export class UserAgentOnPage extends Mixin(
             )
         }
 
-
+        /**
+         * Simulates a "mouse down" action on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
+         * the action happens in the center of the visible part of the target element.
+         *
+         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * and synchronize the cursor position.
+         *
+         * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
+         * of the [[MouseActionOptions]] object.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.mouseDown('.css-class .another-css.class', [ 30, 40 ])
+         * await t.mouseDown('.css-class .another-css.class', { offset : [ 30, 40 ], ctrlKey : true })
+         * await t.mouseDown({ target : '.css-class .another-css.class', offset : [ 30, 40 ], ctrlKey : true })
+         * ```
+         *
+         * A special case of
+         * ```javascript
+         * await t.mouseDown()
+         * ```
+         * is equivalent to `t.mouseDown([])` - clicking at the current cursor location.
+         *
+         * @param target
+         * @param offset
+         */
         async mouseDown (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
         async mouseDown (options : Partial<MouseActionOptions>) : Promise<any>
         async mouseDown (
@@ -867,6 +1098,33 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates a "mouse up" action on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
+         * the action happens in the center of the visible part of the target element.
+         *
+         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * and synchronize the cursor position.
+         *
+         * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
+         * of the [[MouseActionOptions]] object.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.mouseUp('.css-class .another-css.class', [ 30, 40 ])
+         * await t.mouseUp('.css-class .another-css.class', { offset : [ 30, 40 ], ctrlKey : true })
+         * await t.mouseUp({ target : '.css-class .another-css.class', offset : [ 30, 40 ], ctrlKey : true })
+         * ```
+         *
+         * A special case of
+         * ```javascript
+         * await t.mouseUp()
+         * ```
+         * is equivalent to `t.mouseUp([])` - clicking at the current cursor location.
+         *
+         * @param target
+         * @param offset
+         */
         async mouseUp (target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>) : Promise<any>
         async mouseUp (options : Partial<MouseActionOptions>) : Promise<any>
         async mouseUp (
@@ -886,6 +1144,28 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates "mouse move" action to the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided,
+         * cursor moves to the center of the visible part of the target element.
+         *
+         * Before performing mouse move, Siesta waits for the target element to [[AutoWatingGuide|become actionable]].
+         *
+         * This method has several overloads and `target` and `offset` can be given either as positional arguments, or in the form
+         * of the [[MouseActionOptions]] object.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.moveMouseTo(30, 40)
+         * await t.moveMouseTo([ 30, 40 ])
+         * await t.moveMouseTo('.css-class .another-css.class', [ 30, 40 ])
+         * await t.moveMouseTo('.css-class .another-css.class', { offset : [ 30, 40 ], ctrlKey : true })
+         * await t.moveMouseTo({ target : '.css-class .another-css.class', offset : [ 30, 40 ], ctrlKey : true })
+         * ```
+         * @param x
+         * @param y
+         * @param options
+         */
         async moveMouseTo (x : number, y : number, options? : Partial<MouseActionOptions>) : Promise<any>
         async moveMouseTo (target : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions>)
         async moveMouseTo (options : Partial<MouseActionOptions>)
@@ -914,6 +1194,21 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates a relative "mouse move" action, from the current position, by the given delta.
+         *
+         * This method has several overloads and `delta` can be provided either as a [[Point]] or 2 positional arguments.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.moveMouseBy(30, 40)
+         * await t.moveMouseBy([ 30, 40 ], { ctrlKey : true })
+         * ```
+         *
+         * @param target
+         * @param offset
+         */
         async moveMouseBy (dx : number, dy : number, options? : Partial<MouseActionOptions>) : Promise<any>
         async moveMouseBy (delta : Point, options? : Partial<MouseActionOptions>)
         async moveMouseBy (
@@ -928,6 +1223,21 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates a drag action, from the `source` element, to the `target` element
+         *
+         * This method has several overloads and `source` and `target` can be provided either as positional arguments, or
+         * as properties of the [[DragActionOptions]] object.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.dragTo('#source', '#target', { ctrlKey : true })
+         * await t.dragTo({ source : '#source', target : '#target', ctrlKey : true })
+         * ```
+         *
+         * @param options
+         */
         async dragTo (options : Partial<DragActionOptions>) : Promise<any>
         async dragTo (source : ActionTarget, target : ActionTarget, options? : Partial<DragActionOptions>) : Promise<any>
         async dragTo (
@@ -955,6 +1265,18 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates a drag action, from the given `source` element, by the given delta.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.dragBy('#source', [ 10, 20 ], { ctrlKey : true })
+         * await t.dragBy([], [ 10, 20 ], { ctrlKey : true }) // drag from current cursor position
+         * ```
+         *
+         * @param options
+         */
         async dragBy (source : ActionTarget, delta : Point, options? : Partial<DragActionOptions>) : Promise<any> {
             if (!delta) throw new Error("No drag delta provided")
 
@@ -978,6 +1300,20 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates keyboard typing on the given `target` element. Performs all actions that a real user would do,
+         * including pressing and releasing a keyboard button for every character.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.type('#source', 'some text', { ctrlKey : true })
+         * ```
+         *
+         * @param target
+         * @param text The text to type
+         * @param options Additional options for the action
+         */
         async type (target : ActionTarget, text : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, text, options)
 

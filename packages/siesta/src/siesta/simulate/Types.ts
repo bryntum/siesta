@@ -4,14 +4,48 @@ import { SimulatorKeyboard } from "./SimulatorKeyboard.js"
 import { SimulatorMouse } from "./SimulatorMouse.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/**
+ * This type represent a 2-dimensional point, as a tuple (array with 2 elements)
+ */
 export type Point                   = [ x : number, y : number ]
 
+/**
+ * This type represent mouse button.
+ */
 export type MouseButton             = 'left' | 'right' | 'middle'
 
+/**
+ * This union type represent action target for various user-action simulation methods.
+ *
+ * It can be:
+ * - a native DOM `Element`
+ * - a `string`, which contains a CSS query to be resolved. The [[TestDescriptorBrowser.onAmbiguousQuery]] controls
+ * the behavior if a query is resolved to multiple elements.
+ * - a [[Point]] on the screen, with the coordinates in the
+ * [client](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems#client) coordinate system.
+ * - an empty array - equivalent of the point with current cursor location.
+ *
+ * For example:
+ *
+ * ```javascript
+ * await t.click(document.body)
+ * await t.click('body .css-class')
+ * await t.click([ 100, 200 ])
+ * await t.click([])
+ * ```
+ */
 export type ActionTarget            = Element | string | Point | []
 
-// export type ActionTargetElement     = Element | string | Point | []
-
+/**
+ * The offset for the action point. It should be a 2-elements array with either exact offsets (number)
+ * or "offset expressions" (string).
+ *
+ * The expression consists from "percentage" part and "fixed" part and should have the following syntax:
+ * ```
+ * '50% + 10'
+ * '50% - 10'
+ * ```
+ */
 export type ActionTargetOffset      = [ dx : number | string, dy : number | string ]
 
 // export type ActionTarget            = ActionTargetElement | { target : ActionTargetElement, offset : ActionTargetOffset } | (() => ActionTarget)
