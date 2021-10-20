@@ -213,9 +213,10 @@ export class UserAgentOnPage extends Mixin(
 
         simulator               : Simulator                     = undefined
 
-        onAmbiguousQuery        : 'use_first' | 'warn' | 'throw'   = 'warn'
 
-        // coordinatesSystem   : 'page' | 'viewport'           = 'viewport'
+        get onAmbiguousQuery () : 'use_first' | 'warn' | 'throw' {
+            return 'warn'
+        }
 
 
         get mouseMovePrecision () : PointerMovePrecision {

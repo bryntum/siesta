@@ -68,6 +68,11 @@ export class TestBrowser extends Mixin(
         }
 
 
+        get onAmbiguousQuery () : 'use_first' | 'warn' | 'throw' {
+            return this.descriptor.onAmbiguousQuery
+        }
+
+
         get mouseMovePrecision () : PointerMovePrecision {
             return this.descriptor.mouseMovePrecision
         }

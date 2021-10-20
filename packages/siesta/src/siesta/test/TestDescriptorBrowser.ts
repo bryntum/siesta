@@ -74,6 +74,16 @@ export class TestDescriptorBrowser extends Mixin(
         @prototypeValue(true)
         expandBody          : boolean
 
+        /**
+         * What to do, if an [[ActionTarget]] query has been resolved into multiple elements:
+         *
+         * - `use_first` - silently use the 1st one in the results, usually its the 1st element matching the query
+         * in the depth-first order of the DOM tree.
+         * - `warn` - use the 1st element, and issue a warning
+         * - `throw` - throw an exception
+         */
+        onAmbiguousQuery        : 'use_first' | 'warn' | 'throw'   = 'warn'
+
 
         // TODO refactor: Probably need a separate data structure `TestLaunchInfo`
         // which will contain the information about how exactly this descriptor is launched
