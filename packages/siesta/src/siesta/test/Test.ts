@@ -29,8 +29,15 @@ import { TestDescriptor, TestDescriptorArgument } from "./TestDescriptor.js"
 import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
 import { TestDescriptorDeno } from "./TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "./TestDescriptorNodejs.js"
-import { Assertion, AssertionAsyncResolution, Exception, LogMessage, TestNodeResult, TestResult } from "./TestResult.js"
-import { SubTestCheckInfo } from "./TestResultReactive.js"
+import {
+    Assertion,
+    AssertionAsyncResolution,
+    Exception,
+    LogMessage,
+    SubTestCheckInfo,
+    TestNodeResult,
+    TestResult
+} from "./TestResult.js"
 
 // this imports handles the case when a standalone isomorphic test is launched via node launcher
 // in this case, the launcher will create a nodejs project with nodejs test descriptor

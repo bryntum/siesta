@@ -6,7 +6,7 @@ import { PortHandshakeParent } from "../../../rpc/port/PortHandshake.js"
 import { Context } from "../../context/Context.js"
 import { DashboardLaunchInfo } from "../../launcher/DashboardConnector.js"
 import { Launcher } from "../../launcher/Launcher.js"
-import { SubTestCheckInfo } from "../TestResultReactive.js"
+import { SubTestCheckInfo } from "../TestResult.js"
 import { TestReporterParent } from "./TestReporterParent.js"
 
 

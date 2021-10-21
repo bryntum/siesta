@@ -4,7 +4,7 @@ import { local } from "../../../rpc/port/Port.js"
 import { PortHandshakeChild } from "../../../rpc/port/PortHandshake.js"
 import { DashboardLaunchInfo } from "../../launcher/DashboardConnector.js"
 import { globalTestEnv, Test } from "../Test.js"
-import { SubTestCheckInfo } from "../TestResultReactive.js"
+import { SubTestCheckInfo } from "../TestResult.js"
 import { TestLauncher } from "./TestLauncherParent.js"
 import { TestReporterChild } from "./TestReporterChild.js"
 

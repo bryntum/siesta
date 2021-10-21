@@ -6,9 +6,11 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
+import { TreeNode } from "../../tree/TreeNode.js"
 import { escapeRegExp } from "../../util/Helpers.js"
 import { LUID, luid } from "../common/LUID.js"
 import { TestDescriptor } from "./TestDescriptor.js"
+import { TestNodeResultReactive } from "./TestResultReactive.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Result extends Mixin(
@@ -453,5 +455,32 @@ export type ChildResultsIndex<T extends TestNodeResult> = {
 }
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// This class needs to reside in the `TestResult` file, not the `TestResultReactive`
+// this is because Test needs to import it, to be able to de-serialize
+// however, we don't want `Test` to depend on the rest of the `TestResultReactive`
+// since it brings the ChronoGraph into the `Test` bundle and we want that
+// to be as slim as possible
+
+@serializable({ id : 'SubTestCheckInfo' })
+export class SubTestCheckInfo extends Mixin(
+    [ Serializable, TreeNode, Base ],
+    (base : ClassUnion<typeof Serializable, typeof TreeNode, typeof Base>) =>
+
+    class SubTestCheckInfo extends base {
+        title       : string        = ''
+
+        titleId     : string        = ''
+
+        childNodeT  : SubTestCheckInfo
+        parentNode  : SubTestCheckInfo
 
 
+        static fromTestResult<T extends typeof SubTestCheckInfo> (this : T, result : TestNodeResultReactive) : InstanceType<T> {
+            return this.new({
+                title       : result.descriptor.title,
+                titleId     : result.parentNode?.childResultsIndex.childToId.get(result)
+            } as Partial<InstanceType<T>>)
+        }
+    }
+) {}

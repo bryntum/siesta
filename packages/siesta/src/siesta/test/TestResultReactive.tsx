@@ -6,14 +6,14 @@ import { calculate, Entity, field } from "@bryntum/chronograph/src/replica2/Enti
 import { Replica } from "@bryntum/chronograph/src/replica2/Replica.js"
 import { Field } from "@bryntum/chronograph/src/schema2/Field.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
-import { Base, ClassUnion, Mixin } from "typescript-mixin-class"
-import { exclude, Serializable, serializable } from "typescript-serializable-mixin"
+import { ClassUnion, Mixin } from "typescript-mixin-class"
+import { exclude, serializable } from "typescript-serializable-mixin"
 import { CI } from "../../iterator/Iterator.js"
-import { TreeNode } from "../../tree/TreeNode.js"
 import {
     AssertionAsyncCreation,
     AssertionAsyncResolution,
     ChildResultsIndex,
+    SubTestCheckInfo,
     TestNodeResult,
     TestNodeState,
     TestResult
@@ -120,36 +120,8 @@ export class TestNodeResultReactive extends Mixin(
     }
 ){}
 
-globalGraph.autoCommit      = true
-globalGraph.historyLimit    = 0
 
-// // @ts-ignore
-// window.globalGraph = globalGraph
-
-@serializable({ id : 'SubTestCheckInfo' })
-export class SubTestCheckInfo extends Mixin(
-    [ Serializable, TreeNode, Base ],
-    (base : ClassUnion<typeof Serializable, typeof TreeNode, typeof Base>) =>
-
-    class SubTestCheckInfo extends base {
-        title       : string        = ''
-
-        titleId     : string        = ''
-
-        childNodeT  : SubTestCheckInfo
-        parentNode  : SubTestCheckInfo
-
-
-        static fromTestResult<T extends typeof SubTestCheckInfo> (this : T, result : TestNodeResultReactive) : InstanceType<T> {
-            return this.new({
-                title       : result.descriptor.title,
-                titleId     : result.parentNode?.childResultsIndex.childToId.get(result)
-            } as Partial<InstanceType<T>>)
-        }
-    }
-) {}
-
-
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const checkInfoFromTestResult    = (result : TestNodeResultReactive) : SubTestCheckInfo | undefined => {
 
     const fromChildren  = CI(result.eachResultOfClass(TestNodeResultReactive))
@@ -184,6 +156,7 @@ export const individualCheckInfoForTestResult    = (result : TestNodeResultReact
     return checkInfo
 }
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 globalGraph.autoCommit      = true
 globalGraph.historyLimit    = 0
 
