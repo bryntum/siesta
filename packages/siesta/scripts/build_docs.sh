@@ -2,6 +2,7 @@
 
 # exit if any of command has failed
 set -e
+shopt -s globstar
 
 # switch to the root folder of the package
 DIR="$( cd "$( dirname "$0" )" && pwd )"
@@ -22,13 +23,18 @@ sed -i -e 's!\[\[GettingStartedBrowserGuide|Getting started with Siesta in brows
 
 echo ">> Starting docs generation with typedoc"
 
-npx typedoc \
+npx typedoc index.ts nodejs.ts browser.ts deno.ts entry/*.ts src/guides/**/*.ts \
+    --out docs \
+    --media 'src/guides' \
     --readme "resources/docs_src/README.md" \
     --includes 'src/guides' \
-    --media 'src/guides' \
-    --out docs \
     --exclude 'tests/**/*' --exclude 'bin/**/*' --exclude 'examples/**/*' \
     --exclude 'src/iterator/**/*' \
-    --excludeNotDocumented --listInvalidSymbolLinks \
-    --theme node_modules/typedoc-default-themes/bin/default/
+    --exclude 'src/logger/**/*' \
+    --excludeNotDocumented --excludeExternals \
+    --validation.invalidLink \
+    --plugin typedoc-plugin-missing-exports
+
+     #\
+    #--theme node_modules/typedoc-default-themes/bin/default/
 
