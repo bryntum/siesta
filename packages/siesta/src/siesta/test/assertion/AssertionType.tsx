@@ -75,7 +75,7 @@ export class AssertionType extends Mixin(
          * t.isInstanceOf(1, Number)
          * ```
          *
-         * @param value The recieved value
+         * @param value The received value
          * @param cls The class constructor
          * @param description
          */

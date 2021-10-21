@@ -29,7 +29,16 @@ export class AssertionElement extends Mixin(
             }))
         }
 
-
+        /**
+         * This assertion passes if the given offset point of the `target` element is directly reachable by the user, i.e.
+         * it is not covered with some other element. If the offset is not provided, the center of the element is tested.
+         * The test is performed using the [document.getElementFromPoint()](https://developer.mozilla.org/en-US/docs/Web/API/Document/elementFromPoint) method.
+         *
+         * Usually it is fine
+         *
+         * @param target
+         * @param description
+         */
         isElementPointReachable (
             target : ActionTarget, description? : string
         )

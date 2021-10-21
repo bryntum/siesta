@@ -1328,6 +1328,19 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates a single key press on the given `target` element.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.keyPress('#source', 's', { ctrlKey : true })
+         * ```
+         *
+         * @param target
+         * @param key
+         * @param options
+         */
         async keyPress (target : ActionTarget, key : string, options? : Partial<KeyboardActionOptions>) : Promise<any> {
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key, options)
 
@@ -1342,6 +1355,18 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates a key down action on the given `target` element.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.keyDown('#source', 's')
+         * ```
+         *
+         * @param target
+         * @param key
+         */
         async keyDown (target : ActionTarget, key : string) : Promise<any> {
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key)
 
@@ -1354,6 +1379,18 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        /**
+         * Simulates a key up action on the given `target` element.
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.keyUp('#source', 's')
+         * ```
+         *
+         * @param target
+         * @param key
+         */
         async keyUp (target : ActionTarget, key : string) : Promise<any> {
             const keyboardAction    = this.normalizeKeyboardActionOptions(target ?? this.activeElement, key)
 

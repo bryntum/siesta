@@ -19,6 +19,11 @@ export class TextSelectionHelpers extends Mixin(
 
     class TextSelectionHelpers extends base {
 
+        /**
+         * This helper method returns a selected text in the given `target` element
+         *
+         * @param target
+         */
         getSelectedText (target : ActionTarget) : string {
             const el        = this.resolveActionTarget(target) as HTMLInputElement
 
@@ -26,6 +31,14 @@ export class TextSelectionHelpers extends Mixin(
         }
 
 
+        /**
+         * This helper method selects text in the given `target` element, starting from the index `start` (0-based)
+         * till the index `end`
+         *
+         * @param target
+         * @param start
+         * @param end
+         */
         selectText (target : ActionTarget, start? : number, end? : number) {
             const el        = this.resolveActionTarget(target) as HTMLInputElement
 
@@ -33,6 +46,11 @@ export class TextSelectionHelpers extends Mixin(
         }
 
 
+        /**
+         * This helper method returns an index of the caret position (0-based) in the given `target` element
+         *
+         * @param target
+         */
         getCaretPosition (target : ActionTarget) : number | null {
             const el        = this.resolveActionTarget(target) as HTMLInputElement
 
@@ -40,6 +58,12 @@ export class TextSelectionHelpers extends Mixin(
         }
 
 
+        /**
+         * This helper method sets the index of the caret position (0-based) in the given `target` element.
+         *
+         * @param target
+         * @param caretPos
+         */
         setCaretPosition (target : ActionTarget, caretPos : number) {
             const el        = this.resolveActionTarget(target) as HTMLInputElement
 
@@ -47,6 +71,12 @@ export class TextSelectionHelpers extends Mixin(
         }
 
 
+        /**
+         * This helper method moves the caret position in the given `target` element by the `delta`.
+         *
+         * @param target
+         * @param caretPos
+         */
         moveCaretPosition (target : ActionTarget, delta : number) {
             const el        = this.resolveActionTarget(target) as HTMLInputElement
 
