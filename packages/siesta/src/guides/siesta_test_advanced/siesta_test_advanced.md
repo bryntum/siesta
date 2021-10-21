@@ -117,10 +117,17 @@ the test that caused the "unhandled" exception. We might revisit this topic in t
 Logging
 =======
 
-The [[Test]] class implements the [[Logger]] mixin. One can use the [[Logger]] methods to report some useful information from tests.
+The [[Test]] class implements several logging methods:
+- [[Test.error]]
+- [[Test.warn]]
+- [[Test.log]]
+- [[Test.debug]]
+- [[Test.info]]
+
+One can use them to report some useful information from test.
 
 Note, that only the log messages which are the current log level (or higher) are reported. The current log level is determined with the
-`--log-level` command line option.
+`--log-level` command line option. By default its `warn`
 
 
 Console and stdout/stderr output

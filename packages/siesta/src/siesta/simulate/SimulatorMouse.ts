@@ -6,7 +6,7 @@ import { MouseButton, Point } from "./Types.js"
 /**
  * Union type, that describes the precision of the pointer movement. It defines how many `mousemove/pointermove` events
  * will be fired for the mouse move actions. This also includes moving cursor the target point for other actions,
- * like [[TestBrowser.click]] and similar.
+ * like [[Test.click]] and similar.
  *
  * The `kind` options are:
  *

@@ -11,7 +11,7 @@ Siesta test is a regular JavaScript file. By convention, it should have `*.t.js`
 
 All test files of a certain software project are called "test suite". Test suite is usually placed in the `tests` directory of your project, however this is not enforced and up to the user. Some users prefer to place the test files near the corresponding source files. Choose what is most appropriate for your needs.
 
-Test file is structured as a tree. The "parent" nodes of the tree are called "test sections" or "sub-tests". They are created using the [["src/siesta/test/Test".it|it]] call. 
+Test file is structured as a tree. The "parent" nodes of the tree are called "test sections" or "sub-tests". They are created using the [[Test.it|it]] call. 
 
 The 1st argument of the `it` call is a configuration object for test [[TestDescriptor|descriptor]]. In the simplest form it's a string, containing the title of the test. It can also be an object with various configuration options to customize the test behavior. The 2nd argument of the `it` call is a test function, it can be `async` if needed. The 1st argument, passed to every test function, is a [[Test]] instance, usually called `t` for brevity. 
 

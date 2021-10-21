@@ -483,7 +483,7 @@ export class Test extends TestPre {
      *
      * See also [[iit]], [[xit]] methods to quickly isolate/exclude a test section.
      *
-     * To create a top-level test section, the [["src/siesta/test/Test".it|it]] function or <a href="#it-1">it</a> static
+     * To create a top-level test section, the [[Test.it|it]] function or <a href="#it-1">it</a> static
      * method should be used. These aliases can actually be used inside the test function as well, however
      * it is recommended to use the method on the test instance.
      *
