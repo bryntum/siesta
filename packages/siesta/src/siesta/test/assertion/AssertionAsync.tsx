@@ -30,11 +30,13 @@ export type WaitForOptions<R> = {
      * In pseudo-code:
      *
      * ```javascript
-     * dataStore.loadData() // if caching is applied, the `load` event
-     *                      // will be triggered in this method
+     * // if caching is applied, the `load` event
+     * // will be triggered in this method
+     * dataStore.loadData()
      *
-     * await t.waitForEvent(dataStore, 'load') // by this time, the event might be already fired
-     *                                         // so waiting will never complete
+     * // by this time, the event might be already fired
+     * // so waiting will never complete
+     * await t.waitForEvent(dataStore, 'load')
      * ```
      *
      * The correct way would be first start waiting for event, and then "trigger" the action, that causes the waiting
@@ -233,13 +235,21 @@ export class AssertionAsync extends Mixin(
         }
 
         /**
-         * This assertion passes, if the `waiting` has completed successfully, within the expected timeout.
-         * The `waiting` argument can be either a condition checker function, or the [[WaitForArg]] object.
+         * This assertion passes, if waiting for some condition has completed successfully, within the expected timeout.
          *
-         * For the waiting to complete, the condition checker function should return some truthy value.
-         * That value (wrapped in a Promise) will be returned from the `waitFor` method.
+         * The condition to wait for should be specified as a `checker` function. It can be `async` if needed (return a `Promise`).
+         * For the waiting to complete, the condition checker should return some "truthy" value, like `true`, `1`, `'some_string'`, etc.
+         * That value (wrapped in a `Promise`) will be returned from the `waitFor` method itself.
          *
-         * Note, this method is `async`. Don't forget to `await` on it. Condition checker function can be `async` (return a `Promise`).
+         * Alternatively, this method can just await for certain time.
+         *
+         * This method has 3 overloads:
+         * - one for waiting the specified time
+         * - one when checker function is provided directly in the argument
+         * - one with [[WaitForOptions|options]] argument. In this overload, all options are available, for example,
+         * one can customize the maximum time to wait - `timeout`.
+         *
+         * Note, this method is `async`. Don't forget to `await` on it. .
          *
          * For example:
          *
@@ -258,6 +268,9 @@ export class AssertionAsync extends Mixin(
          *     return els.length > 0 ? els : null
          * })
          * ```
+         *
+         * IMPORTANT: To avoid race conditions, always start waiting for certain event, *before* triggering it.
+         * See the trigger option in the [[WaitForOptions]] object for more details.
          *
          * @param waiting
          * @param description

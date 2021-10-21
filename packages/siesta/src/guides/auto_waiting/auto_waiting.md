@@ -21,7 +21,7 @@ and/or resizing on the screen.
 - `reachable` This check passes, when the target point of the DOM element is directly reachable by the user - it is 
 not covered with any other elements, like masks, overlays etc. Note, that it's usually fine, if the element is covered 
 with one of its child elements - this check normally passes in this case too. This behavior is controlled with 
-[[MouseActionOptions.allowChild]] option.
+the `allowChild` option of the [[MouseActionOptions]] object.
 
 Mouse actions
 =============

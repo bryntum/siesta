@@ -77,6 +77,7 @@ class TestPre extends Mixin(
     >) =>
 
     // when using the un-exported mixin class, the internal class need to have different name
+    // for docs generation purposes (TypeDoc chokes otherwise)
     class TestPreInternal extends base {
     }
 ){}
