@@ -11,7 +11,7 @@ import { Assertion, AssertionAsyncCreation, AssertionAsyncResolution, TestNodeRe
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
- * An argument for the [[Test.waitFor|waitFor]] test class method, denoting the "waiting"
+ * An options object for the [[Test.waitFor|waitFor]] test class method
  */
 export type WaitForOptions<R> = {
     /**
@@ -21,8 +21,30 @@ export type WaitForOptions<R> = {
     condition       : () => OrPromise<R>,
 
     /**
-     * A trigger function. This function is called once the waiting has started. It allows to avoid race conditions
-     * and more verbose syntax
+     * A trigger function. This function is called once the waiting has started. It allows to avoid race conditions.
+     *
+     * For example, the typical mistake, which causes the race condition, is to call some method (which will trigger
+     * an event) and then start waiting for that event. The event might be triggered synchronously (for example if
+     * caching is applied), so it will be _already_ triggered, by the time we start waiting for it.
+     *
+     * In pseudo-code:
+     *
+     * ```javascript
+     * dataStore.loadData() // if caching is applied, the `load` event
+     *                      // will be triggered in this method
+     *
+     * await t.waitForEvent(dataStore, 'load') // by this time, the event might be already fired
+     *                                         // so waiting will never complete
+     * ```
+     *
+     * The correct way would be first start waiting for event, and then "trigger" the action, that causes the waiting
+     * to complete:
+     *
+     * ```javascript
+     * await t.waitForEvent(dataStore, 'load', {
+     *     trigger : () => dataStore.loadData()
+     * })
+     * ```
      */
     trigger         : AnyFunction,
 

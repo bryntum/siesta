@@ -7,12 +7,44 @@ import { Assertion } from "../TestResult.js"
 import { AssertionAsync, WaitForOptions } from "./AssertionAsync.js"
 import { GotExpectTemplate, verifyExpectedNumber } from "./AssertionCompare.js"
 
-
+/**
+ * The options object for the [[firesOk]] assertion
+ */
 export type FiresOkOptions<O> = {
+    /**
+     * The observable, on which to count the fired events. The exact meaning of the "observable" depends from the
+     * environment, for example in browsers it is an instance of `EventTarget` interface and in Node.js - `EventEmitter` class.
+     *
+     * In general "observable" is whatever the [[resolveObservable]] method accepts as the 1st argument.
+     */
     observable      : O,
+
+    /**
+     * An object with the events to count. The keys of the object corresponds to the event names.
+     * The values - to the expected number of that event. The value can be either a number indicating the exact expected
+     * events number, or a string, with the "expected number expression".
+     *
+     * The expression consists from the comparison operator and number:
+     * ```javascript
+     * '> 5'
+     * '<= 1'
+     * '== 3'
+     * ```
+     */
     events          : Record<string, string | number>,
+
+    /**
+     * The period of time during which the events are counted. It can be:
+     *
+     * - execution of the function (which can possibly be `async`, in this case, don't forget to `await` on the [[firesOk]] call itself)
+     * - time period, in milliseconds
+     * - the rest of the test (if not provided).
+     */
     during?         : number | AnyFunction,
 
+    /**
+     * Description for the assertion.
+     */
     description?    : string
 
     // internal, do not document
@@ -60,23 +92,24 @@ export class AssertionObservable extends Mixin(
         }
 
         /**
-         * This assertion passes, if the provided "observable" (see [[resolveObservable]]), triggers the specified event
-         * within the timeout and fails otherwise
+         * This assertion passes, if the provided `observable`, triggers the specified `event`
+         * within the `timeout` and fails otherwise. The `timeout` can be specified using the `object` argument,
+         * if not provided the [[TestDescriptor.waitForTimeout]] is used.
          *
-         * @param source
+         * @param observable
          * @param event
          * @param options
          */
-        async waitForEvent (source : this[ 'ObservableSourceT' ], event : string, options? : Partial<WaitForOptions<unknown>>) {
-            const observable            = this.resolveObservable(source)
+        async waitForEvent (observable : this[ 'ObservableSourceT' ], event : string, options? : Partial<WaitForOptions<unknown>>) {
+            const resolved            = this.resolveObservable(observable)
 
-            if (!observable) {
+            if (!resolved) {
                 this.addResult(Assertion.new({
                     name        : 'waitForEvent',
                     passed      : false,
                     description : options?.description,
                     annotation  : <div>
-                        <div>Could not resolve action target `<span class="accented">{ source }</span>` to observable</div>
+                        <div>Could not resolve action target `<span class="accented">{ observable }</span>` to observable</div>
                     </div>
                 }))
 
@@ -86,8 +119,8 @@ export class AssertionObservable extends Mixin(
             let listener : AnyFunction
 
             const eventFiredPromise     = new Promise<void>(resolve => {
-                this.addListenerToObservable(observable, event, listener = () => {
-                    this.removeListenerFromObservable(observable, event, listener)
+                this.addListenerToObservable(resolved, event, listener = () => {
+                    this.removeListenerFromObservable(resolved, event, listener)
 
                     resolve()
                 })
@@ -110,7 +143,7 @@ export class AssertionObservable extends Mixin(
                 }))
 
             } catch (e) {
-                this.removeListenerFromObservable(observable, event, listener)
+                this.removeListenerFromObservable(resolved, event, listener)
 
                 if (e === timeoutError) {
                     this.addResult(Assertion.new({
@@ -118,7 +151,7 @@ export class AssertionObservable extends Mixin(
                         passed      : false,
                         description : options?.description,
                         annotation  : <div>
-                            <div>Waited too long for event `<span class="accented">{ event }</span>` to be triggered on observable <span class="accented">{ observable }</span></div>
+                            <div>Waited too long for event `<span class="accented">{ event }</span>` to be triggered on observable <span class="accented">{ resolved }</span></div>
                             <div>Timeout is { waitTimeout }ms</div>
                         </div>
                     }))
@@ -129,85 +162,42 @@ export class AssertionObservable extends Mixin(
 
 
         /**
-         * This assertion verifies the number of events, triggered by the provided observable instance during execution of the provided
-         * function (which can possibly `async`), time period or during the rest of the test.
+         * This assertion counts the number of events, triggered by the provided `observable` instance, during the
+         * provided period and compares it with the expected numbers. The period is specified with the `during` option and can be:
          *
-         * For example:
+         * - execution of the provided function (which can possibly be `async`)
+         * - time period, in milliseconds
+         * - the rest of the test (if not provided).
          *
-
-    t.firesOk({
-        observable      : store,
-        events          : {
-            update      : 1,
-            add         : 2,
-            datachanged : '> 1'
-        },
-        during          : function () {
-            store.getAt(0).set('Foo', 'Bar');
-
-            store.add({ FooBar : 'BazQuix' })
-            store.add({ Foo : 'Baz' })
-        },
-        desc            : 'Correct events fired'
-    })
-
-    // or async
-
-    await t.firesOk({
-        observable      : someObservable,
-        events          : {
-            datachanged : '> 1'
-        },
-        during          : async () => {
-            await someObservable.loadData()
-        },
-        desc            : 'Correct events fired'
-    })
-
-    // or
-
-    t.firesOk({
-        observable      : store,
-        events          : {
-            update      : 1,
-            add         : 2,
-            datachanged : '>= 1'
-        },
-        during          : 1
-    })
-
-    store.getAt(0).set('Foo', 'Bar');
-
-    store.add({ FooBar : 'BazQuix' })
-    store.add({ Foo : 'Baz' })
-
+         * The exact notion of what the `observable` is, is defined by the [[resolveObservable]] method.
          *
-         * Normally this method accepts a single object with various options (as shown above), but also can be called in 2 additional shortcuts forms:
+         * This method has several overloads. Normally it accepts a single object with various [[FiresOkOptions|options]]:
          *
-
-    // 1st form for multiple events
-    t.firesOk(observable, { event1 : 1, event2 : '>1' }, description)
-
-    // 2nd form for single event
-    t.firesOk(observable, eventName, 1, description)
-    t.firesOk(observable, eventName, '>1', description)
-
+         * ```javascript
+         * await t.firesOk({
+         *     observable      : document.body,
+         *     events          : {
+         *         mousedown        : 2,
+         *         mouseup          : 2,
+         *         click            : '> 1',
+         *         dblclick         : '== 1'
+         *     },
+         *     during          : async () {
+         *         await t.click([ 100, 100 ])
+         *     },
+         *     desc            : 'Correct double click events fired'
+         * })
+         * ```
+         * This method also can be called in 2 additional shortcuts forms:
          *
-         * In both forms, `during` is assumed to be undefined and `description` is optional.
+         * ```javascript
+         * // shortcut form, multiple events
+         * t.firesOk(observable, { event1 : 1, event2 : '>1' }, description)
          *
-         * @param {Object} options An obect with the following properties:
-         * @param {Ext.util.Observable/Ext.Element/HTMLElement} options.observable Any browser observable, window object, element instances, CSS selector.
-         * @param {Object} options.events The object, properties of which corresponds to event names and values - to expected
-         * number of this event triggering. If value of some property is a number then exact that number of events is expected. If value
-         * of some property is a string starting with one of the comparison operators like "\<", "\<=", "==" etc and followed by the number
-         * then Siesta will perform that comparison with the number of actualy fired events.
-         * @param {Number/Function} [options.during] If provided as a number denotes the number of milliseconds during which
-         * this assertion will "record" the events from observable, if provided as regular function - then this assertion will "record"
-         * only events fired during execution of this function (`async` functions are supported, in this case, don't forget to `await`
-         * on the assertion call itself). If not provided at all - assertions are recorded until the end of
-         * current test (or sub-test)
-         * @param {Function} [options.callback] A callback to call after this assertion has been checked. Only used if `during` value is provided.
-         * @param {String} [options.desc] A description for this assertion
+         * // shortcut form, single event
+         * t.firesOk(observable, eventName, 1, during?, description)
+         * t.firesOk(observable, eventName, '>1', during?, description)
+         * ```
          */
         async firesOk (options : FiresOkOptions<this[ 'ObservableSourceT' ]>)
         async firesOk (
@@ -394,12 +384,15 @@ export class AssertionObservable extends Mixin(
 
 
         /**
-         * This assertion passes if the observable fires the specified event(s) exactly (n) times during the test execution.
+         * This assertion passes if the provided `observable` triggers the specified event(s) exactly `N` times during
+         * the rest of the test execution.
          *
-         * @param {Ext.util.Observable/Ext.Element/HTMLElement} observable The observable instance
-         * @param {String} event The name of event
-         * @param {Number} expected The expected number of events to be fired
-         * @param {String} [desc] The description of the assertion.
+         * This method is a specialized form of the [[firesOk]] assertion.
+         *
+         * @param observable The observable instance, anything that [[resolveObservable]] accepts
+         * @param event The name of the event(s)
+         * @param expected Expected number of events
+         * @param description Assertion description
          */
         willFireNTimes (observable : this[ 'ObservableSourceT'], event : string | string[], expected : string | number, description? : string) {
             this.firesOk({
@@ -417,11 +410,14 @@ export class AssertionObservable extends Mixin(
 
 
         /**
-         * This assertion passes if the observable does not fire the specified event(s) after calling this method.
+         * This assertion passes if the provided `observable` does not trigger the specified event(s) during
+         * the rest of the test execution.
          *
-         * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
-         * @param {String/Array[String]} event The name of event or array of such
-         * @param {String} [desc] The description of the assertion.
+         * This method is a specialized form of the [[firesOk]] assertion.
+         *
+         * @param observable The observable instance, anything that [[resolveObservable]] accepts
+         * @param event The name of the event(s)
+         * @param description Assertion description
          */
         wontFire (observable : this[ 'ObservableSourceT' ], event : string | string[], description? : string) {
             this.firesOk({
@@ -433,11 +429,14 @@ export class AssertionObservable extends Mixin(
         }
 
         /**
-         * This assertion passes if the observable fires the specified event exactly once after calling this method.
+         * This assertion passes if the provided `observable` triggers the specified event(s) exactly 1 time during
+         * the rest of the test execution.
          *
-         * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
-         * @param {String/Array[String]} event The name of event or array of such
-         * @param {String} [desc] The description of the assertion.
+         * This method is a specialized form of the [[firesOk]] assertion.
+         *
+         * @param observable The observable instance, anything that [[resolveObservable]] accepts
+         * @param event The name of the event(s)
+         * @param description Assertion description
          */
         firesOnce (observable : this[ 'ObservableSourceT' ], event : string | string[], description? : string) {
             this.firesOk({
@@ -451,21 +450,24 @@ export class AssertionObservable extends Mixin(
         /**
          * Alias for [[wontFire]] method
          *
-         * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
-         * @param {String/Array[String]} event The name of event or array of such
-         * @param {String} [desc] The description of the assertion.
+         * @param observable
+         * @param event
+         * @param description
          */
         isntFired (observable : this[ 'ObservableSourceT' ], event : string | string[], description? : string) {
             return this.wontFire(observable, event, description)
         }
 
         /**
-         * This assertion passes if the observable fires the specified event at least `n` times after calling this method.
+         * This assertion passes if the provided `observable` triggers the specified event(s) at least `N` times times during
+         * the rest of the test execution.
          *
-         * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
-         * @param {String} event The name of event
-         * @param {Number} n The minimum number of events to be fired
-         * @param {String} [desc] The description of the assertion.
+         * This method is a specialized form of the [[firesOk]] assertion.
+         *
+         * @param observable The observable instance, anything that [[resolveObservable]] accepts
+         * @param event The name of the event(s)
+         * @param n The minimum number of events to be fired
+         * @param description Assertion description
          */
         firesAtLeastNTimes (observable : this[ 'ObservableSourceT' ], event : string | string[], n : number, description? : string) {
             this.firesOk({
