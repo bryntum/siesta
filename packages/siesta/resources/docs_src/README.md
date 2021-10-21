@@ -13,17 +13,20 @@ Version 6 is a complete rewrite, using a modern technology stack and a decade of
 
 Main features:
 
-- One test tool to run all types of tests. Siesta can run tests in all modern browsers, Node.js and Deno.
+- One test tool to run all types of tests. Siesta can run tests in all modern browsers, Node.js and Deno. Moreover,
+in browsers, both in-process and out-of-process execution models are supported, so that you can choose the most 
+appropriate one
 - Supports parallel execution
+- Supports native simulation of user actions, like clicking, typing etc. 
 - Provides accurate and well-formatted deep diff for equality assertion
 
 Siesta powers the test suites of all [Bryntum products](https://www.bryntum.com) and thousands of our clients. 
 
 
-Supported target environments
+Supported environments
 =============================
 
-Siesta can run the test in browsers, Node.js and Deno. 
+Siesta can run the test in browsers (both in-process and out-of-process), Node.js and Deno. 
 
 Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Edge Chromium. IE, legacy Edge and quirks mode are not supported.
 
