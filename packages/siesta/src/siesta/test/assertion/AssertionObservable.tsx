@@ -449,7 +449,7 @@ export class AssertionObservable extends Mixin(
         }
 
         /**
-         * Alias for {@link #wontFire} method
+         * Alias for [[wontFire]] method
          *
          * @param {Mixed} observable Any browser observable, window object, element instances, CSS selector.
          * @param {String/Array[String]} event The name of event or array of such

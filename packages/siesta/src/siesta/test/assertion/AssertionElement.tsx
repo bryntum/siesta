@@ -30,25 +30,33 @@ export class AssertionElement extends Mixin(
         }
 
         /**
-         * This assertion passes if the given offset point of the `target` element is directly reachable by the user, i.e.
-         * it is not covered with some other element. If the offset is not provided, the center of the element is tested.
+         * This assertion passes if the given `offset` point of the `target` element is directly reachable by the user, i.e.
+         * it is not covered with some other element. If the `offset` is not provided, the center of the element is tested.
          * The test is performed using the [document.getElementFromPoint()](https://developer.mozilla.org/en-US/docs/Web/API/Document/elementFromPoint) method.
          *
-         * Usually it is fine
+         * Usually it is fine if the element is covered with one of its children - it is still considered reachable.
+         * This behaviour is controlled with the `allowChildren` option, by default it is set to `true`.
+         *
+         * This method has 2 overloads, one simplified and one with options.
          *
          * @param target
          * @param description
          */
-        isElementPointReachable (
+        elementPointIsReachable (
             target : ActionTarget, description? : string
         )
-        isElementPointReachable (
-            target : ActionTarget, options : { offset : ActionTargetOffset, allowChildren : boolean } | ActionTargetOffset, description? : string
+        elementPointIsReachable (
+            target : ActionTarget, options : {
+                /** include */
+                offset? : ActionTargetOffset,
+                /** include */
+                allowChildren? : boolean
+            } | ActionTargetOffset, description? : string
         )
-        isElementPointReachable (
+        elementPointIsReachable (
             ...args :
                 | [ target : ActionTarget, description? : string ]
-                | [ target : ActionTarget, options : { offset : ActionTargetOffset, allowChildren : boolean } | ActionTargetOffset, description? : string ]
+                | [ target : ActionTarget, options : { offset? : ActionTargetOffset, allowChildren? : boolean } | ActionTargetOffset, description? : string ]
         ) {
             const negated       = this.isAssertionNegated
             const target        = args[ 0 ]
@@ -56,12 +64,12 @@ export class AssertionElement extends Mixin(
             const options       = isString(args[ 1 ]) ? undefined : args[ 1 ]
 
             const offset        = isArray(options) ? options : options?.offset
-            const allowChildren = isArray(options) ? false : options?.allowChildren
+            const allowChildren = isArray(options) ? true : (options?.allowChildren ?? true)
 
             const el            = this.resolveActionTarget(target)
 
             if (!el) {
-                this.addMissingTargetFailedAssertion('isElementPointReachable', target, description)
+                this.addMissingTargetFailedAssertion('elementPointIsReachable', target, description)
                 return
             }
 
@@ -71,7 +79,7 @@ export class AssertionElement extends Mixin(
             const offsetValue   = normalizeOffset(el, offset)
 
             this.addResult(Assertion.new({
-                name        : 'isElementPointReachable',
+                name        : 'elementPointIsReachable',
                 passed,
                 negated,
                 description,
@@ -94,6 +102,21 @@ export class AssertionElement extends Mixin(
         }
 
 
+        /**
+         * This assertion passes, if the `value` property of the `target` element is strictly equal to the given `value`
+         * argument. No assumption is made about what is the target element, but usually it should be `<input>` or
+         * `<textarea>`.
+         *
+         * For example:
+         *
+         * ```javascript
+         * t.elementValuesIs('#input1', 'Need this text', 'Correct text in the input field')
+         * ```
+         *
+         * @param target
+         * @param value
+         * @param description
+         */
         elementValueIs (target : ActionTarget, value : string, description? : string) {
             const el            = this.resolveActionTarget(target) as HTMLInputElement
 
@@ -115,8 +138,29 @@ export class AssertionElement extends Mixin(
         }
 
 
+        /**
+         * This assertions passes if waiting for the given `selector` completes within `timeout`.
+         * If no `timeout` is given [[TestDescriptor.defaultTimeout]] is used. One can also specify
+         * a `root` element, from which the query will be starting.
+         *
+         * This method has 2 overloads
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.waitForSelector('.css-class', { root : '.root', timeout : 5000 })
+         * ```
+         *
+         * @param selector
+         * @param root
+         */
         async waitForSelector (selector : string, root : ActionTarget)
-        async waitForSelector (selector : string, options? : { root? : ActionTarget, timeout? : number })
+        async waitForSelector (selector : string, options? : {
+            /** include */
+            root? : ActionTarget,
+            /** include */
+            timeout? : number
+        })
         async waitForSelector (
             ...args :
                 | [ selector : string, root : ActionTarget ]
@@ -154,17 +198,19 @@ export class AssertionElement extends Mixin(
 
 
         //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // deprecated, backward compat only
+        // methods below this line are deprecated, backward compat only
+
+
         elementIsTopElement (target : ActionTarget, allowChildren : boolean = false, description? : string, strict : boolean = false) {
             const el    = this.resolveActionTarget(target)
 
             if (strict) {
-                this.isElementPointReachable(el, { offset : [ 1, 1 ], allowChildren }, `Top/left corner: ${ description }`)
-                this.isElementPointReachable(el, { offset : [ 1, '100% - 1' ], allowChildren }, `Bottom/left corner: ${ description }`)
-                this.isElementPointReachable(el, { offset : [ '100% - 1', '100% - 1' ], allowChildren }, `Bottom/right corner: ${ description }`)
-                this.isElementPointReachable(el, { offset : [ '100% - 1', 1 ], allowChildren }, `top/right corner: ${ description }`)
+                this.elementPointIsReachable(el, { offset : [ 1, 1 ], allowChildren }, `Top/left corner: ${ description }`)
+                this.elementPointIsReachable(el, { offset : [ 1, '100% - 1' ], allowChildren }, `Bottom/left corner: ${ description }`)
+                this.elementPointIsReachable(el, { offset : [ '100% - 1', '100% - 1' ], allowChildren }, `Bottom/right corner: ${ description }`)
+                this.elementPointIsReachable(el, { offset : [ '100% - 1', 1 ], allowChildren }, `top/right corner: ${ description }`)
             } else {
-                this.isElementPointReachable(el, { offset : [ '50%', '50%' ], allowChildren }, `${ description }`)
+                this.elementPointIsReachable(el, { offset : [ '50%', '50%' ], allowChildren }, `${ description }`)
             }
         }
 

@@ -225,7 +225,7 @@ it('`moveMouseTo` should NOT await for target to become reachable', async t => {
 
     await t.moveMouseTo('#delayed')
 
-    t.not.isElementPointReachable(div)
+    t.not.elementPointIsReachable(div)
 })
 
 

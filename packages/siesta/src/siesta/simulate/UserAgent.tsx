@@ -919,7 +919,7 @@ export class UserAgentOnPage extends Mixin(
          * Simulates a click on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
          * the action happens in the center of the visible part of the target element.
          *
-         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * Before performing an action, Siesta waits for the target element to [[AutoWaitingGuide|become actionable]]
          * and synchronize the cursor position.
          *
          * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
@@ -965,7 +965,7 @@ export class UserAgentOnPage extends Mixin(
          * Simulates a right click on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
          * the action happens in the center of the visible part of the target element.
          *
-         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * Before performing an action, Siesta waits for the target element to [[AutoWaitingGuide|become actionable]]
          * and synchronize the cursor position.
          *
          * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
@@ -1011,7 +1011,7 @@ export class UserAgentOnPage extends Mixin(
          * Simulates a double click on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
          * the action happens in the center of the visible part of the target element.
          *
-         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * Before performing an action, Siesta waits for the target element to [[AutoWaitingGuide|become actionable]]
          * and synchronize the cursor position.
          *
          * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
@@ -1056,7 +1056,7 @@ export class UserAgentOnPage extends Mixin(
          * Simulates a "mouse down" action on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
          * the action happens in the center of the visible part of the target element.
          *
-         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * Before performing an action, Siesta waits for the target element to [[AutoWaitingGuide|become actionable]]
          * and synchronize the cursor position.
          *
          * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
@@ -1102,7 +1102,7 @@ export class UserAgentOnPage extends Mixin(
          * Simulates a "mouse up" action on the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided
          * the action happens in the center of the visible part of the target element.
          *
-         * Before performing an action, Siesta waits for the target element to [[AutoWatingGuide|become actionable]]
+         * Before performing an action, Siesta waits for the target element to [[AutoWaitingGuide|become actionable]]
          * and synchronize the cursor position.
          *
          * This method has 2 overloads and `target` and `offset` can be given either as positional arguments, or in the form
@@ -1148,7 +1148,7 @@ export class UserAgentOnPage extends Mixin(
          * Simulates "mouse move" action to the given [[ActionTarget]] at the given [[ActionTargetOffset]] point. If offset is not provided,
          * cursor moves to the center of the visible part of the target element.
          *
-         * Before performing mouse move, Siesta waits for the target element to [[AutoWatingGuide|become actionable]].
+         * Before performing mouse move, Siesta waits for the target element to [[AutoWaitingGuide|become actionable]].
          *
          * This method has several overloads and `target` and `offset` can be given either as positional arguments, or in the form
          * of the [[MouseActionOptions]] object.

@@ -6,8 +6,7 @@ import {
     anyNumberApprox,
     anyStringLike,
     Approximation,
-    FuzzyMatcherAny,
-    FuzzyMatcherInstance, FuzzyMatcherNumberApproximation,
+    FuzzyMatcherNumberApproximation,
     FuzzyMatcherString,
     NumberApproximation
 } from "../../../compare_deep/FuzzyMatcherDiff.js"

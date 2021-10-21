@@ -111,7 +111,7 @@ it('should scroll element into view 1', async t => {
 
     await t.dragBy('#inner', [ 10, 10 ])
 
-    t.isElementPointReachable('#inner', "Element has been scrolled into view")
+    t.elementPointIsReachable('#inner', "Element has been scrolled into view")
 })
 
 
@@ -124,7 +124,7 @@ it('should scroll element into view 2', async t => {
 
     await t.dragTo({ source : '#inner', target : '#inner', targetOffset : [ '100% + 50', '50%' ] })
 
-    t.isElementPointReachable('#inner', "Element has been scrolled into view")
+    t.elementPointIsReachable('#inner', "Element has been scrolled into view")
 })
 
 
@@ -140,7 +140,7 @@ it('should scroll element into view 3', async t => {
 
     await t.dragBy('#inner2', [ 10, 10 ])
 
-    t.isElementPointReachable('#inner2', "Element has been scrolled into view")
+    t.elementPointIsReachable('#inner2', "Element has been scrolled into view")
 })
 
 
@@ -155,7 +155,7 @@ it('should scroll element into view 4', async t => {
 
     await t.dragTo({ source : '#inner2', target : '#inner2', targetOffset : [ '100% + 50', '50%' ] })
 
-    t.isElementPointReachable('#inner2', "Element has been scrolled into view")
+    t.elementPointIsReachable('#inner2', "Element has been scrolled into view")
 })
 
 
