@@ -48,15 +48,6 @@ export type ActionTarget            = Element | string | Point | []
  */
 export type ActionTargetOffset      = [ dx : number | string, dy : number | string ]
 
-// export type ActionTarget            = ActionTargetElement | { target : ActionTargetElement, offset : ActionTargetOffset } | (() => ActionTarget)
-//
-// export type ActionTargetNormalized  = ActionTargetElement | { target : ActionTargetElement, offset : ActionTargetOffset }
-
-
-// export class ActionTargetData extends Base {
-//     target : ActionTargetElement    = undefined
-//     offset : ActionTargetOffset     = undefined
-// }
 
 export const isActionTarget         = (a : any) : a is ActionTarget =>
     isString(a) || isArray(a) || isHTMLElement(a) || isSVGElement(a)
@@ -76,16 +67,6 @@ export type ActionableCheck         =
     // 1) the action offset point of the element is a top one, or is covered with a child element
     // 2) mouse cursor is not yet at the action point
     | 'reachable'
-
-
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// export const normalizeActionTarget    = (actionTarget : ActionTarget) : ActionTargetNormalized => {
-//     let target      = actionTarget
-//
-//     while (isFunction(target)) target = target()
-//
-//     return target
-// }
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
