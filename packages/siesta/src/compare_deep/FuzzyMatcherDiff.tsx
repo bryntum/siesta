@@ -94,15 +94,15 @@ export type Approximation   = number | Partial<NumberApproximation> | NumberAppr
  * The instance of this fuzzy matcher will match any number, which is approximately equal to the [[value|expected value]],
  * with the notion of "approximate equality" defined by the [[approx]] configuration property.
  *
- * This class is usually instantiated with the helper function [[anyNumberApprox]]
+ * This class is usually instantiated with the helper method [[Test.anyNumberApprox]]
  *
  * For example:
  *
  * ```ts
  *
- * t.is(10.5, anyNumberApprox(10))
+ * t.is(10.5, t.anyNumberApprox(10))
  *
- * t.is(10.1, anyNumberApprox(10, { percent : 1 }))
+ * t.is(10.1, t.anyNumberApprox(10, { percent : 1 }))
  * ```
  */
 export class FuzzyMatcherNumberApproximation extends FuzzyMatcher {
@@ -267,9 +267,9 @@ export const anyNumberBetween = (min : number, max : number, inclusive : boolean
  *
  * ```ts
  *
- * t.is('woops', anyStringLike('ps'))
+ * t.is('woops', t.anyStringLike('ps'))
  *
- * t.is('boops', anyStringLike(/OOP/i))
+ * t.is('boops', t.anyStringLike(/OOP/i))
  * ```
  */
 export class FuzzyMatcherString extends FuzzyMatcher {
@@ -339,10 +339,10 @@ export const anyStringLike = (pattern : string | RegExp) : FuzzyMatcherString =>
  * ```ts
  *
  * // pass
- * t.is([ 1, 2, 3 ], any(Array), 'Array is "any array"')
+ * t.is([ 1, 2, 3 ], t.any(Array), 'Array is "any array"')
  *
  * // fail
- * t.is([ 1, 2, 3 ], any(Map), 'Array is "any map"')
+ * t.is([ 1, 2, 3 ], t.any(Map), 'Array is "any map"')
  * ```
  */
 export class FuzzyMatcherInstance extends FuzzyMatcher {
@@ -397,13 +397,13 @@ export const anyInstanceOf = (cls : AnyConstructor) : FuzzyMatcherInstance => Fu
 /**
  * An instance of this matcher class will match anything.
  *
- * This class is usually instantiated with the helper function [[any]]
+ * This class is usually instantiated with the helper method [[Test.any]]
  *
  * For example:
  * ```ts
- * t.is([ 1, 2, 3 ], any(), 'Array matches `any()`')
+ * t.is([ 1, 2, 3 ], t.any(), 'Array matches `any()`')
  *
- * t.is(new Set(), any(), 'Set matches `any()`')
+ * t.is(new Set(), t.any(), 'Set matches `any()`')
  * ```
  */
 export class FuzzyMatcherAny extends FuzzyMatcher {

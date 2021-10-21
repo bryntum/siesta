@@ -171,6 +171,7 @@ export class AssertionAsync extends Mixin(
          * })
          * ```
          *
+         * @category Asynchronicity
          * @param {Number} time The maximum time (in ms) to wait until forcing the finalization of this async gap.
          * Optional, default timeout is defined with [[TestDescriptor.defaultTimeout|defaultTimeout]] config option.
          *
@@ -209,6 +210,7 @@ export class AssertionAsync extends Mixin(
         /**
          * This method finalizes the "asynchronous gap" started with {@link beginAsync}.
          *
+         * @category Asynchronicity
          * @param gapId The gap id to finalize (returned by the {@link beginAsync} method)
          */
         endAsync (gapId : AsyncGapId) {
@@ -272,6 +274,7 @@ export class AssertionAsync extends Mixin(
          * IMPORTANT: To avoid race conditions, always start waiting for certain event, *before* triggering it.
          * See the trigger option in the [[WaitForOptions]] object for more details.
          *
+         * @category Asynchronicity
          * @param waiting
          * @param description
          */

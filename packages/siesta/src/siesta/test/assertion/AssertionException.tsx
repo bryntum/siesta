@@ -181,13 +181,14 @@ export class AssertionException extends Mixin(
          *
          * See also [[doesNotThrow]]
          *
+         * @category Exceptions handling
          * @param func The function to call. May be `async` or return `Promise`. In such case, do not
          * forget to `await` on the assertion method itself:
          * @param pattern
          * @param description
          */
         async throws (func : AnyFunction, pattern : string | RegExp = '', description : string = '') {
-            return this.assertThrowInternal('throws(func, pattern)', false, func, this.getSourcePoint(), pattern, description)
+            return this.assertThrowInternal('throws(func, pattern)', this.isAssertionNegated, func, this.getSourcePoint(), pattern, description)
         }
 
         /**
@@ -213,32 +214,35 @@ export class AssertionException extends Mixin(
          *
          * See also [[throws]]
          *
+         * @category Exceptions handling
          * @param func
          * @param description
          */
         async doesNotThrow (func : AnyFunction, description : string = '') {
-            return this.assertThrowInternal('doesNotThrow(func)', true, func, this.getSourcePoint(), '', description)
+            return this.assertThrowInternal('doesNotThrow(func)', !this.isAssertionNegated, func, this.getSourcePoint(), '', description)
         }
 
         /**
          * Backward compatible alias for [[throws]]
          *
+         * @category Exceptions handling
          * @param func
          * @param pattern
          * @param description
          */
         async throwsOk (func : AnyFunction, pattern : string | RegExp, description : string = '') {
-            return this.assertThrowInternal('throwsOk(func, pattern)', false, func, this.getSourcePoint(), pattern, description)
+            return this.assertThrowInternal('throwsOk(func, pattern)', this.isAssertionNegated, func, this.getSourcePoint(), pattern, description)
         }
 
         /**
          * Backward compatible alias for [[doesNotThrow]]
          *
+         * @category Exceptions handling
          * @param func
          * @param description
          */
         async livesOk (func : AnyFunction, description : string = '') {
-            return this.assertThrowInternal('livesOk(func)', true, func, this.getSourcePoint(), '', description)
+            return this.assertThrowInternal('livesOk(func)', !this.isAssertionNegated, func, this.getSourcePoint(), '', description)
         }
 
         async lives_ok (func : AnyFunction, description : string = '') {

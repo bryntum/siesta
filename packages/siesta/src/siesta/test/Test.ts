@@ -233,6 +233,7 @@ export class Test extends TestPre {
      * })
      * ```
      *
+     * @category Subtest management
      * @param code
      */
     beforeEach (code : (t : this) => any) {
@@ -274,13 +275,36 @@ export class Test extends TestPre {
      * })
      * ```
      *
+     * @category Subtest management
      * @param code
      */
     afterEach (code : (t : this) => any) {
         this.afterEachHooks.push(code)
     }
 
-
+    /**
+     * This is an *assertion modifier*. It returns the test instance itself, but the next added assertion is specialized
+     * in a certain way.
+     *
+     * This modifier makes the assertion "silent" - it will only appear in the test log if it fails.
+     *
+     * Note, that by default, the console output already hides passed assertions. The dashboard interface however
+     * shows them.
+     *
+     * This modifier causes the passed assertion to be physically excluded from the log, so it won't appear in any
+     * kind of user interface or report.
+     *
+     * For example:
+     *
+     * ```javascript
+     * t.silent.equal(1, 1) // passes, assertion excluded from the log
+     * t.silent.equal(1, 2) // fails, assertion will be included in the log as usual
+     * ```
+     *
+     * Any assertion can be modified in this way.
+     *
+     * @category Assertion modifiers
+     */
     get silent () : this {
         // the small joys of JavaScript programming
         return new Proxy(this, {
@@ -316,6 +340,25 @@ export class Test extends TestPre {
         return value
     }
 
+    /**
+     * This is an *assertion modifier*. It returns the test instance itself, but the next added assertion is specialized
+     * in a certain way.
+     *
+     * This modifier "inverts" the assertion, so it obtains a negative semantic.
+     *
+     * For example, there's a [[equal]] assertion which passes, when provided objects are the structurally the same.
+     * Inverted assertion will pass when provided objects are structurally different:
+     *
+     * ```javascript
+     * t.equal(1, 1) // passes
+     * t.not.equal(1, 2) // passes
+     * t.not.equal(1, 1) // fails
+     * ```
+     *
+     * Any assertion can be negated in this way, except the ones related to waiting, like [[waitFor]].
+     *
+     * @category Assertion modifiers
+     */
     get not () : this {
         this.$isAssertionNegated    = true
 
@@ -374,6 +417,8 @@ export class Test extends TestPre {
 
     /**
      * This method has the same functionality as [[it]], plus it sets the [[TestDescriptor.isTodo|isTodo]] config of the test descriptor to `true`.
+     *
+     * @category Subtest management
      */
     todo (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
         const test              = this.it(name, code)
@@ -386,6 +431,8 @@ export class Test extends TestPre {
 
     /**
      * This is a no-op method, allowing you to quickly ignore some test sections - just add `x` ("exclude") to the section call.
+     *
+     * @category Subtest management
      */
     xit (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
         const cls       = this.constructor as typeof Test
@@ -399,6 +446,8 @@ export class Test extends TestPre {
     /**
      * This is an "exclusive" version of the regular {@link it} test section. When such exclusive section is found,
      * the other regular test sections at the same level will not be executed, only "exclusive" ones.
+     *
+     * @category Subtest management
      */
     iit (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
         const test          = this.it(name, code)
@@ -452,6 +501,7 @@ export class Test extends TestPre {
      * Test.it('Test section', async (t : Test) => { ... }) // static `Test.it` method
      * ```
      *
+     * @category Subtest management
      * @param name The configuration descriptor for the test section
      * @param code The test function. Can be `async` if needed or return `Promise`.
      */
@@ -487,6 +537,8 @@ export class Test extends TestPre {
 
     /**
      * An alias for [[it]]
+     *
+     * @category Subtest management
      */
     describe (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
         return this.it(name, code)
@@ -494,6 +546,8 @@ export class Test extends TestPre {
 
     /**
      * An alias for [[iit]]
+     *
+     * @category Subtest management
      */
     ddescribe (name : TestDescriptorArgument<this>, code : (t : this) => any) : this {
         return this.iit(name, code)
@@ -819,6 +873,8 @@ export class Test extends TestPre {
     /**
      * Alias for [[Test.iit]]. Should be used for top-level sub-tests only.
      *
+     * @category Subtest management
+     *
      * @param name
      * @param code
      */
@@ -834,6 +890,8 @@ export class Test extends TestPre {
     /**
      * Alias for [[Test.xit]]. Should be used for top-level sub-tests only.
      *
+     * @category Subtest management
+     *
      * @param name
      * @param code
      */
@@ -843,6 +901,8 @@ export class Test extends TestPre {
 
     /**
      * Static alias for [[Test.it]]. Should be used for top-level sub-tests only. Can be useful if you create your own subclass of the test class.
+     *
+     * @category Subtest management
      *
      * @param name
      * @param code
@@ -880,6 +940,8 @@ export class Test extends TestPre {
 
     /**
      * Alias for [[Test.it]].
+     *
+     * @category Subtest management
      */
     static describe<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
         return this.it(name, code)
@@ -888,6 +950,8 @@ export class Test extends TestPre {
 
     /**
      * Alias for [[Test.iit]].
+     *
+     * @category Subtest management
      */
     static ddescribe<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
         return this.iit(name, code)
@@ -896,6 +960,8 @@ export class Test extends TestPre {
 
     /**
      * Alias for [[Test.xit]].
+     *
+     * @category Subtest management
      */
     static xdescribe<T extends typeof Test> (this : T, name : TestDescriptorArgument<InstanceType<T>>, code : (t : InstanceType<T>) => any) : InstanceType<T> {
         return this.xit(name, code)

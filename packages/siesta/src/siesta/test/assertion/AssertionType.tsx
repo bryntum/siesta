@@ -75,6 +75,8 @@ export class AssertionType extends Mixin(
          * t.isInstanceOf(1, Number)
          * ```
          *
+         * @category Typeguards
+         *
          * @param value The received value
          * @param cls The class constructor
          * @param description
@@ -97,6 +99,7 @@ export class AssertionType extends Mixin(
         /**
          * This assertion passes if the received `value` is a `Boolean`.
          *
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -106,6 +109,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `String`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -115,6 +119,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `Number`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -124,6 +129,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `Object`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -133,6 +139,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `Array`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -142,6 +149,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `Date`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -151,6 +159,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `RegExp`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -160,6 +169,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `Function`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -169,6 +179,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `Set`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -178,6 +189,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `Map`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -187,6 +199,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `WeakSet`.
+         * @category Typeguards
          * @param value
          * @param description
          */
@@ -196,6 +209,7 @@ export class AssertionType extends Mixin(
 
         /**
          * This assertion passes if the received `value` is a `WeakMap`.
+         * @category Typeguards
          * @param value
          * @param description
          */

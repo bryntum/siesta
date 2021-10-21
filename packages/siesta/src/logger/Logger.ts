@@ -59,6 +59,8 @@ export class Logger extends Mixin(
 
         /**
          * The log method for the `info` [[LogLevel|log level]]
+         *
+         * @category Logging
          * @param message
          */
         info (...message : unknown[]) {
@@ -68,6 +70,8 @@ export class Logger extends Mixin(
 
         /**
          * The log method for the `debug` [[LogLevel|log level]]
+         *
+         * @category Logging
          * @param message
          */
         debug (...message : unknown[]) {
@@ -77,6 +81,8 @@ export class Logger extends Mixin(
 
         /**
          *The log method for the  `log` [[LogLevel|log level]]
+         *
+         * @category Logging
          * @param message
          */
         log (...message : unknown[]) {
@@ -86,6 +92,8 @@ export class Logger extends Mixin(
 
         /**
          * The log method for the `warn` [[LogLevel|log level]]
+         *
+         * @category Logging
          * @param message
          */
         warn (...message : unknown[]) {
@@ -95,6 +103,8 @@ export class Logger extends Mixin(
 
         /**
          * The log method for the `error` [[LogLevel|log level]]
+         *
+         * @category Logging
          * @param message
          */
         error (...message : unknown[]) {

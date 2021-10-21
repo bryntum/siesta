@@ -29,9 +29,8 @@ npx typedoc index.ts nodejs.ts browser.ts deno.ts entry/*.ts src/guides/**/*.ts 
     --readme "resources/docs_src/README.md" \
     --includes 'src/guides' \
     --exclude 'tests/**/*' --exclude 'bin/**/*' --exclude 'examples/**/*' \
-    --exclude 'src/iterator/**/*' \
-    --exclude 'src/logger/**/*' \
     --excludeNotDocumented --excludeExternals \
+    --categorizeByGroup false \
     --validation.invalidLink \
     --plugin typedoc-plugin-missing-exports
 
