@@ -3,8 +3,10 @@ lockfileVersion: 5.3
 overrides:
   typescript-mixin-class>chained-iterator: workspace:*
   typescript-serializable-mixin>typescript-mixin-class: workspace:*
+  '@bryntum/chronograph>chained-iterator': workspace:*
   '@bryntum/chronograph>typescript-mixin-class': workspace:*
   '@bryntum/chronograph>typescript-serializable-mixin': workspace:*
+  '@bryntum/siesta>chained-iterator': workspace:*
   '@bryntum/siesta>typescript-mixin-class': workspace:*
   '@bryntum/siesta>typescript-serializable-mixin': workspace:*
   '@bryntum/siesta>@bryntum/chronograph': workspace:*
@@ -29,7 +31,7 @@ importers:
       '@bryntum/siesta': ^6.0.0-alpha-3
       '@types/node': ^12.7.2
       '@web/dev-server': ^0.1.17
-      chained-iterator: ^0.0.2
+      chained-iterator: workspace:*
       core-js: ^2.6.5
       cose-base: ^1.0.2
       cytoscape: ^3.14.1
@@ -52,7 +54,7 @@ importers:
       typescript-mixin-class: workspace:*
       typescript-serializable-mixin: workspace:*
     dependencies:
-      chained-iterator: 0.0.2
+      chained-iterator: link:../chained-iterator
       esm: 3.2.25
       tslib: 2.3.1
       typescript-mixin-class: link:../typescript-mixin-class
@@ -93,7 +95,7 @@ importers:
       '@web/dev-server': ^0.1.24
       '@web/rollup-plugin-import-meta-assets': ^1.0.7
       bulma: ^0.9.3
-      chained-iterator: ^0.0.2
+      chained-iterator: workspace:*
       chalk: ^4.1.0
       cssom: ^0.4.4
       esinstall: ^1.1.7
@@ -118,7 +120,7 @@ importers:
     dependencies:
       '@bryntum/chronograph': link:../chronograph
       '@web/dev-server': 0.1.24_rollup@2.58.0
-      chained-iterator: 0.0.2
+      chained-iterator: link:../chained-iterator
       chalk: 4.1.2
       glob: 7.1.7
       minimatch: 3.0.4
@@ -746,6 +748,7 @@ packages:
 
   /@types/yauzl/2.9.2:
     resolution: {integrity: sha512-8uALY5LTvSuHgloDVUvWP3pIauILm+8/0pDMokuDYIoNsOkSwd5AiHBTSEJjKTDcZr5z8UpgOWZkxBF4iJftoA==}
+    requiresBuild: true
     dependencies:
       '@types/node': 16.6.1
     optional: true
@@ -1172,10 +1175,6 @@ packages:
     resolution: {integrity: sha512-mYQLZnx5Qt1JgB1WEiMCf2647plpGeQ2NMR/5L0HNZzGQo4fuSPnK+wjfPnKZV0aiJDgzmWqqkV/g7JD+DW0qw==}
     engines: {node: '>=0.10.0'}
     dev: true
-
-  /chained-iterator/0.0.2:
-    resolution: {integrity: sha512-7dY+MwJnrwfp2ok28o8vkjksemPb1/UoMOX62+/cl6l1xKgBuPHweZZbY1sgLylQ0e++xEXzXVCM/oKQdZ2LiQ==}
-    dev: false
 
   /chalk/1.1.3:
     resolution: {integrity: sha1-qBFcVeSnAv5NFQq9OHKCKn4J/Jg=}
@@ -1839,6 +1838,7 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
     deprecated: '"Please update to latest v2.3 or v2.2"'
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -1846,6 +1846,7 @@ packages:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /function-bind/1.1.1:
@@ -3874,6 +3875,7 @@ packages:
     resolution: {integrity: sha512-JhS3hmcVaXlp/xSo3PKY5R0JqKs5M3IV+exdLHW99qKvKivPO4Z8qbej6mte17SOPqAOVMjt/XGgWacnFSzM3g==}
     engines: {node: '>=0.8.0'}
     hasBin: true
+    requiresBuild: true
     dev: true
     optional: true
 

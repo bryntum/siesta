@@ -7,8 +7,10 @@
         "overrides": {
             "typescript-mixin-class>chained-iterator": "workspace:*",
             "typescript-serializable-mixin>typescript-mixin-class": "workspace:*",
+            "@bryntum/chronograph>chained-iterator": "workspace:*",
             "@bryntum/chronograph>typescript-mixin-class": "workspace:*",
             "@bryntum/chronograph>typescript-serializable-mixin": "workspace:*",
+            "@bryntum/siesta>chained-iterator": "workspace:*",
             "@bryntum/siesta>typescript-mixin-class": "workspace:*",
             "@bryntum/siesta>typescript-serializable-mixin": "workspace:*",
             "@bryntum/siesta>@bryntum/chronograph": "workspace:*"
