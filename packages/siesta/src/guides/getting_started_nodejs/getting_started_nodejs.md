@@ -71,7 +71,9 @@ To launch several tests, you need to use the Siesta launcher. Siesta launcher is
 npx siesta --help
 ```
 
-To launch several tests, pass a matching glob pattern as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it, recursively. To resolve the glob pattern, Siesta uses the [glob](https://www.npmjs.com/package/glob) npm library, please refer to its documentation for details on globs resolution. 
+To launch several tests, pass a matching glob pattern as the 1st argument for the launcher. It can be also a directory name, in such case Siesta will pick up all `*.t.m?js` files in it, recursively. To resolve the glob pattern, Siesta uses the [glob](https://www.npmjs.com/package/glob) npm library, please refer to its documentation for details on globs resolution.
+
+**IMPORTANT:** Don't forget to quote your glob pattern with single quotes, otherwise it will be expanded by the shell. 
 
 Some examples:
 
@@ -82,12 +84,12 @@ npx siesta tests
 
 Launch all tests in `tests` directory, with custom extension:
 ```shell
-npx siesta tests/**/*.test.js
+npx siesta 'tests/**/*.test.js'
 ```
 
 Launch all tests in `tests` directory, which have characters `1` or `2` in their names:
 ```shell
-npx siesta tests/**/*@(1|2)*.t.js
+npx siesta 'tests/**/*@(1|2)*.t.js'
 ```
 
 

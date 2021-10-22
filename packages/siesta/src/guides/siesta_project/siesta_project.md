@@ -1,13 +1,13 @@
 Siesta project
 ==============
 
-As you might already know from the other guides, individual Siesta test files can be launched directly as JavaScript executable files, and Siesta can launch a group of tests, matching a glob, or directory of tests. This might be enough for simple projects. For more complex projects one may need to fine-tune the configuration options for the whole test suite, or may be for the group of test in it. Of course one can always do that inside the individual test files, however repeating the same code is tiresome and violates the DRY principle. That is why, for such configuration needs, one can create Siesta project.
+As you might already know from the other guides, individual Siesta test files can be launched directly as JavaScript executable files, and Siesta can launch a group of tests, matching a glob, or directory of tests. This might be enough for simple projects. For more complex projects one may need to fine-tune the configuration options for the whole test suite, or may be for the group of test in it. This of course can always be done inside the individual test files, however repeating the same code is tiresome and violates the DRY principle. That is why, for such configuration needs, one can create Siesta project.
 
 Siesta project is a regular JavaScript file. It does not have any convention for its name or extension. It is usually placed in the root of the `tests` directory. At Bryntum, we often call the project file `index.js`
 
 Essentially, project file is simply a configuration file for the test suite. Having it in the form of JavaScript, instead of JSON, has an advantage, that one can perform the configuration *dynamically*, using all expression power of the language. For example, project can perform some feature testing and based on its results, decide to skip certain group of tests, or tweak the configuration.
 
-What makes it possible, is that project file is always run in the same target environment as the test suite itself. For example, your test suite is targeting a browser environment. If you will launch the project file from the command line, it will still be executed in the chosen browser, and the dynamic configuration will happen in the same environment. 
+What makes it possible, is that project file is always executed in the same environment as the test suite itself. For example, your test suite is targeting a browser environment. If you launch the project file from the command line, it will still be executed in the chosen browser, and the dynamic configuration will happen in the same environment. 
 
 Project file should perform 3 main actions:
 1. Create and configure the instance of the [[Project]] class and the global [[Project.testDescriptor|testDescriptor]]
