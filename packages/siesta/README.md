@@ -69,6 +69,14 @@ Build statuses
     <td style="text-align:center"><img alt="Safari build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Isomorphic_Siesta6isomorphicTargetSafari)/statusIcon.svg"/></td>
 </tr>
 <tr>
+    <td nowrap style="white-space: nowrap">Siesta browser</td>
+    <td style="background-color: #eee"></td>
+    <td style="background-color: #eee"></td>
+    <td style="text-align:center"><img alt="Chrome build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Isomorphic_Siesta6isomorphicTargetChrome)/statusIcon.svg"/></td>
+    <td style="text-align:center"><img alt="Firefox build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Isomorphic_Siesta6isomorphicTargetFirefox)/statusIcon.svg"/></td>
+    <td style="text-align:center"><img alt="Safari build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Isomorphic_Siesta6isomorphicTargetSafari)/statusIcon.svg"/></td>
+</tr>
+<tr>
     <td nowrap style="white-space: nowrap">Siesta Node.js 12</td>
     <td style="text-align:center"><img alt="Node.js 12 build status" src="http://teamcity.bryntum.com/app/rest/builds/buildType:(id:Siesta6_Siesta6NodeJsSpecificTargetNodeJs)/statusIcon.svg"/></td>
     <td style="background-color: #eee"></td>
