@@ -25,6 +25,7 @@ echo ">> Starting docs generation with typedoc"
 
 npx typedoc index.ts nodejs.ts browser.ts deno.ts entry/*.ts src/guides/**/*.ts \
     --out docs \
+    --customCss resources/docs_src/styling.css \
     --media 'src/guides' \
     --readme "resources/docs_src/README.md" \
     --includes 'src/guides' \
@@ -34,6 +35,5 @@ npx typedoc index.ts nodejs.ts browser.ts deno.ts entry/*.ts src/guides/**/*.ts 
     --validation.invalidLink \
     --plugin typedoc-plugin-missing-exports
 
-     #\
-    #--theme node_modules/typedoc-default-themes/bin/default/
-
+cp -f "resources/images/readme_header.svg" "docs/assets/"
+sed -i -e 's!"\./packages/siesta/resources/images/readme_header.svg"!"./assets/readme_header.svg"!' "docs/index.html"
