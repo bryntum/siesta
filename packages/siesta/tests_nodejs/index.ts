@@ -1,4 +1,4 @@
-import { Project } from "../entry/project_nodejs.js"
+import { Project } from "../nodejs.js"
 
 const project = Project.new({
     title                   : 'Siesta 6 Node.js specific test suite',

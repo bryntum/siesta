@@ -1,7 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { isNodejs } from "../../util/Helpers.js"
 import { EnvironmentType } from "../common/Environment.js"
-import { LauncherBrowser } from "../launcher/LauncherBrowser.js"
 import { ExitCodes } from "../launcher/Types.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeBrowser } from "../runtime/RuntimeBrowser.js"
@@ -21,7 +20,6 @@ export class ProjectBrowser extends Mixin(
     class ProjectBrowser extends base {
         type                    : EnvironmentType               = 'browser'
 
-        launcherClass           : typeof LauncherBrowser        = LauncherBrowser
         testDescriptorClass     : typeof TestDescriptorBrowser  = TestDescriptorBrowser
         runtimeClass            : typeof Runtime                = RuntimeBrowser
 

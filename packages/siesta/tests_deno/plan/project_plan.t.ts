@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as path from "https://deno.land/std@0.94.0/path/mod.ts"
 import { iit, it } from "../../deno.js"
-import { ProjectDeno } from "../../entry/project_deno.js"
+import { ProjectDeno } from "../../deno.js"
 import { TestDescriptor } from "../../src/siesta/test/TestDescriptor.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

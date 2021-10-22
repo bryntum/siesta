@@ -1,4 +1,4 @@
-import { Project } from "../../../entry/project_isomorphic.js"
+import { Project } from "../../../index.js"
 
 const project = Project.new({
     title                   : 'Awesome isomorphic project test suite',

@@ -1,4 +1,4 @@
-import { Project } from "../../../entry/project_browser.js"
+import { Project } from "../../../browser.js"
 
 const project = Project.new({
     title                   : 'Browser test suite'

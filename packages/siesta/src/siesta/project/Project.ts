@@ -23,8 +23,6 @@ export class Project extends Mixin(
         type                    : EnvironmentType           = 'isomorphic'
         siestaPackageRootUrl    : string                    = siestaPackageRootUrl
 
-        launcherClass           : typeof Launcher           = undefined
-
         /**
          * The constructor of [[TestDescriptor]] class or its subclass, to use in this project.
          */
@@ -145,7 +143,7 @@ export class Project extends Mixin(
             }
         }
 
-        async getLauncherClass () : Promise<this[ 'launcherClass' ]> {
+        async getLauncherClass () : Promise<typeof Launcher> {
             if (isNodejs())
                 return (await import('../launcher/LauncherNodejs.js')).LauncherNodejs
             else if (isDeno())
@@ -155,14 +153,14 @@ export class Project extends Mixin(
         }
 
 
-        async getStandaloneLauncher () : Promise<InstanceType<this[ 'launcherClass' ]>> {
+        async getStandaloneLauncher () : Promise<InstanceType<typeof Launcher>> {
             const launcher = (await this.getLauncherClass()).new({
                 projectData             : this.asProjectSerializableData(),
 
                 inputArguments          : this.runtime.inputArguments,
 
                 project                 : this.runtime.scriptUrl
-            } as InstanceType<this[ 'launcherClass' ]>)
+            } as InstanceType<typeof Launcher>)
 
             return launcher
         }

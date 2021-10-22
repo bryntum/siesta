@@ -1,4 +1,4 @@
-import { Project } from "../../entry/project_isomorphic.js"
+import { Project } from "../../index.js"
 
 /*
     This project contains various examples of failing assertions.
