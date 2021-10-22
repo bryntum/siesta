@@ -1329,10 +1329,21 @@ export class UserAgentOnPage extends Mixin(
          * Simulates keyboard typing on the given `target` element. Performs all actions that a real user would do,
          * including pressing and releasing a keyboard button for every character.
          *
+         * If target is provided as `[]` or `null`, the typing will be performed on the currently focused element.
+         * Otherwise, target will be resolved and focused.
+         *
+         * Simulation of pressing the special keys is supported. You can specify them, by using their all uppercased
+         * key name inside the square brackets: `[ENTER]`, `[BACKSPACE]`, `[LEFT]`. To type `[ENTER]` as plain text and not as
+         * a special character - use double square brackets: `[[ENTER]`<span>]</span>. The full list of special key names is
+         * [[KeyNamesGuide|available here]].
+         *
+         * To specify a control key like "SHIFT / CONTROL / ALT / META" of to be pressed during typing, use the `options`
+         * argument.
+         *
          * For example:
          *
          * ```javascript
-         * await t.type('#source', 'some text', { ctrlKey : true })
+         * await t.type('#source', 'some text[ENTER]', { ctrlKey : true })
          * ```
          *
          * @category User action simulation

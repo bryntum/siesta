@@ -40,10 +40,21 @@ export type ActionTarget            = Element | string | Point | []
  * The offset for the action point. It should be a 2-elements array with either exact offsets (number)
  * or "offset expressions" (string).
  *
- * The expression consists from "percentage" part and "fixed" part and should have the following syntax:
+ * The expression consists from "percentage" part and optional "fixed" part and should have the following syntax:
  * ```
+ * '25%'
  * '50% + 10'
  * '50% - 10'
+ * ```
+ * Overall, it may look like this:
+ * ```
+ * [ 10, '50% + 10' ]
+ * ```
+ *
+ * **Note,** that '100%' offset corresponds to the 1st point outside of the element's dimension, to specify
+ * the right/bottom-most element's point as an offset, provide it as:
+ * ```
+ * [ '100% - 1', '100% - 1' ]
  * ```
  */
 export type ActionTargetOffset      = [ dx : number | string, dy : number | string ]

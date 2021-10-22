@@ -23,7 +23,7 @@ sed -i -e 's!\[\[GettingStartedBrowserGuide|Getting started with Siesta in brows
 
 echo ">> Starting docs generation with typedoc"
 
-npx typedoc index.ts nodejs.ts browser.ts deno.ts entry/*.ts src/guides/**/*.ts \
+npx typedoc index.ts nodejs.ts browser.ts deno.ts src/guides/**/*.ts \
     --out docs \
     --customCss resources/docs_src/styling.css \
     --media 'src/guides' \
