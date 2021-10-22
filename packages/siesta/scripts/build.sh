@@ -70,7 +70,5 @@ fi
 
 
 if [[ -n $bundle ]]; then
-    echo ">> Generating bundles with Rollup"
-
-    rm -rf dist && npx rollup -c
+    scripts/bundle.sh
 fi
