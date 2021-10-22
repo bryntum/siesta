@@ -2,6 +2,6 @@ h1 {
     line-height: 1.1em;
 }
 
-pre, pre * {
-    background-color: #eeeeee;
+:root {
+    --light-code-background: #eeeeee;
 }
