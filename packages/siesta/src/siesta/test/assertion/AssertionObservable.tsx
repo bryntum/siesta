@@ -85,6 +85,8 @@ export class AssertionObservable extends Mixin(
          * Different environments have different meaning of what exactly is an "observable", for example in browsers
          * it is probably an `Element` instance (`EventTarget` to be precise), in Node.js - "EventEmitter" instance, etc.
          *
+         * @category Observable assertions
+         *
          * @param source
          */
         resolveObservable (source : unknown) : any {
@@ -95,6 +97,8 @@ export class AssertionObservable extends Mixin(
          * This assertion passes, if the provided `observable`, triggers the specified `event`
          * within the `timeout` and fails otherwise. The `timeout` can be specified using the `object` argument,
          * if not provided the [[TestDescriptor.waitForTimeout]] is used.
+         *
+         * @category Observable assertions
          *
          * @param observable
          * @param event
@@ -198,6 +202,7 @@ export class AssertionObservable extends Mixin(
          * t.firesOk(observable, eventName, 1, during?, description)
          * t.firesOk(observable, eventName, '>1', during?, description)
          * ```
+         * @category Observable assertions
          */
         async firesOk (options : FiresOkOptions<this[ 'ObservableSourceT' ]>)
         async firesOk (
@@ -389,6 +394,8 @@ export class AssertionObservable extends Mixin(
          *
          * This method is a specialized form of the [[firesOk]] assertion.
          *
+         * @category Observable assertions
+         *
          * @param observable The observable instance, anything that [[resolveObservable]] accepts
          * @param event The name of the event(s)
          * @param expected Expected number of events
@@ -415,6 +422,8 @@ export class AssertionObservable extends Mixin(
          *
          * This method is a specialized form of the [[firesOk]] assertion.
          *
+         * @category Observable assertions
+         *
          * @param observable The observable instance, anything that [[resolveObservable]] accepts
          * @param event The name of the event(s)
          * @param description Assertion description
@@ -434,6 +443,8 @@ export class AssertionObservable extends Mixin(
          *
          * This method is a specialized form of the [[firesOk]] assertion.
          *
+         * @category Observable assertions
+         *
          * @param observable The observable instance, anything that [[resolveObservable]] accepts
          * @param event The name of the event(s)
          * @param description Assertion description
@@ -450,6 +461,8 @@ export class AssertionObservable extends Mixin(
         /**
          * Alias for [[wontFire]] method
          *
+         * @category Observable assertions
+         *
          * @param observable
          * @param event
          * @param description
@@ -463,6 +476,8 @@ export class AssertionObservable extends Mixin(
          * the rest of the test execution.
          *
          * This method is a specialized form of the [[firesOk]] assertion.
+         *
+         * @category Observable assertions
          *
          * @param observable The observable instance, anything that [[resolveObservable]] accepts
          * @param event The name of the event(s)

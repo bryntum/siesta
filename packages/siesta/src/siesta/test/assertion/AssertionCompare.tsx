@@ -682,8 +682,11 @@ export class AssertionCompare extends Mixin(
             return anyNumberApprox(value, approx)
         }
 
+
         /**
          * Returns a fuzzy matcher instance.
+         *
+         * @category Fuzzy comparison
          *
          * @param args
          */

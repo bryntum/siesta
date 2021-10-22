@@ -195,6 +195,8 @@ export class Test extends TestPre {
      * ```
      * Please refer to the documentation of the [[Expectation]] class for the list of available methods.
      *
+     * @category Assertion modifiers
+     *
      * @param received
      */
     expect (received : unknown) : Expectation {
@@ -785,6 +787,8 @@ export class Test extends TestPre {
      *
      * See also the {@link Spy} class for additional details.
      *
+     * @category Mocking
+     *
      * @param object An object which property is being spied
      * @param propertyName A name of the property over which to install the spy.
      *
@@ -822,6 +826,8 @@ export class Test extends TestPre {
      *
      * See also: {@link spyOn}
      *
+     * @category Mocking
+     *
      * @param spyName A name of the spy for debugging purposes
      *
      * @return Created function. The associated spy instance is assigned to it as the `spy` property
@@ -854,6 +860,8 @@ export class Test extends TestPre {
      * ```
      *
      * See also: {@link createSpy}
+     *
+     * @category Mocking
      *
      * @param spyName A name of the spy object. Can be omitted.
      * @param properties An array of the property names. For each property name a spy function will be created.

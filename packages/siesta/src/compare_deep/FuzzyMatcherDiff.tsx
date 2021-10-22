@@ -267,9 +267,9 @@ export const anyNumberBetween = (min : number, max : number, inclusive : boolean
  *
  * ```ts
  *
- * t.is('woops', t.anyStringLike('ps'))
+ * t.is('woops', t.anyStringLike('ps')) // passes
  *
- * t.is('boops', t.anyStringLike(/OOP/i))
+ * t.is('boops', t.anyStringLike(/OOP/i)) // passes
  * ```
  */
 export class FuzzyMatcherString extends FuzzyMatcher {

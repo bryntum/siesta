@@ -380,6 +380,8 @@ export class UserAgentOnPage extends Mixin(
         /**
          * Performs a query in the DOM, by default its CSS query. The query syntax may be enhanced by the addons.
          *
+         * @category Dom helper methods
+         *
          * @param query
          * @param root The root DOM element (or a `Document`) from which to start the query. Optional, by default
          * its the `document` of the test context.
@@ -417,6 +419,8 @@ export class UserAgentOnPage extends Mixin(
         /**
          * Performs a query in the DOM using [[query]] method and returns the 1st element from the results.
          *
+         * @category Dom helper methods
+         *
          * @param query
          * @param root
          */
@@ -426,6 +430,8 @@ export class UserAgentOnPage extends Mixin(
 
         /**
          * Synonym for [[query]].
+         *
+         * @category Dom helper methods
          *
          * @param query
          * @param root
@@ -939,6 +945,8 @@ export class UserAgentOnPage extends Mixin(
          * ```
          * is equivalent to `t.click([])` - clicking at the current cursor location.
          *
+         * @category User action simulation
+         *
          * @param target
          * @param offset
          */
@@ -984,6 +992,8 @@ export class UserAgentOnPage extends Mixin(
          * await t.rightClick()
          * ```
          * is equivalent to `t.rightClick([])` - clicking at the current cursor location.
+         *
+         * @category User action simulation
          *
          * @param target
          * @param offset
@@ -1031,6 +1041,8 @@ export class UserAgentOnPage extends Mixin(
          * ```
          * is equivalent to `t.doubleClick([])` - clicking at the current cursor location.
          *
+         * @category User action simulation
+         *
          * @param target
          * @param offset
          */
@@ -1075,6 +1087,8 @@ export class UserAgentOnPage extends Mixin(
          * await t.mouseDown()
          * ```
          * is equivalent to `t.mouseDown([])` - clicking at the current cursor location.
+         *
+         * @category User action simulation
          *
          * @param target
          * @param offset
@@ -1122,6 +1136,8 @@ export class UserAgentOnPage extends Mixin(
          * ```
          * is equivalent to `t.mouseUp([])` - clicking at the current cursor location.
          *
+         * @category User action simulation
+         *
          * @param target
          * @param offset
          */
@@ -1162,6 +1178,9 @@ export class UserAgentOnPage extends Mixin(
          * await t.moveMouseTo('.css-class .another-css.class', { offset : [ 30, 40 ], ctrlKey : true })
          * await t.moveMouseTo({ target : '.css-class .another-css.class', offset : [ 30, 40 ], ctrlKey : true })
          * ```
+         *
+         * @category User action simulation
+         *
          * @param x
          * @param y
          * @param options
@@ -1206,6 +1225,8 @@ export class UserAgentOnPage extends Mixin(
          * await t.moveMouseBy([ 30, 40 ], { ctrlKey : true })
          * ```
          *
+         * @category User action simulation
+         *
          * @param target
          * @param offset
          */
@@ -1235,6 +1256,8 @@ export class UserAgentOnPage extends Mixin(
          * await t.dragTo('#source', '#target', { ctrlKey : true })
          * await t.dragTo({ source : '#source', target : '#target', ctrlKey : true })
          * ```
+         *
+         * @category User action simulation
          *
          * @param options
          */
@@ -1275,6 +1298,8 @@ export class UserAgentOnPage extends Mixin(
          * await t.dragBy([], [ 10, 20 ], { ctrlKey : true }) // drag from current cursor position
          * ```
          *
+         * @category User action simulation
+         *
          * @param options
          */
         async dragBy (source : ActionTarget, delta : Point, options? : Partial<DragActionOptions>) : Promise<any> {
@@ -1310,6 +1335,8 @@ export class UserAgentOnPage extends Mixin(
          * await t.type('#source', 'some text', { ctrlKey : true })
          * ```
          *
+         * @category User action simulation
+         *
          * @param target
          * @param text The text to type
          * @param options Additional options for the action
@@ -1336,6 +1363,8 @@ export class UserAgentOnPage extends Mixin(
          * ```javascript
          * await t.keyPress('#source', 's', { ctrlKey : true })
          * ```
+         *
+         * @category User action simulation
          *
          * @param target
          * @param key
@@ -1364,6 +1393,8 @@ export class UserAgentOnPage extends Mixin(
          * await t.keyDown('#source', 's')
          * ```
          *
+         * @category User action simulation
+         *
          * @param target
          * @param key
          */
@@ -1387,6 +1418,8 @@ export class UserAgentOnPage extends Mixin(
          * ```javascript
          * await t.keyUp('#source', 's')
          * ```
+         *
+         * @category User action simulation
          *
          * @param target
          * @param key

@@ -22,6 +22,8 @@ export class TextSelectionHelpers extends Mixin(
         /**
          * This helper method returns a selected text in the given `target` element
          *
+         * @category Dom helper methods
+         *
          * @param target
          */
         getSelectedText (target : ActionTarget) : string {
@@ -34,6 +36,8 @@ export class TextSelectionHelpers extends Mixin(
         /**
          * This helper method selects text in the given `target` element, starting from the index `start` (0-based)
          * till the index `end`
+         *
+         * @category Dom helper methods
          *
          * @param target
          * @param start
@@ -49,6 +53,8 @@ export class TextSelectionHelpers extends Mixin(
         /**
          * This helper method returns an index of the caret position (0-based) in the given `target` element
          *
+         * @category Dom helper methods
+         *
          * @param target
          */
         getCaretPosition (target : ActionTarget) : number | null {
@@ -60,6 +66,8 @@ export class TextSelectionHelpers extends Mixin(
 
         /**
          * This helper method sets the index of the caret position (0-based) in the given `target` element.
+         *
+         * @category Dom helper methods
          *
          * @param target
          * @param caretPos
@@ -73,6 +81,8 @@ export class TextSelectionHelpers extends Mixin(
 
         /**
          * This helper method moves the caret position in the given `target` element by the `delta`.
+         *
+         * @category Dom helper methods
          *
          * @param target
          * @param caretPos

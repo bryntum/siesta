@@ -39,6 +39,8 @@ export class AssertionElement extends Mixin(
          *
          * This method has 2 overloads, one simplified and one with options.
          *
+         * @category Dom assertions
+         *
          * @param target
          * @param description
          */
@@ -113,6 +115,8 @@ export class AssertionElement extends Mixin(
          * t.elementValuesIs('#input1', 'Need this text', 'Correct text in the input field')
          * ```
          *
+         * @category Dom assertions
+         *
          * @param target
          * @param value
          * @param description
@@ -139,6 +143,38 @@ export class AssertionElement extends Mixin(
 
 
         /**
+         * This assertion passes if the given CSS / ActionTarget selector is found in the DOM.
+         *
+         * @category Dom assertions
+         *
+         * @param selector A CSS or ActionTarget selector
+         * @param description The description for the assertion
+         */
+        selectorExists (selector : string, description? : string) {
+            if (!selector) throw new Error("No selector provided for `selectorExists`")
+
+            if (this.query(selector).length === 0) {
+                this.addResult(Assertion.new({
+                    name            : 'selectorExists',
+                    sourcePoint     : this.getSourcePoint(),
+                    passed          : false,
+                    description,
+                    annotation      : <div>
+                        The query for selector `{ selector }` does not match any elements.
+                    </div>
+                }))
+            } else {
+                this.addResult(Assertion.new({
+                    name            : 'selectorExists',
+                    sourcePoint     : this.getSourcePoint(),
+                    passed          : true,
+                    description
+                }))
+            }
+        }
+
+
+        /**
          * This assertions passes if waiting for the given `selector` completes within `timeout`.
          * If no `timeout` is given [[TestDescriptor.defaultTimeout]] is used. One can also specify
          * a `root` element, from which the query will be starting.
@@ -150,6 +186,8 @@ export class AssertionElement extends Mixin(
          * ```javascript
          * await t.waitForSelector('.css-class', { root : '.root', timeout : 5000 })
          * ```
+         *
+         * @category Dom assertions
          *
          * @param selector
          * @param root
