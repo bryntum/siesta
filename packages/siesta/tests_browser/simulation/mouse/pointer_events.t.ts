@@ -118,26 +118,20 @@ it('Preventing the `pointerdown` should skip mouse events from firing', async t 
     ])
 })
 
-// TODO
-// it('Preventing the `pointerdown` should skip `mouse` events from firing when dragging', async t => {
-//     doSetup()
-//
-//     box1.addEventListener('pointerdown', e => e.preventDefault())
-//
-//     t.chain(
-//         { drag : '#box1', by : [10, 10] },
-//
-//         function (next) {
-//             t.equal(log, [
-//                 'pointerdown/box1',
-//                 'pointerup/box1',
-//                 'click/box1'
-//             ])
-//
-//             next()
-//         }
-//     )
-// })
+
+it('Preventing the `pointerdown` should skip `mouse` events from firing when dragging', async t => {
+    doSetup()
+
+    box1.addEventListener('pointerdown', e => e.preventDefault())
+
+    await t.dragBy('#box1', [ 10, 10 ])
+
+    t.equal(log, [
+        'pointerdown/box1',
+        'pointerup/box1',
+        'click/box1'
+    ])
+})
 
 
 it('Should fire pointer events for mouse movements', async t => {

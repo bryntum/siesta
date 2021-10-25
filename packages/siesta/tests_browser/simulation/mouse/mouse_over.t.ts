@@ -77,7 +77,6 @@ it('Should trigger `mouseover/mouseout/mouseenter/mouseleave/mousemove` events w
     await t.moveMouseTo([ 200, 275 ])
     await t.moveMouseTo([ 200, 350 ])
 
-    // no "mouseenter/leave" events except the IE
     t.equal(counter.child, {
         mouseover       : 1,
         mouseout        : 1,
@@ -158,7 +157,7 @@ it('Triggering `mouseover` events should work for <span> elements', async t => {
     const firedParent   = { mouseover : 0, mouseout : 0, mouseenter : 0, mouseleave : 0 }
     const firedChild    = { mouseover : 0, mouseout : 0, mouseenter : 0, mouseleave : 0 }
 
-    await t.moveMouseTo([ 100, 0 ])
+    await t.moveMouseTo('#parent', [ '50%', -10 ])
 
     parent.addEventListener('mouseover', () => firedParent.mouseover++)
     parent.addEventListener('mouseout', () => firedParent.mouseout++)
@@ -170,7 +169,13 @@ it('Triggering `mouseover` events should work for <span> elements', async t => {
     child.addEventListener('mouseenter', () => firedChild.mouseenter++)
     child.addEventListener('mouseleave', () => firedChild.mouseleave++)
 
-    await t.moveMouseTo({ target : [ 100, 250 ], mouseMovePrecision : 1 })
+    await t.moveMouseTo('#parent', [ '50%', 1 ])
+
+    await t.moveMouseTo('#child', [ '50%', 1 ])
+
+    await t.moveMouseTo('#child', [ '50%', '100% + 10' ])
+
+    await t.moveMouseTo('#parent', [ '50%', '100% + 10' ])
 
     t.equal(firedChild, { mouseover : 1, mouseout : 1, mouseenter : 1, mouseleave : 1 }, 'Correct events detected for child')
     t.equal(firedParent, { mouseover : 3, mouseout : 3, mouseenter : 1, mouseleave : 1 }, 'Correct events detected for parent')
@@ -192,15 +197,15 @@ it("After mouse interactions, the target el must be re-evaluated", async t => {
 
     await t.moveMouseTo('#outer')
 
-    t.firesOnce(inner, 'mouseleave', 'inner mouseleave')
-    t.firesOnce(outer, 'mouseover', 'outer mouseover')
+    const innerWait     = t.waitForEvent(inner, 'mouseleave')
+    const outerWait     = t.waitForEvent(outer, 'mouseover')
 
     // this click hides the `#inner` element, so it should trigger `mouseleave`
     // the cursor then becomes positioned on the `#outer`, which should trigger `mouseover`
     await t.click([])
 
     // the events above are triggered in the next tick, so need to wait a bit
-    await delay(10)
+    await Promise.all([ innerWait, outerWait ])
 })
 
 
