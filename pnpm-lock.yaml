@@ -102,7 +102,7 @@ importers:
       glob: ^7.1.7
       minimatch: ^3.0.4
       node-fetch: ^3.0.0-beta.9
-      playwright: ^1.15.2
+      playwright: ^1.16.1
       rollup: ^2.58.0
       rollup-plugin-multi-input: ^1.3.1
       rollup-plugin-preserve-shebangs: ^0.2.0
@@ -125,7 +125,7 @@ importers:
       glob: 7.1.7
       minimatch: 3.0.4
       node-fetch: 3.0.0-beta.10
-      playwright: 1.15.2
+      playwright: 1.16.1
       tslib: 2.3.1
       typescript-mixin-class: link:../typescript-mixin-class
       typescript-serializable-mixin: link:../typescript-serializable-mixin
@@ -1312,6 +1312,12 @@ packages:
   /commander/6.2.1:
     resolution: {integrity: sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==}
     engines: {node: '>= 6'}
+    dev: true
+
+  /commander/8.3.0:
+    resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
+    engines: {node: '>= 12'}
+    dev: false
 
   /commondir/1.0.1:
     resolution: {integrity: sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=}
@@ -2949,6 +2955,33 @@ packages:
       find-up: 4.1.0
     dev: true
 
+  /playwright-core/1.16.1:
+    resolution: {integrity: sha512-SdThyChaLkvFkVEPZ/pfhiaaD4pnBTts2MYZzRMS+fYeyHzPy/FI+NUTj5Rgs+ZN9BCIrbJhfzvfYBxco/4X4A==}
+    engines: {node: '>=12'}
+    hasBin: true
+    dependencies:
+      commander: 8.3.0
+      debug: 4.3.2
+      extract-zip: 2.0.1
+      https-proxy-agent: 5.0.0
+      jpeg-js: 0.4.3
+      mime: 2.5.2
+      pngjs: 5.0.0
+      progress: 2.0.3
+      proper-lockfile: 4.1.2
+      proxy-from-env: 1.1.0
+      rimraf: 3.0.2
+      socks-proxy-agent: 6.1.0
+      stack-utils: 2.0.3
+      ws: 7.5.3
+      yauzl: 2.10.0
+      yazl: 2.5.1
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+    dev: false
+
   /playwright/1.14.0:
     resolution: {integrity: sha512-aR5oZ1iVsjQkGfYCjgYAmyMAVu0MQ0i8MgdnfdqDu9EVLfbnpuuFmTv/Rb7/Yjno1kOrDUP9+RyNC+zfG3wozA==}
     engines: {node: '>=12'}
@@ -2975,26 +3008,13 @@ packages:
       - utf-8-validate
     dev: true
 
-  /playwright/1.15.2:
-    resolution: {integrity: sha512-+Z+7ckihyxR6rK5q8DWC6eUbKARfXpyxpjNcoJfgwSr64lAOzjhyFQiPC/JkdIqhsLgZjxpWfl1S7fLb+wPkgA==}
+  /playwright/1.16.1:
+    resolution: {integrity: sha512-D7o7itqxsJ4vx4OlcPv9brOe74M2J4gDDt9qVI9ptgtHtxCi48I8tSXE/trX1PoHFuJeeVlo+tGvhtisvPGu1A==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      commander: 6.2.1
-      debug: 4.3.2
-      extract-zip: 2.0.1
-      https-proxy-agent: 5.0.0
-      jpeg-js: 0.4.3
-      mime: 2.5.2
-      pngjs: 5.0.0
-      progress: 2.0.3
-      proper-lockfile: 4.1.2
-      proxy-from-env: 1.1.0
-      rimraf: 3.0.2
-      stack-utils: 2.0.3
-      ws: 7.5.3
-      yazl: 2.5.1
+      playwright-core: 1.16.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -3479,6 +3499,30 @@ packages:
   /slow-kill/0.1.0:
     resolution: {integrity: sha1-ttTTahPP+hmaD4V67KKaELLjBqQ=}
     dev: true
+
+  /smart-buffer/4.2.0:
+    resolution: {integrity: sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==}
+    engines: {node: '>= 6.0.0', npm: '>= 3.0.0'}
+    dev: false
+
+  /socks-proxy-agent/6.1.0:
+    resolution: {integrity: sha512-57e7lwCN4Tzt3mXz25VxOErJKXlPfXmkMLnk310v/jwW20jWRVcgsOit+xNkN3eIEdB47GwnfAEBLacZ/wVIKg==}
+    engines: {node: '>= 10'}
+    dependencies:
+      agent-base: 6.0.2
+      debug: 4.3.2
+      socks: 2.6.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /socks/2.6.1:
+    resolution: {integrity: sha512-kLQ9N5ucj8uIcxrDwjm0Jsqk06xdpBjGNQtpXy4Q8/QY2k+fY7nZH8CARy+hkbG+SGAovmzzuauCpBlb8FrnBA==}
+    engines: {node: '>= 10.13.0', npm: '>= 3.0.0'}
+    dependencies:
+      ip: 1.1.5
+      smart-buffer: 4.2.0
+    dev: false
 
   /source-map-support/0.5.20:
     resolution: {integrity: sha512-n1lZZ8Ve4ksRqizaBQgxXDgKwttHDhyfQjA6YZZn8+AroHbsIz+JjwxQDxbp+7y5OYCI8t1Yk7etjD9CRd2hIw==}
