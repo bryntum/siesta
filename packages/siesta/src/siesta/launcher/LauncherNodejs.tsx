@@ -298,6 +298,10 @@ export class LauncherNodejs extends Mixin(
                 process.exit(ExitCodes.UNHANDLED_EXCEPTION)
             })
 
+            process.on('uncaughtException', (reason : any, promise) => {
+                process.exitCode = ExitCodes.UNHANDLED_EXCEPTION
+            })
+
             const launcher  = this.new({
                 inputArguments      : process.argv.slice(2)
             })
