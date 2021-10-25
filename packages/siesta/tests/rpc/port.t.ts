@@ -89,7 +89,7 @@ it('Should handle exceptions in remote calls', async t => {
     } catch (e) {
         t.like(e.message, 'oopsy')
 
-        t.like(e.stack, 'oopsy')
+        t.like(e.stack, 'multiply')
     }
 })
 
