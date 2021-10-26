@@ -1,6 +1,22 @@
 export const preLaunchTest =
 
     async (url : string, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> => {
+        const doc           = document
+
+        doc.open()
+
+        doc.write([
+            '<!DOCTYPE html>',
+            '<html>',
+                '<head>',
+                '</head>',
+                '<body>',
+                '</body>',
+            '</html>'
+        ].join(''))
+
+        doc.close()
+
         Object.defineProperty(globalThis, '__SIESTA_GLOBAL_TEST_DESC_STR__', {
             enumerable      : false,
             value           : testDescriptorStr
