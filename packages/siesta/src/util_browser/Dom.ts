@@ -165,6 +165,12 @@ export const elementFromPoint = (queryRoot : DocumentOrShadowRoot, viewportX : n
 {
     const el            = queryRoot.elementFromPoint(viewportX, viewportY)
 
+    // in Firefox, `elementFromPoint` of shadow root can return `null`
+    if (!el && isShadowRoot(queryRoot)) return {
+        el          : queryRoot.host,
+        localXY     : [ viewportX, viewportY ]
+    }
+
     if (deep && isHTMLIFrameElement(el) && isSameDomainIframe(el)) {
         const rect      = el.getBoundingClientRect()
 
