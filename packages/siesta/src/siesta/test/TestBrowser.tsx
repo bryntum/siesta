@@ -16,6 +16,7 @@ import { TextSelectionHelpers } from "./browser/TextSelectionHelpers.js"
 import { TestLauncherChild } from "./port/TestLauncherChild.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
+import { Exception, SubTestCheckInfo } from "./TestResult.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -105,6 +106,16 @@ export class TestBrowser extends Mixin(
 
                 await this.simulator.simulateMouseMove([ 0, 0 ], { mouseMovePrecision : { kind : 'last_only', precision : 1 } })
             }
+        }
+
+
+        async launch (checkInfo : SubTestCheckInfo = undefined) {
+            if (!this.parentNode && document.compatMode === 'BackCompat') {
+                this.addResult(Exception.new({ exception : new Error('The test page is opened in the quirks mode') }))
+                return
+            }
+
+            await super.launch(checkInfo)
         }
 
 
