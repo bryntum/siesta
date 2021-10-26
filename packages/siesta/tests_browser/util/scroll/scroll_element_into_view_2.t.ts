@@ -6,7 +6,7 @@ beforeEach(() => {
     document.body.innerHTML = ''
 })
 
-// IMPORTANT: This test assumes `expandBody=false`
+// IMPORTANT: This test assumes `expandBody=false`, so the <body> and <html> tags expands to the full content height
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be able to scroll element point into view, direct child of <body>, from bottom', async t => {
