@@ -1,4 +1,5 @@
 import { beforeEach, it } from "../../../browser.js"
+import { env } from "../../../src/siesta/common/Environment.js"
 import { createPositionedIframe } from "../../@helpers.js"
 
 
@@ -99,7 +100,12 @@ it('`click` should focus input element', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it("Clicking inside iframe should focus iframe's body", async t => {
+// TODO figure out what to do with this test
+// it seems to pass, but only if test is running "exclusively" w/o other tests running in parallel
+// for example, it passes if `separateBrowserForEveryPage` is set to `true` in `ContextProviderNodePlaywright`
+// but, otherwise, it fails sporadically
+// need to have configurable isolation and for this test, set it to `browser`
+env.browser !== 'firefox' && it("Clicking inside iframe should focus iframe's body", async t => {
     const iframe    = await createPositionedIframe('about:blank', { left : 50, top : 50, width : 100, height : 100 })
 
     await t.click('iframe')
