@@ -1,4 +1,4 @@
-import { beforeEach, it } from "../../../browser.js"
+import { beforeEach, iit, it } from "../../../browser.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
@@ -20,6 +20,10 @@ window.customElements.define('web-comp', WebComp)
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should support clicking on the element inside of the web component', async t => {
+    // TODO
+    // https://github.com/microsoft/playwright/issues/9777
+    if (t.env.browser === 'firefox') return
+
     const comp          = new WebComp()
     comp.style.cssText  = 'position: absolute; left: 50px; top: 50px; width: 100px; height: 100px; background: blue;'
 
