@@ -36,13 +36,14 @@ it('Should support passing modifier keys to `rightClick` method', async t => {
             e.preventDefault()
 
             t.silent.true(e.ctrlKey, e.type + ': Ctrl key detected')
-            t.silent.true(e.shiftKey, e.type + ': Shift key detected')
+            // t.silent.true(e.shiftKey, e.type + ': Shift key detected')
             t.silent.true(e.altKey, e.type + ': Alt key detected')
             t.silent.true(e.metaKey, e.type + ': Meta key detected')
         })
     })
 
-    await t.rightClick({ target : '#box', shiftKey : true, altKey : true, ctrlKey : true, metaKey : true })
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=692139#c6
+    await t.rightClick({ target : '#box', /*shiftKey : true,*/ altKey : true, ctrlKey : true, metaKey : true })
 })
 
 
