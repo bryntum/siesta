@@ -1,4 +1,4 @@
-import { beforeEach, it } from "../../../browser.js"
+import { beforeEach, iit, it } from "../../../browser.js"
 import { Assertion } from "../../../src/siesta/test/TestResult.js"
 import { verifyAllFailed } from "../../../tests/siesta/@helpers.js"
 import { createElement } from "../../@helpers.js"
@@ -75,6 +75,10 @@ it('Right click', async t => {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should use the current cursor position for action, if its provided as `[]` or not provided', async t => {
+    // TODO
+    // https://github.com/microsoft/playwright/issues/9777
+    if (t.env.browser === 'firefox') return
+
     document.body.innerHTML =
         '<div style="position: absolute; left: 50px; top: 50px; width: 1px; height: 1px; background: red;" id="marker"></div>'
 
