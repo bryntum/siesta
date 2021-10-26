@@ -339,7 +339,7 @@ export class Reporter extends Mixin(
         exceptionTemplate (exception : Exception) : XmlElement {
             return <div class="exception">
                 <div class='exception_icon'> EXCEPTION </div>
-                <div class='indented'>{ exception.stack || exception }</div>
+                <div class='indented'>{ exception.text }</div>
             </div>
         }
 

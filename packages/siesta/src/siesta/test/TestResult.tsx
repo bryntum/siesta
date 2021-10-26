@@ -78,13 +78,32 @@ export class Exception extends Mixin(
     class Exception extends base {
         exception       : unknown           = undefined
 
-        stack           : string            = ''
+        // TODO unify the stack representation
+        // Currently Chrome and Firefox produces different stack traces, need to unify them at least a little:
+        //
+        // Chrome stack trace example:
+        //      ReferenceError: com is not defined
+        //          at TestBrowser.code (http://localhost:8000/tests_browser/simulation/mouse/web_component.t.js:43:31)
+        //          at TestBrowser.launch (http://localhost:8000/src/siesta/test/Test.js:518:24)
+        // Firefox stack trace example:
+        //      com is not defined
+        //      @http://localhost:8000/tests_browser/simulation/mouse/web_component.t.js:43:5
+        //      launch@http://localhost:8000/src/siesta/test/Test.js:518:24
+        //      async*start@http://localhost:8000/src/siesta/test/Test.js:461:20
 
-        initialize (props? : Partial<Exception>) {
-            super.initialize(props)
+        get text () : string {
+            const exception     = this.exception
+            // @ts-expect-error
+            const stack         = (exception.stack as string) ?? ''
+            // @ts-expect-error
+            const message       = (exception.message as string) ?? ''
 
-            // @ts-ignore
-            this.stack      = this.exception?.stack
+            return stack
+                // Chrome includes the message in the stack, Firefox does not
+                ? stack.indexOf(message) !== -1
+                    ? stack
+                    : message + '\n' + stack
+                : String(exception)
         }
     }
 ) {}
