@@ -111,7 +111,7 @@ export class TestBrowser extends Mixin(
 
         async launch (checkInfo : SubTestCheckInfo = undefined) {
             if (!this.parentNode && document.compatMode === 'BackCompat') {
-                this.addResult(Exception.new({ exception : new Error('The test page is opened in the quirks mode') }))
+                this.addResult(Exception.new({ exception : new Error('Test page is opened in the quirks mode') }))
                 return
             }
 
