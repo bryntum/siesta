@@ -646,6 +646,8 @@ export class UserAgentOnPage extends Mixin(
                     }
 
                     focusElement(el as HTMLElement)
+                    // 2nd time is needed when focusing element inside the iframe in FF
+                    focusElement(el as HTMLElement)
 
                     if (action.clearExisting) {
                         if ('value' in el) {
