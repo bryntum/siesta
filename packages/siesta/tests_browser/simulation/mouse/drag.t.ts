@@ -1,4 +1,4 @@
-import { beforeEach, it } from "../../../browser.js"
+import { beforeEach, iit, it } from "../../../browser.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -41,8 +41,6 @@ it('`dragTo` method should work', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// // native FF does fire click in this case
-// if (!(t.bowser.firefox && t.simulator.type == 'native'))
 it('Drag should NOT fire click event if `mouseup` moves target to another parent', async t => {
     document.body.innerHTML =
         '<div id="newcontainer" style="position: absolute; left: 0; top: 0; height: 50px; width: 100px; background: #aaa;"></div>' +
@@ -67,8 +65,9 @@ it('Drag should NOT fire click event if `mouseup` moves target to another parent
 
     t.firesOnce(div, [ 'mousedown', 'mouseup' ])
 
-    t.wontFire(div, 'click')
-    t.wontFire(document.body, 'click')
+    // native FF does fire click in this case
+    t.firesOk(div, 'click', t.env.browser === 'firefox' ? 1 : 0)
+    t.firesOk(document.body, 'click', t.env.browser === 'firefox' ? 1 : 0)
 
     await t.dragBy(div, [ 20, 0 ])
 })
