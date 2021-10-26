@@ -47,6 +47,9 @@ export class ContextPlaywright extends Mixin(
 
         async navigate (url : string) {
             await this.page.goto(url)
+
+            // needed only for safari: https://github.com/microsoft/playwright/issues/8340
+            await this.page.waitForFunction(() => document.readyState === 'complete')
         }
 
 
