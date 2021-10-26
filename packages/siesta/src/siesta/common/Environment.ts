@@ -402,3 +402,7 @@ const detectRenderingEngine = (ua : string) : EngineDescriptor => {
         if (tester.test.test(ua)) return tester.describe(ua)
     }
 }
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const env = Environment.detect()
