@@ -4,6 +4,11 @@ import { Serializable, serializable } from "../../serializable/Serializable.js"
 import { isDeno, isNodejs } from "../../util/Helpers.js"
 import { isArray, isFunction, isRegExp } from "../../util/Typeguards.js"
 
+/*
+    Based on the Bowser code, MIT licensed:
+    https://github.com/lancedikson/bowser/blob/959082b45d429ce1ed91fbe66f7d2313ff5d7f2a/LICENSE
+*/
+
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const Environments = {
     isomorphic      : 'Isomorphic',
