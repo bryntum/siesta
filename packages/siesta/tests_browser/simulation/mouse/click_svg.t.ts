@@ -1,4 +1,5 @@
 import { beforeEach, iit, it } from "../../../browser.js"
+import { env } from "../../../src/siesta/common/Environment.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -59,12 +60,11 @@ it("should support clicking SVG element with translate values", async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// OLD code: !bowser.msie && !bowser.msedge && !bowser.gecko && it("should
-// seems not supposed to work in Firefox?
-it("should support clicking SVG element with scaled values", async t => {
+env.browser !== 'firefox' && it("should support clicking SVG element with scaled values", async t => {
     document.body.innerHTML =
-        '<svg width="800px" height="800px" style="position:absolute;left:100px;top:100px">' +
-        '   <g transform="scale(0.5)"><rect id="myrect" x="50" y="50" width="100" height="100"></rect>' +
+        '<svg width="800px" height="600px" style="position: absolute; left: 100px; top: 100px">' +
+        '   <g transform="scale(0.5)">' +
+        '       <rect id="myrect" x="50" y="50" width="100" height="100"></rect>' +
         '   </g>' +
         '</svg>'
 

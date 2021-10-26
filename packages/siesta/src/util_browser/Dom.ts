@@ -1,8 +1,15 @@
 import { CI } from "chained-iterator"
+import { env } from "../siesta/common/Environment.js"
 import { ActionTargetOffset, Point, sumPoints } from "../siesta/simulate/Types.js"
 import { Rect } from "../util/Rect.js"
-import { getViewportActionPoint, getViewportRect, isOffsetInsideElementBox, normalizeOffset, translatePointToParentViewport } from "./Coordinates.js"
-import { isHTMLIFrameElement, isShadowRoot } from "./Typeguards.js"
+import {
+    getViewportActionPoint,
+    getViewportRect,
+    isOffsetInsideElementBox,
+    normalizeOffset,
+    translatePointToParentViewport
+} from "./Coordinates.js"
+import { isHTMLIFrameElement, isShadowRoot, isSVGGraphicsElement } from "./Typeguards.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const awaitDomReady = async () : Promise<void> => {
@@ -79,7 +86,7 @@ export const isElementAccessible = (el : Element) : boolean => {
 
     if (style.display === 'none' || style.visibility === 'hidden') return false
 
-    const rect      = el.getBoundingClientRect()
+    const rect      = getBoundingClientRect(el)
 
     return rect.width > 0 && rect.height > 0
 }
@@ -235,3 +242,29 @@ export const focusElement = (el : HTMLElement) => {
     el.focus({ preventScroll : true })
 }
 
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const getBoundingClientRect = (el : Element) : DOMRect => {
+    if (isSVGGraphicsElement(el) && el.ownerSVGElement && env.browser === 'firefox') {
+        const elBox     = el.getBBox()
+        const svgRect   = el.ownerSVGElement.getBoundingClientRect()
+
+        const left      = svgRect.left + elBox.x
+        const top       = svgRect.top + elBox.y
+        const right     = left + elBox.width
+        const bottom    = top + elBox.height
+
+        return {
+            x      : left,
+            y      : top,
+            left,
+            right,
+            top,
+            bottom,
+            height : elBox.height,
+            width  : elBox.width,
+        } as DOMRect
+    } else {
+        return el.getBoundingClientRect()
+    }
+}

@@ -12,6 +12,8 @@ export const isHTMLElement = (a : any) : a is HTMLElement => /HTML\w*Element/.te
 
 export const isSVGElement = (a : any) : a is SVGElement => /SVG\w*Element/.test(typeOf(a))
 
+export const isSVGGraphicsElement = (a : any) : a is SVGGraphicsElement => isSVGElement(a) && Boolean((a as any).getBBox)
+
 export const isElement = (a : any) : a is Element => /^(HTML|SVG)\w*Element/.test(typeOf(a))
 
 export const isShadowRoot = (a : any) : a is ShadowRoot => typeOf(a) === 'ShadowRoot'

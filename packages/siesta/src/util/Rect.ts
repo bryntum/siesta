@@ -1,5 +1,6 @@
 import { Base } from "typescript-mixin-class"
 import { Point } from "../siesta/simulate/Types.js"
+import { getBoundingClientRect } from "../util_browser/Dom.js"
 import { getOffsetsMap, getScrollbarWidth } from "../util_browser/Scroll.js"
 
 export class Rect extends Base {
@@ -141,7 +142,7 @@ export class Rect extends Base {
 
 
     static fromElement<T extends typeof Rect> (this : T, el : Element, global : boolean = false) : InstanceType<T> {
-        const rect      = el.getBoundingClientRect()
+        const rect      = getBoundingClientRect(el)
 
         let instance    = this.new({
             left        : rect.left,
@@ -164,7 +165,7 @@ export class Rect extends Base {
     static fromElementContent<T extends typeof Rect> (this : T, el : HTMLElement, global : boolean = false) : InstanceType<T> {
         const win       = el.ownerDocument.defaultView
         const style     = win.getComputedStyle(el)
-        const rect      = el.getBoundingClientRect()
+        const rect      = getBoundingClientRect(el)
 
         const borderLeftWidth   = Number.parseFloat(style.borderLeftWidth)
         const borderRightWidth  = Number.parseFloat(style.borderRightWidth)

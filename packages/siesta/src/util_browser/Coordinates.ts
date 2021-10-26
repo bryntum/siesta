@@ -3,8 +3,8 @@ import { ActionTargetOffset, Point, sumPoints, sumPoints3 } from "../siesta/simu
 import { lastElement } from "../util/Helpers.js"
 import { Rect } from "../util/Rect.js"
 import { isNumber, isString } from "../util/Typeguards.js"
-import { elementFromPoint, parentWindows } from "./Dom.js"
-import { getOffsetsMap, getScrollbarWidth } from "./Scroll.js"
+import { elementFromPoint, getBoundingClientRect, parentWindows } from "./Dom.js"
+import { getOffsetsMap } from "./Scroll.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const clientXtoPageX = (x : number, win : Window) : number => x + win.scrollX
@@ -30,7 +30,7 @@ const evaluateOffsetExpression  = (baseValue : number, expression : string) : nu
 }
 
 export const normalizeOffset = (el : Element, offset : ActionTargetOffset = [ '50%', '50%' ]) : Point => {
-    const rect              = el.getBoundingClientRect()
+    const rect              = getBoundingClientRect(el)
 
     return [
         isString(offset[ 0 ]) ? evaluateOffsetExpression(rect.width, offset[ 0 ]) : offset[ 0 ],
@@ -76,7 +76,7 @@ export const getActionPointData = (el : Element, offset? : ActionTargetOffset) :
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isOffsetInsideElementBox = (el : Element, offset : ActionTargetOffset) : boolean => {
-    const rect              = el.getBoundingClientRect()
+    const rect              = getBoundingClientRect(el)
     const [ dx, dy ]        = normalizeOffset(el, offset)
 
     return dx >= 0 && dx < rect.width && dy >= 0 && dy < rect.height
@@ -88,7 +88,7 @@ export const getBoundingPageRect = (el : Element) : Rect => {
     const doc               = el.ownerDocument
     const win               = doc.defaultView
 
-    const rect              = el.getBoundingClientRect()
+    const rect              = getBoundingClientRect(el)
 
     return Rect.new({
         left        : rect.left + win.scrollX,
