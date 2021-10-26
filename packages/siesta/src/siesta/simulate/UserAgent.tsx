@@ -14,7 +14,7 @@ import {
 } from "../../util_browser/Coordinates.js"
 import {
     activeElement,
-    elementFromPoint,
+    elementFromPoint, focusElement,
     isElementAccessible,
     isElementConnected,
     isElementPointVisible,
@@ -645,7 +645,7 @@ export class UserAgentOnPage extends Mixin(
                         return
                     }
 
-                    (el as HTMLElement).focus({ preventScroll : true })
+                    focusElement(el as HTMLElement)
 
                     if (action.clearExisting) {
                         if ('value' in el) {

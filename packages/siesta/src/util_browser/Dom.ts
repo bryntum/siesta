@@ -1,3 +1,4 @@
+import { CI } from "chained-iterator"
 import { ActionTargetOffset, Point, sumPoints } from "../siesta/simulate/Types.js"
 import { Rect } from "../util/Rect.js"
 import { getViewportActionPoint, getViewportRect, isOffsetInsideElementBox, normalizeOffset, translatePointToParentViewport } from "./Coordinates.js"
@@ -207,5 +208,24 @@ export const activeElement = (doc : DocumentOrShadowRoot = document, deep : bool
     }
 
     return focusedEl || (isShadowRoot(doc) ? doc.host : (doc as Document).body)
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// in Firefox, to focus the element inside the iframe, one need to focus the iframe
+// element itself first, otherwise the call to `.focus()` method is ignored
+export const focusElement = (el : HTMLElement) => {
+    if (!el.isConnected) return
+
+    CI(parentWindows(el.ownerDocument.defaultView, true)).reversed().forEach((win : Window, index : number) => {
+        // ignore top window
+        if (index === 0) return
+
+        const frameElement  = win.frameElement as HTMLIFrameElement
+
+        frameElement?.focus({ preventScroll : true })
+    })
+
+    el.focus({ preventScroll : true })
 }
 
