@@ -260,14 +260,14 @@ const getAndroidVersionName = (version : string) : string => {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type OSDescriptor   = { os : OperationSystemType, name : string, version : string }
 
-type OSTester = {
+type Tester<Desc> = {
     test            : RegExp | RegExp[] | ((ua : string) => boolean)
-    describe        : (ua : string) => OSDescriptor
+    describe        : (ua : string) => Desc
 }
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const detectBrowserOS = (ua : string) : OSDescriptor => {
-    const testers : OSTester[] = [
+    const testers : Tester<OSDescriptor>[] = [
         /* Linux */
         {
             test : /linux/i,
@@ -323,7 +323,8 @@ const detectBrowserOS = (ua : string) : OSDescriptor => {
         /* Android */
         {
             test (ua : string) : boolean {
-                // should just use a look behind assertion?
+                // Lookbehind assertions are not supported in Safari:
+                // https://bugs.webkit.org/show_bug.cgi?id=174931
                 const notLikeAndroid    = !/like android/i.test(ua)
                 const butAndroid        = /android/i.test(ua)
 
@@ -354,19 +355,21 @@ const detectBrowserOS = (ua : string) : OSDescriptor => {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 type EngineDescriptor   = { engine : RenderingEngineType, version : string }
 
-type EngineTester = {
-    test            : RegExp
-    describe        : (ua : string) => EngineDescriptor
-}
-
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const detectRenderingEngine = (ua : string) : EngineDescriptor => {
 
-    const testers : EngineTester[] = [
+    const testers : Tester<EngineDescriptor>[] = [
         /* Gecko */
         {
-            test : /(?<!like )gecko/i,
+            test (ua : string) : boolean {
+                // Lookbehind assertions are not supported in Safari:
+                // https://bugs.webkit.org/show_bug.cgi?id=174931
+                const notLikeGecko    = !/like gecko/i.test(ua)
+                const butGecko        = /gecko/i.test(ua)
+
+                return notLikeGecko && butGecko
+            },
             describe (ua : string) : EngineDescriptor {
                 return {
                     engine      : 'gecko',
@@ -399,7 +402,11 @@ const detectRenderingEngine = (ua : string) : EngineDescriptor => {
     ]
 
     for (const tester of testers) {
-        if (tester.test.test(ua)) return tester.describe(ua)
+        const test      = tester.test
+
+        if (isRegExp(test) && test.test(ua) || isArray(test) && test.every(regexp => regexp.test(ua)) || isFunction(test) && test(ua)) {
+            return tester.describe(ua)
+        }
     }
 }
 
