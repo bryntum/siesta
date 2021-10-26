@@ -8,6 +8,9 @@ beforeEach(() => {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should be possible to press modifier keys when typing', async t => {
+    // TODO: https://github.com/microsoft/playwright/issues/9755
+    const isFirefox     = t.env.browser === 'firefox'
+
     document.body.innerHTML = '<input id="txt" type="text">'
 
     const field     = t.$('#txt') as HTMLInputElement
@@ -17,7 +20,7 @@ it('Should be possible to press modifier keys when typing', async t => {
             t.true(e.ctrlKey, e.type + ': Ctrl key detected')
             t.true(e.shiftKey, e.type + ': Shift key detected')
             t.true(e.altKey, e.type + ': Alt key detected')
-            t.true(e.metaKey, e.type + ': Meta key detected')
+            !isFirefox && t.true(e.metaKey, e.type + ': Meta key detected')
         }
     }
 
@@ -25,7 +28,7 @@ it('Should be possible to press modifier keys when typing', async t => {
     field.addEventListener('keypress', doAssert)
     field.addEventListener('keyup', doAssert)
 
-    await t.type('#txt', 'z', { shiftKey : true, ctrlKey : true, altKey : true, metaKey : true })
+    await t.type('#txt', 'z', { shiftKey : true, ctrlKey : true, altKey : true, metaKey : !isFirefox })
 })
 
 
