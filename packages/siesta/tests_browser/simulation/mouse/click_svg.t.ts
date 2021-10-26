@@ -1,4 +1,4 @@
-import { beforeEach, it } from "../../../browser.js"
+import { beforeEach, iit, it } from "../../../browser.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -90,7 +90,7 @@ it("should support clicking SVG element with scaled values", async t => {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it("should support clicking a polyline", async t => {
     document.body.innerHTML =
-        '<svg style="width: 1px;height: 1px;overflow: visible;position: absolute;pointer-events: none;">' +
+        '<svg style="width: 1px; height: 1px; overflow: visible; position: absolute; pointer-events: none;">' +
             '<marker id="arrowStart" markerWidth="12" markerHeight="12" refX="1" refY="3" viewBox="0 0 9 6" orient="auto" markerUnits="userSpaceOnUse">' +
                 '<path d="M0,3 L9,6 L9,0 z"></path>' +
             '</marker>' +
@@ -98,7 +98,7 @@ it("should support clicking a polyline", async t => {
                 '<path d="M0,0 L0,6 L9,3 z"></path>' +
             '</marker>' +
             '<polyline ' +
-                'style="pointer-events:all;fill: transparent;marker-end: url(#arrowEnd);stroke: #999;stroke-width: 1;" ' +
+                'style="pointer-events: all; fill: transparent; marker-end: url(#arrowEnd); stroke: #999; stroke-width: 1;" ' +
                 'class="b-sch-dependency" depId="1" points="300,22.5 312,22.5 312,22.5 312,37 312,37 188,37 188,37 188,68.5 188,68.5 200,68.5">' +
             '</polyline>' +
         '</svg>'
