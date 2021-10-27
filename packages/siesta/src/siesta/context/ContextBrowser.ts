@@ -1,4 +1,5 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { preLaunchTestBrowser } from "../test/port/LaunchTest.js"
 import { Context } from "./Context.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -22,7 +23,7 @@ export class ContextBrowser extends Mixin(
             // the only reliable url we have is the test file itself
             await this.navigate(url)
 
-            return await super.preLaunchTest(url, testDescriptorStr, delayStart)
+            return await this.evaluateBasic(preLaunchTestBrowser, url, testDescriptorStr, delayStart)
         }
     }
 ) {}
