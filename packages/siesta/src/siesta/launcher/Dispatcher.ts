@@ -279,7 +279,8 @@ export class Dispatcher extends Mixin(
 
         chooseContextProviderFor (desc : TestDescriptor) : ContextProvider {
             if (this.launcher.dashboardConnector && desc.type === 'browser' && (desc.isolation === 'iframe' || desc.isolation === 'context')) {
-                return this.contextProviders[ 1 ]
+                // in pure-browser mode there's only 1 context provider
+                return this.contextProviders[ 1 ] || this.contextProviders[ 0 ]
             } else {
                 return this.contextProviders[ 0 ]
             }
