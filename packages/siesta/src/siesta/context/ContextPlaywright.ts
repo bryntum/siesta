@@ -54,10 +54,7 @@ export class ContextPlaywright extends Mixin(
 
 
         async setupChannel (parentPort : PortHandshakeParent, relativeChildPortModuleUrl : string, relativeChildPortClassSymbol : string) {
-            await Promise.all([
-                this.startWebSocketServer(),
-                // this.navigate(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/landing.html')
-            ])
+            await this.startWebSocketServer()
 
             const parentMedia           = new this.parentMediaClass()
 
@@ -66,10 +63,6 @@ export class ContextPlaywright extends Mixin(
 
             const awaitConnection       = new Promise<ws>(resolve => this.onConnectionHook.once((self, socket) => resolve(socket)))
 
-            // this.onErrorHook.once((error) => this.provider.launcher.logger.debug(error))
-
-            // this.provider.launcher.logger.debug('Context before seed')
-
             await this.seedChildPort(
                 relativeChildPortModuleUrl,
                 relativeChildPortClassSymbol,
@@ -77,13 +70,9 @@ export class ContextPlaywright extends Mixin(
                 { wsHost : '127.0.0.1', wsPort : this.wsPort }
             )
 
-            // this.provider.launcher.logger.debug('Context after seed')
-
             parentMedia.socket          = await awaitConnection
 
             await parentPort.connect()
-
-            // this.provider.launcher.logger.debug('Context after connect')
         }
     }
 ) {}
