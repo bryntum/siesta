@@ -45,6 +45,13 @@ export class ContextPlaywright extends Mixin(
         }
 
 
+        async preLaunchTest (url : string, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
+            await this.page.goto(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/blank.html')
+
+            return await super.preLaunchTest(url, testDescriptorStr, delayStart)
+        }
+
+
         async navigate (url : string) {
             await this.page.goto(url)
 
