@@ -21,7 +21,7 @@ export class ContextBrowser extends Mixin(
             // (not a module context?)
             // anyway, to solve this, we need to navigate to some url, which is in the test's address space
             // the only reliable url we have is the test file itself
-            await this.navigate(url)
+            // await this.navigate(url)
 
             return await this.evaluateBasic(preLaunchTestBrowser, url, testDescriptorStr, delayStart)
         }
