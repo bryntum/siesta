@@ -17,24 +17,28 @@ export const preLaunchTest =
 
 
 export const preLaunchTestBrowser =
+    // embed the `preLaunchTest` sources, since this function will be executed in the remote environment
+    globalThis.eval(
+        (async (url : string, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> => {
+            const doc           = document
 
-    async (url : string, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> => {
-        const doc           = document
+            doc.open()
 
-        doc.open()
+            doc.write([
+                '<!DOCTYPE html>',
+                '<html>',
+                    '<head>',
+                    '</head>',
+                    '<body>',
+                    '</body>',
+                '</html>'
+            ].join(''))
 
-        doc.write([
-            '<!DOCTYPE html>',
-            '<html>',
-                '<head>',
-                '</head>',
-                '<body>',
-                '</body>',
-            '</html>'
-        ].join(''))
+            doc.close()
 
-        doc.close()
-
-        return preLaunchTest(url, testDescriptorStr, delayStart)
-    }
+            return preLaunchTest(url, testDescriptorStr, delayStart)
+        })
+            .toString()
+            .replace(/preLaunchTest/, `(${ preLaunchTest.toString() })`)
+    )
 
