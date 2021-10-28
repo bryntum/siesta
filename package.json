@@ -20,6 +20,26 @@
                 "dependencies": {
                     "dev-scripts": "workspace:*"
                 }
+            },
+            "typescript-mixin-class": {
+                "dependencies": {
+                    "dev-scripts": "workspace:*"
+                }
+            },
+            "@bryntum/chronograph": {
+                "dependencies": {
+                    "dev-scripts": "workspace:*"
+                }
+            },
+            "typescript-serializable-mixin": {
+                "dependencies": {
+                    "dev-scripts": "workspace:*"
+                }
+            },
+            "@bryntum/siesta": {
+                "dependencies": {
+                    "dev-scripts": "workspace:*"
+                }
             }
         }
     },
