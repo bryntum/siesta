@@ -34,22 +34,22 @@
         "node": ">=12.21.0"
     },
     "dependencies": {
-        "chained-iterator": "^0.0.2",
+        "chained-iterator": "^0.0.3",
         "chalk": "^4.1.0",
         "glob": "^7.1.7",
         "minimatch": "^3.0.4",
         "node-fetch": "^3.0.0-beta.9",
         "playwright": "^1.16.1",
         "ws": "^7.4.4",
-        "typescript-mixin-class": "^0.0.1",
-        "typescript-serializable-mixin": "^0.0.1",
-        "@bryntum/chronograph": "^2.0.1",
+        "typescript-mixin-class": "^0.0.2",
+        "typescript-serializable-mixin": "^0.0.2",
+        "@bryntum/chronograph": "^2.0.2",
         "@web/dev-server": "^0.1.24",
         "tslib": "^2.3.1"
     },
     "peerDependencies": {
-        "typescript-mixin-class": "^0.0.1",
-        "typescript-serializable-mixin": "^0.0.1"
+        "typescript-mixin-class": "^0.0.2",
+        "typescript-serializable-mixin": "^0.0.2"
     },
     "devDependencies": {
         "@types/cssom": "^0.4.1",
