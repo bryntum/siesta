@@ -5,3 +5,5 @@
 # dependencies
 /node_modules
 
+# temporarily used for releases
+/packages/DIST
