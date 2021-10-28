@@ -32,8 +32,14 @@ export class ServerNodeWebSocket extends Mixin(
 
             return new Promise((resolve, reject) => {
                 const server = this.httpsServer = https.createServer({
-                    cert    : fs.readFileSync(path.resolve(current, '../../../resources/cert/certificate.pem')),
-                    key     : fs.readFileSync(path.resolve(current, '../../../resources/cert/key.pem'))
+                    cert    : fs.readFileSync(
+                        // bundle-proof relative urls
+                        fileURLToPath(new URL('../../../resources/cert/certificate.pem', import.meta.url).href)
+                    ),
+                    key     : fs.readFileSync(
+                        // bundle-proof relative urls
+                        fileURLToPath(new URL('../../../resources/cert/key.pem', import.meta.url).href)
+                    )
                 })
 
                 const wsServer    = this.wsServer = new ws.Server({
