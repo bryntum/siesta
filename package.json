@@ -14,6 +14,13 @@
             "@bryntum/siesta>typescript-mixin-class": "workspace:*",
             "@bryntum/siesta>typescript-serializable-mixin": "workspace:*",
             "@bryntum/siesta>@bryntum/chronograph": "workspace:*"
+        },
+        "packageExtensions": {
+            "chained-iterator": {
+                "dependencies": {
+                    "dev-scripts": "workspace:*"
+                }
+            }
         }
     },
     "engines": {

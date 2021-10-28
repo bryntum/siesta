@@ -11,6 +11,8 @@ overrides:
   '@bryntum/siesta>typescript-serializable-mixin': workspace:*
   '@bryntum/siesta>@bryntum/chronograph': workspace:*
 
+packageExtensionsChecksum: 4f6b41ceb7123157aa528c2c9b3c9d45
+
 importers:
 
   .:
@@ -19,8 +21,11 @@ importers:
   packages/chained-iterator:
     specifiers:
       '@bryntum/siesta': ^6.0.0-alpha-3
+      dev-scripts: workspace:*
       tslint: ^6.1.3
       typescript: ^4.3.5
+    dependencies:
+      dev-scripts: link:../dev-scripts
     devDependencies:
       '@bryntum/siesta': 6.0.0-alpha-3
       tslint: 6.1.3_typescript@4.3.5
@@ -80,6 +85,9 @@ importers:
       typedoc: github.com/bryntum/typedoc/0a7c77fe0170c4084712c1d56bf27fc9adda7035_typescript@4.4.0
       typedoc-default-themes: github.com/bryntum/typedoc-default-themes/35a96be59eb3ad4e8cb7d991bd7b6fe6b931c326
       typescript: github.com/bryntum/TypeScript/b538fc36e97afc930b9c4044337becd824e79aae
+
+  packages/dev-scripts:
+    specifiers: {}
 
   packages/siesta:
     specifiers:
@@ -159,12 +167,14 @@ importers:
       '@bryntum/siesta': ^6.0.0-alpha-3
       '@web/dev-server': ^0.1.17
       chained-iterator: workspace:*
+      typedoc: ^0.22.7
       typescript: ^4.3.5
     dependencies:
       chained-iterator: link:../chained-iterator
     devDependencies:
       '@bryntum/siesta': 6.0.0-alpha-3
       '@web/dev-server': 0.1.21
+      typedoc: 0.22.7_typescript@4.3.5
       typescript: 4.3.5
 
   packages/typescript-serializable-mixin:
@@ -2575,6 +2585,12 @@ packages:
     hasBin: true
     dev: true
 
+  /marked/3.0.8:
+    resolution: {integrity: sha512-0gVrAjo5m0VZSJb4rpL59K1unJAMb/hm8HRXqasD8VeC8m91ytDPMritgFSlKonfdt+rRYYpP/JfLxgIX8yoSw==}
+    engines: {node: '>= 12'}
+    hasBin: true
+    dev: true
+
   /media-typer/0.3.0:
     resolution: {integrity: sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=}
     engines: {node: '>= 0.6'}
@@ -3899,6 +3915,21 @@ packages:
       minimatch: 3.0.4
       shiki: 0.9.12
       typescript: github.com/bryntum/TypeScript/b538fc36e97afc930b9c4044337becd824e79aae
+    dev: true
+
+  /typedoc/0.22.7_typescript@4.3.5:
+    resolution: {integrity: sha512-ndxxp+tU1Wczvdxp4u2/PvT1qjD6hdFdSdehpORHjE+JXmMkl2bftXCR0upHmsnesBG7VCcr8vfgloGHIH8glQ==}
+    engines: {node: '>= 12.10.0'}
+    hasBin: true
+    peerDependencies:
+      typescript: 4.0.x || 4.1.x || 4.2.x || 4.3.x || 4.4.x
+    dependencies:
+      glob: 7.2.0
+      lunr: 2.3.9
+      marked: 3.0.8
+      minimatch: 3.0.4
+      shiki: 0.9.12
+      typescript: 4.3.5
     dev: true
 
   /typescript/4.3.5:

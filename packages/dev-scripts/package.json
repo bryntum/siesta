@@ -1,0 +1,13 @@
+{
+    "name": "dev-scripts",
+    "version": "0.0.0",
+    "description": "Internal scripts",
+    "author": "Nickolay Platonov, Bryntum",
+    "license": "MIT",
+
+    "directories": {
+        "bin" : "bin"
+    },
+    "devDependencies": {
+    }
+}
