@@ -180,7 +180,8 @@ export class LauncherNodejs extends Mixin(
             }
 
             const browser       = await browserType(this.browser).launch(launchOptions)
-            const page          = this.dashboardPage = await browser.newPage({ viewport : null })
+            const page          = this.dashboardPage =
+                await browser.newPage({ viewport : null, ignoreHTTPSErrors : true, bypassCSP : true })
 
             let webServer : UnwrapPromise<ReturnType<typeof startDevServer>>
 

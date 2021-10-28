@@ -39,7 +39,7 @@ export class ContextProviderNodePlaywright extends Mixin(
         async getPrimaryBrowserContext () : Promise<playwright.BrowserContext> {
             if (this.$primaryBrowserContext !== undefined) return this.$primaryBrowserContext
 
-            return this.$primaryBrowserContext = await (await this.getPrimaryBrowser()).newContext()
+            return this.$primaryBrowserContext = await (await this.getPrimaryBrowser()).newContext({ ignoreHTTPSErrors : true, bypassCSP : true })
         }
 
 
@@ -58,7 +58,7 @@ export class ContextProviderNodePlaywright extends Mixin(
 
             // this.launcher.logger.debug('Context has browser')
 
-            const page              = await browser.newPage({ ignoreHTTPSErrors : true })
+            const page              = await browser.newPage({ ignoreHTTPSErrors : true, bypassCSP : true })
 
             // this.launcher.logger.debug('Context has page')
 
