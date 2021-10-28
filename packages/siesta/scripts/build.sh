@@ -70,5 +70,5 @@ fi
 
 
 if [[ -n $bundle ]]; then
-    scripts/bundle.sh
+    scripts/bundle.sh -c
 fi

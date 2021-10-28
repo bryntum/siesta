@@ -16,7 +16,7 @@ NEW_VERSION=$(npm version $V)
 
 NEW_VERSION_TIME=$(node -e "require('./scripts/changelog.cjs').updateVersion()")
 
-echo "/build" > .npmignore
+echo "/scripts" > .npmignore
 
 npm publish --access public
 
@@ -24,8 +24,8 @@ npm publish --access public
 # post-publish steps, the following code is executed on the main repo
 cd "$DIR/../.."
 
-# update the changelog first, so that the tag, created with `npm version`
-# will point to completely correct distribution
+# update the changelog first, so that the tag, created with `npm version` below
+# will point to correct revision
 node -e "require('./scripts/changelog.cjs').updateVersionAndStartNew('$NEW_VERSION', $NEW_VERSION_TIME)"
 
 git add CHANGELOG.md
