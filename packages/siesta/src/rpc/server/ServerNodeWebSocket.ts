@@ -1,4 +1,8 @@
 import ws from 'ws'
+import fs from 'fs'
+import path from 'path'
+import https from 'https'
+import { fileURLToPath } from "url"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { isString } from "../../util/Typeguards.js"
@@ -17,17 +21,27 @@ export class ServerNodeWebSocket extends Mixin(
         wsPort                  : number        = 0
 
         wsServer                : ws.Server     = undefined
+        httpsServer             : https.Server  = undefined
 
         onConnectionHook        : Hook<[ this, WebSocket ]>     = new Hook()
         onErrorHook             : Hook<[ this, Error ]>         = new Hook()
 
 
         startWebSocketServer () : Promise<number> {
+            const current   = path.dirname(fileURLToPath(import.meta.url))
+
             return new Promise((resolve, reject) => {
+                const server = this.httpsServer = https.createServer({
+                    cert    : fs.readFileSync(path.resolve(current, '../../../resources/cert/certificate.pem')),
+                    key     : fs.readFileSync(path.resolve(current, '../../../resources/cert/key.pem'))
+                })
+
                 const wsServer    = this.wsServer = new ws.Server({
-                    clientTracking      : true,
-                    port                : this.wsPort
-                }, () => {
+                    server,
+                    clientTracking      : true
+                })
+
+                wsServer.on('listening', () => {
                     const address       = wsServer.address()
 
                     // save the assigned port
@@ -39,7 +53,7 @@ export class ServerNodeWebSocket extends Mixin(
                 wsServer.on('connection', socket => this.onConnection(socket))
                 wsServer.on('error', error => this.onError(error) )
 
-                // wsServer.on('headers', (headers, request) => console.log("HEADERS: ", headers, request));
+                server.listen(this.wsPort)
             })
         }
 
@@ -58,9 +72,12 @@ export class ServerNodeWebSocket extends Mixin(
             return new Promise<void>((resolve, reject) => {
                 if (this.wsServer)
                     this.wsServer.close(() => {
-                        this.wsServer = null
+                        this.httpsServer.close(() => {
+                            this.httpsServer    = null
+                            this.wsServer       = null
 
-                        resolve()
+                            resolve()
+                        })
                     })
                 else
                     resolve()

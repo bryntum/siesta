@@ -18,7 +18,7 @@ export class MediaBrowserWebSocketChild extends Mixin(
 
         async doConnect () : Promise<void> {
             return new Promise((resolve, reject) => {
-                const socket = this.socket = new WebSocket('ws://' + this.wsHost + ':' + this.wsPort)
+                const socket = this.socket = new WebSocket('wss://' + this.wsHost + ':' + this.wsPort)
 
                 socket.addEventListener('open', event => {
                     socket.removeEventListener('close', connectionErrorRejection)
