@@ -13,7 +13,7 @@ Installation
 Installer adds `--quiet` to the executable arguments. This is because the diagnostic messages [breaks the dynamic output of the test reporter](https://github.com/denoland/deno/issues/10558) and there's no other way to intercept/suppress them. The `--no-check` option is recommended for speed, `--unstable` is required for WebWorker feature.
 
 ```shell
-deno install -n siesta -A -q --unstable --no-check https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/bin/siesta-deno.js
+deno install -n siesta -A -q --unstable --no-check https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/bin/siesta_deno.js
 ```
 
 Basics
