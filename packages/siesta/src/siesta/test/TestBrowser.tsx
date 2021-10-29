@@ -172,34 +172,34 @@ Please use Siesta launcher instead and web url:
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const {
-    /**
-     * Alias for {@link TestBrowser.it | it} method.
-     */
-    it,
+const api = createTestSectionConstructors(TestBrowser)
 
-    /**
-     * Alias for {@link TestBrowser.iit | iit} method.
-     */
-    iit,
+/**
+ * Alias for {@link TestBrowser.it | it} method.
+ */
+export const it = api.it
 
-    /**
-     * Alias for {@link TestBrowser.xit | xit} method.
-     */
-    xit,
+/**
+ * Alias for {@link TestBrowser.iit | iit} method.
+ */
+export const iit = api.iit
 
-    /**
-     * Alias for {@link TestBrowser.describe | describe} method.
-     */
-    describe,
+/**
+ * Alias for {@link TestBrowser.xit | xit} method.
+ */
+export const xit = api.xit
 
-    /**
-     * Alias for {@link TestBrowser.ddescribe | ddescribe} method.
-     */
-    ddescribe,
+/**
+ * Alias for {@link TestBrowser.describe | describe} method.
+ */
+export const describe = api.describe
 
-    /**
-     * Alias for {@link TestBrowser.xdescribe | xdescribe} method.
-     */
-    xdescribe
-} = createTestSectionConstructors(TestBrowser)
+/**
+ * Alias for {@link TestBrowser.ddescribe | ddescribe} method.
+ */
+export const ddescribe = api.ddescribe
+
+/**
+ * Alias for {@link TestBrowser.xdescribe | xdescribe} method.
+ */
+export const xdescribe = api.xdescribe

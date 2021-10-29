@@ -6,7 +6,6 @@ import { ExecutionContextDeno } from "../../context/ExecutionContextDeno.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
-import { TestBrowser } from "./TestBrowser.js"
 import { TestDescriptorDeno } from "./TestDescriptorDeno.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -23,7 +22,7 @@ export class TestDeno extends Mixin(
     ],
     (base : ClassUnion<
         typeof Test
-    >) => 
+    >) =>
 
     class TestDeno extends base {
         @prototypeValue(TestDescriptorDeno)
@@ -64,34 +63,34 @@ export class TestDeno extends Mixin(
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const {
-    /**
-     * Alias for {@link TestDeno.it | it} method.
-     */
-    it,
+const api = createTestSectionConstructors(TestDeno)
 
-    /**
-     * Alias for {@link TestDeno.iit | iit} method.
-     */
-    iit,
+/**
+ * Alias for {@link TestDeno.it | it} method.
+ */
+export const it = api.it
 
-    /**
-     * Alias for {@link TestDeno.xit | xit} method.
-     */
-    xit,
+/**
+ * Alias for {@link TestDeno.iit | iit} method.
+ */
+export const iit = api.iit
 
-    /**
-     * Alias for {@link TestDeno.describe | describe} method.
-     */
-    describe,
+/**
+ * Alias for {@link TestDeno.xit | xit} method.
+ */
+export const xit = api.xit
 
-    /**
-     * Alias for {@link TestDeno.ddescribe | ddescribe} method.
-     */
-    ddescribe,
+/**
+ * Alias for {@link TestDeno.describe | describe} method.
+ */
+export const describe = api.describe
 
-    /**
-     * Alias for {@link TestDeno.xdescribe | xdescribe} method.
-     */
-    xdescribe
-} = createTestSectionConstructors(TestDeno)
+/**
+ * Alias for {@link TestDeno.ddescribe | ddescribe} method.
+ */
+export const ddescribe = api.ddescribe
+
+/**
+ * Alias for {@link TestDeno.xdescribe | xdescribe} method.
+ */
+export const xdescribe = api.xdescribe

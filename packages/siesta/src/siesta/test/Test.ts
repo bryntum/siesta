@@ -1170,37 +1170,40 @@ export const createTestSectionConstructors = <T extends typeof Test>(testClass :
     }
 }
 
-export const {
-    /**
-     * Alias for {@link Test.it | it} method.
-     */
-    it,
+// can't use destructuring here:
+// https://github.com/TypeStrong/typedoc/issues/1770
+const api = createTestSectionConstructors(Test)
 
-    /**
-     * Alias for {@link Test.iit | iit} method.
-     */
-    iit,
+/**
+ * Alias for {@link Test.it | it} method.
+ */
+export const it = api.it
 
-    /**
-     * Alias for {@link Test.xit | xit} method.
-     */
-    xit,
+/**
+ * Alias for {@link Test.iit | iit} method.
+ */
+export const iit = api.iit
 
-    /**
-     * Alias for {@link Test.describe | describe} method.
-     */
-    describe,
+/**
+ * Alias for {@link Test.xit | xit} method.
+ */
+export const xit = api.xit
 
-    /**
-     * Alias for {@link Test.ddescribe | ddescribe} method.
-     */
-    ddescribe,
+/**
+ * Alias for {@link Test.describe | describe} method.
+ */
+export const describe = api.describe
 
-    /**
-     * Alias for {@link Test.xdescribe | xdescribe} method.
-     */
-    xdescribe
-} = createTestSectionConstructors(Test)
+/**
+ * Alias for {@link Test.ddescribe | ddescribe} method.
+ */
+export const ddescribe = api.ddescribe
+
+/**
+ * Alias for {@link Test.xdescribe | xdescribe} method.
+ */
+export const xdescribe = api.xdescribe
+
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

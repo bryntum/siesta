@@ -5,7 +5,6 @@ import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
-import { TestDeno } from "./TestDeno.js"
 import { TestDescriptorNodejs } from "./TestDescriptorNodejs.js"
 
 
@@ -57,34 +56,34 @@ export class TestNodejs extends Mixin(
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const {
-    /**
-     * Alias for {@link TestNodejs.it | it} method.
-     */
-    it,
+const api = createTestSectionConstructors(TestNodejs)
 
-    /**
-     * Alias for {@link TestNodejs.iit | iit} method.
-     */
-    iit,
+/**
+ * Alias for {@link TestNodejs.it | it} method.
+ */
+export const it = api.it
 
-    /**
-     * Alias for {@link TestNodejs.xit | xit} method.
-     */
-    xit,
+/**
+ * Alias for {@link TestNodejs.iit | iit} method.
+ */
+export const iit = api.iit
 
-    /**
-     * Alias for {@link TestNodejs.describe | describe} method.
-     */
-    describe,
+/**
+ * Alias for {@link TestNodejs.xit | xit} method.
+ */
+export const xit = api.xit
 
-    /**
-     * Alias for {@link TestNodejs.ddescribe | ddescribe} method.
-     */
-    ddescribe,
+/**
+ * Alias for {@link TestNodejs.describe | describe} method.
+ */
+export const describe = api.describe
 
-    /**
-     * Alias for {@link TestNodejs.xdescribe | xdescribe} method.
-     */
-    xdescribe
-} = createTestSectionConstructors(TestNodejs)
+/**
+ * Alias for {@link TestNodejs.ddescribe | ddescribe} method.
+ */
+export const ddescribe = api.ddescribe
+
+/**
+ * Alias for {@link TestNodejs.xdescribe | xdescribe} method.
+ */
+export const xdescribe = api.xdescribe

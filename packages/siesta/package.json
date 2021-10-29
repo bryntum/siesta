@@ -56,7 +56,7 @@
         "esinstall": "^1.1.7",
         "sass": "^1.32.11",
         "tslint": "^6.1.3",
-        "typedoc": "^0.22.6",
+        "typedoc": "^0.22.7",
         "typedoc-plugin-missing-exports": "^0.22.3",
         "typescript": "git://github.com/bryntum/TypeScript.git#feat/7342",
         "rollup": "^2.58.0",
