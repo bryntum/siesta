@@ -10,7 +10,6 @@ import { TreeNode } from "../../tree/TreeNode.js"
 import { escapeRegExp } from "../../util/Helpers.js"
 import { LUID, luid } from "../common/LUID.js"
 import { TestDescriptor } from "./TestDescriptor.js"
-import { TestNodeResultReactive } from "./TestResultReactive.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Result extends Mixin(
@@ -500,7 +499,7 @@ export class SubTestCheckInfo extends Mixin(
         parentNode  : SubTestCheckInfo
 
 
-        static fromTestResult<T extends typeof SubTestCheckInfo> (this : T, result : TestNodeResultReactive) : InstanceType<T> {
+        static fromTestResult<T extends typeof SubTestCheckInfo> (this : T, result : TestNodeResult) : InstanceType<T> {
             return this.new({
                 title       : result.descriptor.title,
                 titleId     : result.parentNode?.childResultsIndex.childToId.get(result)
