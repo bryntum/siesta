@@ -45,3 +45,37 @@ wait $P4
 if [[ "$?" != '0' ]]; then
     exit 1
 fi
+
+# run browser-specific suite in Chrome
+(
+    node bin/siesta.js $SIESTA_PACKAGE_ROOT_WEB_PATH/tests_browser/index.js --no-color || (echo ">>Browser test suite failed, target Chrome" && false)
+) & P5=$!
+
+wait $P5
+
+
+# run examples-compilation
+(
+    cd ../siesta-example-isomorphic
+    npx tsc
+) & P6=$!
+
+(
+    cd ../siesta-example-browser
+    npx tsc
+) & P7=$!
+
+(
+    cd ../siesta-example-nodejs
+    npx tsc
+) & P8=$!
+
+(
+    cd ../siesta-example-deno
+    npx tsc
+) & P9=$!
+
+wait $P6
+wait $P7
+wait $P8
+wait $P9
