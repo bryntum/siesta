@@ -1,0 +1,31 @@
+{
+    "compilerOptions" : {
+        "experimentalDecorators"    : true,
+
+        "noImplicitThis"            : true,
+        "strictBindCallApply"       : true,
+        // https://github.com/microsoft/TypeScript/issues/29872#issuecomment-868535962
+        "strictPropertyInitialization" : false,
+
+        "target"                    : "es2017",
+        "sourceMap"                 : false,
+
+        "lib"                       : [
+            "esnext"
+        ],
+
+        "module"                    : "esnext",
+        "moduleResolution"          : "node",
+
+        "allowSyntheticDefaultImports"    : true
+    },
+
+    "include" : [
+        "index.ts",
+        "src/**/*.ts",
+        "tests/**/*.ts",
+    ],
+
+    "exclude" : [
+    ]
+}
