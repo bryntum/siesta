@@ -4,6 +4,5 @@
 set -e
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd "$DIR/.."
 
 git clean -f -x -d -e node_modules ./
