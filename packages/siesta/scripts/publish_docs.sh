@@ -4,13 +4,14 @@
 set -e
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-DOCS="$1"
 
-if [[ -z $DOCS ]]; then
+if [[ -z $1 ]]; then
     echo ">> No path to docs given"
 
     exit 1
 fi
+
+DOCS="$( cd "$1" && pwd )"
 
 DIST_DOCS="$DIR/../DIST_DOCS"
 

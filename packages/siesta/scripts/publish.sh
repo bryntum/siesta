@@ -23,11 +23,11 @@ git tag "$NEW_VERSION"
 
 echo "/scripts" > .npmignore
 
-npm publish --access public --dry-run
+#npm publish --access public --dry-run
 npm pack
 
 #---------------------------------------------------------------------------------
 # post-publish steps
-git push origin HEAD --tags
+#git push origin HEAD --tags
 
 scripts/publish_docs.sh "./docs"
