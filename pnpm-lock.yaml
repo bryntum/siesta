@@ -10,6 +10,7 @@ overrides:
   '@bryntum/siesta>typescript-mixin-class': workspace:*
   '@bryntum/siesta>typescript-serializable-mixin': workspace:*
   '@bryntum/siesta>@bryntum/chronograph': workspace:*
+  siesta-example-isomorphic>@bryntum/siesta: workspace:*
 
 packageExtensionsChecksum: ec5a1d14d287cb9092e7cd4152d20c03
 
@@ -165,6 +166,16 @@ importers:
       typedoc: 0.22.6_typescript@4.4.0
       typedoc-plugin-missing-exports: 0.22.3_typedoc@0.22.6
       typescript: github.com/bryntum/TypeScript/b538fc36e97afc930b9c4044337becd824e79aae
+
+  packages/siesta-example-isomorphic:
+    specifiers:
+      '@bryntum/siesta': workspace:*
+      tslint: ^6.1.3
+      typescript: ^4.3.5
+    devDependencies:
+      '@bryntum/siesta': link:../siesta
+      tslint: 6.1.3_typescript@4.3.5
+      typescript: 4.3.5
 
   packages/typescript-mixin-class:
     specifiers:

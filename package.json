@@ -13,7 +13,8 @@
             "@bryntum/siesta>chained-iterator": "workspace:*",
             "@bryntum/siesta>typescript-mixin-class": "workspace:*",
             "@bryntum/siesta>typescript-serializable-mixin": "workspace:*",
-            "@bryntum/siesta>@bryntum/chronograph": "workspace:*"
+            "@bryntum/siesta>@bryntum/chronograph": "workspace:*",
+            "siesta-example-isomorphic>@bryntum/siesta": "workspace:*"
         },
         "packageExtensions": {
             "chained-iterator": {
