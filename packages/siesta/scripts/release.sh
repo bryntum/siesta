@@ -35,3 +35,7 @@ scripts/build.sh -r -d -e -b
 # restart point inside the dist
 scripts/do_release.sh
 
+echo ">> Release done, cleaning up"
+
+git reset --hard
+npx gitclean.sh
