@@ -115,17 +115,30 @@ export class AssertionAsync extends Mixin(
         // this promise should not reject, its only used to keep the test going
         ongoing             : Promise<any>          = Promise.resolve()
 
-
-        get defaultTimeout () : number {
+        // this mess is because of the declaration files generation support
+        getDefaultTimeout () : number {
             return this.descriptor.defaultTimeout
         }
-
-        get waitForTimeout () : number {
-            return this.descriptor.waitForTimeout
+        get defaultTimeout () : number {
+            return this.getDefaultTimeout()
         }
 
-        get waitForPollInterval () : number {
+
+        // this mess is because of the declaration files generation support
+        getWaitForTimeout () : number {
+            return this.descriptor.waitForTimeout
+        }
+        get waitForTimeout () : number {
+            return this.getWaitForTimeout()
+        }
+
+
+        // this mess is because of the declaration files generation support
+        getWaitForPollInterval () : number {
             return this.descriptor.waitForPollInterval
+        }
+        get waitForPollInterval () : number {
+            return this.getWaitForPollInterval()
         }
 
 

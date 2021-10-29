@@ -235,8 +235,12 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        get isAssertionNegated () : boolean {
+        // this mess is because of the declaration files generation support
+        getIsAssertionNegated () : boolean {
             return false
+        }
+        get isAssertionNegated () : boolean {
+            return this.getIsAssertionNegated()
         }
 
 

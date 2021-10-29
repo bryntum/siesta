@@ -166,15 +166,15 @@ export class Test extends TestPre {
     }
 
 
-    get defaultTimeout () : number {
+    getDefaultTimeout () : number {
         return this.descriptor.defaultTimeout
     }
 
-    get waitForTimeout () : number {
+    getWaitForTimeout () : number {
         return this.descriptor.waitForTimeout
     }
 
-    get waitForPollInterval () : number {
+    getWaitForPollInterval () : number {
         return this.descriptor.waitForPollInterval
     }
 
@@ -334,7 +334,7 @@ export class Test extends TestPre {
 
     $isAssertionNegated : boolean       = false
 
-    get isAssertionNegated () : boolean {
+    getIsAssertionNegated () : boolean {
         const value                 = this.$isAssertionNegated
 
         this.$isAssertionNegated    = false
