@@ -11,10 +11,7 @@
     "scripts": {
         "wds": "npx wds --node-resolve",
         "sass": "npx sass --watch resources/styling/ src/",
-        "chrome_bench": "google-chrome-stable --js-flags=\"--expose-gc\" $1",
-        "bench": "node --expose-gc -r esm benchmarks/chrono2/suite_everything.js",
         "deno": "deno run --allow-all --unstable --quiet",
-        "test": "node ./tests/index.js",
         "docs": "scripts/build_docs.sh"
     },
     "homepage": "https://github.com/bryntum/siesta",
@@ -33,6 +30,12 @@
     "engines": {
         "node": ">=12.21.0"
     },
+    "bundledDependencies": [
+        "chained-iterator",
+        "typescript-mixin-class",
+        "typescript-serializable-mixin",
+        "@bryntum/chronograph"
+    ],
     "dependencies": {
         "chained-iterator": "^0.0.3",
         "chalk": "^4.1.0",

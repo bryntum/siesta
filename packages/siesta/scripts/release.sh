@@ -18,21 +18,19 @@ if [[ -z "$V" ]]; then
     exit 1
 fi
 
+cd "$DIR/.."
 
-DIST="$DIR/../DIST"
+exit_if_git_repo_has_changes .
 
 echo ">> Starting release"
 
-"$DIR"/make_dist.sh
+echo ">> Performing git clean"
 
-cd $DIST
+npx gitclean.sh
 
-# the following code is executed on the "distribution" copy
-#---------------------------------------------------------------------------------
-
+echo ">> Preparing the distribution"
 # prepare the dist for release
-scripts/build.sh -r -d -e
-
+scripts/build.sh -r -d -e -b
 
 # restart point inside the dist
 scripts/do_release.sh
