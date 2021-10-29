@@ -16,9 +16,9 @@ echo ">> Copying and post-processing the README.md"
 
 cp -f "resources/docs_src/README.md" "README.md"
 
-sed -i -e 's!\[\[GettingStartedNodejsGuide|Getting started with Siesta in Node.js environment\]\]![Getting started with Siesta in Node.js environment](https://bryntum.github.io/siesta/docs/modules/_src_guides_getting_started_nodejs_getting_started_nodejs_.html#gettingstartednodejsguide)!' "README.md"
-sed -i -e 's!\[\[GettingStartedDenoGuide|Getting started with Siesta in Deno environment\]\]![Getting started with Siesta in Deno environment](https://bryntum.github.io/siesta/docs/modules/_src_guides_getting_started_deno_getting_started_deno_.html#gettingstarteddenoguide)!' "README.md"
-sed -i -e 's!\[\[GettingStartedBrowserGuide|Getting started with Siesta in browser environment\]\]![Getting started with Siesta in browser environment](https://bryntum.github.io/siesta/docs/modules/_src_guides_getting_started_browser_getting_started_browser_.html#gettingstartedbrowserguide)!' "README.md"
+sed -i -e 's!\[\[GettingStartedNodejsGuide|Getting started with Siesta in Node.js environment\]\]![Getting started with Siesta in Node.js environment](https://bryntum.github.io/siesta/docs/modules/Guide__Getting_started_Node_js.html)!' "README.md"
+sed -i -e 's!\[\[GettingStartedDenoGuide|Getting started with Siesta in Deno environment\]\]![Getting started with Siesta in Deno environment](https://bryntum.github.io/siesta/docs/modules/Guide__Getting_started_Deno.html)!' "README.md"
+sed -i -e 's!\[\[GettingStartedBrowserGuide|Getting started with Siesta in browser environment\]\]![Getting started with Siesta in browser environment](https://bryntum.github.io/siesta/docs/modules/Guide__Getting_started_browser.html)!' "README.md"
 
 
 echo ">> Starting docs generation with typedoc"
