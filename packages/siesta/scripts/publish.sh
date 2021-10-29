@@ -16,14 +16,15 @@ NEW_VERSION=$(npm --no-git-tag-version version $V)
 
 node -e "require('./scripts/changelog.cjs').updateVersion('$NEW_VERSION')"
 
-git add CHANGELOG.md
-git commit -m "Updated changelog"
+git add CHANGELOG.md package.json package-lock.json
+git commit -m "Updated version"
 
-git tag "v$NEW_VERSION"
+git tag "$NEW_VERSION"
 
 echo "/scripts" > .npmignore
 
 npm publish --access public --dry-run
+npm pack
 
 #---------------------------------------------------------------------------------
 # post-publish steps
