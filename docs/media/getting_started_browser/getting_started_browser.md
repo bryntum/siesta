@@ -137,15 +137,15 @@ await t.type('#input-element', 'some text[ENTER]')
 ```
 
 Please refer to the documentation of the individual simulation methods:
-- [[Test.click]]
-- [[Test.rightClick]]
-- [[Test.doubleClick]]
-- [[Test.moveMouseTo]]
-- [[Test.moveMouseBy]]
-- [[Test.dragTo]]
-- [[Test.dragBy]]
-- [[Test.type]]
-- [[Test.keyPress]] 
+- [[TestBrowser.click]]
+- [[TestBrowser.rightClick]]
+- [[TestBrowser.doubleClick]]
+- [[TestBrowser.moveMouseTo]]
+- [[TestBrowser.moveMouseBy]]
+- [[TestBrowser.dragTo]]
+- [[TestBrowser.dragBy]]
+- [[TestBrowser.type]]
+- [[TestBrowser.keyPress]] 
 
 
 Debugging
