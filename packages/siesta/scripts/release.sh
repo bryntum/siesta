@@ -41,8 +41,8 @@ scripts/do_release.sh
 
 echo ">> Release done, cleaning up"
 
-#git reset --hard
-#npx gitclean.sh
+git reset --hard
+npx gitclean.sh
 
 
 #npm i --package-lock-only
