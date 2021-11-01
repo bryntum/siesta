@@ -1,5 +1,6 @@
 {
     "compilerOptions" : {
+        "strict"                    : true,
         "experimentalDecorators"    : true,
 
         "noImplicitThis"            : true,
