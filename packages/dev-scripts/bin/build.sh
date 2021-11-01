@@ -15,6 +15,7 @@ while getopts "de" opt; do
         d)  declarations="-d"
             ;;
         e)  embed_references="true"
+            declarations="-d"
             ;;
     esac
 done

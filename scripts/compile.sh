@@ -5,6 +5,16 @@ set -e
 # enable **, ! in globs
 shopt -s globstar extglob
 
+declarations=""
+
+while getopts "d" opt; do
+    case "$opt" in
+        d)  declarations="-d"
+            ;;
+    esac
+done
+
+
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd "$DIR/.."
 
@@ -13,7 +23,7 @@ cd "$DIR/.."
     echo ""
     echo "------------------------------------------"
     echo "Compiling [chained-iterator]"
-    npx tsc
+    npx build.sh $declarations
 )
 
 (
@@ -21,7 +31,7 @@ cd "$DIR/.."
     echo ""
     echo "------------------------------------------"
     echo "Compiling [typescript-mixin-class]"
-    npx tsc
+    npx build.sh $declarations
 )
 
 (
@@ -29,7 +39,11 @@ cd "$DIR/.."
     echo ""
     echo "------------------------------------------"
     echo "Compiling [typescript-serializable-mixin]"
-    npx tsc
+    npx build.sh $declarations
+
+    if [[ -n $declarations ]]; then
+        scripts/tweak_dts.sh
+    fi
 )
 
 (
@@ -37,7 +51,7 @@ cd "$DIR/.."
     echo ""
     echo "------------------------------------------"
     echo "Compiling [chronograph]"
-    npx tsc
+    npx build.sh $declarations
 )
 
 (
@@ -45,5 +59,10 @@ cd "$DIR/.."
     echo ""
     echo "------------------------------------------"
     echo "Compiling [siesta]"
-    npx tsc
+    if [[ -n $declarations ]];
+    then
+        scripts/build.sh -r -e -b
+    else
+        npx tsc
+    fi
 )
