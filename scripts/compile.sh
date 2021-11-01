@@ -51,7 +51,7 @@ cd "$DIR/.."
     echo ""
     echo "------------------------------------------"
     echo "Compiling [chronograph]"
-    npx build.sh $declarations
+    npx build.sh $declarations || true
 )
 
 (
