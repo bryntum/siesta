@@ -1,5 +1,7 @@
 # Release history for Siesta:
 
+## v6.0.0-alpha-4        2021-11-01 12:37
+
 #### FEATURES / ENHANCEMENTS
 
 - Added simulation of user actions for browser tests
