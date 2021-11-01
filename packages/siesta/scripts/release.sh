@@ -22,6 +22,11 @@ cd "$DIR/.."
 
 exit_if_git_repo_has_changes .
 
+dependency_repo_is_on_released_tag ../chained-iterator
+dependency_repo_is_on_released_tag ../typescript-mixin-class
+dependency_repo_is_on_released_tag ../typescript-serializable-mixin
+dependency_repo_is_on_released_tag ../chronograph
+
 echo ">> Starting release"
 
 echo ">> Performing git clean"
