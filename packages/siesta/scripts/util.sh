@@ -28,13 +28,14 @@ dependency_repo_is_on_released_tag() (
             exit 1
         fi
 
-        VERSION=$(node -e "require('./package.json').version")
+        VERSION=$(node -e "console.log(require('./package.json').version)")
         TAG=$(git describe --tag)
 
         if [[ "v$VERSION" == "$TAG" ]]; then
             dummy=1
         else
             echo ">> Package at $(pwd) has unpublished commits"
+            exit 1
         fi
     )
 )
