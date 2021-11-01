@@ -1,6 +1,6 @@
 {
     "name": "@bryntum/siesta",
-    "version": "6.0.0-alpha-4",
+    "version": "6.0.0-alpha-3",
     "description": "Stress-free JavaScript/TypeScript testing and benchmarking tool",
     "main": "index.js",
     "module": "index.js",
@@ -38,13 +38,13 @@
         "playwright": "^1.16.1",
         "ws": "^7.4.4",
         "@web/dev-server": "^0.1.24",
-        "tslib": "^2.3.1"
-    },
-    "devDependencies": {
+        "tslib": "^2.3.1",
         "chained-iterator": "^0.0.4",
         "typescript-mixin-class": "^0.0.3",
         "typescript-serializable-mixin": "^0.0.3",
-        "@bryntum/chronograph": "^2.0.3",
+        "@bryntum/chronograph": "^2.0.3"
+    },
+    "devDependencies": {
         "@types/cssom": "^0.4.1",
         "@types/glob": "^7.1.3",
         "@types/minimatch": "^3.0.5",

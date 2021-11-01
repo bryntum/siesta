@@ -5,4 +5,4 @@ set -e
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
-git clean -f -x -d -e node_modules ./
+git clean -f -x -d -e 'node_modules' -e '.idea' ./

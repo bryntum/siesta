@@ -130,7 +130,9 @@ importers:
       typescript-serializable-mixin: workspace:*
       ws: ^7.4.4
     dependencies:
+      '@bryntum/chronograph': link:../chronograph
       '@web/dev-server': 0.1.24_rollup@2.58.0
+      chained-iterator: link:../chained-iterator
       chalk: 4.1.2
       dev-scripts: link:../dev-scripts
       glob: 7.1.7
@@ -138,9 +140,10 @@ importers:
       node-fetch: 3.0.0-beta.10
       playwright: 1.16.1
       tslib: 2.3.1
+      typescript-mixin-class: link:../typescript-mixin-class
+      typescript-serializable-mixin: link:../typescript-serializable-mixin
       ws: 7.5.3
     devDependencies:
-      '@bryntum/chronograph': link:../chronograph
       '@rollup/plugin-commonjs': 21.0.0_rollup@2.58.0
       '@rollup/plugin-node-resolve': 13.0.5_rollup@2.58.0
       '@types/cssom': 0.4.1
@@ -151,7 +154,6 @@ importers:
       '@types/ws': 7.4.7
       '@web/rollup-plugin-import-meta-assets': 1.0.7
       bulma: 0.9.3
-      chained-iterator: link:../chained-iterator
       cssom: 0.4.4
       esinstall: 1.1.7
       rollup: 2.58.0
@@ -164,8 +166,6 @@ importers:
       typedoc: 0.22.7_typescript@4.4.0
       typedoc-plugin-missing-exports: 0.22.3_typedoc@0.22.7
       typescript: github.com/bryntum/TypeScript/b538fc36e97afc930b9c4044337becd824e79aae
-      typescript-mixin-class: link:../typescript-mixin-class
-      typescript-serializable-mixin: link:../typescript-serializable-mixin
 
   packages/siesta-example-browser:
     specifiers:

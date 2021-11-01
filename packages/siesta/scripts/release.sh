@@ -31,11 +31,10 @@ echo ">> Starting release"
 
 echo ">> Performing git clean"
 
-npx gitclean.sh
+(cd ../.. && packages/dev-scripts/bin/gitclean.sh)
 
-echo ">> Preparing the distribution"
 # prepare the dist for release
-scripts/build.sh -r -d -e -b
+(cd ../.. && scripts/compile.sh -d)
 
 # restart point inside the dist
 scripts/do_release.sh

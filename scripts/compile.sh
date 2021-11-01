@@ -61,7 +61,7 @@ cd "$DIR/.."
     echo "Compiling [siesta]"
     if [[ -n $declarations ]];
     then
-        scripts/build.sh -r -e -b
+        scripts/build.sh -r -e -b -d
     else
         npx tsc
     fi
