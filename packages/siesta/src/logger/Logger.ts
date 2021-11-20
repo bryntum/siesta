@@ -57,6 +57,7 @@ export class Logger extends Mixin(
             // abstract logger is silent
         }
 
+
         /**
          * The log method for the `info` [[LogLevel|log level]]
          *
@@ -87,6 +88,12 @@ export class Logger extends Mixin(
          */
         log (...message : unknown[]) {
             if (this.logLevel <= LogLevel.log) this.printLogMessage('log', ...message)
+        }
+
+
+        // backward compat
+        diag (...message : unknown[]) {
+            if (this.logLevel <= LogLevel.info) this.printLogMessage('log', ...message)
         }
 
 
