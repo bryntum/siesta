@@ -15,13 +15,13 @@ while getopts "d" opt; do
 done
 
 
-DIR="$( cd "$( dirname "$0" )" && pwd )"
-DIST="$DIR/../SIESTA_DIST"
+DIR="$( cd "$( dirname "$0" )" && cd .. && pwd )"
+DIST="$DIR/SIESTA_DIST"
 
 rm -rf "$DIST"
 mkdir -p "$DIST"
 
-rsync -l -I -r --exclude 'node_modules' --exclude '.git' --exclude 'SIESTA_DIST' --exclude '.idea' "$DIR/../../siesta-monorepo/" "$DIST/"
+rsync -l -I -r --exclude 'node_modules' --exclude '.git' --exclude 'SIESTA_DIST' --exclude '.idea' "./" "$DIST/"
 
 cd "$DIST"
 

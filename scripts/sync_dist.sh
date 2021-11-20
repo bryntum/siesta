@@ -18,8 +18,8 @@ while getopts "ds:" opt; do
 done
 
 
-DIR="$( cd "$( dirname "$0" )" && pwd )"
-DIST="$DIR/../SIESTA_DIST"
+DIR="$( cd "$( dirname "$0" )" && cd .. && pwd )"
+DIST="$DIR/SIESTA_DIST"
 
 $DIR/make_dist.sh
 
