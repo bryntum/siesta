@@ -26,5 +26,7 @@ $DIR/scripts/make_dist.sh
 (
 cd $DIST
 
+echo $(pwd)
+
 scripts/compile.sh -s "-r"
 )
