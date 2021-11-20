@@ -21,7 +21,7 @@ done
 DIR="$( cd "$( dirname "$0" )" && cd .. && pwd )"
 DIST="$DIR/SIESTA_DIST"
 
-$DIR/make_dist.sh
+$DIR/scripts/make_dist.sh
 
 (
 cd $DIST
