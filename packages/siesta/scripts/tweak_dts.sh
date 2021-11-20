@@ -62,3 +62,13 @@ sed -i -e 's!dashboardLaunchInfo:.*!dashboardLaunchInfo:any!' "src/siesta/test/T
 sed -i -e 's!getLauncherClass():.*!getLauncherClass():any!' "src/siesta/project/ProjectDeno.d.ts"
 sed -i -e 's!getStandaloneLauncher():.*!getStandaloneLauncher():any!' "src/siesta/project/ProjectDeno.d.ts"
 sed -i -e 's!launcherClass:.*!launcherClass:any!' "src/siesta/project/ProjectDeno.d.ts"
+
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TypeScript 3.8.3 compat
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/project/Project.d.ts"
+sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/project/ProjectNodejs.d.ts"
+sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/test/TestDescriptorDeno.d.ts"
+sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/test/TestDescriptorNodejs.d.ts"
+sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/test/TestNodejs.d.ts"
+sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/test/assertion/AssertionAsync.d.ts"
