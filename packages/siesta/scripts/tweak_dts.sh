@@ -66,9 +66,23 @@ sed -i -e 's!launcherClass:.*!launcherClass:any!' "src/siesta/project/ProjectDen
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # TypeScript 3.8.3 compat
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/siesta/project/Project.d.ts"
 sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/project/Project.d.ts"
+
+sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/siesta/project/ProjectNodejs.d.ts"
 sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/project/ProjectNodejs.d.ts"
+
+sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/siesta/test/TestDescriptorDeno.d.ts"
 sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/test/TestDescriptorDeno.d.ts"
+
+sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/siesta/test/TestDescriptorNodejs.d.ts"
 sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/test/TestDescriptorNodejs.d.ts"
+
+sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/siesta/test/TestNodejs.d.ts"
 sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/test/TestNodejs.d.ts"
+
+sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/siesta/test/assertion/AssertionAsync.d.ts"
 sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/test/assertion/AssertionAsync.d.ts"
+
+sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/serializer/SerializerRendering.d.ts"
+sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/serializer/SerializerRendering.d.ts"

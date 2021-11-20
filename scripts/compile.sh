@@ -6,10 +6,13 @@ set -e
 shopt -s globstar extglob
 
 declarations=""
+siesta_compile_options="-r -e -b -d"
 
-while getopts "d" opt; do
+while getopts "ds:" opt; do
     case "$opt" in
         d)  declarations="-d"
+            ;;
+        s)  siesta_compile_options="$OPTARG"
             ;;
     esac
 done
@@ -59,7 +62,10 @@ cd "$DIR/.."
     echo ""
     echo "------------------------------------------"
     echo "Compiling [siesta]"
-    if [[ -n $declarations ]];
+    if [[ -n $siesta_compile_options ]];
+    then
+        scripts/build.sh $siesta_compile_options
+    elif [[ -n $declarations  ]];
     then
         scripts/build.sh -r -e -b -d
     else
