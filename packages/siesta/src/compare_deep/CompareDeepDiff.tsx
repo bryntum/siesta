@@ -873,8 +873,5 @@ export const comparePrimitiveAndFuzzyMatchers = function (
 
     if (matchersDiff) return matchersDiff.same
 
-    const type1         = typeOf(v1)
-    const type2         = typeOf(v2)
-
-    return type1 === type2 && compareAtomic(v1, v2, strictEquality)
+    return compareAtomic(v1, v2, strictEquality)
 }

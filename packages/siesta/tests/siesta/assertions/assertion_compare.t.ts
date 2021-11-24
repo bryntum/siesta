@@ -192,10 +192,6 @@ it('`is/isNot` assertion should work', async t => {
 
     t.isNot('string', 'STRING')
 
-    t.isNot(null, undefined)
-
-    t.isNot(undefined, null)
-
     t.isNot(NaN, 10)
 
     const date11    = new Date(2020, 1, 1)
@@ -231,10 +227,6 @@ it('`is/isNot` assertion should work', async t => {
         t.is([ 1, 2, 3 ], [ 1, 2, 3 ])
 
         t.is('string', 'STRING')
-
-        t.is(null, undefined)
-
-        t.is(undefined, null)
 
         t.is(NaN, 10)
 
