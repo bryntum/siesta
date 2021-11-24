@@ -376,13 +376,13 @@ export class AssertionCompare extends Mixin(
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region "is" comparison
 
-        comparePrimitives (value1 : unknown, value2 : unknown) : boolean {
-            return comparePrimitiveAndFuzzyMatchers(value1, value2, this.descriptor.deepCompareConfig)
+        comparePrimitives (value1 : unknown, value2 : unknown, strictEquality : boolean = true) : boolean {
+            return comparePrimitiveAndFuzzyMatchers(value1, value2, this.descriptor.deepCompareConfig, strictEquality)
         }
 
 
         comparePrimitivesIs (value1 : unknown, value2 : unknown) : boolean {
-            return isDate(value1) && isDate(value2) ? value1.getTime() === value2.getTime() : this.comparePrimitives(value1, value2)
+            return isDate(value1) && isDate(value2) ? value1.getTime() === value2.getTime() : this.comparePrimitives(value1, value2, false)
         }
 
         /**

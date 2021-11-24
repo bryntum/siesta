@@ -854,7 +854,8 @@ const compareFuzzyMatchersDeepDiff = function (
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const compareAtomic = (v1 : unknown, v2 : unknown) : boolean => v1 === v2 || (Number.isNaN(v1) && Number.isNaN(v2))
+const compareAtomic = (v1 : unknown, v2 : unknown, strictEquality : boolean = true) : boolean =>
+    (strictEquality ? v1 === v2 : v1 == v2) || (Number.isNaN(v1) && Number.isNaN(v2))
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -862,6 +863,7 @@ export const comparePrimitiveAndFuzzyMatchers = function (
     v1                  : unknown,
     v2                  : unknown,
     options             : DeepCompareOptions    = defaultDeepCompareOptions,
+    strictEquality      : boolean               = true
 )
     : boolean
 {
@@ -874,5 +876,5 @@ export const comparePrimitiveAndFuzzyMatchers = function (
     const type1         = typeOf(v1)
     const type2         = typeOf(v2)
 
-    return type1 === type2 && compareAtomic(v1, v2)
+    return type1 === type2 && compareAtomic(v1, v2, strictEquality)
 }
