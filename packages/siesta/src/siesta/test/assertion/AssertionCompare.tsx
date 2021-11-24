@@ -237,7 +237,7 @@ export class AssertionCompare extends Mixin(
         }
 
         /**
-         * A shorter alias for [[notEqual]]
+         * A shorter alias for [[notEqual]]. Can be also written as `t.not.eq()`, see [[not|t.not]] for details.
          *
          * @category Equality
          */
@@ -398,10 +398,14 @@ export class AssertionCompare extends Mixin(
         }
 
         /**
-         * This assertion passes if the received and expected values are equal, as defined by the `===` operator.
-         * In addition, the fuzzy matchers, like [[any]], [[anyNumberApprox]], etc are supported for the `expected` value.
+         * This is Siesta 5 backward compatible assertion, which performs comparison of the 2 values, using the `==` comparison.
+         * So, `null` will be equal to `undefined`, `4` to `"4"` and so on. As an additional quirk, `Date` instances
+         * are compared structurally, by their time, instead of by reference.
          *
-         * If you are looking for deep structural equality, check [[equal]].
+         * The fuzzy matchers, like [[any]], [[anyNumberApprox]], etc are supported for the `expected` value.
+         *
+         * It is recommended to use the deep structural equality instead of this assertion, check [[equal]] and its
+         * shortcut alias [[eq]].
          *
          * @category Equality
          * @param received
@@ -420,7 +424,7 @@ export class AssertionCompare extends Mixin(
         }
 
         /**
-         * The negated version of [[is]].
+         * The negated version of [[is]]. Can be also written as `t.not.is()`. See [[not|t.not]] for details.
          *
          * @category Equality
          * @param value1
