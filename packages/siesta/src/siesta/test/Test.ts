@@ -20,6 +20,7 @@ import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
 import { AssertionException } from "./assertion/AssertionException.js"
+import { AssertionFunction } from "./assertion/AssertionFunction.js"
 import { AssertionGeneral } from "./assertion/AssertionGeneral.js"
 import { AssertionType } from "./assertion/AssertionType.js"
 import { Expectation } from "./Expectation.js"
@@ -63,7 +64,8 @@ class TestPre extends Mixin(
         AssertionCompare,
         AssertionException,
         AssertionGeneral,
-        AssertionType
+        AssertionType,
+        AssertionFunction
     ],
     (base : ClassUnion<
         typeof TestNodeResult,
@@ -73,7 +75,8 @@ class TestPre extends Mixin(
         typeof AssertionCompare,
         typeof AssertionException,
         typeof AssertionGeneral,
-        typeof AssertionType
+        typeof AssertionType,
+        typeof AssertionFunction
     >) =>
 
     // when using the un-exported mixin class, the internal class need to have different name
