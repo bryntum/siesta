@@ -57,6 +57,9 @@
 /browser.js
 /browser.js.map
 /browser.d.ts
+/react.js
+/react.js.map
+/react.d.ts
 
 /resources/styling/**/*.css
 /resources/styling/**/*.css.map
