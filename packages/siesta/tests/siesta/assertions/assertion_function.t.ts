@@ -1,11 +1,12 @@
 import { it } from "../../../index.js"
 import { verifyAllFailed } from "../@helpers.js"
 
+
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Function property calls assertions should work', async t => {
-    const scope       = {}
+    const scope     = {}
 
-    const obj = {
+    const obj       = {
         indirect        : function () {
             t.isStrict(this, scope, "Correct scope during indirect call")
         },
@@ -48,3 +49,57 @@ it('Function property calls assertions should work', async t => {
     }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
 })
 
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Method calls assertions should work', async t => {
+    class Cat {
+        makeFurBall () {
+            t.silent.isInstanceOf(this, Cat, "Wrong scope of method")
+        }
+
+        purr () {
+            t.silent.isInstanceOf(this, Cat, "Wrong scope of method")
+        }
+    }
+
+
+    t.it('`methodIsCalledNTimes` should work', t => {
+        t.methodIsCalledNTimes('makeFurBall', Cat, 1, 'purr called')
+        t.methodIsCalledNTimes(Cat.prototype.purr, Cat, 1, 'purr fn called')
+
+        new Cat().makeFurBall()
+        new Cat().purr()
+    })
+
+
+    t.it('`methodIsntCalled` should work', t => {
+        t.methodIsntCalled('purr', Cat, 'pass: purr not called')
+    })
+
+
+    t.it('`methodIsCalled` should work', t => {
+        t.methodIsCalled('purr', Cat, 'pass: purr not called')
+
+        new Cat().purr()
+        new Cat().purr()
+    })
+
+
+    //------------------
+    t.todo('Should all fail', async t => {
+        t.methodIsntCalled('purr', Cat, 'fail: purr not called')
+
+        new Cat().purr()
+    }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
+
+
+    //------------------
+    t.todo('Should all fail', async t => {
+        t.methodIsCalledNTimes('purr', Cat, 1, 'purr not called')
+
+        t.methodIsCalledNTimes('makeFurBall', Cat, 1, 'makeFurBall is called 2 times')
+
+        new Cat().makeFurBall()
+        new Cat().makeFurBall()
+    }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
+})
