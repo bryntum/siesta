@@ -153,12 +153,11 @@ export class AssertionFunction extends Mixin(
          *
          * @param property The function itself or the name of the function property on the host object (2nd argument)
          * @param object The host object
-         * @param expected The expected number of calls
          * @param desc The description of the assertion
          *
          * @category Function calls assertions
          */
-        isCalled<T extends object, K extends keyof T> (property : AnyFunction | K, object : T, expected : number | string, desc? : string) {
+        isCalled<T extends object, K extends keyof T> (property : AnyFunction | K, object : T, desc? : string) {
             this.assertExpectedCallNumber('isCalled', this.isAssertionNegated, property, object, '>=1', desc)
         }
 
@@ -169,12 +168,11 @@ export class AssertionFunction extends Mixin(
          *
          * @param property The function itself or the name of the function property on the host object (2nd argument)
          * @param object The host object
-         * @param expected The expected number of calls
          * @param desc The description of the assertion
          *
          * @category Function calls assertions
          */
-        isCalledOnce<T extends object, K extends keyof T> (property : AnyFunction | K, object : T, expected : number | string, desc? : string) {
+        isCalledOnce<T extends object, K extends keyof T> (property : AnyFunction | K, object : T, desc? : string) {
             this.assertExpectedCallNumber('isCalledOnce', this.isAssertionNegated, property, object, 1, desc)
         }
 
@@ -185,12 +183,11 @@ export class AssertionFunction extends Mixin(
          *
          * @param property The function itself or the name of the function property on the host object (2nd argument)
          * @param object The host object
-         * @param expected The expected number of calls
          * @param desc The description of the assertion
          *
          * @category Function calls assertions
          */
-        isntCalled<T extends object, K extends keyof T> (property : AnyFunction | K, object : T, expected : number | string, desc? : string) {
+        isntCalled<T extends object, K extends keyof T> (property : AnyFunction | K, object : T, desc? : string) {
             this.assertExpectedCallNumber('isntCalled', this.isAssertionNegated, property, object, 0, desc)
         }
 
