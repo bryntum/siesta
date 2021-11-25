@@ -15,6 +15,12 @@ it('`isBoolean/isNumber/...` assertion should work', async t => {
 
     t.isDate(new Date())
 
+    t.isArray([])
+
+    t.isMap(new Map())
+
+    t.isSet(new Set())
+
     //------------------
     t.todo('Should all fail', async t => {
 
@@ -28,6 +34,13 @@ it('`isBoolean/isNumber/...` assertion should work', async t => {
         t.isString(0)
 
         t.isDate(11)
+
+        t.isArray({})
+
+        t.isMap(new Set())
+
+        t.isSet(new Map())
+
     }).postFinishHook.on(todoTest => verifyAllFailed(todoTest, t))
 })
 
