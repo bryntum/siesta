@@ -1,6 +1,7 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { OutputType } from "../../context/ExecutionContext.js"
+import { Hook } from "../../hook/Hook.js"
 import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
@@ -220,6 +221,9 @@ export class TestNodeResult extends Mixin(
         resultLog       : TestResult[]      = []
 
         asyncAssertionsMapping  : Map<LUID, AssertionAsyncCreation>     = new Map()
+
+        // this hook is defined in Test, and used by various assertion mixins
+        finishHook          : Hook<[ this ]>
 
 
         get url () : string {

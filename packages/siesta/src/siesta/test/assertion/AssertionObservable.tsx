@@ -63,9 +63,6 @@ export class AssertionObservable extends Mixin(
         ObservableSourceT   : Parameters<this[ 'resolveObservable' ]>[ 0 ]
         ObservableT         : ReturnType<this[ 'resolveObservable' ]>
 
-        // TODO this hook is defined in Test, can we do better than this?
-        finishHook          : Hook<[ this ]>        = new Hook()
-
 
         addListenerToObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
             throw new Error("Abstract method called")
