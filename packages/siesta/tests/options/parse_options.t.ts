@@ -1,9 +1,11 @@
 import { it } from "../../index.js"
 import { Option, OptionsBag, OptionsParseErrorCodes, OptionsParseWarningCodes } from "../../src/siesta/option/Option.js"
 
-const string    = Option.new({ name : 'string', type : 'string' })
-const number    = Option.new({ name : 'number', type : 'number' })
-const boolean   = Option.new({ name : 'boolean', type : 'boolean' })
+const string        = Option.new({ name : 'string', type : 'string' })
+const number        = Option.new({ name : 'number', type : 'number' })
+const boolean       = Option.new({ name : 'boolean', type : 'boolean' })
+const stringArray   = Option.new({ name : 'string', type : 'string', structure : 'array' })
+const enumArray     = Option.new({ name : 'enumArray', type : 'enum', structure : 'array', enumeration : [ 'enum1', 'enum2' ] })
 
 
 it('Should be able to parse options', async t => {
@@ -23,6 +25,60 @@ it('Should be able to parse options', async t => {
             ])
         },
         'Basics should work'
+    )
+})
+
+
+it('Should be able to parse array options with single element', async t => {
+    const bag       = OptionsBag.new({
+        input   : [ '--string=str1' ]
+    })
+
+    t.equal(
+        bag.extractOptions([ stringArray, number, boolean ]),
+        {
+            errors      : [],
+            warnings    : [],
+            values      : new Map<Option, unknown>([
+                [ stringArray, [ 'str1' ] ]
+            ])
+        }
+    )
+})
+
+
+it('Should be able to parse array options with many elements', async t => {
+    const bag       = OptionsBag.new({
+        input   : [ '--string=str1', '--string=str2' ]
+    })
+
+    t.equal(
+        bag.extractOptions([ stringArray, number, boolean ]),
+        {
+            errors      : [],
+            warnings    : [],
+            values      : new Map<Option, unknown>([
+                [ stringArray, [ 'str1', 'str2' ] ]
+            ])
+        }
+    )
+})
+
+
+it('Should be able to parse enum array options', async t => {
+    const bag       = OptionsBag.new({
+        input   : [ '--enum-array=enum1', '--enum-array=enum2' ]
+    })
+
+    t.equal(
+        bag.extractOptions([ enumArray, stringArray, number, boolean ]),
+        {
+            errors      : [],
+            warnings    : [],
+            values      : new Map<Option, unknown>([
+                [ enumArray, [ 'enum1', 'enum2' ] ]
+            ])
+        }
     )
 })
 

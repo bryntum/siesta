@@ -5,9 +5,9 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export type OptionAtomType         = 'boolean' | 'string' | 'number' | 'object'
+export type OptionAtomType         = 'boolean' | 'string' | 'number' | 'object' | 'enum'
 
-export type OptionStructureType    = 'map' | 'array' | 'set' | 'atom' | 'enum'
+export type OptionStructureType    = 'map' | 'array' | 'set' | 'atom'
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -48,20 +48,23 @@ export class Option extends Mixin(
 
 
         get printableType () : string {
+            const type      = this.type === 'enum'
+                ? this.enumeration.map(member => "'" + member + "'").join(' | ')
+                : this.type
+
             if (this.structure === 'atom') {
-                return this.type
+                return type
             }
             else if (this.structure === 'array') {
-                return this.type + '[]'
-            }
-            else if (this.structure === 'enum') {
-                return this.enumeration.map(member => "'" + member + "'").join(' | ')
+                return this.type === 'enum'
+                    ? '(' + type + ')[]'
+                    : type + '[]'
             }
             else if (this.structure === 'set') {
-                return `Set<${ this.type }`
+                return `Set<${ type }`
             }
             else if (this.structure === 'map') {
-                return `Map<string, ${ this.type }`
+                return `Map<string, ${ type }`
             }
         }
 
@@ -139,31 +142,6 @@ export class Option extends Mixin(
 
                     (valueEntry.value as Set<unknown>).add(parseRes.value)
                 }
-                else if (this.structure === 'enum') {
-                    if (this.type !== 'string') throw new Error("Only enum of strings are supported")
-
-                    if (!this.enumeration.some(enumMember => enumMember.toLowerCase() === optionValue.toLowerCase())) {
-                        errors.push({
-                            error       : OptionsParseErrorCodes.UnknownEnumMember,
-                            input       : optionValue,
-                            option      : this
-                        })
-
-                        return
-                    }
-
-                    const newValue      = this.enumeration.find(enumMember => enumMember.toLowerCase() === optionValue.toLowerCase())
-
-                    if (valueEntry.value !== undefined)
-                        warnings.push({
-                            warning             : OptionsParseWarningCodes.ExistingValueOverwritten,
-                            option              : this,
-                            value               : valueEntry.value,
-                            overwrittenWith     : newValue
-                        })
-
-                    valueEntry.value    = newValue
-                }
             }
         }
 
@@ -195,6 +173,16 @@ export class Option extends Mixin(
                 } else {
                     return { value }
                 }
+            }
+            else if (this.type === 'enum') {
+                if (input === undefined)
+                    return { error : { error : OptionsParseErrorCodes.OptionDoesNotHaveValue, option : this } }
+
+                if (!this.enumeration.some(enumMember => enumMember.toLowerCase() === input.toLowerCase())) {
+                    return { error : { error : OptionsParseErrorCodes.UnknownEnumMember, option : this, input } }
+                }
+
+                return { value : this.enumeration.find(enumMember => enumMember.toLowerCase() === input.toLowerCase()) }
             } else {
                 if (input === undefined) return { value : true }
 
@@ -288,11 +276,11 @@ export const option = (config? : Partial<Option>, optionCls : typeof Option = Op
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-type OptionValueEntry = { key : string, value : string }
+type OptionTokenEntry = { key : string, value : string }
 
 type OptionsTokenizingResult = {
     argv        : string[],
-    opts        : OptionValueEntry[]
+    opts        : OptionTokenEntry[]
 }
 
 function parseOptions (input : string[]) : OptionsTokenizingResult {
@@ -353,7 +341,7 @@ export class OptionsBag extends Base {
 
     $argv                   : string[]              = undefined
 
-    $entries                : OptionValueEntry[]    = undefined
+    $entries                : OptionTokenEntry[]    = undefined
 
     get argv () : string[] {
         if (this.$argv !== undefined) return this.$argv
@@ -365,7 +353,7 @@ export class OptionsBag extends Base {
         return this.$argv       = parseRes.argv
     }
 
-    get entries () : OptionValueEntry[] {
+    get entries () : OptionTokenEntry[] {
         if (this.$entries !== undefined) return this.$entries
 
         const parseRes          = parseOptions(this.input)
@@ -375,7 +363,7 @@ export class OptionsBag extends Base {
         return this.$entries    = parseRes.opts
     }
 
-    set entries (value : OptionValueEntry[]) {
+    set entries (value : OptionTokenEntry[]) {
         this.$entries           = value
     }
 
