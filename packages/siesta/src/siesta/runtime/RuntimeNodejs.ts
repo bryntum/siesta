@@ -67,4 +67,11 @@ export class RuntimeNodejs extends Runtime {
     cwd () : string {
         return process.cwd()
     }
+
+
+    async writeToFile (file : string, content : string) {
+        return new Promise<void>((resolve, reject) =>
+            fs.writeFile(file, content, { encoding : 'utf-8' }, err => err ? reject(err) : resolve())
+        )
+    }
 }

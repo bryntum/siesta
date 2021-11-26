@@ -119,9 +119,6 @@ export class Test extends TestPre {
     // "upgrade" types from TreeNode
     parentNode          : Test
 
-    startTime           : Date                  = undefined
-    endTime             : Date                  = undefined
-
     code                : (t : this) => any     = t => {}
 
     pendingSubTests     : Test[]                = []
@@ -560,7 +557,7 @@ export class Test extends TestPre {
 
 
     get isFinished () : boolean {
-        return this.endTime !== undefined
+        return this.endDate !== undefined
     }
 
 
@@ -572,7 +569,7 @@ export class Test extends TestPre {
 
         globalTestEnv.currentTest       = this
 
-        this.startTime                  = new Date()
+        this.startDate                  = new Date()
 
         this.connector.onSubTestStart(this.rootTest.descriptor.guid, this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
 
@@ -596,7 +593,7 @@ export class Test extends TestPre {
 
         this.connector.onSubTestFinish(this.rootTest.descriptor.guid, this.localId, false)
 
-        this.endTime                    = new Date()
+        this.endDate                    = new Date()
 
         globalTestEnv.currentTest       = this.parentNode
 

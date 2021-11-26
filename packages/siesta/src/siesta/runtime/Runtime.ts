@@ -58,6 +58,11 @@ export class Runtime extends Base {
     cwd () : string {
         throw new Error("Abstract method")
     }
+
+
+    async writeToFile (file : string, content : string) {
+        throw new Error("Abstract method")
+    }
 }
 
 

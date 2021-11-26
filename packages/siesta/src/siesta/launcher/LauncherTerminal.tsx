@@ -24,10 +24,13 @@ import {
 } from "./Launcher.js"
 import { LauncherError } from "./LauncherError.js"
 import { extractProjectInfo } from "./ProjectExtractor.js"
+import { JSONReportRootNode } from "./TestLaunchResult.js"
 import { ExitCodes } from "./Types.js"
 
 // generic sever-side, cross Node/Deno functionality
 // DO NOT USE THE NODE.JS/NPM/DENO MODULES HERE
+
+export type ReportFormat = 'json' | 'html' | 'junit'
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class LauncherDescriptorTerminal extends Mixin(
@@ -87,7 +90,7 @@ export class LauncherDescriptorTerminal extends Mixin(
                 exactly the same number of times, the files and formats will be matched by their order.
             </div>
         })
-        reportFormat    : ('json' | 'html' | 'junit')[]     = [ 'json' ]
+        reportFormat    : ReportFormat[]    = [ 'json' ]
     }
 ) {}
 
@@ -321,7 +324,35 @@ export class LauncherTerminal extends Mixin(
         async launchOnce (projectPlanItemsToLaunch : TestDescriptor[]) {
             await super.launchOnce(projectPlanItemsToLaunch)
 
+            const reportsGeneration = this.reportFile.map(
+                (reportFile : string, index : number ) => this.generateReport(reportFile, this.reportFormat[ index ])
+            )
 
+            await Promise.all(reportsGeneration)
+        }
+
+
+        async generateReport (reportFile : string, reportFormat : ReportFormat) {
+            if (reportFormat === 'json') {
+                const report        = await this.generateReportJSON()
+
+                await this.runtime.writeToFile(reportFile, JSON.stringify(report))
+            }
+            else if (reportFormat === 'junit') {
+
+            }
+            else if (reportFormat === 'html') {
+
+            }
+        }
+
+
+        async generateReportJSON () : Promise<JSONReportRootNode> {
+            return this.dispatcher.projectPlanLaunchResult.asJSONReportRootNode(this.dispatcher)
+        }
+
+
+        async generateReportJUnit () {
         }
     }
 ) {}

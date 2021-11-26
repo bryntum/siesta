@@ -218,6 +218,9 @@ export class TestNodeResult extends Mixin(
 
         parentNode      : TestNodeResult    = undefined
 
+        startDate       : Date              = undefined
+        endDate         : Date              = undefined
+
         resultLog       : TestResult[]      = []
 
         asyncAssertionsMapping  : Map<LUID, AssertionAsyncCreation>     = new Map()
