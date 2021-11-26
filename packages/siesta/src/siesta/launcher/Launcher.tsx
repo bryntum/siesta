@@ -56,6 +56,12 @@ export const OptionsGroupOutput  = OptionGroup.new({
     weight      : 900
 })
 
+export const OptionsGroupReport  = OptionGroup.new({
+    name        : 'report',
+    title       : 'Reports',
+    weight      : 200
+})
+
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const optionsToArray    = (obj : Record<string, Option>) : Option[] => objectEntriesDeep(obj).map(entry => entry[ 1 ])
@@ -96,8 +102,7 @@ export class LauncherDescriptor extends Mixin(
         maxWorkers      : number            = 5
 
         @option({
-            type        : 'string',
-            structure   : 'enum',
+            type        : 'enum',
             enumeration : [ 'info', 'debug', 'log', 'warn', 'error' ],
             group       : OptionsGroupFiltering,
             help        : <span>
@@ -141,8 +146,7 @@ export class LauncherDescriptor extends Mixin(
         exclude         : string[]          = []
 
         @option({
-            type        : 'string',
-            structure   : 'enum',
+            type        : 'enum',
             enumeration : [ 'file', 'subtest', 'assertion' ],
             group       : OptionsGroupOutput,
             defaultValue : () => 'file',
@@ -192,8 +196,7 @@ export class LauncherDescriptor extends Mixin(
 
 
         @option({
-            type        : 'string',
-            structure   : 'enum',
+            type        : 'enum',
             enumeration : [ 'dark', 'light', 'universal', 'accessible' ],
             defaultValue : () => 'universal',
             group       : OptionsGroupOutput,

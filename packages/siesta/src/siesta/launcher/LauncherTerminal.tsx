@@ -13,8 +13,15 @@ import { Context } from "../context/Context.js"
 import { option } from "../option/Option.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ProjectTerminal } from "../project/ProjectTerminal.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
 import { LogMessage } from "../test/TestResult.js"
-import { Launcher, LauncherDescriptor, OptionsGroupOutput } from "./Launcher.js"
+import {
+    Launcher,
+    LauncherDescriptor,
+    OptionsGroupOutput,
+    OptionsGroupReport,
+    PrepareOptionsResult
+} from "./Launcher.js"
 import { LauncherError } from "./LauncherError.js"
 import { extractProjectInfo } from "./ProjectExtractor.js"
 import { ExitCodes } from "./Types.js"
@@ -38,6 +45,49 @@ export class LauncherDescriptorTerminal extends Mixin(
             </div>
         })
         noColor         : boolean               = false
+
+
+        @option({
+            type        : 'string',
+            structure   : 'array',
+            group       : OptionsGroupReport,
+            help        : <div>
+                If this option is provided, Siesta will generate a report after running the test suite.
+                The format of the report can be specified with the <span class="accented">--report-format</span> option.
+                This option specifies the file name template to save the report to. Template can contain
+                variables, marked as <span class="accented">&#123;variable&#125;</span>.
+                The value for variables is taken from other options values.{'\n'}
+                For example, if you've passed the options as "--browser=safari", and set the file name template as:{'\n'}
+                {'    '}--report-file=result-&#123;browser&#125;.json{'\n'}
+                resulting file name will be: "result-safari.json".{'\n'}
+                {'\n'}
+                For the HTML report format this option actually specifies the directory, to which save the required files.
+                This option can be repeated several times (several reports will be generated), in this case,
+                the <span class="accented">--report-format</span> option should be provided
+                exactly the same number of times, the files and formats will be matched by their order.
+            </div>
+        })
+        reportFile      : string[]                          = []
+
+
+        @option({
+            type        : 'enum',
+            structure   : 'array',
+            enumeration : [ 'html', 'json', 'junit' ],
+            group       : OptionsGroupReport,
+            defaultValue : () => [ 'json' ],
+            help        : <div>
+                Specifies the report format to generate after running the test suite. To actually generate a report,
+                need to provide the <span class="accented">--report-file</span> option as well.
+                The `html` report includes `json` with additional files for results visualization.
+                When using `html` report, the <span class="accented">--report-file</span> option actually specifies
+                the <span class="accented">directory</span> to save data into, not a single file.
+                This option can be repeated several times (several reports will be generated), in this case,
+                the <span class="accented">--report-file</span> option should be provided
+                exactly the same number of times, the files and formats will be matched by their order.
+            </div>
+        })
+        reportFormat    : ('json' | 'html' | 'junit')[]     = [ 'json' ]
     }
 ) {}
 
@@ -68,6 +118,42 @@ export class LauncherTerminal extends Mixin(
                 return messages.map(message => isString(message) ? message : SerializerXml.serialize(message/*, this.descriptor.serializerConfig*/))
             // else
             //     return [ SerializerXml.serialize(messages/*, this.descriptor.serializerConfig*/) ]
+        }
+
+
+        async prepareLauncherOptions () : Promise<PrepareOptionsResult> {
+            const res               = await super.prepareLauncherOptions()
+
+            this.validateReportOptions(res)
+
+            return res
+        }
+
+
+        validateReportOptions (res : PrepareOptionsResult) {
+            const reportFormats     = this.reportFormat
+            const reportFiles       = this.reportFile
+
+            // nothing to validate - validation passed
+            if (!reportFiles) return
+
+            if (
+                reportFiles.length > 1 && reportFormats.length !== reportFiles.length
+                ||
+                reportFiles.length === 1 && reportFormats.length > 1
+            ) {
+                res.errors.push(<div>
+                    <span class="log_message_error"> ERROR </span> The number of <span class="accented">--report-format</span> and
+                    <span class="accented">--report-file</span> options does not match.
+                </div>)
+            }
+
+            if (reportFiles.length === 0 && reportFormats.length > 0) {
+                res.errors.push(<div>
+                    <span class="log_message_error"> ERROR </span> The <span class="accented">--report-file</span> option
+                    is required when <span class="accented">--report-format</span> is provided.
+                </div>)
+            }
         }
 
 
@@ -229,6 +315,13 @@ export class LauncherTerminal extends Mixin(
                 return (await import('../project/ProjectDeno.js')).ProjectDeno
             else
                 throw new Error("Should not reach this line")
+        }
+
+
+        async launchOnce (projectPlanItemsToLaunch : TestDescriptor[]) {
+            await super.launchOnce(projectPlanItemsToLaunch)
+
+
         }
     }
 ) {}
