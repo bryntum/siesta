@@ -18,7 +18,7 @@ export class XmlElement extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Base>) =>
 
     class XmlElement extends base {
-        props           : { class? : string }
+        props           : Record<string, unknown> & { class? : string }
 
         parent          : XmlElement                = undefined
 
