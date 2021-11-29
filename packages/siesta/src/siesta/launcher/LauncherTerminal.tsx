@@ -1,3 +1,4 @@
+import { siestaPackageRootUrl } from "../../../index.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { importer } from "../../Importer.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
@@ -333,19 +334,21 @@ export class LauncherTerminal extends Mixin(
 
 
         async generateReport (reportFile : string, reportFormat : ReportFormat) {
+            const runtime       = this.runtime
+
             if (reportFormat === 'json') {
                 const report        = await this.generateReportJSON()
 
-                await this.runtime.writeToFile(reportFile, JSON.stringify(report))
+                await runtime.writeToFile(reportFile, JSON.stringify(report))
             }
             else if (reportFormat === 'junit') {
                 const report        = await this.generateReportJUnit()
 
-                await this.runtime.writeToFile(reportFile, report.toString())
-
+                await runtime.writeToFile(reportFile, report.toString())
             }
             else if (reportFormat === 'html') {
 
+                await runtime.copyDir(siestaPackageRootUrl + 'resources/', reportFile + '/index.html')
             }
         }
 

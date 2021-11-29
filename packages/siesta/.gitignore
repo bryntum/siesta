@@ -45,6 +45,9 @@
 /resources/dashboard/**/*.js
 /resources/dashboard/**/*.js.map
 /resources/dashboard/**/*.d.ts
+/resources/html_report/**/*.js
+/resources/html_report/**/*.js.map
+/resources/html_report/**/*.d.ts
 /index.js
 /index.js.map
 /index.d.ts
