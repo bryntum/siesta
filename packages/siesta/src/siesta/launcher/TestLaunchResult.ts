@@ -1,7 +1,10 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { TextBlock } from "../../jsx/TextBlock.js"
 import { LogLevel, LogMethod } from "../../logger/Logger.js"
 import { TreeNodeMapped } from "../../tree/TreeNodeMapped.js"
+import { isString } from "../../util/Typeguards.js"
+import { stripAnsiControlCharacters } from "../../util_nodejs/Terminal.js"
 import { AssertionWaitForCreation } from "../test/assertion/AssertionAsync.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Assertion, Exception, LogMessage, SourcePoint, TestNodeResult } from "../test/TestResult.js"
@@ -104,6 +107,8 @@ export type JSONReportDirectoryNode = {
 export type JSONReportRootNode = {
     type        : 'project',
     title       : string,
+    url         : string,
+    urlAbs      : string,
 
     startDate   : Date,
     endDate     : Date,
@@ -127,6 +132,29 @@ export class TestLaunchResult extends Mixin(
         mostRecentResult    : TestNodeResultReactive    = undefined
 
 
+        get passed () : boolean {
+            if (this.isLeaf()) return this.mostRecentResult ? this.mostRecentResult.passed : true
+
+            return this.childNodes.every(childNode => childNode.passed === true)
+        }
+
+
+        nonEmptyChildren (dispatcher : Dispatcher) : (JSONReportDirectoryNode | JSONReportTestFileNode)[] {
+            return this.childNodes.map(childDescriptor => {
+                if (childDescriptor.isLeaf() && !childDescriptor.mostRecentResult) return undefined
+
+                if (childDescriptor.isLeaf())
+                    return childDescriptor.asJSONReportTestFileNode(dispatcher)
+                else {
+                    const node      = childDescriptor.asJSONReportDirectoryNode(dispatcher)
+
+                    // do not include empty directories in the report
+                    return node.items.length > 0 ? node : undefined
+                }
+            }).filter(node => Boolean(node))
+        }
+
+
         asJSONReportRootNode (dispatcher : Dispatcher) : JSONReportRootNode {
             if (this.parentNode) throw new Error("This method can only be called on root node")
 
@@ -137,19 +165,16 @@ export class TestLaunchResult extends Mixin(
                 startDate   : dispatcher.launcher.reporter.startTime,
                 endDate     : dispatcher.launcher.reporter.endTime,
 
-                // TODO
-                passed      : true, //this.mostRecentResult.passed,
+                passed      : this.passed,
+                url         : this.descriptor.url,
+                urlAbs      : this.descriptor.urlAbs,
 
-                items       : this.childNodes.map(childDescriptor =>
-                    childDescriptor.isLeaf()
-                        ? childDescriptor.mostRecentResult ? childDescriptor.asJSONReportTestFileNode() : undefined
-                        : childDescriptor.asJSONReportDirectoryNode()
-                ).filter(node => Boolean(node))
+                items       : this.nonEmptyChildren(dispatcher)
             }
         }
 
 
-        asJSONReportDirectoryNode () : JSONReportDirectoryNode {
+        asJSONReportDirectoryNode (dispatcher : Dispatcher) : JSONReportDirectoryNode {
             if (this.isLeaf()) throw new Error("This method can only be called on directory node")
 
             return {
@@ -160,34 +185,32 @@ export class TestLaunchResult extends Mixin(
                 url         : this.descriptor.url,
                 urlAbs      : this.descriptor.urlAbs,
 
-                items       : this.childNodes.map(childDescriptor =>
-                    childDescriptor.isLeaf()
-                        ? childDescriptor.mostRecentResult ? childDescriptor.asJSONReportTestFileNode() : undefined
-                        : childDescriptor.asJSONReportDirectoryNode()
-                ).filter(node => Boolean(node))
+                items       : this.nonEmptyChildren(dispatcher)
             }
         }
 
 
-        asJSONReportTestFileNode () : JSONReportTestFileNode {
+        asJSONReportTestFileNode (dispatcher : Dispatcher) : JSONReportTestFileNode {
             if (!this.isLeaf()) throw new Error("This method can only be called on leaf node")
 
             return {
-                type    : 'file',
+                type        : 'file',
 
                 title       : this.descriptor.title,
                 filename    : this.descriptor.filename,
                 url         : this.descriptor.url,
                 urlAbs      : this.descriptor.urlAbs,
 
-                topTest : testNodeResultAsJSONReportTestCaseNode(this.mostRecentResult)
+                topTest     : testNodeResultAsJSONReportTestCaseNode(this.mostRecentResult, dispatcher)
             }
         }
     }
 ) {}
 
 
-const testNodeResultAsJSONReportTestCaseNode = (result : TestNodeResult) : JSONReportTestCaseNode => {
+const testNodeResultAsJSONReportTestCaseNode = (result : TestNodeResult, dispatcher : Dispatcher) : JSONReportTestCaseNode => {
+    const launcher      = dispatcher.launcher
+
     return {
         type        : 'testcase',
         title       : result.descriptor.title,
@@ -200,42 +223,41 @@ const testNodeResultAsJSONReportTestCaseNode = (result : TestNodeResult) : JSONR
 
         items       : result.resultLog.map(result => {
             if (result instanceof TestNodeResult)
-                return testNodeResultAsJSONReportTestCaseNode(result)
+                return testNodeResultAsJSONReportTestCaseNode(result, dispatcher)
             else if (result instanceof LogMessage)
                 return {
-                    type        : 'logmessage',
-                    level       : LogLevel[ result.level ],
-                    messageType : result.type,
-                    // TODO render to string
-                    message     : result.message + ''
+                    type            : 'logmessage',
+                    level           : LogLevel[ result.level ],
+                    messageType     : result.type,
+                    message         : result.message.map(message =>
+                        isString(message) ? message : stripAnsiControlCharacters(launcher.render(message))
+                    ).join('\n')
                 } as JSONReportLogMessageNode
             else if ((result instanceof Assertion) && !(result instanceof AssertionWaitForCreation))
                 return {
-                    type        : 'assertion',
-                    name        : result.name,
-                    passed      : result.passed,
-                    sourcePoint : result.sourcePoint,
-                    description : result.description,
-                    // TODO render to string
-                    annotation  : result.annotation + ''
+                    type            : 'assertion',
+                    name            : result.name,
+                    passed          : result.passed,
+                    sourcePoint     : result.sourcePoint,
+                    description     : result.description,
+                    annotation      : result.annotation ? stripAnsiControlCharacters(launcher.render(result.annotation)) : undefined
                 } as JSONReportSyncAssertionNode
             else if (result instanceof AssertionWaitForCreation)
                 return {
-                    type        : 'assertion_waitfor',
-                    name        : result.name,
-                    passed      : result.passed,
-                    sourcePoint : result.sourcePoint,
-                    description : result.description,
-                    elapsed     : result.resolution.elapsedTime,
+                    type            : 'assertion_waitfor',
+                    name            : result.name,
+                    passed          : result.passed,
+                    sourcePoint     : result.sourcePoint,
+                    description     : result.description,
+                    elapsed         : result.resolution.elapsedTime,
                     timeoutHappened : result.resolution.timeoutHappened,
                     exception       : result.resolution.exception,
-                    // TODO render to string
-                    annotation  : result.annotation + ''
+                    annotation      : result.annotation ? stripAnsiControlCharacters(launcher.render(result.annotation)) : undefined
                 } as JSONReportWaitForAssertionNode
             else if (result instanceof Exception)
                 return {
-                    type        : 'exception',
-                    message     : result.text
+                    type            : 'exception',
+                    message         : result.text
                 } as JSONReportExceptionNode
         })
     }
