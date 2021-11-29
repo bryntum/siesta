@@ -38,8 +38,7 @@ export class LauncherDescriptorNodejs extends Mixin(
 
 
         @option({
-            type        : 'string',
-            structure   : 'enum',
+            type        : 'enum',
             enumeration : [ 'nodejs', 'deno', 'playwright' ],
             group       : OptionsGroupPrimary,
             help        : <div>
@@ -51,8 +50,7 @@ export class LauncherDescriptorNodejs extends Mixin(
 
 
         @option({
-            type        : 'string',
-            structure   : 'enum',
+            type        : 'enum',
             enumeration : [ 'chrome', 'firefox', 'edge', 'safari' ],
             group       : OptionsGroupBrowser,
             defaultValue : () => 'chrome',
