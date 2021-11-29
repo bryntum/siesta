@@ -4,7 +4,7 @@ import { LogLevel, LogMethod } from "../../logger/Logger.js"
 import { TreeNodeMapped } from "../../tree/TreeNodeMapped.js"
 import { AssertionWaitForCreation } from "../test/assertion/AssertionAsync.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { Assertion, AssertionAsyncCreation, Exception, LogMessage, TestNodeResult } from "../test/TestResult.js"
+import { Assertion, Exception, LogMessage, SourcePoint, TestNodeResult } from "../test/TestResult.js"
 import { TestNodeResultReactive } from "../test/TestResultReactive.js"
 import { Dispatcher } from "./Dispatcher.js"
 
@@ -34,6 +34,8 @@ export type JSONReportSyncAssertionNode = {
 
     passed      : boolean,
 
+    sourcePoint : SourcePoint
+
     description : string,
     annotation  : string
 }
@@ -46,6 +48,8 @@ export type JSONReportWaitForAssertionNode = {
     elapsed     : number,
 
     passed      : boolean,
+
+    sourcePoint : SourcePoint
 
     description : string,
     annotation  : string,
@@ -78,7 +82,9 @@ export type JSONReportTestCaseNode = {
 export type JSONReportTestFileNode = {
     type        : 'file',
     title       : string,
+    filename    : string,
     url         : string,
+    urlAbs      : string,
 
     topTest     : JSONReportTestCaseNode
 }
@@ -87,6 +93,9 @@ export type JSONReportTestFileNode = {
 export type JSONReportDirectoryNode = {
     type        : 'dir',
     title       : string,
+    filename    : string,
+    url         : string,
+    urlAbs      : string,
 
     items       : (JSONReportDirectoryNode | JSONReportTestFileNode)[]
 }
@@ -133,38 +142,43 @@ export class TestLaunchResult extends Mixin(
 
                 items       : this.childNodes.map(childDescriptor =>
                     childDescriptor.isLeaf()
-                        ? childDescriptor.asJSONReportTestFileNode()
+                        ? childDescriptor.mostRecentResult ? childDescriptor.asJSONReportTestFileNode() : undefined
                         : childDescriptor.asJSONReportDirectoryNode()
-                )
+                ).filter(node => Boolean(node))
             }
         }
 
 
         asJSONReportDirectoryNode () : JSONReportDirectoryNode {
-            if (this.isLeaf()) throw new Error("This method can only be called on root node")
+            if (this.isLeaf()) throw new Error("This method can only be called on directory node")
 
             return {
-                type    : 'dir',
+                type        : 'dir',
 
-                title   : this.descriptor.title,
+                title       : this.descriptor.title,
+                filename    : this.descriptor.filename,
+                url         : this.descriptor.url,
+                urlAbs      : this.descriptor.urlAbs,
 
                 items       : this.childNodes.map(childDescriptor =>
                     childDescriptor.isLeaf()
-                        ? childDescriptor.asJSONReportTestFileNode()
+                        ? childDescriptor.mostRecentResult ? childDescriptor.asJSONReportTestFileNode() : undefined
                         : childDescriptor.asJSONReportDirectoryNode()
-                )
+                ).filter(node => Boolean(node))
             }
         }
 
 
         asJSONReportTestFileNode () : JSONReportTestFileNode {
-            if (this.isLeaf()) throw new Error("This method can only be called on root node")
+            if (!this.isLeaf()) throw new Error("This method can only be called on leaf node")
 
             return {
                 type    : 'file',
 
-                title   : this.descriptor.title,
-                url     : this.descriptor.url,
+                title       : this.descriptor.title,
+                filename    : this.descriptor.filename,
+                url         : this.descriptor.url,
+                urlAbs      : this.descriptor.urlAbs,
 
                 topTest : testNodeResultAsJSONReportTestCaseNode(this.mostRecentResult)
             }
@@ -200,6 +214,7 @@ const testNodeResultAsJSONReportTestCaseNode = (result : TestNodeResult) : JSONR
                     type        : 'assertion',
                     name        : result.name,
                     passed      : result.passed,
+                    sourcePoint : result.sourcePoint,
                     description : result.description,
                     // TODO render to string
                     annotation  : result.annotation + ''
@@ -209,6 +224,7 @@ const testNodeResultAsJSONReportTestCaseNode = (result : TestNodeResult) : JSONR
                     type        : 'assertion_waitfor',
                     name        : result.name,
                     passed      : result.passed,
+                    sourcePoint : result.sourcePoint,
                     description : result.description,
                     elapsed     : result.resolution.elapsedTime,
                     timeoutHappened : result.resolution.timeoutHappened,

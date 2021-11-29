@@ -67,6 +67,9 @@
 /src/**/*.css
 /src/**/*.css.map
 
+# random temp files
+asd*
+
 
 # docs
 /docs
