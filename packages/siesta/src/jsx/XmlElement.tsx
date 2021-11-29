@@ -65,7 +65,7 @@ export class XmlElement extends Mixin(
         initialize (props? : Partial<XmlElement>) {
             super.initialize(props)
 
-            this.adoptChildren(this.childNodes)
+            this.childNodes && this.adoptChildren(this.childNodes)
         }
 
 
@@ -77,7 +77,7 @@ export class XmlElement extends Mixin(
 
 
         toString () : string {
-            const childrenContent       = this.childNodes.map(child => child.toString())
+            const childrenContent       = this.childNodes ? this.childNodes.map(child => child.toString()) : []
             const attributesContent     = this.$attributes
                 ?
                     Object.entries(this.attributes)

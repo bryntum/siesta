@@ -375,8 +375,14 @@ export class AssertionWaitForCreation extends Mixin(
     (base : ClassUnion<typeof AssertionAsyncCreation>) =>
 
     class AssertionWaitForCreation extends base {
-        // @ts-ignore
-        declare get resolution () : AssertionWaitForResolution
+        $resolution     : AssertionWaitForResolution          = undefined
+
+        get resolution () : AssertionWaitForResolution | null {
+            return this.$resolution
+        }
+        set resolution (value : AssertionWaitForResolution) {
+            this.$resolution    = value
+        }
 
         name            : string        = 'waitFor'
     }
