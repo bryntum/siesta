@@ -571,7 +571,9 @@ export class Test extends TestPre {
 
         this.startDate                  = new Date()
 
-        this.connector.onSubTestStart(this.rootTest.descriptor.guid, this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor)
+        this.connector.onSubTestStart(
+            this.rootTest.descriptor.guid, this.localId, this.parentNode ? this.parentNode.localId : null, this.descriptor, this.startDate
+        )
 
         // start hook, can add assertions in it
         this.startHook.trigger(this)
@@ -591,9 +593,9 @@ export class Test extends TestPre {
         // finish hook, can add assertions
         this.finishHook.trigger(this)
 
-        this.connector.onSubTestFinish(this.rootTest.descriptor.guid, this.localId, false)
-
         this.endDate                    = new Date()
+
+        this.connector.onSubTestFinish(this.rootTest.descriptor.guid, this.localId, false, this.endDate)
 
         globalTestEnv.currentTest       = this.parentNode
 
@@ -694,8 +696,8 @@ export class Test extends TestPre {
                     // instead it always assumes subtest is launched
                     // so we do that, with a special flag for `onSubTestFinish`
                     // this can be improved
-                    this.connector.onSubTestStart(this.rootTest.descriptor.guid, subTest.localId, subTest.parentNode ? subTest.parentNode.localId : null, subTest.descriptor)
-                    this.connector.onSubTestFinish(this.rootTest.descriptor.guid, subTest.localId, true)
+                    this.connector.onSubTestStart(this.rootTest.descriptor.guid, subTest.localId, subTest.parentNode ? subTest.parentNode.localId : null, subTest.descriptor, new Date())
+                    this.connector.onSubTestFinish(this.rootTest.descriptor.guid, subTest.localId, true, new Date())
                 }
             } else
                 await subTest.start()

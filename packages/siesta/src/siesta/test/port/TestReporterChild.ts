@@ -15,10 +15,10 @@ export class TestReporterChild extends Mixin(
 
     class TestReporterChild extends base implements TestReporter {
         @remote()
-        onSubTestStart : (rootTestId : LUID, testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) => Promise<any>
+        onSubTestStart : (rootTestId : LUID, testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor, startDate : Date) => Promise<any>
 
         @remote()
-        onSubTestFinish : (rootTestId : LUID, testNodeId : LUID, isIgnored : boolean) => Promise<any>
+        onSubTestFinish : (rootTestId : LUID, testNodeId : LUID, isIgnored : boolean, endDate : Date) => Promise<any>
 
         @remote()
         onResult : (rootTestId : LUID, testNodeId : LUID, result : TestResultLeaf) => Promise<any>

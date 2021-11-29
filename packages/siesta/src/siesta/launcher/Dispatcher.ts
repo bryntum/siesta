@@ -314,16 +314,19 @@ export class Dispatcher extends Mixin(
             try {
                 preLaunchRes        = await context.preLaunchTest(normalized.urlAbs, stringifiedDesc, this.getTestLaunchDelay())
             } catch (e) {
-                const testNode      = TestNodeResultReactive.new({ descriptor : normalized })
+                const startDate     = new Date()
+                const endDate       = new Date()
+
+                const testNode      = TestNodeResultReactive.new({ descriptor : normalized, startDate, endDate })
 
                 this.reporter.onSubTestStart(testNode)
-                dashboardConnector?.onSubTestStart(item.guid, testNode.localId, undefined, normalized)
+                dashboardConnector?.onSubTestStart(item.guid, testNode.localId, undefined, normalized, startDate)
 
                 const exception     = testNode.addResult(Exception.new({ exception : e }))
                 dashboardConnector?.onResult(item.guid, testNode.localId, exception)
 
                 this.reporter.onSubTestFinish(testNode)
-                dashboardConnector?.onSubTestFinish(item.guid, testNode.localId, false)
+                dashboardConnector?.onSubTestFinish(item.guid, testNode.localId, false, endDate)
 
                 this.setDashboardLaunchState(item, 'completed')
 
@@ -337,13 +340,16 @@ export class Dispatcher extends Mixin(
             // no global importer available - test file is probably empty, or does not import any Siesta code
             // test will be reported as passed
             if (!preLaunchRes) {
-                const testNode      = TestNodeResultReactive.new({ descriptor : normalized })
+                const startDate     = new Date()
+                const endDate       = new Date()
+
+                const testNode      = TestNodeResultReactive.new({ descriptor : normalized, startDate, endDate })
 
                 this.reporter.onSubTestStart(testNode)
-                dashboardConnector?.onSubTestStart(item.guid, testNode.localId, undefined, normalized)
+                dashboardConnector?.onSubTestStart(item.guid, testNode.localId, undefined, normalized, startDate)
 
                 this.reporter.onSubTestFinish(testNode)
-                dashboardConnector?.onSubTestFinish(item.guid, testNode.localId, false)
+                dashboardConnector?.onSubTestFinish(item.guid, testNode.localId, false, endDate)
 
                 this.setDashboardLaunchState(item, 'completed')
 

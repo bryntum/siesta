@@ -32,9 +32,9 @@ XmlElement
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export interface TestReporter {
-    onSubTestStart (rootTestId : LUID, testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) : Promise<any>
+    onSubTestStart (rootTestId : LUID, testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor, startDate : Date) : Promise<any>
 
-    onSubTestFinish (rootTestId : LUID, testNodeId : LUID, isIgnored : boolean) : Promise<any>
+    onSubTestFinish (rootTestId : LUID, testNodeId : LUID, isIgnored : boolean, endDate : Date) : Promise<any>
 
     onResult (rootTestId : LUID, testNodeId : LUID, result : TestResultLeaf) : Promise<any>
 
@@ -63,7 +63,7 @@ export class TestReporterParent extends Mixin(
 
 
         @local()
-        async onSubTestStart (rootTestId : LUID, testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor) {
+        async onSubTestStart (rootTestId : LUID, testNodeId : LUID, parentTestNodeId : LUID, descriptor : TestDescriptor, startDate : Date) {
             if (this.currentTestNodeResult) {
                 if (this.currentTestNodeResult.localId !== parentTestNodeId) {
                     throw new Error("Parent test node internal id mismatch")
@@ -73,6 +73,8 @@ export class TestReporterParent extends Mixin(
                     localId         : testNodeId,
                     descriptor      : descriptor,
                     state           : 'running',
+
+                    startDate,
 
                     parentNode      : this.currentTestNodeResult
                 })
@@ -99,6 +101,8 @@ export class TestReporterParent extends Mixin(
                     descriptor      : descriptor,
                     state           : 'running',
 
+                    startDate,
+
                     previous        : this.launchInfo.mostRecentResult
                 })
 
@@ -109,23 +113,24 @@ export class TestReporterParent extends Mixin(
 
             this.reporter.onSubTestStart(this.currentTestNodeResult)
 
-            if (this.connector) this.connector.onSubTestStart(rootTestId, testNodeId, parentTestNodeId, descriptor)
+            if (this.connector) this.connector.onSubTestStart(rootTestId, testNodeId, parentTestNodeId, descriptor, startDate)
         }
 
         @local()
-        async onSubTestFinish (rootTestId : LUID, testNodeId : LUID, isIgnored : boolean) {
+        async onSubTestFinish (rootTestId : LUID, testNodeId : LUID, isIgnored : boolean, endDate : Date) {
             if (!this.currentTestNodeResult || this.currentTestNodeResult.localId !== testNodeId) {
                 throw new Error("No current test node or test node id mismatch")
             }
 
             this.currentTestNodeResult.frozen   = true
             this.currentTestNodeResult.state    = isIgnored ? 'ignored' : 'completed'
+            this.currentTestNodeResult.endDate  = endDate
 
             this.reporter.onSubTestFinish(this.currentTestNodeResult)
 
             this.currentTestNodeResult          = this.currentTestNodeResult.parentNode
 
-            if (this.connector) this.connector.onSubTestFinish(rootTestId, testNodeId, isIgnored)
+            if (this.connector) this.connector.onSubTestFinish(rootTestId, testNodeId, isIgnored, endDate)
         }
 
 
