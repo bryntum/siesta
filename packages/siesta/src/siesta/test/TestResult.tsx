@@ -478,6 +478,15 @@ export class TestNodeResult extends Mixin(
         get assertions () : Assertion[] {
             return Array.from(this.eachResultOfClass(Assertion))
         }
+
+        // used in JUnit report
+        * eachAssertionAndExceptionDeep () : Generator<Assertion | Exception> {
+            for (const result of this.resultLog) {
+                if ((result instanceof Assertion) || (result instanceof Exception)) yield result
+
+                if (result instanceof TestNodeResult) yield* result.eachAssertionAndExceptionDeep()
+            }
+        }
     }
 ) {}
 

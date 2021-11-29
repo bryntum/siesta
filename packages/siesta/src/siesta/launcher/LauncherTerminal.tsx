@@ -1,7 +1,7 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { importer } from "../../Importer.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { XmlNode } from "../../jsx/XmlElement.js"
+import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel, LogMethod } from "../../logger/Logger.js"
 import { LoggerHookable } from "../../logger/LoggerHookable.js"
 import { parse } from "../../serializable/Serializable.js"
@@ -339,6 +339,9 @@ export class LauncherTerminal extends Mixin(
                 await this.runtime.writeToFile(reportFile, JSON.stringify(report))
             }
             else if (reportFormat === 'junit') {
+                const report        = await this.generateReportJUnit()
+
+                await this.runtime.writeToFile(reportFile, report.toString())
 
             }
             else if (reportFormat === 'html') {
@@ -352,7 +355,8 @@ export class LauncherTerminal extends Mixin(
         }
 
 
-        async generateReportJUnit () {
+        async generateReportJUnit () : Promise<XmlElement> {
+            return this.dispatcher.projectPlanLaunchResult.asJUnitReportRootNode(this.dispatcher)
         }
     }
 ) {}

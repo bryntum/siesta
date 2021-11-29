@@ -1,8 +1,9 @@
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
-import { TextBlock } from "../../jsx/TextBlock.js"
+import { XmlElement } from "../../jsx/XmlElement.js"
 import { LogLevel, LogMethod } from "../../logger/Logger.js"
 import { TreeNodeMapped } from "../../tree/TreeNodeMapped.js"
+import { typeOf } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { stripAnsiControlCharacters } from "../../util_nodejs/Terminal.js"
 import { AssertionWaitForCreation } from "../test/assertion/AssertionAsync.js"
@@ -203,6 +204,141 @@ export class TestLaunchResult extends Mixin(
 
                 topTest     : testNodeResultAsJSONReportTestCaseNode(this.mostRecentResult, dispatcher)
             }
+        }
+
+
+        asJUnitReportRootNode (dispatcher : Dispatcher) : XmlElement {
+            if (this.parentNode) throw new Error("This method can only be called on root node")
+
+            const launcher      = dispatcher.launcher
+
+            const startTime     = dispatcher.launcher.reporter.startTime
+            const endTime       = dispatcher.launcher.reporter.endTime
+
+            const testSuiteNode = XmlElement.new({
+                tagName     : 'testsuite',
+
+                attributes  : {
+                    name        : this.descriptor.title || 'No title',
+                    timestamp   : startTime.toJSON(),
+                    time        : (endTime.getTime() - startTime.getTime()) / 1000,
+                    hostname    : ''
+                }
+            })
+
+            // let properties          = options.properties
+            //
+            // if (properties) {
+            //     let propertiesNode  = testSuiteNode.appendChild({
+            //         tag         : 'properties'
+            //     })
+            //
+            //     Joose.O.each(properties, function (value, name) {
+            //         propertiesNode.appendChild({
+            //             tag         : 'property',
+            //
+            //             attributes  : {
+            //                 name        : name,
+            //                 value       : value
+            //             }
+            //         })
+            //     })
+            // }
+
+            let totalTests      = 0
+            let totalErrors     = 0
+            let totalFailures   = 0
+
+            const projectPlanItemsToLaunch  = dispatcher.projectPlanItemsToLaunch
+
+            projectPlanItemsToLaunch.forEach(descriptor => {
+                totalTests++
+
+                const testCaseNode  = XmlElement.new({
+                    tagName         : 'testcase',
+
+                    attributes      : {
+                        name        : descriptor.urlAbs,
+                        classname   : 'siesta/test'
+                    }
+                })
+
+                const result        = dispatcher.resultsMappingById.get(descriptor.guid)
+
+                if (!result || !result.mostRecentResult) {
+                    totalErrors++
+
+                    testCaseNode.appendChild(XmlElement.new({
+                        tagName         : 'error',
+                        childNodes      : [
+                            'Missing result node'
+                        ]
+                    }))
+                } else {
+                    const testNodeResult    = result.mostRecentResult
+
+                    // if (descriptor.sessionId != null) testCaseNode.setAttribute('sessionId', descriptor.sessionId)
+
+                    testCaseNode.setAttribute('time', (testNodeResult.endDate.getTime() - testNodeResult.startDate.getTime()) / 1000)
+
+                    let hasException        = false
+                    let totalAssertions     = 0
+                    let failedAssertions    = 0
+
+                    for (const assertion of testNodeResult.eachAssertionAndExceptionDeep()) {
+                        if (assertion instanceof Exception) {
+                            totalAssertions++
+                            totalErrors++
+
+                            hasException    = true
+
+                            testCaseNode.appendChild(XmlElement.new({
+                                tagName         : 'error',
+                                attributes      : {
+                                    type        : typeOf(assertion.exception)
+                                },
+                                childNodes      : [
+                                    assertion.text
+                                ]
+                            }))
+                        }
+                        else if (assertion instanceof Assertion) {
+                            totalAssertions++
+
+                            if (!assertion.passed) {
+                                failedAssertions++
+
+                                testCaseNode.appendChild(XmlElement.new({
+                                    tagName     : 'failure',
+
+                                    attributes  : {
+                                        message     : assertion.description || '',
+                                        type        : assertion.name || 'FAIL'
+                                    },
+
+                                    childNodes      : assertion.annotation
+                                        ? [ stripAnsiControlCharacters(launcher.render(assertion.annotation)) ]
+                                        : undefined
+                                }))
+                            }
+                        }
+                    }
+
+                    testCaseNode.setAttribute('totalAssertions', totalAssertions)
+                    testCaseNode.setAttribute('failedAssertions', failedAssertions)
+
+                    // test has failed, but w/o exception - some other reason
+                    if (!hasException && !result.passed) totalFailures++
+                }
+
+                testSuiteNode.appendChild(testCaseNode)
+            })
+
+            testSuiteNode.setAttribute('tests', totalTests)
+            testSuiteNode.setAttribute('errors', totalErrors)
+            testSuiteNode.setAttribute('failures', totalFailures)
+
+            return testSuiteNode
         }
     }
 ) {}

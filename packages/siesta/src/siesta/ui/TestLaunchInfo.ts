@@ -6,7 +6,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { CI } from "../../iterator/Iterator.js"
 import { ContextBrowserIframe } from "../context/ContextBrowserIframe.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { Exception} from "../test/TestResult.js"
+import { Exception } from "../test/TestResult.js"
 import { TestNodeResultReactive } from "../test/TestResultReactive.js"
 import { Dashboard } from "./Dashboard.js"
 
