@@ -1,4 +1,5 @@
 import fs from "fs"
+import fse from "fs-extra"
 import glob from "glob"
 import path from "path"
 import { fileURLToPath } from "url"
@@ -73,5 +74,15 @@ export class RuntimeNodejs extends Runtime {
         return new Promise<void>((resolve, reject) =>
             fs.writeFile(file, content, { encoding : 'utf-8' }, err => err ? reject(err) : resolve())
         )
+    }
+
+
+    async copyFile (source : string, destination : string) {
+        await fse.copyFile(source, destination)
+    }
+
+
+    async copyDir (source : string, destination : string) {
+        await fse.copy(source, destination)
     }
 }

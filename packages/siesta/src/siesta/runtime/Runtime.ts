@@ -63,6 +63,16 @@ export class Runtime extends Base {
     async writeToFile (file : string, content : string) {
         throw new Error("Abstract method")
     }
+
+
+    async copyFile (source : string, destination : string) {
+        throw new Error("Abstract method")
+    }
+
+
+    async copyDir (source : string, destination : string) {
+        throw new Error("Abstract method")
+    }
 }
 
 
