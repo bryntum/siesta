@@ -133,6 +133,7 @@ export class TestGroupLaunchInfo extends Mixin(
 
         items               : (TestGroupLaunchInfo | TestLaunchInfo)[]      = []
 
+        // calculated property
         @field()
         viewState           : TestGroupViewState
 
@@ -181,7 +182,7 @@ export class TestGroupLaunchInfo extends Mixin(
         uncheckParents () {
             this.checked    = false
 
-            this.parentInfo && this.parentInfo.uncheckParents()
+            this.parentInfo?.uncheckParents()
         }
 
 
