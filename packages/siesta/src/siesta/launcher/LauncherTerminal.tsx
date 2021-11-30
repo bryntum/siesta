@@ -91,7 +91,9 @@ export class LauncherDescriptorTerminal extends Mixin(
                 exactly the same number of times, the files and formats will be matched by their order.
             </div>
         })
-        reportFormat    : ReportFormat[]    = [ 'json' ]
+        // no initializer intentionally, to be able to determine if user has provided a value or not
+        // (default value goes into prototype)
+        reportFormat    : ReportFormat[]
     }
 ) {}
 
@@ -152,7 +154,7 @@ export class LauncherTerminal extends Mixin(
                 </div>)
             }
 
-            if (reportFiles.length === 0 && reportFormats.length > 0) {
+            if (reportFiles.length === 0 && this.hasOwnProperty('reportFormats')) {
                 res.errors.push(<div>
                     <span class="log_message_error"> ERROR </span> The <span class="accented">--report-file</span> option
                     is required when <span class="accented">--report-format</span> is provided.
