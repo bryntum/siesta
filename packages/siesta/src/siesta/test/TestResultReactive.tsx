@@ -30,11 +30,14 @@ export class TestNodeResultReactive extends Mixin(
         override $childResultsIndex : ChildResultsIndex<TestNodeResultReactive>
         override parentNode      : TestNodeResultReactive
 
+        // TODO does not belong here, view model
         previous        : this          = undefined
 
+        // TODO does not belong here, view model
         @field()
         checked         : boolean       = false
 
+        // TODO does not belong here, view model
         @field()
         expandedState   : 'collapsed' | 'expanded'      = null
 
