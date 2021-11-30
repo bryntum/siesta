@@ -29,8 +29,6 @@ export class TestLaunchInfo extends Mixin(
     (base : ClassUnion<typeof Entity, typeof Base>) =>
 
     class TestLaunchInfo extends base {
-        dashboard           : Dashboard                 = undefined
-
         descriptor          : TestDescriptor            = undefined
 
         // the only possible type of context to be here is `ContextBrowserIframe`
@@ -55,21 +53,13 @@ export class TestLaunchInfo extends Mixin(
         @field()
         checked             : boolean                   = false
 
+        parentInfo          : TestGroupLaunchInfo       = undefined
+
 
         initialize (props? : Partial<TestLaunchInfo>) {
             super.initialize(props)
 
             this.enterGraph(globalGraph as Replica)
-
-            const descriptor        = this.descriptor
-
-            this.dashboard.results.set(descriptor, this)
-            this.dashboard.mapping.set(descriptor.guid, this)
-        }
-
-
-        get parentInfo () : TestGroupLaunchInfo {
-            return this.dashboard.resultsGroups.get(this.descriptor.parentNode)
         }
 
 
@@ -85,7 +75,7 @@ export class TestLaunchInfo extends Mixin(
         }
 
 
-        async schedulePendingTestLaunch () {
+        async schedulePendingTestLaunch (dashboard : Dashboard) {
             this.launchState        = 'pending'
 
             try {
@@ -93,7 +83,7 @@ export class TestLaunchInfo extends Mixin(
                 this.testSources    = undefined
 
                 // should always fetch the fresh test sources, might change anytime
-                this.testSources    = await this.dashboard.connector.fetchSources(this.descriptor.urlAbs)
+                this.testSources    = await dashboard.connector.fetchSources(this.descriptor.urlAbs)
             } catch (e) {
             }
         }
@@ -127,8 +117,6 @@ export class TestGroupLaunchInfo extends Mixin(
     (base : ClassUnion<typeof Entity, typeof Base>) =>
 
     class TestGroupLaunchInfo extends base {
-        dashboard           : Dashboard                 = undefined
-
         descriptor          : TestDescriptor            = undefined
 
         items               : (TestGroupLaunchInfo | TestLaunchInfo)[]      = []
@@ -144,6 +132,9 @@ export class TestGroupLaunchInfo extends Mixin(
         expandedState       : 'collapsed' | 'expanded'  = null
 
 
+        parentInfo          : TestGroupLaunchInfo       = undefined
+
+
         initialize (props? : Partial<TestGroupLaunchInfo>) {
             super.initialize(props)
 
@@ -152,16 +143,21 @@ export class TestGroupLaunchInfo extends Mixin(
             if (this.descriptor.childNodes)
                 this.items      = this.descriptor.childNodes.map(descriptor => {
                     return descriptor.isLeaf()
-                        ? TestLaunchInfo.new({ descriptor, dashboard : this.dashboard })
-                        : TestGroupLaunchInfo.new({ descriptor, dashboard : this.dashboard })
+                        ? TestLaunchInfo.new({ descriptor, parentInfo : this })
+                        : TestGroupLaunchInfo.new({ descriptor, parentInfo : this })
                 })
-
-            this.dashboard.resultsGroups.set(this.descriptor, this)
         }
 
 
-        get parentInfo () : TestGroupLaunchInfo {
-            return this.descriptor.parentNode ? this.dashboard.resultsGroups.get(this.descriptor.parentNode) : undefined
+        * iterate () : Generator<TestGroupLaunchInfo | TestLaunchInfo> {
+            yield this
+
+            for (const item of (this.items || [])) {
+                if (item instanceof TestGroupLaunchInfo)
+                    yield* item.iterate()
+                else
+                    yield item
+            }
         }
 
 

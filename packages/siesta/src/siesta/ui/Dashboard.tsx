@@ -266,9 +266,20 @@ export class Dashboard extends Mixin(
 
         async setup () {
             this.projectPlanLaunchInfo  = TestGroupLaunchInfo.new({
-                descriptor  : this.projectData.projectPlan,
-                dashboard   : this
+                descriptor  : this.projectData.projectPlan
             })
+
+            for (const item of this.projectPlanLaunchInfo.iterate()) {
+                if (item instanceof TestGroupLaunchInfo) {
+                    this.resultsGroups.set(item.descriptor, item)
+                }
+                else if (item instanceof TestLaunchInfo) {
+                    const descriptor        = item.descriptor
+
+                    this.results.set(descriptor, item)
+                    this.mapping.set(descriptor.guid, item)
+                }
+            }
 
             await Promise.all([ awaitDomInteractive(), this.renderer.setupTheme() ])
         }
@@ -484,7 +495,7 @@ export class Dashboard extends Mixin(
             // TODO need a proper "exclusive" queue in dispatcher too
             if (projectPlanItemsToLaunch.length > 1) isolationOverride = isolationOverride ?? 'page'
 
-            projectPlanItemsToLaunch.forEach(desc => this.getTestLaunchInfo(desc).schedulePendingTestLaunch())
+            projectPlanItemsToLaunch.forEach(desc => this.getTestLaunchInfo(desc).schedulePendingTestLaunch(this))
 
             this.connector.launchContinuously(projectPlanItemsToLaunch, isolationOverride)
         }
@@ -492,7 +503,7 @@ export class Dashboard extends Mixin(
 
         async launchContinuouslyWithCheckInfo (desc : TestDescriptor, checkInfo : SubTestCheckInfo) {
             // this method will fetch the fresh test sources, among other things
-            this.getTestLaunchInfo(desc).schedulePendingTestLaunch()
+            this.getTestLaunchInfo(desc).schedulePendingTestLaunch(this)
 
             this.connector.launchContinuouslyWithCheckInfo(desc, checkInfo)
         }
