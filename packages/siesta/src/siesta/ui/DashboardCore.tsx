@@ -263,7 +263,7 @@ export class DashboardCore extends Mixin(
         }
 
 
-        async setup () {
+        setupData () {
             this.projectPlanLaunchInfo  = TestGroupLaunchInfo.new({
                 descriptor  : this.projectData.projectPlan
             })
@@ -279,6 +279,11 @@ export class DashboardCore extends Mixin(
                     this.mapping.set(descriptor.guid, item)
                 }
             }
+        }
+
+
+        async setup () {
+            this.setupData()
 
             await Promise.all([ awaitDomInteractive(), this.renderer.setupTheme() ])
         }

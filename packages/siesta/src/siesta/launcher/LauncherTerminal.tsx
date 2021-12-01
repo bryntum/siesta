@@ -7,7 +7,7 @@ import { LogLevel, LogMethod } from "../../logger/Logger.js"
 import { LoggerHookable } from "../../logger/LoggerHookable.js"
 import { parse, stringify } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
-import { isDeno, isNodejs } from "../../util/Helpers.js"
+import { cloneObject, isDeno, isNodejs } from "../../util/Helpers.js"
 import { stripBasename } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
 import { Context } from "../context/Context.js"
@@ -362,9 +362,38 @@ export class LauncherTerminal extends Mixin(
         async createReportHTML (reportFile : string) {
             const runtime       = this.runtime
 
+            const hasResults    = new Set<TestDescriptor>()
+
+            for (const launchRes of this.dispatcher.projectPlanLaunchResult.traverseGen()) {
+                if (launchRes.isLeaf() && launchRes.mostRecentResult) hasResults.add(launchRes.descriptor)
+            }
+
+            const filterMap     = (desc : TestDescriptor) : TestDescriptor => {
+                const instance      = cloneObject(desc)
+
+                if (desc.isLeaf())
+                    return hasResults.has(desc) ? instance : undefined
+                else {
+                    const children  = desc.childNodes.map(filterMap).filter(el => Boolean(el))
+
+                    if (children.length > 0) {
+                        instance.childNodes = []
+                        children.forEach(child => instance.appendChild(child))
+
+                        return instance
+                    } else
+                        return undefined
+                }
+            }
+
+            const filteredPlan  = filterMap(this.projectData.projectPlan)
+
             const data          = stringify(
                 {
-                    projectData         : this.projectData,
+                    projectData         : Object.assign(ProjectSerializableData.new(this.projectData), {
+                        projectPlan : filteredPlan
+                    } as Partial<ProjectSerializableData>),
+
                     launcherDescriptor  : this.getDescriptor(),
                     launchResult        : this.dispatcher.projectPlanLaunchResult
                 } as HTMLReportData,

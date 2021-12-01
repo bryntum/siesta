@@ -26,6 +26,7 @@ const fetchData = async () => {
 
     dashboard.projectData           = data.projectData
     dashboard.launcherDescriptor    = data.launcherDescriptor
+    dashboard.launchResult          = data.launchResult
 
     await dashboard.start()
 }
