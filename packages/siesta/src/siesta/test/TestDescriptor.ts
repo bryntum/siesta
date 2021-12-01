@@ -193,7 +193,7 @@ export class TestDescriptor extends TestDescriptorPre {
     stringifierConfig   : Partial<XmlRendererDifference>    = { prettyPrint : true }
     deepCompareConfig   : DeepCompareOptions                = undefined
 
-
+    // TODO should probably index by `urlAbs` instead of `filename`
     childrenByName      : Map<string, TestDescriptor>       = new Map()
 
 
