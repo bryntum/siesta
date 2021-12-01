@@ -45,7 +45,8 @@
         "tests_deno/**/*.ts",
         "tests_deno/**/*.tsx",
         "examples/**/*.ts",
-        "resources/dashboard/**/*.ts"
+        "resources/dashboard/**/*.ts",
+        "resources/html_report/**/*.ts"
     ],
 
     "exclude" : [
