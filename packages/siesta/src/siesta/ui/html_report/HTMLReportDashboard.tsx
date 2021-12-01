@@ -27,6 +27,7 @@ export class HTMLReportDashboard extends Mixin(
                     const launchInfo = this.mapping.get(launchRes.descriptor.guid)
 
                     launchInfo.mostRecentResult = launchRes.mostRecentResult
+                    launchInfo.launchState      = "completed"
                 }
             }
         }
