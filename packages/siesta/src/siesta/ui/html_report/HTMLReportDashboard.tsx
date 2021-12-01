@@ -3,6 +3,8 @@ import { ClassUnion, Mixin } from "typescript-mixin-class/index.js"
 import { TestLaunchResult } from "../../launcher/TestLaunchResult.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
 import { DashboardCore } from "../DashboardCore.js"
+import { LaunchInfoComponentCore } from "../test_result/LaunchInfoComponentCore.js"
+import { HTMLReportLaunchInfoComponent } from "./HTMLReportLaunchInfoComponent.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -12,6 +14,8 @@ export class HTMLReportDashboard extends Mixin(
 
     class HTMLReportDashboard extends base {
         launchResult            : TestLaunchResult          = undefined
+
+        launchInfoComponentClass    : typeof LaunchInfoComponentCore            = HTMLReportLaunchInfoComponent
 
 
         setupData () {

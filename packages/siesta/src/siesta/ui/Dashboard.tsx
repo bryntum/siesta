@@ -9,6 +9,8 @@ import { TestDescriptor } from "../test/TestDescriptor.js"
 import { SubTestCheckInfo } from "../test/TestResult.js"
 import { individualCheckInfoForTestResult } from "../test/TestResultReactive.js"
 import { DashboardCore, flattenFilteredTestDescriptor } from "./DashboardCore.js"
+import { LaunchInfoComponent } from "./test_result/LaunchInfoComponent.js"
+import { LaunchInfoComponentCore } from "./test_result/LaunchInfoComponentCore.js"
 
 ChronoGraphJSX
 
@@ -18,6 +20,8 @@ export class Dashboard extends Mixin(
     (base : ClassUnion<typeof DashboardCore>) =>
 
     class Dashboard extends base {
+        launchInfoComponentClass    : typeof LaunchInfoComponentCore            = LaunchInfoComponent
+
         connector                   : DashboardConnectorClient  = DashboardConnectorClient.new({ dashboard : this })
 
 

@@ -15,24 +15,18 @@ import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { buffer } from "../../util/TimeHelpers.js"
 import { awaitDomInteractive } from "../../util_browser/Dom.js"
-import { IsolationLevel } from "../common/IsolationLevel.js"
 import { LUID } from "../common/LUID.js"
-import { DashboardConnectorClient } from "../launcher/DashboardConnector.js"
 import { LauncherDescriptor } from "../launcher/Launcher.js"
 import { LauncherDescriptorNodejs } from "../launcher/LauncherDescriptorNodejs.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { TestReporterParent } from "../test/port/TestReporterParent.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
-import { SubTestCheckInfo } from "../test/TestResult.js"
-import {
-    individualCheckInfoForTestResult,
-    TestNodeResultReactive
-} from "../test/TestResultReactive.js"
+import { TestNodeResultReactive } from "../test/TestResultReactive.js"
 import { Splitter } from "./components/Splitter.js"
 import { ProjectPlanComponent, TestDescriptorComponent } from "./ProjectPlanComponent.js"
 import { RippleEffectManager } from "./RippleEffectManager.js"
-import { DomContainerPosition, LaunchInfoComponent } from "./test_result/LaunchInfoComponent.js"
+import { DomContainerPosition, LaunchInfoComponentCore } from "./test_result/LaunchInfoComponentCore.js"
 import { TestOverlay } from "./test_result/TestOverlay.js"
 import { TestNodeResultComponent } from "./test_result/TestResult.js"
 import { TestGroupLaunchInfo, TestLaunchInfo } from "./TestLaunchInfo.js"
@@ -116,6 +110,8 @@ export class DashboardCore extends Mixin(
         mapping                     : Map<LUID, TestLaunchInfo>                 = new Map()
 
         renderer                    : DashboardRenderer         = DashboardRenderer.new({ dashboard : this })
+
+        launchInfoComponentClass    : typeof LaunchInfoComponentCore            = LaunchInfoComponentCore
 
 
         get projectPlan () : TestDescriptor {
@@ -390,13 +386,13 @@ export class DashboardCore extends Mixin(
 
                         const launchInfo            = this.getTestLaunchInfo(this.currentTest)
 
-                        return <LaunchInfoComponent
+                        return <this.launchInfoComponentClass
                             dashboard               = { this }
                             launchInfo              = { launchInfo }
                             domContainerWidthBox    = { this.domContainerWidthBox }
                             domContainerHeightBox   = { this.domContainerHeightBox }
                             domContainerPositionBox = { this.domContainerPositionBox }
-                        ></LaunchInfoComponent>
+                        ></this.launchInfoComponentClass>
                     }
                 }
             </div>
