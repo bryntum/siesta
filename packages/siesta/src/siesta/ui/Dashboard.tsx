@@ -18,6 +18,7 @@ import { awaitDomInteractive } from "../../util_browser/Dom.js"
 import { IsolationLevel } from "../common/IsolationLevel.js"
 import { LUID } from "../common/LUID.js"
 import { DashboardConnectorClient } from "../launcher/DashboardConnector.js"
+import { LauncherDescriptor } from "../launcher/Launcher.js"
 import { LauncherDescriptorNodejs } from "../launcher/LauncherDescriptorNodejs.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
@@ -107,7 +108,7 @@ export class Dashboard extends Mixin(
 
         projectData                 : ProjectSerializableData                   = undefined
 
-        launcherDescriptor          : LauncherDescriptorNodejs                  = LauncherDescriptorNodejs.new()
+        launcherDescriptor          : LauncherDescriptor                        = LauncherDescriptorNodejs.new()
 
         projectPlanLaunchInfo       : TestGroupLaunchInfo                       = undefined
         resultsGroups               : Map<TestDescriptor, TestGroupLaunchInfo>  = new Map()
