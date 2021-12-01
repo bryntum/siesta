@@ -6,8 +6,14 @@ import { calculate, Entity, field } from "@bryntum/chronograph/src/replica2/Enti
 import { Replica } from "@bryntum/chronograph/src/replica2/Replica.js"
 import { Field } from "@bryntum/chronograph/src/schema2/Field.js"
 import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
-import { ClassUnion, Mixin } from "typescript-mixin-class"
-import { exclude, serializable } from "typescript-serializable-mixin"
+import { ClassUnion, Mixin } from "typescript-mixin-class/index.js"
+import {
+    exclude,
+    lookupSerializableClass,
+    Serializable,
+    serializable,
+    Visitor
+} from "typescript-serializable-mixin/index.js"
 import { CI } from "../../iterator/Iterator.js"
 import {
     AssertionAsyncCreation,
@@ -21,10 +27,16 @@ import {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const collapserVisitSymbol           = Symbol('collapserVisitSymbol')
+export const expanderMappingVisitSymbol     = Symbol('expanderMappingVisitSymbol')
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'TestNodeResultReactive', mode : 'optIn' })
 @entity()
 export class TestNodeResultReactive extends Mixin(
-    [ TestNodeResult, Entity ],
-    (base : ClassUnion<typeof TestNodeResult, typeof Entity>) =>
+    [ Serializable, TestNodeResult, Entity ],
+    (base : ClassUnion<typeof Serializable, typeof TestNodeResult, typeof Entity>) =>
 
     class TestNodeResultReactive extends base {
         override $childResultsIndex : ChildResultsIndex<TestNodeResultReactive>
@@ -119,6 +131,55 @@ export class TestNodeResultReactive extends Mixin(
                             atom.write(value)
                 }
             })
+        }
+
+
+        [collapserVisitSymbol] (visitor : Visitor) {
+            return {
+                $class      : this.$class,
+
+                localId     : this.localId,
+                frozen      : this.frozen,
+                state       : this.state,
+
+                descriptor  : visitor.visit(this.descriptor),
+                parentNode  : visitor.visit(this.parentNode),
+
+                startDate   : visitor.visit(this.startDate),
+                endDate     : visitor.visit(this.endDate),
+
+                // small hack - store the reactive array value in different property
+                $resultLog  : visitor.visit(this.resultLog)
+            }
+        }
+
+
+        [expanderMappingVisitSymbol] (visitor : Visitor) {
+            const cls       = lookupSerializableClass(this.$class)
+
+            const instance  = Object.create(cls.prototype)
+
+            Object.assign(instance, {
+                localId     : this.localId,
+                frozen      : this.frozen,
+                state       : this.state,
+
+                descriptor  : visitor.visit(this.descriptor),
+                parentNode  : visitor.visit(this.parentNode),
+
+                startDate   : visitor.visit(this.startDate),
+                endDate     : visitor.visit(this.endDate),
+
+                // small hack - extract the reactive array value from different property
+                resultLog   : visitor.visit(
+                    // @ts-ignore
+                    this.$resultLog
+                )
+            })
+
+            instance.enterGraph(globalGraph as Replica)
+
+            return instance
         }
     }
 ){}

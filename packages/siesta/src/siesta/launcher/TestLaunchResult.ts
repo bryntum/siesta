@@ -1,3 +1,4 @@
+import { Serializable, serializable } from "typescript-serializable-mixin/index.js"
 import { Base } from "../../class/Base.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
@@ -6,11 +7,21 @@ import { TreeNodeMapped } from "../../tree/TreeNodeMapped.js"
 import { typeOf } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { stripAnsiControlCharacters } from "../../util_nodejs/Terminal.js"
+import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { AssertionWaitForCreation } from "../test/assertion/AssertionAsync.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Assertion, Exception, LogMessage, SourcePoint, TestNodeResult } from "../test/TestResult.js"
 import { TestNodeResultReactive } from "../test/TestResultReactive.js"
 import { Dispatcher } from "./Dispatcher.js"
+import { LauncherDescriptor } from "./Launcher.js"
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type HTMLReportData = {
+    projectData         : ProjectSerializableData
+    launcherDescriptor  : LauncherDescriptor
+    launchResult        : TestLaunchResult
+}
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -121,9 +132,10 @@ export type JSONReportRootNode = {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'TestLaunchResult' })
 export class TestLaunchResult extends Mixin(
-    [ TreeNodeMapped, Base ],
-    (base : ClassUnion<typeof TreeNodeMapped, typeof Base>) =>
+    [ Serializable, TreeNodeMapped, Base ],
+    (base : ClassUnion<typeof Serializable, typeof TreeNodeMapped, typeof Base>) =>
 
     class TestLaunchInfo extends base {
         childNodeT          : this
