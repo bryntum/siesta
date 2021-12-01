@@ -5,7 +5,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel, LogMethod } from "../../logger/Logger.js"
 import { LoggerHookable } from "../../logger/LoggerHookable.js"
-import { parse } from "../../serializable/Serializable.js"
+import { parse, stringify } from "../../serializable/Serializable.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { isDeno, isNodejs } from "../../util/Helpers.js"
 import { stripBasename } from "../../util/Path.js"
@@ -16,6 +16,7 @@ import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { ProjectTerminal } from "../project/ProjectTerminal.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { LogMessage } from "../test/TestResult.js"
+import { collapserVisitSymbol } from "../test/TestResultReactive.js"
 import {
     Launcher,
     LauncherDescriptor,
@@ -25,7 +26,7 @@ import {
 } from "./Launcher.js"
 import { LauncherError } from "./LauncherError.js"
 import { extractProjectInfo } from "./ProjectExtractor.js"
-import { JSONReportRootNode } from "./TestLaunchResult.js"
+import { HTMLReportData, JSONReportRootNode } from "./TestLaunchResult.js"
 import { ExitCodes } from "./Types.js"
 
 // generic sever-side, cross Node/Deno functionality
@@ -349,9 +350,30 @@ export class LauncherTerminal extends Mixin(
                 await runtime.writeToFile(reportFile, report.toString())
             }
             else if (reportFormat === 'html') {
-
-                await runtime.copyDir(siestaPackageRootUrl + 'resources/', reportFile + '/index.html')
+                await this.createReportHTML(reportFile)
             }
+        }
+
+
+        async createReportHTML (reportFile : string) {
+            const runtime       = this.runtime
+
+            const data          = stringify(
+                {
+                    projectData         : this.projectData,
+                    launcherDescriptor  : this.getDescriptor(),
+                    launchResult        : this.dispatcher.projectPlanLaunchResult
+                } as HTMLReportData,
+                { collapserVisitSymbol : collapserVisitSymbol }
+            )
+
+            await runtime.writeToFile(reportFile + '/report_data.json', data)
+
+            const packageRoot   = runtime.fileURLToPath(siestaPackageRootUrl)
+
+            await runtime.copyFile(packageRoot + 'resources/html_report/index.html', reportFile + '/index.html')
+            await runtime.copyFile(packageRoot + 'resources/html_report/index.js', reportFile + '/index.js')
+            await runtime.copyDir(packageRoot + 'resources/styling/browser', reportFile + '/styling/')
         }
 
 
