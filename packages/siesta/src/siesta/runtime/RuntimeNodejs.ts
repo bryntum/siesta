@@ -71,18 +71,16 @@ export class RuntimeNodejs extends Runtime {
 
 
     async writeToFile (file : string, content : string) {
-        return new Promise<void>((resolve, reject) =>
-            fs.writeFile(file, content, { encoding : 'utf-8' }, err => err ? reject(err) : resolve())
-        )
+        await fse.outputFile(file, content, 'utf-8')
     }
 
 
     async copyFile (source : string, destination : string) {
-        await fse.copyFile(source, destination)
+        await fse.copy(source, destination, { overwrite : true })
     }
 
 
     async copyDir (source : string, destination : string) {
-        await fse.copy(source, destination)
+        await fse.copy(source, destination, { overwrite : true })
     }
 }
