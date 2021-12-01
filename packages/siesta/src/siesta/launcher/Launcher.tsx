@@ -555,7 +555,7 @@ export class Launcher extends Mixin(
         }
 
 
-        async setupProjectData () {
+        async setupProjectData (avoidSameContext? : boolean) {
         }
 
 

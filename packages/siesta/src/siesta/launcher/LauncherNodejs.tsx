@@ -254,10 +254,18 @@ export class LauncherNodejs extends Mixin(
 
                     // this call takes time because launcher spans a new browser instance..
                     // should have one browser instance "spare" and span a page in it?
-                    forAwait.push(this.setupProjectData())
+                    forAwait.push(this.setupProjectData(true))
                 }
 
-                await Promise.all(forAwait)
+                try {
+                    await Promise.all(forAwait)
+                } catch (e) {
+                    if (e instanceof LauncherError) {
+                        this.onLauncherError(e)
+                    } else {
+                        this.onUnknownError(e)
+                    }
+                }
 
                 if (counter > 1) {
                     this.dispatcher         = this.dispatcherClass.new({

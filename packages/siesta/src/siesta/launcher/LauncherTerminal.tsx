@@ -194,7 +194,11 @@ export class LauncherTerminal extends Mixin(
         }
 
 
-        async setupProjectData () {
+        // when calling this method repeatedly, one should set `avoidSameContext` to `true`
+        // the reason is that repeated same-context import from project file won't trigger
+        // actual file load (since it has been already loaded previously)
+        // this is important for Node.js
+        async setupProjectData (avoidSameContext? : boolean) {
             await super.setupProjectData()
 
             // `projectDescriptor` might be already provided
@@ -247,7 +251,7 @@ export class LauncherTerminal extends Mixin(
                                 this.projectData.projectPlan.url    = this.runtime.cwd()
                             } else {
                                 // finally - project file name
-                                await this.setupProjectDataFromProjectFile(projectUrl)
+                                await this.setupProjectDataFromProjectFile(projectUrl, avoidSameContext)
                             }
                         }
                     }
@@ -264,8 +268,8 @@ export class LauncherTerminal extends Mixin(
         // for Node.js it generally fine (and most performant) to use same-context context
         // this is based on assumption, that both project and launcher shares the same set of Siesta files
         // Deno overrides this method, to always create a separate context for project
-        async setupProjectDataFromProjectFile (projectUrl : string) {
-            const contextProvider               = this.contextProviderSameContext
+        async setupProjectDataFromProjectFile (projectUrl : string, avoidSameContext? : boolean) {
+            const contextProvider               = avoidSameContext ? this.dispatcher.contextProviders[ 0 ] : this.contextProviderSameContext
 
             const context                       = await contextProvider.createContext()
 
