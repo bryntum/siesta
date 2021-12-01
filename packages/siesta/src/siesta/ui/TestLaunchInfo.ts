@@ -8,6 +8,7 @@ import { ContextBrowserIframe } from "../context/ContextBrowserIframe.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Exception } from "../test/TestResult.js"
 import { TestNodeResultReactive } from "../test/TestResultReactive.js"
+import { Dashboard } from "./Dashboard.js"
 import { DashboardCore } from "./DashboardCore.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -75,7 +76,7 @@ export class TestLaunchInfo extends Mixin(
         }
 
 
-        async schedulePendingTestLaunch (dashboard : DashboardCore) {
+        async schedulePendingTestLaunch (dashboard : Dashboard) {
             this.launchState        = 'pending'
 
             try {
