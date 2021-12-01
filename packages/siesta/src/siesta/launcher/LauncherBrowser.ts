@@ -8,7 +8,7 @@ import { ReporterBrowser } from "../reporter/ReporterBrowser.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeBrowser } from "../runtime/RuntimeBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
-import { Dashboard } from "../ui/Dashboard.js"
+import { DashboardCore } from "../ui/DashboardCore.js"
 import { DashboardConnectorServer } from "./DashboardConnector.js"
 import { Launcher } from "./Launcher.js"
 
@@ -27,7 +27,7 @@ export class LauncherBrowser extends Mixin(
 
         ui                      : boolean                           = true
 
-        dashboard               : Dashboard                         = undefined
+        dashboard               : DashboardCore                     = undefined
 
         keepNLastResults        : number                            = 5
 
@@ -50,7 +50,7 @@ export class LauncherBrowser extends Mixin(
             // will be erased by TS)
             // this excludes UI code from the project bundle and allows us to issue a meaningful error,
             // when browser project is launched directly as node script
-            const DashBoardCls      = (await import('../ui/Dashboard.js')).Dashboard
+            const DashBoardCls      = (await import('../ui/DashboardCore.js')).DashboardCore
 
             this.dashboard          = DashBoardCls.new()
 

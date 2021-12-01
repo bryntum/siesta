@@ -16,7 +16,7 @@ import { TestReporter } from "../test/port/TestReporterParent.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { AssertionAsyncResolution, SubTestCheckInfo, TestResultLeaf } from "../test/TestResult.js"
 import { TestNodeResultReactive } from "../test/TestResultReactive.js"
-import { Dashboard } from "../ui/Dashboard.js"
+import { DashboardCore } from "../ui/DashboardCore.js"
 import { Translator } from "../ui/test_result/Translator.js"
 import { LaunchState, TestLaunchInfo } from "../ui/TestLaunchInfo.js"
 import { Launcher, LauncherDescriptor } from "./Launcher.js"
@@ -136,7 +136,7 @@ export class DashboardConnectorClient extends Mixin(
     (base : ClassUnion<typeof PortHandshakeChild, typeof Base>) =>
 
     class DashboardConnectorClient extends base implements DashboardConnectorInterface, TestReporter {
-        dashboard                   : Dashboard         = undefined
+        dashboard                   : DashboardCore         = undefined
 
         iframeContextProvider       : ContextProviderBrowserIframe  = ContextProviderBrowserIframe.new()
 

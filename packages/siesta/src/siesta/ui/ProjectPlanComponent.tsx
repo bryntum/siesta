@@ -9,7 +9,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TreeComponent } from "./components/TreeComponent.js"
-import { Dashboard, TestDescriptorFiltered } from "./Dashboard.js"
+import { DashboardCore, TestDescriptorFiltered } from "./DashboardCore.js"
 
 ChronoGraphJSX
 
@@ -31,7 +31,7 @@ export class ProjectPlanComponent extends Mixin(
 
         selectedTestBox         : Box<TestDescriptor>                   = undefined
 
-        dashboard               : Dashboard                             = undefined
+        dashboard               : DashboardCore                         = undefined
 
 
         render () : Element {
@@ -65,7 +65,7 @@ export class TestDescriptorComponent extends Component {
         dashboard               : TestDescriptorComponent[ 'dashboard' ]
     }
 
-    dashboard                   : Dashboard                     = undefined
+    dashboard                   : DashboardCore                 = undefined
 
     testDescriptor              : TestDescriptorFiltered        = undefined
     selectedTestBox             : Box<TestDescriptor>           = undefined

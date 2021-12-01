@@ -11,7 +11,7 @@ import { ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { checkInfoFromTestResult } from "../../test/TestResultReactive.js"
 import { Splitter } from "../components/Splitter.js"
-import { Dashboard } from "../Dashboard.js"
+import { DashboardCore } from "../DashboardCore.js"
 import { TestLaunchInfo } from "../TestLaunchInfo.js"
 import { TestNodeResultComponent } from "./TestResult.js"
 import { Translator } from "./Translator.js"
@@ -38,7 +38,7 @@ export class LaunchInfoComponent extends Mixin(
         }
 
         launchInfo              : TestLaunchInfo    = undefined
-        dashboard               : Dashboard         = undefined
+        dashboard               : DashboardCore     = undefined
 
         @field()
         scaleMode               : 'none' | 'fit_full' | 'fit_width' | 'fit_height'   = 'fit_full'

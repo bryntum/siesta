@@ -24,7 +24,7 @@ import {
 } from "../../test/TestResult.js"
 import { TestNodeResultReactive } from "../../test/TestResultReactive.js"
 import { TreeComponent } from "../components/TreeComponent.js"
-import { Dashboard } from "../Dashboard.js"
+import { DashboardCore } from "../DashboardCore.js"
 import { TestLaunchInfo } from "../TestLaunchInfo.js"
 
 ChronoGraphJSX
@@ -44,7 +44,7 @@ export class TestNodeResultComponent extends Mixin(
 
         launchInfo  : TestLaunchInfo                = undefined
         testNode    : TestNodeResultReactive        = undefined
-        dashboard   : Dashboard                     = undefined
+        dashboard   : DashboardCore                 = undefined
 
 
         render () : ReactiveElement {
@@ -142,7 +142,7 @@ export class AssertionComponent extends Mixin(
 
         assertion       : Assertion                 = undefined
         testNode        : TestNodeResultReactive    = undefined
-        dashboard       : Dashboard                 = undefined
+        dashboard       : DashboardCore             = undefined
         launchInfo      : TestLaunchInfo            = undefined
 
 

@@ -1,9 +1,9 @@
 import { MediaBrowserWebSocketChild } from "../../src/rpc/media/MediaBrowserWebSocketChild.js"
-import { Dashboard } from "../../src/siesta/ui/Dashboard.js"
+import { DashboardCore } from "../../src/siesta/ui/DashboardCore.js"
 
 
 const connect = async (wsPort : number) => {
-    const dashboard     = Dashboard.new()
+    const dashboard     = DashboardCore.new()
 
     // TODO move this inside the dashboard itself ?
     const port          = dashboard.connector

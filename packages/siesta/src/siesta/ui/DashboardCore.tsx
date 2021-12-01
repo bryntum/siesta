@@ -68,7 +68,7 @@ export class DashboardRenderer extends Mixin(
     (base : ClassUnion<typeof ConsoleXmlRenderer>) =>
 
     class DashboardRenderer extends base {
-        dashboard           : Dashboard         = undefined
+        dashboard           : DashboardCore         = undefined
 
 
         getMaxLen () : number {
@@ -85,11 +85,11 @@ export class DashboardRenderer extends Mixin(
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class Dashboard extends Mixin(
+export class DashboardCore extends Mixin(
     [ Component ],
     (base : ClassUnion<typeof Component>) =>
 
-    class Dashboard extends base {
+    class DashboardCore extends base {
         @field()
         currentTest                 : TestDescriptor            = undefined
 

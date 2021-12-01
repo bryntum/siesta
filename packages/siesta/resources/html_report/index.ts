@@ -8,7 +8,7 @@ import { TestDescriptorBrowser } from "../../src/siesta/test/TestDescriptorBrows
 import { TestDescriptorDeno } from "../../src/siesta/test/TestDescriptorDeno.js"
 import { TestDescriptorNodejs } from "../../src/siesta/test/TestDescriptorNodejs.js"
 import { expanderMappingVisitSymbol, TestNodeResultReactive } from "../../src/siesta/test/TestResultReactive.js"
-import { Dashboard } from "../../src/siesta/ui/Dashboard.js"
+import { DashboardCore } from "../../src/siesta/ui/DashboardCore.js"
 
 TestDescriptor
 TestDescriptorNodejs
@@ -23,7 +23,7 @@ const fetchData = async () => {
     const text              = await (await fetch(new URL("./report_data.json", import.meta.url).href)).text()
     const data              = parse(text, { mappingVisitSymbol : expanderMappingVisitSymbol }) as HTMLReportData
 
-    const dashboard                 = Dashboard.new()
+    const dashboard                 = DashboardCore.new()
 
     dashboard.projectData           = data.projectData
     dashboard.launcherDescriptor    = data.launcherDescriptor

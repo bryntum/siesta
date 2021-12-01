@@ -10,7 +10,7 @@ import { Component } from "../../../chronograph-jsx/Component.js"
 import { ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { ContextBrowserIframe } from "../../context/ContextBrowserIframe.js"
-import { Dashboard } from "../Dashboard.js"
+import { DashboardCore } from "../DashboardCore.js"
 import { TestLaunchInfo } from "../TestLaunchInfo.js"
 import { Translator } from "./Translator.js"
 
