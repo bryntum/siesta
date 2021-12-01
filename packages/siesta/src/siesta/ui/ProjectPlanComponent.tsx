@@ -41,7 +41,7 @@ export class ProjectPlanComponent extends Mixin(
                         return this.testDescriptor
                             ?
                                 <TestDescriptorComponent
-                                    dashboard= { this.dashboard }
+                                    dashboard       = { this.dashboard }
                                     selectedTestBox = { this.selectedTestBox }
                                     testDescriptor  = { this.testDescriptor }
                                 ></TestDescriptorComponent>
