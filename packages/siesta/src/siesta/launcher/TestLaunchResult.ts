@@ -137,7 +137,7 @@ export class TestLaunchResult extends Mixin(
     [ Serializable, TreeNodeMapped, Base ],
     (base : ClassUnion<typeof Serializable, typeof TreeNodeMapped, typeof Base>) =>
 
-    class TestLaunchInfo extends base {
+    class TestLaunchResult extends base {
         childNodeT          : this
 
         descriptor          : TestDescriptor            = undefined
