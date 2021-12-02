@@ -134,6 +134,7 @@ export class TestNodeResultReactive extends Mixin(
         }
 
 
+        // TODO need to figure out better way to serialize reactive entities
         [collapserVisitSymbol] (visitor : Visitor) {
             return {
                 $class      : this.$class,
@@ -154,6 +155,7 @@ export class TestNodeResultReactive extends Mixin(
         }
 
 
+        // TODO need to figure out better way to serialize reactive entities
         [expanderMappingVisitSymbol] (visitor : Visitor) {
             const cls       = lookupSerializableClass(this.$class)
 
@@ -251,6 +253,49 @@ export class AssertionAsyncCreationReactive extends Mixin(
         set resolution (value : AssertionAsyncResolution) {
             this.$resolution    = value
             this.resolutionBox.write(value)
+        }
+
+        // TODO need to figure out better way to serialize reactive entities
+        [collapserVisitSymbol] (visitor : Visitor) {
+            return {
+                $class      : this.$class,
+
+                name        : this.name,
+                passed      : this.passed,
+                negated     : this.negated,
+
+                description : this.description,
+                annotation  : visitor.visit(this.annotation),
+
+                sourcePoint : visitor.visit(this.sourcePoint),
+
+                $resolution : visitor.visit(this.$resolution),
+            }
+        }
+
+
+        // TODO need to figure out better way to serialize reactive entities
+        [expanderMappingVisitSymbol] (visitor : Visitor) {
+            const cls       = lookupSerializableClass(this.$class)
+
+            const instance  = Object.create(cls.prototype)
+
+            Object.assign(instance, {
+                name        : this.name,
+                passed      : this.passed,
+                negated     : this.negated,
+
+                description : this.description,
+                annotation  : visitor.visit(this.annotation),
+
+                sourcePoint : visitor.visit(this.sourcePoint),
+
+                $resolution : visitor.visit(this.$resolution),
+            })
+
+            instance.enterGraph(globalGraph as Replica)
+
+            return instance
         }
     }
 ) {}
