@@ -7,14 +7,17 @@ import { siestaPackageRootUrl } from "../../index.js"
 import { Queue } from "../../src/siesta/launcher/Queue.js"
 import { Test } from "../../src/siesta/test/Test.js"
 import { UnwrapPromise } from "../../src/util/Helpers.js"
-import { isString } from "../../src/util/Typeguards.js"
+import { isString, isArray } from "../../src/util/Typeguards.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export type LaunchResult    = { exitCode : number, error? : Error, stdout : string, stderr : string }
+export type LaunchResult    = { exitCode : number, error? : Error, stdout : string, stderr : string, options : CmdOptions }
+
+type CmdOptions = string[]
+
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const runProjectDirectly = async (projectUrl : string, options : object = {}, inDeno : boolean = false) : Promise<LaunchResult> => {
+export const runProjectDirectly = async (projectUrl : string, options : CmdOptions = [], inDeno : boolean = false) : Promise<LaunchResult> => {
     return new Promise((resolve, reject) => {
 
         child_process.execFile(
@@ -29,7 +32,7 @@ export const runProjectDirectly = async (projectUrl : string, options : object =
                 shell       : true
             },
             (error, stdout, stderr) => {
-                resolve({ exitCode : error?.code || 0, error, stdout, stderr })
+                resolve({ exitCode : error?.code || 0, error, stdout, stderr, options })
             }
         )
     })
@@ -37,7 +40,7 @@ export const runProjectDirectly = async (projectUrl : string, options : object =
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const runProjectViaLauncher = async (projectUrl : string, options : object = {}, inDeno : boolean = false) : Promise<LaunchResult> => {
+export const runProjectViaLauncher = async (projectUrl : string, options : CmdOptions = [], inDeno : boolean = false) : Promise<LaunchResult> => {
     return new Promise((resolve, reject) => {
 
         child_process.execFile(
@@ -52,7 +55,7 @@ export const runProjectViaLauncher = async (projectUrl : string, options : objec
                 shell       : true
             },
             (error, stdout, stderr) => {
-                resolve({ exitCode : error?.code || 0, error, stdout, stderr })
+                resolve({ exitCode : error?.code || 0, error, stdout, stderr, options })
             }
         )
     })
@@ -60,7 +63,7 @@ export const runProjectViaLauncher = async (projectUrl : string, options : objec
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const runTestDirectly = async (testUrl : string, options : object = {}, inDeno : boolean = false) : Promise<LaunchResult> => {
+export const runTestDirectly = async (testUrl : string, options : CmdOptions = [], inDeno : boolean = false) : Promise<LaunchResult> => {
     return new Promise((resolve, reject) => {
 
         child_process.execFile(
@@ -76,7 +79,7 @@ export const runTestDirectly = async (testUrl : string, options : object = {}, i
                 shell       : true
             },
             (error, stdout, stderr) => {
-                resolve({ exitCode : error?.code || 0, error, stdout, stderr })
+                resolve({ exitCode : error?.code || 0, error, stdout, stderr, options })
             }
         )
     })
@@ -84,7 +87,7 @@ export const runTestDirectly = async (testUrl : string, options : object = {}, i
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const runTestViaLauncher = async (testUrl : string, options : object = {}, inDeno : boolean = false) : Promise<LaunchResult> => {
+export const runTestViaLauncher = async (testUrl : string, options : CmdOptions = [], inDeno : boolean = false) : Promise<LaunchResult> => {
     return new Promise((resolve, reject) => {
 
         child_process.execFile(
@@ -100,7 +103,7 @@ export const runTestViaLauncher = async (testUrl : string, options : object = {}
                 shell       : true
             },
             (error, stdout, stderr) => {
-                resolve({ exitCode : error?.code || 0, error, stdout, stderr })
+                resolve({ exitCode : error?.code || 0, error, stdout, stderr, options })
             }
         )
     })
@@ -136,8 +139,13 @@ export const verifySampleTestLaunch = async (t : Test, launchRes : LaunchResult)
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const stringifyOptions = (options : object) : string[] =>
-    Object.entries(options).map(([ key, value ]) => `${ key.replace(/^(--)?/, '--') }='${ value }'`)
+const stringifyOptions = (options : CmdOptions) : string[] => {
+    if (isArray(options)) {
+        return options
+    } else {
+        return Object.entries(options).map(([ key, value ]) => `${ key.replace(/^(--)?/, '--') }='${ value }'`)
+    }
+}
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

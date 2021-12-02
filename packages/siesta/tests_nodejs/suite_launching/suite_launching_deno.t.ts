@@ -19,21 +19,21 @@ const __dirname     = path.dirname(__filename)
 if (process.env.BUNDLED) {
 
     it('Should be able to launch the Deno project in Deno directly', async t => {
-        const launchRes     = await runProjectDirectly(path.resolve(__dirname, '../@sample_test_suites/deno/index.js'), {}, true)
+        const launchRes     = await runProjectDirectly(path.resolve(__dirname, '../@sample_test_suites/deno/index.js'), [], true)
 
         await verifySampleProjectLaunch(t, launchRes)
     })
 
 
     it('Should be able to launch the Deno project in Deno via launcher', async t => {
-        const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/deno/index.js'), {}, true)
+        const launchRes     = await runProjectViaLauncher(path.resolve(__dirname, '../@sample_test_suites/deno/index.js'), [], true)
 
         await verifySampleProjectLaunch(t, launchRes)
     })
 
 
     it('Should be able to launch the Deno test file in Deno directly', async t => {
-        const launchRes     = await runTestDirectly(path.resolve(__dirname, '../@sample_test_suites/deno/test_1.t.js'), {}, true)
+        const launchRes     = await runTestDirectly(path.resolve(__dirname, '../@sample_test_suites/deno/test_1.t.js'), [], true)
 
         await verifySampleTestLaunch(t, launchRes)
     })

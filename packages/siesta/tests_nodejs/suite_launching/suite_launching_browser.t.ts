@@ -1,3 +1,5 @@
+import fs from "fs"
+import os from "os"
 import path from "path"
 import { fileURLToPath } from "url"
 import { it, TestNodejs } from "../../nodejs.js"
@@ -7,7 +9,8 @@ import {
     launchWebServer,
     runProjectDirectly,
     runProjectViaLauncher,
-    runTestDirectly, runTestsQueued,
+    runTestDirectly,
+    runTestsQueued,
     runTestViaLauncher,
     verifySampleProjectLaunch,
     verifySampleTestLaunch
@@ -17,6 +20,7 @@ import {
 const __filename    = fileURLToPath(import.meta.url)
 const __dirname     = path.dirname(__filename)
 
+const tmpDir        = os.tmpdir()
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Launching browser tests should work', async t => {
@@ -24,10 +28,31 @@ it('Launching browser tests should work', async t => {
 
     await runTestsQueued(t, [
         {
-            title       : 'Should be able to launch the browser project in browser via launcher',
-            launch      : async () => await runProjectViaLauncher(`http://localhost:${ port }/tests_nodejs/@sample_test_suites/browser/index.js`),
+            title       : 'Should be able to launch the browser project in browser via launcher and generate reports',
+            launch      : async () => {
+                return await runProjectViaLauncher(
+                    `http://localhost:${port}/tests_nodejs/@sample_test_suites/browser/index.js`,
+                    [
+                        '--report-format', 'json',
+                        '--report-file', `${ tmpDir }/siesta/${ Math.random() }.json`,
+                        '--report-format', 'junit',
+                        '--report-file', `${ tmpDir }/siesta/${ Math.random() }.xml`,
+                        '--report-format', 'html',
+                        '--report-file', `${ tmpDir }/siesta/html-report-${ Math.random() }`,
+                    ]
+                )
+            },
             func        : async (t : TestNodejs, launchRes : LaunchResult) => {
                 await verifySampleProjectLaunch(t, launchRes)
+
+                const options       = launchRes.options
+
+                t.true(fs.existsSync(options[ 3 ]), `File ${ options[ 3 ] } exists`)
+                t.true(fs.existsSync(options[ 7 ]), `File ${ options[ 7 ] } exists`)
+                t.true(fs.existsSync(options[ 11 ]), `File ${ options[ 11 ] } exists`)
+                t.true(fs.existsSync(`${ options[ 11 ] }/report_data.json`), `File ${ options[ 11 ] }/report_data.json exists`)
+                t.true(fs.existsSync(`${ options[ 11 ] }/index.html`), `File ${ options[ 11 ] }/index.html exists`)
+                t.true(fs.existsSync(`${ options[ 11 ] }/index.js`), `File ${ options[ 11 ] }/index.js exists`)
             }
         },
         {
