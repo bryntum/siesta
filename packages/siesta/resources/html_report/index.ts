@@ -19,7 +19,8 @@ ProjectSerializableData
 Environment
 
 const fetchData = async () => {
-    const text              = await (await fetch(new URL("./report_data.json", import.meta.url).href)).text()
+    // make the url expression, so that bundler does not try to bundle it
+    const text              = await (await fetch(new URL("" + "./report_data.json", import.meta.url).href)).text()
     const data              = parse(text, { mappingVisitSymbol : expanderMappingVisitSymbol }) as HTMLReportData
 
     const dashboard                 = HTMLReportDashboard.new()

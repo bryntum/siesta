@@ -72,4 +72,5 @@ fi
 
 if [[ -n $bundle ]]; then
     scripts/bundle.sh -c
+    scripts/bundle_html_report.sh -c
 fi

@@ -407,6 +407,7 @@ export class LauncherTerminal extends Mixin(
             await runtime.copyFile(packageRoot + 'resources/html_report/index.html', reportFile + '/index.html')
             await runtime.copyFile(packageRoot + 'resources/html_report/index.js', reportFile + '/index.js')
             await runtime.copyDir(packageRoot + 'resources/styling/browser', reportFile + '/styling/')
+            await runtime.copyDir(packageRoot + 'resources/html_report/dist', reportFile + '/dist/')
         }
 
 

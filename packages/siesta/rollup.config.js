@@ -73,6 +73,7 @@ export default defineConfig({
         'node-fetch',
         'glob',
         'chalk',
-        'ws'
+        'ws',
+        'fs-extra'
     ]
 })
