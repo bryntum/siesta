@@ -222,40 +222,43 @@ export class DashboardCore extends Mixin(
 
 
         tweakTheHead () {
-            const metas         = Array.from(document.head.getElementsByTagName('meta'))
+            // the idea of this method was that people would be creating their own
+            // dashboard html pages and those can be tweaked automatically by adding
+            // css and fav icon, however it does not look like a good idea anymore
 
-            if (!metas.some(meta => /viewport/i.test(meta.name))) {
-                const meta      = document.createElement('meta')
-
-                meta.setAttribute('name', 'viewport')
-                meta.setAttribute('content', 'width=device-width, initial-scale=1')
-
-                document.head.appendChild(meta)
-            }
-
-            //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
-            const links         = Array.from(document.head.getElementsByTagName('link'))
-
-            if (!links.some(link => /resources\/styling\/browser\/css\/styling\.css/.test(link.href))) {
-                const linkEl        = document.createElement('link')
-
-                linkEl.setAttribute('type', 'text/css')
-                linkEl.setAttribute('rel', 'stylesheet')
-                linkEl.setAttribute('href', `${ siestaPackageRootUrl }resources/styling/browser/css/styling.css`)
-
-                document.head.appendChild(linkEl)
-            }
-
-            if (!links.some(link => /icon/.test(link.rel))) {
-                const linkEl        = document.createElement('link')
-
-                linkEl.setAttribute('type', 'image/svg+xml')
-                linkEl.setAttribute('rel', 'icon')
-                linkEl.setAttribute('href', `${ siestaPackageRootUrl }resources/styling/browser/images/logo_on_transparent.svg`)
-
-                document.head.appendChild(linkEl)
-            }
-
+            // const metas         = Array.from(document.head.getElementsByTagName('meta'))
+            //
+            // if (!metas.some(meta => /viewport/i.test(meta.name))) {
+            //     const meta      = document.createElement('meta')
+            //
+            //     meta.setAttribute('name', 'viewport')
+            //     meta.setAttribute('content', 'width=device-width, initial-scale=1')
+            //
+            //     document.head.appendChild(meta)
+            // }
+            //
+            // //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
+            // const links         = Array.from(document.head.getElementsByTagName('link'))
+            //
+            // if (!links.some(link => /resources\/styling\/browser\/css\/styling\.css/.test(link.href))) {
+            //     const linkEl        = document.createElement('link')
+            //
+            //     linkEl.setAttribute('type', 'text/css')
+            //     linkEl.setAttribute('rel', 'stylesheet')
+            //     linkEl.setAttribute('href', `${ siestaPackageRootUrl }resources/styling/browser/css/styling.css`)
+            //
+            //     document.head.appendChild(linkEl)
+            // }
+            //
+            // if (!links.some(link => /icon/.test(link.rel))) {
+            //     const linkEl        = document.createElement('link')
+            //
+            //     linkEl.setAttribute('type', 'image/svg+xml')
+            //     linkEl.setAttribute('rel', 'icon')
+            //     linkEl.setAttribute('href', `${ siestaPackageRootUrl }resources/styling/browser/images/logo_on_transparent.svg`)
+            //
+            //     document.head.appendChild(linkEl)
+            // }
         }
 
 
