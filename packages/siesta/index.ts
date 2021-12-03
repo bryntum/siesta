@@ -2,4 +2,4 @@ export { Test, it, iit, xit, describe, ddescribe, xdescribe, beforeEach, afterEa
 
 export { Project } from "./src/siesta/project/Project.js"
 
-export const siestaPackageRootUrl : string = import.meta.url.replace(/index\.js$/, '')
+export const siestaPackageRootUrl : string = import.meta.url.replace(/[^/]*$/, '')

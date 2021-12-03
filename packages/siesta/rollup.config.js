@@ -1,3 +1,4 @@
+import { fileURLToPath } from "url"
 import { defineConfig } from 'rollup'
 import resolve from '@rollup/plugin-node-resolve'
 // import commonjs from '@rollup/plugin-commonjs'
@@ -54,6 +55,15 @@ export default defineConfig({
     },
 
     plugins : [
+        {
+            // if `siestaPackageRootUrl` is moved into a chunk, move its value one level up
+            resolveImportMeta (prop, { chunkId, moduleId, format }) {
+                if (moduleId === fileURLToPath(new URL('index.js', import.meta.url)) && chunkId.startsWith('chunks')) {
+                    return `import.meta.url.replace(/[^/]*$/, '../')`
+                } else
+                    return null
+            }
+        },
         resolve({ preferBuiltins : true }),
         // commonjs(),
         multiInput(),
