@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# TODO
+# right now, the bundle size for html report is pretty much the same as for the main distribution
+# somehow the launcher code is pulled in
+# need to reduce it, not critical though
+
 # exit if any of command has failed
 set -e
 # enable **, ! in globs
