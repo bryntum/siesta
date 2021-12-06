@@ -111,7 +111,7 @@ export class TestBrowser extends Mixin(
                     preload.isEcmaModule && el.setAttribute("crossorigin", "anonymous")
 
                     if ('url' in preload) {
-                        el.src = preload.url
+                        el.src = new URL(preload.url, this.descriptor.urlAbs).href
 
                         waitFor.push(new Promise((resolve, reject) => {
                             el.addEventListener('load', resolve)
@@ -129,7 +129,7 @@ export class TestBrowser extends Mixin(
 
                         el.type     = 'text/css'
                         el.rel      = 'stylesheet'
-                        el.href     = preload.url
+                        el.href     = new URL(preload.url, this.descriptor.urlAbs).href
 
                         waitFor.push(new Promise((resolve, reject) => {
                             el.addEventListener('load', resolve)
@@ -150,17 +150,10 @@ export class TestBrowser extends Mixin(
                 }
             }
 
-            const results   = await Promise.allSettled(waitFor)
+            const results   = await Promise.all(waitFor)
 
             for (const result of results) {
-                if (result.status === 'fulfilled') {
-                    // if (typeOf(result.value) === 'ErrorEvent') {
-                        console.log(result.value)
-                    // }
-                }
-                else {
-                    throw new Error("Should never happen")
-                }
+                // console.log(result)
             }
         }
 
