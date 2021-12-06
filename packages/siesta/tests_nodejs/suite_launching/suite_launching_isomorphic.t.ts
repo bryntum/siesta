@@ -45,7 +45,7 @@ it('Launching isomorphic tests in Node.js should work', async t => {
                 t.true(fs.existsSync(options[ 11 ]), `File ${ options[ 11 ] } exists`)
                 t.true(fs.existsSync(`${ options[ 11 ] }/report_data.json`), `File ${ options[ 11 ] }/report_data.json exists`)
                 t.true(fs.existsSync(`${ options[ 11 ] }/index.html`), `File ${ options[ 11 ] }/index.html exists`)
-                t.true(fs.existsSync(`${ options[ 11 ] }/index.js`), `File ${ options[ 11 ] }/index.js exists`)
+                t.true(fs.existsSync(`${ options[ 11 ] }/dist`), `File ${ options[ 11 ] }/dist exists`)
             }
         },
         {
