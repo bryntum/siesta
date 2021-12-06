@@ -183,7 +183,7 @@ export class TestBrowser extends Mixin(
             let mousePositionRestore    = Promise.resolve()
 
             if (this.dashboardLaunchInfo) {
-                //@ts-expect-error
+                // @ts-expect-error
                 this.simulator.offset   = this.dashboardLaunchInfo.offset
 
                 mousePositionRestore    = await this.simulator.simulateMouseMove([ 0, 0 ], { mouseMovePrecision : { kind : 'last_only', precision : 1 } })

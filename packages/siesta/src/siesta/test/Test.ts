@@ -580,12 +580,14 @@ export class Test extends TestPre {
 
         if (this.isRoot) {
             await this.setupRootTest()
+            // TODO should have timeout
             await this.setup()
         }
 
         await this.launch(checkInfo)
 
         if (this.isRoot) {
+            // TODO should have timeout
             await this.tearDown()
             await this.tearDownRootTest()
         }
@@ -740,7 +742,6 @@ export class Test extends TestPre {
     }
 
 
-    // TODO should have timeout property
     async setup () {
     }
 

@@ -218,6 +218,10 @@ export class TestDescriptorBrowser extends Mixin(
 ){}
 
 
+// special reducer for properties, inheritance of which should be blocked by the presence of `pageUrl` config
+// these are:
+// -- DONE: 'preload',
+// -- TODO: 'innerHtmlHead/innerHtmlBody'
 function inheritanceBlockedByPageUrl (configName : keyof TestDescriptorBrowser, parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ typeof configName ] {
     let pageUrlConfigFound  = false
     let isInheriting        = false
