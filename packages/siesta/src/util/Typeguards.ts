@@ -29,3 +29,5 @@ export const isRegExp = (a : any) : a is RegExp => typeOf(a) === 'RegExp'
 export const isDate = (a : any) : a is Date => typeOf(a) === 'Date'
 
 export const isPromise = (a : any) : a is Promise<unknown> => typeOf(a) === 'Promise'
+
+export const isErrorEvent = (a : any) : a is ErrorEvent => typeOf(a) === 'ErrorEvent'
