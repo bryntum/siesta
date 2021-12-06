@@ -17,11 +17,59 @@ see
 */
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/**
+ * A preload descriptor describes what resources should be loaded into the test page, before executing it.
+ * It can point to JavaScript or CSS resource, or can provide it inline.
+ *
+ * Preload descriptor can be:
+ *
+ * - an object in the form `{ type : 'js', url : string, isEcmaModule? : boolean }`, pointing to the JavaScript file.
+ * If the file contains Ecma module, the `isEcmaModule` flag should be set to `true`
+ * - an object in the form `{ type : 'js', content : string, isEcmaModule? : boolean }`, providing the inline JavaScript content.
+ * If the content represents an Ecma module, the `isEcmaModule` flag should be set to `true`
+ * - an object in the form `{ type : 'css', url : string }`, pointing to the CSS file.
+ * - an object in the form `{ type : 'css', content : string }`, providing the inline CSS content.
+ * - a plain string, if it ends with `.css` it corresponds to `{ type : 'css', url : string }`,
+ * otherwise it corresponds to `{ type : 'js', url : string, isEcmaModule : false }`
+ * - an object in the form `{ code : string | Function }`, which corresponds to `{ type : 'js', content : string, isEcmaModule : false }`.
+ * If the `code` property is provided as a `Function` it will be stringified with `.toString()` call.
+ * - an object in the form `{ style : string  }`, which corresponds to `{ type : 'css', content : string }`.
+ * - a string `inherit` - see the note below.
+ * - a "falsy" value, like `null`, `undefined`, empty string etc. It will be ignored
+ * - an array of preload descriptors - will be flattened.
+ *
+ * The last 2 cases allows simple conditional preloading, for example:
+ * ```js
+ * preload         : [
+ *     'http://mydomain.com/file1.js'
+ *     {
+ *         code    : 'MySpecialGlobalFunc = () => { if (typeof console != "undefined") ... }'
+ *     },
+ *     // simple conditional preload
+ *     someCondition ?
+ *         [
+ *             'http://mydomain.com/file2.css',
+ *             'http://mydomain.com/file3.js'
+ *         ]
+ *     :
+ *         null
+ * ],
+ * ```
+ *
+ * **Note**, that if test descriptor has non-empty [[pageUrl]] option, then *it will not inherit* the [[preload]] option
+ * from parent descriptors or project, **unless** it has the [[preload]] config set to string `inherit`.
+ * If both [[pageUrl]] and [[preload]] are set on the project level (or on the directory),
+ * [[preload]] value still will be inherited.
+ *
+ */
 export type PreloadDescriptor =
     | 'inherit'
     | string
-    | { type? : 'js' | 'css', url : string, isEcmaModule : boolean }
-    | { type? : 'js' | 'css', content : string, isEcmaModule : boolean }
+    | false | null | undefined | ''
+    | { type : 'js', url : string, isEcmaModule? : boolean }
+    | { type : 'js', content : string, isEcmaModule? : boolean }
+    | { type : 'css', url : string }
+    | { type : 'css', content : string }
     | { text : string | Function }
     | { code : string | Function }
     | { style : string }
@@ -55,6 +103,10 @@ export class TestDescriptorBrowser extends Mixin(
         @option()
         isolation           : IsolationLevel            = 'iframe'
 
+        /**
+         * A [[PreloadDescriptor|preload descriptor]] or an array of those. Defines what resources should be loaded
+         * into the test page, before executing the test.
+         */
         @config({
             reducer : (name : 'preload', parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ 'preload' ] => {
                 // @ts-ignore
@@ -63,6 +115,10 @@ export class TestDescriptorBrowser extends Mixin(
         })
         preload             : PreloadDescriptor | PreloadDescriptor[]
 
+        /**
+         * A [[PreloadDescriptor|preload descriptor]] or an array of those. Defines what resources should be loaded
+         * into the test page *in addition* to the [[preload]] config, before executing the test.
+         */
         @config({
             reducer : (name : 'alsoPreload', parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ 'alsoPreload' ] => {
                 return CI(parentsAxis.flatMap(desc => desc.alsoPreload)).reversed().toArray()

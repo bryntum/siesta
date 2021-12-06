@@ -8,7 +8,7 @@ const project = Project.new({
 
 project.plan(
     {
-        filename       : 'chronograph_jsx',
+        url       : 'chronograph_jsx',
 
         items       : [
             'plain_jsx.t.js',
@@ -17,18 +17,18 @@ project.plan(
         ]
     },
     {
-        filename       : 'serializer',
+        url       : 'serializer',
 
         items       : [
             'serializer_xml.t.js',
         ]
     },
     {
-        filename       : 'simulation',
+        url       : 'simulation',
 
         items       : [
             {
-                filename    : 'keyboard',
+                url    : 'keyboard',
 
                 items       : [
                     'backspace_delete.t.js',
@@ -46,7 +46,7 @@ project.plan(
                 ]
             },
             {
-                filename    : 'mouse',
+                url    : 'mouse',
 
                 items       : [
                     'click.t.js',
@@ -60,14 +60,14 @@ project.plan(
                     'mouse_over.t.js',
                     'offset.t.js',
                     'pointer_events.t.js',
-                    { filename : 'scroll_into_view.t.js', expandBody : false },
+                    { url : 'scroll_into_view.t.js', expandBody : false },
                     'transformed_element.t.js',
                     'wait_for_target.t.js',
                     'web_component.t.js'
                 ]
             },
             {
-                filename    : 'targeting',
+                url    : 'targeting',
 
                 items       : [
                     'actionability_checks.t.js',
@@ -77,11 +77,11 @@ project.plan(
         ]
     },
     {
-        filename       : 'util',
+        url       : 'util',
 
         items       : [
             {
-                filename       : 'coordinates',
+                url       : 'coordinates',
 
                 items       : [
                     'filter_path.t.js',
@@ -89,34 +89,58 @@ project.plan(
                 ]
             },
             {
-                filename       : 'dom',
+                url       : 'dom',
 
                 items       : [
                     'element_from_point.t.js'
                 ]
             },
             {
-                filename       : 'scroll',
+                url       : 'scroll',
 
                 items       : [
                     'scroll_element_into_view.t.js',
                     // TODO move the test itself once we support `export config = {}`
-                    { filename : 'scroll_element_into_view_2.t.js', expandBody : false },
+                    { url : 'scroll_element_into_view_2.t.js', expandBody : false },
                 ]
             }
         ]
     },
     {
-        filename    : 'siesta',
+        url    : 'siesta',
 
         items       : [
             {
-                filename    : 'assertions',
+                url    : 'assertions',
 
                 items       : [
                     'assertion_element.t.js',
                     'assertion_observable.t.js',
                     'silent.t.js',
+                ]
+            },
+            {
+                url    : 'test',
+
+                items       : [
+                    {
+                        url         : 'preload.t.js',
+                        preload     : [
+                            {
+                                code : () => {
+                                    //@ts-ignore
+                                    PRELOAD_INLINE = true
+                                }
+                            },
+                            'preload_file.js',
+                            { type : 'js', url : 'preload_file_module.js', isEcmaModule : true },
+
+                            {
+                                style : '.inline-class { margin : 10px }'
+                            },
+                            'preload_file.css',
+                        ]
+                    },
                 ]
             },
         ]
