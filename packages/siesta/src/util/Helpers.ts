@@ -1,4 +1,5 @@
 import { AnyConstructor } from "../class/Mixin.js"
+import { isArray } from "./Typeguards.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // assume 32-bit platform (https://v8.dev/blog/react-cliff)
@@ -165,6 +166,8 @@ export const saneSplit = (str : string, split : string | RegExp) : string[] => s
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const randomElement = <V>(array : V[]) : V => array[ Math.floor(array.length * Math.random()) ]
 export const lastElement = <V>(array : V[]) : V | undefined => array[ array.length - 1 ]
+
+export const wantArray = <V>(array : V | V[]) : V[] => isArray(array) ? array : [ array ]
 
 export type NonEmptyArray<T>    = [ T, ...T[] ]
 
