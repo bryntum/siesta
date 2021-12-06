@@ -187,6 +187,16 @@ export class TestDescriptorBrowser extends Mixin(
         @prototypeValue({ kind : 'last_only', precision : 1 })
         mouseMovePrecision  : PointerMovePrecision
 
+        /**
+         * When this config is set to `true`, the failures when loading various resources (`script/link/img` tags, etc)
+         * will be reported as failed assertions.
+         *
+         * Default value is `false`.
+         */
+        @config()
+        @prototypeValue(false)
+        failOnResourceLoadError  : boolean
+
         // TODO rename or may be even replace with more generic option
         // like `cssReset` which will accept a CSS text
         @config()
