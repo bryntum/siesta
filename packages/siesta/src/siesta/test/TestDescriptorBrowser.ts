@@ -1,7 +1,8 @@
 import { CI } from "chained-iterator/index.js"
-import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
 import { prototypeValue } from "../../util/Helpers.js"
+import { isArray, isFunction, isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { IsolationLevel, SimulationType } from "../common/IsolationLevel.js"
 import { option } from "../option/Option.js"
@@ -34,7 +35,6 @@ see
  * - an object in the form `{ code : string | Function }`, which corresponds to `{ type : 'js', content : string, isEcmaModule : false }`.
  * If the `code` property is provided as a `Function` it will be stringified with `.toString()` call.
  * - an object in the form `{ style : string  }`, which corresponds to `{ type : 'css', content : string }`.
- * - a string `inherit` - see the note below.
  * - a "falsy" value, like `null`, `undefined`, empty string etc. It will be ignored
  * - an array of preload descriptors - will be flattened.
  *
@@ -56,25 +56,65 @@ see
  * ],
  * ```
  *
- * **Note**, that if test descriptor has non-empty [[pageUrl]] option, then *it will not inherit* the [[preload]] option
- * from parent descriptors or project, **unless** it has the [[preload]] config set to string `inherit`.
- * If both [[pageUrl]] and [[preload]] are set on the project level (or on the directory),
- * [[preload]] value still will be inherited.
- *
  */
 export type PreloadDescriptor =
-    | 'inherit'
     | string
     | false | null | undefined | ''
     | { type : 'js', url : string, isEcmaModule? : boolean }
     | { type : 'js', content : string, isEcmaModule? : boolean }
     | { type : 'css', url : string }
     | { type : 'css', content : string }
-    | { text : string | Function }
-    | { code : string | Function }
+    | { text : string | AnyFunction }
+    | { code : string | AnyFunction }
     | { style : string }
     | PreloadDescriptor[]
 
+export type PreloadDescriptorNormalized =
+    | { type : 'js', url : string, isEcmaModule? : boolean }
+    | { type : 'js', content : string, isEcmaModule? : boolean }
+    | { type : 'css', url : string }
+    | { type : 'css', content : string }
+
+
+export const normalizePreloadDescriptor = (desc : PreloadDescriptor) : PreloadDescriptorNormalized => {
+    if (isArray(desc)) {
+        throw new Error("Descriptor should be flattened before using this function")
+    }
+    else if (desc === null || desc === undefined || desc === '' || desc === false) {
+        throw new Error("Descriptor should be filtered before using this function")
+    }
+    else if (isString(desc) && desc.endsWith('.css')) {
+        return {
+            type        : 'css',
+            url         : desc
+        }
+    }
+    else if (isString(desc)) {
+        return {
+            type        : 'js',
+            url         : desc,
+            isEcmaModule : false
+        }
+    }
+    else if ('style' in desc) {
+        return {
+            type            : 'css',
+            content         : desc.style,
+        }
+    }
+    else if ('code' in desc || 'text' in desc) {
+        const code  = 'code' in desc ? desc.code : desc.text
+
+        return {
+            type            : 'js',
+            content         : isFunction(code) ? `(${ code.toString() })()` : code,
+            isEcmaModule    : false
+        }
+    }
+    else {
+        return desc
+    }
+}
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
@@ -106,6 +146,11 @@ export class TestDescriptorBrowser extends Mixin(
         /**
          * A [[PreloadDescriptor|preload descriptor]] or an array of those. Defines what resources should be loaded
          * into the test page, before executing the test.
+         *
+         * **Note**, that if test descriptor has non-empty [[pageUrl]] option, then *it will not inherit* the [[preload]] option
+         * from parent descriptors or project, **unless** it has the [[preload]] config set to string `inherit`.
+         * If both [[pageUrl]] and [[preload]] are set on the project level (or on the directory),
+         * [[preload]] value still will be inherited.
          */
         @config({
             reducer : (name : 'preload', parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ 'preload' ] => {
@@ -113,7 +158,7 @@ export class TestDescriptorBrowser extends Mixin(
                 return inheritanceBlockedByPageUrl('preload', parentsAxis)
             }
         })
-        preload             : PreloadDescriptor | PreloadDescriptor[]
+        preload             : 'inherit' | PreloadDescriptor | PreloadDescriptor[]
 
         /**
          * A [[PreloadDescriptor|preload descriptor]] or an array of those. Defines what resources should be loaded

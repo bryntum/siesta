@@ -2,7 +2,7 @@ import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { isNodejs, prototypeValue } from "../../util/Helpers.js"
+import { isNodejs, prototypeValue, wantArray } from "../../util/Helpers.js"
 import { awaitDomInteractive, elementFromPoint } from "../../util_browser/Dom.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ExitCodes } from "../launcher/Types.js"
@@ -15,7 +15,7 @@ import { AssertionObservable } from "./assertion/AssertionObservable.js"
 import { TextSelectionHelpers } from "./browser/TextSelectionHelpers.js"
 import { TestLauncherChild } from "./port/TestLauncherChild.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
-import { TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
+import { normalizePreloadDescriptor, TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
 import { Exception, SubTestCheckInfo } from "./TestResult.js"
 
 
@@ -40,6 +40,10 @@ export class TestBrowser extends Mixin(
     >) =>
 
     class TestBrowser extends base {
+        // allow the browser test initialize w/o exception even in Node.js environment
+        // (we'll issue a meaningful error in this case later)
+        window                  : Window                        = typeof window !== 'undefined' ? window : undefined
+
         @prototypeValue(TestDescriptorBrowser)
         testDescriptorClass     : typeof TestDescriptorBrowser
 
@@ -89,7 +93,75 @@ export class TestBrowser extends Mixin(
         async setupPreloads () {
             await awaitDomInteractive()
 
+            const preloads      = wantArray(this.descriptor.preload || [])
+                .concat(this.descriptor.alsoPreload || [])
+                .flat(2000)
+                .filter(el => Boolean(el))
+                .map(normalizePreloadDescriptor)
 
+            const doc   = this.window.document
+
+            const waitFor : Promise<ErrorEvent | Event>[]      = []
+
+            for (const preload of preloads) {
+                if (preload.type === 'js') {
+                    const el    = doc.createElement('script')
+
+                    el.type = preload.isEcmaModule ? 'module' : 'text/javascript'
+                    preload.isEcmaModule && el.setAttribute("crossorigin", "anonymous")
+
+                    if ('url' in preload) {
+                        el.src = preload.url
+
+                        waitFor.push(new Promise((resolve, reject) => {
+                            el.addEventListener('load', resolve)
+                            el.addEventListener('error', resolve)
+                        }))
+                    }
+                    else
+                        el.text = preload.content
+
+                    doc.head.appendChild(el)
+                }
+                else {
+                    if ('url' in preload) {
+                        const el    = doc.createElement('link')
+
+                        el.type     = 'text/css'
+                        el.rel      = 'stylesheet'
+                        el.href     = preload.url
+
+                        waitFor.push(new Promise((resolve, reject) => {
+                            el.addEventListener('load', resolve)
+                            el.addEventListener('error', resolve)
+                        }))
+
+                        doc.head.appendChild(el)
+                    }
+                    else {
+                        const el    = doc.createElement('style')
+
+                        el.setAttribute("type", 'text/css')
+
+                        el.appendChild(document.createTextNode(preload.content))
+
+                        doc.head.appendChild(el)
+                    }
+                }
+            }
+
+            const results   = await Promise.allSettled(waitFor)
+
+            for (const result of results) {
+                if (result.status === 'fulfilled') {
+                    // if (typeOf(result.value) === 'ErrorEvent') {
+                        console.log(result.value)
+                    // }
+                }
+                else {
+                    throw new Error("Should never happen")
+                }
+            }
         }
 
 
@@ -97,9 +169,11 @@ export class TestBrowser extends Mixin(
             const superSetup            = super.setupRootTest()
             const mouseCursorVisStart   = this.mouseCursorVisualizer.start()
 
+            const doc   = this.window.document
+
             if (this.descriptor.expandBody) {
-                const html      = document.documentElement
-                const body      = document.body
+                const html      = doc.documentElement
+                const body      = doc.body
 
                 body.style.width    = html.style.width  = '100%'
                 body.style.height   = html.style.height = '100%'
@@ -120,7 +194,7 @@ export class TestBrowser extends Mixin(
 
 
         async launch (checkInfo : SubTestCheckInfo = undefined) {
-            if (!this.parentNode && document.compatMode === 'BackCompat') {
+            if (!this.parentNode && this.window.document.compatMode === 'BackCompat') {
                 this.addResult(Exception.new({ exception : new Error('Test page is opened in the quirks mode') }))
                 return
             }
