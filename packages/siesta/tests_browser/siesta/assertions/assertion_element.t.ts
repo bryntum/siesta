@@ -1,4 +1,4 @@
-// import { CI } from "../../../../chained-iterator"
+// import { CI } from "chained-iterator"
 // import { it } from "../../../browser.js"
 // import { Assertion } from "../../../src/siesta/test/TestResult.js"
 // import { verifyAllFailed } from "../../../tests/siesta/@helpers.js"

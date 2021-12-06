@@ -1,4 +1,4 @@
-import { CI } from "../../../../chained-iterator"
+import { CI } from "chained-iterator/index.js"
 import { beforeEach, it } from "../../../browser.js"
 import { Assertion } from "../../../src/siesta/test/TestResult.js"
 import { delay, measure } from "../../../src/util/TimeHelpers.js"
