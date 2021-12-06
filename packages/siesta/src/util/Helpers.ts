@@ -174,8 +174,8 @@ export const escapeRegExp = (source : string) : string => source.replace(/[.*+?^
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const objectEntriesDeep = <T extends unknown>(source : { [ key in ArbitraryObjectKey ] : T }) : [ ArbitraryObjectKey, T ][] => {
-    const res : [ ArbitraryObjectKey, T ][]   = []
+export const objectEntriesDeep = <Key extends PropertyKey, Value extends unknown>(source : Record<Key, Value>) : [ Key, Value ][] => {
+    const res : [ Key, Value ][]   = []
 
     for (const key in source) res.push([ key, source[ key ] ])
 
