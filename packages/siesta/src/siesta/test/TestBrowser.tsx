@@ -3,7 +3,7 @@ import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { isNodejs, prototypeValue } from "../../util/Helpers.js"
-import { elementFromPoint } from "../../util_browser/Dom.js"
+import { awaitDomInteractive, elementFromPoint } from "../../util_browser/Dom.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ExitCodes } from "../launcher/Types.js"
 import { PointerMovePrecision } from "../simulate/SimulatorMouse.js"
@@ -86,10 +86,16 @@ export class TestBrowser extends Mixin(
         }
 
 
-        async setupRootTest () {
-            await super.setupRootTest()
+        async setupPreloads () {
+            await awaitDomInteractive()
 
-            await this.mouseCursorVisualizer.start()
+
+        }
+
+
+        async setupRootTest () {
+            const superSetup            = super.setupRootTest()
+            const mouseCursorVisStart   = this.mouseCursorVisualizer.start()
 
             if (this.descriptor.expandBody) {
                 const html      = document.documentElement
@@ -100,12 +106,16 @@ export class TestBrowser extends Mixin(
                 body.style.margin   = body.style.padding = '0'
             }
 
+            let mousePositionRestore    = Promise.resolve()
+
             if (this.dashboardLaunchInfo) {
                 //@ts-expect-error
                 this.simulator.offset   = this.dashboardLaunchInfo.offset
 
-                await this.simulator.simulateMouseMove([ 0, 0 ], { mouseMovePrecision : { kind : 'last_only', precision : 1 } })
+                mousePositionRestore    = await this.simulator.simulateMouseMove([ 0, 0 ], { mouseMovePrecision : { kind : 'last_only', precision : 1 } })
             }
+
+            await Promise.all([ superSetup, mouseCursorVisStart, mousePositionRestore, this.setupPreloads() ])
         }
 
 
