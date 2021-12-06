@@ -629,7 +629,7 @@ export class Test extends TestPre {
     // need to figure out if we need to wait until all reports (`this.reporter.onXXX`)
     // has been completed or not, before completing the method
     async launch (checkInfo : SubTestCheckInfo = undefined) {
-        this.onExceptionHook.on((test, exception, type) => {
+        this.onExceptionHook.on((test, type, exception) => {
             this.addResult(Exception.new({ exception }))
         })
 

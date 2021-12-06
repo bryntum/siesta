@@ -27,10 +27,10 @@ export class ExecutionContextNode extends ExecutionContext {
     setup () {
         if (this.overrideException) {
             this.uncaughtExceptionListener  = (err : unknown, origin : 'uncaughtException' | 'uncaughtRejection') => {
-                this.onException(err, origin === 'uncaughtException' ? 'exception' : 'rejection')
+                this.onException(origin === 'uncaughtException' ? 'exception' : 'rejection', err, undefined)
             }
             this.uncaughtRejectionListener  = (err) => {
-                this.onException(err, 'rejection')
+                this.onException('rejection', err, undefined)
             }
 
             process.on('unhandledRejection', this.uncaughtRejectionListener)

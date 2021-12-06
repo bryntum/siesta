@@ -26,10 +26,10 @@ export class ExecutionContext extends Base {
     }
 
 
-    onException (exception : unknown, type : ExceptionType) {
+    onException (type : ExceptionType, exception : unknown, extra : unknown) {
         const attachment    = lastElement(this.attachments)
 
-        attachment.onExceptionHook.trigger(attachment, type, exception)
+        attachment.onExceptionHook.trigger(attachment, type, exception, extra)
     }
 
 
@@ -65,7 +65,9 @@ export class ExecutionContextAttachable extends Mixin(
     (base : ClassUnion) =>
 
     class ExecutionContextAttachable extends base {
-        onExceptionHook : Hook<[ this, ExceptionType, unknown ]>    = new Hook()
+        // TODO do these really need to hooks? perhaps a method is enough
+
+        onExceptionHook : Hook<[ this, ExceptionType, unknown, unknown ]>    = new Hook()
 
         onConsoleHook : Hook<[ this, LogMethod, unknown[] ]>        = new Hook()
 
