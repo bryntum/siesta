@@ -178,7 +178,7 @@ export class TestBrowser extends Mixin(
                         passed      : false,
                         annotation  : url
                             ? <div>
-                                Preloading of the `${ url }` has failed
+                                Preloading of the `{ url }` has failed
                             </div>
                             : <div>
                                 Preloading of the resource has failed.
@@ -215,7 +215,7 @@ export class TestBrowser extends Mixin(
                         // TODO, should probably include serialized element to the annotation
                         annotation  : url
                             ? <div>
-                                Loading of the `${ url }` has failed
+                                Loading of the `{ url }` has failed
                             </div>
                             : <div>
                                 Loading of the resource has failed.

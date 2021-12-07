@@ -125,6 +125,7 @@ project.plan(
                 items       : [
                     {
                         url         : 'preload.t.js',
+                        failOnResourceLoadError : true,
                         preload     : [
                             {
                                 code : () => {
