@@ -22,6 +22,8 @@ export default defineConfig({
         'browser.js',
         'nodejs.js',
         'deno.js',
+        'react.js',
+        'sencha.js',
         'resources/dashboard/index.js',
         // TODO ideally, for publishing, we should create a bundle w/o tests as entry points
         // however, how to test the package then? (we would like to run all the tests on the "bundled"

@@ -65,6 +65,9 @@
 /react.js
 /react.js.map
 /react.d.ts
+/sencha.js
+/sencha.js.map
+/sencha.d.ts
 
 /resources/styling/**/*.css
 /resources/styling/**/*.css.map
