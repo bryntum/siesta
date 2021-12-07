@@ -378,7 +378,7 @@ export class UserAgentOnPage extends Mixin(
 
 
         /**
-         * Performs a query in the DOM, by default its CSS query. The query syntax may be enhanced by the addons.
+         * Performs a query in the DOM, by default it is a CSS query. The query syntax may be enhanced by the subclasses.
          *
          * @category Dom helper methods
          *
