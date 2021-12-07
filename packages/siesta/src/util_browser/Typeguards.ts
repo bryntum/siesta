@@ -7,6 +7,9 @@ export const isSameDomainHTMLIFrameElement = (a : any) : a is HTMLIFrameElement 
     typeOf(a) === 'HTMLIFrameElement' && Boolean(a.contentDocument)
 
 export const isHTMLInputElement = (a : any) : a is HTMLInputElement => typeOf(a) === 'HTMLInputElement'
+export const isHTMLScriptElement = (a : any) : a is HTMLScriptElement => typeOf(a) === 'HTMLScriptElement'
+export const isHTMLLinkElement = (a : any) : a is HTMLLinkElement => typeOf(a) === 'HTMLLinkElement'
+export const isHTMLImageElement = (a : any) : a is HTMLImageElement => typeOf(a) === 'HTMLImageElement'
 
 export const isHTMLElement = (a : any) : a is HTMLElement => /HTML\w*Element/.test(typeOf(a))
 

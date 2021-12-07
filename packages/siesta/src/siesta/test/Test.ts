@@ -578,6 +578,9 @@ export class Test extends TestPre {
         // start hook, can add assertions in it
         this.startHook.trigger(this)
 
+        await this.setupExecutionContext()
+        this.rootTest.executionContext.attach(this)
+
         if (this.isRoot) {
             await this.setupRootTest()
             // TODO should have timeout
@@ -591,6 +594,8 @@ export class Test extends TestPre {
             await this.tearDown()
             await this.tearDownRootTest()
         }
+
+        this.rootTest.executionContext.detach(this)
 
         // finish hook, can add assertions
         this.finishHook.trigger(this)
@@ -627,10 +632,16 @@ export class Test extends TestPre {
         return this.parentNode ? this.parentNode.suppressOutputLogging : this.$suppressOutputLogging
     }
 
-    // TODO
-    // need to figure out if we need to wait until all reports (`this.reporter.onXXX`)
-    // has been completed or not, before completing the method
-    async launch (checkInfo : SubTestCheckInfo = undefined) {
+
+    async setupExecutionContext () {
+        if (this.isRoot) {
+            const executionContextClass     = await (this.constructor as typeof Test).getExecutionContextClass()
+
+            this.executionContext           = executionContextClass.new()
+
+            this.executionContext.setup()
+        }
+
         this.onExceptionHook.on((test, type, exception) => {
             this.addResult(Exception.new({ exception }))
         })
@@ -653,10 +664,13 @@ export class Test extends TestPre {
                 message     : this.prepareLogMessage(message)
             }))
         })
+    }
 
 
-        this.rootTest.executionContext.attach(this)
-
+    // TODO
+    // need to figure out if we need to wait until all reports (`this.reporter.onXXX`)
+    // has been completed or not, before completing the method
+    async launch (checkInfo : SubTestCheckInfo = undefined) {
         const beforeHooks   = this.collectParents(true).flatMap(parent => parent.beforeEachHooks)
         const afterHooks    = this.collectParents().flatMap(parent => parent.afterEachHooks)
 
@@ -708,8 +722,6 @@ export class Test extends TestPre {
         await this.awaitAllDone()
 
         for (const hook of afterHooks) await hook(this)
-
-        this.rootTest.executionContext.detach(this)
     }
 
 
@@ -734,11 +746,6 @@ export class Test extends TestPre {
 
     // internal "setup"
     async setupRootTest () {
-        const executionContextClass     = await (this.constructor as typeof Test).getExecutionContextClass()
-
-        this.executionContext           = executionContextClass.new()
-
-        this.executionContext.setup()
     }
 
 

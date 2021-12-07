@@ -1,9 +1,10 @@
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
-import { ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
+import { ExecutionContextAttachableBrowser, ExecutionContextBrowser } from "../../context/ExecutionContextBrowser.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { isNodejs, prototypeValue, wantArray } from "../../util/Helpers.js"
+import { isNodejs, prototypeValue, typeOf, wantArray } from "../../util/Helpers.js"
 import { awaitDomInteractive, elementFromPoint } from "../../util_browser/Dom.js"
+import { isHTMLLinkElement, isHTMLScriptElement } from "../../util_browser/Typeguards.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ExitCodes } from "../launcher/Types.js"
 import { PointerMovePrecision } from "../simulate/SimulatorMouse.js"
@@ -16,7 +17,7 @@ import { TextSelectionHelpers } from "./browser/TextSelectionHelpers.js"
 import { TestLauncherChild } from "./port/TestLauncherChild.js"
 import { createTestSectionConstructors, Test } from "./Test.js"
 import { normalizePreloadDescriptor, TestDescriptorBrowser } from "./TestDescriptorBrowser.js"
-import { Exception, SubTestCheckInfo } from "./TestResult.js"
+import { Assertion, Exception, SubTestCheckInfo } from "./TestResult.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -29,6 +30,7 @@ export class TestBrowser extends Mixin(
         AssertionObservable,
         AssertionElement,
         TextSelectionHelpers,
+        ExecutionContextAttachableBrowser,
         Test
     ],
     (base : ClassUnion<
@@ -36,6 +38,7 @@ export class TestBrowser extends Mixin(
         typeof AssertionObservable,
         typeof AssertionElement,
         typeof TextSelectionHelpers,
+        typeof ExecutionContextAttachableBrowser,
         typeof Test
     >) =>
 
@@ -101,11 +104,14 @@ export class TestBrowser extends Mixin(
 
             const doc   = this.window.document
 
-            const waitFor : Promise<ErrorEvent | Event>[]      = []
+            const waitFor : Promise<Event | undefined>[]        = []
 
             for (const preload of preloads) {
                 if (preload.type === 'js') {
                     const el    = doc.createElement('script')
+
+                    // @ts-ignore
+                    el.PRELOAD  = true
 
                     el.type = preload.isEcmaModule ? 'module' : 'text/javascript'
                     preload.isEcmaModule && el.setAttribute("crossorigin", "anonymous")
@@ -114,7 +120,7 @@ export class TestBrowser extends Mixin(
                         el.src = new URL(preload.url, this.descriptor.urlAbs).href
 
                         waitFor.push(new Promise((resolve, reject) => {
-                            el.addEventListener('load', resolve)
+                            el.addEventListener('load', () => resolve(undefined))
                             el.addEventListener('error', resolve)
                         }))
                     }
@@ -127,12 +133,15 @@ export class TestBrowser extends Mixin(
                     if ('url' in preload) {
                         const el    = doc.createElement('link')
 
+                        // @ts-ignore
+                        el.PRELOAD  = true
+
                         el.type     = 'text/css'
                         el.rel      = 'stylesheet'
                         el.href     = new URL(preload.url, this.descriptor.urlAbs).href
 
                         waitFor.push(new Promise((resolve, reject) => {
-                            el.addEventListener('load', resolve)
+                            el.addEventListener('load', () => resolve(undefined))
                             el.addEventListener('error', resolve)
                         }))
 
@@ -153,12 +162,70 @@ export class TestBrowser extends Mixin(
             const results   = await Promise.all(waitFor)
 
             for (const result of results) {
-                // console.log(result)
+                if (result) {
+                    const target    = result.target
+
+                    const url       = target
+                        ? isHTMLScriptElement(target)
+                            ? target.src
+                            : isHTMLLinkElement(target)
+                                ? target.href
+                                : undefined
+                        : undefined
+
+                    this.addResult(Assertion.new({
+                        name        : 'Resource preloading failure',
+                        passed      : false,
+                        annotation  : url
+                            ? <div>
+                                Preloading of the `${ url }` has failed
+                            </div>
+                            : <div>
+                                Preloading of the resource has failed.
+                            </div>
+                    }))
+                }
             }
         }
 
 
-        async setupRootTest () {
+        override async setupExecutionContext () {
+            await super.setupExecutionContext()
+
+            if (this.descriptor.failOnResourceLoadError)
+                this.onResourceLoadFailureHook.on((me : TestBrowser, event : Event) => {
+                    // ignore the loading errors from the elements, that were created by the preload mechanism -
+                    // it has its own error reporting
+                    // @ts-ignore
+                    if (event.target.PRELOAD) return
+
+                    const target    = event.target
+
+                    const url       = target
+                        ? isHTMLScriptElement(target)
+                            ? target.src
+                            : isHTMLLinkElement(target)
+                                ? target.href
+                                : undefined
+                        : undefined
+
+                    this.addResult(Assertion.new({
+                        name        : 'Resource loading failure',
+                        passed      : false,
+                        // TODO, should probably include serialized element to the annotation
+                        annotation  : url
+                            ? <div>
+                                Loading of the `${ url }` has failed
+                            </div>
+                            : <div>
+                                Loading of the resource has failed.
+                            </div>
+                    }))
+                })
+        }
+
+
+        override async setupRootTest () {
             const superSetup            = super.setupRootTest()
             const mouseCursorVisStart   = this.mouseCursorVisualizer.start()
 
@@ -182,7 +249,10 @@ export class TestBrowser extends Mixin(
                 mousePositionRestore    = await this.simulator.simulateMouseMove([ 0, 0 ], { mouseMovePrecision : { kind : 'last_only', precision : 1 } })
             }
 
-            await Promise.all([ superSetup, mouseCursorVisStart, mousePositionRestore, this.setupPreloads() ])
+            // this will await until the `super` method installs the ExecutionContext hooks
+            await superSetup
+
+            await Promise.all([ mouseCursorVisStart, mousePositionRestore, this.setupPreloads() ])
         }
 
 
