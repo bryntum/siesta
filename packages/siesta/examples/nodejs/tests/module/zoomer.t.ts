@@ -1,4 +1,4 @@
-import { it, Test } from "siesta/nodejs.js"
+import { it, Test } from "@bryntum/siesta/nodejs.js"
 import { zoomer } from "../../src/module.js"
 
 it('Using `zoomer` should work', async (t : Test) => {

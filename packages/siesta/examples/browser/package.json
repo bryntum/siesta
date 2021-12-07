@@ -7,7 +7,7 @@
     "node": ">=12.21.0"
   },
   "devDependencies": {
-    "siesta": "../../",
+    "@bryntum/siesta": "../../",
     "typescript": "^4.2.3",
     "vite": "^2.3.3"
   }

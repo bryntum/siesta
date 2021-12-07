@@ -9,6 +9,6 @@
     "node": ">=12.21.0"
   },
   "devDependencies": {
-    "siesta": "../../"
+    "@bryntum/siesta": "../../"
   }
 }

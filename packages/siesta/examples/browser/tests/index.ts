@@ -1,4 +1,4 @@
-import { Project } from "siesta/index.js"
+import { Project } from "@bryntum/siesta/index.js"
 
 const project = Project.new({
     title                   : 'Awesome isomorphic project test suite',

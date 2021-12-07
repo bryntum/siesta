@@ -1,4 +1,4 @@
-import { it, Test } from "siesta/index.js"
+import { it, Test } from "@bryntum/siesta/index.js"
 
 it('Basic Siesta Node.js test', async (t : Test) => {
     t.true(true, "That's true")
