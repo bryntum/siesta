@@ -38,9 +38,11 @@ it('Should support typing on the element inside of the web component', async t =
         t.silent.is(event.composed, true, 'event composed')
     }
 
-    document.documentElement.addEventListener('keydown', verifyEvent)
-    document.documentElement.addEventListener('keyup', verifyEvent)
-    document.documentElement.addEventListener('keypress', verifyEvent)
+    const docEl     = document.documentElement
+
+    docEl.addEventListener('keydown', verifyEvent)
+    docEl.addEventListener('keyup', verifyEvent)
+    docEl.addEventListener('keypress', verifyEvent)
 
     const text      = 'Sure does'
 
@@ -51,6 +53,10 @@ it('Should support typing on the element inside of the web component', async t =
 
     t.elementValueIs('web-comp -> input', 'Sure does', '`elementValueIs` works')
     t.is(input.value, 'Sure does', 'typed successfully')
+
+    docEl.removeEventListener('keydown', verifyEvent)
+    docEl.removeEventListener('keyup', verifyEvent)
+    docEl.removeEventListener('keypress', verifyEvent)
 })
 
 
