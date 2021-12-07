@@ -44,14 +44,20 @@ it('Should support clicking on the element inside of the web component', async t
         t.silent.is(event.composed, true, 'event composed')
     }
 
-    document.documentElement.addEventListener('mousedown', verifyEvent)
-    document.documentElement.addEventListener('mouseup', verifyEvent)
-    document.documentElement.addEventListener('click', verifyEvent)
+    const docEl     = document.documentElement
+
+    docEl.addEventListener('mousedown', verifyEvent)
+    docEl.addEventListener('mouseup', verifyEvent)
+    docEl.addEventListener('click', verifyEvent)
 
     t.firesOnce(document.documentElement, 'click')
     t.firesOnce(div, 'click')
 
     await t.click('web-comp -> #marker')
+
+    docEl.removeEventListener('mousedown', verifyEvent)
+    docEl.removeEventListener('mouseup', verifyEvent)
+    docEl.removeEventListener('click', verifyEvent)
 })
 
 
