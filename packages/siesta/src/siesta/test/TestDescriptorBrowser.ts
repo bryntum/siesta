@@ -38,6 +38,8 @@ see
  * - a "falsy" value, like `null`, `undefined`, empty string etc. It will be ignored
  * - an array of preload descriptors - will be flattened.
  *
+ * **IMPORTANT** The url of the preload descriptor is resolved relative to the test file location.
+ *
  * The last 2 cases allows simple conditional preloading, for example:
  * ```js
  * preload         : [
@@ -146,6 +148,24 @@ export class TestDescriptorBrowser extends Mixin(
         /**
          * A [[PreloadDescriptor|preload descriptor]] or an array of those. Defines what resources should be loaded
          * into the test page, before executing the test.
+         *
+         * **IMPORTANT** The preloading happens *after* the test file has been loaded into the page, but *before* any test
+         * starts. This means, if want to use the preloaded resources in some code, it needs to be placed **inside**
+         * any of the [[it]], [[describe]] or [[beforeEach]] section. Using the preloaded resources at the top-level of the file
+         * won't work. For example:
+         *
+         * ```js
+         * // this test file preloads a file which defines a global constant `MY_CONSTANT`
+         * import { beforeEach, it } from "../../browser.js"
+         *
+         * // this will throw - `MY_CONSTANT` is not preloaded yet
+         * const some = MY_CONSTANT + 1
+         *
+         * // this will work correctly, test are launched after preload
+         * it('My test', async t => {
+         *     const some = MY_CONSTANT + 1
+         * })
+         * ```
          *
          * **Note**, that if test descriptor has non-empty [[pageUrl]] option, then *it will not inherit* the [[preload]] option
          * from parent descriptors or project, **unless** it has the [[preload]] config set to string `inherit`.
