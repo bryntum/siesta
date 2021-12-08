@@ -378,7 +378,43 @@ export class UserAgentOnPage extends Mixin(
 
 
         /**
-         * Performs a query in the DOM, by default it is a CSS query. The query syntax may be enhanced by the subclasses.
+         * Performs a query in the DOM, by default it is a regular CSS query. Query is performed inside a single DOM context
+         * (single iframe or single web component). See [[query]] for cross-context querying capabilities.
+         *
+         * This method can be overridden by the subclass, to provide some extra query syntax, features etc.
+         *
+         * @category Dom helper methods
+         *
+         * @param query
+         * @param root
+         */
+        querySingleContext (query : string, root : Element | Document | ShadowRoot = this.window.document) : Element[] {
+            return Array.from(root.querySelectorAll(query))
+        }
+
+
+        /**
+         * Performs a query in the DOM, by default it is a CSS query with extra capabilities.
+         *
+         * Notably, the `->` characters split the query into segments, and each segment matches inside a "context".
+         * Context can be either an iframe or a web component shadow DOM. Simply put, the `->` symbol marks the boundary
+         * of the iframe/web component. Web component need to have "opened" shadow DOM for query to work.
+         *
+         * For example:
+         * ```
+         * // matches the `body` element of all iframes with `my-frame` CSS class
+         * .my-frame -> body
+         *
+         * // matches the `body` element of all iframes with `nested-frame` CSS class, which are in turn contained
+         * // inside the iframes with `my-frame` class
+         * .my-frame -> .nested-frame -> body
+         *
+         * // matches the elements with `target-class` CSS class, which are inside the shadow DOM of the
+         * // web component element with `my-web-comp1` class
+         * .my-web-comp1 -> .target-class
+         * ```
+         *
+         * This method uses [[querySingleContext]] to perform simple query inside a single context.
          *
          * @category Dom helper methods
          *
@@ -386,13 +422,13 @@ export class UserAgentOnPage extends Mixin(
          * @param root The root DOM element (or a `Document`) from which to start the query. Optional, by default
          * its the `document` of the test context.
          */
-        query (query : string, root : Element | Document = this.window.document) : Element[] {
+        query (query : string, root : Element | Document | ShadowRoot = this.window.document) : Element[] {
             if (!query) throw new Error("The provided selector is empty")
             if (!isString(query)) throw new Error("The provided selector is not a string")
 
             const segments  = saneSplit(query, /\s*->\s*/)
 
-            let currentRoots : Element[] = Array.from(root.querySelectorAll(segments[ 0 ]))
+            let currentRoots : Element[] = this.querySingleContext(segments[ 0 ], root)
 
             for (let i = 1; i < segments.length; i++) {
                 const segment   = segments[ i ]
@@ -403,10 +439,10 @@ export class UserAgentOnPage extends Mixin(
                     const currentRoot   = currentRoots[ j ]
 
                     if (isSameDomainHTMLIFrameElement(currentRoot)) {
-                        newRoots.push(...Array.from(currentRoot.contentDocument.querySelectorAll(segment)))
+                        newRoots.push(...this.querySingleContext(segment, currentRoot.contentDocument))
                     }
                     else if (currentRoot.shadowRoot) {
-                        newRoots.push(...Array.from(currentRoot.shadowRoot.querySelectorAll(segment)))
+                        newRoots.push(...this.querySingleContext(segment, currentRoot.shadowRoot))
                     }
                 }
 
