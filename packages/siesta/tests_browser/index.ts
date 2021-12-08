@@ -147,16 +147,32 @@ project.plan(
         ]
     },
     {
-        url    : 'sencha',
+        url         : 'sencha',
+
+        preload     : [
+            '../../../workspace/ext-7.4.0/build/classic/theme-classic/resources/theme-classic-all.css',
+            '../../../workspace/ext-7.4.0/build/ext-all-debug.js'
+        ],
 
         items       : [
             {
-                url         : 'query.t.js',
-                preload     : [
-                    '../../../workspace/ext-7.4.0/build/classic/theme-classic/resources/theme-classic-all.css',
-                    '../../../workspace/ext-7.4.0/build/ext-all-debug.js'
+                url     : 'simulation',
+                items   : [
+                    {
+                        url     : 'keyboard',
+                        items   : [
+                            'type.t.js'
+                        ]
+                    },
+                    {
+                        url     : 'mouse',
+                        items   : [
+                            'click.t.js'
+                        ]
+                    }
                 ]
-            }
+            },
+            'query.t.js'
         ]
     }
 )

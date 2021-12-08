@@ -1,6 +1,8 @@
-import { ClassUnion, Mixin } from "typescript-mixin-class"
+import { AnyFunction, ClassUnion, Mixin } from "typescript-mixin-class"
 import { prototypeValue } from "../../util/Helpers.js"
+import { isString } from "../../util/Typeguards.js"
 import { isElementPointReachable } from "../../util_browser/Dom.js"
+import { ActionTarget } from "../simulate/Types.js"
 import { createTestSectionConstructors } from "../test/Test.js"
 import { TestBrowser } from "../test/TestBrowser.js"
 import { TestDescriptorSencha } from "./TestDescriptorSencha.js"
@@ -9,6 +11,11 @@ import { TestDescriptorSencha } from "./TestDescriptorSencha.js"
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // dummy type for better signatures
 export type ExtComponent        = any
+
+export const isComponentQuery = (selector : string) : boolean => Boolean(selector.match(/^\s*>>/))
+
+export const isExtComponent = (a : any, Ext) : a is ExtComponent => Boolean(Ext && (a instanceof Ext.Component))
+
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
@@ -29,19 +36,47 @@ export class TestSencha extends Mixin(
         descriptor              : TestDescriptorSencha
 
 
-        // addListenerToObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
-        //     observable.addEventListener(event, listener)
-        // }
-        //
-        //
-        // removeListenerFromObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
-        //     observable.removeEventListener(event, listener)
-        // }
-        //
-        //
-        // resolveObservable (source : ActionTarget) : Element {
-        //     return this.resolveActionTarget(source)
-        // }
+        addListenerToObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
+            const Ext     = this.Ext
+
+            if (Ext && isExtComponent(observable, Ext)) {
+                observable.addListener(event, listener)
+            } else
+                super.addListenerToObservable(observable, event, listener)
+        }
+
+
+        removeListenerFromObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
+            const Ext     = this.Ext
+
+            if (Ext && isExtComponent(observable, Ext)) {
+                observable.removeListener(event, listener)
+            } else
+                super.addListenerToObservable(observable, event, listener)
+        }
+
+
+        resolveObservable (source : ActionTarget) : Element | ExtComponent {
+            if (isString(source) && isComponentQuery(source)) {
+                const components    = this.componentQuery(source)
+
+                if (components.length > 1) {
+                    if (this.onAmbiguousQuery === 'warn')
+                        this.warn(`Query for observable resolved to multiple components: ${ components }`)
+                    else if (this.onAmbiguousQuery === 'throw')
+                        throw new Error(`Query resolved to multiple elements: ${ components }`)
+                }
+
+                return components[ 0 ]
+            } else {
+                const Ext       = this.Ext
+
+                if (Ext && (source instanceof Ext.Component))
+                    return source
+                else
+                    return super.resolveObservable(source)
+            }
+        }
 
 
         get Ext () : any {
@@ -50,14 +85,70 @@ export class TestSencha extends Mixin(
         }
 
 
-        compToEl (comp : ExtComponent) : Element {
-            // const Ext       = this.Ext
+        compToEl (comp : ExtComponent, locateInputEl = true) : Element {
+            if (!comp) return null
 
-            if (comp.getEl) {
-                const extEl     = comp.getEl()
+            const Ext         = this.Ext
 
-                return extEl?.dom
+            // Handle editors, deal with the field directly
+            if (Ext.Editor && comp instanceof Ext.Editor && comp.field) {
+                comp        = comp.field
             }
+
+            // Ext JS
+            if (Ext && Ext.form && Ext.form.Field && locateInputEl) {
+                // Deal with bizarre markup in Ext 5.1.2+
+                if (
+                    (Ext.form.Checkbox && comp instanceof Ext.form.Checkbox || Ext.form.Radio && comp instanceof Ext.form.Radio)
+                    && comp.el
+                ) {
+                    let displayEl   = comp.displayEl
+
+                    if (displayEl && comp.boxLabel) {
+                        return displayEl
+                    }
+
+                    let inputComponent  = Ext.ComponentQuery.query('checkboxinput', comp)[ 0 ]
+
+                    if (inputComponent) return this.compToEl(inputComponent)
+
+                    //                                                    Ext6 Modern               Ext6.7                                   Fallback
+                    return comp.el.down('.x-form-field') || comp.el.down('.x-field-input') || comp.el.down('.x-input-el') || comp.inputEl || comp.el
+                }
+
+                if (comp instanceof Ext.form.Field && comp.inputEl) {
+                    let field       = comp.el.down('.x-form-field')
+
+                    return (field && field.dom) ? field : comp.inputEl
+                }
+
+                if (Ext.form.HtmlEditor && comp instanceof Ext.form.HtmlEditor) {
+                    //     Ext JS 3       Ext JS 4
+                    return comp.iframe || comp.inputEl
+                }
+            }
+
+            if (Ext && Ext.field && Ext.field.Slider && (comp instanceof Ext.field.Slider)) {
+                return this.compToEl(Ext.ComponentQuery.query('slider', comp)[ 0 ])
+            }
+
+            // Sencha Touch: Form fields can have a child input component
+            if (Ext && Ext.field && Ext.field.Field && comp instanceof Ext.field.Field && locateInputEl && comp.getComponent) {
+                comp        = comp.getComponent()
+
+                // some of the SenchaTouch fields uses "masks" - another DOM element, which is applied
+                // on top of the field when it does not have focus
+                // some of them have mask always ("useMask === true"), for such fields return mask element
+                // as its the primary point of user interaction
+                if (comp.getUseMask && comp.getUseMask() === true && comp.mask) return comp.mask
+
+                if (locateInputEl && comp.input) return comp.input
+
+                if (comp.bodyElement) return comp.bodyElement
+            }
+
+            //                      Ext JS   vs                    Sencha Touch
+            return comp.getEl && !comp.element ? comp.getEl() : locateInputEl && comp.input || comp.el || comp.element
         }
 
 
@@ -114,7 +205,7 @@ export class TestSencha extends Mixin(
                     ? this.compositeQuery(query, this.Ext.ComponentQuery)
                     : []
             }
-            else if (query.match(/>>/)) {
+            else if (isComponentQuery(query)) {
                 return this.Ext
                     ? this.componentQuery(query, this.Ext.ComponentQuery, { ignoreNonVisible : false })
                         .map(comp => this.compToEl(comp))
