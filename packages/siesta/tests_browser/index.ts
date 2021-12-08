@@ -145,6 +145,19 @@ project.plan(
                 ]
             },
         ]
+    },
+    {
+        url    : 'sencha',
+
+        items       : [
+            {
+                url         : 'query.t.js',
+                preload     : [
+                    '../../../workspace/ext-7.4.0/build/classic/theme-classic/resources/theme-classic-all.css',
+                    '../../../workspace/ext-7.4.0/build/ext-all-debug.js'
+                ]
+            }
+        ]
     }
 )
 
