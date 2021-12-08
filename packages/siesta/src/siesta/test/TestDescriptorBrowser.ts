@@ -1,7 +1,7 @@
 import { CI } from "chained-iterator/index.js"
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
-import { prototypeValue } from "../../util/Helpers.js"
+import { prototypeValue, wantArray } from "../../util/Helpers.js"
 import { isArray, isFunction, isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { IsolationLevel, SimulationType } from "../common/IsolationLevel.js"
@@ -76,6 +76,18 @@ export type PreloadDescriptorNormalized =
     | { type : 'js', content : string, isEcmaModule? : boolean }
     | { type : 'css', url : string }
     | { type : 'css', content : string }
+
+
+export const normalizePreloadValue = (preload : 'inherit' | PreloadDescriptor | PreloadDescriptor[]) : PreloadDescriptorNormalized[] => {
+    if (preload === 'inherit')
+        return undefined
+    else {
+        return wantArray(preload || [])
+            .flat(2000)
+            .filter(el => Boolean(el))
+            .map(normalizePreloadDescriptor)
+    }
+}
 
 
 export const normalizePreloadDescriptor = (desc : PreloadDescriptor) : PreloadDescriptorNormalized => {
@@ -175,7 +187,18 @@ export class TestDescriptorBrowser extends Mixin(
         @config({
             reducer : (name : 'preload', parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ 'preload' ] => {
                 // @ts-ignore
-                return inheritanceBlockedByPageUrl('preload', parentsAxis)
+                return inheritanceBlockedByPageUrl('preload', parentsAxis, desc => {
+                    const normalized    = normalizePreloadValue(desc.preload)
+
+                    return (normalized || []).map(preloadDesc => {
+                        if ('url' in preloadDesc) {
+                            return Object.assign({}, preloadDesc, {
+                                url     : new URL(preloadDesc.url, desc.urlAbs).href
+                            })
+                        } else
+                            return preloadDesc
+                    })
+                })
             }
         })
         preload             : 'inherit' | PreloadDescriptor | PreloadDescriptor[]
@@ -252,7 +275,13 @@ export class TestDescriptorBrowser extends Mixin(
 // these are:
 // -- DONE: 'preload',
 // -- TODO: 'innerHtmlHead/innerHtmlBody'
-function inheritanceBlockedByPageUrl (configName : keyof TestDescriptorBrowser, parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ typeof configName ] {
+function inheritanceBlockedByPageUrl (
+    configName : keyof TestDescriptorBrowser,
+    parentsAxis : TestDescriptorBrowser[],
+    getValue? : (desc : TestDescriptorBrowser) => TestDescriptorBrowser[ typeof configName ]
+)
+    : TestDescriptorBrowser[ typeof configName ]
+{
     let pageUrlConfigFound  = false
     let isInheriting        = false
 
@@ -264,7 +293,7 @@ function inheritanceBlockedByPageUrl (configName : keyof TestDescriptorBrowser, 
         pageUrlConfigFound  = pageUrlConfigFound || descriptor.hasOwnProperty('pageUrl')
 
         if (descriptor.hasOwnProperty(configName) || isProjectNode) {
-            let value       = descriptor[ configName ]
+            let value       = getValue ? getValue(descriptor) : descriptor[ configName ]
 
             if (value == 'inherit')
                 isInheriting = true

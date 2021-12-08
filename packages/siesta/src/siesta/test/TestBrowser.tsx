@@ -96,6 +96,12 @@ export class TestBrowser extends Mixin(
         async setupPreloads () {
             await awaitDomInteractive()
 
+            // TODO clean this up
+            // there's now pre-normalization step in the "flatten" method,
+            // which converts all `PreloadDescriptor`s to `PreloadDescriptorNormalized`
+            // and "absolutize" their `url`s, so these conversions are not needed
+            // even though they are not harmful (since every `PreloadDescriptorNormalized`
+            // is also a regular `PreloadDescriptor`)
             const preloads      = wantArray(this.descriptor.preload || [])
                 .concat(this.descriptor.alsoPreload || [])
                 .flat(2000)
@@ -117,7 +123,9 @@ export class TestBrowser extends Mixin(
                     preload.isEcmaModule && el.setAttribute("crossorigin", "anonymous")
 
                     if ('url' in preload) {
-                        el.src = new URL(preload.url, this.descriptor.urlAbs).href
+                        // TODO clean this up, see note above
+                        // el.src = new URL(preload.url, this.descriptor.urlAbs).href
+                        el.src = preload.url
 
                         waitFor.push(new Promise((resolve, reject) => {
                             el.addEventListener('load', () => resolve(undefined))
@@ -138,7 +146,9 @@ export class TestBrowser extends Mixin(
 
                         el.type     = 'text/css'
                         el.rel      = 'stylesheet'
-                        el.href     = new URL(preload.url, this.descriptor.urlAbs).href
+                        // TODO clean this up, see note above
+                        // el.href     = new URL(preload.url, this.descriptor.urlAbs).href
+                        el.href     = preload.url
 
                         waitFor.push(new Promise((resolve, reject) => {
                             el.addEventListener('load', () => resolve(undefined))
