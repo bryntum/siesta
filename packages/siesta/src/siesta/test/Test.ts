@@ -17,6 +17,8 @@ import { LauncherError } from "../launcher/LauncherError.js"
 import { SiestaProjectExtraction } from "../launcher/ProjectExtractor.js"
 import { Project } from "../project/Project.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
+import { TestDescriptorReact } from "../react/TestDescriptorReact.js"
+import { TestDescriptorSencha } from "../sencha/TestDescriptorSencha.js"
 import { AssertionAsync } from "./assertion/AssertionAsync.js"
 import { AssertionCompare } from "./assertion/AssertionCompare.js"
 import { AssertionException } from "./assertion/AssertionException.js"
@@ -40,6 +42,8 @@ import {
     TestResult
 } from "./TestResult.js"
 
+
+// TODO need to figure out how to handle custom TestDescriptor subclasses
 // this imports handles the case when a standalone isomorphic test is launched via node launcher
 // in this case, the launcher will create a nodejs project with nodejs test descriptor
 // as the project plan
@@ -47,6 +51,8 @@ import {
 TestDescriptorNodejs
 TestDescriptorBrowser
 TestDescriptorDeno
+TestDescriptorSencha
+TestDescriptorReact
 SubTestCheckInfo
 
 // When a `it` starter is imported, the `importer` is always expected to be created
