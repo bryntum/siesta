@@ -60,17 +60,19 @@ export class TestBrowser extends Mixin(
         mouseCursorVisualizer   : MouseCursorVisualizer     = MouseCursorVisualizer.new()
 
 
-        addListenerToObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
+        addListenerToObservable (observable : unknown, event : string, listener : AnyFunction) {
+            // @ts-ignore
             observable.addEventListener(event, listener)
         }
 
 
-        removeListenerFromObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
+        removeListenerFromObservable (observable : unknown, event : string, listener : AnyFunction) {
+            // @ts-ignore
             observable.removeEventListener(event, listener)
         }
 
 
-        resolveObservable (source : ActionTarget) : Element {
+        resolveObservable (source : ActionTarget) : unknown {
             return this.resolveActionTarget(source)
         }
 
