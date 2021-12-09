@@ -29,8 +29,6 @@ it('`click` action should support composite query', async t => {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`click` action should support component query', async t => {
-    let clicked         = false
-
     const panel        = new Ext.Panel({
         renderTo        : document.body,
 
@@ -44,16 +42,48 @@ it('`click` action should support component query', async t => {
                 xtype           : 'button',
                 cls             : 'test-button',
                 text            : 'Button2',
-
-                listeners       : {
-                    click : () => clicked = true
-                }
             }
         ]
     })
 
-    await t.click('>>button[text=Button2]')
+    t.firesOk('>>button[text=Button2]', 'click', 1)
 
-    t.true(clicked)
+    await t.click('>>button[text=Button2]')
 })
 
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('should be able to click on widgets', async t => {
+
+    const treeStore = new Ext.data.TreeStore({
+        fields      : [ 'id', 'text' ],
+
+        root        : {
+            text        : 'root',
+            expanded    : true,
+
+            children    : [
+                { id : 1, text : "1", leaf : true },
+                {
+                    id : 2, text : "2", expanded : true, children : [
+                        { id : 3, text : "3", leaf : true },
+                        { id : 4, text : "4", leaf : true }
+                    ]
+                },
+                { id : 5, text : "5", leaf : true }
+            ]
+        }
+    })
+
+    const treeList    = new Ext.list.Tree({
+        renderTo    : Ext.getBody(),
+        store       : treeStore,
+
+        width       : 400,
+        height      : 300
+    })
+
+    t.firesOnce(t.cq1('>>treelistitem[text=3]').el, 'click')
+
+    await t.click('>>treelistitem[text=3]')
+})

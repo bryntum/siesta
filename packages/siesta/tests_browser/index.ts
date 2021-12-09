@@ -172,7 +172,8 @@ project.plan(
                     }
                 ]
             },
-            'query.t.js'
+            'query.t.js',
+            'set_value.t.js'
         ]
     }
 )

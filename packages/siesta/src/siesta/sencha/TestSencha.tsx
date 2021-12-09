@@ -1,17 +1,21 @@
 import { AnyFunction, ClassUnion, Mixin } from "typescript-mixin-class"
+import { TextJSX } from "../../jsx/TextJSX.js"
+import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { isElementPointReachable } from "../../util_browser/Dom.js"
 import { ActionTarget } from "../simulate/Types.js"
 import { createTestSectionConstructors } from "../test/Test.js"
 import { TestBrowser } from "../test/TestBrowser.js"
+import { Assertion } from "../test/TestResult.js"
 import { TestDescriptorSencha } from "./TestDescriptorSencha.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // dummy types for better signatures
+export type ExtObservable       = { addListener : AnyFunction, removeListener : AnyFunction }
 export type ExtComponent        = any
-export type ExtElement          = { dom : Element }
+export type ExtElement          = { dom : Element } & ExtObservable
 
 export const isComponentQuery = (selector : string) : boolean => Boolean(selector.match(/^\s*>>/))
 
@@ -57,7 +61,7 @@ export class TestSencha extends Mixin(
         }
 
 
-        resolveObservable (source : ActionTarget) : Element | ExtComponent {
+        resolveExtComponent (source : ActionTarget) : ExtComponent {
             if (isString(source) && isComponentQuery(source)) {
                 const components    = this.componentQuery(source)
 
@@ -68,15 +72,28 @@ export class TestSencha extends Mixin(
                         throw new Error(`Query resolved to multiple elements: ${ components }`)
                 }
 
-                return components[ 0 ]
+                return components[ 0 ] ?? null
             } else {
                 const Ext       = this.Ext
 
                 if (Ext && (source instanceof Ext.Component))
                     return source
                 else
-                    return super.resolveObservable(source)
+                    return undefined
             }
+        }
+
+
+        resolveObservable (source : ActionTarget) : Element | ExtComponent {
+            const Ext           = this.Ext
+            const component     = this.resolveExtComponent(source)
+
+            return component !== undefined
+                ? component
+                : Ext && (source instanceof Ext.Element)
+                    // @ts-ignore
+                    ? source.dom
+                    : super.resolveObservable(source)
         }
 
 
@@ -167,17 +184,17 @@ export class TestSencha extends Mixin(
         }
 
 
-        cq (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : Element[] {
+        cq (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : ExtComponent[] {
             return this.componentQuery(query, root, options)
         }
 
 
-        cq1 (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : Element {
-            return this.componentQuery(query, root, options)[ 0 ]
+        cq1 (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : ExtComponent | null {
+            return this.componentQuery(query, root, options)[ 0 ] ?? null
         }
 
 
-        componentQuery (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : Element[] {
+        componentQuery (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : ExtComponent[] {
             const selector  = query.replace(/^(\s*>>)?/, '').trim()
 
             const results   = root.query(selector)
@@ -220,6 +237,97 @@ export class TestSencha extends Mixin(
             } else
                 return super.querySingleContext(query, root)
         }
+
+
+        assertComponentQueryExistsInternal (
+            assertionName   : string,
+            negated         : boolean,
+            query           : string,
+            description     : string = ''
+        ) {
+            const results       = this.cq(query)
+            const passed        = negated ? results.length === 0 : results.length > 0
+
+            this.addResult(Assertion.new({
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
+                passed,
+                description,
+                annotation      : passed
+                    ? undefined
+                    : negated
+                        ? <div>
+                            Component query <span class="underlined">{ query }</span> match { results.length } component(s).{'\n'}
+
+                            <div class="indented">{ SerializerXml.serialize(results[ 0 ]) }</div>
+                        </div>
+                        : <div>
+                            Component query <span class="underlined">{ query }</span> did not match any component
+                        </div>
+            }))
+        }
+
+
+        /**
+         * This assertion passes if the provided component query matches at least one component.
+         *
+         * @param query
+         * @param description
+         */
+        cqExists (query : string, description? : string) {
+            this.assertComponentQueryExistsInternal(
+                'cqExists',
+                this.isAssertionNegated,
+                query,
+                description
+            )
+        }
+
+
+        /**
+         * This assertion passes if the provided component query does not match any components.
+         *
+         * @param query
+         * @param description
+         */
+        cqNotExists (query : string, description? : string) {
+            this.assertComponentQueryExistsInternal(
+                'cqNotExists',
+                !this.isAssertionNegated,
+                query,
+                description
+            )
+        }
+
+
+        /**
+         * This assertion passes if the provided component query matches at least one component.
+         *
+         * @param query
+         * @param description
+         */
+        componentQueryExists (query : string, description? : string) {
+            this.assertComponentQueryExistsInternal(
+                'componentQueryExists',
+                this.isAssertionNegated,
+                query,
+                description
+            )
+        }
+
+        /**
+         * Sets a value to an Ext Component. A faster way to set a value than manually calling "type" into
+         * a text field for example. A value is set by calling either the `setChecked` or `setRawValue` or
+         * `setValue` method of the component.
+         *
+         * @param component A component instance or a component query to resolve
+         * @param value
+         */
+        setValue (component : ExtComponent | ActionTarget, value : unknown) {
+            component = this.resolveExtComponent(component);
+
+            (component.setChecked || component.setRawValue || component.setValue).call(component, value)
+        }
+
     }
 ) {}
 

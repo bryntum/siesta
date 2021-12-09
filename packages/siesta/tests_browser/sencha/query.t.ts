@@ -47,10 +47,8 @@ it('Sencha-specific querying should work', async t => {
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     it('`query` method should support component query', async t => {
         t.eq(t.query('>>#panel1'), [ Ext.getCmp('panel1').getEl().dom ], "Normalize element returns the root el of a component")
-        t.eq(t.componentQuery('>>#panel1'), [ Ext.getCmp('panel1') ], "Normalize element returns the root el of a component")
 
         t.eq(t.query('>>panel button'), [ Ext.getCmp('test-button').getEl().dom ], "Normalize element returns the root el of a component")
-        t.eq(t.componentQuery('>>panel button'), [ Ext.getCmp('test-button') ], "Normalize element returns the root el of a component")
     })
 
 
@@ -62,6 +60,23 @@ it('Sencha-specific querying should work', async t => {
             'Found the divs with class `quix` inside of whole viewport'
         )
 
+        t.eq(
+            t.query('#panel2 => #test_div2'),
+            [ Ext.get('test_div2').dom ]
+        )
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('`componentQuery` method should work', async t => {
+        t.eq(t.componentQuery('>>#panel1'), [ Ext.getCmp('panel1') ], "Normalize element returns the root el of a component")
+
+        t.eq(t.componentQuery('>>panel button'), [ Ext.getCmp('test-button') ], "Normalize element returns the root el of a component")
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('`compositeQuery` method should work', async t => {
         t.eq(
             t.compositeQuery('viewport => div.quix'),
             [ Ext.get('test_div1').dom, Ext.get('test_div2').dom ],
@@ -89,11 +104,47 @@ it('Sencha-specific querying should work', async t => {
 
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('Should be able to normalize a nested CSQ where CSS match is not found in the first top component match', function (t) {
+        Ext.create('Ext.form.FieldSet', {
+            renderTo : document.body,
+            items : [
+                { xtype : 'radiofield' }
+            ]
+        })
+
+        Ext.create('Ext.form.FieldSet', {
+            renderTo : document.body,
+            items : [
+                { xtype : 'radiofield', cls : 'foo'}
+            ]
+        })
+
+        Ext.create('Ext.form.FieldSet', {
+            renderTo : document.body,
+            items : [
+                { xtype : 'radiofield'}
+            ]
+        })
+
+        t.eq(t.compositeQuery('fieldset => .foo'), [ t.cq1('[cls=foo]').el.dom ])
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     it('`compositeQuery` method should throw when provided with invalid selector', async t => {
         t.throwsOk(() => {
             t.compositeQuery('panel[title=foo]')
         }, '', 'Invalid composite query selector: panel[title=foo]')
     })
 
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('`cqExists` method should work', async t => {
+        t.cqExists('[title=foo1]')
+        t.not.cqExists('[title=zoo]')
+
+        t.cqNotExists('[title=zoo]')
+        t.not.cqNotExists('[title=foo1]')
+    })
 })
 
