@@ -9,8 +9,9 @@ import { TestDescriptorSencha } from "./TestDescriptorSencha.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// dummy type for better signatures
+// dummy types for better signatures
 export type ExtComponent        = any
+export type ExtElement          = { dom : Element }
 
 export const isComponentQuery = (selector : string) : boolean => Boolean(selector.match(/^\s*>>/))
 
@@ -86,6 +87,11 @@ export class TestSencha extends Mixin(
 
 
         compToEl (comp : ExtComponent, locateInputEl = true) : Element {
+            return this.compToExtEl(comp, locateInputEl)?.dom
+        }
+
+
+        compToExtEl (comp : ExtComponent, locateInputEl = true) : ExtElement {
             if (!comp) return null
 
             const Ext         = this.Ext
@@ -110,7 +116,7 @@ export class TestSencha extends Mixin(
 
                     let inputComponent  = Ext.ComponentQuery.query('checkboxinput', comp)[ 0 ]
 
-                    if (inputComponent) return this.compToEl(inputComponent)
+                    if (inputComponent) return this.compToExtEl(inputComponent)
 
                     //                                                    Ext6 Modern               Ext6.7                                   Fallback
                     return comp.el.down('.x-form-field') || comp.el.down('.x-field-input') || comp.el.down('.x-input-el') || comp.inputEl || comp.el
@@ -129,7 +135,7 @@ export class TestSencha extends Mixin(
             }
 
             if (Ext && Ext.field && Ext.field.Slider && (comp instanceof Ext.field.Slider)) {
-                return this.compToEl(Ext.ComponentQuery.query('slider', comp)[ 0 ])
+                return this.compToExtEl(Ext.ComponentQuery.query('slider', comp)[ 0 ])
             }
 
             // Sencha Touch: Form fields can have a child input component
