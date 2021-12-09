@@ -1,4 +1,5 @@
 import { beforeEach, it } from "../../../../sencha.js"
+import { verifyAllFailed } from "../../../../tests/siesta/@helpers.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
@@ -86,4 +87,17 @@ it('should be able to click on widgets', async t => {
     t.firesOnce(t.cq1('>>treelistitem[text=3]').el, 'click')
 
     await t.click('>>treelistitem[text=3]')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should not crash when clicking unrendered component', async t => {
+
+    t.it({ title : 'internal', isTodo : true, defaultTimeout : 100 }, async t => {
+        await t.click(new Ext.button.Button())
+    }).postFinishHook.on(test => {
+        verifyAllFailed(test, t)
+
+        t.is(test.assertions.length, 1)
+    })
 })

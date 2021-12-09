@@ -15,11 +15,16 @@ import { TestDescriptorSencha } from "./TestDescriptorSencha.js"
 // dummy types for better signatures
 export type ExtObservable       = { addListener : AnyFunction, removeListener : AnyFunction }
 export type ExtComponent        = any
+// TODO
+// better type for Ext.Component, which however messes up the things
+export type ExtComponentT       = { rendered : true } & ExtObservable
 export type ExtElement          = { dom : Element } & ExtObservable
 
 export const isComponentQuery = (selector : string) : boolean => Boolean(selector.match(/^\s*>>/))
 
 export const isExtComponent = (a : any, Ext) : a is ExtComponent => Boolean(Ext && (a instanceof Ext.Component))
+
+export type ActionTargetSencha  = ActionTarget | ExtComponentT | ExtElement
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -41,6 +46,16 @@ export class TestSencha extends Mixin(
         descriptor              : TestDescriptorSencha
 
 
+        isActionTarget (a : any) : a is ActionTarget {
+            const Ext       = this.Ext
+
+            if (Ext && (a instanceof Ext.Component)) return true
+            if (Ext && (a instanceof Ext.Element)) return true
+
+            return super.isActionTarget(a)
+        }
+
+
         addListenerToObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
             const Ext     = this.Ext
 
@@ -58,6 +73,22 @@ export class TestSencha extends Mixin(
                 observable.removeListener(event, listener)
             } else
                 super.addListenerToObservable(observable, event, listener)
+        }
+
+
+        resolveActionTargetAll (target : ActionTarget) : Element[] {
+            const Ext       = this.Ext
+
+            if (Ext && (target instanceof Ext.Component)) {
+                return [ this.compToEl(target) ]
+            }
+
+            if (Ext && (target instanceof Ext.Element)) {
+                // @ts-ignore
+                return [ target.dom ]
+            }
+
+            return super.resolveActionTargetAll(target)
         }
 
 
