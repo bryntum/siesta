@@ -477,13 +477,18 @@ export class UserAgentOnPage extends Mixin(
         }
 
 
+        isActionTarget (a : any) : a is ActionTarget {
+            return isActionTarget(a)
+        }
+
+
         normalizeMouseActionOptions (
             ...args :
                 | [ target? : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
                 | [ options : Partial<MouseActionOptions> ]
         ) : MouseActionOptions {
-            const target        = isActionTarget(args[ 0 ]) ? args[ 0 ] : undefined
-            const offset        = isActionTarget(args[ 0 ]) || args.length === 2 ? args[ 1 ] : args[ 0 ]
+            const target        = this.isActionTarget(args[ 0 ]) ? args[ 0 ] : undefined
+            const offset        = this.isActionTarget(args[ 0 ]) || args.length === 2 ? args[ 1 ] : args[ 0 ]
 
             const defaults : MouseActionOptions = {
                 target,
@@ -1232,13 +1237,13 @@ export class UserAgentOnPage extends Mixin(
                 | [ target : ActionTarget, offset? : ActionTargetOffset | Partial<MouseActionOptions> ]
                 | [ options : Partial<MouseActionOptions> ]
         ) {
-            const target        = isActionTarget(args[ 0 ])
+            const target        = this.isActionTarget(args[ 0 ])
                 ? args[ 0 ]
                 : isNumber(args[ 0 ]) ? [ args[ 0 ], args[ 1 ] ] as Point : undefined
 
             const offsetOrOptions = (isNumber(args[ 0 ]) && isNumber(args[ 1 ])
                 ? args[ 2 ]
-                : isActionTarget(args[ 0 ]) ? args[ 1 ] : args[ 0 ]) as ActionTargetOffset | Partial<MouseActionOptions>
+                : this.isActionTarget(args[ 0 ]) ? args[ 1 ] : args[ 0 ]) as ActionTargetOffset | Partial<MouseActionOptions>
 
             if (target !== undefined && offsetOrOptions && !isArray(offsetOrOptions)) offsetOrOptions.target = target
 

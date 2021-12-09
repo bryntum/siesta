@@ -4,7 +4,7 @@ import { WaitForResult } from "../../../util/TimeHelpers.js"
 import { isArray, isString } from "../../../util/Typeguards.js"
 import { normalizeOffset } from "../../../util_browser/Coordinates.js"
 import { isElementPointReachable } from "../../../util_browser/Dom.js"
-import { ActionTarget, ActionTargetOffset, isActionTarget } from "../../simulate/Types.js"
+import { ActionTarget, ActionTargetOffset } from "../../simulate/Types.js"
 import { UserAgentOnPage } from "../../simulate/UserAgent.js"
 import { Assertion } from "../TestResult.js"
 import { AssertionAsync, WaitForOptions } from "./AssertionAsync.js"
@@ -207,8 +207,8 @@ export class AssertionElement extends Mixin(
             : Promise<Element[] | undefined>
         {
             const selector  = args[ 0 ]
-            const options   = isActionTarget(args[ 1 ]) ? undefined : args[ 1 ]
-            const root      = isActionTarget(args[ 1 ]) ? args[ 1 ] : options?.root
+            const options   = this.isActionTarget(args[ 1 ]) ? undefined : args[ 1 ]
+            const root      = this.isActionTarget(args[ 1 ]) ? args[ 1 ] : options?.root
             const timeout   = options?.timeout ?? this.waitForTimeout
 
             if (!selector) throw new Error("Need `selector` argument for the `waitForSelector` assertion")
