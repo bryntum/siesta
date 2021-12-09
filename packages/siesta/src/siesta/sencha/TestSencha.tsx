@@ -256,7 +256,7 @@ export class TestSencha extends Mixin(
         override querySingleContext (query : string, root : Element | Document = this.window.document) : Element[] {
             if (query.match(/=>/)) {
                 return this.Ext
-                    ? this.compositeQuery(query, this.Ext.ComponentQuery)
+                    ? this.compositeQuery(query, this.Ext.ComponentQuery, { ignoreNonVisible : false })
                     : []
             }
             else if (isComponentQuery(query)) {

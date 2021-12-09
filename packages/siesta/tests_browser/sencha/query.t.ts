@@ -132,7 +132,7 @@ it('Sencha-specific querying should work', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('Should be able to normalize a nested CSQ where CSS match is not found in the first top component match', function (t) {
+it('Should be able to normalize a nested CSQ where CSS match is not found in the first top component match', t => {
     Ext.create('Ext.form.FieldSet', {
         renderTo : document.body,
         items : [
