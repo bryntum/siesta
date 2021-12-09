@@ -332,47 +332,30 @@ export class UserAgentOnPage extends Mixin(
 
 
         resolveActionTarget (target : ActionTarget, onAmbiguousQuery : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery) : Element {
+            const resolved  = this.resolveActionTargetAll(target)
+
+            if (resolved.length > 1) {
+                if (onAmbiguousQuery === 'warn')
+                    this.warn(`Action target resolved to multiple elements: ${ target }`)
+                else if (onAmbiguousQuery === 'throw')
+                    throw new Error(`Action target resolved to multiple elements: ${ target }`)
+            }
+
+            return resolved[ 0 ]
+        }
+
+
+        resolveActionTargetAll (target : ActionTarget) : Element[] {
             if (!target) {
-                return elementFromPoint(this.window.document, ...this.simulator.currentPosition, true).el
+                return [ elementFromPoint(this.window.document, ...this.simulator.currentPosition, true).el ]
             }
             else if (target instanceof Array) {
-                return elementFromPoint(this.window.document, ...(target.length === 0 ? this.simulator.currentPosition : target), true).el
+                return [ elementFromPoint(this.window.document, ...(target.length === 0 ? this.simulator.currentPosition : target), true).el ]
             }
-            else {
-                return this.normalizeElement(target, onAmbiguousQuery)
-            }
-        }
-
-
-        normalizeElement (el : string | Element, onAmbiguousQuery : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery) : Element | undefined {
-            if (isString(el)) {
-                const resolved      = this.query(el)
-
-                if (resolved.length > 1) {
-                    if (onAmbiguousQuery === 'warn')
-                        this.warn(`Query resolved to multiple elements: ${ el }`)
-                    else if (onAmbiguousQuery === 'throw')
-                        throw new Error(`Query resolved to multiple elements: ${ el }`)
-                }
-
-                return resolved[ 0 ]
+            else if (isString(target)) {
+                return this.query(target)
             } else {
-                return el
-            }
-        }
-
-
-        normalizeElementDetailed (
-            el : string | Element, onResolvedToMultiple : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery
-        )
-            : { el : Element, multiple : boolean }
-        {
-            if (isString(el)) {
-                const resolved      = this.query(el)
-
-                return { el : resolved[ 0 ], multiple : resolved.length > 1 }
-            } else {
-                return { el, multiple : false }
+                return [ target ]
             }
         }
 
@@ -657,9 +640,9 @@ export class UserAgentOnPage extends Mixin(
                     }
 
                     //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
-                    const res       = this.normalizeElementDetailed(target)
+                    const resolved      = this.resolveActionTargetAll(target)
 
-                    if (!silent && res.multiple) {
+                    if (!silent && resolved.length > 1) {
                         if (this.onAmbiguousQuery === 'throw')
                             throw new Error(`Query resolved to multiple elements: ${ target }`)
                         else if (this.onAmbiguousQuery === 'warn' && !warned) {
@@ -672,7 +655,7 @@ export class UserAgentOnPage extends Mixin(
                     //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
                     const checks : ActionableCheck[]  = []
 
-                    el              = res.el
+                    el              = resolved[ 0 ]
 
                     if (!el) {
                         checks.push('present')
@@ -786,9 +769,9 @@ export class UserAgentOnPage extends Mixin(
                         }
 
                         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
-                        const res       = this.normalizeElementDetailed(target)
+                        const resolved      = this.resolveActionTargetAll(target)
 
-                        if (!silent && res.multiple) {
+                        if (!silent && resolved.length > 1) {
                             if (this.onAmbiguousQuery === 'throw')
                                 throw new Error(`Query resolved to multiple elements: ${ target }`)
                             else if (this.onAmbiguousQuery === 'warn' && !warned) {
@@ -801,7 +784,7 @@ export class UserAgentOnPage extends Mixin(
                         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
                         const checks : ActionableCheck[]  = []
 
-                        el              = res.el
+                        el              = resolved[ 0 ]
 
                         if (!el) {
                             checks.push('present')
