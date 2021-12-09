@@ -3,7 +3,7 @@ import { verifyAllFailed } from "../../../../tests/siesta/@helpers.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
-    document.body.innerHTML = ''
+    Ext.ComponentQuery.query('component').forEach(comp => comp.destroy())
 })
 
 declare const Ext

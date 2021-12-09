@@ -2,7 +2,7 @@ import { beforeEach, it } from "../../../../sencha.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
-    document.body.innerHTML = ''
+    Ext.ComponentQuery.query('component').forEach(comp => comp.destroy())
 })
 
 declare const Ext

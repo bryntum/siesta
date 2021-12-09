@@ -2,39 +2,48 @@ import { beforeEach, it } from "../../sencha.js"
 
 declare const Ext
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+beforeEach(() => {
+    Ext.ComponentQuery.query('component').forEach(comp => comp.destroy())
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Sencha-specific querying should work', async t => {
-    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const viewport = new Ext.Viewport({
-        id              : 'viewport',
 
-        items           : [
-            {
-                id              : 'panel1',
-                title           : 'foo1',
-                height          : 100,
-                html            : '<div style="height:100%" class="quix" id="test_div1"></div>'
-            },
-            {
-                id              : 'panel2',
-                title           : 'foo2',
-                html            : '<div style="height:100%" class="quix" id="test_div2"></div>',
+    beforeEach(() => {
+        const viewport = new Ext.Viewport({
+            id              : 'viewport',
 
-                height          : 100,
+            items           : [
+                {
+                    id              : 'panel1',
+                    title           : 'foo1',
+                    height          : 100,
+                    html            : '<div style="height:100%" class="quix" id="test_div1"></div>'
+                },
+                {
+                    id              : 'panel2',
+                    title           : 'foo2',
+                    html            : '<div style="height:100%" class="quix" id="test_div2"></div>',
 
-                items           : [
-                    {
-                        xtype           : 'button',
-                        text            : 'test',
-                        id              : 'test-button'
-                    }
-                ]
-            },
-            {
-                xtype           : 'textfield',
-                cls             : 'test-field',
-                id              : 'test-field'
-            }
-        ]
+                    height          : 100,
+
+                    items           : [
+                        {
+                            xtype           : 'button',
+                            text            : 'test',
+                            id              : 'test-button'
+                        }
+                    ]
+                },
+                {
+                    xtype           : 'textfield',
+                    cls             : 'test-field',
+                    id              : 'test-field'
+                }
+            ]
+        })
     })
 
 
@@ -104,33 +113,6 @@ it('Sencha-specific querying should work', async t => {
 
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    it('Should be able to normalize a nested CSQ where CSS match is not found in the first top component match', function (t) {
-        Ext.create('Ext.form.FieldSet', {
-            renderTo : document.body,
-            items : [
-                { xtype : 'radiofield' }
-            ]
-        })
-
-        Ext.create('Ext.form.FieldSet', {
-            renderTo : document.body,
-            items : [
-                { xtype : 'radiofield', cls : 'foo'}
-            ]
-        })
-
-        Ext.create('Ext.form.FieldSet', {
-            renderTo : document.body,
-            items : [
-                { xtype : 'radiofield'}
-            ]
-        })
-
-        t.eq(t.compositeQuery('fieldset => .foo'), [ t.cq1('[cls=foo]').el.dom ])
-    })
-
-
-    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     it('`compositeQuery` method should throw when provided with invalid selector', async t => {
         t.throwsOk(() => {
             t.compositeQuery('panel[title=foo]')
@@ -147,4 +129,32 @@ it('Sencha-specific querying should work', async t => {
         t.not.cqNotExists('[title=foo1]')
     })
 })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should be able to normalize a nested CSQ where CSS match is not found in the first top component match', function (t) {
+    Ext.create('Ext.form.FieldSet', {
+        renderTo : document.body,
+        items : [
+            { xtype : 'radiofield' }
+        ]
+    })
+
+    Ext.create('Ext.form.FieldSet', {
+        renderTo : document.body,
+        items : [
+            { xtype : 'radiofield', cls : 'foo'}
+        ]
+    })
+
+    Ext.create('Ext.form.FieldSet', {
+        renderTo : document.body,
+        items : [
+            { xtype : 'radiofield'}
+        ]
+    })
+
+    t.eq(t.compositeQuery('fieldset => .foo'), [ t.cq1('[cls=foo]').el.dom ])
+})
+
 

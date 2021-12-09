@@ -4,7 +4,7 @@ declare const Ext
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
-    document.body.innerHTML = ''
+    Ext.ComponentQuery.query('component').forEach(comp => comp.destroy())
 })
 
 
