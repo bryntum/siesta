@@ -673,6 +673,15 @@ export class Test extends TestPre {
     }
 
 
+    async runBeforeAfterHook (hook : (t : this) => any, hookType : 'before' | 'after') {
+        try {
+            await hook(this)
+        } catch (exception) {
+            this.addResult(Exception.new({ title : `Exception while running ${ hookType } hook`, exception }))
+        }
+    }
+
+
     // TODO
     // need to figure out if we need to wait until all reports (`this.reporter.onXXX`)
     // has been completed or not, before completing the method
@@ -680,7 +689,7 @@ export class Test extends TestPre {
         const beforeHooks   = this.collectParents(true).flatMap(parent => parent.beforeEachHooks)
         const afterHooks    = this.collectParents().flatMap(parent => parent.afterEachHooks)
 
-        for (const hook of beforeHooks) await hook(this)
+        for (const hook of beforeHooks) await this.runBeforeAfterHook(hook, 'before')
 
         try {
             await this.code(this)
@@ -727,7 +736,7 @@ export class Test extends TestPre {
 
         await this.awaitAllDone()
 
-        for (const hook of afterHooks) await hook(this)
+        for (const hook of afterHooks) await this.runBeforeAfterHook(hook, 'after')
     }
 
 
