@@ -294,7 +294,7 @@ export class Expectation extends Base {
         const name          = 'expect(spy).toHaveBeenCalled(expected)'
 
         this.t.addResult(Assertion.new({
-            name            : this.negated ? this.t.negateExpectationName(name) : name,
+            name            : this.negated ? this.t.negateAssertionName(name) : name,
             passed,
 
             annotation      : passed ? undefined : GotExpectTemplate.el({
@@ -347,7 +347,7 @@ export class Expectation extends Base {
         const name          = 'expect(spy).toHaveBeenCalledWith(...arguments)'
 
         this.t.addResult(Assertion.new({
-            name            : this.negated ? this.t.negateExpectationName(name) : name,
+            name            : this.negated ? this.t.negateAssertionName(name) : name,
             passed,
 
             annotation      : passed ? undefined : GotExpectTemplate.el({

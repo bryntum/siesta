@@ -251,8 +251,11 @@ export class TestNodeResult extends Mixin(
         }
 
 
-        negateExpectationName (name : string) : string {
-            return name.replace(/^(expect\(.+?\)\.)/, '$1not.')
+        negateAssertionName (name : string) : string {
+            if (/^(expect\(.+?\)\.)/.test(name))
+                return name.replace(/^(expect\(.+?\)\.)/, '$1not.')
+            else
+                return 'not.' + name
         }
 
 

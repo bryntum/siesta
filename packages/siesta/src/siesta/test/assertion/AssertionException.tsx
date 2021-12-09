@@ -68,7 +68,7 @@ export class AssertionException extends Mixin(
                 if (negated)
                     this.addResult(Assertion.new({
                         sourcePoint,
-                        name            : this.negateExpectationName(assertionName),
+                        name            : this.negateAssertionName(assertionName),
                         passed          : true,
                         description
                     }))
@@ -95,7 +95,7 @@ export class AssertionException extends Mixin(
                 if (negated)
                     this.addResult(Assertion.new({
                         sourcePoint,
-                        name            : this.negateExpectationName(assertionName),
+                        name            : this.negateAssertionName(assertionName),
                         passed          : false,
                         description,
 

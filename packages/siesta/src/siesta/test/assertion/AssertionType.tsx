@@ -27,7 +27,7 @@ export class AssertionType extends Mixin(
             const title         = (negated && inverted) ? 'defined' : negated || inverted ? 'undefined' : 'defined'
 
             this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
                 passed,
                 description,
                 annotation      : passed ? undefined : GotExpectTemplate.el({
@@ -53,7 +53,7 @@ export class AssertionType extends Mixin(
             const passed        = negated ? !condition : condition
 
             this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
                 passed,
                 description,
                 annotation      : passed ? undefined : GotExpectTemplate.el({

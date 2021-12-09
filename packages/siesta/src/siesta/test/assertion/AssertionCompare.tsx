@@ -81,7 +81,7 @@ export class AssertionCompare extends Mixin(
             const passed        = negated || inverted ? !Boolean(value) : Boolean(value)
 
             this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
                 passed,
                 description,
                 annotation      : passed ? undefined : GotExpectTemplate.el({
@@ -158,7 +158,7 @@ export class AssertionCompare extends Mixin(
             const passed        = negated ? !same : same
 
             this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
                 passed,
                 description,
 
@@ -187,7 +187,7 @@ export class AssertionCompare extends Mixin(
             const passed        = negated ? !same : same
 
             this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
                 passed,
                 description,
 
@@ -215,7 +215,7 @@ export class AssertionCompare extends Mixin(
             const passed        = negated ? !same : same
 
             this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
                 passed,
                 description,
 
@@ -309,7 +309,7 @@ export class AssertionCompare extends Mixin(
             pattern         : string | RegExp,
             description     : string = ''
         ) {
-            const assertionName     = negated ? this.negateExpectationName(assertName) : assertName
+            const assertionName     = negated ? this.negateAssertionName(assertName) : assertName
             const condition         = isRegExp(pattern) ? pattern.test(string) : String(string).indexOf(pattern) !== -1
             const passed            = negated ? !condition : condition
 
@@ -461,7 +461,7 @@ export class AssertionCompare extends Mixin(
             const passed    = negated ? !contains : contains
 
             this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
                 passed          : passed,
                 description     : description,
                 annotation      : passed ? undefined : GotExpectTemplate.el({
@@ -515,7 +515,7 @@ export class AssertionCompare extends Mixin(
             const passed    = negated ? !condition : condition
 
             this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
                 passed          : passed,
                 description     : description,
                 annotation      : passed ? undefined : GotExpectTemplate.el({
@@ -621,7 +621,7 @@ export class AssertionCompare extends Mixin(
             const passed        = negated ? !condition : condition
 
             this.addResult(Assertion.new({
-                name            : negated ? this.negateExpectationName(assertionName) : assertionName,
+                name            : negated ? this.negateAssertionName(assertionName) : assertionName,
                 passed          : passed,
                 description     : description,
                 annotation      : passed ? undefined : GotExpectTemplate.el({
