@@ -76,6 +76,8 @@ export class Exception extends Mixin(
     (base : ClassUnion<typeof Serializable, typeof Result>) =>
 
     class Exception extends base {
+        title           : string            = undefined
+
         exception       : unknown           = undefined
 
         // TODO unify the stack representation

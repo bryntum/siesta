@@ -274,7 +274,7 @@ export class ExceptionComponent extends Mixin(
 
         render () : Element {
             return <div class="exception">
-                <span class='exception_icon'>EXCEPTION</span>
+                <span class='exception_icon'>{ this.exception.title ?? 'EXCEPTION' }</span>
                 <pre>{ this.exception.text }</pre>
             </div>
         }
