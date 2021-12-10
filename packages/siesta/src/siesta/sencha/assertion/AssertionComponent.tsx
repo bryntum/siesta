@@ -250,7 +250,7 @@ export class AssertionComponent extends Mixin(
                 condition           : () => {
                     const result    = this.componentQuery(target, opts.root)
 
-                    return result.length > 0 ? result : null
+                    return result.length === 0 ? result : null
                 },
                 reporting : {
                     assertionName       : 'waitForComponentQuery',
