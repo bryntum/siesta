@@ -1,4 +1,5 @@
 import { beforeEach, it } from "../../../sencha.js"
+import { measure } from "../../../src/util/TimeHelpers.js"
 import { verifyAllFailed } from "../../../tests/siesta/@helpers.js"
 
 declare const Ext
@@ -7,6 +8,8 @@ declare const Ext
 beforeEach(() => {
     Ext.ComponentQuery.query('component').forEach(comp => comp.destroy())
 })
+
+const defaultDelay      = 100
 
 
 it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', async t => {
@@ -19,7 +22,7 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
             hidden      : true
         })
 
-        setTimeout(() => container.setHidden(false), 100)
+        setTimeout(() => container.setHidden(false), defaultDelay)
 
         await t.waitForComponentVisible(container)
 
@@ -37,7 +40,7 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
             itemId      : 'hidden'
         })
 
-        setTimeout(() => container.setHidden(false), 100)
+        setTimeout(() => container.setHidden(false), defaultDelay)
 
         await t.waitForComponentVisible('#hidden')
 
@@ -47,7 +50,7 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     it('Waiting for component to become visible should fail correctly', async t => {
-        t.it({ title : 'internal', isTodo : true, defaultTimeout : 100 }, async t => {
+        t.it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
             const container = new Ext.container.Container({
                 renderTo    : Ext.getBody(),
                 style       : 'background-color: pink',
@@ -73,7 +76,7 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
             html        : 'Some text'
         })
 
-        setTimeout(() => container.setHidden(true), 100)
+        setTimeout(() => container.setHidden(true), defaultDelay)
 
         await t.waitForComponentNotVisible(container)
 
@@ -90,7 +93,7 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
             itemId      : 'hidden'
         })
 
-        setTimeout(() => container.setHidden(true), 100)
+        setTimeout(() => container.setHidden(true), defaultDelay)
 
         await t.waitForComponentNotVisible('#hidden')
 
@@ -100,7 +103,7 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     it('Waiting for component to become not visible should fail correctly', async t => {
-        t.it({ title : 'internal', isTodo : true, defaultTimeout : 100 }, async t => {
+        t.it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
             const container = new Ext.container.Container({
                 renderTo    : Ext.getBody(),
                 style       : 'background-color: pink',
@@ -131,7 +134,7 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
             button          = new Ext.Button({ text : 'Button', moo : 'zoo' })
 
             container.add(button)
-        }, 100)
+        }, defaultDelay)
 
         const result        = await t.waitForComponentQuery('button[moo=zoo]')
 
@@ -151,7 +154,7 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
             button          = new Ext.Button({ text : 'Button', moo : 'zoo' })
 
             container.add(button)
-        }, 100)
+        }, defaultDelay)
 
         const result        = await t.waitForComponentQuery({ target : 'button[moo=zoo]', root : container })
 
@@ -161,7 +164,7 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     it('Waiting for component query should fail correctly', async t => {
-        t.it({ title : 'internal', isTodo : true, defaultTimeout : 100 }, async t => {
+        t.it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
             await t.waitForComponentQuery('#absent')
         }).postFinishHook.on(test => {
             verifyAllFailed(test, t)
@@ -175,7 +178,7 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
     it('Should be able to wait for component query to resolve to empty array', async t => {
         const button        = new Ext.Button({ text : 'Button', moo : 'zoo' })
 
-        setTimeout(() => button.destroy(), 100)
+        setTimeout(() => button.destroy(), defaultDelay)
 
         const result        = await t.waitForComponentQueryNotFound('button[moo=zoo]')
 
@@ -195,7 +198,7 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
             ]
         })
 
-        setTimeout(() => Ext.getCmp('moo').destroy(), 100)
+        setTimeout(() => Ext.getCmp('moo').destroy(), defaultDelay)
 
         const result        = await t.waitForComponentQueryNotFound({ target : 'button[moo=zoo]', root : container })
 
@@ -205,7 +208,7 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     it('`waitForComponentQueryNotFound` should fail correctly', async t => {
-        t.it({ title : 'internal', isTodo : true, defaultTimeout : 100 }, async t => {
+        t.it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
             const button        = new Ext.Button({ text : 'Button', moo : 'zoo' })
 
             await t.waitForComponentQueryNotFound('button[moo=zoo]')
@@ -218,3 +221,80 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
 })
 
 
+it('`waitForComponentQueryVisible` / `waitForComponentQueryNotVisible` methods should work', async t => {
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('`waitForComponentQueryVisible` method should work', async t => {
+        const container = new Ext.container.Container({
+            renderTo    : Ext.getBody()
+        })
+
+        let button
+
+        setTimeout(() => {
+            button          = new Ext.Button({ text : 'Button', moo : 'zoo' })
+
+            container.add(button)
+        }, defaultDelay)
+
+        const result        = await t.waitForComponentQueryVisible('button[moo=zoo]')
+
+        t.eq(result, [ button ])
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('`waitForComponentQueryVisible` should fail correctly', async t => {
+
+        it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
+            const button = new Ext.Button({
+                text        : 'Button',
+                moo         : 'zoo',
+                renderTo    : Ext.getBody(),
+                hidden      : true
+            })
+            await t.waitForComponentQueryVisible('button[moo=zoo]')
+        }).postFinishHook.on(test => {
+            verifyAllFailed(test, t)
+
+            t.is(test.assertions.length, 1)
+        })
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('`waitForComponentQueryNotVisible` method should work', async t => {
+        const button = new Ext.Button({
+            text        : 'Button',
+            moo         : 'zoo',
+            renderTo    : Ext.getBody(),
+            hidden      : true
+        })
+
+        setTimeout(() => button.setHidden(true), defaultDelay)
+
+        const result        = await measure(t.waitForComponentQueryNotVisible('button[moo=zoo]'))
+
+        t.eq(result.resolved, [ button ])
+
+        // t.isGreaterOrEqual(result.elapsed, defaultDelay)
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('`waitForComponentQueryNotVisible` should fail correctly', async t => {
+
+        it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
+            const container = new Ext.Button({
+                text        : 'Button',
+                moo         : 'zoo',
+                renderTo    : Ext.getBody()
+            })
+
+            await t.waitForComponentQueryNotVisible('button[moo=zoo]')
+        }).postFinishHook.on(test => {
+            verifyAllFailed(test, t)
+
+            t.is(test.assertions.length, 1)
+        })
+    })
+})

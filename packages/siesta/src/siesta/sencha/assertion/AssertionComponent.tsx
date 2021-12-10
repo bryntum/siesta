@@ -1,4 +1,4 @@
-import { AnyFunction, ClassUnion, Mixin } from "typescript-mixin-class"
+import { AnyFunction, ClassUnion, Mixin } from "typescript-mixin-class/index.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { WaitForResult } from "../../../util/TimeHelpers.js"
 import { isFunction, isString } from "../../../util/Typeguards.js"
@@ -143,7 +143,7 @@ export class AssertionComponent extends Mixin(
                     return this.componentIsHidden(components[ 0 ]) ? components[ 0 ] : null
                 },
                 reporting : {
-                    assertionName       : 'waitForComponentVisible',
+                    assertionName       : 'waitForComponentNotVisible',
                     onTimeout           : (waitRes : WaitForResult<ExtComponent>, waitOptions : WaitForOptions<ExtComponent>) =>
                         <div>
                             Waited too long for the element of component { target } to become not visible
@@ -193,7 +193,7 @@ export class AssertionComponent extends Mixin(
 
             return await this.waitFor(Object.assign(opts, {
                 condition           : () => {
-                    const result    = this.componentQuery(target, opts.root)
+                    const result    = this.componentQuery(target, root ?? opts.root)
 
                     return result.length > 0 ? result : null
                 },
@@ -248,12 +248,12 @@ export class AssertionComponent extends Mixin(
 
             return await this.waitFor(Object.assign(opts, {
                 condition           : () => {
-                    const result    = this.componentQuery(target, opts.root)
+                    const result    = this.componentQuery(target, root ?? opts.root)
 
                     return result.length === 0 ? result : null
                 },
                 reporting : {
-                    assertionName       : 'waitForComponentQuery',
+                    assertionName       : 'waitForComponentQueryNotFound',
                     onTimeout           : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
                         <div>
                             Waited too long for the component query { target } to return empty array
@@ -265,6 +265,320 @@ export class AssertionComponent extends Mixin(
                     onException         : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
                         <div>
                             <div>Exception thrown while resolving the component query { target }</div>
+                            <div>{ String(waitRes.exception) }</div>
+                        </div>
+                }
+            } as WaitForOptions<ExtComponent[]>, timeout != null ? { timeout } as WaitForOptions<ExtComponent[]> : null))
+        }
+
+
+        /**
+         * Waits until the passed composite query is resolved to at least one DOM element.
+         *
+         * Returns a promise, which is resolved to the result of the query.
+         *
+         * The "root" argument of this method can be omitted.
+         *
+         * @param options The component query selector or [[WaitForComponentQueryOptions]] object
+         * @param root The container to start a component query from. Optional
+         */
+        async waitForCompositeQuery (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        )
+            : Promise<Element[]>
+        {
+            // no `root` supplied
+            if (isFunction(root)) {
+                // @ts-ignore
+                timeout     = scope
+                scope       = callback
+                callback    = root
+                root        = undefined
+            }
+
+            const target    = isString(options) ? options : options.target
+            const opts      = isString(options) ? {} as Partial<WaitForComponentQueryOptions> : options
+
+            if (!isString(target)) throw new Error("Invalid input for `waitForComponentQuery")
+
+            return await this.waitFor(Object.assign(opts, {
+                condition           : () => {
+                    const result    = this.compositeQuery(target, root ?? opts.root)
+
+                    return result.length > 0 ? result : null
+                },
+                reporting : {
+                    assertionName       : 'waitForCompositeQuery',
+                    onTimeout           : (waitRes : WaitForResult<Element[]>, waitOptions : WaitForOptions<Element[]>) =>
+                        <div>
+                            Waited too long for the composite query { target } to return at least one DOM element
+                        </div>,
+                    onConditionMet      : (waitRes : WaitForResult<Element[]>, waitOptions : WaitForOptions<Element[]>) =>
+                        <div>
+                            Waited { waitRes.elapsedTime }ms for the composite query { target } to return at least one DOM element
+                        </div>,
+                    onException         : (waitRes : WaitForResult<Element[]>, waitOptions : WaitForOptions<Element[]>) =>
+                        <div>
+                            <div>Exception thrown while resolving the composite query { target }</div>
+                            <div>{ String(waitRes.exception) }</div>
+                        </div>
+                }
+            } as WaitForOptions<Element[]>, timeout != null ? { timeout } as WaitForOptions<Element[]> : null))
+        }
+
+
+        /**
+         * Waits until the passed composite query is resolved to empty array.
+         *
+         * Returns a promise, which is resolved to the result of the query.
+         *
+         * The "root" argument of this method can be omitted.
+         *
+         * @param options The composite query selector or [[WaitForComponentQueryOptions]] object
+         * @param root The container to start a composite query from. Optional
+         */
+        async waitForCompositeQueryNotFound (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        )
+            : Promise<Element[]>
+        {
+            // no `root` supplied
+            if (isFunction(root)) {
+                // @ts-ignore
+                timeout     = scope
+                scope       = callback
+                callback    = root
+                root        = undefined
+            }
+
+            const target    = isString(options) ? options : options.target
+            const opts      = isString(options) ? {} as Partial<WaitForComponentQueryOptions> : options
+
+            if (!isString(target)) throw new Error("Invalid input for `waitForComponentQuery")
+
+            return await this.waitFor(Object.assign(opts, {
+                condition           : () => {
+                    const result    = this.compositeQuery(target, root ?? opts.root)
+
+                    return result.length === 0 ? result : null
+                },
+                reporting : {
+                    assertionName       : 'waitForCompositeQueryNotFound',
+                    onTimeout           : (waitRes : WaitForResult<Element[]>, waitOptions : WaitForOptions<Element[]>) =>
+                        <div>
+                            Waited too long for the component query { target } to return empty array
+                        </div>,
+                    onConditionMet      : (waitRes : WaitForResult<Element[]>, waitOptions : WaitForOptions<Element[]>) =>
+                        <div>
+                            Waited { waitRes.elapsedTime }ms for the component query { target } to return empty array
+                        </div>,
+                    onException         : (waitRes : WaitForResult<Element[]>, waitOptions : WaitForOptions<Element[]>) =>
+                        <div>
+                            <div>Exception thrown while resolving the component query { target }</div>
+                            <div>{ String(waitRes.exception) }</div>
+                        </div>
+                }
+            } as WaitForOptions<Element[]>, timeout != null ? { timeout } as WaitForOptions<Element[]> : null))
+        }
+
+
+        /**
+         * Alias for [[waitForComponentQuery]]
+         *
+         * @param options
+         * @param root
+         * @param callback
+         * @param scope
+         * @param timeout
+         */
+        async waitForCQ (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        )
+            : Promise<ExtComponent[]>
+        {
+            return this.waitForComponentQuery(options, root, callback, scope, timeout)
+        }
+
+
+        /**
+         * Alias for [[waitForComponentQueryNotFound]]
+         *
+         * @param options
+         * @param root
+         * @param callback
+         * @param scope
+         * @param timeout
+         */
+        async waitForCQNotFound (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        ) {
+            return this.waitForComponentQueryNotFound(options, root, callback, scope, timeout)
+        }
+
+
+        /**
+         * Alias for [[waitForComponentQueryVisible]]
+         *
+         * @param options
+         * @param root
+         * @param callback
+         * @param scope
+         * @param timeout
+         */
+        async waitForCQVisible (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        )
+            : Promise<ExtComponent[]>
+        {
+            return this.waitForComponentQueryVisible(options, root, callback, scope, timeout)
+        }
+
+        /**
+         * Alias for [[waitForComponentQueryNotVisible]]
+         *
+         * @param options
+         * @param root
+         * @param callback
+         * @param scope
+         * @param timeout
+         */
+        async waitForCQNotVisible () {
+            return this.waitForComponentQueryNotVisible.apply(this, arguments);
+        }
+
+
+        /**
+         * Waits until all results of the `Ext.ComponentQuery` are detected and visible.
+         * The visibility criteria in this assertion is that component should be rendered and its main element
+         * has non-empty bounding rectangle (as returned by the [getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) method.
+         * Note, that element still may be not visible on the screen, because it can be scrolled out of the viewport.
+         * This is different from the [[waitForComponentVisible]] method.
+         *
+         * This assertion is useful, when you need to determine that many components are rendered and physically
+         * present in the DOM.
+         *
+         * Returns a promise, which is resolved to the result of the query.
+         *
+         * The "root" argument of this method can be omitted.
+         *
+         * @param options The component query selector or [[WaitForComponentQueryOptions]] object
+         * @param root The container to start a component query from. Optional
+         */
+        async waitForComponentQueryVisible (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        )
+            : Promise<ExtComponent[]>
+        {
+            // no `root` supplied
+            if (isFunction(root)) {
+                // @ts-ignore
+                timeout     = scope
+                scope       = callback
+                callback    = root
+                root        = undefined
+            }
+
+            const target    = isString(options) ? options : options.target
+            const opts      = isString(options) ? {} as Partial<WaitForComponentQueryOptions> : options
+
+            if (!isString(target)) throw new Error("Invalid input for `waitForComponentQuery")
+
+            let firstNonVisibleId
+            let resultsLen : number
+
+            return await this.waitFor(Object.assign(opts, {
+                condition           : () => {
+                    const result    = this.componentQuery(target, root ?? opts.root)
+                    resultsLen      = result.length
+
+                    for (const comp of result)
+                        if (this.componentIsHidden(comp)) { firstNonVisibleId = comp.id; return null }
+
+                    return resultsLen === 0 ? null : result
+                },
+                reporting : {
+                    assertionName       : 'waitForComponentQueryVisible',
+                    onTimeout           : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) => {
+                        if (resultsLen === 0)
+                            return <div>
+                                Waited too long for the component query { target } to return non-empty array
+                            </div>
+                        else
+                            return <div>
+                                Waited too long for the component query { target } to return array of visible components.
+                                The matching component [id={ firstNonVisibleId }] is not visible
+                            </div>
+                    },
+                    onConditionMet      : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            Waited { waitRes.elapsedTime }ms for the component query { target } to return non-empty array of visible components
+                        </div>,
+                    onException         : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            <div>Exception thrown while resolving and checking for visibility the component query { target }</div>
+                            <div>{ String(waitRes.exception) }</div>
+                        </div>
+                }
+            } as WaitForOptions<ExtComponent[]>, timeout != null ? { timeout } as WaitForOptions<ExtComponent[]> : null))
+        }
+
+
+        /**
+         * `Ext.ComponentQuery` is either empty, or the found component(s) is not visible.
+         * See the [[waitForComponentQueryVisible]] for the visibility criteria.
+         *
+         * Returns a promise, which is resolved to the result of the query.
+         *
+         * The "root" argument of this method can be omitted.
+         *
+         * @param options The component query selector or [[WaitForComponentQueryOptions]] object
+         * @param root The container to start a component query from. Optional
+         */
+        async waitForComponentQueryNotVisible (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        )
+            : Promise<ExtComponent[]>
+        {
+            // no `root` supplied
+            if (isFunction(root)) {
+                // @ts-ignore
+                timeout     = scope
+                scope       = callback
+                callback    = root
+                root        = undefined
+            }
+
+            const target    = isString(options) ? options : options.target
+            const opts      = isString(options) ? {} as Partial<WaitForComponentQueryOptions> : options
+
+            if (!isString(target)) throw new Error("Invalid input for `waitForComponentQuery")
+
+            let firstVisibleId
+
+            return await this.waitFor(Object.assign(opts, {
+                condition           : () => {
+                    const result    = this.componentQuery(target, root ?? opts.root)
+
+                    for (const comp of result)
+                        if (!this.componentIsHidden(comp)) { firstVisibleId = comp.id; return null }
+
+                    return result
+                },
+                reporting : {
+                    assertionName       : 'waitForComponentQueryNotVisible',
+                    onTimeout           : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) => {
+                        return <div>
+                            Waited too long for the component query { target } to return array of visible components.
+                            The matching component [id={ firstVisibleId }] is visible
+                        </div>
+                    },
+                    onConditionMet      : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            Waited { waitRes.elapsedTime }ms for the component query { target } to return non-empty array of visible components
+                        </div>,
+                    onException         : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            <div>Exception thrown while resolving and checking for visibility the component query { target }</div>
                             <div>{ String(waitRes.exception) }</div>
                         </div>
                 }
