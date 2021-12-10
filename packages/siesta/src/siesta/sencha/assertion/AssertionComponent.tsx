@@ -8,7 +8,12 @@ import { ExtComponent, TestSenchaPre } from "../TestSenchaPre.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export type WaitForComponentQueryOptions = Omit<WaitForOptions<any>, 'condition'> & {
+/**
+ * This type excludes the `condition` property from the [[WaitForOptions]] type and adds `target`
+ *
+ * Target can be either an `Ext.Component` instance or a component query string.
+ */
+export type WaitForComponentQueryOptions = Omit<WaitForOptions<ExtComponent>, 'condition'> & {
     target      : string | ExtComponent
 }
 
@@ -21,17 +26,14 @@ export class AssertionComponent extends Mixin(
     class AssertionComponent extends base {
 
         /**
-         * Waits until the main element of the passed component becomes "reachable" in the DOM. The callback will receive the passed component instance.
+         * Waits until the main element of the passed component becomes "reachable" in the DOM.
+         * Returns a promise, which is resolved to the passed component instance.
          *
-         * @param {Ext.Component/String} component An Ext.Component instance or a ComponentQuery string. In the latter case,
-         * this method will also wait until the component query find some component (meaning the component does not have to
-         * be already created when waiting starts)
-         * @param {Function} callback The callback to call after the component becomes visible
-         * @param {Object} scope The scope for the callback
-         * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value.
+         * @param options Either a component query string, Ext.Component instance or [[WaitForComponentQueryOptions]] options.
+         * If provided as a component query, this method will additionally wait for the
          */
         async waitForComponentVisible (
-            options : string | ExtComponent | Partial<WaitForComponentQueryOptions>, callback : AnyFunction, scope : object, timeout : number
+            options : string | ExtComponent | Partial<WaitForComponentQueryOptions>, callback? : AnyFunction, scope? : object, timeout? : number
         )
             : Promise<ExtComponent>
         {
@@ -40,14 +42,18 @@ export class AssertionComponent extends Mixin(
 
             if (!isString(target) && !this.isExtComponent(target)) throw new Error("Invalid input for `waitForComponentVisible")
 
+            let warned : boolean        = false
+
             return await this.waitFor(Object.assign(opts, {
                 condition           : () => {
-                    const comp      = this.resolveExtComponent(target)
-                    if (!comp) return null
+                    const components    = this.resolveExtComponentAll(target)
 
-                    const el        = this.compToEl(comp)
+                    if (!warned) warned = this.warnAmbiguousComponentQuery(components)
+                    if (components.length === 0) return null
 
-                    return el && isElementPointReachable(el, null, true) ? comp : null
+                    const el        = this.compToEl(components[ 0 ])
+
+                    return el && isElementPointReachable(el, undefined, true).reachable ? components[ 0 ] : null
                 },
                 reporting : {
                     assertionName       : 'waitForComponentVisible',
@@ -55,17 +61,17 @@ export class AssertionComponent extends Mixin(
                         <div>
                             Waited too long for the element of component { target } to become reachable
                         </div>,
-                    onConditionMet
+                    onConditionMet      : (waitRes : WaitForResult<ExtComponent>, waitOptions : WaitForOptions<ExtComponent>) =>
+                        <div>
+                            Waited { waitRes.elapsedTime }ms for the element of component { target } to become reachable
+                        </div>,
+                    onException         : (waitRes : WaitForResult<ExtComponent>, waitOptions : WaitForOptions<ExtComponent>) =>
+                        <div>
+                            <div>Exception thrown while checking for component visibility</div>
+                            <div>{ String(waitRes.exception) }</div>
+                        </div>
                 }
-
-
-
-                // callback        : callback,
-                // scope           : scope,
-                // timeout         : timeout,
-                // assertionName   : 'waitForComponentVisible',
-                // description     : ' ' + R.get('component') + ' "' + (me.typeOf(component) == 'String' ? component : component.id) + '" ' + R.get('toBeVisible')
-            } as WaitForOptions<ExtComponent>))
+            } as WaitForOptions<ExtComponent>, timeout != null ? { timeout } as WaitForOptions<ExtComponent> : null))
         }
     }
 ) {}
