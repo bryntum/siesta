@@ -1,7 +1,7 @@
 import { AnyFunction, ClassUnion, Mixin } from "typescript-mixin-class"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { WaitForResult } from "../../../util/TimeHelpers.js"
-import { isString } from "../../../util/Typeguards.js"
+import { isFunction, isString } from "../../../util/Typeguards.js"
 import { isElementPointReachable } from "../../../util_browser/Dom.js"
 import { WaitForOptions } from "../../test/assertion/AssertionAsync.js"
 import { ExtComponent, TestSenchaPre } from "../TestSenchaPre.js"
@@ -18,6 +18,11 @@ export type WaitForComponentOptions = Omit<WaitForOptions<ExtComponent>, 'condit
      * Either an `Ext.Component` instance or a component query string.
      */
     target      : string | ExtComponent
+
+    /**
+     * The optional root component in which the query should be resolved
+     */
+    root        : ExtComponent
 }
 
 
@@ -31,6 +36,11 @@ export type WaitForComponentQueryOptions = Omit<WaitForOptions<ExtComponent>, 'c
      * A component query string to wait for
      */
     target      : string
+
+    /**
+     * The optional root component in which the query should be resolved
+     */
+    root        : ExtComponent
 }
 
 
@@ -70,7 +80,7 @@ export class AssertionComponent extends Mixin(
 
             return await this.waitFor(Object.assign(opts, {
                 condition           : () => {
-                    const components    = this.resolveExtComponentAll(target)
+                    const components    = this.resolveExtComponentAll(target, opts.root)
 
                     if (!warned) warned = this.warnAmbiguousComponentQuery(components)
                     if (components.length === 0) return null
@@ -125,7 +135,7 @@ export class AssertionComponent extends Mixin(
 
             return await this.waitFor(Object.assign(opts, {
                 condition           : () => {
-                    const components    = this.resolveExtComponentAll(target)
+                    const components    = this.resolveExtComponentAll(target, opts.root)
 
                     if (!warned) warned = this.warnAmbiguousComponentQuery(components)
                     if (components.length === 0) return null
@@ -149,6 +159,116 @@ export class AssertionComponent extends Mixin(
                         </div>
                 }
             } as WaitForOptions<ExtComponent>, timeout != null ? { timeout } as WaitForOptions<ExtComponent> : null))
+        }
+
+
+        /**
+         * Waits until the passed component query is resolved to at least one component.
+         *
+         * Returns a promise, which is resolved to the result of the query.
+         *
+         * The "root" argument of this method can be omitted.
+         *
+         * @param options The component query selector or [[WaitForComponentQueryOptions]] object
+         * @param root The container to start a component query from. Optional
+         */
+        async waitForComponentQuery (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        )
+            : Promise<ExtComponent[]>
+        {
+            // no `root` supplied
+            if (isFunction(root)) {
+                // @ts-ignore
+                timeout     = scope
+                scope       = callback
+                callback    = root
+                root        = undefined
+            }
+
+            const target    = isString(options) ? options : options.target
+            const opts      = isString(options) ? {} as Partial<WaitForComponentQueryOptions> : options
+
+            if (!isString(target)) throw new Error("Invalid input for `waitForComponentQuery")
+
+            return await this.waitFor(Object.assign(opts, {
+                condition           : () => {
+                    const result    = this.componentQuery(target, opts.root)
+
+                    return result.length > 0 ? result : null
+                },
+                reporting : {
+                    assertionName       : 'waitForComponentQuery',
+                    onTimeout           : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            Waited too long for the component query { target } to return at least one component
+                        </div>,
+                    onConditionMet      : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            Waited { waitRes.elapsedTime }ms for the component query { target } to return at least one component
+                        </div>,
+                    onException         : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            <div>Exception thrown while resolving the component query { target }</div>
+                            <div>{ String(waitRes.exception) }</div>
+                        </div>
+                }
+            } as WaitForOptions<ExtComponent[]>, timeout != null ? { timeout } as WaitForOptions<ExtComponent[]> : null))
+        }
+
+
+        /**
+         * Waits until the passed component query is resolved to empty array.
+         *
+         * Returns a promise, which is resolved to the result of the query.
+         *
+         * The "root" argument of this method can be omitted.
+         *
+         * @param options The component query selector or [[WaitForComponentQueryOptions]] object
+         * @param root The container to start a component query from. Optional
+         */
+        async waitForComponentQueryNotFound (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        )
+            : Promise<ExtComponent[]>
+        {
+            // no `root` supplied
+            if (isFunction(root)) {
+                // @ts-ignore
+                timeout     = scope
+                scope       = callback
+                callback    = root
+                root        = undefined
+            }
+
+            const target    = isString(options) ? options : options.target
+            const opts      = isString(options) ? {} as Partial<WaitForComponentQueryOptions> : options
+
+            if (!isString(target)) throw new Error("Invalid input for `waitForComponentQuery")
+
+            return await this.waitFor(Object.assign(opts, {
+                condition           : () => {
+                    const result    = this.componentQuery(target, opts.root)
+
+                    return result.length > 0 ? result : null
+                },
+                reporting : {
+                    assertionName       : 'waitForComponentQuery',
+                    onTimeout           : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            Waited too long for the component query { target } to return empty array
+                        </div>,
+                    onConditionMet      : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            Waited { waitRes.elapsedTime }ms for the component query { target } to return empty array
+                        </div>,
+                    onException         : (waitRes : WaitForResult<ExtComponent[]>, waitOptions : WaitForOptions<ExtComponent[]>) =>
+                        <div>
+                            <div>Exception thrown while resolving the component query { target }</div>
+                            <div>{ String(waitRes.exception) }</div>
+                        </div>
+                }
+            } as WaitForOptions<ExtComponent[]>, timeout != null ? { timeout } as WaitForOptions<ExtComponent[]> : null))
         }
     }
 ) {}
