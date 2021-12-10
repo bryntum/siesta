@@ -171,56 +171,50 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
     })
 
 
-    // //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // it('Should be able to wait for component to become not visible, passed as component instance', async t => {
-    //     const container = new Ext.container.Container({
-    //         renderTo    : Ext.getBody(),
-    //         style       : 'background-color: pink',
-    //         html        : 'Some text'
-    //     })
-    //
-    //     setTimeout(() => container.setHidden(true), 100)
-    //
-    //     await t.waitForComponentNotVisible(container)
-    //
-    //     t.true(container.getHidden())
-    // })
-    //
-    //
-    // //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // it('Should be able to wait for component to become not visible, passed as component query', async t => {
-    //     const container = new Ext.container.Container({
-    //         renderTo    : Ext.getBody(),
-    //         style       : 'background-color: pink',
-    //         html        : 'Some text',
-    //         itemId      : 'hidden'
-    //     })
-    //
-    //     setTimeout(() => container.setHidden(true), 100)
-    //
-    //     await t.waitForComponentNotVisible('#hidden')
-    //
-    //     t.true(container.getHidden())
-    // })
-    //
-    //
-    // //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // it('Waiting for component to become not visible should fail correctly', async t => {
-    //     t.it({ title : 'internal', isTodo : true, defaultTimeout : 100 }, async t => {
-    //         const container = new Ext.container.Container({
-    //             renderTo    : Ext.getBody(),
-    //             style       : 'background-color: pink',
-    //             html        : 'Some text',
-    //             itemId      : 'hidden'
-    //         })
-    //
-    //         await t.waitForComponentNotVisible('#hidden')
-    //     }).postFinishHook.on(test => {
-    //         verifyAllFailed(test, t)
-    //
-    //         t.is(test.assertions.length, 1)
-    //     })
-    // })
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('Should be able to wait for component query to resolve to empty array', async t => {
+        const button        = new Ext.Button({ text : 'Button', moo : 'zoo' })
+
+        setTimeout(() => button.destroy(), 100)
+
+        const result        = await t.waitForComponentQueryNotFound('button[moo=zoo]')
+
+        t.eq(result, [])
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('Should be able to wait for component query to resolve to empty array with root', async t => {
+        const button        = new Ext.Button({ text : 'Button', moo : 'zoo' })
+
+        const container     = new Ext.container.Container({
+            renderTo    : Ext.getBody(),
+
+            items       : [
+                { xtype : 'button', text : 'Button', moo : 'zoo', id : 'moo' }
+            ]
+        })
+
+        setTimeout(() => Ext.getCmp('moo').destroy(), 100)
+
+        const result        = await t.waitForComponentQueryNotFound({ target : 'button[moo=zoo]', root : container })
+
+        t.eq(result, [])
+    })
+
+
+    //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    it('`waitForComponentQueryNotFound` should fail correctly', async t => {
+        t.it({ title : 'internal', isTodo : true, defaultTimeout : 100 }, async t => {
+            const button        = new Ext.Button({ text : 'Button', moo : 'zoo' })
+
+            await t.waitForComponentQueryNotFound('button[moo=zoo]')
+        }).postFinishHook.on(test => {
+            verifyAllFailed(test, t)
+
+            t.is(test.assertions.length, 1)
+        })
+    })
 })
 
 
