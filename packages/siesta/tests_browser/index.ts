@@ -156,6 +156,12 @@ project.plan(
 
         items       : [
             {
+                url     : 'assertion',
+                items   : [
+                    'assertion_component.t.js'
+                ]
+            },
+            {
                 url     : 'simulation',
                 items   : [
                     {
