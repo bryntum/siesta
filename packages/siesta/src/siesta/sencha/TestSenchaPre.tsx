@@ -88,23 +88,39 @@ export class TestSenchaPre extends TestBrowser {
     }
 
 
-    resolveExtComponent (source : string | ExtComponent) : ExtComponent {
-        if (isString(source) && isComponentQuery(source)) {
+    warnAmbiguousComponentQuery (components : ExtComponent[], onAmbiguousQuery : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery) : boolean {
+        if (components.length > 1) {
+            if (onAmbiguousQuery === 'warn') {
+                this.warn(`Component query resolved to multiple components: ${components}`)
+                return true
+            }
+            else if (onAmbiguousQuery === 'throw')
+                throw new Error(`Component query resolved to multiple components: ${ components }`)
+        }
+
+        return false
+    }
+
+
+    resolveExtComponent (source : string | ExtComponent, onAmbiguousQuery : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery) : ExtComponent {
+        const components    = this.resolveExtComponentAll(source)
+
+        this.warnAmbiguousComponentQuery(components, onAmbiguousQuery)
+
+        return components[ 0 ] ?? null
+    }
+
+
+    resolveExtComponentAll (source : string | ExtComponent) : ExtComponent[] {
+        if (isString(source)) {
             const components    = this.componentQuery(source)
 
-            if (components.length > 1) {
-                if (this.onAmbiguousQuery === 'warn')
-                    this.warn(`Component query resolved to multiple components: ${ components }`)
-                else if (this.onAmbiguousQuery === 'throw')
-                    throw new Error(`Component query resolved to multiple components: ${ components }`)
-            }
-
-            return components[ 0 ] ?? null
+            return components
         } else {
             if (this.isExtComponent(source))
-                return source
+                return [ source ]
             else
-                return undefined
+                return []
         }
     }
 
