@@ -96,9 +96,9 @@ export class Exception extends Mixin(
         get text () : string {
             const exception     = this.exception
             // @ts-expect-error
-            const stack         = (exception.stack as string) ?? ''
+            const stack         = (exception?.stack as string) ?? ''
             // @ts-expect-error
-            const message       = (exception.message as string) ?? ''
+            const message       = (exception?.message as string) ?? ''
 
             return stack
                 // Chrome includes the message in the stack, Firefox does not
