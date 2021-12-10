@@ -125,7 +125,7 @@ export class AssertionAsync extends Mixin(
 
         // this mess is because of the declaration files generation support
         getWaitForTimeout () : number {
-            return this.descriptor.waitForTimeout
+            return this.descriptor.waitForTimeout ?? this.descriptor.defaultTimeout
         }
         get waitForTimeout () : number {
             return this.getWaitForTimeout()

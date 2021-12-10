@@ -177,7 +177,7 @@ export class Test extends TestPre {
     }
 
     getWaitForTimeout () : number {
-        return this.descriptor.waitForTimeout
+        return this.descriptor.waitForTimeout ?? this.descriptor.defaultTimeout
     }
 
     getWaitForPollInterval () : number {

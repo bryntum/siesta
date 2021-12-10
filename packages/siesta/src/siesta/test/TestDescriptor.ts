@@ -255,7 +255,7 @@ export class TestDescriptor extends TestDescriptorPre {
      * If not provided, the [[defaultTimeout]] will be used.
      */
     @config()
-    @option({ defaultValue : () => 15000, group : OptionsGroupTestDescriptor })
+    @option({ group : OptionsGroupTestDescriptor })
     waitForTimeout      : number
 
     /**
