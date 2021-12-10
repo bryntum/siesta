@@ -151,6 +151,7 @@ export const isElementPointReachable = (
 )
     : { reachable : boolean, point : Point, elAtPoint : Element } =>
 {
+    if (!isElementAccessible(el)) return { reachable : false, point : undefined, elAtPoint : undefined }
     if (!isOffsetInsideElementBox(el, offset)) throw new Error("Can only check inside offsets for reachability")
 
     const point             = getViewportActionPoint(el, offset)
