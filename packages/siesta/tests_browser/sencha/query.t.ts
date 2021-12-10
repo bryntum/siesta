@@ -158,3 +158,15 @@ it('Should be able to normalize a nested CSQ where CSS match is not found in the
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Querying for unrendered components should not throw', async t => {
+    const button = new Ext.button.Button({ foo : true })
+
+    t.eq(Ext.ComponentQuery.query('[foo]'), [ button ])
+    t.eq(t.componentQuery('[foo]'), [ button ])
+
+    t.eq(
+        t.query('>> [foo]'), [],
+        'Querying for unrendered components returns empty array (since such components dont have elements) and query is resolved till elements'
+    )
+})
