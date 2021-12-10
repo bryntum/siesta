@@ -102,8 +102,8 @@ export class TestSenchaPre extends TestBrowser {
     }
 
 
-    resolveExtComponent (source : string | ExtComponent, onAmbiguousQuery : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery) : ExtComponent {
-        const components    = this.resolveExtComponentAll(source)
+    resolveExtComponent (source : string | ExtComponent, root? : ExtComponent, onAmbiguousQuery : 'use_first' | 'warn' | 'throw' = this.onAmbiguousQuery) : ExtComponent {
+        const components    = this.resolveExtComponentAll(source, root)
 
         this.warnAmbiguousComponentQuery(components, onAmbiguousQuery)
 
@@ -111,9 +111,9 @@ export class TestSenchaPre extends TestBrowser {
     }
 
 
-    resolveExtComponentAll (source : string | ExtComponent) : ExtComponent[] {
+    resolveExtComponentAll (source : string | ExtComponent, root? : ExtComponent) : ExtComponent[] {
         if (isString(source)) {
-            const components    = this.componentQuery(source)
+            const components    = this.componentQuery(source, root)
 
             return components
         } else {
