@@ -3,7 +3,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { isString } from "../../util/Typeguards.js"
-import { isElementPointReachable } from "../../util_browser/Dom.js"
+import { isElementAccessible } from "../../util_browser/Dom.js"
 import { ActionTarget } from "../simulate/Types.js"
 import { TestBrowser } from "../test/TestBrowser.js"
 import { Assertion } from "../test/TestResult.js"
@@ -223,7 +223,7 @@ export class TestSenchaPre extends TestBrowser {
 
         if (!el) return true
 
-        return (comp.isVisible && !comp.isVisible()) || !isElementPointReachable(el, undefined, true)
+        return (comp.isVisible && !comp.isVisible()) || !isElementAccessible(el)
     }
 
 
