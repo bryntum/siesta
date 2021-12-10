@@ -81,20 +81,19 @@ export type WaitForReporting<R> = {
 const defaultWaitForReporting : WaitForReporting<unknown> = {
     assertionName           : 'waitFor',
 
-    onConditionMet          : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) => {
-        return <div>
+    onConditionMet          : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) =>
+        <div>
             Waited { waitRes.elapsedTime }ms to fulfill the condition
-        </div>
-    },
-    onException             : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) => {
-        return <div>
+        </div>,
+    onException             : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) =>
+        <div>
             <div>Exception thrown from condition checker function:</div>
             <div>{ String(waitRes.exception) }</div>
+        </div>,
+    onTimeout               : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) =>
+        <div>
+            Waiting for condition aborted by timeout ({ waitOptions.timeout }ms)
         </div>
-    },
-    onTimeout               : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) => {
-        return <div>Waiting for condition aborted by timeout ({ waitOptions.timeout }ms)</div>
-    }
 }
 
 
