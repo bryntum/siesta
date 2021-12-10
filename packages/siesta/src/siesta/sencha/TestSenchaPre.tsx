@@ -223,7 +223,7 @@ export class TestSenchaPre extends TestBrowser {
 
         if (!el) return true
 
-        return (comp.isVisible && !comp.isVisible()) || !isElementPointReachable(el, null, true)
+        return (comp.isVisible && !comp.isVisible()) || !isElementPointReachable(el, undefined, true)
     }
 
 

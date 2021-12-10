@@ -64,37 +64,53 @@ it('Waiting for component to become visible should fail correctly', async t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should be able to wait for component to become not visible, passed as component instance', async t => {
+    const container = new Ext.container.Container({
+        renderTo    : Ext.getBody(),
+        style       : 'background-color: pink',
+        html        : 'Some text'
+    })
 
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// it('Should be able to wait for component query to become visible', async t => {
-//     // const container = new Ext.container.Container({
-//     //     renderTo    : Ext.getBody(),
-//     //     itemId      : 'hidden',
-//     //     hidden      : true
-//     // })
-//     //
-//     // setTimeout(() => container.setVisible(true))
-//     //
-//     // await t.waitForComponentVisible(container)
-//     //
-//     // t.true(container.getVisible())
-//     //
-//     // t.is(t.normalizeElement(container), container.getEl().dom, "Hidden components should be normalized to their root el")
-//     //
-//     // let afterWait   = false
-//     //
-//     // t.waitForCQVisible('#hidden', function () {
-//     //     t.ok(afterWait, "waitForCQVisible triggered its callback already after 500ms delay and manual call to `setVisible`")
-//     // })
-//     //
-//     // t.chain(
-//     //     'waitFor(500)',
-//     //     function () {
-//     //         afterWait       = true
-//     //         container.setVisible(true)
-//     //     }
-//     // )
-//
-// })
-//
-//
+    setTimeout(() => container.setHidden(true), 100)
+
+    await t.waitForComponentNotVisible(container)
+
+    t.true(container.getHidden())
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should be able to wait for component to become not visible, passed as component query', async t => {
+    const container = new Ext.container.Container({
+        renderTo    : Ext.getBody(),
+        style       : 'background-color: pink',
+        html        : 'Some text',
+        itemId      : 'hidden'
+    })
+
+    setTimeout(() => container.setHidden(true), 100)
+
+    await t.waitForComponentNotVisible('#hidden')
+
+    t.true(container.getHidden())
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Waiting for component to become not visible should fail correctly', async t => {
+    t.it({ title : 'internal', isTodo : true, defaultTimeout : 100 }, async t => {
+        const container = new Ext.container.Container({
+            renderTo    : Ext.getBody(),
+            style       : 'background-color: pink',
+            html        : 'Some text',
+            itemId      : 'hidden'
+        })
+
+        await t.waitForComponentNotVisible('#hidden')
+    }).postFinishHook.on(test => {
+        verifyAllFailed(test, t)
+
+        t.is(test.assertions.length, 1)
+    })
+})
