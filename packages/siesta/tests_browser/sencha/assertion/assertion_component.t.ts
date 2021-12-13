@@ -24,9 +24,10 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
 
         setTimeout(() => container.setHidden(false), defaultDelay)
 
-        await t.waitForComponentVisible(container)
+        const result        = await measure(t.waitForComponentVisible(container))
 
         t.false(container.getHidden())
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
@@ -42,9 +43,10 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
 
         setTimeout(() => container.setHidden(false), defaultDelay)
 
-        await t.waitForComponentVisible('#hidden')
+        const result        = await measure(t.waitForComponentVisible('#hidden'))
 
         t.false(container.getHidden())
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
@@ -78,9 +80,10 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
 
         setTimeout(() => container.setHidden(true), defaultDelay)
 
-        await t.waitForComponentNotVisible(container)
+        const result        = await measure(t.waitForComponentNotVisible(container))
 
         t.true(container.getHidden())
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
@@ -95,9 +98,10 @@ it('`waitForComponentVisible/waitForComponentNotVisible` methods should work', a
 
         setTimeout(() => container.setHidden(true), defaultDelay)
 
-        await t.waitForComponentNotVisible('#hidden')
+        const result        = await measure(t.waitForComponentNotVisible('#hidden'))
 
         t.true(container.getHidden())
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
@@ -136,9 +140,10 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
             container.add(button)
         }, defaultDelay)
 
-        const result        = await t.waitForComponentQuery('button[moo=zoo]')
+        const result        = await measure(t.waitForComponentQuery('button[moo=zoo]'))
 
-        t.eq(result, [ button ])
+        t.eq(result.resolved, [ button ])
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
@@ -156,9 +161,10 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
             container.add(button)
         }, defaultDelay)
 
-        const result        = await t.waitForComponentQuery({ target : 'button[moo=zoo]', root : container })
+        const result        = await measure(t.waitForComponentQuery({ target : 'button[moo=zoo]', root : container }))
 
-        t.eq(result, [ button ])
+        t.eq(result.resolved, [ button ])
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
@@ -180,9 +186,10 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
 
         setTimeout(() => button.destroy(), defaultDelay)
 
-        const result        = await t.waitForComponentQueryNotFound('button[moo=zoo]')
+        const result        = await measure(t.waitForComponentQueryNotFound('button[moo=zoo]'))
 
-        t.eq(result, [])
+        t.eq(result.resolved, [])
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
@@ -200,9 +207,11 @@ it('`waitForComponentQuery` / `waitForComponentQueryNotFound` methods should wor
 
         setTimeout(() => Ext.getCmp('moo').destroy(), defaultDelay)
 
-        const result        = await t.waitForComponentQueryNotFound({ target : 'button[moo=zoo]', root : container })
+        const result        = await measure(t.waitForComponentQueryNotFound({ target : 'button[moo=zoo]', root : container }))
 
-        t.eq(result, [])
+        t.eq(result.resolved, [])
+
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
@@ -236,9 +245,11 @@ it('`waitForComponentQueryVisible` / `waitForComponentQueryNotVisible` methods s
             container.add(button)
         }, defaultDelay)
 
-        const result        = await t.waitForComponentQueryVisible('button[moo=zoo]')
+        const result        = await measure(t.waitForComponentQueryVisible('button[moo=zoo]'))
 
-        t.eq(result, [ button ])
+        t.eq(result.resolved, [ button ])
+
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
@@ -266,8 +277,7 @@ it('`waitForComponentQueryVisible` / `waitForComponentQueryNotVisible` methods s
         const button = new Ext.Button({
             text        : 'Button',
             moo         : 'zoo',
-            renderTo    : Ext.getBody(),
-            hidden      : true
+            renderTo    : Ext.getBody()
         })
 
         setTimeout(() => button.setHidden(true), defaultDelay)
@@ -276,7 +286,7 @@ it('`waitForComponentQueryVisible` / `waitForComponentQueryNotVisible` methods s
 
         t.eq(result.resolved, [ button ])
 
-        // t.isGreaterOrEqual(result.elapsed, defaultDelay)
+        t.isGreaterOrEqual(result.elapsed, defaultDelay)
     })
 
 
