@@ -1,3 +1,4 @@
+import { Sizzle } from "../../../web_modules/sizzle_patched.js"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { lastElement, saneSplit } from "../../util/Helpers.js"
@@ -372,7 +373,11 @@ export class UserAgentOnPage extends Mixin(
          * @param root
          */
         querySingleContext (query : string, root : Element | Document | ShadowRoot = this.window.document) : Element[] {
-            return Array.from(root.querySelectorAll(query))
+            if (/:contains\(/.test(query)) {
+                return Sizzle(query, root)
+            } else {
+                return Array.from(root.querySelectorAll(query))
+            }
         }
 
 
