@@ -1,65 +1,60 @@
-// import { CI } from "chained-iterator"
-// import { it } from "../../../browser.js"
-// import { Assertion } from "../../../src/siesta/test/TestResult.js"
-// import { verifyAllFailed } from "../../../tests/siesta/@helpers.js"
-// import { createElement } from "../../@helpers.js"
-//
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// it('`waitForEvent` assertion should work', async t => {
-//
-//     const clickDiv = document.body.appendChild(createElement('div', {
-//         id      : 'div',
-//         style   : 'width : 40px;',
-//         text    : 'testing 1'
-//     }))
-//
-//     await t.waitForEvent(clickDiv, 'click', { trigger : () => t.click(clickDiv) })
-//
-//     await t.waitForEvent('#div', 'click', { trigger : () => t.click(clickDiv), description : 'Should resolve string to element' })
-//
-//     await t.waitForEvent([ 100, 100 ], 'click', { trigger : () => t.click(document.body), description : 'Should resolve point to element' })
-//
-//     //------------------
-//     t.todo('Should all fail', async t => {
-//
-//         await t.waitForEvent(clickDiv, 'click', { timeout : 1 })
-//
-//     }).postFinishHook.on(todoTest => {
-//         verifyAllFailed(todoTest, t)
-//
-//         t.is(CI(todoTest.eachResultOfClassDeep(Assertion)).size, 1)
-//     })
-// })
-//
-//
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// it('`firesOk` assertion should work', async t => {
-//
-//     const clickDiv = document.body.appendChild(createElement('div', {
-//         id      : 'div2',
-//         style   : 'width : 40px;',
-//         text    : 'testing 2'
-//     }))
-//
-//     await t.firesOk({
-//         observable  : '#div2',
-//         events      : { click : 1, mick : 0 },
-//         during      : async () => await t.click(clickDiv)
-//     })
-//
-//
-//     //------------------
-//     t.todo('Should all fail', async t => {
-//
-//         t.firesOk({
-//             observable  : '#div2',
-//             events      : { click : 0, mick : 1 },
-//             during      : async () => await t.click(clickDiv)
-//         })
-//
-//     }).postFinishHook.on(todoTest => {
-//         verifyAllFailed(todoTest, t)
-//
-//         t.is(CI(todoTest.eachResultOfClassDeep(Assertion)).size, 1)
-//     })
-// })
+import { beforeEach, it } from "../../../browser.js"
+import { measure } from "../../../src/util/TimeHelpers.js"
+import { verifyAllFailed } from "../../../tests/siesta/@helpers.js"
+import { createElement } from "../../@helpers.js"
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+beforeEach(() => {
+    document.body.innerHTML = ''
+})
+
+const defaultDelay = 50
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`waitForSelector` assertion should work', async t => {
+    setTimeout(() => createElement({ parent : document.body, id : 'delayed' }), defaultDelay)
+
+    const result        = await measure(t.waitForSelector('#delayed'))
+
+    t.eq(result.resolved, [ document.querySelector('#delayed') ])
+    t.isGreaterOrEqual(result.elapsed, defaultDelay)
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`waitForSelector` should fail correctly', async t => {
+    t.it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
+        await t.waitForSelector('#unexisted')
+    }).postFinishHook.on(test => {
+        verifyAllFailed(test, t)
+
+        t.is(test.assertions.length, 1)
+    })
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`waitForSelectors` assertion should work', async t => {
+    let div1, div2, div3
+
+    setTimeout(() => div1 = createElement({ parent : document.body, class : 'div1' }), defaultDelay)
+    setTimeout(() => div2 = createElement({ parent : document.body, class : 'div2' }), defaultDelay * 2)
+    setTimeout(() => div3 = createElement({ parent : document.body, class : 'div3' }), defaultDelay * 3)
+
+    const result        = await measure(t.waitForSelectors([ '.div1', 'div.div2', 'body > div.div3' ]))
+
+    t.eq(result.resolved, [ [ div1 ], [ div2 ], [ div3 ] ])
+    t.isGreaterOrEqual(result.elapsed, defaultDelay)
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`waitForSelectors` should fail correctly', async t => {
+    t.it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
+        await t.waitForSelectors([ '#unexisted', 'body' ])
+    }).postFinishHook.on(test => {
+        verifyAllFailed(test, t)
+
+        t.is(test.assertions.length, 1)
+    })
+})
