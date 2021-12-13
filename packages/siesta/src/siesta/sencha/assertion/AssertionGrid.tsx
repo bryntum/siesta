@@ -184,7 +184,7 @@ export class AssertionGrid extends Mixin(
             let rowEl       = grid && this.getRow(grid, row)
             let cellNode    = rowEl && this.query(grid.view.cellSelector, rowEl.dom)[ col ]
 
-            return cellNode && this.Ext().get(cellNode)
+            return cellNode && this.Ext.get(cellNode)
         }
 
     //     /**
