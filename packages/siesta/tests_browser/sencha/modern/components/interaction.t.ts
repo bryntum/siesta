@@ -4,7 +4,13 @@ declare const Ext
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
-    Ext.ComponentQuery.query('component').forEach(comp => comp.destroy())
+    Ext.ComponentQuery.query('component').forEach(comp => {
+        try {
+            // as usually, Ext grid in 7.4 throws exceptions when being destroyed
+            comp.destroy()
+        } catch (e) {
+        }
+    })
 })
 
 
@@ -23,6 +29,22 @@ it('Interacting with the checkbox', async t => {
     await t.click(cmp)
 
     t.is(cmp.getChecked(), false, 'Checkbox should be unchecked after 2nd click')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Toggle field', async t => {
+    Ext.create({
+        xtype       : 'togglefield',
+        label       : 'Toggle',
+        renderTo    : document.body
+    })
+
+    t.is(t.cq1('togglefield').getValue(), false, "Togglefield is unchecked")
+
+    await t.click('>> togglefield')
+
+    t.is(t.cq1('togglefield').getValue(), true, "Togglefield has been checked")
 })
 
 
@@ -101,4 +123,32 @@ it('Grid', async t => {
 
     t.true(rowNode, 'row node returned')
     t.like(rowNode.dom.innerHTML, 'Lisa')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Move mouse to select field', async t => {
+    const selectField     = Ext.create({
+        xtype: 'selectfield',
+        label: 'Choose one',
+        options: [{
+            text: 'First Option',
+            value: 'first'
+        }, {
+            text: 'Second Option',
+            value: 'second'
+        }, {
+            text: 'Third Option',
+            value: 'third'
+        }],
+        renderTo    : document.body
+    })
+
+    t.firesOnce(selectField, 'change')
+
+    await t.click('>>selectfield')
+
+    await t.waitForEvent(selectField, 'change', {
+        trigger : async () => await t.click('.x-listitem:contains(Second Option)')
+    })
 })
