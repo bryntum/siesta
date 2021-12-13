@@ -195,9 +195,9 @@ export class AssertionElement extends Mixin(
         async waitForSelector (selector : string, root : ActionTarget)
         async waitForSelector (selector : string, options? : {
             /** include */
-            root? : ActionTarget,
+            root?       : ActionTarget,
             /** include */
-            timeout? : number
+            timeout?    : number
         })
         async waitForSelector (
             ...args :
@@ -224,6 +224,76 @@ export class AssertionElement extends Mixin(
 
                 reporting   : {
                     assertionName   : 'waitForSelector',
+                    onConditionMet          : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) =>
+                        <div>
+                            Waited { waitRes.elapsedTime }ms for matching elements to appear in DOM
+                        </div>,
+                    onTimeout               : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) =>
+                        <div>Waiting for selector aborted by timeout ({ waitOptions.timeout }ms)</div>
+                }
+            })
+        }
+
+
+        /**
+         * This assertions passes if waiting for the given `selector` completes within `timeout`.
+         * If no `timeout` is given [[TestDescriptor.defaultTimeout]] is used. One can also specify
+         * a `root` element, from which the query will be starting.
+         *
+         * This method has 2 overloads
+         *
+         * For example:
+         *
+         * ```javascript
+         * await t.waitForSelector('.css-class', { root : '.root', timeout : 5000 })
+         * ```
+         *
+         * @category Dom assertions
+         *
+         * @param selector
+         * @param root
+         */
+        async waitForSelectors (selector : string[], root : ActionTarget)
+        async waitForSelectors (selector : string[], options? : {
+            /** include */
+            root?       : ActionTarget,
+            /** include */
+            timeout?    : number
+        })
+        async waitForSelectors (
+            ...args :
+                | [ selector : string[], root : ActionTarget ]
+                | [ selector : string[], options? : { root? : ActionTarget, timeout? : number } ]
+        )
+            : Promise<Element[][] | undefined>
+        {
+            const selectors = args[ 0 ]
+            const options   = this.isActionTarget(args[ 1 ]) ? undefined : args[ 1 ]
+            const root      = this.isActionTarget(args[ 1 ]) ? args[ 1 ] : options?.root
+            const timeout   = options?.timeout ?? this.waitForTimeout
+
+            if (!selectors) throw new Error("Need `selector` argument for the `waitForSelector` assertion")
+
+            return this.waitFor<Element[][]>({
+                condition : () => {
+                    const resolvedRoot  = root ? this.resolveActionTarget(root, 'throw') : undefined
+
+                    const result        = [] as Element[][]
+
+                    for (const selector of selectors) {
+                        const res       = this.query(selector, resolvedRoot)
+
+                        if (res.length === 0) return null
+
+                        result.push(res)
+                    }
+
+                    return result
+                },
+                timeout,
+
+                reporting   : {
+                    assertionName   : 'waitForSelectors',
                     onConditionMet          : (waitRes : WaitForResult<unknown>, waitOptions : WaitForOptions<unknown>) =>
                         <div>
                             Waited { waitRes.elapsedTime }ms for matching elements to appear in DOM
