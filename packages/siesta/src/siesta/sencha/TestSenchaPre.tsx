@@ -12,13 +12,28 @@ import { TestDescriptorSencha } from "./TestDescriptorSencha.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // dummy types for better signatures
+/**
+ * This type denotes the Ext.Observable instance
+ */
 export type ExtObservable       = { addListener : AnyFunction, removeListener : AnyFunction }
+
+/**
+ * This type denotes the Ext.Component instance
+ */
 export type ExtComponent        = Record<string, any> & ExtObservable
+
+/**
+ * This type denotes the Ext.Element instance
+ */
 export type ExtElement          = { dom : Element } & ExtObservable
 
 export const isComponentQuery = (selector : string) : boolean => Boolean(selector.match(/^\s*>>/))
 
 export const isExtComponent = (a : any, Ext) : a is ExtComponent => Boolean(Ext && (a instanceof Ext.Component))
+
+/**
+ * This type extends the [[ActionTarget]] with the extra options for Sencha framework
+ */
 
 export type ActionTargetSencha  = ActionTarget | ExtComponent | ExtElement
 
