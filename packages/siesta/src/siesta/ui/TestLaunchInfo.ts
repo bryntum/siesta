@@ -101,7 +101,7 @@ export class TestLaunchInfo extends Mixin(
                 case 'running':
                     return this.launchState
                 case 'completed':
-                    if (CI(this.mostRecentResult.eachResultOfClassDeep(Exception)).size > 0) return 'exception'
+                    if (this.mostRecentResult.hasException()) return 'exception'
 
                     return this.mostRecentResult.passed ? 'passed' : 'failed'
             }

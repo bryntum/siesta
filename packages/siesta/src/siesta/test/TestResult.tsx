@@ -480,6 +480,19 @@ export class TestNodeResult extends Mixin(
         }
 
 
+        hasException (ignoreTodoTests : boolean = true) : boolean {
+            for (const result of this.resultLog) {
+                if ((result instanceof Exception) && (!ignoreTodoTests || !this.isTodo)) return true
+
+                if (result instanceof TestNodeResult) {
+                    if (result.hasException(ignoreTodoTests)) return true
+                }
+            }
+
+            return false
+        }
+
+
         get assertions () : Assertion[] {
             return Array.from(this.eachResultOfClass(Assertion))
         }
