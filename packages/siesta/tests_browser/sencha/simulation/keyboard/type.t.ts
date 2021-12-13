@@ -71,3 +71,14 @@ it('`type` action should support component instance', async t => {
 
     t.is(field.getValue(), 'Some text')
 })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should not crash while typing this', async t => {
+    const field     = new Ext.form.TextField({
+        emptyText       : 'please enter some text',
+        renderTo        : Ext.getBody()
+    })
+
+    await t.type(field, 'username[TAB]foo', { shiftKey : true })
+})
