@@ -196,7 +196,11 @@ export class TestGroupLaunchInfo extends Mixin(
             else if (this.items.some(launchInfo => launchInfo.viewState === 'running' || launchInfo.viewState === 'started')) {
                 result = 'running'
             }
-            else if (this.items.every(launchInfo => launchInfo.viewState === 'passed')) {
+            else if (
+                this.items.every(launchInfo => launchInfo.viewState === 'passed'
+                // mark the parent group as passed even if it contains some empty child group (which will have `noinfo` viewstate)
+                || (launchInfo instanceof TestGroupLaunchInfo) && launchInfo.items.length === 0)
+            ) {
                 result = 'passed'
             }
             else if (this.items.some(launchInfo => launchInfo.viewState === 'failed' || launchInfo.viewState === 'exception')) {
