@@ -94,7 +94,7 @@ export class TestDescriptorComponent extends Component {
                     this.testDescriptor.filteredChildren.map(childNode =>
                         <leaf>
                             <TestDescriptorComponent
-                                dashboard= { this.dashboard }
+                                dashboard       = { this.dashboard }
                                 selectedTestBox = { this.selectedTestBox }
                                 testDescriptor  = { childNode }
                             >
