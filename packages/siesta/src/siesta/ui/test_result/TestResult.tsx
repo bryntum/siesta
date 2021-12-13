@@ -108,7 +108,7 @@ export class TestNodeResultComponent extends Mixin(
                 { children }
             </TreeComponent> as ComponentElement<TreeComponent>
 
-            // save changes in `state` atom of the TreeComponent to the `expanded
+            // save changes in `state` atom of the TreeComponent to the `expandedState`
             (el.comp.$.state as Box<TreeComponent[ 'state' ]>).commitValueOptimisticHook.on((atom, value) => this.testNode.expandedState = value)
 
             return el
