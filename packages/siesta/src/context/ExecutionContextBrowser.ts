@@ -25,7 +25,8 @@ export class ExecutionContextBrowser extends ExecutionContext {
         // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
         this.uncaughtExceptionListener  = (event : ErrorEvent | Event) => {
             if (isErrorEvent(event))
-                this.onException('exception', event.error, event)
+                // there might be no `error` property (for cross-domain exceptions?)
+                this.onException('exception', event.error ?? event.message, event)
             else
                 this.onResourceLoadFailure(event)
 
