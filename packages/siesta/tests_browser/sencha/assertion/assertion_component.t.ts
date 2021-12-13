@@ -245,7 +245,7 @@ it('`waitForComponentQueryVisible` / `waitForComponentQueryNotVisible` methods s
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     it('`waitForComponentQueryVisible` should fail correctly', async t => {
 
-        it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
+        it({ title : 'internal visible', isTodo : true, defaultTimeout : defaultDelay }, async t => {
             const button = new Ext.Button({
                 text        : 'Button',
                 moo         : 'zoo',
@@ -283,7 +283,7 @@ it('`waitForComponentQueryVisible` / `waitForComponentQueryNotVisible` methods s
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     it('`waitForComponentQueryNotVisible` should fail correctly', async t => {
 
-        it({ title : 'internal', isTodo : true, defaultTimeout : defaultDelay }, async t => {
+        it({ title : 'internal not visible', isTodo : true, defaultTimeout : defaultDelay }, async t => {
             const container = new Ext.Button({
                 text        : 'Button',
                 moo         : 'zoo',
