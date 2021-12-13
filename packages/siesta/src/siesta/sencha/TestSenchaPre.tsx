@@ -197,10 +197,11 @@ export class TestSenchaPre extends TestBrowser {
                 return comp.el.down('.x-form-field') || comp.el.down('.x-field-input') || comp.el.down('.x-input-el') || comp.inputEl || comp.el
             }
 
-            if (comp instanceof Ext.form.Field && comp.inputEl) {
+            //                                                         Ext 7
+            if (comp instanceof Ext.form.Field && (comp.inputEl || comp.inputElement)) {
                 let field       = comp.el.down('.x-form-field')
 
-                return (field && field.dom) ? field : comp.inputEl
+                return (field && field.dom) ? field : (comp.inputEl || comp.inputElement)
             }
 
             if (Ext.form.HtmlEditor && comp instanceof Ext.form.HtmlEditor) {
