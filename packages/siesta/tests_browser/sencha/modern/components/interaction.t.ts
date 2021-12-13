@@ -5,11 +5,8 @@ declare const Ext
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
     Ext.ComponentQuery.query('component').forEach(comp => {
-        try {
-            // as usually, Ext grid in 7.4 throws exceptions when being destroyed
-            comp.destroy()
-        } catch (e) {
-        }
+        // as usually, Ext grid in 7.4 throws exceptions when being destroyed
+        try { comp.destroy() } catch (e) {}
     })
 })
 

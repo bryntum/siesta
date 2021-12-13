@@ -47,6 +47,27 @@ it('`type` action should support component query', async t => {
 
     await t.type('>>textfield[zoo]', 'Some text')
 
-    t.is(Ext.getCmp('test-field2').getValue(), 'Some text', 'The result of the composite query, passed as argument to the `t.type` is correct')
+    t.is(Ext.getCmp('test-field2').getValue(), 'Some text', 'The result of the component query, passed as argument to the `t.type` is correct')
 })
 
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`type` action should support component instance', async t => {
+    const panel        = new Ext.Panel({
+        renderTo        : document.body,
+
+        items           : [
+            {
+                xtype           : 'textfield',
+                cls             : 'test-field',
+                id              : 'test-field'
+            }
+        ]
+    })
+
+    const field         = Ext.getCmp('test-field')
+
+    await t.type(field, 'Some text')
+
+    t.is(field.getValue(), 'Some text')
+})

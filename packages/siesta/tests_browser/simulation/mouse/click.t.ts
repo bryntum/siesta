@@ -164,11 +164,27 @@ it('Double click', async t => {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Verify check box click works', async t => {
-    document.body.innerHTML = '<input type="checkbox" />'
+    document.body.innerHTML = '<input id="native1" type="checkbox" />'
+
+    t.firesOnce('#native1', 'change')
+    t.firesOnce('body', 'change')
 
     await t.click('input')
 
     t.selectorExists('input:checked', 'Checkbox should be checked after clicking it')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Verify click on check box with label works', async t => {
+    document.body.innerHTML = '<label id="label2"><input id="native2" type="checkbox"/>Very Long Label text</label>';
+
+    t.firesOnce('#native2', 'change')
+    t.firesOnce('body', 'change')
+
+    await t.click('#label2')
+
+    t.selectorExists('#native2:checked', 'Checkbox should be checked after clicking it')
 })
 
 
