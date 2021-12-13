@@ -158,7 +158,8 @@ project.plan(
             {
                 url     : 'assertion',
                 items   : [
-                    'assertion_component.t.js'
+                    'assertion_component.t.js',
+                    'assertion_form_field.t.js'
                 ]
             },
             {
@@ -199,7 +200,6 @@ project.plan(
                 ]
             },
             'query.t.js',
-            'set_value.t.js'
         ]
     }
 )

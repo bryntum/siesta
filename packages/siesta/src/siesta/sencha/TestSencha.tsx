@@ -2,6 +2,7 @@ import { ClassUnion, Mixin } from "typescript-mixin-class"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { createTestSectionConstructors } from "../test/Test.js"
 import { AssertionComponent } from "./assertion/AssertionComponent.js"
+import { AssertionFormField } from "./assertion/AssertionFormField.js"
 import { AssertionGrid } from "./assertion/AssertionGrid.js"
 import { TestSenchaPre } from "./TestSenchaPre.js"
 
@@ -14,11 +15,13 @@ export class TestSencha extends Mixin(
     [
         AssertionComponent,
         AssertionGrid,
+        AssertionFormField,
         TestSenchaPre
     ],
     (base : ClassUnion<
         typeof AssertionComponent,
         typeof AssertionGrid,
+        typeof AssertionFormField,
         typeof TestSenchaPre
     >) =>
 

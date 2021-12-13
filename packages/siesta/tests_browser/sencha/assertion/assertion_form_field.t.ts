@@ -1,10 +1,29 @@
-import { beforeEach, it } from "../../sencha.js"
+import { beforeEach, it } from "../../../sencha.js"
 
 declare const Ext
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 beforeEach(() => {
     Ext.ComponentQuery.query('component').forEach(comp => comp.destroy())
+})
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`fieldHasValue` assertion should work', async t => {
+    const panel        = new Ext.Panel({
+        renderTo        : document.body,
+
+        items           : [
+            {
+                xtype           : 'textfield',
+                cls             : 'test-field',
+                id              : 'test-field'
+            }
+        ]
+    })
+
+    await t.type('>>#test-field', 'Some text')
+
+    t.fieldHasValue('#test-field', 'Some text')
 })
 
 

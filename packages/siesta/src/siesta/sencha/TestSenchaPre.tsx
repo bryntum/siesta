@@ -372,19 +372,4 @@ export class TestSenchaPre extends TestBrowser {
             description
         )
     }
-
-    /**
-     * Sets a value to an Ext Component. A faster way to set a value than manually calling "type" into
-     * a text field for example. A value is set by calling either the `setChecked` or `setRawValue` or
-     * `setValue` method of the component.
-     *
-     * @param component A component instance or a component query to resolve
-     * @param value
-     */
-    setValue (component : ExtComponent | string, value : unknown) {
-        component = this.resolveExtComponent(component);
-
-        // semi-colon needed
-        (component.setChecked || component.setRawValue || component.setValue).call(component, value)
-    }
 }
