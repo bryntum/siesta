@@ -534,6 +534,7 @@ export class Test extends TestPre {
         // mess
         this.descriptor.planItem(descriptor)
         const flatten   = descriptor.flatten
+        flatten.url     = this.url
         this.descriptor.removeItem(descriptor)
         // need to turn the node into leaf again, after adding/removing child
         this.descriptor.childNodes = undefined

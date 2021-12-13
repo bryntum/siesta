@@ -240,7 +240,10 @@ export class TestNodeResult extends Mixin(
         get sourceLineExtractor () : RegExp {
             if (this.$sourceLineExtractor !== undefined) return this.$sourceLineExtractor
 
-            return this.$sourceLineExtractor = new RegExp(escapeRegExp(this.url) + ':(\\d+):(\\d+)')
+            // normalize the url by passing it through the `new URL()`
+            const url       = new URL(this.descriptor.urlAbs).href
+
+            return this.$sourceLineExtractor = new RegExp(escapeRegExp(url) + ':(\\d+):(\\d+)')
         }
 
 
