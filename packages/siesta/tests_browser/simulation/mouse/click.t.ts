@@ -177,7 +177,7 @@ it('Verify check box click works', async t => {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Verify click on check box with label works', async t => {
-    document.body.innerHTML = '<label id="label2"><input id="native2" type="checkbox"/>Very Long Label text</label>';
+    document.body.innerHTML = '<label id="label2"><input id="native2" type="checkbox"/>Very Long Label text</label>'
 
     t.firesOnce('#native2', 'change')
     t.firesOnce('body', 'change')

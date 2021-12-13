@@ -442,8 +442,12 @@ export class AssertionComponent extends Mixin(
          * @param scope
          * @param timeout
          */
-        async waitForCQNotVisible () {
-            return this.waitForComponentQueryNotVisible.apply(this, arguments);
+        async waitForCQNotVisible (
+            options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
+        )
+            : Promise<ExtComponent[]>
+        {
+            return this.waitForComponentQueryNotVisible(options, root, callback, scope, timeout)
         }
 
 
