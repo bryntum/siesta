@@ -193,8 +193,8 @@ export class TestSenchaPre extends TestBrowser {
 
                 if (inputComponent) return this.compToExtEl(inputComponent)
 
-                //                                                    Ext6 Modern               Ext6.7                                   Fallback
-                return comp.el.down('.x-form-field') || comp.el.down('.x-field-input') || comp.el.down('.x-input-el') || comp.inputEl || comp.el
+                //                                                    Ext6 Modern               Ext6.7                                       Ext7             Fallback
+                return comp.el.down('.x-form-field') || comp.el.down('.x-field-input') || comp.el.down('.x-input-el') || comp.inputEl || comp.inputElement || comp.el
             }
 
             //                                                         Ext 7
@@ -206,7 +206,7 @@ export class TestSenchaPre extends TestBrowser {
 
             if (Ext.form.HtmlEditor && comp instanceof Ext.form.HtmlEditor) {
                 //     Ext JS 3       Ext JS 4
-                return comp.iframe || comp.inputEl
+                return comp.iframe || comp.inputEl || comp.inputElement
             }
         }
 
