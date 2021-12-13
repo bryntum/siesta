@@ -162,6 +162,11 @@ project.plan(
                 ]
             },
             {
+                url     : 'components',
+                items   : [
+                ]
+            },
+            {
                 url     : 'simulation',
                 items   : [
                     {
@@ -174,6 +179,21 @@ project.plan(
                         url     : 'mouse',
                         items   : [
                             'click.t.js'
+                        ]
+                    }
+                ]
+            },
+            {
+                url     : 'modern',
+                preload     : [
+                    '../../../../workspace/ext-7.4.0/build/modern/theme-material/resources/theme-material-all.css',
+                    '../../../../workspace/ext-7.4.0/build/ext-modern-all-debug.js'
+                ],
+                items   : [
+                    {
+                        url     : 'components',
+                        items   : [
+                            'interaction.t.js'
                         ]
                     }
                 ]
