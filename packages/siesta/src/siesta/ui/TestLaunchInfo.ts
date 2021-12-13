@@ -187,10 +187,10 @@ export class TestGroupLaunchInfo extends Mixin(
         calculateViewState () : TestGroupViewState {
             let result : TestGroupViewState      = 'noinfo'
 
-            if (this.items.every(launchInfo => launchInfo.viewState === 'noinfo')) {
+            if (this.items.length === 0 || this.items.every(launchInfo => launchInfo.viewState === 'noinfo')) {
                 result = 'noinfo'
             }
-            if (this.items.every(launchInfo => launchInfo.viewState === 'pending')) {
+            else if (this.items.every(launchInfo => launchInfo.viewState === 'pending')) {
                 result = 'pending'
             }
             else if (this.items.some(launchInfo => launchInfo.viewState === 'running' || launchInfo.viewState === 'started')) {
