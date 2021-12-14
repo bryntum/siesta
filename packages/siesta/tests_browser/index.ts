@@ -6,6 +6,67 @@ const project = Project.new({
     testDescriptor          : {}
 })
 
+
+const senchaGroup = (version : string) => new Object({
+    unique      : true,
+    url         : 'sencha',
+    title       : `Sencha: ${ version }`,
+
+    preload     : [
+        `../../../workspace/ext-${ version }/build/classic/theme-classic/resources/theme-classic-all.css`,
+        `../../../workspace/ext-${ version }/build/ext-all-debug.js`
+    ],
+
+    items       : [
+        {
+            url     : 'assertion',
+            items   : [
+                'assertion_component.t.js',
+                'assertion_form_field.t.js'
+            ]
+        },
+        {
+            url     : 'components',
+            items   : [
+            ]
+        },
+        {
+            url     : 'simulation',
+            items   : [
+                {
+                    url     : 'keyboard',
+                    items   : [
+                        'type.t.js'
+                    ]
+                },
+                {
+                    url     : 'mouse',
+                    items   : [
+                        'click.t.js'
+                    ]
+                }
+            ]
+        },
+        {
+            url     : 'modern',
+            preload     : [
+                `../../../../workspace/ext-${ version }/build/modern/theme-material/resources/theme-material-all.css`,
+                `../../../../workspace/ext-${ version }/build/ext-modern-all-debug.js`
+            ],
+            items   : [
+                {
+                    url     : 'components',
+                    items   : [
+                        'interaction.t.js'
+                    ]
+                }
+            ]
+        },
+        'query.t.js',
+    ]
+})
+
+
 project.plan(
     {
         url       : 'chronograph_jsx',
@@ -147,59 +208,12 @@ project.plan(
         ]
     },
     {
-        url         : 'sencha',
+        title   : "Sencha all versions",
+        url     : './',
 
-        preload     : [
-            '../../../workspace/ext-7.4.0/build/classic/theme-classic/resources/theme-classic-all.css',
-            '../../../workspace/ext-7.4.0/build/ext-all-debug.js'
-        ],
-
-        items       : [
-            {
-                url     : 'assertion',
-                items   : [
-                    'assertion_component.t.js',
-                    'assertion_form_field.t.js'
-                ]
-            },
-            {
-                url     : 'components',
-                items   : [
-                ]
-            },
-            {
-                url     : 'simulation',
-                items   : [
-                    {
-                        url     : 'keyboard',
-                        items   : [
-                            'type.t.js'
-                        ]
-                    },
-                    {
-                        url     : 'mouse',
-                        items   : [
-                            'click.t.js'
-                        ]
-                    }
-                ]
-            },
-            {
-                url     : 'modern',
-                preload     : [
-                    '../../../../workspace/ext-7.4.0/build/modern/theme-material/resources/theme-material-all.css',
-                    '../../../../workspace/ext-7.4.0/build/ext-modern-all-debug.js'
-                ],
-                items   : [
-                    {
-                        url     : 'components',
-                        items   : [
-                            'interaction.t.js'
-                        ]
-                    }
-                ]
-            },
-            'query.t.js',
+        items   : [
+            senchaGroup('7.4.0'),
+            senchaGroup('6.7.0')
         ]
     }
 )

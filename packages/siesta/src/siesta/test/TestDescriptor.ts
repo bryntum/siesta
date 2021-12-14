@@ -96,6 +96,8 @@ export class TestDescriptor extends TestDescriptorPre {
 
     type            : EnvironmentType           = 'isomorphic'
 
+    unique          : boolean                   = false
+
     @config()
     isolation       : IsolationLevel            = 'process'
 
@@ -272,8 +274,8 @@ export class TestDescriptor extends TestDescriptorPre {
     stringifierConfig   : Partial<XmlRendererDifference>    = { prettyPrint : true }
     deepCompareConfig   : DeepCompareOptions                = undefined
 
-    // TODO should probably index by `urlAbs` instead of `filename`, or at least support the case
-    // when there's `url` given, but not the `filename`
+    // TODO should probably index by `urlAbs` instead of `filename`??
+    // or since `url` is not always relative thats enough?
     childrenByName      : Map<string, TestDescriptor>       = new Map()
 
 
@@ -287,12 +289,12 @@ export class TestDescriptor extends TestDescriptorPre {
     planItem<T extends TestDescriptor> (item : T) : T {
         const existing  = this.childrenByName.get(item.filename)
 
-        if (existing) {
+        if (existing && !item.unique) {
             existing.merge(item)
         } else {
             this.appendChild(item)
 
-            this.childrenByName.set(item.filename, item)
+            !item.unique && this.childrenByName.set(item.filename, item)
         }
 
         return item
