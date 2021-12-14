@@ -165,16 +165,16 @@ export class TestDescriptor extends TestDescriptorPre {
         reducer : (name : 'url', parentsAxis : TestDescriptor[]) : TestDescriptor[ 'url' ] => {
             const urlParts      = []
 
-            CI(parentsAxis).forEach(desc => {
+            for (const desc of parentsAxis) {
                 if (desc.url) {
                     urlParts.push(stripTrailingSlash(desc.url))
 
-                    if (isAbsolute(desc.url)) return false
+                    if (isAbsolute(desc.url)) break
                 }
                 else {
                     urlParts.push(desc.filename)
                 }
-            })
+            }
 
             urlParts.reverse()
 
