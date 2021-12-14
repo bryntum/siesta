@@ -213,7 +213,11 @@ project.plan(
 
         items   : [
             senchaGroup('7.4.0'),
-            senchaGroup('6.7.0')
+            senchaGroup('7.3.1'),
+            senchaGroup('7.2.0'),
+            senchaGroup('6.7.0'),
+            senchaGroup('6.6.0'),
+            senchaGroup('6.5.3')
         ]
     }
 )
