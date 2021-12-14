@@ -312,7 +312,7 @@ export class Dispatcher extends Mixin(
 
             //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             try {
-                preLaunchRes        = await context.preLaunchTest(normalized.urlAbs, stringifiedDesc, this.getTestLaunchDelay())
+                preLaunchRes        = await context.preLaunchTest(normalized, stringifiedDesc, this.getTestLaunchDelay())
             } catch (e) {
                 const startDate     = new Date()
                 const endDate       = new Date()

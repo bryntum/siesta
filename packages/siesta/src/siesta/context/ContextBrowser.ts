@@ -1,5 +1,6 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { preLaunchTest } from "../test/port/LaunchTest.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
 import { Context } from "./Context.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -14,7 +15,7 @@ export class ContextBrowser extends Mixin(
         }
 
 
-        async preLaunchTest (url : string, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
+        async preLaunchTest (desc : TestDescriptor, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
             // the newly opened page is at "about:blank" url, which is not what people usually assume
             // for example the Vite HMR mechanism fails on such urls
             // another thing is that it seems, for "about:blank" pages you can't make dynamic imports
@@ -23,7 +24,7 @@ export class ContextBrowser extends Mixin(
             // the only reliable url we have is the test file itself
             // await this.navigate(url)
 
-            return await this.evaluateBasic(preLaunchTest, url, testDescriptorStr, delayStart)
+            return await this.evaluateBasic(preLaunchTest, desc.urlAbs, testDescriptorStr, delayStart)
         }
     }
 ) {}

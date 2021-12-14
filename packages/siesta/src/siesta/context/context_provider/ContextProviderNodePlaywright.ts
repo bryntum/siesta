@@ -1,5 +1,4 @@
-import playwright from "playwright"
-import { LaunchOptions } from "playwright"
+import playwright, { LaunchOptions } from "playwright"
 import { ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { browserType } from "../../../util_browser/PlaywrightHelpers.js"
 import { LauncherNodejs } from "../../launcher/LauncherNodejs.js"

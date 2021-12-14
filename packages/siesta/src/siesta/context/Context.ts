@@ -6,6 +6,7 @@ import { Port } from "../../rpc/port/Port.js"
 import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
 import { preLaunchTest } from "../test/port/LaunchTest.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
 import { ContextProvider } from "./context_provider/ContextProvider.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -46,8 +47,8 @@ export class Context extends Mixin(
         }
 
 
-        async preLaunchTest (url : string, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
-            return await this.evaluateBasic(preLaunchTest, url, testDescriptorStr, delayStart)
+        async preLaunchTest (desc : TestDescriptor, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
+            return await this.evaluateBasic(preLaunchTest, desc.urlAbs, testDescriptorStr, delayStart)
         }
 
 

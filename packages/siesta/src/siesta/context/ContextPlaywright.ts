@@ -5,6 +5,8 @@ import { MediaNodeWebSocketParent } from "../../rpc/media/MediaNodeWebSocketPare
 import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { ServerNodeWebSocket } from "../../rpc/server/ServerNodeWebSocket.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
+import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { ContextBrowser } from "./ContextBrowser.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -45,10 +47,13 @@ export class ContextPlaywright extends Mixin(
         }
 
 
-        async preLaunchTest (url : string, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
-            await this.page.goto(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/blank.html')
+        override async preLaunchTest (desc : TestDescriptor, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
+            if (desc instanceof TestDescriptorBrowser && desc.pageUrl)
+                await this.navigate(new URL(desc.pageUrl, desc.urlAbs).href)
+            else
+                await this.navigate(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/blank.html')
 
-            return await super.preLaunchTest(url, testDescriptorStr, delayStart)
+            return await super.preLaunchTest(desc, testDescriptorStr, delayStart)
         }
 
 
