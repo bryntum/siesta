@@ -185,6 +185,10 @@ project.plan(
 
                 items       : [
                     {
+                        url         : 'pageUrl.t.js',
+                        pageUrl     : 'page.html'
+                    },
+                    {
                         url         : 'preload.t.js',
                         failOnResourceLoadError : true,
                         preload     : [
