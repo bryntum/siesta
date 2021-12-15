@@ -1,5 +1,3 @@
-// @ts-ignore
-import * as path from "https://deno.land/std@0.94.0/path/mod.ts"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextDeno } from "../../context/ExecutionContextDeno.js"
@@ -27,26 +25,6 @@ export class TestDeno extends Mixin(
     class TestDeno extends base {
         @prototypeValue(TestDescriptorDeno)
         testDescriptorClass     : typeof TestDescriptorDeno
-
-        // @prototypeValue(ExecutionContextNode)
-        // executionContextClass   : typeof ExecutionContext
-
-
-        static getSelfUrl () : string {
-            const testUrl       = path.fromFileUrl(Deno.mainModule)
-
-            return path.relative(path.resolve(), testUrl)
-        }
-
-
-        static getInputArguments () : string[] {
-            return Deno.args
-        }
-
-
-        static async getIsomorphicTestClass () : Promise<typeof Test> {
-            return this
-        }
 
 
         static async getExecutionContextClass () : Promise<typeof ExecutionContext> {

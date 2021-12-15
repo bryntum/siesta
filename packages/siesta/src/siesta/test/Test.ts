@@ -1002,16 +1002,6 @@ export class Test extends TestPre {
     }
 
 
-    // TODO these 2 methods should probably reside in the Launcher or in the separate abstraction
-    static getSelfUrl () : string {
-        throw new Error("Abstract method")
-    }
-
-    static getInputArguments () : string[] {
-        throw new Error("Abstract method")
-    }
-
-
     static async launchStandalone () {
         const topTest       = globalTestEnv.topTest
         const descriptor    = topTest.descriptor

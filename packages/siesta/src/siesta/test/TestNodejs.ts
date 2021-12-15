@@ -1,4 +1,3 @@
-import path from "path"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { ExecutionContext } from "../../context/ExecutionContext.js"
 import { ExecutionContextNode } from "../../context/ExecutionContextNode.js"
@@ -23,23 +22,6 @@ export class TestNodejs extends Mixin(
     class TestNodejs extends base {
         @prototypeValue(TestDescriptorNodejs)
         testDescriptorClass     : typeof TestDescriptorNodejs
-
-
-        static getSelfUrl () : string {
-            const testUrl       = process.argv[ 1 ]
-
-            return path.relative(path.resolve(), testUrl)
-        }
-
-
-        static getInputArguments () : string[] {
-            return process.argv.slice(2)
-        }
-
-
-        static async getIsomorphicTestClass () : Promise<typeof Test> {
-            return this
-        }
 
 
         static async getExecutionContextClass () : Promise<typeof ExecutionContext> {
