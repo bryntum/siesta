@@ -102,6 +102,26 @@ export class Project extends Mixin(
          * This method adds a test [[TestDescriptor|descriptor]] to the project's plan. The descriptor
          * is represented with the value of [[ProjectPlanItemDescriptor]] type.
          *
+         * See also [[TestDescriptor.url]] for details on specifying the test file url.
+         *
+         * For example:
+         *
+         * ```ts
+         * project.plan(
+         *     {
+         *         // relative to project file
+         *         url : 'some_directory',
+         *
+         *         items    : [
+         *             // relative to `some_directory`
+         *             { url : 'test_1.t.js' }
+         *             // or just:
+         *             'test_2.t.js',
+         *         ]
+         *     }
+         * )
+         * ```
+         *
          * @param items
          */
         plan (...items : (this[ 'planItemT' ] | this[ 'planItemT' ][])[]) {
