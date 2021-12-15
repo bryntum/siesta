@@ -8,7 +8,7 @@ const project = Project.new({
 
 project.plan(
     {
-        filename       : 'chained_iterator',
+        url         : 'chained_iterator',
 
         items       : [
             'chained_iterator.t.js',
