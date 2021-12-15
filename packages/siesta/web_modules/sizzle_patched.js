@@ -8,7 +8,12 @@
  *
  * Date: @DATE
  */
-export const Sizzle = ( function( window ) {
+import { isBrowser } from "../src/util/Helpers.js"
+
+// the browser project may be launched directly in Node, in such case we want to provide
+// a meaningful error message instead of failing on the `window` absence
+
+export const Sizzle = isBrowser() ? (function ( window ) {
 var i,
 	support,
 	Expr,
@@ -2477,4 +2482,4 @@ if ( !assert( function( el ) {
 
 return Sizzle
 
-} )( window );
+} )( window ) : undefined;
