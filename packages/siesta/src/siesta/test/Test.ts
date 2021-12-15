@@ -1014,11 +1014,11 @@ export class Test extends TestPre {
         const topTest       = globalTestEnv.topTest
         const descriptor    = topTest.descriptor
 
-        const projectPlan   = this.prototype.testDescriptorClass.new({ url : '.' })
-
         if (isNodejs() || isDeno()) {
             const launcher          = (await this.getLauncherClass()).new()
             const runtime           = launcher.runtime
+
+            const projectPlan       = this.prototype.testDescriptorClass.new({ url : runtime.pathResolve() })
 
             descriptor.url          = projectPlan.title = runtime.pathRelative(runtime.pathResolve(), runtime.scriptUrl)
 
@@ -1068,6 +1068,8 @@ export class Test extends TestPre {
 
             launcher.setExitCode(launcher.computeExitCode())
         } else {
+            const projectPlan       = this.prototype.testDescriptorClass.new({ url : '.' })
+
             // TODO refactor this, to not create extra context and do everything in the test context,
             // as in Node.js case above
             const extraction        = globalThis.__SIESTA_PROJECT_EXTRACTION__ as SiestaProjectExtraction
