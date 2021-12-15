@@ -29,3 +29,18 @@ it('Should report exceptions, thrown outside of the test function', async t => {
     })
 })
 
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should be able to generate source points for failures', async t => {
+    t.todo('internal', async t => {
+        t.true(false)
+    }).postFinishHook.on(todoTest => {
+        const assertion     = todoTest.assertions[ 0 ]
+
+        t.true(assertion.sourcePoint)
+
+        t.isNumber(assertion.sourcePoint.line)
+        t.isNumber(assertion.sourcePoint.char)
+    })
+})
+
