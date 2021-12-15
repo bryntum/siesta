@@ -23,6 +23,7 @@ export class ProjectTerminal extends Mixin(
             super.initialize(props)
 
             this.descriptorsByAbsPath.set(this.runtime.pathResolve(this.baseUrl), this.projectPlan)
+            this.projectPlan.url    = this.baseUrl
 
             this.rootMostPath       = this.baseUrl
             this.rootMostDesc       = this.projectPlan
@@ -62,19 +63,17 @@ export class ProjectTerminal extends Mixin(
                 return existingDescriptor
             }
             else {
-                const name          = stripDirname(absolute)
+                const dirAbs                    = stripBasename(absolute, false)
+                const existingDirDescriptor     = this.descriptorsByAbsPath.get(dirAbs)
 
                 const descriptor    = this.testDescriptorClass.fromProjectPlanItemDescriptor(
-                    item ? Object.assign({}, item, { filename : name }) : { filename : name }
+                    item ? Object.assign({}, item, { url : absolute }) : { url : absolute }
                 )
 
                 this.descriptorsByAbsPath.set(absolute, descriptor)
 
-                const dirAbs        = stripBasename(absolute, false)
-
-                const existingDirDescriptor     = this.descriptorsByAbsPath.get(dirAbs)
-
                 if (existingDirDescriptor) {
+                    descriptor.url      = this.runtime.pathRelative(existingDirDescriptor.urlAbs, absolute)
                     existingDirDescriptor.planItem(descriptor)
                 } else {
                     do {
@@ -84,7 +83,7 @@ export class ProjectTerminal extends Mixin(
                             this.rootMostPath       = this.runtime.pathResolve(this.rootMostPath, '..')
 
                             this.rootMostDesc       = this.testDescriptorClass.fromProjectPlanItemDescriptor({
-                                url : this.rootMostPath, filename : stripDirname(this.rootMostPath)
+                                url : this.rootMostPath
                             })
 
                             this.descriptorsByAbsPath.set(this.rootMostPath, this.rootMostDesc)
@@ -97,6 +96,7 @@ export class ProjectTerminal extends Mixin(
 
                     this.descriptorsByAbsPath.set(dirAbs, dirDesc)
 
+                    descriptor.url      = this.runtime.pathRelative(dirDesc.urlAbs, absolute)
                     dirDesc.planItem(descriptor)
                 }
 

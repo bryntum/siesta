@@ -13,7 +13,7 @@ const project = Project.new({
 
 project.plan(
     {
-        filename    : 'theme',
+        url    : 'theme',
 
         items       : [
             'equality.t.js',

@@ -290,11 +290,6 @@ export class TestBrowser extends Mixin(
         }
 
 
-        static async getIsomorphicTestClass () : Promise<typeof Test> {
-            return this
-        }
-
-
         static async getExecutionContextClass () : Promise<typeof ExecutionContext> {
             return ExecutionContextBrowser
         }

@@ -8,14 +8,14 @@ const project = Project.new({
 // it needs to list all test files manually
 project.plan(
     {
-        filename        : 'basic',
+        url        : 'basic',
 
         items           : [
             'basic_test.t.js'
         ]
     },
     {
-        filename        : 'module',
+        url        : 'module',
 
         items           : [
             'delay.t.js',

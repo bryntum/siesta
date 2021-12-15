@@ -12,7 +12,6 @@ const __dirname     = path.dirname(__filename)
 const extract   = (desc : TestDescriptor) => {
     return {
         url         : desc.url,
-        filename    : desc.filename,
         children    : desc.childNodes?.map(extract)
     }
 }
@@ -34,16 +33,13 @@ it('Should be able to plan individual files inside the project directory', async
         extract(project.projectPlan),
         {
             url         : project.baseUrl,
-            filename    : '',
             children    : [
                 {
-                    url         : undefined,
-                    filename    : 'test_1.t.js',
+                    url         : 'test_1.t.js',
                     children    : undefined
                 },
                 {
-                    url         : undefined,
-                    filename    : 'test_2.t.js',
+                    url         : 'test_2.t.js',
                     children    : undefined
                 }
             ]
@@ -68,30 +64,24 @@ it('Should be able to plan individual files outside the project directory', asyn
         extract(project.projectPlan),
         {
             url         : project.baseUrl,
-            filename    : '',
             children    : [
                 {
                     url         : path.resolve(__dirname, '../@sample_test_suites/'),
-                    filename    : '@sample_test_suites',
                     children    : [
                         {
-                            url         : undefined,
-                            filename    : 'isomorphic',
+                            url         : 'isomorphic',
                             children    : [
                                 {
-                                    url         : undefined,
-                                    filename    : 'test_1.t.js',
+                                    url         : 'test_1.t.js',
                                     children    : undefined
                                 }
                             ]
                         },
                         {
-                            url         : undefined,
-                            filename    : 'browser',
+                            url         : 'browser',
                             children    : [
                                 {
-                                    url         : undefined,
-                                    filename    : 'test_2.t.js',
+                                    url         : 'test_2.t.js',
                                     children    : undefined
                                 }
                             ]
@@ -117,16 +107,13 @@ it('Should plan the project file directory by default', async t => {
         extract(project.projectPlan),
         {
             url         : project.baseUrl,
-            filename    : '',
             children    : [
                 {
-                    url         : undefined,
-                    filename    : 'test_1.t.js',
+                    url         : 'test_1.t.js',
                     children    : undefined
                 },
                 {
-                    url         : undefined,
-                    filename    : 'test_2.t.js',
+                    url         : 'test_2.t.js',
                     children    : undefined
                 }
             ]
@@ -150,16 +137,13 @@ it('Should be able to plan the glob pattern', async t => {
         extract(project.projectPlan),
         {
             url         : project.baseUrl,
-            filename    : '',
             children    : [
                 {
-                    url         : undefined,
-                    filename    : 'test_1.t.js',
+                    url         : 'test_1.t.js',
                     children    : undefined
                 },
                 {
-                    url         : undefined,
-                    filename    : 'test_2.t.js',
+                    url         : 'test_2.t.js',
                     children    : undefined
                 }
             ]
@@ -185,11 +169,9 @@ it('Should be able to exclude files by the glob pattern', async t => {
         extract(project.projectPlan),
         {
             url         : project.baseUrl,
-            filename    : '',
             children    : [
                 {
-                    url         : undefined,
-                    filename    : 'test_1.t.js',
+                    url         : 'test_1.t.js',
                     children    : undefined
                 }
             ]

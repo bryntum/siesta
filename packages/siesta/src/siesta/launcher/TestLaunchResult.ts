@@ -97,7 +97,6 @@ export type JSONReportTestCaseNode = {
 export type JSONReportTestFileNode = {
     type        : 'file',
     title       : string,
-    filename    : string,
     url         : string,
     urlAbs      : string,
 
@@ -108,7 +107,6 @@ export type JSONReportTestFileNode = {
 export type JSONReportDirectoryNode = {
     type        : 'dir',
     title       : string,
-    filename    : string,
     url         : string,
     urlAbs      : string,
 
@@ -194,7 +192,6 @@ export class TestLaunchResult extends Mixin(
                 type        : 'dir',
 
                 title       : this.descriptor.title,
-                filename    : this.descriptor.filename,
                 url         : this.descriptor.url,
                 urlAbs      : this.descriptor.urlAbs,
 
@@ -210,7 +207,6 @@ export class TestLaunchResult extends Mixin(
                 type        : 'file',
 
                 title       : this.descriptor.title,
-                filename    : this.descriptor.filename,
                 url         : this.descriptor.url,
                 urlAbs      : this.descriptor.urlAbs,
 

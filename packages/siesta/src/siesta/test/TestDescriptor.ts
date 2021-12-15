@@ -117,49 +117,31 @@ export class TestDescriptor extends TestDescriptorPre {
         this.title = value
     }
 
+    filename        : string                = ''
+
     /**
-     * The base name of the test file - not including the directory part. By convention,
-     * Siesta tests should have `*.t.js` extension.
+     * The url for this test, **relative to the parent descriptor**. It can also be an absolute url.
+     * By convention, Siesta tests should have `*.t.js` extension.
      *
-     * If descriptor represents a directory it should contain the base name of the directory.
+     * For the top-level descriptors, `url` is **relative to the project file itself**.
      *
      * For example:
      *
      * ```ts
      * project.plan(
      *     {
-     *         filename : 'some_directory',
+     *         // relative to project file
+     *         url : 'some_directory',
      *
      *         items    : [
-     *             { filename : 'test_1.t.js' }
+     *             // relative to `some_directory`
+     *             { url : 'test_1.t.js' }
      *             // or just:
      *             'test_2.t.js',
      *         ]
      *     }
      * )
      * ```
-     *
-     *
-     * Either this property or the [[url]] should be provided for the descriptor.
-     *
-     * This property is only used for the top-level tests, and it is ignored for the nested test sections.
-     */
-    filename        : string                = ''
-
-    get fileName () : string {
-        return this.filename
-    }
-
-    set fileName (value : string) {
-        this.filename = value
-    }
-
-    /**
-     * The complete url for this test, can be absolute or **relative to the parent descriptor**.
-     *
-     * For the top-level descriptors, `url` is **relative to the project file itself**.
-     *
-     * Either this property or the [[filename]] should be provided for the descriptor.
      */
     @config({
         reducer : (name : 'url', parentsAxis : TestDescriptor[]) : TestDescriptor[ 'url' ] => {
@@ -167,13 +149,13 @@ export class TestDescriptor extends TestDescriptorPre {
 
             for (const desc of parentsAxis) {
                 if (desc.url) {
-                    urlParts.push(stripTrailingSlash(desc.url))
+                    const stripped  = stripTrailingSlash(desc.url)
 
-                    if (isAbsolute(desc.url)) break
+                    // ignore the `./` segments
+                    if (stripped !== '.') urlParts.push(stripped)
                 }
-                else {
-                    urlParts.push(desc.filename)
-                }
+
+                if (isAbsolute(desc.url)) break
             }
 
             urlParts.reverse()
@@ -181,7 +163,7 @@ export class TestDescriptor extends TestDescriptorPre {
             return urlParts.join('/')
         }
     })
-    url             : string
+    url             : string                    = ''
 
     @config({
         reducer : (name : 'tags', parentsAxis : TestDescriptor[]) : TestDescriptor[ 'tags' ] => {
@@ -282,7 +264,7 @@ export class TestDescriptor extends TestDescriptorPre {
     initialize (props? : Partial<TestDescriptor>) {
         super.initialize(props)
 
-        if (this.url && !this.filename) this.filename = stripDirname(this.url)
+        if (this.url) this.filename = stripDirname(this.url)
     }
 
 
@@ -319,21 +301,22 @@ export class TestDescriptor extends TestDescriptorPre {
     }
 
 
-    // absolute url
+    // the full url, starting from the root node
+    // the "Abs" is a bit misleading, the contract is just that
+    // it starts from the root node
     $urlAbs         : string        = undefined
 
     get urlAbs () : string | null {
         if (this.$urlAbs !== undefined) return this.$urlAbs
 
-        return this.$urlAbs = isAbsolute(this.url) ?
-                this.url
-            :
-                this.parentNode && this.parentNode.urlAbs ? joinUrls(this.parentNode.urlAbs, this.url || this.filename) : null
+        return this.$urlAbs = isAbsolute(this.url) || !this.parentNode
+            ? this.url
+            : joinUrls(this.parentNode.urlAbs, this.url)
     }
 
     // a string used to identify the test descriptor when saving/restoring the persistent UI state
     get titleIdentifier () : string {
-        return this.title || this.urlAbs || this.filename
+        return this.title || this.urlAbs
     }
 
 
@@ -384,7 +367,7 @@ export class TestDescriptor extends TestDescriptorPre {
 
     static fromProjectPlanItemDescriptor<T extends typeof TestDescriptor> (this : T, desc : ProjectPlanItemDescriptor<InstanceType<T>>) : InstanceType<T> {
         if (isString(desc)) {
-            return this.new({ filename : desc } as Partial<InstanceType<T>>)
+            return this.new({ url : desc } as Partial<InstanceType<T>>)
         }
         else if (desc.items !== undefined) {
             const groupDesc     = Object.assign({}, desc)

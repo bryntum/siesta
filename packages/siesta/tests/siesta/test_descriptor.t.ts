@@ -1,4 +1,4 @@
-import { it } from "../../index.js"
+import { iit, it } from "../../index.js"
 import { TestDescriptor } from "../../src/siesta/test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../../src/siesta/test/TestDescriptorBrowser.js"
 
@@ -11,12 +11,13 @@ it('Should be able to flatten the descriptor options', t => {
     })
 
 
-    const childDesc     = rootDesc.planItem(TestDescriptor.new({ filename : 'some.t.js' }))
+    const childDesc     = rootDesc.planItem(TestDescriptor.new({ url : 'some.t.js' }))
 
     t.is(childDesc.flatten.isTodo, true, 'Should "inherit" the `isTodo` value from parent')
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it({ title : 'Nested test descriptors should extend parent descriptor', defaultTimeout : 1000 }, t => {
     t.is(t.descriptor.defaultTimeout, 1000)
 
@@ -42,31 +43,31 @@ it('Inheritance from group', t => {
     })
 
     t.it('Regular test should inherit `preload` config from project', t => {
-        const childDesc     = rootBrowserDesc.planItem(TestDescriptorBrowser.new({ filename : 'some' }))
+        const childDesc     = rootBrowserDesc.planItem(TestDescriptorBrowser.new({ url : 'some' }))
 
         t.equal(
             childDesc.flatten.preload,
-            [ 'root_preload' ],
+            [ { type : 'js', url : './root_preload', isEcmaModule : false } ],
         )
     })
 
 
     t.it('Regular test should inherit `preload` config from directory', t => {
         const dirDesc       = rootBrowserDesc.planItem(
-            TestDescriptorBrowser.new({ filename : 'some', preload : [ 'group_preload' ] })
+            TestDescriptorBrowser.new({ url : 'some', preload : [ 'group_preload' ] })
         )
 
-        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ filename : 'some' }))
+        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ url : 'some' }))
 
         t.equal(
             childDesc.flatten.preload,
-            [ 'group_preload' ],
+            [ { type : 'js', url : './some/group_preload', isEcmaModule : false } ],
         )
     })
 
 
     t.it('Test should not inherit `preload` if it has `pageUrl` set', t => {
-        const childDesc     = rootBrowserDesc.planItem(TestDescriptorBrowser.new({ filename : 'some', pageUrl : 'url' }))
+        const childDesc     = rootBrowserDesc.planItem(TestDescriptorBrowser.new({ url : 'some', pageUrl : 'url' }))
         t.equal(
             childDesc.flatten.preload,
             undefined,
@@ -75,21 +76,21 @@ it('Inheritance from group', t => {
 
 
     t.it('If provided, test should use own `preload`, regardless of `pageUrl`', t => {
-        const childDesc     = rootBrowserDesc.planItem(TestDescriptorBrowser.new({ filename : 'some', pageUrl : 'url', preload : [ 'test_preload' ] }))
+        const childDesc     = rootBrowserDesc.planItem(TestDescriptorBrowser.new({ url : 'some', pageUrl : 'url', preload : [ 'test_preload' ] }))
 
         t.equal(
             childDesc.flatten.preload,
-            [ 'test_preload' ],
+            [ { type : 'js', url : './some/test_preload', isEcmaModule : false } ],
         )
     })
 
 
     t.it('Should stop inheritance of `preload` on the directory with `pageUrl` set', t => {
         const dirDesc       = rootBrowserDesc.planItem(
-            TestDescriptorBrowser.new({ filename : 'some', pageUrl : 'url' })
+            TestDescriptorBrowser.new({ url : 'some', pageUrl : 'url' })
         )
 
-        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ filename : 'some' }))
+        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ url : 'some' }))
 
         t.equal(
             childDesc.flatten.preload,
@@ -100,42 +101,42 @@ it('Inheritance from group', t => {
 
     t.it('Should not stop inheritance of `preload` on the directory with `pageUrl` set, if it is set to `inherit`', t => {
         const dirDesc       = rootBrowserDesc.planItem(
-            TestDescriptorBrowser.new({ filename : 'some', pageUrl : 'url' })
+            TestDescriptorBrowser.new({ url : 'some', pageUrl : 'url' })
         )
 
-        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ filename : 'some', preload : 'inherit' }))
+        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ url : 'some', preload : 'inherit' }))
 
         t.equal(
             childDesc.flatten.preload,
-            [ 'root_preload' ]
+            [ { type : 'js', url : './root_preload', isEcmaModule : false } ]
         )
     })
 
 
     t.it('Should still inherit from root, if group has preload set to `inherit`', t => {
         const dirDesc       = rootBrowserDesc.planItem(
-            TestDescriptorBrowser.new({ filename : 'some', pageUrl : 'url', preload : 'inherit' })
+            TestDescriptorBrowser.new({ url : 'some', pageUrl : 'url', preload : 'inherit' })
         )
 
-        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ filename : 'some' }))
+        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ url : 'some' }))
 
         t.equal(
             childDesc.flatten.preload,
-            [ 'root_preload' ]
+            [ { type : 'js', url : './root_preload', isEcmaModule : false } ]
         )
     })
 
 
     t.it('Should inherit from group, if group has both `pageUrl` and `preload`', t => {
         const dirDesc       = rootBrowserDesc.planItem(
-            TestDescriptorBrowser.new({ filename : 'some', pageUrl : 'url', preload : 'group_preload' })
+            TestDescriptorBrowser.new({ url : 'some', pageUrl : 'url', preload : 'group_preload' })
         )
 
-        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ filename : 'some' }))
+        const childDesc     = dirDesc.planItem(TestDescriptorBrowser.new({ url : 'some' }))
 
         t.equal(
             childDesc.flatten.preload,
-            'group_preload'
+            [ { type : 'js', url : './some/group_preload', isEcmaModule : false } ]
         )
     })
 })
@@ -148,11 +149,11 @@ it('`pageUrl` defined on the project node and combined with `preload` should not
         pageUrl     : 'url'
     })
 
-    const childDesc     = rootBrowserDesc.planItem(TestDescriptorBrowser.new({ filename : 'some.t.js' }))
+    const childDesc     = rootBrowserDesc.planItem(TestDescriptorBrowser.new({ url : 'some.t.js' }))
 
     t.equal(
         childDesc.flatten.preload,
-        [ 'root_preload' ]
+        [ { type : 'js', url : './root_preload', isEcmaModule : false } ]
     )
 })
 

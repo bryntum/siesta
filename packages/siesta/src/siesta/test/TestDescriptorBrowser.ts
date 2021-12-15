@@ -2,6 +2,7 @@ import { CI } from "chained-iterator/index.js"
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
 import { prototypeValue, wantArray } from "../../util/Helpers.js"
+import { joinUrls, stripBasename } from "../../util/Path.js"
 import { isArray, isFunction, isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { IsolationLevel, SimulationType } from "../common/IsolationLevel.js"
@@ -188,12 +189,14 @@ export class TestDescriptorBrowser extends Mixin(
             reducer : (name : 'preload', parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ 'preload' ] => {
                 // @ts-ignore
                 return inheritanceBlockedByPageUrl('preload', parentsAxis, desc => {
+                    if (desc.preload === 'inherit') return 'inherit'
+
                     const normalized    = normalizePreloadValue(desc.preload)
 
                     return (normalized || []).map(preloadDesc => {
                         if ('url' in preloadDesc) {
                             return Object.assign({}, preloadDesc, {
-                                url     : new URL(preloadDesc.url, desc.urlAbs).href
+                                url     : joinUrls(stripBasename(desc.urlAbs), preloadDesc.url)
                             })
                         } else
                             return preloadDesc

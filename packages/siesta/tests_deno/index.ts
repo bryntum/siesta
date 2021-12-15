@@ -8,7 +8,7 @@ const project = Project.new({
 
 project.plan(
     {
-        filename    : 'plan',
+        url    : 'plan',
 
         items       : [
             'project_plan.t.js'

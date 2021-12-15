@@ -1009,7 +1009,15 @@ export class Test extends TestPre {
         const projectPlan   = this.prototype.testDescriptorClass.new({ url : '.' })
 
         if (isNodejs() || isDeno()) {
+            const launcher          = (await this.getLauncherClass()).new()
+            const runtime           = launcher.runtime
+
+            descriptor.url          = projectPlan.title = runtime.pathRelative(runtime.pathResolve(), runtime.scriptUrl)
+
             projectPlan.planItem(descriptor)
+
+            // mess
+            descriptor.$urlAbs      = undefined
 
             // trying hard to not create an extra context for the standalone test launch case
             // this is to aid the debugging ergonomics for developers (everything happens in the
@@ -1021,9 +1029,9 @@ export class Test extends TestPre {
             // we should ignore the output to stdout, performed by launcher
             // this is done using the `$suppressOutputLogging` flag on top test
 
-            const isomorphicTestClass       = await this.getIsomorphicTestClass()
+            launcher.inputArguments = launcher.runtime.inputArguments
 
-            const projectData   = ProjectSerializableData.new({
+            launcher.projectData    = ProjectSerializableData.new({
                 launchType              : 'test',
                 environment             : Environment.detect(),
                 projectPlan,
@@ -1032,40 +1040,23 @@ export class Test extends TestPre {
                 type                    : descriptor.type
             })
 
-            const launcher      = (await this.getLauncherClass()).new({
-                projectData,
-                inputArguments          : isomorphicTestClass.getInputArguments()
-            })
-
             launcher.beforePrintHook.on(() => topTest.$suppressOutputLogging = true)
             launcher.afterPrintHook.on(() => topTest.$suppressOutputLogging = false)
-
-            descriptor.url      = projectPlan.title = isomorphicTestClass.getSelfUrl()
-
-            // TODO this is how it is supposed to be:
-            // const selfUrl           = isomorphicTestClass.getSelfUrl()
-            //
-            // projectPlan.title       = selfUrl
-            // projectPlan.url         = stripBasename(selfUrl)
-            // descriptor.filename     = stripDirname(selfUrl)
-            //
-            // projectPlan.planItem(descriptor)
-
 
             try {
                 await launcher.setup()
             } catch (e) {
-                if (e instanceof LauncherError)
+                if (e instanceof LauncherError) {
+                    launcher.onLauncherError(e)
                     return
+                }
                 else
                     throw e
             }
 
             // for standalone launch we use different test launch procedure, since we want to avoid deriving extra context
             // we don't use `TestLauncher.launchTest()` method for example
-            const dispatcher            = launcher.dispatcher
-
-            await dispatcher.launchStandaloneSameContextTest(topTest)
+            await launcher.dispatcher.launchStandaloneSameContextTest(topTest)
 
             launcher.setExitCode(launcher.computeExitCode())
         } else {
@@ -1076,7 +1067,7 @@ export class Test extends TestPre {
             extraction.state        = 'project_created'
 
             projectPlan.url         = stripBasename(extraction.projectUrl)
-            descriptor.filename     = stripDirname(extraction.projectUrl)
+            descriptor.url          = stripDirname(extraction.projectUrl)
 
             projectPlan.planItem(descriptor)
 
@@ -1090,17 +1081,6 @@ export class Test extends TestPre {
 
             await project.start()
         }
-    }
-
-
-    // TODO remove this method, once the `getSelfUrl` and `getInputArgs` are moved to Launcher
-    static async getIsomorphicTestClass () : Promise<typeof Test> {
-        if (isNodejs())
-            return (await import('./TestNodejs.js')).TestNodejs
-        else if (isDeno())
-            return (await import('./TestDeno.js')).TestDeno
-        else
-            return (await import('./TestBrowser.js')).TestBrowser
     }
 
 

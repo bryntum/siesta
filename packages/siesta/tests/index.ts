@@ -8,7 +8,7 @@ const project = Project.new({
 
 project.plan(
     {
-        filename       : 'util',
+        url       : 'util',
 
         items       : [
             'queued.t.js',
@@ -18,14 +18,14 @@ project.plan(
         ]
     },
     {
-        filename       : 'hook',
+        url       : 'hook',
 
         items       : [
             'hook.t.js',
         ]
     },
     {
-        filename    : 'jsx',
+        url    : 'jsx',
 
         items       : [
             'text_block.t.js',
@@ -33,7 +33,7 @@ project.plan(
         ]
     },
     {
-        filename    : 'rpc',
+        url    : 'rpc',
 
         items       : [
             'port.t.js',
@@ -41,7 +41,7 @@ project.plan(
         ]
     },
     {
-        filename    : 'serializer',
+        url    : 'serializer',
 
         items       : [
             'serializer_xml.t.js',
@@ -49,7 +49,7 @@ project.plan(
         ]
     },
     {
-        filename    : 'compare_deep',
+        url    : 'compare_deep',
 
         items       : [
             'compare_deep_diff.t.js',
@@ -58,18 +58,18 @@ project.plan(
         ]
     },
     {
-        filename    : 'options',
+        url    : 'options',
 
         items       : [
             'parse_options.t.js'
         ]
     },
     {
-        filename    : 'siesta',
+        url    : 'siesta',
 
         items       : [
             {
-                filename    : 'assertions',
+                url    : 'assertions',
 
                 items       : [
                     'assertion_async.t.js',
@@ -82,7 +82,7 @@ project.plan(
                 ]
             },
             {
-                filename    : 'test',
+                url    : 'test',
 
                 items       : [
                     'spies.t.js',
