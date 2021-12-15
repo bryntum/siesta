@@ -572,7 +572,11 @@ export class Test extends TestPre {
         this.dashboardLaunchInfo        = dashboardLaunchInfo
 
         // extra-early start hook, can not add assertions in it
-        this.preStartHook.trigger(this)
+        try {
+            this.preStartHook.trigger(this)
+        } catch (e) {
+            // TODO report exceptions from this hook to parent test
+        }
 
         globalTestEnv.currentTest       = this
 
@@ -614,7 +618,11 @@ export class Test extends TestPre {
         globalTestEnv.currentTest       = this.parentNode
 
         // extra-late finish hook, can not add assertions in it
-        this.postFinishHook.trigger(this)
+        try {
+            this.postFinishHook.trigger(this)
+        } catch (e) {
+            // TODO report exceptions from this hook to parent test
+        }
 
         this.cleanup()
     }
