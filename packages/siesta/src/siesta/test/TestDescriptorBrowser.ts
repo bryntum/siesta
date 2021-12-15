@@ -23,6 +23,10 @@ see
  * A preload descriptor describes what resources should be loaded into the test page, before executing it.
  * It can point to JavaScript or CSS resource, or can provide it inline.
  *
+ * **IMPORTANT** The url of the preload descriptor is resolved relative to the test file location
+ * (inside the directory of the test file). Similarly, if the `preload` config is specified on the directory descriptor,
+ * the url of the preload descriptor is resolved inside the parent directory of that directory.
+ *
  * Preload descriptor can be:
  *
  * - an object in the form `{ type : 'js', url : string, isEcmaModule? : boolean }`, pointing to the JavaScript file.
@@ -38,8 +42,6 @@ see
  * - an object in the form `{ style : string  }`, which corresponds to `{ type : 'css', content : string }`.
  * - a "falsy" value, like `null`, `undefined`, empty string etc. It will be ignored
  * - an array of preload descriptors - will be flattened.
- *
- * **IMPORTANT** The url of the preload descriptor is resolved relative to the test file location.
  *
  * The last 2 cases allows simple conditional preloading, for example:
  * ```js
@@ -163,7 +165,7 @@ export class TestDescriptorBrowser extends Mixin(
          * into the test page, before executing the test.
          *
          * **IMPORTANT** The preloading happens *after* the test file has been loaded into the page, but *before* any test
-         * starts. This means, if want to use the preloaded resources in some code, it needs to be placed **inside**
+         * starts. This means, if want to use the preloaded resources, the code accessing them should be placed **inside**
          * any of the [[it]], [[describe]] or [[beforeEach]] section. Using the preloaded resources at the top-level of the file
          * won't work. For example:
          *
