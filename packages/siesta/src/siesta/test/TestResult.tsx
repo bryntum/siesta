@@ -9,6 +9,7 @@ import { LogLevel } from "../../logger/Logger.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { escapeRegExp } from "../../util/Helpers.js"
+import { normalizeUrl } from "../../util/Path.js"
 import { LUID, luid } from "../common/LUID.js"
 import { TestDescriptor } from "./TestDescriptor.js"
 
@@ -240,8 +241,7 @@ export class TestNodeResult extends Mixin(
         get sourceLineExtractor () : RegExp {
             if (this.$sourceLineExtractor !== undefined) return this.$sourceLineExtractor
 
-            // normalize the url by passing it through the `new URL()`
-            const url       = new URL(this.descriptor.urlAbs).href
+            const url       = normalizeUrl(this.root.descriptor.urlAbs)
 
             return this.$sourceLineExtractor = new RegExp(escapeRegExp(url) + ':(\\d+):(\\d+)')
         }
