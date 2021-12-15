@@ -59,7 +59,7 @@ it('Should not freeze when moving mouse above foreign-domain iframe', async t =>
 
     const frame = document.querySelector('iframe')
 
-    await t.waitForEvent('iframe', 'load', { trigger : () => frame.setAttribute('src', "https://www.theworldsworstwebsiteever.com/") })
+    await t.waitForEvent('iframe', 'load', { trigger : () => frame.setAttribute('src', "https://google.com/") })
 
     await t.click('iframe')
 })
