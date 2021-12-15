@@ -198,13 +198,13 @@ project.plan(
                                     PRELOAD_INLINE = true
                                 }
                             },
-                            'preload_file.js',
+                            './preload_file.js',
                             { type : 'js', url : 'preload_file_module.js', isEcmaModule : true },
 
                             {
                                 style : '.inline-class { margin : 10px }'
                             },
-                            'preload_file.css',
+                            '../test/preload_file.css',
                         ]
                     },
                 ]
