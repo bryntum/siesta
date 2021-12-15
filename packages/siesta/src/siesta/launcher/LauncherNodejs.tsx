@@ -183,7 +183,8 @@ export class LauncherNodejs extends Mixin(
             const page          = this.dashboardPage =
                 await browser.newPage({ viewport : null, ignoreHTTPSErrors : true, bypassCSP : true })
 
-            let webServer : UnwrapPromise<ReturnType<typeof startDevServer>>
+            let webServer   : UnwrapPromise<ReturnType<typeof startDevServer>>
+            let webPort     : number
 
             const isBrowserProject  = this.getEnvironmentByUrl(this.project) === 'browser'
 
@@ -200,7 +201,7 @@ export class LauncherNodejs extends Mixin(
 
                 await Promise.allSettled([
                     browser.close(),
-                    webServer.stop(),
+                    webServer?.stop() ?? Promise.resolve(),
                     connectedPort?.disconnect(true) ?? Promise.resolve()
                 ])
 
@@ -209,29 +210,34 @@ export class LauncherNodejs extends Mixin(
                 done()
             })
 
-            webServer               = await startDevServer({
-                config : {
-                    nodeResolve : true
-                },
-                logStartMessage     : false
-            })
+            // we only need a webserver for the terminal projects, for browser projects
+            // we use the user webserver
+            if (!isBrowserProject) {
+                webServer               = await startDevServer({
+                    config : {
+                        nodeResolve : true
+                    },
+                    logStartMessage     : false
+                })
 
-            const address           = webServer.server.address()
-            const webPort           = !isString(address) ? address.port : undefined
+                const address           = webServer.server.address()
+                webPort                 = !isString(address) ? address.port : undefined
 
-            if (webPort === undefined) throw new Error("Address should be available")
+                if (webPort === undefined) throw new Error("Address should be available")
 
-            this.write(<div>
-                <p>Dashboard web server launched</p>
-                <p class="indented">Root dir : <span class="accented">{ process.cwd() }</span></p>
-                <p class="indented">Address  : <span class="accented">http://localhost:{ webPort }</span></p>
-            </div>)
+                this.write(<div>
+                    <p>Dashboard web server launched</p>
+                    <p class="indented">Root dir : <span class="accented">{ process.cwd() }</span></p>
+                    <p class="indented">Address  : <span class="accented">http://localhost:{ webPort }</span></p>
+                </div>)
+            }
 
             const wsServer          = new ServerNodeWebSocket()
             const wsPort            = await wsServer.startWebSocketServer()
 
             let counter             = 0
 
+            // this is the point where dashboard connects to the websocket server
             wsServer.onConnectionHook.on(async (self, socket) => {
                 const forAwait : Promise<any>[]  = []
 
@@ -252,7 +258,7 @@ export class LauncherNodejs extends Mixin(
                     // this mutable style is bad
                     this.projectData    = undefined
 
-                    // this call takes time because launcher spans a new browser instance..
+                    // TODO this call takes time because launcher spans a new browser instance..
                     // should have one browser instance "spare" and span a page in it?
                     forAwait.push(this.setupProjectData(true))
                 }
@@ -285,16 +291,20 @@ export class LauncherNodejs extends Mixin(
 
                 this.logger.debug('Launcher connected to dashboard')
 
-                this.isClosingDashboard     = false
+                this.isClosingDashboard = false
 
                 await port.startDashboard(this.projectData, this.getDescriptor())
 
                 this.logger.debug('Dashboard started')
             })
 
-            const relPath           = path.relative('./', fileURLToPath(`${ siestaPackageRootUrl }resources/dashboard/index.html`))
+            if (isBrowserProject) {
+                await page.goto(`${ this.projectData.siestaPackageRootUrl }resources/dashboard/index.html?port=${ wsPort }`)
+            } else {
+                const relPath           = path.relative('./', fileURLToPath(`${ siestaPackageRootUrl }resources/dashboard/index.html`))
 
-            await page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
+                await page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
+            }
 
             return donePromise
         }
