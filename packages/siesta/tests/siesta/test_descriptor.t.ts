@@ -61,7 +61,7 @@ it('Inheritance from group', t => {
 
         t.equal(
             childDesc.flatten.preload,
-            [ { type : 'js', url : './some/group_preload', isEcmaModule : false } ],
+            [ { type : 'js', url : './group_preload', isEcmaModule : false } ],
         )
     })
 
@@ -80,7 +80,7 @@ it('Inheritance from group', t => {
 
         t.equal(
             childDesc.flatten.preload,
-            [ { type : 'js', url : './some/test_preload', isEcmaModule : false } ],
+            [ { type : 'js', url : './test_preload', isEcmaModule : false } ],
         )
     })
 
@@ -136,7 +136,7 @@ it('Inheritance from group', t => {
 
         t.equal(
             childDesc.flatten.preload,
-            [ { type : 'js', url : './some/group_preload', isEcmaModule : false } ]
+            [ { type : 'js', url : './group_preload', isEcmaModule : false } ]
         )
     })
 })
