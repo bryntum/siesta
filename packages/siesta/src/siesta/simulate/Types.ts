@@ -19,7 +19,7 @@ export type MouseButton             = 'left' | 'right' | 'middle'
  *
  * It can be:
  * - a native DOM `Element`
- * - a `string`, which contains a CSS query to be resolved. The [[TestDescriptorBrowser.onAmbiguousQuery]] controls
+ * - a `string`, which contains a CSS query to be resolved. The [[TestDescriptorBrowser.onAmbiguousQuery|onAmbiguousQuery]] config controls
  * the behavior if a query is resolved to multiple elements.
  * - a [[Point]] on the screen, with the coordinates in the
  * [client](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems#client) coordinate system.

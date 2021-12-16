@@ -65,6 +65,8 @@ export class AssertionComponent extends Mixin(
          * @param options Either a component query string, Ext.Component instance or [[WaitForComponentOptions]] options.
          * If provided as a component query, this method will additionally wait for the query to resolve to at least one
          * component.
+         *
+         * @category Sencha: Wait for
          */
         async waitForComponentVisible (
             options : string | ExtComponent | Partial<WaitForComponentOptions>, callback? : AnyFunction, scope? : object, timeout? : number
@@ -120,6 +122,8 @@ export class AssertionComponent extends Mixin(
          * @param options Either a component query string, Ext.Component instance or [[WaitForComponentOptions]] options.
          * If provided as a component query, this method will additionally wait for the query to resolve to at least one
          * component.
+         *
+         * @category Sencha: Wait for
          */
         async waitForComponentNotVisible (
             options : string | ExtComponent | Partial<WaitForComponentOptions>, callback? : AnyFunction, scope? : object, timeout? : number
@@ -171,6 +175,8 @@ export class AssertionComponent extends Mixin(
          *
          * @param options The component query selector or [[WaitForComponentQueryOptions]] object
          * @param root The container to start a component query from. Optional
+         *
+         * @category Sencha: Wait for
          */
         async waitForComponentQuery (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
@@ -226,6 +232,8 @@ export class AssertionComponent extends Mixin(
          *
          * @param options The component query selector or [[WaitForComponentQueryOptions]] object
          * @param root The container to start a component query from. Optional
+         *
+         * @category Sencha: Wait for
          */
         async waitForComponentQueryNotFound (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
@@ -281,6 +289,8 @@ export class AssertionComponent extends Mixin(
          *
          * @param options The component query selector or [[WaitForComponentQueryOptions]] object
          * @param root The container to start a component query from. Optional
+         *
+         * @category Sencha: Wait for
          */
         async waitForCompositeQuery (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
@@ -336,6 +346,8 @@ export class AssertionComponent extends Mixin(
          *
          * @param options The composite query selector or [[WaitForComponentQueryOptions]] object
          * @param root The container to start a composite query from. Optional
+         *
+         * @category Sencha: Wait for
          */
         async waitForCompositeQueryNotFound (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
@@ -390,6 +402,8 @@ export class AssertionComponent extends Mixin(
          * @param callback
          * @param scope
          * @param timeout
+         *
+         * @category Sencha: Wait for
          */
         async waitForCQ (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
@@ -408,6 +422,8 @@ export class AssertionComponent extends Mixin(
          * @param callback
          * @param scope
          * @param timeout
+         *
+         * @category Sencha: Wait for
          */
         async waitForCQNotFound (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
@@ -424,6 +440,8 @@ export class AssertionComponent extends Mixin(
          * @param callback
          * @param scope
          * @param timeout
+         *
+         * @category Sencha: Wait for
          */
         async waitForCQVisible (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
@@ -441,6 +459,8 @@ export class AssertionComponent extends Mixin(
          * @param callback
          * @param scope
          * @param timeout
+         *
+         * @category Sencha: Wait for
          */
         async waitForCQNotVisible (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
@@ -467,6 +487,8 @@ export class AssertionComponent extends Mixin(
          *
          * @param options The component query selector or [[WaitForComponentQueryOptions]] object
          * @param root The container to start a component query from. Optional
+         *
+         * @category Sencha: Wait for
          */
         async waitForComponentQueryVisible (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number
@@ -537,6 +559,8 @@ export class AssertionComponent extends Mixin(
          *
          * @param options The component query selector or [[WaitForComponentQueryOptions]] object
          * @param root The container to start a component query from. Optional
+         *
+         * @category Sencha: Wait for
          */
         async waitForComponentQueryNotVisible (
             options : string | Partial<WaitForComponentQueryOptions>, root? : ExtComponent, callback? : AnyFunction, scope? : object, timeout? : number

@@ -52,12 +52,12 @@ Support for the bare import specifiers
 
 Siesta itself is "transpilation" process agnostic and assumes native EcmaScript setup. However, Ecma spec does not define the behavior for the "bare import specifiers", like `import { it } from "@bryntum/siesta/browser.js"`. The proposed solution for it, [import maps](https://github.com/WICG/import-maps) is only [partially](https://github.com/WICG/import-maps/issues/235) supported in Chrome. 
 
-This means that the bundler-free development is still the shiny future (hopefully not a distant one) and in the meantime, an extra transpilation step / development web server is needed. We recommend [Vite](https://vitejs.dev/) for this purpose, as a modern and very fast alternative to Webpack.
+This means that the bundler-free development is still the shiny future (hopefully not a distant one) and in the meantime, an extra transpilation step / development web server is needed. We recommend [Vite](https://vitejs.dev/) for this purpose, as a modern and very fast alternative to Webpack. However, any development server will work.
 
 The example we made for a test suite targeting browsers, works with Vite with zero configuration. Yes, no Vite config is needed! This is kind of impressive, comparing how much hassle it can be with configuring the other bundling tools. See the `examples/browser`.
 
 That example is very simple, it is possible that more complex apps will require certain configuration. 
-In any case, the configuration should consist no more than in specifying the test files as entry points:
+In any case, the configuration should consist no more than in **specifying the test files as entry points**:
 
 ```javascript
 /**
@@ -146,6 +146,14 @@ Please refer to the documentation of the individual simulation methods:
 - [[TestBrowser.dragBy]]
 - [[TestBrowser.type]]
 - [[TestBrowser.keyPress]] 
+
+
+Preload some files on the test page before executing
+=======================
+
+
+Using external page for test
+============================
 
 
 Debugging

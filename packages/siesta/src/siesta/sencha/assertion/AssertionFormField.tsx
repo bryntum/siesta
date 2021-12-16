@@ -11,11 +11,13 @@ export class AssertionFormField extends Mixin(
     class AssertionFormField extends base {
 
         /**
-         * Passes if the passed field has the expected value.
+         * Passes if the passed Ext form field has the expected value.
          *
          * @param target A form field or a component query selector
          * @param value A value to compare to.
          * @param description The description of the assertion
+         *
+         * @category Sencha: Form field
          */
         fieldHasValue (target : string | ExtComponent, value : unknown, description? : string) {
             const field = this.resolveExtComponent(target)
@@ -32,10 +34,12 @@ export class AssertionFormField extends Mixin(
 
 
         /**
-         * Passes if the passed field has no value ("" or `null`).
+         * Passes if the passed Ext form field has no value ("" or `null`).
          *
          * @param target A form field or a component query selector
          * @param description The description of the assertion
+         *
+         * @category Sencha: Form field
          */
         isFieldEmpty (target : string | ExtComponent, description? : string) {
             const field     = this.resolveExtComponent(target)
@@ -59,6 +63,8 @@ export class AssertionFormField extends Mixin(
          *
          * @param component A component instance or a component query to resolve
          * @param value
+         *
+         * @category Sencha: Form field
          */
         setFieldValue (component : ExtComponent | string, value : unknown) {
             component   = this.resolveExtComponent(component);

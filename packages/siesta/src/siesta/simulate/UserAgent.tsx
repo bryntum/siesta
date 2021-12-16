@@ -362,10 +362,11 @@ export class UserAgentOnPage extends Mixin(
 
 
         /**
+         * You probably don't need to use this method in your tests. Use [[query]] instead.
+         * This method can be overridden by the subclass, to provide some extra query syntax, features etc.
+         *
          * Performs a query in the DOM, by default it is a regular CSS query. Query is performed inside a single DOM context
          * (single iframe or single web component). See [[query]] for cross-context querying capabilities.
-         *
-         * This method can be overridden by the subclass, to provide some extra query syntax, features etc.
          *
          * @category Dom helper methods
          *
@@ -382,9 +383,12 @@ export class UserAgentOnPage extends Mixin(
 
 
         /**
-         * Performs a query in the DOM, by default it is a CSS query with extra capabilities.
+         * Performs a query in the DOM, by default it is a regular CSS query with extra capabilities.
          *
-         * Notably, the `->` characters split the query into segments, and each segment matches inside a "context".
+         * Notably, the `:contains(text)` pseudo is supported. It matches, if the text content of the element
+         * contains the provided `text`.
+         *
+         * Also, the `->` characters split the query into segments, and each segment matches inside a "context".
          * Context can be either an iframe or a web component shadow DOM. Simply put, the `->` symbol marks the boundary
          * of the iframe/web component. Web component need to have "opened" shadow DOM for query to work.
          *
@@ -406,7 +410,7 @@ export class UserAgentOnPage extends Mixin(
          *
          * @category Dom helper methods
          *
-         * @param query
+         * @param query An enhanced CSS selector
          * @param root The root DOM element (or a `Document`) from which to start the query. Optional, by default
          * its the `document` of the test context.
          */

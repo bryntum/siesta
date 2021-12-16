@@ -13,17 +13,20 @@ import { TestDescriptorSencha } from "./TestDescriptorSencha.js"
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // dummy types for better signatures
 /**
- * This type denotes the Ext.Observable instance
+ * This type denotes the Ext.Observable instance.
+ * Its not a real type with all properties, only used to improve the code readability.
  */
 export type ExtObservable       = { addListener : AnyFunction, removeListener : AnyFunction }
 
 /**
- * This type denotes the Ext.Component instance
+ * This type denotes the Ext.Component instance.
+ * Its not a real type with all properties, only used to improve the code readability.
  */
 export type ExtComponent        = Record<string, any> & ExtObservable
 
 /**
- * This type denotes the Ext.Element instance
+ * This type denotes the Ext.Element instance.
+ * Its not a real type with all properties, only used to improve the code readability.
  */
 export type ExtElement          = { dom : Element } & ExtObservable
 
@@ -32,9 +35,11 @@ export const isComponentQuery = (selector : string) : boolean => Boolean(selecto
 export const isExtComponent = (a : any, Ext) : a is ExtComponent => Boolean(Ext && (a instanceof Ext.Component))
 
 /**
- * This type extends the [[ActionTarget]] with the extra options for Sencha framework
+ * This type extends the [[ActionTarget]] with the extra options for Sencha framework.
+ * Notably, it accepts the `Ext.Component/Ext.Element` instances.
+ *
+ * Also, the semantic of string selector is extended with [[componentQuery|component query]] and [[compositeQuery|composite query]].
  */
-
 export type ActionTargetSencha  = ActionTarget | ExtComponent | ExtElement
 
 
@@ -154,7 +159,9 @@ export class TestSenchaPre extends TestBrowser {
                 : super.resolveObservable(source)
     }
 
-
+    /**
+     * This accessor provides an `Ext` global, from the test's context.
+     */
     get Ext () : any {
         // @ts-ignore
         return this.window.Ext
@@ -242,18 +249,82 @@ export class TestSenchaPre extends TestBrowser {
         return (comp.isVisible && !comp.isVisible()) || !isElementAccessible(el)
     }
 
-
-    cq (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : ExtComponent[] {
+    /**
+     * An alias for the [[componentQuery]] method.
+     *
+     * @param query
+     * @param root
+     * @param options
+     *
+     * @category Sencha: Querying
+     */
+    cq (
+        query : string,
+        root : ExtComponent = this.Ext.ComponentQuery,
+        options? : {
+            /**
+             * Whether to ignore the non-visible components
+             */
+            ignoreNonVisible : boolean
+        }
+    ) : ExtComponent[] {
         return this.componentQuery(query, root, options)
     }
 
 
-    cq1 (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : ExtComponent | null {
+    /**
+     * An alias for the [[componentQuery]] method which returns the 1st element of the results array
+     * (or `null` if the component query does not match any components).
+     *
+     * @param query
+     * @param root
+     * @param options
+     *
+     * @category Sencha: Querying
+     */
+    cq1 (
+        query : string,
+        root : ExtComponent = this.Ext.ComponentQuery,
+        options? : {
+            /**
+             * Whether to ignore the non-visible components
+             */
+            ignoreNonVisible : boolean
+        }
+    ) : ExtComponent | null {
         return this.componentQuery(query, root, options)[ 0 ] ?? null
     }
 
 
-    componentQuery (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : ExtComponent[] {
+    /**
+     * This methods performs a component query (`Ext.ComponentQuery.query()`) in the ExtJS components tree.
+     *
+     * Component query selector is distinguished from the regular CSS selector by the leading `>>` symbol:
+     * ```js
+     * await t.click('>>panel[title=My Panel]')
+     * ```
+     * Such query is resolved to the main elements of the matching components.
+     *
+     * The `>>` symbol is optional when calling this method, however it is mandatory when using other methods
+     * (like [[query]], [[click]] etc) and inside [[ActionTargetSencha]].
+     * This is to be able to distinguish the component query from CSS query.
+     *
+     * @param query A regular ExtJS component query. May have a `>>` prefix, which will be trimmed.
+     * @param root A root component to start the query from.
+     * @param options
+     *
+     * @category Sencha: Querying
+     */
+    componentQuery (
+        query : string,
+        root : ExtComponent = this.Ext.ComponentQuery,
+        options? : {
+            /**
+             * Whether to ignore the non-visible components
+             */
+            ignoreNonVisible : boolean
+        }
+    ) : ExtComponent[] {
         const selector  = query.replace(/^(\s*>>)?/, '').trim()
 
         const results   = root.query(selector)
@@ -264,7 +335,36 @@ export class TestSenchaPre extends TestBrowser {
     }
 
 
-    compositeQuery (query : string, root : ExtComponent = this.Ext.ComponentQuery, options? : { ignoreNonVisible : boolean }) : Element[] {
+    /**
+     * This method performs a *composite query*. This query is distinguished from the regular CSS query by the presence of
+     * the `=>` separator.
+     *
+     * This symbol splits the query into 2 parts (hence the name) - the 1st part is a component query and 2nd -
+     * a regular CSS query. First, the component query is performed, then - the CSS query inside the main elements
+     * of all matching components.
+     *
+     * ```js
+     * await t.click('panel[title=My Panel] => .my-class')
+     * ```
+     * Such query is resolved to the DOM elements, matching the CSS query (2nd part) inside the main elements of components,
+     * matching the component query (1st part).
+     *
+     * @param query
+     * @param root
+     * @param options
+     *
+     * @category Sencha: Querying
+     */
+    compositeQuery (
+        query : string,
+        root : ExtComponent = this.Ext.ComponentQuery,
+        options? : {
+            /**
+             * Whether to ignore the non-visible components
+             */
+            ignoreNonVisible : boolean
+        }
+    ) : Element[] {
         const parts         = query.split(/\s*=>\s*/)
 
         if (parts.length < 2 || parts.length > 2) throw new Error("Composite query should contain a single `=>` delimeter")
@@ -278,6 +378,27 @@ export class TestSenchaPre extends TestBrowser {
 
             return compEl ? this.querySingleContext(domSelector, compEl) : []
         })
+    }
+
+
+    /**
+     * This method extends the [[TestBrowser.query]] functionality with Sencha-specific querying.
+     *
+     * Notably, the [[componentQuery|component query]] and [[compositeQuery|composite query]] are supported.
+     *
+     * For example:
+     * ```js
+     * const res = t.query('>>panel[title=My Panel]')
+     * const res = t.query('panel[title=My Panel] => .my-class')
+     * ```
+     *
+     * @category Dom helper methods
+     *
+     * @param query
+     * @param root
+     */
+    override query (query : string, root : Element | Document = this.window.document) : Element[] {
+        return super.query(query, root)
     }
 
 
@@ -327,10 +448,12 @@ export class TestSenchaPre extends TestBrowser {
 
 
     /**
-     * This assertion passes if the provided component query matches at least one component.
+     * Alias for [[componentQueryExists]]
      *
      * @param query
      * @param description
+     *
+     * @category Sencha: Querying
      */
     cqExists (query : string, description? : string) {
         this.assertComponentQueryExistsInternal(
@@ -343,10 +466,12 @@ export class TestSenchaPre extends TestBrowser {
 
 
     /**
-     * This assertion passes if the provided component query does not match any components.
+     * Alias for [[componentQueryNotExists]]
      *
      * @param query
      * @param description
+     *
+     * @category Sencha: Querying
      */
     cqNotExists (query : string, description? : string) {
         this.assertComponentQueryExistsInternal(
@@ -363,11 +488,31 @@ export class TestSenchaPre extends TestBrowser {
      *
      * @param query
      * @param description
+     *
+     * @category Sencha: Querying
      */
     componentQueryExists (query : string, description? : string) {
         this.assertComponentQueryExistsInternal(
             'componentQueryExists',
             this.isAssertionNegated,
+            query,
+            description
+        )
+    }
+
+
+    /**
+     * This assertion passes if the provided component query does not match any components.
+     *
+     * @param query
+     * @param description
+     *
+     * @category Sencha: Querying
+     */
+    componentQueryNotExists (query : string, description? : string) {
+        this.assertComponentQueryExistsInternal(
+            'componentQueryNotExists',
+            !this.isAssertionNegated,
             query,
             description
         )

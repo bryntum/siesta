@@ -136,6 +136,8 @@ export class AssertionGrid extends Mixin(
          *
          * @param target The table panel instance or a component query, matching a panel
          * @param index The row index in the whole dataset
+         *
+         * @category Sencha: Grid
          */
         getRow  (target : string | ExtComponent, index : number) : ExtElement {
             const Ext       = this.Ext
@@ -170,13 +172,15 @@ export class AssertionGrid extends Mixin(
         /**
          * Utility method which returns the cell at the supplied row and col position.
          *
-         * Please also refer to the {@link #getRow} method for additional information about the buffered renderer case.
+         * Please also refer to the [[getRow]] method for additional information about the buffered renderer case.
          *
          * @return The element of the grid cell at specified position.
          *
          * @param target The panel or a ComponentQuery matching a panel
          * @param row The row index
          * @param col The column index
+         *
+         * @category Sencha: Grid
          */
         getCell (target : string | ExtComponent, row : number, col : number) : ExtElement {
             const grid      = this.resolveExtComponent(target)
