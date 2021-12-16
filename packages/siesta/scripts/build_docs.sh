@@ -19,11 +19,12 @@ cp -f "resources/docs_src/README.md" "README.md"
 sed -i -e 's!\[\[GettingStartedNodejsGuide|Getting started with Siesta in Node.js environment\]\]![Getting started with Siesta in Node.js environment](https://bryntum.github.io/siesta/docs/modules/Guide__Getting_started_Node_js.html)!' "README.md"
 sed -i -e 's!\[\[GettingStartedDenoGuide|Getting started with Siesta in Deno environment\]\]![Getting started with Siesta in Deno environment](https://bryntum.github.io/siesta/docs/modules/Guide__Getting_started_Deno.html)!' "README.md"
 sed -i -e 's!\[\[GettingStartedBrowserGuide|Getting started with Siesta in browser environment\]\]![Getting started with Siesta in browser environment](https://bryntum.github.io/siesta/docs/modules/Guide__Getting_started_browser.html)!' "README.md"
+sed -i -e 's!\[\[GettingStartedSenchaGuide|Getting started with Siesta in Sencha framework environment\]\]![Getting started with Siesta in Sencha framework environment](https://bryntum.github.io/siesta/docs/modules/Guide__Getting_started_Sencha.html)!' "README.md"
 
 
 echo ">> Starting docs generation with typedoc"
 
-npx typedoc index.ts nodejs.ts browser.ts deno.ts src/guides/**/*.ts \
+npx typedoc index.ts nodejs.ts browser.ts deno.ts sencha.ts src/guides/**/*.ts \
     --out docs \
     --customCss resources/docs_src/styling.css \
     --media 'src/guides' \
