@@ -517,4 +517,11 @@ export class TestSenchaPre extends TestBrowser {
             description
         )
     }
+
+
+    override async setupRootTest () {
+        await super.setupRootTest()
+
+        if (this.descriptor.waitForExtReady && this.Ext) await new Promise(resolve => this.Ext.onReady(resolve))
+    }
 }
