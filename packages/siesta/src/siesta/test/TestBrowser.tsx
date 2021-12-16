@@ -23,6 +23,8 @@ import { Assertion, Exception, SubTestCheckInfo } from "./TestResult.js"
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * Test class for code running in the browser environment.
+ *
+ * Please refer to the [[TestDescriptorBrowser]] documentation for the list of available config options.
  */
 export class TestBrowser extends Mixin(
     [

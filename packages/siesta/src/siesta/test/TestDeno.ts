@@ -13,6 +13,8 @@ declare const Deno
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * Test class for code running in the [Deno](https://deno.land/) environment.
+ *
+ * Please refer to the [[TestDescriptorDeno]] documentation for the list of available config options.
  */
 export class TestDeno extends Mixin(
     [

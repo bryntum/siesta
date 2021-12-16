@@ -98,7 +98,7 @@ let isSilentAssertionAddition : boolean = false
  * The test class for the isomorphic code. The instances of this class are usually created with the [[Test.it|it]] call:
  *
  * ```ts
- * import { it } from "siesta/index.js"
+ * import { it } from "@bryntum/siesta/index.js"
  *
  * it('Isomorphic Siesta test', async (t : Test) => {
  *     ...
@@ -107,9 +107,12 @@ let isSilentAssertionAddition : boolean = false
  *
  * Using various assertion methods of the test instance one can create a testing scenario.
  *
- * The configuration of the test class is extracted into separate class, called [[TestDescriptor]]. This is done to be able
- * to transfer the configuration over the network (`TestDescriptor` is serializable, whereas `Test` is not). Each test class
- * has the [[Test.testDescriptorClass|testDescriptorClass]] property, which should contain the constructor of the [[TestDescriptor]] class
+ * The configuration of the test class is extracted into separate class, called [[TestDescriptor]]. This is done to be
+ * able to transfer the configuration over the network (`TestDescriptor` is serializable, whereas `Test` is not).
+ *
+ * Please refer to the [[TestDescriptor]] documentation for the list of available config options.
+ *
+ * Each test class has the [[Test.testDescriptorClass|testDescriptorClass]] property, which should contain the constructor of the [[TestDescriptor]] class
  * to use for configuration.
  */
 export class Test extends TestPre {
@@ -224,7 +227,7 @@ export class Test extends TestPre {
      * This method can be called several times, providing several hook functions to execute.
      *
      * ```javascript
-     * import { it, beforeEach } from "siesta/index.js"
+     * import { it, beforeEach } from "@bryntum/siesta/index.js"
      *
      * let sum
 
@@ -266,7 +269,7 @@ export class Test extends TestPre {
      * This method can be called several times, providing several hook functions to execute.
      *
      * ```javascript
-     * import { it, beforeEach } from "siesta/index.js"
+     * import { it, beforeEach } from "@bryntum/siesta/index.js"
      *
      * let file
      * beforeEach(() => file = OPEN_FILE())
@@ -479,7 +482,7 @@ export class Test extends TestPre {
      * will use that value too.
      *
      * ```javascript
-     * import { it } from "siesta/index.js"
+     * import { it } from "@bryntum/siesta/index.js"
      *
      * it({ title : 'Test section', defaultTimeout : 1000 }, async t => {
      *     t.it('Nested test section', async t => {
@@ -496,7 +499,7 @@ export class Test extends TestPre {
      * it is recommended to use the method on the test instance.
      *
      * ```ts
-     * import { it, Test } from "siesta/index.js"
+     * import { it, Test } from "@bryntum/siesta/index.js"
      *
      * it('Test section', async (t : Test) => {
      *     t.it({ title : 'Nested section', isTodo : true }, async (t : Test) => {

@@ -148,7 +148,7 @@ export class AssertionAsync extends Mixin(
          * method call inside of it:
          *
          * ```javascript
-         * import { it } from "siesta/index.js"
+         * import { it } from "@bryntum/siesta/index.js"
          * import { MyClass } from "my-lib"
          *
          * it('Testing asynchronous code should work', async t => {
@@ -167,7 +167,7 @@ export class AssertionAsync extends Mixin(
          *
          * For example:
          * ```javascript
-         * import { it } from "siesta/index.js"
+         * import { it } from "@bryntum/siesta/index.js"
          * import { MyClass } from "my-lib"
          *
          * it('Testing asynchronous code should work', t => {

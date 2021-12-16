@@ -10,6 +10,8 @@ import { TestSenchaPre } from "./TestSenchaPre.js"
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * Test class for testing code using Sencha framework.
+ *
+ * Please refer to the [[TestDescriptorSencha]] documentation for the list of available config options.
  */
 export class TestSencha extends Mixin(
     [

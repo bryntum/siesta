@@ -162,7 +162,7 @@ export class AssertionException extends Mixin(
          * stringifies to the `pattern`.
          *
          * ```javascript
-         * import { it } from "siesta/index.js"
+         * import { it } from "@bryntum/siesta/index.js"
          *
          * it('Test section', async t => {
          *     t.throws(() => throw new Error("oops"), /oop/i, 'Correct exception thrown')
@@ -172,7 +172,7 @@ export class AssertionException extends Mixin(
          * forget to `await` on the assertion method itself:
          *
          * ```javascript
-         * import { it } from "siesta/index.js"
+         * import { it } from "@bryntum/siesta/index.js"
          *
          * it('Test section', async t => {
          *     await t.throws(async () => throw new Error("oops"), /oop/i, 'Correct exception thrown')
@@ -195,7 +195,7 @@ export class AssertionException extends Mixin(
          * This assertion passes, if the provided function `func` does not throw any exceptions.
          *
          * ```javascript
-         * import { it } from "siesta/index.js"
+         * import { it } from "@bryntum/siesta/index.js"
          *
          * it('Test section', async t => {
          *     t.doesNotThrow(() => {}, 'No exceptions thrown')
@@ -205,7 +205,7 @@ export class AssertionException extends Mixin(
          * forget to `await` on the assertion method itself:
          *
          * ```javascript
-         * import { it } from "siesta/index.js"
+         * import { it } from "@bryntum/siesta/index.js"
          *
          * it('Test section', async t => {
          *     await t.doesNotThrow(async () => {}, 'No exceptions thrown')

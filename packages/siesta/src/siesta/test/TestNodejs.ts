@@ -10,6 +10,8 @@ import { TestDescriptorNodejs } from "./TestDescriptorNodejs.js"
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
  * Test class for code running in the [Node.js](https://nodejs.org/) environment.
+ *
+ * Please refer to the [[TestDescriptorNodejs]] documentation for the list of available config options.
  */
 export class TestNodejs extends Mixin(
     [
