@@ -1,0 +1,145 @@
+{
+  "name": "MyExtGenApp",
+  "namespace": "MyExtGenApp",
+  "version": "1.0.0.0",
+  "framework": "ext",
+  "template": "moderndesktop",
+  "indexHtmlPath": "index.html",
+  "requires": [
+    "font-awesome"
+  ],
+
+  "builds": {
+    "desktop": {
+      "toolkit": "modern",
+      "theme": "theme-material",
+      "sass": {
+        "generated": {
+          "var": "${build.id}/sass/save.scss",
+          "src": "${build.id}/sass/save"
+        }
+      }
+    }
+  },
+
+  "classpath": ["app/shared/src","app/${build.id}/src"],
+  "overrides": ["app/shared/overrides","app/${build.id}/overrides"],
+
+  "sass": {
+    "namespace": "MyExtGenApp",
+
+    "etc": [
+      "sass/etc/all.scss"
+    ],
+    "var": [
+      "app/shared/sass/var.scss",
+      "app/${build.id}/sass/var.scss"
+    ],
+    "src": [
+      "app/shared/src/sass/src.scss",
+      "app/${build.id}/sass/src.scss"
+    ]
+  },
+
+  "resources": [
+    { "path": "resources", "output": "shared" }
+
+    ,{ "path": "resources/${build.id}" }
+
+  ],
+
+  "output": {
+    "base": "${workspace.build.dir}/${build.environment}/${app.name}",
+    "page": "index.html",
+    "manifest": "generatedFiles/${build.id}.json",
+    "js": "generatedFiles/${build.id}/app.js",
+    "appCache": {"enable": false},
+    "resources": {
+      "path": "${build.id}/resources",
+      "shared": "resources"
+    }
+  },
+  
+  "fashion": {
+   "missingParameters": "error",
+    "inliner": {"enable": false}
+  },
+
+  "js": [
+  ],
+
+  "classic": {"js": []},
+  "modern": {"js": []},
+
+  "css": [
+    {
+      "path": "${build.out.css.path}",
+      "bundle": true,
+      "exclude": ["fashion"]
+    }
+  ],
+
+  "loader": {
+    "cache": false,
+    "cacheParam": "_dc"
+  },
+
+  "production": {
+    "js": [
+      {"path": "app.js", "bundle": true},
+      {"path": "${app.webpack.bundle}", "compress": false }
+    ],
+    "output": {
+      "appCache": {
+        "enable": false,
+        "path": "cache.appcache"
+      }
+    },
+    "loader": {
+      "cache": "${build.timestamp}"
+    },
+    "cache": {
+      "enable": true
+    },
+    "compressor": {
+      "type": "yui"
+    }
+  },
+  "testing": {
+    "js": [
+      {"path": "app.js", "bundle": true},
+      {"path": "${app.webpack.bundle}", "compress": false }
+    ]
+  },
+  "development": {
+    "js": [
+      {"path": "app.js", "bundle": true},
+      {"path": "main.js"}
+    ],
+    "watch": {
+      "delay": 250
+    }
+  },
+
+  "bootstrap": {
+    "base": "${app.dir}",
+    "manifest": "generatedFiles/${build.id}.json",
+    "microloader": "generatedFiles/bootstrap.js",
+    "css": "generatedFiles/bootstrap.css"
+  },
+
+  "cache": {
+      "enable": false,
+      "deltas": "${build.id}/deltas"
+  },
+
+  "appCache": {
+    "cache": ["index.html"],
+    "network": ["*"],
+    "fallback": []
+  },
+
+  "archivePath": "archive/${build.id}",
+  "ignore": ["(^|/)CVS(/?$|/.*?$)"],
+  "id": "394efee4-39ec-408a-b5db-47f519af3a53"
+}
