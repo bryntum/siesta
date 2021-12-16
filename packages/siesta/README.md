@@ -122,6 +122,8 @@ Please start reading from one the following guides, corresponding to the environ
 
 [Getting started with Siesta in browser environment](https://bryntum.github.io/siesta/docs/modules/Guide__Getting_started_browser.html)
 
+[[GettingStartedSenchaGuide|Getting started with Siesta in Sencha framework environment]]
+
 
 Resources
 ===========

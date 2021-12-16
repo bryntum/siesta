@@ -122,6 +122,8 @@ Please start reading from one the following guides, corresponding to the environ
 
 [[GettingStartedBrowserGuide|Getting started with Siesta in browser environment]]
 
+[[GettingStartedSenchaGuide|Getting started with Siesta in Sencha framework environment]]
+
 
 Resources
 ===========

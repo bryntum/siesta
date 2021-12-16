@@ -23,7 +23,7 @@ To familiarize yourself with the basic Siesta concepts, which are common for all
 Importing API
 =============
 
-When targeting Node.js environment for running tests, import the Siesta API from the `siesta/nodejs.js` entry file.
+When targeting Node.js environment for running tests, import the Siesta API from the `@bryntum/siesta/nodejs.js` entry file.
 
 
 Launching individual test
@@ -32,7 +32,7 @@ Launching individual test
 Let's assume we have the following Siesta test file, called `basic_test.t.js`.
 
 ```javascript
-import { it } from "siesta/nodejs.js"
+import { it } from "@bryntum/siesta/nodejs.js"
 
 it('Basic Siesta test', async t => {
     t.true(true, "That's true")

@@ -11,7 +11,7 @@ Testing asynchronous code
 In the simplest form, when testing the asynchronous code, you can just make your test function `async` and use `await` where needed:
 
 ```javascript
-import { it } from "siesta/index.js"
+import { it } from "@bryntum/siesta/index.js"
 import { MyClass } from "my-lib"
 
 it('Testing promise-based asynchronous code', async t => {
@@ -23,11 +23,11 @@ it('Testing promise-based asynchronous code', async t => {
 
 Sometimes, for example if code is using callbacks, you might not have the `Promise` instance to `await` for. In such case, use a pair of
 [[Test.beginAsync|beginAsync]]/[[Test.endAsync|endAsync]] calls to indicate the beginning/ending of the asynchronous "gap" in the code flow.
-Siesta will await for all [[Test.beginAsync|beginAsync]] calls to complete with the corresponding [[Test.endAsync|endAsync]], before finalizing the test.
+Siesta will await for all [[Test.beginAsync|beginAsync]] calls to complete with the corresponding [[Test.endAsync|endAsync]] call, before finalizing the test. If the asynchronous gap does not end within [[TestDescriptor.defaultTimeout]] time, it is finalized forcefully and failed assertion added to the test.
 
 For example:
 ```javascript
-import { it } from "siesta/index.js"
+import { it } from "@bryntum/siesta/index.js"
 import { MyClass } from "my-lib"
 
 it('Testing callbacks-based asynchronous code', t => {
@@ -54,7 +54,7 @@ For example if parent section sets the [[TestDescriptor.defaultTimeout|defaultTi
 will use that value too.
 
 ```javascript
-import { it } from "siesta/index.js"
+import { it } from "@bryntum/siesta/index.js"
 
 it({ title : 'Test section', defaultTimeout : 1000 }, async t => {
     t.it('Nested test section', async t => {
@@ -76,7 +76,7 @@ code flow. These are "normal" exceptions, since they can be caught with the `try
 
 For example:
 ```javascript
-import { it } from "siesta/index.js"
+import { it } from "@bryntum/siesta/index.js"
 
 it('Test section', async t => {
     // "normal" exception
@@ -90,7 +90,7 @@ not included in the test function code flow, is rejected.
 
 For example:
 ```javascript
-import { it } from "siesta/index.js"
+import { it } from "@bryntum/siesta/index.js"
 
 it('Test section 1', async t => {
     setTimeout(() => {
@@ -126,7 +126,7 @@ The [[Test]] class implements several logging methods:
 
 One can use them to report some useful information from test.
 
-Note, that only the log messages which are the current log level (or higher) are reported. The current log level is determined with the
+Note, that only the log messages which are at the current log level (or higher) are reported. The current log level is determined with the
 `--log-level` command line option. By default its `warn`
 
 

@@ -1,14 +1,20 @@
-Getting started with Siesta in browser environment
+Getting started with Siesta in Sencha environment
 ================================================
 
 Siesta is a stress-free JavaScript/TypeScript testing tool. It is ubiquitous - tests can be run in browsers, Node.js and Deno, on Linux, macOS and Windows.
 Moreover, in browsers, both in-process and out-of-process execution is supported.
 
-In this guide, we assume a setup, pointed toward running tests in browsers, using in-process execution.
+In this guide, we assume a setup, pointed toward running tests for code written with Sencha framework.
 
-Siesta supports modern, ever-green browsers only - Chrome, Firefox, Safari and Chromium Edge. IE, legacy Edge and quirks mode are not supported.
+Sencha-related functionality of Siesta is based on the generic browser layer. Please familiarize yourself with the [[GettingStartedBrowserGuide|Getting started with Siesta in browser environment]] guide first.
 
-Installation
+Importing API
+=============
+
+When targeting sencha environment for running tests, import the Siesta API from the `@bryntum/siesta/sencha.js` entry file.
+
+
+Action target extensions. Component query. Composite query.
 ============
 
 Running tests in browsers is supported with the Node.js launcher only, so Siesta should be installed via `npm` package manager:
@@ -32,19 +38,19 @@ To familiarize yourself with the basic Siesta concepts, which are common for all
 In-process execution model
 ==================
 
-Siesta runs the browser tests right on the browser page, so called "in-process" (or "in-page") execution. This means, your test file has full access to the page and Web API. There's no need to use the asynchronous `evaluate` command as commonly seen in tools like Playwright, Puppeteer and Selenium. 
+Siesta runs the browser tests right on the browser page, so called "in-process" execution. This means, your test file has full access to the page and Web API. There's no need to use the asynchronous `evaluate` command as commonly seen in tools like Playwright, Puppeteer and Selenium. 
 
 Such architecture means that test script can create and manipulate arbitrary DOM, using the regular Web API. For example, test can render some Web component and then check that its DOM object is properly created by accessing its `style` attribute directly.
 
 However, test script will not survive the page redirect or reload. You should avoid doing that. In the future release we will allow running the script in the side iframe, which will survive the *same-domain* redirects of the testing page.
 
-If you need to test the page with arbitrary redirects, then instead [[GettingStartedNodejsGuide|write your tests as Node.js scripts]] and use the "classic" Playwright API to create the page instance and `evalulate` command of those libraries ("out-of-page" execution model). In the future releases, we'll provide an unified API for both on-page and out-of-page testing scenarios.
+If you need to test the page with arbitrary redirects, then instead [[GettingStartedNodejsGuide|write your tests as Node.js scripts]] and use the "classic" Playwright API to create the page instance and `evalulate` command of those libraries. In the future releases, we'll provide an unified API for both on-page and out-of-page testing scenarios.
 
 
 Importing API
 =============
 
-When targeting browser environment for running tests, import the Siesta API from the `@bryntum/siesta/browser.js` entry file.
+When targeting browser environment for running tests, import the Siesta API from the `siesta/browser.js` entry file.
 
 
 Support for the bare import specifiers
