@@ -223,6 +223,10 @@ project.plan(
             senchaGroup('6.6.0'),
             senchaGroup('6.5.3')
         ]
+    },
+    {
+        pageUrl : '@my-app/build/testing/MyExtGenApp/index.html',
+        url     : 'sencha/cmd_app.t.js'
     }
 )
 

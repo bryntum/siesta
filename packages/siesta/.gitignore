@@ -85,3 +85,7 @@ asd*
 # `package-lock.json` files of examples
 /examples/**/node_modules
 /examples/**/package-lock.json
+
+
+# SenchaCmd sample app (JS)
+!/tests_browser/sencha/@my-app/**/*.js
