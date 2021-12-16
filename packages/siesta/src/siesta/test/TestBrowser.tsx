@@ -100,10 +100,10 @@ export class TestBrowser extends Mixin(
         async setupPreloads () {
             await awaitDomInteractive()
 
-            // TODO clean this up
+            // TODO clean this up once the support for in-test config is implemented
             // there's now pre-normalization step in the "flatten" method,
             // which converts all `PreloadDescriptor`s to `PreloadDescriptorNormalized`
-            // and "absolutize" their `url`s, so these conversions are not needed
+            // and "absolutize" their `url`s, so it seems these conversions are not needed
             // even though they are not harmful (since every `PreloadDescriptorNormalized`
             // is also a regular `PreloadDescriptor`)
             const preloads      = wantArray(this.descriptor.preload || [])
