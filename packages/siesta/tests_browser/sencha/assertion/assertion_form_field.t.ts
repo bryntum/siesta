@@ -48,43 +48,43 @@ it('Should be able to type in the field with regexp validation', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('`setValue` method should work for text field', async t => {
+it('`setFieldValue` method should work for text field', async t => {
     const textField = new Ext.form.field.Text({
         renderTo    : document.body,
         zoo         : 'moo'
     })
 
-    t.setValue(textField, 'foo')
+    t.setFieldValue(textField, 'foo')
 
     t.is(textField.getValue(), 'foo')
 
 
-    t.setValue('>>[zoo=moo]', 'goo')
+    t.setFieldValue('>>[zoo=moo]', 'goo')
 
     t.is(textField.getValue(), 'goo')
 })
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('`setValue` method should work for checkbox field', async t => {
+it('`setFieldValue` method should work for checkbox field', async t => {
     const checkbox = new Ext.form.field.Checkbox({
         renderTo : document.body
     })
 
-    t.setValue(checkbox, true)
+    t.setFieldValue(checkbox, true)
 
     t.is(checkbox.getValue(), true)
 })
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-it('`setValue` method should work for combobox field', async t => {
+it('`setFieldValue` method should work for combobox field', async t => {
     const combo = new Ext.form.field.ComboBox({
         renderTo : document.body,
         store    : ['Foo', 'Bar']
     })
 
-    t.setValue(combo, 'Foo')
+    t.setFieldValue(combo, 'Foo')
 
     t.is(combo.getValue(), 'Foo')
 })

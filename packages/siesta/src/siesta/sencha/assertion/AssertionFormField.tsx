@@ -60,11 +60,17 @@ export class AssertionFormField extends Mixin(
          * @param component A component instance or a component query to resolve
          * @param value
          */
-        setValue (component : ExtComponent | string, value : unknown) {
+        setFieldValue (component : ExtComponent | string, value : unknown) {
             component   = this.resolveExtComponent(component);
 
             // semi-colon needed
             (component.setChecked || component.setRawValue || component.setValue).call(component, value)
+        }
+
+
+        // deprecated
+        setValue (component : ExtComponent | string, value : unknown) {
+            this.setFieldValue(component, value)
         }
     }
 ) {}
