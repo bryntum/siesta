@@ -1,3 +1,5 @@
 packages:
   - 'packages/**'
   - '!packages/siesta/tests_browser/**'
+  - '!packages/siesta/workspace'
+  - '!packages/siesta/workspace/**'
