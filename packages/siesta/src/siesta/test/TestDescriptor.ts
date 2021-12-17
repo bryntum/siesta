@@ -23,22 +23,19 @@ export const OptionsGroupTestDescriptor  = OptionGroup.new({
     weight      : 800
 })
 
+export const firstDescWithOwnProperty  = <Desc extends TestDescriptor = TestDescriptor>(name : keyof Desc, parentsAxis : Desc[]) : Desc => {
+    for (let i = 0; i < parentsAxis.length; i++) {
+        const desc      = parentsAxis[ i ]
+
+        if (desc.hasOwnProperty(name) || i === parentsAxis.length - 1) return desc
+    }
+}
 
 export class Config<Desc extends TestDescriptor = TestDescriptor> extends Base {
     name        : string        = undefined
 
-    reducer     : (name : keyof Desc, parentAxis : Desc[]) => Desc[ typeof name ] =
-
-        (name : keyof Desc, parentsAxis : Desc[]) : Desc[ typeof name ] => {
-            let res : Desc[ typeof name ]
-
-            // take either the first own property, or the value on root (event if its not own property)
-            CI(parentsAxis).forEach((desc, index) => {
-                if (desc.hasOwnProperty(name) || index === parentsAxis.length - 1) { res = desc[ name ]; return false }
-            })
-
-            return res
-        }
+    reducer     : (name : keyof Desc, parentsAxis : Desc[]) => Desc[ typeof name ] =
+        (name : keyof Desc, parentsAxis : Desc[]) : Desc[ typeof name ] => firstDescWithOwnProperty(name, parentsAxis)[ name ]
 }
 
 
