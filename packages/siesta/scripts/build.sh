@@ -72,5 +72,6 @@ fi
 
 if [[ -n $bundle ]]; then
     scripts/bundle.sh -c
-    scripts/bundle_html_report.sh -c
+    # need to figure out a solution3
+    #scripts/bundle_html_report.sh -c
 fi
