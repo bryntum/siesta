@@ -22,6 +22,8 @@ git commit -m "Updated version"
 git tag "$NEW_VERSION"
 
 echo "/scripts" > .npmignore
+echo "/workspace" >> .npmignore
+echo "/tests*" >> .npmignore
 
 npm publish --access public
 
