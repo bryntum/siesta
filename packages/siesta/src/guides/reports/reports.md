@@ -22,7 +22,9 @@ Or, to generate HTML report:
 > node index.js --report-file html_report --report-format html
 ```
 
-After generation, open the `html_report/index.html` file in the browser.
+After generation, open the `html_report/index.html` file in the browser, you should see something like:
+
+![HTML report UI](media://reports/reports.jpg)
 
 
 COPYRIGHT AND LICENSE
