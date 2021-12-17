@@ -34,7 +34,12 @@ echo ">> Performing git clean"
 (cd ../.. && packages/dev-scripts/bin/gitclean.sh)
 
 # prepare the dist for release
-(cd ../.. && scripts/compile.sh -d)
+(
+    cd ../..
+    scripts/compile.sh -d
+    scripts/build_sencha_tests.sh
+    npx sass resources/styling
+)
 
 # restart point inside the dist
 scripts/do_release.sh
