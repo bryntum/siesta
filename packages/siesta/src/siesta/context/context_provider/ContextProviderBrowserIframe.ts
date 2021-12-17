@@ -29,7 +29,7 @@ export class ContextProviderBrowserIframe extends Mixin(
             //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
             const iframe        = document.createElement('iframe')
 
-            iframe.src          = desc.pageUrl ? new URL(desc.pageUrl, desc.urlAbs).href : 'about:blank'
+            iframe.src          = desc.pageUrl || desc.pageUrlRel || 'about:blank'
 
             iframe.classList.add('s-iframe')
 
@@ -84,7 +84,7 @@ export class ContextProviderBrowserIframe extends Mixin(
 
                 document.body.appendChild(wrapper)
 
-                if (!desc.pageUrl) this.forceStandardsMode(iframe, desc.expandBody)
+                if (!(desc.pageUrl || desc.pageUrlRel)) this.forceStandardsMode(iframe, desc.expandBody)
             })
 
             return this.contextClass.new({ iframe, wrapper }) as InstanceType<this[ 'contextClass' ]>

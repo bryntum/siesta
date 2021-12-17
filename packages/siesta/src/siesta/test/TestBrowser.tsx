@@ -107,6 +107,7 @@ export class TestBrowser extends Mixin(
             // even though they are not harmful (since every `PreloadDescriptorNormalized`
             // is also a regular `PreloadDescriptor`)
             const preloads      = wantArray(this.descriptor.preload || [])
+                .concat(this.descriptor.preloadRel || [])
                 .concat(this.descriptor.alsoPreload || [])
                 .flat(2000)
                 .filter(el => Boolean(el))

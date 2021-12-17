@@ -13,8 +13,8 @@ const senchaGroup = (version : string) => new Object({
     title       : `Sencha: ${ version }`,
 
     preload     : [
-        `../../../workspace/ext-${ version }/build/classic/theme-classic/resources/theme-classic-all.css`,
-        `../../../workspace/ext-${ version }/build/ext-all-debug.js`
+        `../../workspace/ext-${ version }/build/classic/theme-classic/resources/theme-classic-all.css`,
+        `../../workspace/ext-${ version }/build/ext-all-debug.js`
     ],
 
     items       : [
@@ -50,8 +50,8 @@ const senchaGroup = (version : string) => new Object({
         {
             url     : 'modern',
             preload     : [
-                `../../../../workspace/ext-${ version }/build/modern/theme-material/resources/theme-material-all.css`,
-                `../../../../workspace/ext-${ version }/build/ext-modern-all-debug.js`
+                `../../workspace/ext-${ version }/build/modern/theme-material/resources/theme-material-all.css`,
+                `../../workspace/ext-${ version }/build/ext-modern-all-debug.js`
             ],
             items   : [
                 {
@@ -186,12 +186,37 @@ project.plan(
                 items       : [
                     {
                         url         : 'pageUrl.t.js',
-                        pageUrl     : 'page.html'
+                        pageUrl     : 'siesta/test/page.html'
+                    },
+                    {
+                        url         : 'pageUrl.t.js',
+                        unique      : true,
+                        pageUrlRel  : 'page.html'
                     },
                     {
                         url         : 'preload.t.js',
                         failOnResourceLoadError : true,
                         preload     : [
+                            {
+                                code : () => {
+                                    //@ts-ignore
+                                    PRELOAD_INLINE = true
+                                }
+                            },
+                            './siesta/test/preload_file.js',
+                            { type : 'js', url : 'siesta/test/preload_file_module.js', isEcmaModule : true },
+
+                            {
+                                style : '.inline-class { margin : 10px }'
+                            },
+                            '../tests_browser/siesta/test/preload_file.css',
+                        ]
+                    },
+                    {
+                        url         : 'preload.t.js',
+                        unique      : true,
+                        failOnResourceLoadError : true,
+                        preloadRel  : [
                             {
                                 code : () => {
                                     //@ts-ignore
@@ -225,8 +250,8 @@ project.plan(
         ]
     },
     {
-        pageUrl : '@my-app/build/testing/MyExtGenApp/index.html',
-        url     : 'sencha/cmd_app.t.js'
+        pageUrlRel  : '@my-app/build/testing/MyExtGenApp/index.html',
+        url         : 'sencha/cmd_app.t.js'
     }
 )
 

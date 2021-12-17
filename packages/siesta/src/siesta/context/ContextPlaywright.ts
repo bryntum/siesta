@@ -48,8 +48,9 @@ export class ContextPlaywright extends Mixin(
 
 
         override async preLaunchTest (desc : TestDescriptor, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
-            if (desc instanceof TestDescriptorBrowser && desc.pageUrl)
-                await this.navigate(new URL(desc.pageUrl, desc.urlAbs).href)
+            // HACK? - uptyping the `desc` to `TestDescriptorBrowser`
+            if (desc instanceof TestDescriptorBrowser && (desc.pageUrl || desc.pageUrlRel))
+                await this.navigate(desc.pageUrl || desc.pageUrlRel)
             else
                 await this.navigate(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/blank.html')
 

@@ -1,14 +1,14 @@
 import { CI } from "chained-iterator/index.js"
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
 import { serializable } from "../../serializable/Serializable.js"
-import { prototypeValue, wantArray } from "../../util/Helpers.js"
-import { joinUrls, stripBasename } from "../../util/Path.js"
+import { lastElement, prototypeValue, wantArray } from "../../util/Helpers.js"
+import { isAbsolute, joinUrls, stripBasename } from "../../util/Path.js"
 import { isArray, isFunction, isString } from "../../util/Typeguards.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { IsolationLevel, SimulationType } from "../common/IsolationLevel.js"
 import { option } from "../option/Option.js"
 import { PointerMovePrecision } from "../simulate/SimulatorMouse.js"
-import { config, TestDescriptor } from "./TestDescriptor.js"
+import { config, firstDescWithOwnProperty, TestDescriptor } from "./TestDescriptor.js"
 
 /*
 IMPORTANT
@@ -20,12 +20,8 @@ see
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /**
- * A preload descriptor describes what resources should be loaded into the test page, before executing it.
+ * A preload descriptor describes what resources should be loaded into the test page, before starting the test.
  * It can point to JavaScript or CSS resource, or can provide it inline.
- *
- * **IMPORTANT** The url of the preload descriptor is resolved relative to the test file location
- * (inside the directory of the test file). Similarly, if the `preload` config is specified on the directory descriptor,
- * the url of the preload descriptor is resolved inside the parent directory of that directory.
  *
  * Preload descriptor can be:
  *
@@ -90,6 +86,18 @@ export const normalizePreloadValue = (preload : 'inherit' | PreloadDescriptor | 
             .filter(el => Boolean(el))
             .map(normalizePreloadDescriptor)
     }
+}
+
+
+export const normalizePreloadDescUrl = (preloadDesc : PreloadDescriptorNormalized, baseDesc : TestDescriptorBrowser) : PreloadDescriptorNormalized => {
+    if ('url' in preloadDesc) {
+        return Object.assign({}, preloadDesc, {
+            url     : isAbsolute(preloadDesc.url)
+                ? preloadDesc.url
+                : joinUrls(baseDesc.isLeaf() ? stripBasename(baseDesc.urlAbs) : baseDesc.urlAbs, preloadDesc.url)
+        })
+    } else
+        return preloadDesc
 }
 
 
@@ -164,6 +172,12 @@ export class TestDescriptorBrowser extends Mixin(
          * A [[PreloadDescriptor|preload descriptor]] or an array of those. Defines what resources should be loaded
          * into the test page, before executing the test.
          *
+         * **IMPORTANT** The url of the preload descriptor is resolved relative to the project file location
+         * (inside the directory of the project file). See also [[preloadRel]] config, the urls of which are
+         * resolved relative to the test file location.
+         *
+         * Currently, this config is only recognized when provided in the [[SiestaProjectGuide|project file]].
+         *
          * **IMPORTANT** The preloading happens *after* the test file has been loaded into the page, but *before* any test
          * starts. This means, if want to use the preloaded resources, the code accessing them should be placed **inside**
          * any of the [[it]], [[describe]] or [[beforeEach]] section. Using the preloaded resources at the top-level of the file
@@ -189,24 +203,42 @@ export class TestDescriptorBrowser extends Mixin(
          */
         @config({
             reducer : (name : 'preload', parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ 'preload' ] => {
+                const rootDesc      = lastElement(parentsAxis)
+
                 // @ts-ignore
                 return inheritanceBlockedByPageUrl('preload', parentsAxis, desc => {
                     if (desc.preload === 'inherit') return 'inherit'
 
                     const normalized    = normalizePreloadValue(desc.preload)
 
-                    return (normalized || []).map(preloadDesc => {
-                        if ('url' in preloadDesc) {
-                            return Object.assign({}, preloadDesc, {
-                                url     : joinUrls(stripBasename(desc.urlAbs), preloadDesc.url)
-                            })
-                        } else
-                            return preloadDesc
-                    })
+                    return (normalized || []).map(preloadDesc => normalizePreloadDescUrl(preloadDesc, rootDesc))
                 })
             }
         })
-        preload             : 'inherit' | PreloadDescriptor | PreloadDescriptor[]
+        preload                 : 'inherit' | PreloadDescriptor | PreloadDescriptor[]
+
+
+        /**
+         * The relative version of the [[preload]] config. The url of the preload descriptor, specified with this config,
+         * is resolved relative to the test file location (inside the directory of the test file).
+         * Similarly, if the `preload` config is specified on the directory descriptor,
+         * the url of the preload descriptor is resolved inside the parent directory of that directory.
+         *
+         * See [[preload]] documentation for more details.
+         */
+        @config({
+            reducer : (name : 'preloadRel', parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ 'preloadRel' ] => {
+                // @ts-ignore
+                return inheritanceBlockedByPageUrl('preloadRel', parentsAxis, desc => {
+                    if (desc.preloadRel === 'inherit') return 'inherit'
+
+                    const normalized    = normalizePreloadValue(desc.preloadRel)
+
+                    return (normalized || []).map(preloadDesc => normalizePreloadDescUrl(preloadDesc, desc))
+                })
+            }
+        })
+        preloadRel             : 'inherit' | PreloadDescriptor | PreloadDescriptor[]
 
         /**
          * A [[PreloadDescriptor|preload descriptor]] or an array of those. Defines what resources should be loaded
@@ -224,16 +256,10 @@ export class TestDescriptorBrowser extends Mixin(
          * This config allows you to use the external web page for running the test. This page can be generated by
          * your web application for example.
          *
-         * **Important** The url of the page is resolved relative to the url of the test file. For example, for this
-         * setup:
+         * Currently, this config is only recognized when provided in the [[SiestaProjectGuide|project file]].
          *
-         * ```js
-         * project.plan({
-         *     url      : 'dir/file.js',
-         *     pageUrl  : 'page.html'
-         * })
-         * ```
-         * The resolved url for `pageUrl` will be: `dir/page.html` (resolved relative to `dir/file.js`)
+         * **Important** The url of the page is resolved relative to the url of the project file. See also the
+         * [[pageUrlRel]] config, which is resolved relative the test file.
          *
          * Note, that Siesta is using "in-page" execution model for the tests - test is executed right "inside" the page.
          * This means it has full and direct access to page internals, but also means test will not "survive" the
@@ -244,9 +270,41 @@ export class TestDescriptorBrowser extends Mixin(
          * command of those libraries ("out-of-page" execution model). In the future releases, we'll provide an
          * unified API for both on-page and out-of-page testing scenarios.
          */
-        @config()
         @prototypeValue('')
+        @config({
+            reducer : (name : 'pageUrl', parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ 'pageUrl' ] => {
+                const desc      = firstDescWithOwnProperty(name, parentsAxis)
+
+                return desc.pageUrl ? joinUrls(lastElement(parentsAxis).urlAbs, desc.pageUrl) : ''
+            }
+        })
         pageUrl             : string
+
+
+        /**
+         * The relative version of the [[pageUrl]] config. The url of the external page, specified with this config,
+         * is resolved relative to the url of the test file. For example, for this setup:
+         *
+         * ```js
+         * project.plan({
+         *     url          : 'dir/file.js',
+         *     pageUrlRel   : 'page.html'
+         * })
+         * ```
+         * The resolved url for `pageUrl` will be: `dir/page.html` (resolved relative to `dir/file.js`)
+         *
+         * See also [[pageUrl]] documentation for more details.
+         */
+        @prototypeValue('')
+        @config({
+            reducer : (name : 'pageUrlRel', parentsAxis : TestDescriptorBrowser[]) : TestDescriptorBrowser[ 'pageUrlRel' ] => {
+                const desc      = firstDescWithOwnProperty(name, parentsAxis)
+
+                return desc.pageUrlRel ? joinUrls(desc.isLeaf() ? stripBasename(desc.urlAbs) : desc.urlAbs, desc.pageUrlRel) : ''
+            }
+        })
+        pageUrlRel          : string
+
 
         @config()
         @prototypeValue(1024)
@@ -320,7 +378,7 @@ function inheritanceBlockedByPageUrl (
 
         const descriptor    = parentsAxis[ i ]
 
-        pageUrlConfigFound  = pageUrlConfigFound || descriptor.hasOwnProperty('pageUrl')
+        pageUrlConfigFound  = pageUrlConfigFound || descriptor.hasOwnProperty('pageUrl') || descriptor.hasOwnProperty('pageUrlRel')
 
         if (descriptor.hasOwnProperty(configName) || isProjectNode) {
             let value       = getValue ? getValue(descriptor) : descriptor[ configName ]
