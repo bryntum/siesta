@@ -13,8 +13,8 @@ const senchaGroup = (version : string) => new Object({
     title       : `Sencha: ${ version }`,
 
     preload     : [
-        `../../workspace/ext-${ version }/build/classic/theme-classic/resources/theme-classic-all.css`,
-        `../../workspace/ext-${ version }/build/ext-all-debug.js`
+        `../../workspace/extjs-${ version }/build/classic/theme-classic/resources/theme-classic-all.css`,
+        `../../workspace/extjs-${ version }/build/ext-all-debug.js`
     ],
 
     items       : [
@@ -50,8 +50,8 @@ const senchaGroup = (version : string) => new Object({
         {
             url     : 'modern',
             preload     : [
-                `../../workspace/ext-${ version }/build/modern/theme-material/resources/theme-material-all.css`,
-                `../../workspace/ext-${ version }/build/ext-modern-all-debug.js`
+                `../../workspace/extjs-${ version }/build/modern/theme-material/resources/theme-material-all.css`,
+                `../../workspace/extjs-${ version }/build/ext-modern-all-debug.js`
             ],
             items   : [
                 {
