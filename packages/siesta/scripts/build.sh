@@ -39,7 +39,7 @@ if [[ -n $embed_references ]]; then
     echo ">> Embedding reference to declaration types for Deno"
 
     # we don't need to add type references for files in `bin/`
-    GLOBIGNORE=@(examples|node_modules|bin)/**
+    GLOBIGNORE=@(examples|node_modules|bin|tests_browser)/**
 
     for filename_ts in **/!(*.d).ts?(x); do
         regexp="(.*)\.tsx?"
@@ -59,7 +59,7 @@ if [[ -n $release ]]; then
     echo ">> Removing TypeScript sources"
 
     # we need to remove the *.ts files everywhere, including the `bin/`
-    GLOBIGNORE=@(examples|node_modules)/**
+    GLOBIGNORE=@(examples|node_modules|tests_browser)/**
 
     # delete the TypeScript sources, we provide *.d.ts files instead
     rm **/!(*.d).ts?(x)
