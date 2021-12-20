@@ -25,6 +25,7 @@ git tag "$NEW_VERSION"
 echo "/scripts" > .npmignore
 echo "/workspace" >> .npmignore
 echo "/tests*" >> .npmignore
+echo "/misc" >> .npmignore
 
 #npm publish --access public
 
