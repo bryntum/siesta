@@ -25,10 +25,10 @@ echo "/scripts" > .npmignore
 echo "/workspace" >> .npmignore
 echo "/tests*" >> .npmignore
 
-npm publish --access public
+npm publish --access public --dry-run
 
 #---------------------------------------------------------------------------------
 # post-publish steps
-git push origin HEAD --tags
+#git push origin HEAD --tags
 
 scripts/publish_docs.sh "./docs"
