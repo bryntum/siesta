@@ -17,14 +17,14 @@ Project file should perform 3 main actions:
 A simple project file for Node.js test suite may look like this:
 
 ```javascript
-import { Project } from "siesta/nodejs.js"
+import { Project } from "@bryntum/siesta/nodejs.js"
 
 // STEP 1
 const project = Project.new({
     // config option of the project instance
     title                   : 'Awesome Node.js project test suite',
     
-    // global "test descriptor", all other tests in the suite "extends" it
+    // global "test descriptor", all other tests in the suite "inherit" from it
     testDescriptor          : {
         defaultTimeout          : 30000
     }
@@ -39,10 +39,11 @@ project.start()
 
 More about every step below.
 
-Creating and configuring the project instance
+1. Creating and configuring the project instance
 -------------------------
+
 ```javascript
-import { Project } from "siesta/nodejs.js"
+import { Project } from "@bryntum/siesta/nodejs.js"
 
 // STEP 1
 const project = Project.new({
@@ -56,8 +57,9 @@ const project = Project.new({
 })
 ```
 
-In this step, we create an instance of the [[ProjectNodejs]] class, which is exported as `Project` from the `siesta/node.js`. We do that using the static constructor method [[ProjectNodejs.new]], which accepts a single configuration object, with properties, corresponding to the class attributes.
+In this step, we create an instance of the [[ProjectNodejs]] class, which is exported as `Project` from the `@bryntum/siesta/nodejs.js`. We do that using the static constructor method [[ProjectNodejs.new]], which accepts a single configuration object, with properties, corresponding to the class attributes.
 
+For browsers, we should import from the `@bryntum/siesta/browser.js` entry file.
 For Deno, we should import from the `https://cdn.jsdelivr.net/npm/@bryntum/siesta@latest/deno.js` entry file.
 
 There are few configuration options for the project itself, like [[ProjectNodejs.title|title]] and a [[ProjectNodejs.testDescriptor|testDescriptor]] config, which contains the configuration object for the top-level [[TestDescriptor]] instance. All other tests in the test suite will "extend" this descriptor ("inherit" from it). For example, if the top-level descriptor contains certain value for the [[TestDescriptor.defaultTimeout|defaultTimeout]] config, then all tests will use that value, unless they explicitly override it.

@@ -32,32 +32,32 @@ To familiarize yourself with the basic Siesta concepts, which are common for all
 In-process execution model
 ==================
 
-Siesta runs the browser tests right on the browser page, so called "in-process" execution. This means, your test file has full access to the page and Web API. There's no need to use the asynchronous `evaluate` command as commonly seen in tools like Playwright, Puppeteer and Selenium. 
+Siesta runs the browser tests right on the browser page, so called "in-process" (or "in-page") execution. This means, your test file has full access to the page and Web API. There's no need to use the asynchronous `evaluate` command as commonly seen in tools like Playwright, Puppeteer and Selenium. 
 
 Such architecture means that test script can create and manipulate arbitrary DOM, using the regular Web API. For example, test can render some Web component and then check that its DOM object is properly created by accessing its `style` attribute directly.
 
 However, test script will not survive the page redirect or reload. You should avoid doing that. In the future release we will allow running the script in the side iframe, which will survive the *same-domain* redirects of the testing page.
 
-If you need to test the page with arbitrary redirects, then instead [[GettingStartedNodejsGuide|write your tests as Node.js scripts]] and use the "classic" Playwright API to create the page instance and `evalulate` command of those libraries. In the future releases, we'll provide an unified API for both on-page and out-of-page testing scenarios.
+If you need to test the page with arbitrary redirects, then instead [[GettingStartedNodejsGuide|write your tests as Node.js scripts]] and use the "classic" Playwright API to create the page instance and `evalulate` command of those libraries ("out-of-page" execution model). In the future releases, we'll provide an unified API for both on-page and out-of-page testing scenarios.
 
 
 Importing API
 =============
 
-When targeting browser environment for running tests, import the Siesta API from the `siesta/browser.js` entry file.
+When targeting browser environment for running tests, import the Siesta API from the `@bryntum/siesta/browser.js` entry file.
 
 
 Support for the bare import specifiers
 =================================
 
-Siesta itself is "transpilation" process agnostic and assumes native EcmaScript setup. However, Ecma spec does not define the behavior for the "bare import specifiers", like `import { it } from "siesta/browser.js"`. The proposed solution for it, [import maps](https://github.com/WICG/import-maps) is only [partially](https://github.com/WICG/import-maps/issues/235) supported in Chrome. 
+Siesta itself is "transpilation" process agnostic and assumes native EcmaScript setup. However, Ecma spec does not define the behavior for the "bare import specifiers", like `import { it } from "@bryntum/siesta/browser.js"`. The proposed solution for it, [import maps](https://github.com/WICG/import-maps) is only [partially](https://github.com/WICG/import-maps/issues/235) supported in Chrome. 
 
-This means that the bundler-free development is still the shiny future (hopefully not a distant one) and in the meantime, an extra transpilation step / development web server is needed. We recommend [Vite](https://vitejs.dev/) for this purpose, as a modern and very fast alternative to Webpack.
+This means that the bundler-free development is still the shiny future (hopefully not a distant one) and in the meantime, an extra transpilation step / development web server is needed. We recommend [Vite](https://vitejs.dev/) for this purpose, as a modern and very fast alternative to Webpack. However, any development server will work.
 
 The example we made for a test suite targeting browsers, works with Vite with zero configuration. Yes, no Vite config is needed! This is kind of impressive, comparing how much hassle it can be with configuring the other bundling tools. See the `examples/browser`.
 
 That example is very simple, it is possible that more complex apps will require certain configuration. 
-In any case, the configuration should consist no more than in specifying the test files as entry points:
+In any case, the configuration should consist no more than in **specifying the test files as entry points**:
 
 ```javascript
 /**
@@ -83,7 +83,7 @@ Launching individual test
 Let's assume we have the following Siesta test file, called `basic_test.t.js`, which is available on the web URL as `http://localhost:3000/tests/basic_test.t.js`. We assume Vite server running. 
 
 ```javascript
-import { it } from "siesta/browser.js"
+import { it } from "@bryntum/siesta/browser.js"
 
 it('Basic Siesta test', async t => {
     t.true(true, "That's true")
@@ -146,6 +146,24 @@ Please refer to the documentation of the individual simulation methods:
 - [[TestBrowser.dragBy]]
 - [[TestBrowser.type]]
 - [[TestBrowser.keyPress]] 
+
+
+Preload some files on the test page before executing
+=======================
+
+One can load additional resources on the test page, before running it, using the [[TestDescriptorBrowser.preload|preload]] config. Currently, it is only
+recognized when provided in the [[SiestaProjectGuide|project file]].
+
+This config allows you to load a JavaScript file, JavaScript module or CSS file on the page.
+
+
+Using external page for test
+============================
+
+One can also use an external web page for running the test, for example generated by some external application.
+This can be done with the [[TestDescriptorBrowser.pageUrl|pageUrl]] config. Currently, it is only
+recognized when provided in the [[SiestaProjectGuide|project file]].
+
 
 
 Debugging
