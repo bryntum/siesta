@@ -24,7 +24,7 @@ export const runProjectDirectly = async (projectUrl : string, options : CmdOptio
             inDeno ? 'deno' : 'node',
             inDeno
                 ?
-                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--no-check', '--quiet', projectUrl, ...stringifyOptions(options), '--no-color' ]
+                    [ 'run', '--allow-all', '--unstable', '--no-check', '--quiet', projectUrl, ...stringifyOptions(options), '--no-color' ]
                 :
                     [ projectUrl, ...stringifyOptions(options), '--no-color' ],
             {
@@ -47,7 +47,7 @@ export const runProjectViaLauncher = async (projectUrl : string, options : CmdOp
             inDeno ? 'deno' : 'node',
             inDeno
                 ?
-                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--no-check', '--quiet', `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta_deno.js`, projectUrl, ...stringifyOptions(options), '--no-color' ]
+                    [ 'run', '--allow-all', '--unstable', '--no-check', '--quiet', `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta_deno.js`, projectUrl, ...stringifyOptions(options), '--no-color' ]
                 :
                     [ `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta.js`, projectUrl, ...stringifyOptions(options), '--no-color' ],
             {
@@ -70,7 +70,7 @@ export const runTestDirectly = async (testUrl : string, options : CmdOptions = [
             inDeno ? 'deno' : 'node',
             inDeno
                 ?
-                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--no-check', '--quiet', testUrl, ...stringifyOptions(options), '--no-color' ]
+                    [ 'run', '--allow-all', '--unstable', '--no-check', '--quiet', testUrl, ...stringifyOptions(options), '--no-color' ]
                 :
                     [ testUrl, ...stringifyOptions(options), '--no-color' ],
             {
@@ -94,7 +94,7 @@ export const runTestViaLauncher = async (testUrl : string, options : CmdOptions 
             inDeno ? 'deno' : 'node',
             inDeno
                 ?
-                    [ 'run', '--allow-read', '--allow-net', '--allow-env', '--unstable', '--no-check', '--quiet', `deno ${ fileURLToPath(siestaPackageRootUrl) }bin/siesta_deno.js`, testUrl, ...stringifyOptions(options), '--no-color' ]
+                    [ 'run', '--allow-all', '--unstable', '--no-check', '--quiet', `deno ${ fileURLToPath(siestaPackageRootUrl) }bin/siesta_deno.js`, testUrl, ...stringifyOptions(options), '--no-color' ]
                 :
                     [ `${ fileURLToPath(siestaPackageRootUrl) }bin/siesta.js`, testUrl, ...stringifyOptions(options), '--no-color' ],
             {
