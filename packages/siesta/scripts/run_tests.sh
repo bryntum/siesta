@@ -6,6 +6,10 @@ set -e
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd "$DIR/.."
 
+
+# run standalone source point test - making sure source points can be created for standalone test launches
+node ./tests/siesta/test/source_point.t.js --no-color || (echo ">>Standalone source point test failed" && false)
+
 # run isomorphic suite in Node
 (
     node bin/siesta.js ./tests/index.js --no-color || (echo ">>Isomorphic test suite failed, target Node.js" && false)

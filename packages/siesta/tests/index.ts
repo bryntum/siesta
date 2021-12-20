@@ -87,6 +87,7 @@ project.plan(
                 items       : [
                     'spies.t.js',
                     'exception_handling.t.js',
+                    'source_point.t.js'
                 ]
             },
             'test_descriptor.t.js',
