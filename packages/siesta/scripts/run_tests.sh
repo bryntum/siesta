@@ -56,6 +56,9 @@ fi
 ) & P5=$!
 
 wait $P5
+if [[ "$?" != '0' ]]; then
+    exit 1
+fi
 
 
 # run examples-compilation
@@ -80,6 +83,18 @@ wait $P5
 ) & P9=$!
 
 wait $P6
+if [[ "$?" != '0' ]]; then
+    exit 1
+fi
 wait $P7
+if [[ "$?" != '0' ]]; then
+    exit 1
+fi
 wait $P8
+if [[ "$?" != '0' ]]; then
+    exit 1
+fi
 wait $P9
+if [[ "$?" != '0' ]]; then
+    exit 1
+fi
