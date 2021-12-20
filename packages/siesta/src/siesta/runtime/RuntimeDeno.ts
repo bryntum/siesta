@@ -1,5 +1,5 @@
 // @ts-ignore
-import glob from "glob"
+import fse from "https://esm.sh/fs-extra"
 // @ts-ignore
 import * as path from "https://deno.land/std@0.111.0/path/mod.ts"
 // @ts-ignore
@@ -82,5 +82,20 @@ export class RuntimeDeno extends Runtime {
 
     cwd () : string {
         return Deno.cwd()
+    }
+
+
+    async writeToFile (file : string, content : string) {
+        await fse.outputFile(file, content, 'utf-8')
+    }
+
+
+    async copyFile (source : string, destination : string) {
+        await fse.copy(source, destination, { overwrite : true })
+    }
+
+
+    async copyDir (source : string, destination : string) {
+        await fse.copy(source, destination, { overwrite : true })
     }
 }
