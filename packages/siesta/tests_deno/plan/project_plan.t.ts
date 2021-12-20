@@ -67,7 +67,6 @@ it('Should be able to plan individual files outside the project directory', asyn
             children    : [
                 {
                     url         : path.resolve(__dirname, '../@sample_test_suites/'),
-                    filename    : '@sample_test_suites',
                     children    : [
                         {
                             url         : 'isomorphic',
