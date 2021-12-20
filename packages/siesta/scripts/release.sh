@@ -33,13 +33,24 @@ echo ">> Performing git clean"
 
 (cd ../.. && packages/dev-scripts/bin/gitclean.sh)
 
-# prepare the dist for release
+# compiling w/o declaration files, for html report
+(cd ../.. && scripts/compile.sh -s " ")
+
+echo ">> Generating CSS"
+
+npx sass resources/styling
+
+echo ">> Bundling HTML report files"
+
+scripts/bundle_html_report.sh -c
+
+# compiling with declaration files, for main codebase
 (
     cd ../..
     scripts/compile.sh -d
-    scripts/build_sencha_tests.sh
-    npx sass resources/styling
 )
+
+scripts/build_sencha_tests.sh
 
 # restart point inside the dist
 scripts/do_release.sh
