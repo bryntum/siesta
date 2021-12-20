@@ -2,6 +2,7 @@ import { AnyFunction } from "typescript-mixin-class"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { SerializerXml } from "../../serializer/SerializerXml.js"
 import { prototypeValue } from "../../util/Helpers.js"
+import { waitFor, WaitForResult } from "../../util/TimeHelpers.js"
 import { isString } from "../../util/Typeguards.js"
 import { isElementAccessible } from "../../util_browser/Dom.js"
 import { ActionTarget } from "../simulate/Types.js"
@@ -522,6 +523,56 @@ export class TestSenchaPre extends TestBrowser {
     override async setupRootTest () {
         await super.setupRootTest()
 
-        if (this.descriptor.waitForExtReady && this.Ext) await new Promise(resolve => this.Ext.onReady(resolve))
+        const Ext       = this.Ext
+        const toWait : { desc : string, promise : Promise<WaitForResult<boolean>> }[]         = []
+
+        if (Ext) {
+            if (this.descriptor.waitForExtReady) {
+                let extReady                = false
+                let onReadyWaitingStarted   = false
+
+                toWait.push({
+                    desc        : 'waitForExtReady',
+                    promise     : waitFor(() => {
+                        if (onReadyWaitingStarted) {
+                            return extReady
+                        }
+                        else if (Ext.onReady) {
+                            onReadyWaitingStarted   = true
+                            Ext.onReady(() => extReady = true)
+                        }
+                        else
+                            return false
+                    }, this.waitForTimeout, this.waitForPollInterval)
+                })
+            }
+
+            if (this.descriptor.waitForAppReady) {
+                const name      = Ext.manifest.name
+
+                toWait.push({
+                    desc        : 'waitForAppReady',
+                    promise     : waitFor(() => {
+                        try {
+                            // @ts-ignore
+                            return Boolean(this.window[ name ].getApplication().launched)
+                        } catch (e) {
+                            return false
+                        }
+                    }, this.waitForTimeout, this.waitForPollInterval)
+                })
+            }
+        }
+
+        const waitResults   = await Promise.all(toWait.map(w => w.promise))
+
+        for (let i = 0; i < waitResults.length; i++) {
+            if (!waitResults[ i ].conditionIsMet)
+                this.addResult(Assertion.new({
+                    name        : toWait[ i ].desc,
+                    passed      : false,
+                    description : `Waiting for the \`${ toWait[ i ].desc }\` took too long. Timeout is ${ this.waitForTimeout }ms`
+                }))
+        }
     }
 }

@@ -25,6 +25,17 @@ export class TestDescriptorSencha extends Mixin(
         @config()
         @prototypeValue(true)
         waitForExtReady     : boolean
+
+        /**
+         * Setting this configuration option to `true` will cause Siesta to wait until the SenchaCmd application on the test page will become ready,
+         * before starting the test. More precisely, it will wait till the `launched` property of the application, specified
+         * in the `Ext.manifest.name` becomes `true`.
+         *
+         * Defaults to: `false`
+         */
+        @config()
+        @prototypeValue(false)
+        waitForAppReady     : boolean
     }
 ){}
 

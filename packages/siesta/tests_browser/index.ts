@@ -1,4 +1,5 @@
 import { Project } from "../browser.js"
+import { TestDescriptorSencha } from "../src/siesta/sencha/TestDescriptorSencha.js"
 
 const project = Project.new({
     title                   : 'Siesta 6 browser test suite',
@@ -249,10 +250,11 @@ project.plan(
             senchaGroup('6.5.3')
         ]
     },
-    {
+    TestDescriptorSencha.new({
         pageUrlRel  : '@my-app/build/testing/MyExtGenApp/index.html',
-        url         : 'sencha/cmd_app.t.js'
-    }
+        url         : 'sencha/cmd_app.t.js',
+        waitForAppReady : true
+    })
 )
 
 project.start()

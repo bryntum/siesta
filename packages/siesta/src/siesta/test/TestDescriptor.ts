@@ -363,7 +363,10 @@ export class TestDescriptor extends TestDescriptorPre {
 
 
     static fromProjectPlanItemDescriptor<T extends typeof TestDescriptor> (this : T, desc : ProjectPlanItemDescriptor<InstanceType<T>>) : InstanceType<T> {
-        if (isString(desc)) {
+        if (desc instanceof TestDescriptor) {
+            return desc as InstanceType<T>
+        }
+        else if (isString(desc)) {
             return this.new({ url : desc } as Partial<InstanceType<T>>)
         }
         else if (desc.items !== undefined) {
