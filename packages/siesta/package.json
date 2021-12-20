@@ -42,7 +42,7 @@
         "tslib": "^2.3.1",
         "chained-iterator": "^0.0.4",
         "typescript-mixin-class": "^0.0.3",
-        "typescript-serializable-mixin": "^0.0.3",
+        "typescript-serializable-mixin": "^0.0.4",
         "@bryntum/chronograph": "^2.0.3",
         "nyc": "^15.1.0"
     },
