@@ -348,6 +348,10 @@ export class Launcher extends Mixin(
         }
 
 
+        exit () {
+        }
+
+
         async launchDashboardUI () {
             throw new Error("Abstract method called")
         }

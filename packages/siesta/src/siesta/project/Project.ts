@@ -190,6 +190,9 @@ export class Project extends Mixin(
             const launcher  = await this.getStandaloneLauncher()
 
             await launcher.start()
+            await launcher.destroy()
+
+            // launcher.exit()
         }
 
 

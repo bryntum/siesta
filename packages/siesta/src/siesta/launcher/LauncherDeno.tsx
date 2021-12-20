@@ -188,6 +188,11 @@ export class LauncherDeno extends Mixin(
         }
 
 
+        exit () {
+            Deno.exit(this.exitCode)
+        }
+
+
         static async run () {
             // process.on('unhandledRejection', (reason : any, promise) => {
             //     console.log('Unhandled promise rejection, reason:', reason?.stack || reason)
@@ -201,8 +206,7 @@ export class LauncherDeno extends Mixin(
 
             await launcher.start()
             await launcher.destroy()
-
-            Deno.exit(launcher.exitCode)
+            // launcher.exit()
         }
     }
 ) {}
