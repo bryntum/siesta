@@ -1,0 +1,8 @@
+/scripts
+/workspace
+/tests*
+/misc
+/*rollup.config.js
+/src/**/*.js
+/resources/styling/**/*.scss
+/resources/styling/**/*.css.map

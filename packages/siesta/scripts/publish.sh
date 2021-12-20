@@ -22,11 +22,6 @@ node -e "require('./scripts/changelog.cjs').updateVersion('$NEW_VERSION')"
 #
 #git tag "$NEW_VERSION"
 
-echo "/scripts" > .npmignore
-echo "/workspace" >> .npmignore
-echo "/tests*" >> .npmignore
-echo "/misc" >> .npmignore
-
 #pnpm publish --access public --no-git-checks
 
 pnpm pack
