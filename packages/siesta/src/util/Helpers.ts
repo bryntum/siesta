@@ -142,7 +142,7 @@ export const matchAll = function* (regexp : RegExp, testStr : string) : Generato
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const isNodejs = function () : boolean {
-    return typeOf(globalThis.process) === 'process'
+    return typeOf(globalThis.process) === 'process' && globalThis.Deno === undefined
 }
 
 export const isDeno = function () : boolean {

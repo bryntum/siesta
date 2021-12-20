@@ -11,7 +11,7 @@
     "scripts": {
         "wds": "npx wds --node-resolve",
         "sass": "npx sass --watch resources/styling/ src/",
-        "deno": "deno run --allow-all --unstable --quiet",
+        "deno": "deno run --allow-all --unstable --quiet --no-check",
         "docs": "scripts/build_docs.sh"
     },
     "homepage": "https://github.com/bryntum/siesta",

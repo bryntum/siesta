@@ -1,10 +1,13 @@
 // @ts-ignore
-import fse from "https://esm.sh/fs-extra"
+import { copy } from "https://deno.land/std@0.118.0/fs/copy.ts"
+// @ts-ignore
+import { ensureDir } from "https://deno.land/std@0.118.0/fs/mod.ts"
 // @ts-ignore
 import * as path from "https://deno.land/std@0.111.0/path/mod.ts"
 // @ts-ignore
 import { expandGlobSync } from "https://deno.land/std@0.111.0/fs/mod.ts"
 import { CI } from "../../iterator/Iterator.js"
+import { stripBasename } from "../../util/Path.js"
 import { Runtime } from "./Runtime.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -86,16 +89,17 @@ export class RuntimeDeno extends Runtime {
 
 
     async writeToFile (file : string, content : string) {
-        await fse.outputFile(file, content, 'utf-8')
+        await ensureDir(stripBasename(file))
+        await Deno.writeTextFile(file, content)
     }
 
 
     async copyFile (source : string, destination : string) {
-        await fse.copy(source, destination, { overwrite : true })
+        await copy(source, destination, { overwrite : true })
     }
 
 
     async copyDir (source : string, destination : string) {
-        await fse.copy(source, destination, { overwrite : true })
+        await copy(source, destination, { overwrite : true })
     }
 }
