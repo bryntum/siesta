@@ -16,7 +16,8 @@ NEW_VERSION=$(npm --no-git-tag-version version $V)
 
 node -e "require('./scripts/changelog.cjs').updateVersion('$NEW_VERSION')"
 
-git add CHANGELOG.md package.json package-lock.json
+# TODO do we need the `package-lock.json` file for end-users? or its only for developers?
+git add CHANGELOG.md package.json #package-lock.json
 git commit -m "Updated version"
 
 git tag "$NEW_VERSION"
@@ -25,7 +26,9 @@ echo "/scripts" > .npmignore
 echo "/workspace" >> .npmignore
 echo "/tests*" >> .npmignore
 
-npm publish --access public --dry-run
+#npm publish --access public
+
+npm pack
 
 #---------------------------------------------------------------------------------
 # post-publish steps
