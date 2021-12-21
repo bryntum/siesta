@@ -184,13 +184,13 @@ export class LauncherDeno extends Mixin(
 
 
         setExitCode (code : ExitCodes) {
-            this.exitCode   = code
+            Deno.core.opSync("op_set_exit_code", code)
         }
 
 
-        exit () {
-            Deno.exit(this.exitCode)
-        }
+        // exit () {
+        //     Deno.exit(this.exitCode)
+        // }
 
 
         static async run () {
