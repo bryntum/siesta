@@ -58,7 +58,9 @@ scripts/do_release.sh
 echo ">> Release done, cleaning up"
 
 git reset --hard
+# this won't affect the sub-modules
 npx gitclean.sh
-#git submodule update --force
+# cleanup in submodules too
+git submodule update --force
 
 #npm i --package-lock-only
