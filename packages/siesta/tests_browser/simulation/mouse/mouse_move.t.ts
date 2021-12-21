@@ -11,9 +11,10 @@ it('Moving mouse to coordinate should work', async t => {
     document.body.innerHTML =
         '<div style="position: absolute; left: 657px; top: 123px; width: 1px; height: 1px; background: red;" id="marker"></div>'
 
-    t.firesOnce('#marker', 'mouseenter')
-
-    await t.moveMouseTo([ 657, 123 ])
+    // in FF, the `mouseenter` event can be fired with some delay
+    await t.waitForEvent('#marker', 'mouseenter', {
+        trigger : async () => await t.moveMouseTo([ 657, 123 ])
+    })
 
     t.equal(t.simulator.currentPosition, [ 657, 123 ], 'Moved cursor to correct point')
 })
@@ -24,9 +25,10 @@ it('Moving mouse to element should work', async t => {
     document.body.innerHTML =
         '<div style="position: absolute; left: 50px; top: 50px; width: 1px; height: 1px; background: red;" id="marker"></div>'
 
-    t.firesOnce('#marker', 'mouseenter')
-
-    await t.moveMouseTo('#marker', [ 0, 0 ])
+    // in FF, the `mouseenter` event can be fired with some delay
+    await t.waitForEvent('#marker', 'mouseenter', {
+        trigger : async () => await t.moveMouseTo('#marker', [ 0, 0 ])
+    })
 
     t.isDeeply(t.simulator.currentPosition, [ 50, 50 ], 'moveMouseTo Input: Element - Cursor moved to correct place')
 })
