@@ -16,18 +16,18 @@ NEW_VERSION=$(npm --no-git-tag-version version $V)
 
 node -e "require('./scripts/changelog.cjs').updateVersion('$NEW_VERSION')"
 
-## TODO do we need the `package-lock.json` file for end-users? or its only for developers?
-#git add CHANGELOG.md package.json #package-lock.json
-#git commit -m "Updated version"
-#
-#git tag "$NEW_VERSION"
+# TODO do we need the `package-lock.json` file for end-users? or its only for developers?
+git add CHANGELOG.md package.json #package-lock.json
+git commit -m "Updated version"
 
-#pnpm publish --access public --no-git-checks
+git tag "$NEW_VERSION"
 
-pnpm pack
+pnpm publish --access public --no-git-checks
+
+#pnpm pack
 
 #---------------------------------------------------------------------------------
 # post-publish steps
-#git push origin HEAD --tags
+git push origin HEAD --tags
 
 scripts/publish_docs.sh "./docs"

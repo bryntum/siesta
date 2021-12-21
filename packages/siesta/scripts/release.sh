@@ -57,8 +57,8 @@ scripts/do_release.sh
 
 echo ">> Release done, cleaning up"
 
-#git reset --hard
-#npx gitclean.sh
+git reset --hard
+npx gitclean.sh
 #git submodule update --force
 
 #npm i --package-lock-only
