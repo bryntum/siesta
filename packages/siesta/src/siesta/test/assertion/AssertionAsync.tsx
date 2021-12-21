@@ -49,7 +49,7 @@ export type WaitForOptions<R> = {
      * ```
      *
      * The trigger function can be asynchronous, if it returns a promise, Siesta will wait until the promise is resolved,
-     * before continuing waiting
+     * before returning from the waiting method.
      */
     trigger         : AnyFunction,
 
