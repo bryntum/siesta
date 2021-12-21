@@ -143,6 +143,16 @@ Project
 If you want to provide configuration for the whole test suite, you need to create a [[SiestaProjectGuide|Siesta project]].
 
 
+Reports
+=======
+
+You might want to receive the results of the test suite execution in some structured format for your own processing.
+Siesta can generate reports in JSON, JUnit and HTML formats.
+
+See the [[ReportsGuide|Reports guide]].
+
+
+
 COPYRIGHT AND LICENSE
 =================
 
