@@ -8,6 +8,7 @@ In this guide, we assume a setup, pointed toward running tests for code written 
 
 Sencha-related functionality of Siesta is based on the generic browser layer. Please familiarize yourself with the [[GettingStartedBrowserGuide|Getting started with Siesta in browser environment]] guide first.
 
+
 Importing API
 =============
 
@@ -51,6 +52,14 @@ here we'll list only most commonly used:
 - [[waitForComponentQueryVisible]]
 - [[waitForCompositeQuery]]
 - [[componentQueryExists]]
+
+
+Additional test descriptor configs
+==================================
+
+The most important additional configs, added by the Sencha layer are [[waitForExtReady]] and [[waitForAppReady]].
+[[waitForExtReady]] is enabled by default, it just waits for the `Ext.onReady()` callback to happen before starting
+the test. And [[waitForAppReady]] should be enabled when testing a SenchaCmd application. 
 
 
 COPYRIGHT AND LICENSE
