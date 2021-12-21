@@ -206,6 +206,7 @@ export class LauncherDeno extends Mixin(
 
             await launcher.start()
             await launcher.destroy()
+
             // launcher.exit()
         }
     }
