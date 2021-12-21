@@ -133,7 +133,7 @@ export class AssertionObservable extends Mixin(
             try {
                 const promise   = this.keepAlive(timeout(eventFiredPromise, waitTimeout, timeoutError))
 
-                options?.trigger?.()
+                await options?.trigger?.()
 
                 await promise
 

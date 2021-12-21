@@ -21,7 +21,7 @@ export type WaitForOptions<R> = {
     condition       : () => OrPromise<R>,
 
     /**
-     * A trigger function. This function is called once the waiting has started. It allows to avoid race conditions.
+     * A trigger function. This function is called once the waiting has started. It allows us to avoid race conditions.
      *
      * For example, the typical mistake, which causes the race condition, is to call some method (which will trigger
      * an event) and then start waiting for that event. The event might be triggered synchronously (for example if
@@ -31,7 +31,7 @@ export type WaitForOptions<R> = {
      *
      * ```javascript
      * // if caching is applied, the `load` event
-     * // will be triggered in this method
+     * // will be triggered right in this method
      * dataStore.loadData()
      *
      * // by this time, the event might be already fired
@@ -47,6 +47,9 @@ export type WaitForOptions<R> = {
      *     trigger : () => dataStore.loadData()
      * })
      * ```
+     *
+     * The trigger function can be asynchronous, if it returns a promise, Siesta will wait until the promise is resolved,
+     * before continuing waiting
      */
     trigger         : AnyFunction,
 
@@ -329,7 +332,7 @@ export class AssertionAsync extends Mixin(
                 )
                 : this.keepAlive(waitFor(condition, timeout, interval))
 
-            trigger?.()
+            await trigger?.()
 
             const res       = await promise
 
