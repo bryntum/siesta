@@ -195,7 +195,6 @@ export class Dispatcher extends Mixin(
 
                     const result        = TestLaunchResult.new({ descriptor })
 
-                    // this.resultsMapping.set(descriptor, result)
                     this.resultsMappingById.set(descriptor.guid, result)
 
                     return result
@@ -219,11 +218,6 @@ export class Dispatcher extends Mixin(
         get maxWorkers () : number {
             return this.launcher.maxWorkers
         }
-
-
-        // getTestLaunchInfo (desc : TestDescriptor) : TestLaunchResult {
-        //     return this.resultsMapping.get(desc)
-        // }
 
 
         isCompleted () : boolean {
