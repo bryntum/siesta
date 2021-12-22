@@ -47,19 +47,19 @@ export const OptionsGroupFiltering  = OptionGroup.new({
 export const OptionsGroupPrimary  = OptionGroup.new({
     name        : 'launcher',
     title       : 'Primary launcher options',
-    weight      : 1000
+    weight      : 0
 })
 
 export const OptionsGroupOutput  = OptionGroup.new({
     name        : 'output',
     title       : 'Output',
-    weight      : 900
+    weight      : 200
 })
 
 export const OptionsGroupReport  = OptionGroup.new({
     name        : 'report',
     title       : 'Reports',
-    weight      : 200
+    weight      : 300
 })
 
 
@@ -614,7 +614,7 @@ export class Launcher extends Mixin(
 
             const groups            = Array.from(optionsByGroup.keys())
 
-            groups.sort((group1, group2) => group2.weight - group1.weight)
+            groups.sort((group1, group2) => group1.weight - group2.weight)
 
             return <div>
                 <p><span class="accented">npx siesta URL [--option=value]</span></p>
