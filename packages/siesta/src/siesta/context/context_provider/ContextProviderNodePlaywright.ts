@@ -77,6 +77,8 @@ export class ContextProviderNodePlaywright extends Mixin(
 
 
         async createBrowser () : Promise<playwright.Browser> {
+            const launcher      = this.launcher
+
             const args      = [
                 // '--window-size=1280,1024',
                 // prepend `--` if missing
@@ -85,16 +87,22 @@ export class ContextProviderNodePlaywright extends Mixin(
 
             const launchOptions : LaunchOptions = {
                 args,
-                headless                : this.launcher.headless,
+                headless                : launcher.headless,
                 // TODO should enable `slowMo` for non-headless?
                 // at least provide an option to enable it
                 // slowMo                  : 250,
                 timeout                 : 60000
             }
 
-            if (this.launcher.browser === 'chrome') {
-                launchOptions.devtools  = !this.launcher.headless
+            if (launcher.browser === 'chrome') {
+                launchOptions.devtools  = !launcher.headless
             }
+
+            Object.assign(
+                launchOptions,
+                launcher.browserLaunchOptions,
+                launcher.browserBinary ? { executablePath : launcher.browserBinary } : null
+            )
 
             return await this.browserType.launch(launchOptions)
         }

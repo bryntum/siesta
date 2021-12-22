@@ -1,3 +1,4 @@
+import playwright from "playwright"
 import { serializable } from "typescript-serializable-mixin"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
@@ -9,8 +10,8 @@ import { LauncherDescriptorTerminal } from "./LauncherTerminal.js"
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const OptionsGroupBrowser  = OptionGroup.new({
     name        : 'browser',
-    title       : 'Browser',
-    weight      : 900
+    title       : 'Browser-related',
+    weight      : 700
 })
 
 
@@ -70,5 +71,31 @@ export class LauncherDescriptorNodejs extends Mixin(
             </div>
         })
         browserArg      : string[]              = []
+
+
+        @option({
+            type        : 'string',
+            group       : OptionsGroupBrowser,
+            help        : <div>
+                The path to the browser executable. To use system installed Chrome provide it as:
+
+                --browser-binary="$(which google-chrome)"
+
+            </div>
+        })
+        browserBinary       : string            = undefined
+
+
+        @option({
+            type        : 'json',
+            group       : OptionsGroupBrowser,
+            help        : <div>
+                A string with the JSON object (you probably will need to quote it in console), containing
+                the launch options for the browser. Don't forget to quote the object keys.
+
+                See the https://playwright.dev/docs/api/class-browsertype#browser-type-launch for available options.
+            </div>
+        })
+        browserLaunchOptions    : playwright.LaunchOptions      = undefined
     }
 ) {}
