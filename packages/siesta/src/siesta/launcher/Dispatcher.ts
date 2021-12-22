@@ -10,6 +10,7 @@ import { LUID, luid } from "../common/LUID.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ProjectSerializableData } from "../project/ProjectDescriptor.js"
 import { Reporter } from "../reporter/Reporter.js"
+import { TestDescriptorSencha } from "../sencha/TestDescriptorSencha.js"
 import { TestLauncherChild } from "../test/port/TestLauncherChild.js"
 import { TestLauncherParent } from "../test/port/TestLauncherParent.js"
 import { Test } from "../test/Test.js"
@@ -125,6 +126,20 @@ export class CleanupQueue extends Base {
     }
 }
 
+
+// make sure we actually import these class symbols (and not just types),
+// so that their `registerSerializableClass()` calls are made
+// this is so that TestLauncher interface to work correctly, since it is serializing the
+// test descriptor in it's methods arguments
+TestDescriptor
+// IMPORTANT the following classes are assumed to be isomorphic by themselves
+// (even that they represent the data for non-isomorphic classes)
+TestDescriptorNodejs
+TestDescriptorDeno
+TestDescriptorBrowser
+TestDescriptorSencha
+
+
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class Dispatcher extends Mixin(
     [ Base ],
@@ -152,19 +167,6 @@ export class Dispatcher extends Mixin(
         contextProviders            : ContextProvider[]         = []
 
         exitCode                    : ExitCodes                 = undefined
-
-        // make sure we actually import these class symbols (and not just types),
-        // so that their `registerSerializableClass()` calls are made
-        // this is so that TestLauncher interface to work correctly, since it is serializing the
-        // test descriptor in it's methods arguments
-        descriptorClassesToImport   : (typeof TestDescriptor)[] = [
-            TestDescriptor,
-            // IMPORTANT the following classes are assumed to be isomorphic by themselves
-            // (even that they represent the data for non-isomorphic classes)
-            TestDescriptorNodejs,
-            TestDescriptorDeno,
-            TestDescriptorBrowser
-        ]
 
 
         initialize (props? : Partial<Dispatcher>) {
