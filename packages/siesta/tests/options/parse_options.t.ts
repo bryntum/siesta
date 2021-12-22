@@ -4,17 +4,18 @@ import { Option, OptionsBag, OptionsParseErrorCodes, OptionsParseWarningCodes } 
 const string        = Option.new({ name : 'string', type : 'string' })
 const number        = Option.new({ name : 'number', type : 'number' })
 const boolean       = Option.new({ name : 'boolean', type : 'boolean' })
+const json          = Option.new({ name : 'json', type : 'json' })
 const stringArray   = Option.new({ name : 'string', type : 'string', structure : 'array' })
 const enumArray     = Option.new({ name : 'enumArray', type : 'enum', structure : 'array', enumeration : [ 'enum1', 'enum2' ] })
 
 
 it('Should be able to parse options', async t => {
     const bag       = OptionsBag.new({
-        input   : [ 'argv1', '--string=str', 'argv2', '--number', '123', '--boolean', 'true', 'argv3' ]
+        input   : [ 'argv1', '--string=str', 'argv2', '--number', '123', '--boolean', 'true', 'argv3', '--json', '{ "json" : [ true ] }' ]
     })
 
     t.equal(
-        bag.extractOptions([ string, number, boolean ]),
+        bag.extractOptions([ string, number, boolean, json ]),
         {
             errors      : [],
             warnings    : [],
@@ -22,6 +23,7 @@ it('Should be able to parse options', async t => {
                 [ string, 'str' ],
                 [ number, 123 ],
                 [ boolean, true ],
+                [ json, { json : [ true ] } ],
             ])
         },
         'Basics should work'
