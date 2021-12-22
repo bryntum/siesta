@@ -38,7 +38,8 @@ export class ContextProviderNodePlaywright extends Mixin(
         async getPrimaryBrowserContext () : Promise<playwright.BrowserContext> {
             if (this.$primaryBrowserContext !== undefined) return this.$primaryBrowserContext
 
-            return this.$primaryBrowserContext = await (await this.getPrimaryBrowser()).newContext({ ignoreHTTPSErrors : true, bypassCSP : true })
+            return this.$primaryBrowserContext =
+                await (await this.getPrimaryBrowser()).newContext({ ignoreHTTPSErrors : true, bypassCSP : true })
         }
 
 
@@ -88,9 +89,6 @@ export class ContextProviderNodePlaywright extends Mixin(
             const launchOptions : LaunchOptions = {
                 args,
                 headless                : launcher.headless,
-                // TODO should enable `slowMo` for non-headless?
-                // at least provide an option to enable it
-                // slowMo                  : 250,
                 timeout                 : 60000
             }
 
@@ -100,8 +98,8 @@ export class ContextProviderNodePlaywright extends Mixin(
 
             Object.assign(
                 launchOptions,
-                launcher.browserLaunchOptions,
-                launcher.browserBinary ? { executablePath : launcher.browserBinary } : null
+                launcher.browserBinary ? { executablePath : launcher.browserBinary } : null,
+                launcher.browserLaunchOptions
             )
 
             return await this.browserType.launch(launchOptions)
