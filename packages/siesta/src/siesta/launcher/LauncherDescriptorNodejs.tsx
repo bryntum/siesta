@@ -38,16 +38,16 @@ export class LauncherDescriptorNodejs extends Mixin(
         headless        : boolean               = true
 
 
-        @option({
-            type        : 'enum',
-            enumeration : [ 'nodejs', 'deno', 'playwright' ],
-            group       : OptionsGroupPrimary,
-            help        : <div>
-                The context provider to use to launch the tests. By default its `nodejs` for the Node.js test suites,
-                `deno` for Deno test suites, and `playwright` for browser.
-            </div>
-        })
-        provider        : string                = undefined
+        // @option({
+        //     type        : 'enum',
+        //     enumeration : [ 'nodejs', 'deno', 'playwright' ],
+        //     group       : OptionsGroupPrimary,
+        //     help        : <div>
+        //         The context provider to use to launch the tests. By default its `nodejs` for the Node.js test suites,
+        //         `deno` for Deno test suites, and `playwright` for browser.
+        //     </div>
+        // })
+        // provider        : string                = undefined
 
 
         @option({
