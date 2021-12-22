@@ -84,7 +84,7 @@ export class LauncherDescriptorTerminal extends Mixin(
             help        : <div>
                 Specifies the report format to generate after running the test suite. To actually generate a report,
                 need to provide the <span class="accented">--report-file</span> option as well.
-                The `html` report includes `json` with additional files for results visualization.
+                The `html` report is a small web-app, visualizing the test suite launch results.
                 When using `html` report, the <span class="accented">--report-file</span> option actually specifies
                 the <span class="accented">directory</span> to save data into, not a single file.
                 This option can be repeated several times (several reports will be generated), in this case,
