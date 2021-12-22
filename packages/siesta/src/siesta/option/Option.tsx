@@ -426,47 +426,59 @@ export class OptionsBag extends Base {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const unknownOption = (warning : OptionParseWarning) : XmlElement => <div>
-    <span class="log_message_warn"> WARNING </span> Unknown option: <span class="accented">--{ warning.option.name }</span>
-</div>
-
-const existingValueOverwritten = (warning : OptionParseWarning) : XmlElement => <div>
-    <span class="log_message_warn"> WARNING </span> The value of option <span class="accented">--{ warning.option.name }</span>,
-    { ' ' }<span class="accented_value">{ warning.value }</span> is overwritten with <span class="accented_value">{ warning.overwrittenWith }</span>
-</div>
-
 export const optionWarningTemplateByCode = new Map<OptionsParseWarningCodes, (warning : OptionParseWarning) => XmlElement>([
-    [ OptionsParseWarningCodes.UnknownOption, unknownOption ],
-    [ OptionsParseWarningCodes.ExistingValueOverwritten, existingValueOverwritten ]
+    [
+        OptionsParseWarningCodes.UnknownOption,
+        (warning : OptionParseWarning) : XmlElement => <div>
+            <span class="log_message_warn"> WARNING </span> Unknown option: <span class="accented">--{ warning.option.name }</span>
+        </div>
+    ],
+    [
+        OptionsParseWarningCodes.ExistingValueOverwritten,
+        (warning : OptionParseWarning) : XmlElement => <div>
+            <span class="log_message_warn"> WARNING </span> The value of option <span class="accented">--{ warning.option.name }</span>,
+            { ' ' }<span class="accented_value">{ warning.value }</span> is overwritten with <span class="accented_value">{ warning.overwrittenWith }</span>
+        </div>
+    ]
 ])
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const optionDoesNotHaveValue = (error : OptionParseError) : XmlElement => <div>
-    <span class="log_message_error"> ERROR </span> Missing value for option <span class="accented">--{ error.option.name }</span>
-</div>
-
-const unknownEnumMember = (error : OptionParseError) : XmlElement => <div>
-    <p><span class="log_message_error"> ERROR </span> Unknown value <span class="accented_value">{ error.input }</span> for enumeration option <span class="accented">--{ error.option.name }</span></p>
-    <ul>
-        Known values are:
-        { error.option.enumeration.map(enumEntry => <li>- <span class="accented_value">{ enumEntry }</span></li>) }
-    </ul>
-</div>
-
-const invalidNumericValue = (error : OptionParseError) : XmlElement => <div>
-    <p><span class="log_message_error"> ERROR </span> Invalid numeric value <span class="accented_value">{ error.input }</span> for option <span class="accented">--{ error.option.name }</span></p>
-</div>
-
-const invalidBooleanValue = (error : OptionParseError) : XmlElement => <div>
-    <p><span class="log_message_error"> ERROR </span> Invalid boolean value <span class="accented_value">{ error.input }</span> for option <span class="accented">--{ error.option.name }</span></p>
-</div>
-
 export const optionErrorTemplateByCode = new Map<OptionsParseErrorCodes, (warning : OptionParseError) => XmlElement>([
-    [ OptionsParseErrorCodes.OptionDoesNotHaveValue, optionDoesNotHaveValue ],
-    [ OptionsParseErrorCodes.UnknownEnumMember, unknownEnumMember ],
-    [ OptionsParseErrorCodes.InvalidNumericValue, invalidNumericValue ],
-    [ OptionsParseErrorCodes.InvalidBooleanValue, invalidBooleanValue ],
+    [
+        OptionsParseErrorCodes.OptionDoesNotHaveValue,
+        (error : OptionParseError) : XmlElement => <div>
+            <span class="log_message_error"> ERROR </span> Missing value for option <span class="accented">--{ error.option.name }</span>
+        </div>
+    ],
+    [
+        OptionsParseErrorCodes.UnknownEnumMember,
+        (error : OptionParseError) : XmlElement => <div>
+            <p><span class="log_message_error"> ERROR </span> Unknown value <span class="accented_value">{ error.input }</span> for enumeration option <span class="accented">--{ error.option.name }</span></p>
+            <ul>
+                Known values are:
+                { error.option.enumeration.map(enumEntry => <li>- <span class="accented_value">{ enumEntry }</span></li>) }
+            </ul>
+        </div>
+    ],
+    [
+        OptionsParseErrorCodes.InvalidNumericValue,
+        (error : OptionParseError) : XmlElement => <div>
+            <p><span class="log_message_error"> ERROR </span> Invalid numeric value <span class="accented_value">{ error.input }</span> for option <span class="accented">--{ error.option.name }</span></p>
+        </div>
+    ],
+    [
+        OptionsParseErrorCodes.InvalidJSONValue,
+        (error : OptionParseError) : XmlElement => <div>
+            <p><span class="log_message_error"> ERROR </span> Invalid JSON value <span class="accented_value">{ error.input }</span> for option <span class="accented">--{ error.option.name }</span></p>
+        </div>
+    ],
+    [
+        OptionsParseErrorCodes.InvalidBooleanValue,
+        (error : OptionParseError) : XmlElement => <div>
+            <p><span class="log_message_error"> ERROR </span> Invalid boolean value <span class="accented_value">{ error.input }</span> for option <span class="accented">--{ error.option.name }</span></p>
+        </div>
+    ],
     // TODO
     [ OptionsParseErrorCodes.InvalidKeyValuePair, () => <div></div> ],
 ])
