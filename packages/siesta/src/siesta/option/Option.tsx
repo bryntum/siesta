@@ -5,7 +5,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export type OptionAtomType         = 'boolean' | 'string' | 'number' | 'object' | 'enum'
+export type OptionAtomType         = 'boolean' | 'string' | 'number' | 'json' | 'enum'
 
 export type OptionStructureType    = 'map' | 'array' | 'set' | 'atom'
 
@@ -183,6 +183,17 @@ export class Option extends Mixin(
                 }
 
                 return { value : this.enumeration.find(enumMember => enumMember.toLowerCase() === input.toLowerCase()) }
+            }
+            else if (this.type === 'json') {
+                if (input === undefined)
+                    return { error : { error : OptionsParseErrorCodes.OptionDoesNotHaveValue, option : this } }
+
+                try {
+                    return { value : JSON.parse(input) }
+                } catch (e) {
+                    return { error : { error : OptionsParseErrorCodes.InvalidJSONValue, option : this, input } }
+                }
+
             } else {
                 if (input === undefined) return { value : true }
 
@@ -223,6 +234,7 @@ export enum OptionsParseErrorCodes {
     OptionDoesNotHaveValue      = 'OptionDoesNotHaveValue',
     InvalidNumericValue         = 'InvalidNumericValue',
     InvalidBooleanValue         = 'InvalidBooleanValue',
+    InvalidJSONValue            = 'InvalidJSONValue',
     InvalidKeyValuePair         = 'InvalidKeyValuePair',
     UnknownEnumMember           = 'UnknownEnumMember'
 }
