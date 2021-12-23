@@ -5,6 +5,7 @@ import { Media } from "../../rpc/media/Media.js"
 import { Port } from "../../rpc/port/Port.js"
 import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
+import { Dispatcher } from "../launcher/Dispatcher.js"
 import { preLaunchTest } from "../test/port/LaunchTest.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { ContextProvider } from "./context_provider/ContextProvider.js"
@@ -29,7 +30,7 @@ export class Context extends Mixin(
         }
 
 
-        async setup () {
+        async finalizeTestLaunch (desc : TestDescriptor, dispatcher : Dispatcher) {
         }
 
 

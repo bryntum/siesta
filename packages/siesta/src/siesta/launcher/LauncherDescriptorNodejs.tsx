@@ -3,7 +3,7 @@ import { serializable } from "typescript-serializable-mixin"
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
 import { option, OptionGroup } from "../option/Option.js"
-import { LauncherDescriptor, OptionsGroupPrimary } from "./Launcher.js"
+import { LauncherDescriptor } from "./Launcher.js"
 import { LauncherDescriptorTerminal } from "./LauncherTerminal.js"
 
 
@@ -97,5 +97,16 @@ export class LauncherDescriptorNodejs extends Mixin(
             </div>
         })
         browserLaunchOptions    : playwright.LaunchOptions      = undefined
+
+
+        @option({
+            type        : 'boolean',
+            group       : OptionsGroupBrowser,
+            help        : <div>
+                Whether to enable the code coverage information collection, when running browser code.
+                See the [[CodeCoverageGuide|Code coverage guide]] for mode details.
+            </div>
+        })
+        coverage            : boolean           = undefined
     }
 ) {}

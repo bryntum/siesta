@@ -369,13 +369,14 @@ export class Dispatcher extends Mixin(
             try {
                 await context.setupChannel(testLauncher, client.importerUrl, client.symbol)
 
-                this.logger.debug("Channel ready for: ", normalized.url)
+                this.logger.debug("Channel ready for: ", normalized.urlAbs)
 
                 await testLauncher.launchTest(stringifiedDesc, checkInfo, dashboardLaunchInfo)
             } finally {
                 this.setDashboardLaunchState(item, 'completed')
 
                 await slot.setTask(async () => {
+                    await context.finalizeTestLaunch(normalized, this)
                     await testLauncher.disconnect(true)
                     await context.destroy()
                 })

@@ -1,4 +1,5 @@
 import { startDevServer } from "@web/dev-server"
+import { randomBytes } from "crypto"
 import path from "path"
 import { LaunchOptions, Page } from "playwright/index.js"
 import { fileURLToPath } from "url"
@@ -20,11 +21,13 @@ import { ContextProvider } from "../context/context_provider/ContextProvider.js"
 import { ContextProviderDashboardIframe } from "../context/context_provider/ContextProviderDashboardIframe.js"
 import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
 import { ContextProviderNodePlaywright } from "../context/context_provider/ContextProviderNodePlaywright.js"
+import { V8CodeCoverageInfo } from "../context/ContextPlaywright.js"
 import { ProjectDescriptorNodejs } from "../project/ProjectDescriptor.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeNodejs } from "../runtime/RuntimeNodejs.js"
+import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorNodejs } from "../test/TestDescriptorNodejs.js"
 import { DashboardConnectorServer } from "./DashboardConnector.js"
 import { Dispatcher } from "./Dispatcher.js"
@@ -307,6 +310,17 @@ export class LauncherNodejs extends Mixin(
             }
 
             return donePromise
+        }
+
+
+        async collectCoverageInfo (desc : TestDescriptor, rawInfo : V8CodeCoverageInfo[]) {
+            rawInfo.forEach(el => {
+                el.url      = el.url.replace(/^https?:\/\//, 'file:///')
+            })
+
+            const info      = { result : rawInfo }
+
+            this.runtime.writeToFile(`covcov/${ randomBytes(16).toString("hex") }.json`, JSON.stringify(info))
         }
 
 

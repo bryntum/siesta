@@ -5,9 +5,30 @@ import { MediaNodeWebSocketParent } from "../../rpc/media/MediaNodeWebSocketPare
 import { PortHandshakeParent } from "../../rpc/port/PortHandshake.js"
 import { ServerNodeWebSocket } from "../../rpc/server/ServerNodeWebSocket.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
+import { Dispatcher } from "../launcher/Dispatcher.js"
+import { LauncherNodejs } from "../launcher/LauncherNodejs.js"
 import { TestDescriptor } from "../test/TestDescriptor.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
 import { ContextBrowser } from "./ContextBrowser.js"
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type V8CodeCoverageInfo = {
+    url         : string
+    scriptId    : string
+    source?     : string
+
+    functions : {
+        functionName    : string
+        isBlockCoverage : boolean
+        ranges : {
+            count       : number
+            startOffset : number
+            endOffset   : number
+        }[]
+    }[]
+}
+
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ContextPlaywright extends Mixin(
@@ -15,7 +36,6 @@ export class ContextPlaywright extends Mixin(
     (base : ClassUnion<typeof ContextBrowser, typeof ServerNodeWebSocket>) =>
 
     class ContextPlaywright extends base {
-
         parentMediaClass                : typeof MediaNodeWebSocketParent = MediaNodeWebSocketParent
 
         relativeChildMediaModuleUrl     : string                = 'src/rpc/media/MediaBrowserWebSocketChild.js'
@@ -47,12 +67,25 @@ export class ContextPlaywright extends Mixin(
         }
 
 
+        async finalizeTestLaunch (desc : TestDescriptor, dispatcher : Dispatcher) {
+            if (this.provider.launcher instanceof LauncherNodejs && this.provider.launcher.coverage) {
+                const coverageInfo      = await this.page.coverage.stopJSCoverage()
+
+                await this.provider.launcher.collectCoverageInfo(desc, coverageInfo)
+            }
+        }
+
+
         override async preLaunchTest (desc : TestDescriptor, testDescriptorStr : string, delayStart : number = 0) : Promise<boolean> {
             // HACK? - uptyping the `desc` to `TestDescriptorBrowser`
             if (desc instanceof TestDescriptorBrowser && (desc.pageUrl || desc.pageUrlRel))
                 await this.navigate(desc.pageUrl || desc.pageUrlRel)
             else
                 await this.navigate(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/blank.html')
+
+            if (this.provider.launcher instanceof LauncherNodejs && this.provider.launcher.coverage) {
+                await this.page.coverage.startJSCoverage()
+            }
 
             return await super.preLaunchTest(desc, testDescriptorStr, delayStart)
         }
