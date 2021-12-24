@@ -123,10 +123,11 @@ export class LauncherDescriptorNodejs extends Mixin(
         @option({
             type        : 'string',
             group       : OptionsGroupCodeCoverage,
+            defaultValue : () => 'coverage',
             help        : <div>
             </div>
         })
-        coverageReportDir       : string           = undefined
+        coverageReportDir       : string
 
 
         @option({
@@ -175,5 +176,13 @@ export class LauncherDescriptorNodejs extends Mixin(
             </div>
         })
         coverageAll             : boolean           = undefined
+
+
+        @option({
+            type        : 'boolean',
+            group       : OptionsGroupCodeCoverage,
+            hideInHelp  : true
+        })
+        isForeground            : boolean           = undefined
     }
 ) {}

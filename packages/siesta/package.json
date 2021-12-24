@@ -44,7 +44,8 @@
         "typescript-mixin-class": "^0.0.3",
         "typescript-serializable-mixin": "^0.0.4",
         "@bryntum/chronograph": "^2.0.3",
-        "c8": "^7.10.0",
+        "foreground-child": "^2.0.0",
+        "c8": "/home/nickolay/workspace/siesta-workspace/c8/",
         "v8-to-istanbul": "^8.1.0"
     },
     "devDependencies": {

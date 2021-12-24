@@ -1,3 +1,7 @@
+import { promises as fsPromises } from 'fs'
+import { buildYargs } from "c8/lib/parse-args.js"
+import C8Report from "c8/lib/report.js"
+import foreground from "foreground-child"
 import { startDevServer } from "@web/dev-server"
 import { randomBytes } from "crypto"
 import path from "path"
@@ -14,7 +18,7 @@ import { TextJSX } from "../../jsx/TextJSX.js"
 import { MediaNodeWebSocketParent } from "../../rpc/media/MediaNodeWebSocketParent.js"
 import { ServerNodeWebSocket } from "../../rpc/server/ServerNodeWebSocket.js"
 import { UnwrapPromise } from "../../util/Helpers.js"
-import { isString } from "../../util/Typeguards.js"
+import { isArray, isString } from "../../util/Typeguards.js"
 import { browserType } from "../../util_browser/PlaywrightHelpers.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { ContextProvider } from "../context/context_provider/ContextProvider.js"
@@ -22,6 +26,7 @@ import { ContextProviderDashboardIframe } from "../context/context_provider/Cont
 import { ContextProviderNodeChildProcess } from "../context/context_provider/ContextProviderNodeChildProcess.js"
 import { ContextProviderNodePlaywright } from "../context/context_provider/ContextProviderNodePlaywright.js"
 import { V8CodeCoverageInfo } from "../context/ContextPlaywright.js"
+import { camelCaseToSnakeCase } from "../option/Option.js"
 import { ProjectDescriptorNodejs } from "../project/ProjectDescriptor.js"
 import { ReporterNodejs } from "../reporter/ReporterNodejs.js"
 import { ReporterNodejsTerminal } from "../reporter/ReporterNodejsTerminal.js"
@@ -34,7 +39,7 @@ import { Dispatcher } from "./Dispatcher.js"
 import { DispatcherNodejs } from "./DispatcherNodejs.js"
 import { Launcher } from "./Launcher.js"
 import { LauncherDescriptorNodejs } from "./LauncherDescriptorNodejs.js"
-import { LauncherError } from "./LauncherError.js"
+import { LauncherError, LauncherRestartOnCodeCoverage } from "./LauncherError.js"
 import { LauncherTerminal } from "./LauncherTerminal.js"
 import { ExitCodes } from "./Types.js"
 
@@ -105,13 +110,98 @@ export class LauncherNodejs extends Mixin(
         // }
 
 
+        override async finalize () {
+            await super.finalize()
+
+            if (this.coverageReporter) {
+                if (this.getEnvironmentByUrl(this.project) === 'browser') {
+                    // need to use the `--reporter` value, normalized to array, Yargs do not do that
+                    const c8Report      = C8Report(Object.assign({}, this.coverageYargs, { reporter : this.coverageReporter, allowExternal : true }))
+
+                    c8Report._getSourceMap = function (v8ScriptCov) {
+                        return
+                    }
+                }
+            }
+        }
+
+
         async onLauncherOptionsAvailable () {
+            await this.setupCodeCoverage()
+
             await super.onLauncherOptionsAvailable()
 
             if (this.noColor || !process.stdout.isTTY) {
                 this.colorerClass       = ColorerNoop
                 this.reporterClass      = ReporterNodejs
             }
+        }
+
+
+        async setupCodeCoverage () {
+            // coverage is enabled
+            if (this.coverageReporter) {
+                // for Node.js launch
+                if (this.getEnvironmentByUrl(this.project) === 'nodejs') {
+                    // and this is the "original" launch, not the secondary "foreground" launch
+                    // with the `NODE_V8_COVERAGE` enabled
+                    if (!this.isForeground) {
+                        const coverageYargs      = this.coverageYargs
+
+                        // TODO cleanup when dropped support for Node 12
+                        // use newer `rm` if available, the `recursive` option for `rmdir` is deprecated
+                        if (fsPromises.rm)
+                            await fsPromises.rm(coverageYargs.tempDirectory, { recursive : true, force : true })
+                        else
+                            await fsPromises.rmdir(coverageYargs.tempDirectory, { recursive : true })
+
+                        await fsPromises.mkdir(coverageYargs.tempDirectory, { recursive : true })
+
+                        process.env.NODE_V8_COVERAGE = coverageYargs.tempDirectory
+
+                        foreground(process.argv.concat('--is-foreground'), async (done) => {
+                            const c8Report      = C8Report(Object.assign({}, this.coverageYargs, { reporter : this.coverageReporter }))
+                            await c8Report.run()
+                            done()
+                        })
+
+                        // const args = process.argv.slice()
+                        // args.splice(1, 0, '--inspect-brk')
+                        // args.push('--is-foreground')
+                        // foreground(args, async (done) => {
+                        //     const c8Report      = C8Report(Object.assign({}, this.coverageYargs, { reporter : this.coverageReporter }))
+                        //     await c8Report.run()
+                        //     done()
+                        // })
+
+                        throw new LauncherRestartOnCodeCoverage()
+                    }
+                }
+            }
+        }
+
+
+        $coverageYargs          = undefined
+
+        get coverageYargs () {
+            if (this.$coverageYargs !== undefined) return this.$coverageYargs
+
+            const args = [
+                'coverageReporter', 'coverageReportDir', 'coverageSrc',
+                'coverageInclude', 'coverageExclude', 'coverageClean', 'coverageAll'
+            ].flatMap(name => {
+                const value     = this[ name ]
+                const c8Name    = camelCaseToSnakeCase(name.replace(/^coverage/, '').replace(/^./, char => char.toLowerCase()), '-')
+
+                if (value === undefined) return []
+
+                return isArray(value) ? value.flatMap(oneValue => [ `--${ c8Name }`, oneValue ]) : [ `--${ c8Name }`, value ]
+            })
+
+            // requires at least 1 positional argument
+            args.push('dummy-script.js')
+
+            return this.$coverageYargs = buildYargs().parse(args)
         }
 
 
