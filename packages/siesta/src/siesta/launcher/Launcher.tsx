@@ -33,7 +33,7 @@ import { TestDescriptor } from "../test/TestDescriptor.js"
 import { SubTestCheckInfo } from "../test/TestResult.js"
 import { DashboardConnectorServer } from "./DashboardConnector.js"
 import { Dispatcher } from "./Dispatcher.js"
-import { LauncherError } from "./LauncherError.js"
+import { LauncherError, LauncherRestartOnCodeCoverage } from "./LauncherError.js"
 import { ExitCodes } from "./Types.js"
 
 
@@ -330,6 +330,8 @@ export class Launcher extends Mixin(
 
                 await this.finalize()
             } catch (e) {
+                if (e instanceof LauncherRestartOnCodeCoverage) return
+
                 if (e instanceof LauncherError) {
                     this.onLauncherError(e)
                 } else {

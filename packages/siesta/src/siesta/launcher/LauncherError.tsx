@@ -17,3 +17,7 @@ export class LauncherError extends Mixin(
         exitCode            : ExitCodes     = undefined
     }
 ) {}
+
+
+export class LauncherRestartOnCodeCoverage extends Error {
+}
