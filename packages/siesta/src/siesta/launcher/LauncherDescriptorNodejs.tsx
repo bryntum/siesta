@@ -184,5 +184,10 @@ export class LauncherDescriptorNodejs extends Mixin(
             hideInHelp  : true
         })
         isForeground            : boolean           = undefined
+
+
+        get codeCoverageEnabled () : boolean {
+            return this.coverageReporter !== undefined
+        }
     }
 ) {}

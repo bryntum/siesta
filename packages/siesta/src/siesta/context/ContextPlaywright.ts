@@ -68,7 +68,7 @@ export class ContextPlaywright extends Mixin(
 
 
         async finalizeTestLaunch (desc : TestDescriptor, dispatcher : Dispatcher) {
-            if (this.provider.launcher instanceof LauncherNodejs && this.provider.launcher.coverage) {
+            if (this.provider.launcher instanceof LauncherNodejs && this.provider.launcher.codeCoverageEnabled) {
                 const coverageInfo      = await this.page.coverage.stopJSCoverage()
 
                 await this.provider.launcher.collectCoverageInfo(desc, coverageInfo)
@@ -83,7 +83,7 @@ export class ContextPlaywright extends Mixin(
             else
                 await this.navigate(this.provider.launcher.projectData.siestaPackageRootUrl + 'resources/blank.html')
 
-            if (this.provider.launcher instanceof LauncherNodejs && this.provider.launcher.coverage) {
+            if (this.provider.launcher instanceof LauncherNodejs && this.provider.launcher.codeCoverageEnabled) {
                 await this.page.coverage.startJSCoverage()
             }
 
