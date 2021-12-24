@@ -77,10 +77,8 @@ export class LauncherDescriptorNodejs extends Mixin(
             type        : 'string',
             group       : OptionsGroupBrowser,
             help        : <div>
-                The path to the browser executable. To use system installed Chrome provide it as:
-
-                --browser-binary="$(which google-chrome)"
-
+                The path to the browser executable. To use system installed Chrome provide it as:{'\n'}
+                {'    '}--browser-binary="$(which google-chrome)"
             </div>
         })
         browserBinary       : string            = undefined

@@ -320,7 +320,7 @@ export class LauncherNodejs extends Mixin(
 
             const info      = { result : rawInfo }
 
-            this.runtime.writeToFile(`covcov/${ randomBytes(16).toString("hex") }.json`, JSON.stringify(info))
+            await this.runtime.writeToFile(`covcov/${ randomBytes(16).toString("hex") }.json`, JSON.stringify(info))
         }
 
 
