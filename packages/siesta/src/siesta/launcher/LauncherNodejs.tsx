@@ -1,5 +1,7 @@
 import { promises as fsPromises } from 'fs'
 import { buildYargs } from "c8/lib/parse-args.js"
+import istanbulLibReport from 'istanbul-lib-report'
+import istanbulReports from 'istanbul-reports'
 import C8Report from "c8/lib/report.js"
 import foreground from "foreground-child"
 import { startDevServer } from "@web/dev-server"
@@ -115,21 +117,46 @@ export class LauncherNodejs extends Mixin(
 
             if (this.coverageReporter) {
                 if (this.getEnvironmentByUrl(this.project) === 'browser') {
-                    // need to use the `--reporter` value, normalized to array, Yargs do not do that
-                    const c8Report      = C8Report(Object.assign({}, this.coverageYargs, { reporter : this.coverageReporter, allowExternal : true }))
+                    const coverageYargs         = this.coverageYargs
+
+                    // need to use the `--reporter` value, normalized to array, Yargs does not do that
+                    const c8Report      = C8Report(Object.assign(
+                        {}, coverageYargs, { reporter : this.coverageReporter, allowExternal : true }
+                    ))
 
                     c8Report._getSourceMap = function (v8ScriptCov) {
-                        return
+                        return { source : v8ScriptCov.source }
                     }
+
+                    const launcher      = this
+
+                    c8Report.run = async function () {
+                        const context = istanbulLibReport.createContext({
+                            sourceFinder    : (url : string) => launcher.getSourcesOfCoverageFile(url),
+                            dir             : this.reportsDirectory,
+                            watermarks      : this.watermarks,
+                            coverageMap     : await this.getCoverageMapFromAllCoverageFiles()
+                        })
+
+                        for (const reporter of this.reporter) {
+                            istanbulReports.create(reporter, {
+                                skipEmpty   : false,
+                                skipFull    : this.skipFull,
+                                maxCols     : 100
+                            }).execute(context)
+                        }
+                    }
+
+                    await c8Report.run()
                 }
             }
         }
 
 
         async onLauncherOptionsAvailable () {
-            await this.setupCodeCoverage()
-
             await super.onLauncherOptionsAvailable()
+
+            await this.setupCodeCoverage()
 
             if (this.noColor || !process.stdout.isTTY) {
                 this.colorerClass       = ColorerNoop
@@ -138,28 +165,38 @@ export class LauncherNodejs extends Mixin(
         }
 
 
+        async prepareCoverageReportDirs () {
+            const coverageYargs      = this.coverageYargs
+
+            // TODO cleanup when dropped support for Node 12
+            // use newer `rm` if available, the `recursive` option for `rmdir` is deprecated
+            if (fsPromises.rm)
+                await fsPromises.rm(coverageYargs.tempDirectory, { recursive : true, force : true })
+            else
+                await fsPromises.rmdir(coverageYargs.tempDirectory, { recursive : true })
+
+            await fsPromises.mkdir(coverageYargs.tempDirectory, { recursive : true })
+        }
+
+
         async setupCodeCoverage () {
             // coverage is enabled
             if (this.coverageReporter) {
                 // for Node.js launch
                 if (this.getEnvironmentByUrl(this.project) === 'nodejs') {
+                    console.log("NODEJS COV", this.project)
+
                     // and this is the "original" launch, not the secondary "foreground" launch
                     // with the `NODE_V8_COVERAGE` enabled
                     if (!this.isForeground) {
                         const coverageYargs      = this.coverageYargs
 
-                        // TODO cleanup when dropped support for Node 12
-                        // use newer `rm` if available, the `recursive` option for `rmdir` is deprecated
-                        if (fsPromises.rm)
-                            await fsPromises.rm(coverageYargs.tempDirectory, { recursive : true, force : true })
-                        else
-                            await fsPromises.rmdir(coverageYargs.tempDirectory, { recursive : true })
-
-                        await fsPromises.mkdir(coverageYargs.tempDirectory, { recursive : true })
+                        await this.prepareCoverageReportDirs()
 
                         process.env.NODE_V8_COVERAGE = coverageYargs.tempDirectory
 
                         foreground(process.argv.concat('--is-foreground'), async (done) => {
+                            // need to use the `--reporter` value, normalized to array, Yargs does not do that
                             const c8Report      = C8Report(Object.assign({}, this.coverageYargs, { reporter : this.coverageReporter }))
                             await c8Report.run()
                             done()
@@ -176,6 +213,10 @@ export class LauncherNodejs extends Mixin(
 
                         throw new LauncherRestartOnCodeCoverage()
                     }
+                }
+                // for browser launch
+                else {
+                    await this.prepareCoverageReportDirs()
                 }
             }
         }
@@ -413,14 +454,27 @@ export class LauncherNodejs extends Mixin(
         }
 
 
+        sourcesOfCoverageFile : Map<string, string>     = new Map()
+
+        getSourcesOfCoverageFile (url : string) : string {
+            return this.sourcesOfCoverageFile.get(url)
+        }
+
+
         async collectCoverageInfo (desc : TestDescriptor, rawInfo : V8CodeCoverageInfo[]) {
             rawInfo.forEach(el => {
-                el.url      = el.url.replace(/^https?:\/\//, 'file:///')
+                const url       = el.url = el.url.replace(/^https?:\/\//, 'file:///')
+
+                // avoid constantly shuffling the memory with new values for sources
+                if (!this.sourcesOfCoverageFile.has(url)) this.sourcesOfCoverageFile.set(url, el.source)
             })
 
             const info      = { result : rawInfo }
 
-            await this.runtime.writeToFile(`covcov/${ randomBytes(16).toString("hex") }.json`, JSON.stringify(info))
+            await this.runtime.writeToFile(
+                `${ this.coverageYargs.tempDirectory }/browser-cov-report-${ randomBytes(16).toString("hex") }.json`,
+                JSON.stringify(info)
+            )
         }
 
 
