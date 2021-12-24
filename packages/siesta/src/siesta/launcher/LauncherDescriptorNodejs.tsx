@@ -15,6 +15,12 @@ export const OptionsGroupBrowser  = OptionGroup.new({
 })
 
 
+export const OptionsGroupCodeCoverage  = OptionGroup.new({
+    name        : 'code_coverage',
+    title       : 'Code coverage',
+    weight      : 800
+})
+
 export type SupportedBrowsers   = 'chrome' | 'firefox' | 'edge' | 'safari'
 
 
@@ -98,13 +104,76 @@ export class LauncherDescriptorNodejs extends Mixin(
 
 
         @option({
-            type        : 'boolean',
-            group       : OptionsGroupBrowser,
+            type        : 'string',
+            structure   : 'array',
+            group       : OptionsGroupCodeCoverage,
             help        : <div>
-                Whether to enable the code coverage information collection, when running browser code.
-                See the [[CodeCoverageGuide|Code coverage guide]] for mode details.
+                Providing a value for this option will enable the code coverage information collection for this launch.
+                The value of this option should be any valid Istanbul reporter, like `html` or `text`, full list
+                available here: https://git.io/vHysA
+
+                This option can be provided several times, resulting in several reports being generated.
+
+                See the "Code coverage guide" for mode details.
             </div>
         })
-        coverage            : boolean           = undefined
+        coverageReporter        : string[]          = undefined
+
+
+        @option({
+            type        : 'string',
+            group       : OptionsGroupCodeCoverage,
+            help        : <div>
+            </div>
+        })
+        coverageReportDir       : string           = undefined
+
+
+        @option({
+            type        : 'string',
+            structure   : 'array',
+            group       : OptionsGroupCodeCoverage,
+            help        : <div>
+            </div>
+        })
+        coverageSrc             : string[]          = undefined
+
+
+        @option({
+            type        : 'string',
+            structure   : 'array',
+            group       : OptionsGroupCodeCoverage,
+            help        : <div>
+            </div>
+        })
+        coverageInclude         : string[]          = undefined
+
+
+        @option({
+            type        : 'string',
+            structure   : 'array',
+            group       : OptionsGroupCodeCoverage,
+            help        : <div>
+            </div>
+        })
+        coverageExclude         : string[]          = undefined
+
+
+        @option({
+            type        : 'boolean',
+            group       : OptionsGroupCodeCoverage,
+            help        : <div>
+            </div>
+        })
+        coverageClean           : boolean           = undefined
+
+
+        @option({
+            type        : 'boolean',
+            group       : OptionsGroupCodeCoverage,
+            help        : <div>
+            </div>
+        })
+        coverageAll             : boolean           = undefined
     }
 ) {}
