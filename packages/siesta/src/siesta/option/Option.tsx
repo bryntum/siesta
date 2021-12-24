@@ -212,17 +212,6 @@ export class Option extends Mixin(
 ){}
 
 
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// export class OptionArray extends Mixin(
-//     [ Option ],
-//     (base : ClassUnion<typeof Option>) =>
-//
-//     class Option extends base {
-//
-//     }
-// ) {}
-
-
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export enum OptionsParseWarningCodes {
     UnknownOption               = 'UnknownOption',
@@ -419,7 +408,7 @@ export class OptionsBag extends Base {
     }
 
 
-    extract (predicate : (entry : { key : string, value : string }) => boolean) {
+    extract (predicate : (entry : OptionTokenEntry) => boolean) {
         this.entries    = this.entries.filter(entry => !predicate(entry))
     }
 }
@@ -479,7 +468,7 @@ export const optionErrorTemplateByCode = new Map<OptionsParseErrorCodes, (warnin
             <p><span class="log_message_error"> ERROR </span> Invalid boolean value <span class="accented_value">{ error.input }</span> for option <span class="accented">--{ error.option.name }</span></p>
         </div>
     ],
-    // TODO
+    // TODO, or remove the Map type completely
     [ OptionsParseErrorCodes.InvalidKeyValuePair, () => <div></div> ],
 ])
 
