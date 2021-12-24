@@ -99,6 +99,7 @@ export class LauncherDescriptorTerminal extends Mixin(
 ) {}
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class LauncherTerminal extends Mixin(
     [ Launcher, LauncherDescriptorTerminal ],
     (base : ClassUnion<typeof Launcher, typeof LauncherDescriptorTerminal>) =>
@@ -329,8 +330,8 @@ export class LauncherTerminal extends Mixin(
         }
 
 
-        async launchOnce (projectPlanItemsToLaunch : TestDescriptor[]) {
-            await super.launchOnce(projectPlanItemsToLaunch)
+        async finalize () {
+            await super.finalize()
 
             const reportsGeneration = this.reportFile.map(
                 (reportFile : string, index : number ) => this.generateReport(reportFile, this.reportFormat[ index ])

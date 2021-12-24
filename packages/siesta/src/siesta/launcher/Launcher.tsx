@@ -327,6 +327,8 @@ export class Launcher extends Mixin(
                 await this.performSetupOnce()
 
                 await this.doStart()
+
+                await this.finalize()
             } catch (e) {
                 if (e instanceof LauncherError) {
                     this.onLauncherError(e)
@@ -334,6 +336,11 @@ export class Launcher extends Mixin(
                     this.onUnknownError(e)
                 }
             }
+        }
+
+
+        // finalization hook, only called after successful launch
+        async finalize () {
         }
 
 
