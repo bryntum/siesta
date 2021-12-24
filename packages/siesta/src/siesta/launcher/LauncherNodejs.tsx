@@ -132,6 +132,16 @@ export class LauncherNodejs extends Mixin(
 
 
         async setup () {
+            process.on('unhandledRejection', (reason : any, promise) => {
+                console.log('Unhandled promise rejection, reason:', reason?.stack || reason)
+
+                process.exit(ExitCodes.UNHANDLED_EXCEPTION)
+            })
+
+            process.on('uncaughtException', (reason : any, promise) => {
+                process.exitCode = ExitCodes.UNHANDLED_EXCEPTION
+            })
+
             // probably Puppeteer adds a SIGINT listener to `process`
             // many workers may cause a console warning about having too many
             // listeners, suppress that
@@ -325,16 +335,6 @@ export class LauncherNodejs extends Mixin(
 
 
         static async run () {
-            process.on('unhandledRejection', (reason : any, promise) => {
-                console.log('Unhandled promise rejection, reason:', reason?.stack || reason)
-
-                process.exit(ExitCodes.UNHANDLED_EXCEPTION)
-            })
-
-            process.on('uncaughtException', (reason : any, promise) => {
-                process.exitCode = ExitCodes.UNHANDLED_EXCEPTION
-            })
-
             const launcher  = this.new({
                 inputArguments      : process.argv.slice(2)
             })
