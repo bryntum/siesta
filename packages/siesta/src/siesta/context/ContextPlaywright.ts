@@ -71,7 +71,7 @@ export class ContextPlaywright extends Mixin(
             if (this.provider.launcher instanceof LauncherNodejs && this.provider.launcher.codeCoverageEnabled) {
                 const coverageInfo      = await this.page.coverage.stopJSCoverage()
 
-                await this.provider.launcher.collectCoverageInfo(desc, coverageInfo)
+                await this.provider.launcher.collectBrowserCoverageInfo(desc, coverageInfo)
             }
         }
 

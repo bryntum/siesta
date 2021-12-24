@@ -457,13 +457,14 @@ export class LauncherNodejs extends Mixin(
         sourcesOfCoverageFile : Map<string, string>     = new Map()
 
         getSourcesOfCoverageFile (url : string) : string {
-            return this.sourcesOfCoverageFile.get(url)
+            return this.sourcesOfCoverageFile.get(url) || this.sourcesOfCoverageFile.get('file://' + url) || `No sources available for: ${ url }`
         }
 
 
-        async collectCoverageInfo (desc : TestDescriptor, rawInfo : V8CodeCoverageInfo[]) {
+        async collectBrowserCoverageInfo (desc : TestDescriptor, rawInfo : V8CodeCoverageInfo[]) {
             rawInfo.forEach(el => {
-                const url       = el.url = el.url.replace(/^https?:\/\//, 'file:///')
+                const url       = el.url = el.url
+                    .replace(/^https?:\/\//, 'file:///').replace(/^file:\/\/\/([^/]+):(\d+)/, 'file:///$1/$2')
 
                 // avoid constantly shuffling the memory with new values for sources
                 if (!this.sourcesOfCoverageFile.has(url)) this.sourcesOfCoverageFile.set(url, el.source)
