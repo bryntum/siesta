@@ -632,11 +632,14 @@ export class Launcher extends Mixin(
                         <span class="option_group_name">{ '\n' + group.title + ':\n' + '━'.repeat(group.title.length + 1) }</span>
 
                         {
-                            optionsByGroup.get(group).map(option => <div class="option">
-                                <div class="option_name">{ option.printableDeclaration }</div>
-                                <div class="indented">{ option.help }</div>
-                                <p></p>
-                            </div>)
+                            optionsByGroup.get(group).map(option => option.hideInHelp
+                                ? null
+                                : <div className="option">
+                                    <div className="option_name">{option.printableDeclaration}</div>
+                                    <div className="indented">{option.help}</div>
+                                    <p></p>
+                                </div>
+                            )
                         }
                     </div>)
                 }

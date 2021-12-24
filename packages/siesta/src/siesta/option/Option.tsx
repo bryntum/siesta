@@ -37,6 +37,8 @@ export class Option extends Mixin(
 
         help                : XmlElement            = undefined
 
+        hideInHelp          : boolean               = false
+
         defaultValue        : () => unknown     = () => undefined
 
         reviver             : (value : string) => unknown   = undefined
