@@ -75,6 +75,13 @@ is turned into a path segment, so `http://localhost:8000/src/file.js` becomes `f
 Please take this into account, when examining code coverage reports.
 
 
+Code coverage in Deno 
+--------------
+
+Currently, code coverage in Deno, does not work, because of [this issue](https://github.com/denoland/deno/issues/13206).
+We'll be implementing it as soon as the issue is resolved. 
+
+
 Examples
 --------
 
