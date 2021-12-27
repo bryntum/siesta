@@ -27,12 +27,14 @@ it('Launching isomorphic tests in Node.js should work', async t => {
             launch      : async () => await runProjectDirectly(
                 path.resolve(__dirname, '../@sample_test_suites/isomorphic/index.js'),
                 [
-                    '--report-format', 'json',
-                    '--report-file', `${ tmpDir }/siesta/${ Math.random() }.json`,
-                    '--report-format', 'junit',
-                    '--report-file', `${ tmpDir }/siesta/${ Math.random() }.xml`,
-                    '--report-format', 'html',
-                    '--report-file', `${ tmpDir }/siesta/html-report-${ Math.random() }`,
+                    /*  0 */'--report-format', 'json',
+                    /*  2 */'--report-file', `${ tmpDir }/siesta/${ Math.random() }.json`,
+                    /*  4 */'--report-format', 'junit',
+                    /*  6 */'--report-file', `${ tmpDir }/siesta/${ Math.random() }.xml`,
+                    /*  8 */'--report-format', 'html',
+                    /* 10 */'--report-file', `${ tmpDir }/siesta/html-report-${ Math.random() }`,
+                    /* 12 */'--coverage-reporter', `html`,
+                    /* 14 */'--coverage-report-dir', `${ tmpDir }/siesta/coverage-html-report-${ Math.random() }`,
                 ]
             ),
             func        : async (t : TestNodejs, launchRes : LaunchResult) => {
@@ -40,12 +42,22 @@ it('Launching isomorphic tests in Node.js should work', async t => {
 
                 const options       = launchRes.options
 
+                // json report exists
                 t.true(fs.existsSync(options[ 3 ]), `File ${ options[ 3 ] } exists`)
+
+                // junit report exists
                 t.true(fs.existsSync(options[ 7 ]), `File ${ options[ 7 ] } exists`)
+
+                // html report exists
                 t.true(fs.existsSync(options[ 11 ]), `File ${ options[ 11 ] } exists`)
                 t.true(fs.existsSync(`${ options[ 11 ] }/report_data.json`), `File ${ options[ 11 ] }/report_data.json exists`)
                 t.true(fs.existsSync(`${ options[ 11 ] }/index.html`), `File ${ options[ 11 ] }/index.html exists`)
                 t.true(fs.existsSync(`${ options[ 11 ] }/dist`), `File ${ options[ 11 ] }/dist exists`)
+
+                // code coverage report exists
+                t.true(fs.existsSync(`${ options[ 15 ] }`), `File ${ options[ 15 ] } exists`)
+                t.true(fs.existsSync(`${ options[ 15 ] }/index.html`), `File ${ options[ 15 ] }/index.html exists`)
+                t.true(fs.existsSync(`${ options[ 15 ] }/tmp`), `File ${ options[ 15 ] }/tmp exists`)
             }
         },
         {
