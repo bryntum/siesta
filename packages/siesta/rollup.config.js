@@ -86,6 +86,10 @@ export default defineConfig({
         'glob',
         'chalk',
         'ws',
-        'fs-extra'
+        'fs-extra',
+        'c8',
+        'istanbul-reports',
+        'istanbul-lib-report',
+        'foreground-child'
     ]
 })
