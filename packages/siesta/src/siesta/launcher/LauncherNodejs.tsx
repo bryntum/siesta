@@ -117,11 +117,8 @@ export class LauncherNodejs extends Mixin(
 
             if (this.coverageReporter) {
                 if (this.getEnvironmentByUrl(this.project) === 'browser') {
-                    const coverageYargs         = this.coverageYargs
-
-                    // need to use the `--reporter` value, normalized to array, Yargs does not do that
                     const c8Report      = C8Report(Object.assign(
-                        {}, coverageYargs, { reporter : this.coverageReporter, allowExternal : true }
+                        this.coverageYargsAsObject, { allowExternal : true }
                     ))
 
                     c8Report._getSourceMap = function (v8ScriptCov) {
@@ -168,14 +165,37 @@ export class LauncherNodejs extends Mixin(
         async prepareCoverageReportDirs () {
             const coverageYargs      = this.coverageYargs
 
-            // TODO cleanup when dropped support for Node 12
-            // use newer `rm` if available, the `recursive` option for `rmdir` is deprecated
+            // TODO cleanup when dropping support for Node 12
+            // use newer `rm` (Node 14.xx) if available, the `recursive` option for `rmdir` is deprecated
             if (fsPromises.rm)
                 await fsPromises.rm(coverageYargs.tempDirectory, { recursive : true, force : true })
             else
                 await fsPromises.rmdir(coverageYargs.tempDirectory, { recursive : true })
 
             await fsPromises.mkdir(coverageYargs.tempDirectory, { recursive : true })
+        }
+
+
+        get coverageYargsAsObject () : object {
+            const argv      = this.coverageYargs
+
+            return {
+                include             : argv.include,
+                exclude             : argv.exclude,
+                excludeAfterRemap   : argv.excludeAfterRemap,
+                reporter            : Array.isArray(argv.reporter) ? argv.reporter : [argv.reporter],
+                reportsDirectory    : argv['reports-dir'],
+                tempDirectory       : argv.tempDirectory,
+                watermarks          : argv.watermarks,
+                resolve             : argv.resolve,
+                omitRelative        : argv.omitRelative,
+                wrapperLength       : argv.wrapperLength,
+                all                 : argv.all,
+                allowExternal       : argv.allowExternal,
+                src                 : argv.src,
+                skipFull            : argv.skipFull,
+                excludeNodeModules  : argv.excludeNodeModules
+            }
         }
 
 
@@ -194,8 +214,7 @@ export class LauncherNodejs extends Mixin(
                         process.env.NODE_V8_COVERAGE = coverageYargs.tempDirectory
 
                         foreground(process.argv.concat('--is-foreground'), async (done) => {
-                            // need to use the `--reporter` value, normalized to array, Yargs does not do that
-                            const c8Report      = C8Report(Object.assign({}, this.coverageYargs, { reporter : this.coverageReporter }))
+                            const c8Report      = C8Report(this.coverageYargsAsObject)
                             await c8Report.run()
                             done()
                         })
