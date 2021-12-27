@@ -1,8 +1,8 @@
 Code coverage with Siesta
 ==================
 
-Code coverage provides information about what parts of your codebase are actually executed while running your test suite.
-It is said, that such code is "covered with tests". Code, that has not been executed while running the test suite is called 
+Code coverage report provides information about which parts of your codebase are actually executed while running your test suite.
+It is said, that such code is "covered with tests". Code, that has not been executed while running the test suite, is called 
 "uncovered". Basically, there are no tests for uncovered code.
 
 The meaning of the code coverage information should not be overestimated. "Covered" code 
@@ -25,6 +25,8 @@ Siesta aims to provide just a thin integration level over the current state-of-a
 these are [Istanbul/Nyc](https://github.com/istanbuljs/nyc) and [c8](https://github.com/bcoe/c8)). 
 This is to be able to freely upgrade those libraries and stay up to date with their new features and bug fixes.
 
+The code coverage reports are generated directly by the Istanbul library.
+
 
 Collecting code coverage 
 --------------
@@ -32,7 +34,7 @@ Collecting code coverage
 To enable the code coverage, specify the value for the `--coverage-reporter` command line option. It will enable the 
 code coverage collection and generate a report, after the test suite has completed. Recognized values are the names of the Istanbul reporter packages, 
 listed [here](https://github.com/istanbuljs/istanbuljs/tree/master/packages/istanbul-reports/lib).
-Most often used ones are: `html` and `text`. Note, that `text` report will just output the information to the `stdout` and not save it file.
+Most often used ones are: `html`, `html-spa` and `text`. Note, that `text` report will just output the information to the `stdout` and not save it file.
 This option can be repeated several times, resulting in several report generated. 
 
 Other options for code coverage are:
@@ -67,8 +69,8 @@ Code coverage in browser
 
 None of the current code coverage tools support code coverage for browsers. Because of that, Siesta performs some workarounds.
 
-Notably, the protocol of all source file urls is changed from `http/https` to `file`. Port, if it is presented in the url
-is turned into a path segment, so `http://localhost:8000/src/file.js` turns into `file://localhost/8000/src/file.js`.
+Notably, the protocol of all source file urls is changed from `http/https` to `file`. Port, if it presents in the url
+is turned into a path segment, so `http://localhost:8000/src/file.js` becomes `file://localhost/8000/src/file.js`.
 
 Please take this into account, when examining code coverage reports.
 
