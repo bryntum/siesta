@@ -1,1 +1,1 @@
-export * from './src/iterator/Iterator.js'
+export * from './src/module.js'
