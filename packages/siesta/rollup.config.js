@@ -87,7 +87,8 @@ export default defineConfig({
         'chalk',
         'ws',
         'fs-extra',
-        'c8',
+        'c8/lib/report.js',
+        'c8/lib/parse-args.js',
         'istanbul-reports',
         'istanbul-lib-report',
         'foreground-child'
