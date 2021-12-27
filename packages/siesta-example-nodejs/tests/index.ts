@@ -6,14 +6,4 @@ const project = Project.new({
     testDescriptor          : {}
 })
 
-project.plan(
-    {
-        url         : 'chained_iterator',
-
-        items       : [
-            'chained_iterator.t.js',
-        ]
-    }
-)
-
 project.start()
