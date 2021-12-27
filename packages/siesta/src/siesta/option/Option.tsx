@@ -406,7 +406,7 @@ export class OptionsBag extends Base {
 
 
     normalizeOptionName (name : string) : string {
-        return name.replace(/[-_]/, '').toLowerCase()
+        return name.replace(/[-_]/g, '').toLowerCase()
     }
 
 
