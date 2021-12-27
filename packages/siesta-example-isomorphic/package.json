@@ -1,20 +1,24 @@
 {
-  "name": "siesta-example-isomorphic",
-  "version": "0.0.1",
-  "description": "Sample Siesta isomorphic test suite",
-  "main": "index.js",
-  "module": "index.js",
-  "type": "module",
-  "scripts": {
-    "test": "node ./tests/index.js"
-  },
-  "keywords": [],
-  "author": "Bryntum, Nickolay Platonov",
-  "license": "MIT",
-  "dependencies": {},
-  "devDependencies": {
-    "@bryntum/siesta": "file:../bryntum-siesta-6.0.0-alpha-3.tgz",
-    "tslint": "^6.1.3",
-    "typescript": "^4.3.5"
-  }
+    "name": "siesta-example-isomorphic",
+    "version": "0.0.1",
+    "description": "Sample Siesta isomorphic test suite",
+    "main": "index.js",
+    "module": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "npx wds --node-resolve",
+        "test_node": "node ./tests/index.js",
+        "test_browser": "npx siesta http://localhost:8000/tests/index.js",
+        "test_deno": "deno run -A --unstable --no-check tests/index.js"
+    },
+    "keywords": [],
+    "author": "Bryntum, Nickolay Platonov",
+    "license": "MIT",
+    "dependencies": {},
+    "devDependencies": {
+        "@bryntum/siesta": "^6.0.0-alpha-5",
+        "tslint": "^6.1.3",
+        "typescript": "^4.3.5",
+        "@web/dev-server": "^0.1.28"
+    }
 }

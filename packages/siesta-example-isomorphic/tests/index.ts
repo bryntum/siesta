@@ -1,4 +1,4 @@
-import { Project } from "@bryntum/siesta/index.js"
+import { Project } from "../node_modules/@bryntum/siesta/index.js"
 
 const project = Project.new({
     title                   : 'Chained iterator test suite',
@@ -7,13 +7,7 @@ const project = Project.new({
 })
 
 project.plan(
-    {
-        url         : 'chained_iterator',
-
-        items       : [
-            'chained_iterator.t.js',
-        ]
-    }
+    'summer.t.js'
 )
 
 project.start()
