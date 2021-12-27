@@ -7,13 +7,7 @@ const project = Project.new({
 })
 
 project.plan(
-    {
-        url         : 'chained_iterator',
-
-        items       : [
-            'chained_iterator.t.js',
-        ]
-    }
+    'summer.t.js'
 )
 
 project.start()
