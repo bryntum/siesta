@@ -184,8 +184,6 @@ export class LauncherNodejs extends Mixin(
             if (this.coverageReporter) {
                 // for Node.js launch
                 if (this.getEnvironmentByUrl(this.project) === 'nodejs') {
-                    console.log("NODEJS COV", this.project)
-
                     // and this is the "original" launch, not the secondary "foreground" launch
                     // with the `NODE_V8_COVERAGE` enabled
                     if (!this.isForeground) {
