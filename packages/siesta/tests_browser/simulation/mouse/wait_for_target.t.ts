@@ -1,5 +1,5 @@
 import { beforeEach, it, TestBrowser } from "../../../browser.js"
-import { delay, measure } from "../../../src/util/TimeHelpers.js"
+import { delay, measureTrigger } from "../../../src/util/TimeHelpers.js"
 import { createPositionedElement } from "../../@helpers.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -98,11 +98,14 @@ const basicTestingScenarios = (
     it(name, async t => {
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         t.it('`mouseDown` should await for target to become actionable', async t => {
-            const div = createDelayedDiv()
+            const { elapsed } = await measureTrigger(
+                t.mouseDown('#delayed'),
+                () => {
+                    const div = createDelayedDiv()
 
-            t.firesOnce(div, 'mousedown')
-
-            const { elapsed } = await measure(t.mouseDown('#delayed'))
+                    t.firesOnce(div, 'mousedown')
+                }
+            )
 
             t.isGreaterOrEqual(elapsed, defaultDelay)
 
@@ -114,11 +117,14 @@ const basicTestingScenarios = (
         t.it('`mouseUp` should await for target to become actionable', async t => {
             await t.mouseDown()
 
-            const div = createDelayedDiv()
+            const { elapsed } = await measureTrigger(
+                t.mouseUp('#delayed'),
+                () => {
+                    const div = createDelayedDiv()
 
-            t.firesOnce(div, 'mouseup')
-
-            const { elapsed } = await measure(t.mouseUp('#delayed'))
+                    t.firesOnce(div, 'mouseup')
+                }
+            )
 
             t.isGreaterOrEqual(elapsed, defaultDelay)
         })
@@ -126,11 +132,14 @@ const basicTestingScenarios = (
 
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         !skipMouseMove && t.it('`moveMouseTo` should await for target to become actionable', async t => {
-            const div = createDelayedDiv()
+            const { elapsed } = await measureTrigger(
+                t.moveMouseTo('#delayed'),
+                () => {
+                    const div = createDelayedDiv()
 
-            t.waitForEvent(div, 'mouseenter')
-
-            const { elapsed } = await measure(t.moveMouseTo('#delayed'))
+                    t.waitForEvent(div, 'mouseenter')
+                }
+            )
 
             t.isGreaterOrEqual(elapsed, defaultDelay)
         })
@@ -138,11 +147,14 @@ const basicTestingScenarios = (
 
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         t.it('`click` should await for target to become actionable', async t => {
-            const div = createDelayedDiv()
+            const { elapsed } = await measureTrigger(
+                t.click('#delayed'),
+                () => {
+                    const div = createDelayedDiv()
 
-            t.firesOnce(div, 'click')
-
-            const { elapsed } = await measure(t.click('#delayed'))
+                    t.firesOnce(div, 'click')
+                }
+            )
 
             t.isGreaterOrEqual(elapsed, defaultDelay)
         })
@@ -150,13 +162,16 @@ const basicTestingScenarios = (
 
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         t.it('`rightClick` should await for target to become actionable', async t => {
-            const div = createDelayedDiv()
+            const { elapsed } = await measureTrigger(
+                t.rightClick('#delayed'),
+                () => {
+                    const div = createDelayedDiv()
 
-            t.firesOnce(div, 'contextmenu')
+                    t.firesOnce(div, 'contextmenu')
 
-            div.addEventListener('contextmenu', e => e.preventDefault())
-
-            const { elapsed } = await measure(t.rightClick('#delayed'))
+                    div.addEventListener('contextmenu', e => e.preventDefault())
+                }
+            )
 
             t.isGreaterOrEqual(elapsed, defaultDelay)
         })
@@ -164,11 +179,14 @@ const basicTestingScenarios = (
 
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         t.it('`doubleClick` should await for target to become actionable', async t => {
-            const div = createDelayedDiv()
+            const { elapsed } = await measureTrigger(
+                t.doubleClick('#delayed'),
+                () => {
+                    const div = createDelayedDiv()
 
-            t.firesOnce(div, 'dblclick')
-
-            const { elapsed } = await measure(t.doubleClick('#delayed'))
+                    t.firesOnce(div, 'dblclick')
+                }
+            )
 
             t.isGreaterOrEqual(elapsed, defaultDelay)
         })
@@ -176,11 +194,14 @@ const basicTestingScenarios = (
 
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         t.it('`dragTo` should await for target to become actionable', async t => {
-            const div = createDelayedDiv()
+            const { elapsed } = await measureTrigger(
+                t.dragTo('#delayed', [ 300, 300 ]),
+                () => {
+                    const div = createDelayedDiv()
 
-            t.firesOnce(div, 'mousedown')
-
-            const { elapsed } = await measure(t.dragTo('#delayed', [ 300, 300 ]))
+                    t.firesOnce(div, 'mousedown')
+                }
+            )
 
             t.isGreaterOrEqual(elapsed, defaultDelay)
         })
@@ -188,11 +209,14 @@ const basicTestingScenarios = (
 
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         t.it('`dragBy` should await for target to become actionable', async t => {
-            const div = createDelayedDiv()
+            const { elapsed } = await measureTrigger(
+                t.dragBy('#delayed', [ 100, 100 ]),
+                () => {
+                    const div = createDelayedDiv()
 
-            t.firesOnce(div, 'mousedown')
-
-            const { elapsed } = await measure(t.dragBy('#delayed', [ 100, 100 ]))
+                    t.firesOnce(div, 'mousedown')
+                }
+            )
 
             t.isGreaterOrEqual(elapsed, defaultDelay)
         })
@@ -238,19 +262,20 @@ it('`dragTo` method  should wait for target', async t => {
 
     document.body.appendChild(source)
 
-    setTimeout(() => {
-        const target       = createPositionedElement('div', { left : 250, top : 50, width : 100, height : 100 })
-        target.id                       = 'target'
-        target.style.backgroundColor    = 'blue'
-
-        document.body.appendChild(target)
-
-        t.firesOnce('#target', 'mouseup')
-    }, defaultDelay)
-
     t.firesOnce('#source', 'mousedown')
 
-    const { elapsed } = await measure(t.dragTo('#source', '#target'))
+    const { elapsed } = await measureTrigger(
+        t.dragTo('#source', '#target'),
+        () => setTimeout(() => {
+            const target       = createPositionedElement('div', { left : 250, top : 50, width : 100, height : 100 })
+            target.id                       = 'target'
+            target.style.backgroundColor    = 'blue'
+
+            document.body.appendChild(target)
+
+            t.firesOnce('#target', 'mouseup')
+        }, defaultDelay)
+    )
 
     t.isGreaterOrEqual(elapsed, defaultDelay)
 })

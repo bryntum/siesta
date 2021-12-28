@@ -1,3 +1,4 @@
+import { AnyFunction } from "typescript-mixin-class/src/class/Mixin.js"
 import { OrPromise, SetTimeoutHandler } from "./Helpers.js"
 import { isPromise } from "./Typeguards.js"
 
@@ -11,6 +12,36 @@ export const delay = (timeout : number) : Promise<void> => new Promise(resolve =
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const measure = async <T>(promise : Promise<T>) : Promise<{ elapsed : number, resolved : T }> => {
     const start     = Date.now()
+    const resolved  = await promise
+
+    return { elapsed : Date.now() - start, resolved }
+}
+
+/*
+A naive waiting, like:
+    setTimeout(() => container.setHidden(false), defaultDelay)
+
+    const result        = await measure(t.waitForComponentVisible(container))
+
+    t.isGreaterOrEqual(result.elapsed, defaultDelay)
+
+Is giving sporadic failures like
+
+    Received:
+      97 (99 more often)
+    Expect value greater or equal than:
+      100
+
+The reason I guess is that `setTimeout` starts _before_ the promise, so it might take a ms or more before the
+promise method will start.
+
+To fix it, we start the promise first, then timer, then trigger the `setTimeout`
+*/
+export const measureTrigger = async <T>(promise : Promise<T>, trigger : AnyFunction) : Promise<{ elapsed : number, resolved : T }> => {
+    const start     = Date.now()
+
+    trigger()
+
     const resolved  = await promise
 
     return { elapsed : Date.now() - start, resolved }
