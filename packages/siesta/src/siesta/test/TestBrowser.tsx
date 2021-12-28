@@ -52,12 +52,12 @@ export class TestBrowser extends Mixin(
         @prototypeValue(TestDescriptorBrowser)
         testDescriptorClass     : typeof TestDescriptorBrowser
 
-        descriptor          : TestDescriptorBrowser
+        descriptor              : TestDescriptorBrowser
 
         // @prototypeValue(ExecutionContextBrowser)
         // executionContextClass   : typeof ExecutionContext
 
-        connector           : TestLauncherChild & Simulator
+        connector               : TestLauncherChild & Simulator
 
         mouseCursorVisualizer   : MouseCursorVisualizer     = MouseCursorVisualizer.new()
 
