@@ -408,14 +408,17 @@ export type DeepCompareOptions = {
     // even if they contain the same properties
     requireSameClass            : boolean
     maxDifferences              : number,
-    cycleIsPartOfDataStructure  : boolean
+    cycleIsPartOfDataStructure  : boolean,
+
+    compareDateByValue          : boolean
 }
 
 const defaultDeepCompareOptions : DeepCompareOptions = {
     omitEqual                   : false,
     requireSameClass            : false,
     maxDifferences              : Number.MAX_SAFE_INTEGER,
-    cycleIsPartOfDataStructure  : true
+    cycleIsPartOfDataStructure  : true,
+    compareDateByValue          : true
 }
 
 
@@ -821,7 +824,7 @@ const compareDateDeepDiff = function (
 ) : Difference {
     const difference = DifferenceReferenceableAtomic.new({ value1 : date1, value2 : date2, same : date1.getTime() === date2.getTime() })
 
-    state.markVisited(date1, date2, difference, convertingToDiff)
+    if (!options.compareDateByValue) state.markVisited(date1, date2, difference, convertingToDiff)
 
     return difference
 }

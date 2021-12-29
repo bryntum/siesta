@@ -1,11 +1,15 @@
-import { it, iit } from "../../index.js"
+import { it } from "../../index.js"
 import {
     compareDeepDiff,
-    DifferenceAtomic,
     DifferenceArray,
+    DifferenceAtomic,
+    DifferenceHeterogeneous,
     DifferenceMap,
-    DifferenceObject, DifferenceReference,
-    DifferenceSet, DifferenceHeterogeneous, DifferenceReferenceable
+    DifferenceObject,
+    DifferenceReference,
+    DifferenceReferenceable,
+    DifferenceReferenceableAtomic,
+    DifferenceSet
 } from "../../src/compare_deep/CompareDeepDiff.js"
 
 
@@ -456,4 +460,25 @@ it('Deep compare should work with circular data structures #4', async t => {
             ]
         })
     )
+})
+
+
+it('Dates should be compared as values, not as objects', async t => {
+    const dateGen       = () => new Date(2020, 1, 1)
+    const date          = dateGen()
+
+    const v1            = [ date, date ]
+    const v2            = [ dateGen(), dateGen()]
+
+    t.equal(compareDeepDiff(v1, v2), DifferenceArray.new({
+        same            : true,
+
+        value1          : v1,
+        value2          : v2,
+
+        comparisons     : [
+            { index : 0, difference : DifferenceReferenceableAtomic.new({ value1 : date, value2 : date, same : true }) },
+            { index : 1, difference : DifferenceReferenceableAtomic.new({ value1 : date, value2 : date, same : true }) },
+        ]
+    }))
 })
