@@ -431,6 +431,10 @@ export class DashboardCore extends Mixin(
 
 
         getTestResultComponentFromMouseEvent (e : MouseEvent) : TestNodeResultReactive | undefined {
+            const subtestTitle : Element = (e.target as Element).closest('.subtest-title')
+
+            if (!subtestTitle) return undefined
+
             const testResult : ComponentElement<TestNodeResultComponent> = (e.target as Element).closest('.test-file-comp, .subtest-comp')
 
             return testResult ? testResult.comp.testNode : undefined
