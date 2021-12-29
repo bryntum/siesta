@@ -32,7 +32,6 @@ export class Dashboard extends Mixin(
                 this.launchContinuously(desc.leavesAxis(), e.ctrlKey ? 'page' : undefined)
             }
 
-            // TODO move this to `LaunchInfoComponent`
             const result    = this.getTestResultComponentFromMouseEvent(e)
 
             if (result) {
