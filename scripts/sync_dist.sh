@@ -28,5 +28,7 @@ cd $DIST
 
 echo $(pwd)
 
+(cd packages/siesta && npx sass resources/styling)
+
 scripts/compile.sh -s "-r"
 )
