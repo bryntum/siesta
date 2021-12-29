@@ -345,6 +345,7 @@ export class LauncherNodejs extends Mixin(
                 await browser.newPage({ viewport : null, ignoreHTTPSErrors : true, bypassCSP : true })
 
             let webServer   : UnwrapPromise<ReturnType<typeof startDevServer>>
+            let cwd         : string
             let webPort     : number
 
             const isBrowserProject  = this.getEnvironmentByUrl(this.project) === 'browser'
@@ -374,10 +375,22 @@ export class LauncherNodejs extends Mixin(
             // we only need a webserver for the terminal projects, for browser projects
             // we use the user webserver
             if (!isBrowserProject) {
+                cwd                     = path.resolve('./')
+
+                do {
+                    let relPath         = path.relative(cwd, fileURLToPath(siestaPackageRootUrl))
+
+                    if (!relPath.startsWith('../')) break
+
+                    cwd                 = path.resolve(cwd, '..')
+                } while (true)
+
                 webServer               = await startDevServer({
                     config : {
+                        rootDir     : cwd,
                         nodeResolve : true
                     },
+                    readCliArgs         : false,
                     logStartMessage     : false
                 })
 
@@ -462,7 +475,7 @@ export class LauncherNodejs extends Mixin(
             if (isBrowserProject) {
                 await page.goto(`${ this.projectData.siestaPackageRootUrl }resources/dashboard/index.html?port=${ wsPort }`)
             } else {
-                const relPath           = path.relative('./', fileURLToPath(`${ siestaPackageRootUrl }resources/dashboard/index.html`))
+                const relPath           = path.relative(cwd, fileURLToPath(`${ siestaPackageRootUrl }resources/dashboard/index.html`))
 
                 await page.goto(`http://localhost:${ webPort }/${ relPath }?port=${ wsPort }`)
             }
