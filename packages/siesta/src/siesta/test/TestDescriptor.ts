@@ -349,7 +349,7 @@ export class TestDescriptor extends TestDescriptorPre {
 
     // TODO refactor this, see comment for TestDescriptorBrowser
     isRunningInDashboard () : boolean {
-        return false
+        return true
     }
 
 

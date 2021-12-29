@@ -23,6 +23,12 @@ export class TestDescriptorDeno extends Mixin(
 
     class TestDescriptorDeno extends base {
         type            : EnvironmentType               = 'deno'
+
+
+        // TODO refactor this, see comment for TestDescriptorBrowser
+        isRunningInDashboard () : boolean {
+            return false
+        }
     }
 ){}
 

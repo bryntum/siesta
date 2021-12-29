@@ -23,6 +23,12 @@ export class TestDescriptorNodejs extends Mixin(
 
     class TestDescriptorNodejs extends base {
         type            : EnvironmentType               = 'nodejs'
+
+
+        // TODO refactor this, see comment for TestDescriptorBrowser
+        isRunningInDashboard () : boolean {
+            return false
+        }
     }
 ){}
 
