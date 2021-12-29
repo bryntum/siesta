@@ -272,12 +272,22 @@ export class Dispatcher extends Mixin(
             return this.launcher.dashboardConnector?.setLaunchState(desc, launchState)
         }
 
-
+        // TODO pure mess, global refactor needed
         chooseContextProviderFor (desc : TestDescriptor) : ContextProvider {
             if (this.launcher.dashboardConnector && desc.type === 'browser' && (desc.isolation === 'iframe' || desc.isolation === 'context')) {
                 // in pure-browser mode there's only 1 context provider
                 return this.contextProviders[ 1 ] || this.contextProviders[ 0 ]
-            } else {
+            }
+            // launching isomorphic code in browser - can always
+            else if (
+                this.launcher.dashboardConnector
+                && desc.type === 'isomorphic'
+                && this.launcher.getEnvironmentByUrl(this.launcher.project) === 'browser'
+                && desc.isolation !== 'page'
+            ) {
+                return this.contextProviders[ 1 ] || this.contextProviders[ 0 ]
+            }
+            else {
                 return this.contextProviders[ 0 ]
             }
         }
