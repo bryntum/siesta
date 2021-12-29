@@ -23,21 +23,6 @@ export class TestReact extends Mixin(
         testDescriptorClass     : typeof TestDescriptorReact
 
         descriptor              : TestDescriptorReact
-
-
-        // addListenerToObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
-        //     observable.addEventListener(event, listener)
-        // }
-        //
-        //
-        // removeListenerFromObservable (observable : this[ 'ObservableT' ], event : string, listener : AnyFunction) {
-        //     observable.removeEventListener(event, listener)
-        // }
-        //
-        //
-        // resolveObservable (source : ActionTarget) : Element {
-        //     return this.resolveActionTarget(source)
-        // }
     }
 ) {}
 
