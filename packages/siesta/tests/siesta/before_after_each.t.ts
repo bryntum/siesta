@@ -150,3 +150,73 @@ describe('Should be possible to add assertions in the `before/afterEach`', t => 
     t.is((spec2.resultLog[ 0 ] as Assertion).description, 'before')
     t.is((spec2.resultLog[ 1 ] as Assertion).description, 'after')
 })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let log3 : string[]      = []
+
+describe('Should wait for callback before completing the hook', t => {
+
+    t.it('Root', t => {
+        log3.push('Root')
+
+        t.beforeEach(t => {
+            log3.push('Root-beforeEach1')
+        })
+
+        t.beforeEach((t, next) => {
+            setTimeout(() => {
+                log3.push('Root-beforeEach2')
+                next()
+            }, 10)
+        })
+
+        t.afterEach(t => {
+            log3.push('Root-afterEach1')
+        })
+
+        t.afterEach((t, next) => {
+            setTimeout(() => {
+                log3.push('Root-afterEach2')
+                next()
+            }, 10)
+        })
+
+        t.it("Root->Spec1", t => {
+            log3.push('Root->Spec1')
+
+            t.beforeEach(t => {
+                log3.push('Spec1-beforeEach')
+            })
+
+            t.afterEach(t => {
+                log3.push('Spec1-afterEach')
+            })
+
+            t.it('Root->Spec1->Spec11', t => {
+                log3.push('Root->Spec1->Spec11')
+            })
+        })
+
+    })
+
+}).finishHook.on(t => {
+    t.equal(log3,
+        [
+            'Root',
+                'Root-beforeEach1',
+                'Root-beforeEach2',
+                'Root->Spec1',
+                    'Root-beforeEach1',
+                    'Root-beforeEach2',
+                    'Spec1-beforeEach',
+                    'Root->Spec1->Spec11',
+                    'Spec1-afterEach',
+                    'Root-afterEach1',
+                    'Root-afterEach2',
+                'Root-afterEach1',
+                'Root-afterEach2',
+        ],
+        'Correctly called all before/after actions'
+    )
+})

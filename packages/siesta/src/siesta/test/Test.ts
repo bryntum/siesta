@@ -92,6 +92,12 @@ class TestPre extends Mixin(
 ){}
 
 
+/**
+ * The type for test's before/after hooks, which can be created with [[Test.beforeEach]]/[[Test.afterEach]]
+ */
+export type BeforeAfterHook<T extends Test> = (t : T, next? : AnyFunction) => any
+
+
 let isSilentAssertionAddition : boolean = false
 
 /**
@@ -134,8 +140,8 @@ export class Test extends TestPre {
 
     connector           : TestLauncherChild     = undefined
 
-    beforeEachHooks     : ((t : this) => any)[] = []
-    afterEachHooks      : ((t : this) => any)[] = []
+    beforeEachHooks     : BeforeAfterHook<this>[]   = []
+    afterEachHooks      : BeforeAfterHook<this>[]   = []
 
     isExclusive         : boolean               = false
 
@@ -218,7 +224,7 @@ export class Test extends TestPre {
      * It is usually used to restore some global state to the predefined value.
      *
      * `it` sections can be nested, and hooks can be added at every level.
-     * `beforeEach` hooks are executed starting from the outer-most one level.
+     * `beforeEach` hooks are executed starting from the outermost level.
      *
      * The 1st argument of the hook function is always the test instance being launched.
      *
@@ -231,7 +237,7 @@ export class Test extends TestPre {
      *
      * let sum
 
-     * beforeEach(() => sum = 0)
+     * beforeEach(async t => sum = 0)
      *
      * it('Test section #1', async t => {
      *     sum++
@@ -239,15 +245,19 @@ export class Test extends TestPre {
      * })
      *
      * it('Test section #2', async t => {
-     *     sum++
-     *     t.equal(sum, 1)
+     *     sum  += 2
+     *     t.equal(sum, 2)
      * })
      * ```
+     *
+     * Backward compatibility. The hook function also accepts an optional second argument, which is a callback,
+     * which should be called, indicating that hook execution has complete. If it is provided, Siesta will await
+     * both for any promise returned from the hook function and for the call to callback.
      *
      * @category Subtest management
      * @param code
      */
-    beforeEach (code : (t : this) => any) {
+    beforeEach (code : BeforeAfterHook<this>) {
         this.beforeEachHooks.push(code)
     }
 
@@ -260,7 +270,7 @@ export class Test extends TestPre {
      * available after the test completion.
      *
      * `it` sections can be nested, and hooks can be added at every level.
-     * `afterEach` hooks are executed starting from the inner-most one level.
+     * `afterEach` hooks are executed starting from the innermost level.
      *
      * The 1st argument of the hook function is always the test instance being launched.
      *
@@ -272,24 +282,22 @@ export class Test extends TestPre {
      * import { it, beforeEach } from "@bryntum/siesta/index.js"
      *
      * let file
-     * beforeEach(() => file = OPEN_FILE())
-     * afterEach(() => CLOSE_FILE(file))
+     * beforeEach(async () => file = await OPEN_FILE())
+     * afterEach(async () => await CLOSE_FILE(file))
      *
-     * it('Test section #1', async t => {
-     *     sum++
-     *     t.equal(sum, 1)
-     * })
-     *
-     * it('Test section #2', async t => {
-     *     sum++
-     *     t.equal(sum, 1)
+     * it('Test section', async t => {
+     *     const content = await READ_FILE(file)
      * })
      * ```
+     *
+     * Backward compatibility. The hook function also accepts an optional second argument, which is a callback,
+     * which should be called, indicating that hook execution has complete. If it is provided, Siesta will await
+     * both for any promise returned from the hook function and for the call to callback.
      *
      * @category Subtest management
      * @param code
      */
-    afterEach (code : (t : this) => any) {
+    afterEach (code : BeforeAfterHook<this>) {
         this.afterEachHooks.push(code)
     }
 
@@ -685,9 +693,17 @@ export class Test extends TestPre {
     }
 
 
-    async runBeforeAfterHook (hook : (t : this) => any, hookType : 'before' | 'after') {
+    async runBeforeAfterHook (hook : BeforeAfterHook<this>, hookType : 'before' | 'after') {
         try {
-            await hook(this)
+            if (hook.length === 2) {
+                let done : AnyFunction
+                await Promise.all([
+                    // should evaluate first and set value for `done`
+                    new Promise(resolve => done = resolve),
+                    hook(this, done)
+                ])
+            } else
+                await hook(this)
         } catch (exception) {
             this.addResult(Exception.new({ title : `Exception while running ${ hookType } hook`, exception }))
         }
@@ -1219,7 +1235,7 @@ export const xdescribe = api.xdescribe
 /**
  * Alias for {@link Test.beforeEach | beforeEach} method.
  */
-export const beforeEach = (code : (t : Test) => any) => {
+export const beforeEach = (code : BeforeAfterHook<Test>) => {
     const currentTest       = globalTestEnv.currentTest || globalTestEnv.topTest
 
     if (currentTest)
@@ -1231,7 +1247,7 @@ export const beforeEach = (code : (t : Test) => any) => {
 /**
  * Alias for {@link Test.afterEach | afterEach} method.
  */
-export const afterEach = (code : (t : Test) => any) => {
+export const afterEach = (code : BeforeAfterHook<Test>) => {
     const currentTest       = globalTestEnv.currentTest || globalTestEnv.topTest
 
     if (currentTest)
