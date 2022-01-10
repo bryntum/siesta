@@ -616,8 +616,6 @@ const compareKeys = function <K, V>(
 )
     : { common : { el1 : K, el2 : K, difference : Difference }[], onlyIn1 : Set<K>, onlyIn2 : Set<K> }
 {
-    const pathSegmentType   = setMap1 instanceof Map ? 'map_key' : 'set_element'
-
     const common            = [] as { el1 : K, el2 : K, difference : Difference }[]
     const onlyIn1           = new Set<K>()
     const onlyIn2           = new Set<K>(setMap2.keys())
