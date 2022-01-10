@@ -574,6 +574,28 @@ export class Test extends TestPre {
     }
 
 
+    // keeping private for now, for internal usage
+    // this method creates a sub-test, pretty much exactly as `t.it()`, launches it,
+    // and returns a promise which resolves on sub-test completion
+    // it might make sense to have this behavior for regular `t.it()`, however, will require
+    // refactoring of the `skipInfo` mechanism
+    async subTest (name : TestDescriptorArgument<this>, code : (t : this) => any) : Promise<this> {
+        const descriptor : TestDescriptor   = this.createChildDescriptor(name)
+
+        const cls       = this.constructor as typeof Test
+
+        const subTest   = cls.new({ descriptor, code, parentNode : this, connector : this.connector }) as this
+
+        this.addResult(subTest)
+
+        subTest.connector    = this.connector
+
+        await subTest.start()
+
+        return subTest
+    }
+
+
     get isFinished () : boolean {
         return this.endDate !== undefined
     }

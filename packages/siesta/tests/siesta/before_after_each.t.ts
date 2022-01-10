@@ -220,3 +220,33 @@ describe('Should wait for callback before completing the hook', t => {
         'Correctly called all before/after actions'
     )
 })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let log4 : string[]      = []
+
+describe('Should wait for callback before completing the hook', t => {
+
+    t.it('Root', async t => {
+        log4.push('Root')
+
+        await t.subTest("Root->Spec1", async t => {
+            log4.push('Root->Spec1')
+
+            await t.subTest('Root->Spec1->Spec11', t => {
+                log4.push('Root->Spec1->Spec11')
+            })
+        })
+
+    })
+
+}).finishHook.on(t => {
+    t.equal(log4,
+        [
+            'Root',
+                'Root->Spec1',
+                    'Root->Spec1->Spec11',
+        ],
+        'Correctly called all before/after actions'
+    )
+})
