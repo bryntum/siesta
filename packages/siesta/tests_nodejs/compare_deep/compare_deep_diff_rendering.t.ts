@@ -716,7 +716,7 @@ it('Should render the diff of circular data structures correctly #2', async t =>
     const a2    = { a : undefined }
     a2.a        = a2
 
-    const difference0   = compareDeepDiff([ a1, a2 ], [ a1, false])
+    const difference0   = compareDeepDiff([ a1, a2 ], [ a1, false ])
 
     t.is(
         rendererPlain.render(difference0.template()),

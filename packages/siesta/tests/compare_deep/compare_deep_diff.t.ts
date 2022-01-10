@@ -308,7 +308,7 @@ it('Deep compare should work with circular data structures #3', async t => {
                 },
                 {
                     index       : 1,
-                    // might seems strange that references are equal, but if you draw a graph
+                    // might seem strange that references are equal, but if you draw a graph
                     // of the depth-first iteration, you'll see that the a[ 1 ] and b[ 1 ]
                     // points to the same location in graph
                     difference      : DifferenceReference.new({
@@ -370,7 +370,7 @@ it('Deep compare should work with circular data structures #4', async t => {
 })
 
 
-it('Deep compare should work with circular data structures #4', async t => {
+it('Deep compare should work with circular data structures #5', async t => {
     const child     = { parent : undefined, children : [] }
     const parent    = { parent : undefined, children : [ child ] }
     child.parent    = parent
