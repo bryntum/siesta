@@ -621,7 +621,7 @@ const compareKeys = function <K, V>(
     const onlyIn2           = new Set<K>(setMap2.keys())
 
     for (const [ item1, _ ] of setMap1.entries()) {
-        // shortcut for primitive types - strings, numbers etc and for case when both sets has the same objects
+        // shortcut for primitive types - strings, numbers etc and for case when both sets have the same objects
         // (sets may contain structurally equal objects)
         if (setMap2.has(item1)) {
             common.push({
