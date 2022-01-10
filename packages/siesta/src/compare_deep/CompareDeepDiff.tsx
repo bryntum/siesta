@@ -401,15 +401,19 @@ export class DeepCompareState extends Base {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// none of these options are implemented yet
 export type DeepCompareOptions = {
+    // none of these options are implemented yet
     omitEqual                   : boolean,
     // if `true` instances of difference classes will be considered different,
     // even if they contain the same properties
     requireSameClass            : boolean
     maxDifferences              : number,
+
+    // used in the code, but w/o enough thought and test coverage
+    // enabling it globally causes exceptions
     cycleIsPartOfDataStructure  : boolean,
 
+    // implemented
     compareDateByValue          : boolean
 }
 
