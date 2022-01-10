@@ -163,6 +163,14 @@ export class SerializerXml extends SerializerXmlPre {
     }
 
 
+    visitAsyncFunction (value : Function, depth : number) {
+        if (this.includeFunctionSources)
+            this.write(<function>{ functionSources(value) }</function>)
+        else
+            this.write(<function>[AsyncFunction]</function>)
+    }
+
+
     visitObject (object : object, depth : number) : any {
         const objectEl          = <SerializationObject size={ 0 }></SerializationObject> as any as SerializationObject
 
