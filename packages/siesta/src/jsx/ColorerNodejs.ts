@@ -1,9 +1,6 @@
 import chalk from "chalk"
 import { Colorer } from "./Colorer.js"
 
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// const zero  = String.fromCharCode(0)
-
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class ColorerNodejs extends Colorer {
@@ -23,9 +20,4 @@ export class ColorerNodejs extends Colorer {
     text (text : string) : string {
         return this.currentChalk(text)
     }
-
-
-    // wrappings () : [ string, string ] {
-    //     return this.currentChalk(zero).split(zero)
-    // }
 }
