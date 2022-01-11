@@ -54,9 +54,12 @@ export class Difference extends Base {
 
 
     template (
-        serializerConfig? : Partial<SerializerXml>,
-        diffState : [ SerializerXml, SerializerXml ] = [ SerializerXml.new(serializerConfig), SerializerXml.new(serializerConfig) ]
-    ) : DifferenceTemplateRoot {
+        serializerConfig?   : Partial<SerializerXml>,
+        diffState           : [ SerializerXml, SerializerXml ] =
+            [ SerializerXml.new(serializerConfig), SerializerXml.new(serializerConfig) ]
+    )
+        : DifferenceTemplateRoot
+    {
         return <DifferenceTemplateRoot>
             { this.templateInner(serializerConfig, diffState) }
         </DifferenceTemplateRoot> as DifferenceTemplateRoot
