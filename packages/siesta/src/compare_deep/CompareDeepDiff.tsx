@@ -110,8 +110,17 @@ export class DifferenceAtomic extends Difference {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceReferenceable extends Difference {
-    refId1          : number                    = undefined
-    refId2          : number                    = undefined
+    // these properties contains the "reference id" (rendered as <ref *1>) - the id, other
+    // data can reference to (rendered as [Circular *1]
+    refId1          : number            = undefined
+    refId2          : number            = undefined
+
+    // these properties contains the reference id, when the same data structure
+    // is traversed several times, because the other side has a cycle of different
+    // structure, in such case this repeated traversal is indicated with
+    // <circular *1>
+    circular1       : number            = undefined
+    circular2       : number            = undefined
 }
 
 
@@ -121,6 +130,7 @@ export class DifferenceReferenceableAtomic extends DifferenceReferenceable {
     templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
         return <DifferenceTemplateReferenceableAtomic
             type={ this.type } same={ this.same } refId={ this.refId1 } refId2={ this.refId2 }
+            circular1 = { this.circular1 } circular2 = { this.circular2 }
         >
             { this.value1 === Missing ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(this.value1) }
             { this.value2 === Missing ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(this.value2) }
@@ -157,7 +167,8 @@ export class DifferenceArray extends DifferenceReferenceable {
         return <DifferenceTemplateArray
             type={ this.type } same={ this.same }
             length={ this.value1.length } length2={ this.value2.length }
-            refId={ this.refId1 } refId2={ this.refId2 }
+            refId = { this.refId1 } refId2 = { this.refId2 }
+            circular1 = { this.circular1 } circular2 = { this.circular2 }
         >{
             this.comparisons.map(({ index, difference }) =>
                 <DifferenceTemplateArrayEntry type={ difference.type } index={ index } same={ difference.same }>
@@ -204,6 +215,7 @@ export class DifferenceObject extends DifferenceReferenceable {
             size2={ this.value2 !== Missing ? Object.keys(this.value2).length : undefined }
             onlyIn2Size={ this.onlyIn2Size }
             refId={ this.refId1 } refId2={ this.refId2 }
+            circular1 = { this.circular1 } circular2 = { this.circular2 }
         >{
             this.comparisons
                 .sort((comp1, comp2) => compareDifferences(comp1.difference, comp2.difference))
@@ -254,6 +266,7 @@ export class DifferenceSet extends DifferenceReferenceable {
             size={ this.value1.size } size2={ this.value2.size }
             onlyIn2Size={ this.onlyIn2Size }
             refId={ this.refId1 } refId2={ this.refId2 }
+            circular1 = { this.circular1 } circular2 = { this.circular2 }
         >{
             this.comparisons.map(({ difference }) =>
                 <DifferenceTemplateSetEntry type={ difference.type }>
@@ -299,6 +312,7 @@ export class DifferenceMap extends DifferenceReferenceable {
             size={ this.value1.size } size2={ this.value2.size }
             onlyIn2Size={ this.onlyIn2Size }
             refId={ this.refId1 } refId2={ this.refId2 }
+            circular1 = { this.circular1 } circular2 = { this.circular2 }
         >{
             this.comparisons
                 .sort((comp1, comp2) => compareDifferences(comp1.differenceValues, comp2.differenceValues))
@@ -370,15 +384,32 @@ export class DeepCompareState extends Base {
     markVisited (v1 : unknown, v2 : unknown, difference : DifferenceReferenceable, convertingToDiff : 'value1' | 'value2' | undefined) {
         const visitInfo     = [ this.idSource++, difference ] as [ number, DifferenceReferenceable ]
 
-        if (convertingToDiff === undefined) {
-            !this.visited1.has(v1) && this.visited1.set(v1, visitInfo)
-            !this.visited2.has(v2) && this.visited2.set(v2, visitInfo)
+        if (convertingToDiff === undefined || convertingToDiff === 'value1') {
+            const prevVisited1  = this.visited1.get(v1)
+
+            if (prevVisited1) {
+                // save the latest visit id
+                prevVisited1[ 0 ]       = visitInfo[ 0 ]
+
+                // assign reference id if missing
+                if (prevVisited1[ 1 ].refId1 === undefined) prevVisited1[ 1 ].refId1 = this.refIdSource1++
+
+                // save the "circular" id, indicating repeated visit to the data
+                difference.circular1    = prevVisited1[ 1 ].refId1
+            } else
+                this.visited1.set(v1, visitInfo)
         }
-        else if (convertingToDiff === 'value1') {
-            !this.visited1.has(v1) && this.visited1.set(v1, visitInfo)
-        }
-        else {
-            !this.visited2.has(v2) && this.visited2.set(v2, visitInfo)
+
+        if (convertingToDiff === undefined || convertingToDiff === 'value2') {
+            const prevVisited2  = this.visited2.get(v2)
+
+            if (prevVisited2) {
+                // see the comments above
+                prevVisited2[ 0 ]       = visitInfo[ 0 ]
+                if (prevVisited2[ 1 ].refId2 === undefined) prevVisited2[ 1 ].refId2 = this.refIdSource2++
+                difference.circular2    = prevVisited2[ 1 ].refId2
+            } else
+                this.visited2.set(v2, visitInfo)
         }
     }
 
@@ -413,10 +444,6 @@ export type DeepCompareOptions = {
     requireSameClass            : boolean
     maxDifferences              : number,
 
-    // used in the code, but w/o enough thought and test coverage
-    // enabling it globally causes exceptions
-    cycleIsPartOfDataStructure  : boolean,
-
     // implemented
     compareDateByValue          : boolean
 }
@@ -425,7 +452,6 @@ const defaultDeepCompareOptions : DeepCompareOptions = {
     omitEqual                   : false,
     requireSameClass            : false,
     maxDifferences              : Number.MAX_SAFE_INTEGER,
-    cycleIsPartOfDataStructure  : true,
     compareDateByValue          : true
 }
 
@@ -476,7 +502,7 @@ export const compareDeepDiff = function (
             if (refId === undefined) refId = prevVisit[ 1 ][ refProp ] = state[ refIdSourceProp ]++
         }
 
-        if (options.cycleIsPartOfDataStructure && hasPrevious) {
+        if (hasPrevious) {
             // special processing of the case, when a cyclic, already visited in a _single_ stream, value
             // is being converted to Difference with `valueAsDifference`
             // in such case the value in 2nd stream is actually missing
@@ -507,29 +533,33 @@ export const compareDeepDiff = function (
         }
 
         const hasBothPrevious   = hasPrevious1 && hasPrevious2
-        const hasOnePrevious    = hasPrevious1 || hasPrevious2
 
-        if (hasBothPrevious && v1Visit[ 0 ] === v2Visit[ 0 ]) {
+        if (hasBothPrevious) {
             // cyclic visit from the same location in both data structures
             // this is considered as an equal value - the real difference
             // will be determined by the 1st visit
-            return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1, value2 : v2Visit[ 1 ].refId2, same : true })
+            return DifferenceReference.new({
+                value1  : v1Visit[ 1 ].refId1,
+                value2  : v2Visit[ 1 ].refId2,
+                same    : v1Visit[ 0 ] === v2Visit[ 0 ]
+            })
         }
-        else if (options.cycleIsPartOfDataStructure && hasBothPrevious && v1Visit[ 0 ] !== v2Visit[ 0 ]) {
-            return DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1, value2 : v2Visit[ 1 ].refId2, same : false })
-        }
-        else if (options.cycleIsPartOfDataStructure && hasOnePrevious) {
-            if (hasPrevious1)
-                return DifferenceHeterogeneous.new({
-                    value1      : DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1 }),
-                    value2      : valueAsDifference(v2, 'value2', options, state)
-                })
-            else
-                return DifferenceHeterogeneous.new({
-                    value1      : valueAsDifference(v1, 'value1', options, state),
-                    value2      : DifferenceReference.new({ value2 : v2Visit[ 1 ].refId2 }),
-                })
-        }
+        // if one day we decide to support the `cycleIsPartOfDataStructure` option
+        // then we should return early here:
+        //
+        // const hasOnePrevious    = hasPrevious1 || hasPrevious2
+        // else if (options.cycleIsPartOfDataStructure && hasOnePrevious) {
+        //     if (hasPrevious1)
+        //         return DifferenceHeterogeneous.new({
+        //             value1      : DifferenceReference.new({ value1 : v1Visit[ 1 ].refId1 }),
+        //             value2      : valueAsDifference(v2, 'value2', options, state)
+        //         })
+        //     else
+        //         return DifferenceHeterogeneous.new({
+        //             value1      : valueAsDifference(v1, 'value1', options, state),
+        //             value2      : DifferenceReference.new({ value2 : v2Visit[ 1 ].refId2 }),
+        //         })
+        // }
     }
 
     const type1         = typeOf(v1)

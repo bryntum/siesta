@@ -59,10 +59,15 @@ export class SerializationReferenceable extends Mixin(
         }
 
 
-        beforeRenderChildren (renderer : XmlRendererSerialization, output : TextBlock, context : XmlRenderingDynamicContext) {
+        renderReferenceablePrefix (renderer : XmlRendererSerialization, output : TextBlock, context : XmlRenderingDynamicContext) {
             const refId     = this.getRefId(context)
 
             if (refId !== undefined) output.push(`<ref *${ refId }> `)
+        }
+
+
+        beforeRenderChildren (renderer : XmlRendererSerialization, output : TextBlock, context : XmlRenderingDynamicContext) {
+            this.renderReferenceablePrefix(renderer, output, context)
 
             super.beforeRenderChildren(renderer, output, context)
         }

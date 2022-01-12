@@ -1,4 +1,4 @@
-import { it } from "../../index.js"
+import { it, xit } from "../../index.js"
 import {
     compareDeepDiff,
     DifferenceArray,
@@ -221,32 +221,31 @@ it('Deep compare should work with circular data structures #2', async t => {
         DifferenceObject.new({
             value1      : a1,
             value2      : a3,
-            same        : false,
+            same        : true,
             refId1      : 1,
             refId2      : undefined,
             comparisons         : [
                 {
                     key         : "a",
-                    difference      : DifferenceHeterogeneous.new({
-                        value1      : DifferenceReference.new({
-                            value1      : 1,
-                            same        : false
-                        }),
-                        value2      : DifferenceObject.new({
-                            value2      : a2,
-                            same        : false,
-                            refId2      : 1,
-                            comparisons         : [
-                                {
-                                    key         : "a",
-                                    difference      : DifferenceReference.new({
-                                        value2      : 1,
-                                        same        : false
-                                    })
-                                }
-                            ]
-                        }),
-                        same        : false
+                    difference      : DifferenceObject.new({
+                        value1      : a1,
+                        value2      : a2,
+                        same        : true,
+
+                        refId2      : 1,
+                        circular1   : 1,
+                        onlyIn2Size : 0,
+
+                        comparisons : [
+                            {
+                                key             : 'a',
+                                difference      : DifferenceReference.new({
+                                    value1      : 1,
+                                    value2      : 1,
+                                    same        : true
+                                })
+                            }
+                        ]
                     })
                 }
             ]
@@ -481,4 +480,49 @@ it('Dates should be compared as values, not as objects', async t => {
             { index : 1, difference : DifferenceReferenceableAtomic.new({ value1 : date, value2 : date, same : true }) },
         ]
     }))
+})
+
+
+it('Deep compare should not recurse into the referentially identical objects', async t => {
+    const obj           = { prop : 'value', set : null }
+    const set           = new Set([ obj ])
+    obj.set             = set
+
+    // here the `obj` is referentially identical on both sides, however, structurally its different
+    // (contains cyclic reference to `set` on left side and non-cyclic on right)
+    t.equal(set, new Set([ obj ]))
+})
+
+
+it('Deep compare should handle the "distant" cycles', async t => {
+    const a1            = { a : { a : null } }
+    a1.a.a              = a1
+
+    const a2            = { a : { a : null } }
+    a2.a.a              = a2
+
+    t.is(compareDeepDiff(a1, a2).same, true)
+})
+
+
+// TODO, this case is not supported yet (do we need to support it at all?)
+xit('Deep compare should handle the cycles of different length #1', async t => {
+    const a1            = { a : null }
+    a1.a                = a1
+
+    const a2            = { a : { a : { a : null } } }
+    a2.a.a.a            = a2
+
+    t.is(compareDeepDiff(a1, a2).same, false)
+})
+
+
+it('Deep compare should handle the cycles of different length #2', async t => {
+    const a1            = { a : { a : null } }
+    a1.a.a              = a1
+
+    const a2            = { a : { a : { a : null } } }
+    a2.a.a.a            = a2
+
+    t.is(compareDeepDiff(a1, a2).same, false)
 })

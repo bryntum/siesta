@@ -116,6 +116,23 @@ export class DifferenceTemplateReferenceable extends Mixin(
     class DifferenceTemplateReferenceable extends base {
         props   : SerializationReferenceable[ 'props' ] & DifferenceTemplateElement[ 'props' ] & {
             refId2?          : number
+            circular1?       : number
+            circular2?       : number
+        }
+
+
+        renderReferenceablePrefix (renderer : XmlRendererDifference, output : TextBlock, context : XmlRenderingDynamicContextDifference) {
+            const circularId     = this.getCircularId(context)
+
+            if (circularId !== undefined)
+                output.push(`<circular *${ circularId }> `)
+            else
+                super.renderReferenceablePrefix(renderer, output, context)
+        }
+
+
+        getCircularId (context : XmlRenderingDynamicContextDifference) : number {
+            return context.currentStream === 'left' ? this.getAttribute('circular1') : this.getAttribute('circular2')
         }
 
 
