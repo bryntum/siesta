@@ -71,25 +71,26 @@ export class Difference extends Base {
 
         this.same           = false
     }
+}
 
 
-    compareDifferences (difference1 : Difference, difference2 : Difference) : number {
-        const type1     = difference1.type
-        const type2     = difference1.type
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const compareDifferences = (difference1 : Difference, difference2 : Difference) : number => {
+    const type1     = difference1.type
+    const type2     = difference1.type
 
-        if (type1 === 'both' && type2 !== 'both')
-            return -1
-        else if (type1 !== 'both' && type2 === 'both')
-            return 1
-        else if (type1 === 'both' && type2 === 'both')
-            return (difference1.same ? 0 : 1) - (difference2.same ? 0 : 1)
-        else if (type1 === 'onlyIn1' && type2 === 'onlyIn2')
-            return -1
-        else if (type1 === 'onlyIn2' && type2 === 'onlyIn1')
-            return 1
-        else
-            return 0
-    }
+    if (type1 === 'both' && type2 !== 'both')
+        return -1
+    else if (type1 !== 'both' && type2 === 'both')
+        return 1
+    else if (type1 === 'both' && type2 === 'both')
+        return (difference1.same ? 0 : 1) - (difference2.same ? 0 : 1)
+    else if (type1 === 'onlyIn1' && type2 === 'onlyIn2')
+        return -1
+    else if (type1 === 'onlyIn2' && type2 === 'onlyIn1')
+        return 1
+    else
+        return 0
 }
 
 
@@ -205,7 +206,7 @@ export class DifferenceObject extends DifferenceReferenceable {
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons
-                .sort((comp1, comp2) => this.compareDifferences(comp1.difference, comp2.difference))
+                .sort((comp1, comp2) => compareDifferences(comp1.difference, comp2.difference))
                 .map(
                     ({ key, difference }) =>
                     <DifferenceTemplateObjectEntry type={ difference.type }>
@@ -300,7 +301,7 @@ export class DifferenceMap extends DifferenceReferenceable {
             refId={ this.refId1 } refId2={ this.refId2 }
         >{
             this.comparisons
-                .sort((comp1, comp2) => this.compareDifferences(comp1.differenceValues, comp2.differenceValues))
+                .sort((comp1, comp2) => compareDifferences(comp1.differenceValues, comp2.differenceValues))
                 .map(({ differenceKeys, differenceValues }) =>
                     <DifferenceTemplateMapEntry type={ differenceKeys.type }>
                         { differenceKeys.templateInner(serializerConfig, diffState) }
