@@ -755,13 +755,13 @@ it('Should render the diff of circular data structures correctly #3', async t =>
     t.is(
         rendererPlain.render(difference0.template()),
         [
-            'Received             │ │ Expected              ',
-            '                     │ │                       ',
-            '<ref *1> {           │ │ {                     ',
-            '  "a": [Circular *1] │ │   "a": <ref *1> {     ',
-            '                     │ │     "a": [Circular *1]',
-            '                     │ │   }                   ',
-            '}                    │ │ }                     ',
+            'Received               │ │ Expected              ',
+            '                       │ │                       ',
+            '<ref *1> {             │ │ {                     ',
+            '  "a": <circular *1> { │ │   "a": <ref *1> {     ',
+            '    "a": [Circular *1] │ │     "a": [Circular *1]',
+            '  }                    │ │   }                   ',
+            '}                      │ │ }                     ',
         ].join('\n')
     )
 
