@@ -31,6 +31,7 @@ import { TestOverlay } from "./test_result/TestOverlay.js"
 import { TestNodeResultComponent } from "./test_result/TestResult.js"
 import { TestGroupLaunchInfo, TestLaunchInfo } from "./TestLaunchInfo.js"
 
+// added as an expression here, otherwise IDE thinks `ChronoGraphJSX` is unused import
 ChronoGraphJSX
 
 TestReporterParent
