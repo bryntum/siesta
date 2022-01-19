@@ -21,7 +21,10 @@ export class XmlRendererSerialization extends Mixin(
         spaceAfterOpeningBracketObject  : boolean       = true
 
         atomicElementNodes              : Set<string>   = new Set([
-            'boolean', 'number', 'string', 'date', 'regexp', 'symbol', 'function', 'special'
+            'boolean', 'number', 'string', 'symbol',
+            // TODO these are actually "referencable atomics"
+            // should has the `refId` and render it
+            'date', 'regexp', 'function'
         ])
 
 
