@@ -298,6 +298,16 @@ it('Should include reference number into serialization', async t => {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Should include reference number into serialization for "referenceable atomics"', async t => {
+    const date  = new Date(2000, 1, 1)
+
+    const a     = [ date, { ref : date } ]
+
+    t.is(renderer.printValue(a), '[<ref *1> new Date("2000/01/01 00:00:00.0"), { "ref": [Circular *1] }]')
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Should include class name into serialization', async t => {
 
     class SomeClass {

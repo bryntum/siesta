@@ -6,10 +6,10 @@ import { ArbitraryObjectKey, constructorNameOf, isAtomicValue, typeOf } from "..
 import { Visitor } from "typescript-serializable-mixin"
 import {
     Serialization,
-    SerializationArray,
+    SerializationArray, SerializationAtomic,
     SerializationMap, SerializationMapEntry,
     SerializationObject, SerializationObjectEntry, SerializationOutOfDepth, SerializationReference,
-    SerializationReferenceable,
+    SerializationReferenceable, SerializationReferenceableAtomic,
     SerializationSet
 } from "./SerializerRendering.js"
 
@@ -113,61 +113,85 @@ export class SerializerXml extends SerializerXmlPre {
 
 
     visitUndefined (value : symbol, depth : number) {
-        this.write(<undefined>undefined</undefined>)
+        this.write(SerializationAtomic.new({
+            tagName     : 'undefined',
+            childNodes  : [ 'undefined' ]
+        }))
     }
 
 
     visitNull (value : symbol, depth : number) {
-        this.write(<null>null</null>)
+        this.write(SerializationAtomic.new({
+            tagName     : 'null',
+            childNodes  : [ 'null' ]
+        }))
     }
 
 
     visitSymbol (value : symbol, depth : number) {
-        this.write(<symbol>{ value }</symbol>)
+        this.write(SerializationAtomic.new({
+            tagName     : 'symbol',
+            childNodes  : [ String(value) ]
+        }))
     }
 
 
     visitBoolean (value : boolean, depth : number) {
         // note, that just `<boolean>{ value }</boolean>` will create empty tag (`false` is ignored)
-        this.write(<boolean>{ String(value) }</boolean>)
+        this.write(SerializationAtomic.new({
+            tagName     : 'boolean',
+            childNodes  : [ String(value) ]
+        }))
     }
 
 
     visitNumber (value : number, depth : number) {
-        this.write(<number>{ value }</number>)
+        this.write(SerializationAtomic.new({
+            tagName     : 'number',
+            childNodes  : [ String(value) ]
+        }))
     }
 
 
     visitString (value : string, depth : number) {
         // we use `'"' +` expressions inside the {} to create a single child node
         // the form `<string>"{}"</string>` would create 3 child nodes
-        this.write(<string>{ '"' + value /*.replace(/"/g, '\\"').replace(/\n/g, '↵')*/ + '"' }</string>)
+        this.write(SerializationAtomic.new({
+            tagName     : 'string',
+            childNodes  : [ '"' + String(value) + '"' ]
+        }))
     }
 
 
     visitDate (value : Date, depth : number) {
-        this.write(<date>{ dateToString(value) }</date>)
+        this.write(SerializationReferenceableAtomic.new({
+            tagName     : 'date',
+            childNodes  : [ dateToString(value) ]
+        }))
     }
 
 
     visitRegExp (value : RegExp, depth : number) {
-        this.write(<regexp>{ String(value) }</regexp>)
+        this.write(SerializationReferenceableAtomic.new({
+            tagName     : 'regexp',
+            childNodes  : [ String(value) ]
+        }))
     }
 
 
     visitFunction (value : Function, depth : number) {
-        if (this.includeFunctionSources)
-            this.write(<function>{ functionSources(value) }</function>)
-        else
-            this.write(<function>[Function]</function>)
+        this.write(SerializationReferenceableAtomic.new({
+            tagName     : 'function',
+            childNodes  : [ this.includeFunctionSources ? functionSources(value) : '[Function]' ]
+        }))
     }
 
 
     visitAsyncFunction (value : Function, depth : number) {
-        if (this.includeFunctionSources)
-            this.write(<function>{ functionSources(value) }</function>)
-        else
-            this.write(<function>[AsyncFunction]</function>)
+        this.write(SerializationReferenceableAtomic.new({
+            tagName     : 'function',
+            childNodes  : [ this.includeFunctionSources ? functionSources(value) : '[AsyncFunction]' ]
+        }))
     }
 
 

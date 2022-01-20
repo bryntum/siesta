@@ -22,8 +22,7 @@ export class XmlRendererSerialization extends Mixin(
 
         atomicElementNodes              : Set<string>   = new Set([
             'boolean', 'number', 'string', 'symbol',
-            // TODO these are actually "referencable atomics"
-            // should has the `refId` and render it
+            // these are actually "referencable atomics"
             'date', 'regexp', 'function'
         ])
 
@@ -45,6 +44,19 @@ export class Serialization extends XmlElement {
 
     childNodes      : [ SerializationChildNode ]
 }
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerializationAtomic' })
+export class SerializationAtomic extends Mixin(
+    [ XmlElement ],
+    (base : ClassUnion<typeof XmlElement>) =>
+
+    class SerializationAtomic extends base {
+        childNodes          : [ string ]
+    }
+){}
+
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class SerializationReferenceable extends Mixin(
@@ -74,6 +86,18 @@ export class SerializationReferenceable extends Mixin(
 
             super.beforeRenderChildren(renderer, output, context)
         }
+    }
+){}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerializationReferenceableAtomic' })
+export class SerializationReferenceableAtomic extends Mixin(
+    [ SerializationReferenceable ],
+    (base : ClassUnion<typeof SerializationReferenceable>) =>
+
+    class SerializationReferenceableAtomic extends base {
+        childNodes          : [ string ]
     }
 ){}
 
