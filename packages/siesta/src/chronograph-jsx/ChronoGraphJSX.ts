@@ -305,7 +305,7 @@ export const convertXmlElement = (source : XmlElement) : Element => {
         ([ key, value ]) => setProperty(el, key, value)
     )
 
-    el.append(...Array.from(source.childNodes).map(childNode =>
+    el.append(...source.childNodes.map(childNode =>
         isString(childNode) ? document.createTextNode(childNode) : convertXmlElement(childNode)
     ))
 
