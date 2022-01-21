@@ -20,7 +20,7 @@ export class XmlRenderer extends Mixin(
         indentLevel             : number        = 2
 
         blockLevelElements      : Set<string>   = new Set([
-            'div', 'ul', 'unl', 'li', 'tree', 'leaf', 'p'
+            'div', 'ul', 'li', 'tree', 'leaf', 'p'
         ])
 
 
