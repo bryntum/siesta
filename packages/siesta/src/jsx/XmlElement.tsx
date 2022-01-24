@@ -281,8 +281,13 @@ export class XmlElement extends Mixin(
         }
 
 
-        customIndentation (renderer : XmlRendererStreaming) : [ string ] {
+        customIndentation (renderer : XmlRendererStreaming) : string[] {
             return [ this.hasClass('indented') ? ' '.repeat(renderer.indentLevel) : '' ]
+        }
+
+
+        childCustomIndentation (renderer : XmlRendererStreaming, child : XmlElement, index : number) : string[] {
+            return undefined
         }
 
 
@@ -324,7 +329,7 @@ export class XmlElement extends Mixin(
             if (isString(child)) {
                 context.write(child)
             } else {
-                child.renderStreaming(context.deriveChildBlock(child))
+                child.renderStreaming(context.deriveChildBlock(child, index))
             }
         }
 

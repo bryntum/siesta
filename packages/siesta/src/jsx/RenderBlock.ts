@@ -182,12 +182,12 @@ export class XmlRenderBlock extends Mixin(
         }
 
 
-        deriveChildBlock (element : XmlElement) {
+        deriveChildBlock (element : XmlElement, index : number) {
             if (this.renderer.getDisplayType(element) === 'block') {
                 this.flushInlineBuffer()
                 this.canvas.newLinePending()
 
-                const indent            = element.customIndentation(this.renderer)
+                const indent            = this.element.childCustomIndentation(this.renderer, element, index) ?? element.customIndentation(this.renderer)
 
                 return XmlRenderBlock.new({
                     indent,
