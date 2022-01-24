@@ -3,9 +3,10 @@ import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Serializable, serializable } from "../serializable/Serializable.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
+import { Line, RenderCanvas, XmlRenderBlock } from "./RenderBlock.js"
 import { TextBlock } from "./TextBlock.js"
 import { TextJSX } from "./TextJSX.js"
-import { XmlRenderer, XmlRenderingDynamicContext } from "./XmlRenderer.js"
+import { XmlRenderer, XmlRendererStreaming, XmlRenderingDynamicContext } from "./XmlRenderer.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type XmlNode = string | XmlElement
@@ -272,6 +273,63 @@ export class XmlElement extends Mixin(
             output              : TextBlock,
             context             : XmlRenderingDynamicContext
         ) {
+        }
+
+
+        styleIndentation (indent : string) : string {
+            return indent
+        }
+
+
+        customIndentation (renderer : XmlRendererStreaming) : [ string ] {
+            return [ '' ]
+        }
+
+
+        renderStreaming (context : XmlRenderBlock) {
+            this.beforeRenderContent(context)
+            this.renderContent(context)
+            this.afterRenderContent(context)
+
+            context.flushInlineBuffer()
+
+            // when the rendering of the block-level element has complete,
+            // need to insert pending new line into canvas
+            if (context.type === 'block') context.canvas.newLinePending()
+        }
+
+
+        beforeRenderContent (context : XmlRenderBlock) {
+        }
+
+
+        renderContent (context : XmlRenderBlock) {
+            this.childNodes.forEach((child, index) => {
+                this.beforeRenderChildStreaming(context, child, index)
+                this.renderChildStreaming(context, child, index)
+                this.afterRenderChildStreaming(context, child, index)
+            })
+        }
+
+
+        afterRenderContent (context : XmlRenderBlock) {
+        }
+
+
+        beforeRenderChildStreaming (context : XmlRenderBlock, child : XmlNode, index : number) {
+        }
+
+
+        renderChildStreaming (context : XmlRenderBlock, child : XmlNode, index : number) {
+            if (isString(child)) {
+                context.write(child)
+            } else {
+                child.renderStreaming(context.deriveChildBlock(child))
+            }
+        }
+
+
+        afterRenderChildStreaming (context : XmlRenderBlock, child : XmlNode, index : number) {
         }
     }
 ){}
