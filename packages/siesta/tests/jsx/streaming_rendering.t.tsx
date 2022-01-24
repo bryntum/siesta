@@ -1,4 +1,5 @@
 import { it } from "../../index.js"
+import { RenderCanvas } from "../../src/jsx/RenderBlock.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
 import { XmlRendererStreaming } from "../../src/jsx/XmlRenderer.js"
 
@@ -78,9 +79,11 @@ it('Mixin block/inline flows should work', async t => {
 
 
     t.is(
-        renderer.render(<div>
-            Some text <span>inner</span>
-        </div>),
+        renderer.render(
+            <div>
+                Some text <span>inner</span>
+            </div>
+        ),
         `Some text inner`
     )
 })
@@ -101,9 +104,11 @@ it('Empty block-level elements should create line break', async t => {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('Indentation should work', async t => {
     t.is(
-        renderer.render(<div class="indented">
-            Line1
-        </div>),
+        renderer.render(
+            <div class="indented">
+                Line1
+            </div>
+        ),
         `  Line1`
     )
 
@@ -125,22 +130,23 @@ it('Indentation should work', async t => {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 it('`maxWidth` should work', async t => {
     t.is(
-        renderer.render(<div class="indented">
-            Line1
-        </div>),
-        `  Line1`
+        renderer.render(
+            <div>0123456789</div>,
+            RenderCanvas.new({ maxWidth : 5 })
+        ),
+`01234
+56789`
     )
 
     t.is(
         renderer.render(
-            <div class="indented">
-                Line1
-                <div class="indented">
-                    Line2
-                </div>
-            </div>
+            <div class="indented">012345678</div>,
+            RenderCanvas.new({ maxWidth : 5 })
         ),
-`  Line1
-    Line2`
+`  012
+  345
+  678`
     )
 })
+
+

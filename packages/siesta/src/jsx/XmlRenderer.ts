@@ -150,12 +150,10 @@ export class XmlRendererStreaming extends Mixin(
 
         renderToCanvas (el : XmlElement, canvas : RenderCanvas = RenderCanvas.new()) : RenderCanvas {
             const rootBlock     = XmlRenderBlock.new({
-                canvas, parentBlock : undefined, renderer : this, element : XmlElement.new({ tagName : 'div' })
+                canvas, renderer : this, element : XmlElement.new({ tagName : 'div' }), maxWidth : canvas.maxWidth
             })
 
-            el.renderStreaming(rootBlock.deriveChildBlock(el))
-
-            rootBlock.flushInlineBuffer()
+            el.renderStreaming(rootBlock.deriveChildBlock(el, 0))
 
             return canvas
         }
