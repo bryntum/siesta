@@ -75,6 +75,14 @@ it('Mixin block/inline flows should work', async t => {
 8
 9`
     )
+
+
+    t.is(
+        renderer.render(<div>
+            Some text <span>inner</span>
+        </div>),
+        `Some text inner`
+    )
 })
 
 
@@ -86,5 +94,53 @@ it('Empty block-level elements should create line break', async t => {
         ),
 `1
 2`
+    )
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Indentation should work', async t => {
+    t.is(
+        renderer.render(<div class="indented">
+            Line1
+        </div>),
+        `  Line1`
+    )
+
+    t.is(
+        renderer.render(
+            <div class="indented">
+                Line1
+                <div class="indented">
+                    Line2
+                </div>
+            </div>
+        ),
+`  Line1
+    Line2`
+    )
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('`maxWidth` should work', async t => {
+    t.is(
+        renderer.render(<div class="indented">
+            Line1
+        </div>),
+        `  Line1`
+    )
+
+    t.is(
+        renderer.render(
+            <div class="indented">
+                Line1
+                <div class="indented">
+                    Line2
+                </div>
+            </div>
+        ),
+`  Line1
+    Line2`
     )
 })

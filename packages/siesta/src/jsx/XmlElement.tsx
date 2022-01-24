@@ -282,7 +282,7 @@ export class XmlElement extends Mixin(
 
 
         customIndentation (renderer : XmlRendererStreaming) : [ string ] {
-            return [ '' ]
+            return [ this.hasClass('indented') ? ' '.repeat(renderer.indentLevel) : '' ]
         }
 
 

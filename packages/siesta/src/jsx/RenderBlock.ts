@@ -78,13 +78,9 @@ export class XmlRenderBlock extends Mixin(
 
         parentBlock     : this              = undefined
 
-        // type            : 'block' | 'inline'    = 'inline'
-
         renderer        : XmlRendererStreaming  = undefined
 
         element         : XmlElement        = undefined
-
-        // firstLineOffset : number            = 0
 
         // indentation prefixes in the reversed order (the last one goes first, the first one will be repeated)
         indent          : string[]          = [ '' ]
@@ -147,16 +143,19 @@ export class XmlRenderBlock extends Mixin(
         flushInlineBuffer () {
             const canvas        = this.canvas
 
-            this.blockLevelParent.inlineBuffer.forEach((line, index, array) => {
-                const indentation       = this.currentIndentation
-                const styled            = this.element.styleIndentation(indentation)
+            const inlineBuffer  = this.blockLevelParent.inlineBuffer
 
-                canvas.write(styled, indentation.length)
+            if (!(inlineBuffer.length === 1 && inlineBuffer[ 0 ].length === 0))
+                inlineBuffer.forEach((line, index, array) => {
+                    const indentation       = this.currentIndentation
+                    const styled            = this.element.styleIndentation(indentation)
 
-                canvas.write(line.toString(), line.length)
+                    canvas.write(styled, indentation.length)
 
-                if (index !== array.length - 1) canvas.newLine()
-            })
+                    canvas.write(line.toString(), line.length)
+
+                    if (index !== array.length - 1) canvas.newLine()
+                })
 
             this.blockLevelParent.$inlineBuffer = undefined
         }
@@ -186,11 +185,9 @@ export class XmlRenderBlock extends Mixin(
         deriveChildBlock (element : XmlElement) {
             if (this.renderer.getDisplayType(element) === 'block') {
                 this.flushInlineBuffer()
-
                 this.canvas.newLinePending()
 
-                const isIndented        = element.hasClass('indented')
-                const indent            = isIndented ? element.customIndentation(this.renderer) : [ '' ]
+                const indent            = element.customIndentation(this.renderer)
 
                 return XmlRenderBlock.new({
                     indent,
@@ -199,7 +196,7 @@ export class XmlRenderBlock extends Mixin(
                     renderer        : this.renderer,
                     parentBlock     : this,
                     element,
-                    maxWidth        : this.maxWidth - indent.length
+                    maxWidth        : this.maxWidth - indent[ 0 ].length
                 })
             } else
                 return XmlRenderBlock.new({
