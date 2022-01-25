@@ -238,6 +238,7 @@ export class DifferenceTemplateComposite extends Mixin(
             if (context.currentStream !== 'middle')
                 super.afterRenderChildren(renderer, output, context)
 
+            // this sync point is not needed? tests seem to pass w/o it
             if (this.childNodes.length > 0) output.push(ColoredStringSyncPoint.new({ el : this }))
         }
 
