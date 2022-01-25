@@ -77,7 +77,6 @@ it('Mixin block/inline flows should work', async t => {
 9`
     )
 
-
     t.is(
         renderer.render(
             <div>
@@ -85,6 +84,27 @@ it('Mixin block/inline flows should work', async t => {
             </div>
         ),
         `Some text inner`
+    )
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Block level element inside the inline element should be wrapped', async t => {
+    t.is(
+        renderer.render(
+            <div>
+                <span>
+                    123
+                    <div>
+                        456
+                    </div>
+                    789
+                </span>
+            </div>
+        ),
+`123
+456
+789`
     )
 })
 
