@@ -276,7 +276,12 @@ export class XmlElement extends Mixin(
         }
 
 
-        styleIndentation (indent : string) : string {
+        styleText (str : string, block : XmlRenderBlock) : string {
+            return block.style.colorer.text(str)
+        }
+
+
+        styleIndentation (indent : string, block : XmlRenderBlock) : string {
             return indent
         }
 

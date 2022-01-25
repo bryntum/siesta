@@ -4,7 +4,7 @@ import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { Colorer, ColorerRule } from "./Colorer.js"
 import { ColorerNoop } from "./ColorerNoop.js"
-import { RenderCanvas, XmlRenderBlock } from "./RenderBlock.js"
+import { RenderCanvas, Style, XmlRenderBlock } from "./RenderBlock.js"
 import { TextBlock } from "./TextBlock.js"
 import { XmlElement, XmlNode } from "./XmlElement.js"
 
@@ -94,7 +94,7 @@ export class XmlRendererStreaming extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class XmlRenderer extends base {
-        styles                  : Map<string, ColorerRule>  = new Map()
+        styles                  : Map<string, (style : Style) => any>  = new Map()
 
         indentLevel             : number        = 2
 
@@ -123,28 +123,21 @@ export class XmlRendererStreaming extends Mixin(
         }
 
 
-        getRulesFor (el : XmlElement) : ColorerRule[] {
-            const rules = saneSplit(el.attributes.class ?? '', /\s+/)
-                .map(className => this.styles.get(className))
-                .filter(rule => Boolean(rule))
+        applyStyleRules (block : XmlRenderBlock) {
+            const el        = block.element
 
-            if (el.hasClass('underlined')) rules.push(c => c.underline)
+            saneSplit(el.attributes.class ?? '', /\s+/).forEach(className => {
+                const rule     = this.styles.get(className)
 
-            return rules
+                if (rule) rule(block.style)
+            })
+
+            if (el.hasClass('underlined')) block.style.underline = true
         }
 
 
         render (el : XmlElement, canvas? : RenderCanvas) : string {
             return this.renderToCanvas(el, canvas).toString()
-        }
-
-
-        style (str : string, el : XmlElement) : string {
-            const stylingRules  = this.getRulesFor(el)
-
-            const colorer       = stylingRules.reduce((colorer, rule) => rule(colorer), this.c)
-
-            return colorer.text(str)
         }
 
 

@@ -1,5 +1,6 @@
 import { Base, ClassUnion, Mixin } from "typescript-mixin-class"
 import { lastElement, saneSplit } from "../util/Helpers.js"
+import { Colorer } from "./Colorer.js"
 import { XmlElement, XmlNode } from "./XmlElement.js"
 import { XmlRendererStreaming } from "./XmlRenderer.js"
 
@@ -69,6 +70,97 @@ export class Line extends Base {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export type RGBColor = [ number, number, number ]
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// the string, colored with ANSI escape sequences, may have different "actual" and "printable" lengths
+// so we need to track the "printable" length separately
+export class Style extends Base {
+    block               : XmlRenderBlock        = undefined
+
+    // `undefined` means - look at the parent
+    // any other value (including `null`) means - the value computed
+    // `null` means - value computed, not set
+
+    $colorer            : Colorer               = undefined
+
+    get colorer () : Colorer {
+        if (this.$colorer !== undefined) return this.$colorer
+
+        let c           = this.block.renderer.c
+
+        if (this.underline) c = c.underline
+        if (this.inverse) c = c.inverse
+        if (this.bold) c = c.bold
+
+        const color     = this.color
+        if (color) c = c.rgb(color[ 0 ], color[ 1 ], color[ 2 ])
+
+        const bgColor     = this.backgroundColor
+        if (bgColor) c = c.bgRgb(bgColor[ 0 ], bgColor[ 1 ], bgColor[ 2 ])
+
+        return this.$colorer  = c
+    }
+
+
+    $underline          : boolean           = undefined
+    get underline () : boolean {
+        if (this.$underline !== undefined) return this.$underline
+
+        return this.$underline = this.block.parentBlock?.style.underline ?? false
+    }
+    set underline (value : boolean) {
+        this.$underline = value
+    }
+
+
+    $inverse            : boolean           = undefined
+    get inverse () : boolean {
+        if (this.$inverse !== undefined) return this.$inverse
+
+        return this.$inverse = this.block.parentBlock?.style.inverse ?? false
+    }
+    set inverse (value : boolean) {
+        this.$inverse = value
+    }
+
+
+    $bold               : boolean           = undefined
+    get bold () : boolean {
+        if (this.$bold !== undefined) return this.$bold
+
+        return this.$bold = this.block.parentBlock?.style.bold ?? false
+    }
+    set bold (value : boolean) {
+        this.$bold = value
+    }
+
+
+    $color              : RGBColor            = undefined
+    get color () : RGBColor {
+        if (this.$color !== undefined) return this.$color
+
+        return this.$color = this.block.parentBlock?.style.color ?? null
+    }
+    set color (value : RGBColor) {
+        this.$color = value
+    }
+
+
+    $backgroundColor    : RGBColor            = undefined
+    get backgroundColor () : RGBColor {
+        if (this.$backgroundColor !== undefined) return this.$backgroundColor
+
+        return this.$backgroundColor = this.block.parentBlock?.style.backgroundColor ?? null
+    }
+    set backgroundColor (value : RGBColor) {
+        this.$backgroundColor = value
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class XmlRenderBlock extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
@@ -87,7 +179,19 @@ export class XmlRenderBlock extends Mixin(
 
         maxWidth        : number            = Number.MAX_SAFE_INTEGER
 
-        $inlineBuffer   : Line[]            = undefined
+        $style          : Style             = undefined
+
+        get style () : Style {
+            if (this.$style !== undefined) return this.$style
+
+            const style     = Style.new({ block : this })
+
+            this.$style  = style
+
+            this.renderer.applyStyleRules(this)
+
+            return style
+        }
 
 
         $blockLevelParent : XmlRenderBlock  = undefined
@@ -107,6 +211,8 @@ export class XmlRenderBlock extends Mixin(
             return this.renderer.getDisplayType(this.element)
         }
 
+
+        $inlineBuffer   : Line[]            = undefined
 
         get inlineBuffer () : Line[] {
             if (this.$inlineBuffer !== undefined) return this.$inlineBuffer
@@ -128,7 +234,7 @@ export class XmlRenderBlock extends Mixin(
 
                     const partial       = line.substr(sourcePos, available)
 
-                    lastElement(inlineBuffer).push(this.renderer.style(partial, this.element), partial.length)
+                    lastElement(inlineBuffer).push(this.element.styleText(partial, this), partial.length)
 
                     if (sourcePos + partial.length < line.length) inlineBuffer.push(Line.new())
 
@@ -148,7 +254,7 @@ export class XmlRenderBlock extends Mixin(
             if (!(inlineBuffer.length === 1 && inlineBuffer[ 0 ].length === 0))
                 inlineBuffer.forEach((line, index, array) => {
                     const indentation       = this.currentIndentation
-                    const styled            = this.element.styleIndentation(indentation)
+                    const styled            = this.element.styleIndentation(indentation, this)
 
                     canvas.write(styled, indentation.length)
 
