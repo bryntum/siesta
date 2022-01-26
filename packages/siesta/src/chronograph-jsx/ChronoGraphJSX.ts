@@ -153,7 +153,7 @@ export const addEventListener = (element : Element, name : string, listener : (e
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const setProperty = (element : Element, name : string, value : unknown) => {
+export const setProperty = (element : Element, name : string, value : unknown, asAttribute : boolean = false) => {
     const specialProperty  = matchSpecialProperty(name)
 
     if (specialProperty) {
@@ -167,7 +167,7 @@ export const setProperty = (element : Element, name : string, value : unknown) =
         if (name === 'class')
             element.className   = value as string
         else
-            element[ name ]     = value
+            asAttribute ? element.setAttribute(name, String(value)) : element[ name ] = value
     }
 }
 
@@ -298,15 +298,15 @@ export const resolveElementSource = (source : ElementSource, result : Node[] = [
 }
 
 
-export const convertXmlElement = (source : XmlElement) : Element => {
+export const convertXmlElement = (source : XmlElement, asAttributes : boolean = false) : Element => {
     const el        = document.createElement(source.tagName)
 
     Object.entries(source.$attributes || {}).forEach(
-        ([ key, value ]) => setProperty(el, key, value)
+        ([ key, value ]) => setProperty(el, key, value, asAttributes)
     )
 
     el.append(...source.childNodes.map(childNode =>
-        isString(childNode) ? document.createTextNode(childNode) : convertXmlElement(childNode)
+        isString(childNode) ? document.createTextNode(childNode) : convertXmlElement(childNode, asAttributes)
     ))
 
     return el
