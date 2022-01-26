@@ -301,6 +301,12 @@ export class XmlElement extends Mixin(
             this.renderContent(context)
             this.afterRenderContent(context)
 
+            this.renderStreamingDone(context)
+        }
+
+        // keeping this code separate from `afterRenderContent` to let user override that method
+        // this code should be executed after all `afterRenderContent` activity is completed
+        renderStreamingDone (context : XmlRenderBlock) {
             context.flushInlineBuffer()
 
             // when the rendering of the block-level element has complete,
@@ -313,6 +319,9 @@ export class XmlElement extends Mixin(
         }
 
 
+        // should NOT be overridden by user - it is by the `RenderingXmlFragmentWithCanvas`
+        // for the rendering of the initial content, there still might be calls to
+        // `renderChildStreaming` after the call to this method (for the following incremental rendering)
         renderContent (context : XmlRenderBlock) {
             this.childNodes.forEach((child, index) => {
                 this.beforeRenderChildStreaming(context, child, index)
@@ -330,6 +339,8 @@ export class XmlElement extends Mixin(
         }
 
 
+        // should NOT be overridden by user - it is not used during incremental rendering
+        // performed with the `RenderingXmlFragmentWithCanvas`
         renderChildStreaming (context : XmlRenderBlock, child : XmlNode, index : number) {
             if (isString(child)) {
                 context.write(child)

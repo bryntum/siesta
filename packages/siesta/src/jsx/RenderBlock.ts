@@ -1,5 +1,6 @@
 import { Base, ClassUnion, Mixin } from "typescript-mixin-class"
 import { lastElement, saneSplit } from "../util/Helpers.js"
+import { isString } from "../util/Typeguards.js"
 import { Colorer } from "./Colorer.js"
 import { XmlElement, XmlNode } from "./XmlElement.js"
 import { XmlRendererStreaming } from "./XmlRenderer.js"
@@ -41,6 +42,73 @@ export class RenderingXmlFragment extends Base {
         this.currentElement     = undefined
 
         return res
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
+    renderer        : XmlRendererStreaming              = undefined
+
+    canvas          : RenderCanvas                      = undefined
+
+    blockByElement  : Map<XmlElement, XmlRenderBlock>   = new Map()
+
+
+    start (el : XmlElement) {
+        super.start(el)
+
+        this.blockByElement.set(el, XmlRenderBlock.new({
+            canvas      : this.canvas,
+            renderer    : this.renderer,
+            element     : el,
+            maxWidth    : this.canvas.maxWidth
+        }))
+    }
+
+
+    write (el : XmlNode) {
+        const currentElement        = this.currentElement
+        const lastChild             = lastElement(currentElement.childNodes)
+
+        if (lastChild && !isString(lastChild)) {
+            const lastChildBlock    = this.blockByElement.get(lastChild)
+
+            lastChild.afterRenderContent(lastChildBlock)
+            lastChild.renderStreamingDone(lastChildBlock)
+        }
+
+        const currentBlock          = this.blockByElement.get(currentElement)
+
+        currentElement.afterRenderChildStreaming(currentBlock, lastChild, currentElement.childNodes.length - 1)
+
+        super.write(el)
+
+        currentElement.beforeRenderChildStreaming(currentBlock, lastChild, currentElement.childNodes.length - 1)
+
+        if (isString(el))
+            currentBlock.write(el)
+        else {
+            const childBlock    = currentBlock.deriveChildBlock(el, currentElement.childNodes.length - 1)
+
+            this.blockByElement.set(el, childBlock)
+
+            el.beforeRenderContent(childBlock)
+
+            // the `el` written might contain some children already
+            el.renderContent(childBlock)
+        }
+    }
+
+
+    pop () {
+        const currentElement        = this.currentElement
+        const currentBlock          = this.blockByElement.get(currentElement)
+
+        currentElement.afterRenderContent(currentBlock)
+        currentElement.renderStreamingDone(currentBlock)
+
+        super.pop()
     }
 }
 
@@ -293,7 +361,8 @@ export class XmlRenderBlock extends Mixin(
                 this.flushInlineBuffer()
                 this.canvas.newLinePending()
 
-                const indent            = this.element.childCustomIndentation(this.renderer, element, index) ?? element.customIndentation(this.renderer)
+                const indent    = this.element.childCustomIndentation(this.renderer, element, index)
+                    ?? element.customIndentation(this.renderer)
 
                 return XmlRenderBlock.new({
                     indent,
@@ -362,5 +431,10 @@ export class RenderCanvas extends Base {
 
     toString () : string {
         return this.canvas.map(line => line.toString()).join('\n')
+    }
+
+
+    get height () : number {
+        return this.canvas.length
     }
 }
