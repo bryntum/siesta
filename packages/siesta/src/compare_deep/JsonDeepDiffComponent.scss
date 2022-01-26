@@ -1,0 +1,46 @@
+@use "sass:color";
+@use '../../resources/styling/common/_colors.scss' as *;
+
+.json-deep-diff {
+    display: flex;
+    flex-direction: row;
+
+    height : 100%;
+}
+
+
+.json-deep-diff-expander {
+    width : 30px;
+    overflow: hidden;
+}
+
+.json-deep-diff-middle {
+    width : 30px;
+    overflow: hidden;
+}
+
+.json-deep-diff-left, .json-deep-diff-right {
+    flex : 1;
+    min-width: 0;
+}
+
+.json-deep-diff-content {
+    word-break: break-all;
+    line-height: 1.5em;
+}
+
+diff-inner {
+    display: block;
+    padding-left: 2ch;
+}
+
+diff-entry {
+    display: block;
+}
+
+[same=false] {
+    color : $primary_fail_darker;
+}
+[same=true] {
+    color : gray;
+}

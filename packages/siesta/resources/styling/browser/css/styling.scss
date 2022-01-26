@@ -9,6 +9,7 @@
 @use '../../../../src/siesta/ui/test_result/TestOverlay.scss';
 @use '../../../../src/siesta/ui/test_result/Translator.scss';
 @use '../../../../src/siesta/ui/test_result/LaunchInfoComponent.scss';
+@use '../../../../src/compare_deep/JsonDeepDiffComponent.scss';
 
 @use '../../terminal/_styling.scss';
 
@@ -20,9 +21,10 @@
     padding-right: 1ch;
 }
 
-.indented {
-    margin-left: 1rem
-}
+// is this class used?? should be `padding-left : 2ch` probably?
+//.indented {
+//    margin-left: 1rem
+//}
 
 pre {
     padding: 0;
