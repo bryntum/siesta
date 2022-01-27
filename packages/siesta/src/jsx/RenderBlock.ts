@@ -47,6 +47,7 @@ export class RenderingXmlFragment extends Base {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Enjoy the old-good mutable state style in this class
 export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
     renderer        : XmlRendererStreaming              = undefined
 
@@ -54,7 +55,9 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
 
     blockByElement  : Map<XmlElement, XmlRenderBlock>   = new Map()
 
-    lastChild       : XmlNode                           = undefined
+    // mutable mess
+    isRenderingExistingChildren : boolean               = false
+    lastChild                   : XmlNode               = undefined
 
 
     start (el : XmlElement) {
@@ -84,7 +87,7 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
 
         currentElement.afterRenderChildStreaming(currentBlock, lastChild, currentElement.childNodes.length - 1)
 
-        super.write(el)
+        if (!this.isRenderingExistingChildren) super.write(el)
 
         currentElement.beforeRenderChildStreaming(currentBlock, lastChild, currentElement.childNodes.length - 1)
 
@@ -101,6 +104,10 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
             // in such case, we need to render all them recursively
             this.currentElement = el
 
+            const before    = this.isRenderingExistingChildren
+
+            this.isRenderingExistingChildren    = true
+
             el.childNodes.forEach((childNode, index) => {
                 const prevLastChild = this.lastChild
 
@@ -115,7 +122,8 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
                 this.lastChild      = prevLastChild
             })
 
-            this.currentElement = currentElement
+            this.currentElement                 = currentElement
+            this.isRenderingExistingChildren    = before
         }
     }
 
