@@ -54,6 +54,8 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
 
     blockByElement  : Map<XmlElement, XmlRenderBlock>   = new Map()
 
+    lastChild       : XmlNode                           = undefined
+
 
     start (el : XmlElement) {
         super.start(el)
@@ -69,7 +71,7 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
 
     write (el : XmlNode) {
         const currentElement        = this.currentElement
-        const lastChild             = lastElement(currentElement.childNodes)
+        const lastChild             = this.lastChild !== undefined ? this.lastChild : lastElement(currentElement.childNodes)
 
         if (lastChild && !isString(lastChild)) {
             const lastChildBlock    = this.blockByElement.get(lastChild)
@@ -95,8 +97,25 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
 
             el.beforeRenderContent(childBlock)
 
-            // the `el` written might contain some children already
-            el.renderContent(childBlock)
+            // handle the case, when the element just written already has some children
+            // in such case, we need to render all them recursively
+            this.currentElement = el
+
+            el.childNodes.forEach((childNode, index) => {
+                const prevLastChild = this.lastChild
+
+                this.lastChild      = index === 0 ? null : el.childNodes[ index - 1 ]
+
+                if (isString(childNode))
+                    childBlock.write(childNode)
+                else {
+                    this.push(childNode)
+                    this.pop()
+                }
+                this.lastChild      = prevLastChild
+            })
+
+            this.currentElement = currentElement
         }
     }
 
