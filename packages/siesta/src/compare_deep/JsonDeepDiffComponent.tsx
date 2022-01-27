@@ -83,18 +83,18 @@ export class JsonDeepDiffComponent extends Mixin(
             return <div class="json-deep-diff">
                 <div class="json-deep-diff-expander">
                     <JsonDeepDiffContent
-                        stream      = 'expander'
-                        rootComp    = { this }
-                        difference  = { this.difference }
+                        // stream      = 'expander'
+                        // rootComp    = { this }
+                        // difference  = { this.difference }
                     >
                         { convertXmlElement(renderExpander.output.flush(), true) }
                     </JsonDeepDiffContent>
                 </div>
                 <div class="json-deep-diff-left">
                     <JsonDeepDiffContent
-                        stream      = 'left'
-                        rootComp    = { this }
-                        difference  = { this.difference }
+                        // stream      = 'left'
+                        // rootComp    = { this }
+                        // difference  = { this.difference }
                     >
                         { convertXmlElement(renderLeft.output.flush(), true) }
                     </JsonDeepDiffContent>
@@ -104,9 +104,9 @@ export class JsonDeepDiffComponent extends Mixin(
                 </div>
                 <div class="json-deep-diff-right">
                     <JsonDeepDiffContent
-                        stream      = 'right'
-                        rootComp    = { this }
-                        difference  = { this.difference }
+                        // stream      = 'right'
+                        // rootComp    = { this }
+                        // difference  = { this.difference }
                     >
                         { convertXmlElement(renderRight.output.flush(), true) }
                     </JsonDeepDiffContent>
@@ -145,7 +145,7 @@ export class JsonDeepDiffContentRendering extends Base {
         this.output.start(
             XmlElement.new({
                 tagName         : 'div',
-                attributes      : { class : 'json-deep-diff-content' }
+                attributes      : { class : 'json-deep-diff-content-root' }
             })
         )
     }
@@ -179,77 +179,31 @@ export class JsonDeepDiffContent extends Mixin(
     (base : ClassUnion<typeof Component>) =>
 
     class JsonDeepDiffContent extends base {
-        props : Component[ 'props' ] & {
-            expanded?           : JsonDeepDiffContent[ 'expanded' ]
-            stream?             : JsonDeepDiffContent[ 'stream' ]
-            difference?         : JsonDeepDiffContent[ 'difference' ]
-            rootComp?           : JsonDeepDiffContent[ 'rootComp' ]
-        }
-
-        @field()
-        expanded        : boolean                       = true
-
-        stream          : DifferenceRenderingStream     = undefined
-
-        difference      : Difference                    = undefined
-
-        rootComp        : JsonDeepDiffComponent         = undefined
-
-        width           : number                        = undefined
-
-        @field()
-        height          : number                        = undefined
-
-        // difference      : Difference     = undefined
-
-
-        // initialize (props? : Partial<JsonDeepDiffContent>) {
-        //     super.initialize(props)
+        // props : Component[ 'props' ] & {
+        //     expanded?           : JsonDeepDiffContent[ 'expanded' ]
+        //     stream?             : JsonDeepDiffContent[ 'stream' ]
+        //     difference?         : JsonDeepDiffContent[ 'difference' ]
+        //     rootComp?           : JsonDeepDiffContent[ 'rootComp' ]
         // }
+        //
+        // @field()
+        // expanded        : boolean                       = true
+        //
+        // stream          : DifferenceRenderingStream     = undefined
+        //
+        // difference      : Difference                    = undefined
+        //
+        // rootComp        : JsonDeepDiffComponent         = undefined
+        //
+        // width           : number                        = undefined
+        //
+        // @field()
+        // height          : number                        = undefined
 
 
         render () : Element {
             return <div class='json-deep-diff-content'>{ this.children }</div>
-            // const output        = RenderingXmlFragment.new()
-            //
-            // output.start(XmlElement.new({
-            //     tagName     : 'div',
-            //     attributes  : { class : 'json-deep-diff-content', style : `width: ${ this.rootComp.renderWidth }ch` }
-            // }))
-            //
-            // this.difference.render(output, DifferenceRenderingContext.new({ stream : this.stream }))
-            //
-            // return convertXmlElement(output.flush())
-
-            // return <div>{ this.difference.render() }</div>
-            //
-            //
-            // if (this.difference instanceof DifferenceTemplateAtomic) {
-            //     return this.renderDifferenceAtomic()
-            // }
-            // else {
-            //     throw new Error("Unknown difference type")
-            // }
         }
-
-
-        // renderDifferenceAtomic () : Element {
-        //     const diff       = this.difference as DifferenceTemplateAtomic
-        //
-        //     const el         = this.stream === 'left' ? diff.childNodes[ 0 ] : diff.childNodes[ 1 ]
-        //
-        //     if (el instanceof MissingValue)
-        //         return <div>░</div>
-        //     else {
-        //         if (this.rootComp.context.atomicElementNodes.has(el.tagName)) {
-        //             return <div id={ "" }>{ el.childNodes[ 0 ] }</div>
-        //         }
-        //         else {
-        //             throw new Error("Unknown atomic")
-        //         }
-        //     }
-        //
-        // }
     }
 ){}
 
