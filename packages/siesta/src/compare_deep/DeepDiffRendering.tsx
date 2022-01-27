@@ -14,8 +14,25 @@ export class MissingValue extends XmlElement {
 }
 
 
+export type DifferenceRenderingStream   = 'expander' | 'left' | 'middle' | 'right'
+
 export class DifferenceRenderingContext extends Base {
-    stream          : 'expander' | 'left' | 'middle' | 'right'
+    stream          : DifferenceRenderingStream     = undefined
+
+
+    get isContent () : boolean {
+        return this.stream === 'left' || this.stream === 'right'
+    }
+
+
+    get isExpander () : boolean {
+        return this.stream === 'expander'
+    }
+
+
+    get isMiddle () : boolean {
+        return this.stream === 'middle'
+    }
 }
 
 
@@ -151,13 +168,20 @@ export class DifferenceAtomic extends Difference {
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         const stream        = context.stream
 
-        output.write(<diff-atomic same={ this.same } type={ this.type } class={ stream === 'left' ? this.typeOf1 : this.typeOf2 }>
-            {
-                stream === 'left'
-                    ? this.content1 ?? <MissingValue></MissingValue>
-                    : this.content2 ?? <MissingValue></MissingValue>
-            }
-        </diff-atomic>)
+        if (context.isContent) {
+            output.write(<diff-atomic same={ this.same } type={ this.type } class={ stream === 'left' ? this.typeOf1 : this.typeOf2 }>
+                {
+                    stream === 'left'
+                        ? this.content1 ?? <MissingValue></MissingValue>
+                        : this.content2 ?? <MissingValue></MissingValue>
+                }
+            </diff-atomic>)
+        }
+        else if (stream === 'expander') {
+        }
+        else if (stream === 'middle') {
+
+        }
     }
 }
 
@@ -201,7 +225,7 @@ export class DifferenceReferenceable extends Difference {
 
 
     * beforeRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        this.renderReferenceablePrefix(output, context)
+        if (context.isContent) this.renderReferenceablePrefix(output, context)
 
         yield* super.beforeRenderContentGen(output, context)
     }
@@ -234,40 +258,46 @@ export class DifferenceComposite extends DifferenceReferenceable {
 
     entries         : DifferenceRendering[]         = []
 
-    // forEachChild (func : (child : Child, index : number) => any) {
-    //     throw new Error("Abstract method")
-    // }
-    //
-    //
-    // getChild (index : number) : Child {
-    //     throw new Error("Abstract method")
-    // }
 
     // separator
     dummyProp
 
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isExpander) output.push(
+            <diff-expander>
+                <diff-expander-opener>{ '\uf146' }</diff-expander-opener>
+                <diff-expander-closer>{ '\uf146' }</diff-expander-closer>
+            </diff-expander>
+        )
+
+        yield* super.renderGen(output, context)
+
+        if (context.isExpander) output.pop()
+    }
+
+
     * renderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        output.push(<diff-inner class="indented"></diff-inner>)
+        if (context.isContent) output.push(<diff-inner class="indented"></diff-inner>)
 
         for (let i = 0; i < this.entries.length; i++) {
             const child     = this.entries[ i ]
 
             yield* this.beforeRenderChildGen(output, context, child, i)
 
-            output.push(<diff-entry></diff-entry>)
+            if (context.isContent || context.isExpander) output.push(<diff-entry></diff-entry>)
 
             yield DifferenceRenderingSyncPoint.new({ type : 'before' })
 
             yield* this.renderChildGen(output, context, child, i)
 
-            output.pop()
+            if (context.isContent || context.isExpander) output.pop()
 
             yield DifferenceRenderingSyncPoint.new({ type : 'after' })
 
             yield* this.afterRenderChildGen(output, context, child, i)
         }
 
-        output.pop()
+        if (context.isContent) output.pop()
     }
 
 
@@ -385,38 +415,30 @@ export class DifferenceArray extends DifferenceComposite {
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        output.push(<diff-array id={ 1 } same={ this.same } type={ this.type }></diff-array>)
+        if (context.isContent) output.push(<diff-array id={ 1 } same={ this.same } type={ this.type }></diff-array>)
 
         yield* super.renderGen(output, context)
 
-        output.pop()
+        if (context.isContent) output.pop()
     }
 
 
     * beforeRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         yield* super.beforeRenderContentGen(output, context)
 
-        output.write('[')
+        if (context.isContent) output.write('[')
+
+        if (context.isExpander) output.write(String.fromCharCode(0xA0))
     }
 
 
     * afterRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         yield* super.afterRenderContentGen(output, context)
 
-        output.write(']')
+        if (context.isContent) output.write(']')
+
+        if (context.isExpander) output.write(String.fromCharCode(0xA0))
     }
-
-
-    // * renderChildGen (
-    //     output              : RenderingXmlFragment,
-    //     context             : DifferenceRenderingContext,
-    //     child               : DifferenceRendering,
-    //     index               : number
-    // )
-    //     : Generator<DifferenceRenderingSyncPoint>
-    // {
-    //     yield* super.renderChildGen(output, context, child, index)
-    // }
 
 
     // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {

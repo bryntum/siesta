@@ -10,8 +10,11 @@
 
 
 .json-deep-diff-expander {
-    width : 30px;
-    overflow: hidden;
+    width : 1.5ch;
+    //border-right: 1px solid $gray_lighter;
+    padding-right: 0.5ch;
+
+    box-sizing: border-box;
 }
 
 .json-deep-diff-middle {
@@ -38,9 +41,43 @@ diff-entry {
     display: block;
 }
 
+
+diff-expander {
+    display: block;
+    position: relative;
+
+    width: 100%;
+
+    //border-right: 1px solid $gray_lighter;
+    //
+    //&:hover {
+    //    border-right-color: $gray;
+    //}
+
+    & > diff-expander-opener, & >diff-expander-closer {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        font-size: 0.6em;
+        position: absolute;
+        color: $gray;
+        cursor: pointer;
+    }
+
+    & > diff-expander-opener {
+        top: 0;
+        right: -0.5em;
+    }
+
+    & > diff-expander-closer {
+        bottom: 0;
+        right: -0.5em;
+    }
+}
+
+
 [same=false] {
     color : $primary_fail_darker;
 }
 [same=true] {
-    color : gray;
+    color : $gray;
 }

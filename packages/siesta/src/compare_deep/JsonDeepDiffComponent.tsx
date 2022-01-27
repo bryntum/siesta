@@ -9,7 +9,7 @@ import { XmlElement } from "../jsx/XmlElement.js"
 import { XmlRendererStreaming } from "../jsx/XmlRenderer.js"
 import { lastElement } from "../util/Helpers.js"
 import { XmlRendererDifference } from "./CompareDeepDiffRendering.js"
-import { Difference, DifferenceRenderingContext } from "./DeepDiffRendering.js"
+import { Difference, DifferenceRenderingContext, DifferenceRenderingStream } from "./DeepDiffRendering.js"
 
 // added as expression here, otherwise IDE thinks `ChronoGraphJSX` is unused import
 ChronoGraphJSX
@@ -26,11 +26,11 @@ export class JsonDeepDiffComponent extends Mixin(
         difference          : Difference            = undefined
 
         @field()
-        renderWidth         : number                = 15
+        maxWidth            : number                = 15
 
 
         render () : Element {
-            const width         = this.renderWidth
+            const maxWidth         = this.maxWidth
 
             const renderer      = XmlRendererStreaming.new({
                 // styles      : styles
@@ -43,7 +43,7 @@ export class JsonDeepDiffComponent extends Mixin(
                 stream      : 'left',
                 difference  : this.difference,
                 renderer,
-                maxWidth    : width
+                maxWidth
             })
             const iteratorLeft      = renderLeft.render()
 
@@ -51,27 +51,45 @@ export class JsonDeepDiffComponent extends Mixin(
                 stream      : 'right',
                 difference  : this.difference,
                 renderer,
-                maxWidth    : width
+                maxWidth
             })
             const iteratorRight     = renderRight.render()
+
+            const renderExpander   = JsonDeepDiffContentRendering.new({
+                stream      : 'expander',
+                difference  : this.difference,
+                renderer,
+                maxWidth
+            })
+            const iteratorExpander     = renderExpander.render()
 
             while (true) {
                 const leftIteration     = iteratorLeft.next()
                 const rightIteration    = iteratorRight.next()
+                const expanderIteration = iteratorExpander.next()
 
-                if (leftIteration.done === true && rightIteration.done === true) break
+                if (leftIteration.done === true && rightIteration.done === true && expanderIteration.done === true) break
 
-                if (leftIteration.done === false && rightIteration.done === false) {
-                    const maxHeight         = Math.max(leftIteration.value.height, rightIteration.value.height)
+                if (leftIteration.done === false && rightIteration.done === false && expanderIteration.done === false) {
+                    const maxHeight     = Math.max(leftIteration.value.height, rightIteration.value.height)
 
                     leftIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
                     rightIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
+                    expanderIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
                 } else
                     throw new Error("Desync")
             }
 
             return <div class="json-deep-diff">
-                <div class="json-deep-diff-expander">expander</div>
+                <div class="json-deep-diff-expander">
+                    <JsonDeepDiffContent
+                        stream      = 'expander'
+                        rootComp    = { this }
+                        difference  = { this.difference }
+                    >
+                        { convertXmlElement(renderExpander.output.flush(), true) }
+                    </JsonDeepDiffContent>
+                </div>
                 <div class="json-deep-diff-left">
                     <JsonDeepDiffContent
                         stream      = 'left'
@@ -105,7 +123,7 @@ export class JsonDeepDiffContentRendering extends Base {
 
     maxWidth        : number                    = Number.MAX_SAFE_INTEGER
 
-    stream          : 'left' | 'right'          = undefined
+    stream          : DifferenceRenderingStream = undefined
 
     difference      : Difference                = undefined
 
@@ -127,7 +145,7 @@ export class JsonDeepDiffContentRendering extends Base {
         this.output.start(
             XmlElement.new({
                 tagName         : 'div',
-                attributes      : { class : 'json-deep-diff-content', style : `width: ${ this.maxWidth }ch` }
+                attributes      : { class : 'json-deep-diff-content' }
             })
         )
     }
@@ -141,7 +159,8 @@ export class JsonDeepDiffContentRendering extends Base {
         for (const syncPoint of iterator) {
             if (syncPoint.type === 'before') {
                 heightStart.set(this.output.currentElement, this.canvas.height)
-            } else {
+            }
+            else if (syncPoint.type === 'after') {
                 const el    = lastElement(this.output.currentElement.childNodes) as XmlElement
 
                 yield {
@@ -170,7 +189,7 @@ export class JsonDeepDiffContent extends Mixin(
         @field()
         expanded        : boolean                       = true
 
-        stream          : 'expander' | 'left' | 'middle' | 'right' = undefined
+        stream          : DifferenceRenderingStream     = undefined
 
         difference      : Difference                    = undefined
 
