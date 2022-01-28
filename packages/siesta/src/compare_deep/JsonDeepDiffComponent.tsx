@@ -39,59 +39,31 @@ export class JsonDeepDiffComponent extends Mixin(
             renderer.blockLevelElements.add('diff-entry')
             renderer.blockLevelElements.add('diff-inner')
 
-            const renderLeft        = JsonDeepDiffContentRendering.new({
-                stream      : 'left',
-                difference  : this.difference,
-                renderer,
-                maxWidth
-            })
-            const iteratorLeft      = renderLeft.render()
+            const streams       = [ 'expander', 'left', 'middle', 'right' ] as DifferenceRenderingStream[]
 
-            const renderRight       = JsonDeepDiffContentRendering.new({
-                stream      : 'right',
+            const renderers     = streams.map(stream => JsonDeepDiffContentRendering.new({
+                stream,
                 difference  : this.difference,
                 renderer,
                 maxWidth
-            })
-            const iteratorRight     = renderRight.render()
+            }))
 
-            const renderExpander    = JsonDeepDiffContentRendering.new({
-                stream      : 'expander',
-                difference  : this.difference,
-                renderer,
-                maxWidth
-            })
-            const iteratorExpander  = renderExpander.render()
-
-            const renderMiddle      = JsonDeepDiffContentRendering.new({
-                stream      : 'middle',
-                difference  : this.difference,
-                renderer,
-                maxWidth
-            })
-            const iteratorMiddle    = renderMiddle.render()
+            const iterators     = renderers.map(renderer => renderer.render())
 
             while (true) {
-                const leftIteration     = iteratorLeft.next()
-                const rightIteration    = iteratorRight.next()
-                const expanderIteration = iteratorExpander.next()
-                const middleIteration   = iteratorMiddle.next()
+                const iterations        = iterators.map(iterator => iterator.next())
 
-                if (
-                    leftIteration.done === true && rightIteration.done === true
-                    && expanderIteration.done === true && middleIteration.done === true
-                ) break
+                if (iterations.every(iteration => iteration.done)) break
 
-                if (
-                    leftIteration.done === false && rightIteration.done === false
-                    && expanderIteration.done === false && middleIteration.done === false
-                ) {
-                    const maxHeight     = Math.max(leftIteration.value.height, rightIteration.value.height)
+                if (iterations.every(iteration => !iteration.done)) {
+                    const maxHeight     = Math.max(iterations[ 1 ].value.height, iterations[ 3 ].value.height)
 
-                    leftIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
-                    rightIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
-                    expanderIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
-                    middleIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
+                    iterations.forEach(iteration => {
+                        // this comparison is only used for typing purposes
+                        // (TS can't track the `every !done` assertion from above)
+                        if (iteration.done === false)
+                            iteration.value.el.setAttribute('style', `height: ${1.5 * maxHeight}em`)
+                    })
                 } else
                     throw new Error("Desync")
             }
@@ -103,7 +75,7 @@ export class JsonDeepDiffComponent extends Mixin(
                         // rootComp    = { this }
                         // difference  = { this.difference }
                     >
-                        { convertXmlElement(renderExpander.output.flush(), true) }
+                        { convertXmlElement(renderers[ 0 ].output.flush(), true) }
                     </JsonDeepDiffContent>
                 </div>
                 <div class="json-deep-diff-left">
@@ -112,7 +84,7 @@ export class JsonDeepDiffComponent extends Mixin(
                         // rootComp    = { this }
                         // difference  = { this.difference }
                     >
-                        { convertXmlElement(renderLeft.output.flush(), true) }
+                        { convertXmlElement(renderers[ 1 ].output.flush(), true) }
                     </JsonDeepDiffContent>
                 </div>
                 <div class="json-deep-diff-middle">
@@ -121,7 +93,7 @@ export class JsonDeepDiffComponent extends Mixin(
                         // rootComp    = { this }
                         // difference  = { this.difference }
                     >
-                        { convertXmlElement(renderMiddle.output.flush(), true) }
+                        { convertXmlElement(renderers[ 2 ].output.flush(), true) }
                     </JsonDeepDiffContent>
                 </div>
                 <div class="json-deep-diff-right">
@@ -130,7 +102,7 @@ export class JsonDeepDiffComponent extends Mixin(
                         // rootComp    = { this }
                         // difference  = { this.difference }
                     >
-                        { convertXmlElement(renderRight.output.flush(), true) }
+                        { convertXmlElement(renderers[ 3 ].output.flush(), true) }
                     </JsonDeepDiffContent>
                 </div>
             </div>

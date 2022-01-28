@@ -23,6 +23,13 @@
 .json-deep-diff-middle {
     width : 30px;
     overflow: hidden;
+    text-align: center;
+
+    border-left: 1px solid $gray_lighter;
+    border-right: 1px solid $gray_lighter;
+
+    margin-left: 0.5ch;
+    margin-right: 0.5ch;
 }
 
 .json-deep-diff-left, .json-deep-diff-right {

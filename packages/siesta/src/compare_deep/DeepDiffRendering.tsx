@@ -446,7 +446,8 @@ export class DifferenceArray extends DifferenceComposite {
 
         if (context.isContent) output.write('[')
 
-        if (context.isExpander || context.isMiddle) output.write(String.fromCharCode(0xA0))
+        // zero-width space
+        if (context.isExpander || context.isMiddle) output.write(String.fromCharCode(0x200B))
     }
 
 
@@ -455,7 +456,8 @@ export class DifferenceArray extends DifferenceComposite {
 
         if (context.isContent) output.write(']')
 
-        if (context.isExpander || context.isMiddle) output.write(String.fromCharCode(0xA0))
+        // zero-width space
+        if (context.isExpander || context.isMiddle) output.write(String.fromCharCode(0x200B))
     }
 
 
