@@ -39,7 +39,7 @@ export class JsonDeepDiffComponent extends Mixin(
             renderer.blockLevelElements.add('diff-entry')
             renderer.blockLevelElements.add('diff-inner')
 
-            const renderLeft    = JsonDeepDiffContentRendering.new({
+            const renderLeft        = JsonDeepDiffContentRendering.new({
                 stream      : 'left',
                 difference  : this.difference,
                 renderer,
@@ -47,7 +47,7 @@ export class JsonDeepDiffComponent extends Mixin(
             })
             const iteratorLeft      = renderLeft.render()
 
-            const renderRight   = JsonDeepDiffContentRendering.new({
+            const renderRight       = JsonDeepDiffContentRendering.new({
                 stream      : 'right',
                 difference  : this.difference,
                 renderer,
@@ -55,27 +55,43 @@ export class JsonDeepDiffComponent extends Mixin(
             })
             const iteratorRight     = renderRight.render()
 
-            const renderExpander   = JsonDeepDiffContentRendering.new({
+            const renderExpander    = JsonDeepDiffContentRendering.new({
                 stream      : 'expander',
                 difference  : this.difference,
                 renderer,
                 maxWidth
             })
-            const iteratorExpander     = renderExpander.render()
+            const iteratorExpander  = renderExpander.render()
+
+            const renderMiddle      = JsonDeepDiffContentRendering.new({
+                stream      : 'middle',
+                difference  : this.difference,
+                renderer,
+                maxWidth
+            })
+            const iteratorMiddle    = renderMiddle.render()
 
             while (true) {
                 const leftIteration     = iteratorLeft.next()
                 const rightIteration    = iteratorRight.next()
                 const expanderIteration = iteratorExpander.next()
+                const middleIteration   = iteratorMiddle.next()
 
-                if (leftIteration.done === true && rightIteration.done === true && expanderIteration.done === true) break
+                if (
+                    leftIteration.done === true && rightIteration.done === true
+                    && expanderIteration.done === true && middleIteration.done === true
+                ) break
 
-                if (leftIteration.done === false && rightIteration.done === false && expanderIteration.done === false) {
+                if (
+                    leftIteration.done === false && rightIteration.done === false
+                    && expanderIteration.done === false && middleIteration.done === false
+                ) {
                     const maxHeight     = Math.max(leftIteration.value.height, rightIteration.value.height)
 
                     leftIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
                     rightIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
                     expanderIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
+                    middleIteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
                 } else
                     throw new Error("Desync")
             }
@@ -100,7 +116,13 @@ export class JsonDeepDiffComponent extends Mixin(
                     </JsonDeepDiffContent>
                 </div>
                 <div class="json-deep-diff-middle">
-                    middle
+                    <JsonDeepDiffContent
+                        // stream      = 'expander'
+                        // rootComp    = { this }
+                        // difference  = { this.difference }
+                    >
+                        { convertXmlElement(renderMiddle.output.flush(), true) }
+                    </JsonDeepDiffContent>
                 </div>
                 <div class="json-deep-diff-right">
                     <JsonDeepDiffContent
@@ -124,8 +146,9 @@ export class JsonDeepDiffComponent extends Mixin(
 
                 const leftEl    = document.getElementById(`left-${ diffId }`)
                 const rightEl   = document.getElementById(`right-${ diffId }`);
+                const middleEl  = document.getElementById(`middle-${ diffId }`);
 
-                [ expander, leftEl, rightEl ].forEach(el => {
+                [ expander, leftEl, middleEl, rightEl ].forEach(el => {
                     const entry     = el.closest('diff-entry')
 
                     if (entry)

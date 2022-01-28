@@ -276,11 +276,17 @@ export class DifferenceComposite extends DifferenceReferenceable {
                     </diff-expander-controls>
                 </diff-expander>
             )
+        } else if (context.isMiddle) {
+            output.push(
+                <diff-middle id={ `${ context.stream }-${ this.id }` }>
+                </diff-middle>
+            )
         }
 
         yield* super.renderGen(output, context)
 
         if (context.isExpander) output.pop()
+        if (context.isMiddle) output.pop()
     }
 
 
@@ -292,13 +298,15 @@ export class DifferenceComposite extends DifferenceReferenceable {
 
             yield* this.beforeRenderChildGen(output, context, child, i)
 
-            if (context.isContent || context.isExpander) output.push(<diff-entry></diff-entry>)
+            // the entry element presents in all flows and this is what
+            // is synchronizing the height across the streams
+            output.push(<diff-entry></diff-entry>)
 
             yield DifferenceRenderingSyncPoint.new({ type : 'before' })
 
             yield* this.renderChildGen(output, context, child, i)
 
-            if (context.isContent || context.isExpander) output.pop()
+            output.pop()
 
             yield DifferenceRenderingSyncPoint.new({ type : 'after' })
 
@@ -381,6 +389,8 @@ export class DifferenceArrayEntry extends DifferenceRendering {
     zz
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isMiddle) output.write(String(this.index))
+
         yield* this.difference.renderGen(output, context)
     }
 }
@@ -436,7 +446,7 @@ export class DifferenceArray extends DifferenceComposite {
 
         if (context.isContent) output.write('[')
 
-        if (context.isExpander) output.write(String.fromCharCode(0xA0))
+        if (context.isExpander || context.isMiddle) output.write(String.fromCharCode(0xA0))
     }
 
 
@@ -445,7 +455,7 @@ export class DifferenceArray extends DifferenceComposite {
 
         if (context.isContent) output.write(']')
 
-        if (context.isExpander) output.write(String.fromCharCode(0xA0))
+        if (context.isExpander || context.isMiddle) output.write(String.fromCharCode(0xA0))
     }
 
 
