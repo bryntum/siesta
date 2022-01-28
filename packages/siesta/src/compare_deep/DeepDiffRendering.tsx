@@ -266,10 +266,12 @@ export class DifferenceComposite extends DifferenceReferenceable {
         if (context.isExpander) {
             output.push(
                 <diff-expander>
-                    <diff-expander-line>
-                        <diff-expander-opener>{ '\uf146' }</diff-expander-opener>
-                        <diff-expander-closer>{ '\uf146' }</diff-expander-closer>
-                    </diff-expander-line>
+                    <diff-expander-line></diff-expander-line>
+                    <diff-expander-controls>
+                        {/*<diff-expander-line></diff-expander-line>*/}
+                        <diff-expander-opener>{ '\uf0c8' }</diff-expander-opener>
+                        <diff-expander-closer>{ '\uf0c8' }</diff-expander-closer>
+                    </diff-expander-controls>
                 </diff-expander>
             )
         }
