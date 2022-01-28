@@ -26,7 +26,7 @@ export class JsonDeepDiffComponent extends Mixin(
         difference          : Difference            = undefined
 
         @field()
-        maxWidth            : number                = 15
+        maxWidth            : number                = 60
 
 
         render () : Element {
@@ -62,45 +62,31 @@ export class JsonDeepDiffComponent extends Mixin(
                         // this comparison is only used for typing purposes
                         // (TS can't track the `every !done` assertion from above)
                         if (iteration.done === false)
-                            iteration.value.el.setAttribute('style', `height: ${1.5 * maxHeight}em`)
+                            iteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
                     })
                 } else
                     throw new Error("Desync")
             }
 
-            return <div class="json-deep-diff">
+            return <div class="json-deep-diff" on:scroll={ e => this.onScroll(e) }>
                 <div class="json-deep-diff-expander" on:click={ e => this.onExpanderClick(e) }>
-                    <JsonDeepDiffContent
-                        // stream      = 'expander'
-                        // rootComp    = { this }
-                        // difference  = { this.difference }
-                    >
-                        { convertXmlElement(renderers[ 0 ].output.flush(), true) }
-                    </JsonDeepDiffContent>
+                    <JsonDeepDiffContent>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</JsonDeepDiffContent>
                 </div>
                 <div class="json-deep-diff-left">
                     <JsonDeepDiffContent
-                        // stream      = 'left'
-                        // rootComp    = { this }
-                        // difference  = { this.difference }
+                        // @ts-ignore
+                        style:width = { `${ maxWidth }ch` }
                     >
                         { convertXmlElement(renderers[ 1 ].output.flush(), true) }
                     </JsonDeepDiffContent>
                 </div>
                 <div class="json-deep-diff-middle">
-                    <JsonDeepDiffContent
-                        // stream      = 'expander'
-                        // rootComp    = { this }
-                        // difference  = { this.difference }
-                    >
-                        { convertXmlElement(renderers[ 2 ].output.flush(), true) }
-                    </JsonDeepDiffContent>
+                    <JsonDeepDiffContent>{ convertXmlElement(renderers[ 2 ].output.flush(), true) }</JsonDeepDiffContent>
                 </div>
                 <div class="json-deep-diff-right">
                     <JsonDeepDiffContent
-                        // stream      = 'right'
-                        // rootComp    = { this }
-                        // difference  = { this.difference }
+                        // @ts-ignore
+                        style:width = { `${ maxWidth }ch` }
                     >
                         { convertXmlElement(renderers[ 3 ].output.flush(), true) }
                     </JsonDeepDiffContent>
@@ -121,16 +107,15 @@ export class JsonDeepDiffComponent extends Mixin(
                 const middleEl  = document.getElementById(`middle-${ diffId }`);
 
                 [ expander, leftEl, middleEl, rightEl ].forEach(el => {
-                    const entry     = el.closest('diff-entry')
-
-                    if (entry)
-                        entry.classList.toggle('diff-entry-collapsed')
-                    else
-                        el.parentElement.classList.toggle('diff-entry-collapsed')
-
+                    (el.closest('diff-entry') || el.parentElement).classList.toggle('diff-entry-collapsed')
                     el.classList.toggle('diff-collapsed')
                 })
             }
+        }
+
+
+        onScroll (e : Event) {
+
         }
     }
 ){}

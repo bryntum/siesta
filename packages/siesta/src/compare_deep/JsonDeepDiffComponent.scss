@@ -7,10 +7,16 @@ $contour_active : #9c9c9c;
 .json-deep-diff {
     display: flex;
     flex-direction: row;
+    align-items: flex-start;
 
-    height : 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
 
     border: 1px solid $contour_active;
+
+    & > * {
+        height: 100%;
+    }
 }
 
 
@@ -21,18 +27,28 @@ $contour_active : #9c9c9c;
     margin-right: 0.5ch;
 
     box-sizing: border-box;
-    background-color: #f2f2f2;
+
+    &, & > .json-deep-diff-content {
+        background-color: #f2f2f2;
+    }
 
     user-select: none;
 }
 
 .json-deep-diff-middle {
     width : 30px;
-    overflow: hidden;
     text-align: center;
 
-    border-left: 1px solid $contour;
-    border-right: 1px solid $contour;
+    &, & > .json-deep-diff-content {
+        border-left: 1px solid $contour;
+        border-right: 1px solid $contour;
+    }
+
+    & > .json-deep-diff-content {
+        position: relative;
+        width: calc(100% + 2px);
+        left: -1px;
+    }
 
     margin-left: 0.5ch;
     margin-right: 0.5ch;
@@ -172,9 +188,9 @@ diff-expander {
     }
 }
 
-[same=false] {
-    color : $primary_fail_darker;
-}
+//[same=false] {
+//    color : $primary_fail_darker;
+//}
 [same=true] {
     color : $gray;
 }
