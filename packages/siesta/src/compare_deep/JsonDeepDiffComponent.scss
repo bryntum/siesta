@@ -15,6 +15,8 @@
     padding-right: 0.5ch;
 
     box-sizing: border-box;
+
+    --border-right-color: #{ $gray_lighter };
 }
 
 .json-deep-diff-middle {
@@ -54,23 +56,56 @@ diff-expander {
     //    border-right-color: $gray;
     //}
 
-    & > diff-expander-opener, & >diff-expander-closer {
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        font-size: 0.6em;
+    //pointer-events: none;
+
+    &:hover {
+        //background-color: #0bbda7;
+        //--border-right-color: $gray;
+    }
+
+    &:hover > diff-expander-line:not(:hover) {
+        --border-right-color: $gray;
+
+        //background-color: #0bbda7;
+    }
+
+    & > diff-expander-line {
         position: absolute;
-        color: $gray;
-        cursor: pointer;
-    }
+        width: 100%;
+        height: 100%;
+        border-right: 1px solid;
 
-    & > diff-expander-opener {
-        top: 0;
-        right: -0.5em;
-    }
+        //pointer-events: auto;
 
-    & > diff-expander-closer {
-        bottom: 0;
-        right: -0.5em;
+        border-right-color: var(--border-right-color);
+
+        &:hover {
+            //background-color: #2b74b1;
+
+            //--border-right-color: $gray;
+
+            & > diff-expander-opener, & > diff-expander-closer {
+                color: $gray;
+            }
+        }
+
+        & > diff-expander-opener, & > diff-expander-closer {
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 0.6em;
+            position: absolute;
+            color: $gray_lighter;
+            cursor: pointer;
+            right: -0.5em;
+        }
+
+        & > diff-expander-opener {
+            top: 0;
+        }
+
+        & > diff-expander-closer {
+            bottom: 0;
+        }
     }
 }
 

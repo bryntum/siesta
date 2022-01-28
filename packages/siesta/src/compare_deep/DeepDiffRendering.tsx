@@ -263,12 +263,16 @@ export class DifferenceComposite extends DifferenceReferenceable {
     dummyProp
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isExpander) output.push(
-            <diff-expander>
-                <diff-expander-opener>{ '\uf146' }</diff-expander-opener>
-                <diff-expander-closer>{ '\uf146' }</diff-expander-closer>
-            </diff-expander>
-        )
+        if (context.isExpander) {
+            output.push(
+                <diff-expander>
+                    <diff-expander-line>
+                        <diff-expander-opener>{ '\uf146' }</diff-expander-opener>
+                        <diff-expander-closer>{ '\uf146' }</diff-expander-closer>
+                    </diff-expander-line>
+                </diff-expander>
+            )
+        }
 
         yield* super.renderGen(output, context)
 
