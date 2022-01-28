@@ -271,8 +271,8 @@ export class DifferenceComposite extends DifferenceReferenceable {
                 <diff-expander id={ `${ context.stream }-${ this.id }` }>
                     <diff-expander-line></diff-expander-line>
                     <diff-expander-controls>
-                        <diff-expander-opener>{ '\uf146' }</diff-expander-opener>
-                        <diff-expander-closer>{ '\uf146' }</diff-expander-closer>
+                        <diff-expander-opener></diff-expander-opener>
+                        <diff-expander-closer></diff-expander-closer>
                     </diff-expander-controls>
                 </diff-expander>
             )

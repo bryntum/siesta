@@ -95,13 +95,14 @@ diff-expander {
             left: 0.5em;
 
             &:before {
-                font-family: 'Font Awesome 5 Free';
                 font-weight: 900;
                 content: "\f0c8";
                 position: absolute;
                 left: 0;
                 top: 0;
                 z-index: -1;
+                // TODO, IMPORTANT: should match the widget's background-color
+                // this is to hide the border
                 color: #fefefe;
             }
             z-index: 1;
@@ -109,10 +110,16 @@ diff-expander {
 
         & > diff-expander-opener {
             top: 0;
+            &:after {
+                content: "\f146";
+            }
         }
 
         & > diff-expander-closer {
             bottom: 0;
+            &:after {
+                content: "\f146";
+            }
         }
     }
 }
@@ -120,8 +127,16 @@ diff-expander {
 .diff-entry-collapsed {
     height: 1.5em !important;
 
-    & > diff-expander > diff-expander-controls > diff-expander-opener {
+    & > diff-expander > diff-expander-controls {
+        & > diff-expander-opener {
+            &:after {
+                content: "\f0fe";
+            }
+        }
 
+        & > diff-expander-closer {
+            display: none;
+        }
     }
 }
 

@@ -126,7 +126,13 @@ export class JsonDeepDiffComponent extends Mixin(
                 const rightEl   = document.getElementById(`right-${ diffId }`);
 
                 [ expander, leftEl, rightEl ].forEach(el => {
-                    el.closest('diff-entry')?.classList.toggle('diff-entry-collapsed')
+                    const entry     = el.closest('diff-entry')
+
+                    if (entry)
+                        entry.classList.toggle('diff-entry-collapsed')
+                    else
+                        el.parentElement.classList.toggle('diff-entry-collapsed')
+
                     el.classList.toggle('diff-collapsed')
                 })
             }
