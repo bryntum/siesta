@@ -4,6 +4,7 @@ import { exclude, Serializable, serializable } from "typescript-serializable-mix
 import { RenderingXmlFragment } from "../jsx/RenderBlock.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
+import { luid, LUID } from "../siesta/common/LUID.js"
 import { ArbitraryObjectKey } from "../util/Helpers.js"
 import { Missing } from "./DeepDiff.js"
 
@@ -83,6 +84,8 @@ export class Difference extends Mixin(
     (base : ClassUnion<typeof DifferenceRendering, typeof Serializable, typeof Base>) =>
 
     class Difference extends base {
+        id              : LUID                      = luid()
+
         @exclude()
         value1          : unknown | Missing         = Missing
 
@@ -265,12 +268,11 @@ export class DifferenceComposite extends DifferenceReferenceable {
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isExpander) {
             output.push(
-                <diff-expander>
+                <diff-expander id={ `${ context.stream }-${ this.id }` }>
                     <diff-expander-line></diff-expander-line>
                     <diff-expander-controls>
-                        {/*<diff-expander-line></diff-expander-line>*/}
-                        <diff-expander-opener>{ '\uf0c8' }</diff-expander-opener>
-                        <diff-expander-closer>{ '\uf0c8' }</diff-expander-closer>
+                        <diff-expander-opener>{ '\uf146' }</diff-expander-opener>
+                        <diff-expander-closer>{ '\uf146' }</diff-expander-closer>
                     </diff-expander-controls>
                 </diff-expander>
             )
@@ -421,7 +423,7 @@ export class DifferenceArray extends DifferenceComposite {
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) output.push(<diff-array id={ 1 } same={ this.same } type={ this.type }></diff-array>)
+        if (context.isContent) output.push(<diff-array id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-array>)
 
         yield* super.renderGen(output, context)
 

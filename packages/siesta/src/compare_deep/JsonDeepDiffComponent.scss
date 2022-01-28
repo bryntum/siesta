@@ -16,6 +16,8 @@
     box-sizing: border-box;
 
     --border-right-color: #{ $gray_lighter };
+
+    user-select: none;
 }
 
 .json-deep-diff-middle {
@@ -80,8 +82,6 @@ diff-expander {
                 color: $gray;
             }
 
-            //--border-right-color : $gray;
-
             border-right: 1px solid $gray;
         }
 
@@ -92,7 +92,19 @@ diff-expander {
             position: absolute;
             color: $gray_lighter;
             cursor: pointer;
-            right: -0.5em;
+            left: 0.5em;
+
+            &:before {
+                font-family: 'Font Awesome 5 Free';
+                font-weight: 900;
+                content: "\f0c8";
+                position: absolute;
+                left: 0;
+                top: 0;
+                z-index: -1;
+                color: #fefefe;
+            }
+            z-index: 1;
         }
 
         & > diff-expander-opener {
@@ -105,6 +117,32 @@ diff-expander {
     }
 }
 
+.diff-entry-collapsed {
+    height: 1.5em !important;
+
+    & > diff-expander > diff-expander-controls > diff-expander-opener {
+
+    }
+}
+
+.diff-collapsed {
+    & > diff-inner {
+        display: inline;
+        padding-left: 0;
+
+        & * {
+            display: none;
+        }
+
+        &:before {
+            content: '…'
+        }
+    }
+
+    & diff-entry {
+        display: none;
+    }
+}
 
 [same=false] {
     color : $primary_fail_darker;

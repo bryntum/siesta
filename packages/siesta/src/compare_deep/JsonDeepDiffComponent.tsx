@@ -81,7 +81,7 @@ export class JsonDeepDiffComponent extends Mixin(
             }
 
             return <div class="json-deep-diff">
-                <div class="json-deep-diff-expander">
+                <div class="json-deep-diff-expander" on:click={ e => this.onExpanderClick(e) }>
                     <JsonDeepDiffContent
                         // stream      = 'expander'
                         // rootComp    = { this }
@@ -112,6 +112,24 @@ export class JsonDeepDiffComponent extends Mixin(
                     </JsonDeepDiffContent>
                 </div>
             </div>
+        }
+
+
+        onExpanderClick (e : MouseEvent) {
+            const target    = e.target as Element
+
+            if (target.matches('diff-expander-opener, diff-expander-closer')) {
+                const expander  = target.closest('diff-expander')
+                const diffId    = /expander-(\d+)/.exec(expander.id)[ 1 ]
+
+                const leftEl    = document.getElementById(`left-${ diffId }`)
+                const rightEl   = document.getElementById(`right-${ diffId }`);
+
+                [ expander, leftEl, rightEl ].forEach(el => {
+                    el.closest('diff-entry')?.classList.toggle('diff-entry-collapsed')
+                    el.classList.toggle('diff-collapsed')
+                })
+            }
         }
     }
 ){}
