@@ -26,7 +26,7 @@ export class JsonDeepDiffComponent extends Mixin(
         difference          : Difference            = undefined
 
         @field()
-        maxWidth            : number                = 60
+        maxWidth            : number                = 15
 
 
         render () : Element {
@@ -70,27 +70,22 @@ export class JsonDeepDiffComponent extends Mixin(
 
             return <div class="json-deep-diff">
                 <div class="json-deep-diff-expander" on:click={ e => this.onExpanderClick(e) }>
-                    <JsonDeepDiffContent>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</JsonDeepDiffContent>
+                    <div className='json-deep-diff-content'>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</div>
                 </div>
-                <div class="json-deep-diff-left" on:scroll={ e => this.onLeftContentScroll(e) }>
-                    <JsonDeepDiffContent
-                        // @ts-ignore
-                        style:width = { `${ maxWidth }ch` }
-                    >
+                <div class="json-deep-diff-left" on:scroll={ e => this.onLeftContentScroll(e) } on:mouseover={ e => this.onMouseOver(e) }>
+                    <div className="json-deep-diff-highlighter"></div>
+                    {/*TODO: `style:width` here does not work w/o a function wrapper: () =>*/}
+                    <div className='json-deep-diff-content' style:width = { () => `${ maxWidth }ch` }>
                         { convertXmlElement(renderers[ 1 ].output.flush(), true) }
-                    </JsonDeepDiffContent>
+                    </div>
                 </div>
                 <div class="json-deep-diff-middle">
-                    <JsonDeepDiffContent>{ convertXmlElement(renderers[ 2 ].output.flush(), true) }</JsonDeepDiffContent>
+                    <div className='json-deep-diff-content'>{ convertXmlElement(renderers[ 2 ].output.flush(), true) }</div>
                 </div>
-                <div class="json-deep-diff-right" on:scroll={ e => this.onRightContentScroll(e) }>
-                    <div className='json-deep-diff-content'>
-                        <JsonDeepDiffContent
-                            // @ts-ignore
-                            style:width = { `${ maxWidth }ch` }
-                        >
-                            { convertXmlElement(renderers[ 3 ].output.flush(), true) }
-                        </JsonDeepDiffContent>
+                <div class="json-deep-diff-right" on:scroll={ e => this.onRightContentScroll(e) } on:mouseover={ e => this.onMouseOver(e) }>
+                    <div className="json-deep-diff-highlighter"></div>
+                    <div className='json-deep-diff-content' style:width = { () => `${ maxWidth }ch` }>
+                        { convertXmlElement(renderers[ 3 ].output.flush(), true) }
                     </div>
                 </div>
             </div>
@@ -143,6 +138,50 @@ export class JsonDeepDiffComponent extends Mixin(
             middleEl.scrollTop      = scrollTop
             leftEl.scrollTop        = scrollTop
             leftEl.scrollLeft       = rightEl.scrollLeft
+        }
+
+
+        get leftHighlighter () : HTMLElement {
+            // TODO this is the fastest, but fragile, can we improve?
+            // some cached references mechanism? (query performed once)
+            return this.leftArea.children[ 0 ] as HTMLElement
+        }
+
+
+        get rightHighlighter () : HTMLElement {
+            return this.rightArea.children[ 0 ] as HTMLElement
+        }
+
+
+        get leftArea () : HTMLElement {
+            return this.el.children[ 1 ] as HTMLElement
+        }
+
+        get rightArea () : HTMLElement {
+            return this.el.children[ 3 ] as HTMLElement
+        }
+
+
+        onMouseOver (e : Event) {
+            const target            = e.target as HTMLElement
+            const entry             = target.closest('diff-entry') as HTMLElement
+
+            if (entry) {
+                const entryBox      = entry.getBoundingClientRect()
+                const leftAreaBox   = this.leftArea.getBoundingClientRect()
+
+                const offset        = entryBox.top - leftAreaBox.top + this.leftArea.scrollTop
+
+                const leftHighlighterEl = this.leftHighlighter
+
+                leftHighlighterEl.style.top     = offset + 'px'
+                leftHighlighterEl.style.height  = entry.style.height
+
+                const rightHighlighterEl = this.rightHighlighter
+
+                rightHighlighterEl.style.top     = offset + 'px'
+                rightHighlighterEl.style.height  = entry.style.height
+            }
         }
     }
 ){}
@@ -204,37 +243,37 @@ export class JsonDeepDiffContentRendering extends Base {
 }
 
 
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class JsonDeepDiffContent extends Mixin(
-    [ Component ],
-    (base : ClassUnion<typeof Component>) =>
-
-    class JsonDeepDiffContent extends base {
-        // props : Component[ 'props' ] & {
-        //     expanded?           : JsonDeepDiffContent[ 'expanded' ]
-        //     stream?             : JsonDeepDiffContent[ 'stream' ]
-        //     difference?         : JsonDeepDiffContent[ 'difference' ]
-        //     rootComp?           : JsonDeepDiffContent[ 'rootComp' ]
-        // }
-        //
-        // @field()
-        // expanded        : boolean                       = true
-        //
-        // stream          : DifferenceRenderingStream     = undefined
-        //
-        // difference      : Difference                    = undefined
-        //
-        // rootComp        : JsonDeepDiffComponent         = undefined
-        //
-        // width           : number                        = undefined
-        //
-        // @field()
-        // height          : number                        = undefined
-
-
-        render () : Element {
-            return <div class='json-deep-diff-content'>{ this.children }</div>
-        }
-    }
-){}
-
+// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// export class JsonDeepDiffContent extends Mixin(
+//     [ Component ],
+//     (base : ClassUnion<typeof Component>) =>
+//
+//     class JsonDeepDiffContent extends base {
+//         // props : Component[ 'props' ] & {
+//         //     expanded?           : JsonDeepDiffContent[ 'expanded' ]
+//         //     stream?             : JsonDeepDiffContent[ 'stream' ]
+//         //     difference?         : JsonDeepDiffContent[ 'difference' ]
+//         //     rootComp?           : JsonDeepDiffContent[ 'rootComp' ]
+//         // }
+//         //
+//         // @field()
+//         // expanded        : boolean                       = true
+//         //
+//         // stream          : DifferenceRenderingStream     = undefined
+//         //
+//         // difference      : Difference                    = undefined
+//         //
+//         // rootComp        : JsonDeepDiffComponent         = undefined
+//         //
+//         // width           : number                        = undefined
+//         //
+//         // @field()
+//         // height          : number                        = undefined
+//
+//
+//         render () : Element {
+//             return <div class='json-deep-diff-content'>{ this.children }</div>
+//         }
+//     }
+// ){}
+//
