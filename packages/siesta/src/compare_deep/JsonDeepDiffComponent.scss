@@ -71,6 +71,15 @@ $contour_active : #9c9c9c;
     //&::-webkit-scrollbar-track {
     //    background: #f2f2f2;
     //}
+
+    user-select: none;
+
+    cursor: ew-resize;
+
+    .json-deep-diff-middle-index {
+        font-size: 0.7em;
+        vertical-align: top;
+    }
 }
 
 .json-deep-diff-left, .json-deep-diff-right {
@@ -78,7 +87,7 @@ $contour_active : #9c9c9c;
     min-width: 0;
     position: relative;
 
-    overflow: auto;
+    overflow: scroll;
 }
 
 .json-deep-diff-content {
@@ -99,6 +108,8 @@ diff-entry {
 diff-expander {
     display: block;
     position: relative;
+
+    --control-width: 1ch;
 
     &:hover {
         & diff-expander-line {
@@ -129,7 +140,7 @@ diff-expander {
         &:hover {
             & > diff-expander-opener, & > diff-expander-closer {
                 color: $contour_active;
-                right: -0.5ch;
+                right: calc(-1 * var(--control-width) / 2);
             }
 
             border-right: 1px solid $contour_active;
@@ -142,8 +153,7 @@ diff-expander {
             position: absolute;
             color: $contour;
             cursor: pointer;
-            //left: calc(var(--expander-width) - 0.5ch);
-            right: calc(-0.5ch + 1px);
+            right: calc(-1 * var(--control-width) / 2 + 1px);
 
             &:before {
                 font-weight: 900;
@@ -174,6 +184,16 @@ diff-expander {
         }
     }
 }
+
+// in 2022, conditional CSS is still actual
+// some mess with the font-awesome font width
+// chrome treats every char as single, FF as 2 chars
+@-moz-document url-prefix() {
+    diff-expander {
+        --control-width: 2ch;
+    }
+}
+
 
 .diff-entry-collapsed {
     height: 1.5em !important;

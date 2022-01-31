@@ -389,7 +389,7 @@ export class DifferenceArrayEntry extends DifferenceRendering {
     zz
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isMiddle) output.write(String(this.index))
+        if (context.isMiddle) output.write(<span class="json-deep-diff-middle-index">{ this.index }</span>)
 
         yield* this.difference.renderGen(output, context)
     }
