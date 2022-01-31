@@ -68,11 +68,11 @@ export class JsonDeepDiffComponent extends Mixin(
                     throw new Error("Desync")
             }
 
-            return <div class="json-deep-diff" on:scroll={ e => this.onScroll(e) }>
+            return <div class="json-deep-diff">
                 <div class="json-deep-diff-expander" on:click={ e => this.onExpanderClick(e) }>
                     <JsonDeepDiffContent>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</JsonDeepDiffContent>
                 </div>
-                <div class="json-deep-diff-left">
+                <div class="json-deep-diff-left" on:scroll={ e => this.onLeftContentScroll(e) }>
                     <JsonDeepDiffContent
                         // @ts-ignore
                         style:width = { `${ maxWidth }ch` }
@@ -83,13 +83,15 @@ export class JsonDeepDiffComponent extends Mixin(
                 <div class="json-deep-diff-middle">
                     <JsonDeepDiffContent>{ convertXmlElement(renderers[ 2 ].output.flush(), true) }</JsonDeepDiffContent>
                 </div>
-                <div class="json-deep-diff-right">
-                    <JsonDeepDiffContent
-                        // @ts-ignore
-                        style:width = { `${ maxWidth }ch` }
-                    >
-                        { convertXmlElement(renderers[ 3 ].output.flush(), true) }
-                    </JsonDeepDiffContent>
+                <div class="json-deep-diff-right" on:scroll={ e => this.onRightContentScroll(e) }>
+                    <div className='json-deep-diff-content'>
+                        <JsonDeepDiffContent
+                            // @ts-ignore
+                            style:width = { `${ maxWidth }ch` }
+                        >
+                            { convertXmlElement(renderers[ 3 ].output.flush(), true) }
+                        </JsonDeepDiffContent>
+                    </div>
                 </div>
             </div>
         }
@@ -103,7 +105,7 @@ export class JsonDeepDiffComponent extends Mixin(
                 const diffId    = /expander-(\d+)/.exec(expander.id)[ 1 ]
 
                 const leftEl    = document.getElementById(`left-${ diffId }`)
-                const rightEl   = document.getElementById(`right-${ diffId }`);
+                const rightEl   = document.getElementById(`right-${ diffId }`)
                 const middleEl  = document.getElementById(`middle-${ diffId }`);
 
                 [ expander, leftEl, middleEl, rightEl ].forEach(el => {
@@ -114,8 +116,33 @@ export class JsonDeepDiffComponent extends Mixin(
         }
 
 
-        onScroll (e : Event) {
+        onLeftContentScroll (e : Event) {
+            const leftEl            = e.target as HTMLElement
+            const scrollTop         = leftEl.scrollTop
 
+            const expanderEl        = leftEl.previousElementSibling
+            const middleEl          = leftEl.nextElementSibling
+            const rightEl           = middleEl.nextElementSibling
+
+            expanderEl.scrollTop    = scrollTop
+            middleEl.scrollTop      = scrollTop
+            rightEl.scrollTop       = scrollTop
+            rightEl.scrollLeft      = leftEl.scrollLeft
+        }
+
+
+        onRightContentScroll (e : Event) {
+            const rightEl           = e.target as HTMLElement
+            const scrollTop         = rightEl.scrollTop
+
+            const middleEl          = rightEl.previousElementSibling
+            const leftEl            = middleEl.previousElementSibling
+            const expanderEl        = leftEl.previousElementSibling
+
+            expanderEl.scrollTop    = scrollTop
+            middleEl.scrollTop      = scrollTop
+            leftEl.scrollTop        = scrollTop
+            leftEl.scrollLeft       = rightEl.scrollLeft
         }
     }
 ){}
