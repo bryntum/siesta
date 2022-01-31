@@ -4,33 +4,23 @@
 $contour : #d4d4d4;
 $contour_active : #9c9c9c;
 
-//.json-deep-diff-wrapper {
-//    display: flex;
-//    flex-direction: column;
-//}
-//
-//.json-deep-diff-scroller {
-//    position: absolute;
-//    left: 0;
-//    top:100%;
-//    width: 100%;
-//    height: 0.7rem;
-//}
 
 .json-deep-diff {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-
-    //overflow-y: scroll;
-    //overflow-x: hidden;
+    font-family: monospace;
+    box-sizing: border-box;
 
     border: 1px solid $contour_active;
 
     & > * {
         height: 100%;
         overflow-y: hidden;
-        overflow-x: visible;
+        // all containers need to have the same scroll-height canvas, otherwise scroll-sync breaks
+        // the horizontal scrollbar appears to be important for this
+        // try commenting this line and scroll to bottom - see how the expander element is misplaced
+        overflow-x: scroll;
     }
 }
 
@@ -39,11 +29,13 @@ $contour_active : #9c9c9c;
     --expander-width: 2.5ch;
 
     width : var(--expander-width);
-    margin-right: 0.5ch;
 
-    box-sizing: border-box;
+    .json-deep-diff-content {
+        margin-right: 0.5ch;
+        height: 100%;
+    }
 
-    &, & > .json-deep-diff-content {
+    & > .json-deep-diff-content, & > .json-deep-diff-content > .json-deep-diff-content-root {
         background-color: #f2f2f2;
     }
 
@@ -54,15 +46,12 @@ $contour_active : #9c9c9c;
     width : 30px;
     text-align: center;
 
-    &, & > .json-deep-diff-content {
-        border-left: 1px solid $contour;
-        border-right: 1px solid $contour;
-    }
+    border-left: 1px solid $contour;
+    border-right: 1px solid $contour;
+    background-color: #f2f2f2;
 
     & > .json-deep-diff-content {
-        position: relative;
-        width: calc(100% + 2px);
-        left: -1px;
+        height: 100%;
     }
 
     margin-left: 0.5ch;
@@ -97,8 +86,6 @@ diff-expander {
     position: relative;
 
     &:hover {
-        //background-color: #00c7a9;
-
         & diff-expander-line {
             display: none;
         }
@@ -127,6 +114,7 @@ diff-expander {
         &:hover {
             & > diff-expander-opener, & > diff-expander-closer {
                 color: $contour_active;
+                right: -0.5ch;
             }
 
             border-right: 1px solid $contour_active;
@@ -139,7 +127,8 @@ diff-expander {
             position: absolute;
             color: $contour;
             cursor: pointer;
-            left: calc(var(--expander-width) - 0.5ch);
+            //left: calc(var(--expander-width) - 0.5ch);
+            right: calc(-0.5ch + 1px);
 
             &:before {
                 font-weight: 900;
