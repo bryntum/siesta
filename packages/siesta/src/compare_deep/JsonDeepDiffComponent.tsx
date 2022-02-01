@@ -113,32 +113,26 @@ export class JsonDeepDiffComponent extends Mixin(
 
 
         onLeftContentScroll (e : Event) {
-            const leftEl            = e.target as HTMLElement
-            const scrollTop         = leftEl.scrollTop
+            const leftEl                    = this.leftArea
+            const scrollTop                 = leftEl.scrollTop
 
-            const expanderEl        = leftEl.previousElementSibling
-            const middleEl          = leftEl.nextElementSibling
-            const rightEl           = middleEl.nextElementSibling
+            this.expanderArea.scrollTop     = scrollTop
+            this.middleArea.scrollTop       = scrollTop
 
-            expanderEl.scrollTop    = scrollTop
-            middleEl.scrollTop      = scrollTop
-            rightEl.scrollTop       = scrollTop
-            rightEl.scrollLeft      = leftEl.scrollLeft
+            this.rightArea.scrollTop        = scrollTop
+            this.rightArea.scrollLeft       = leftEl.scrollLeft
         }
 
 
         onRightContentScroll (e : Event) {
-            const rightEl           = e.target as HTMLElement
-            const scrollTop         = rightEl.scrollTop
+            const rightEl                   = this.rightArea
+            const scrollTop                 = rightEl.scrollTop
 
-            const middleEl          = rightEl.previousElementSibling
-            const leftEl            = middleEl.previousElementSibling
-            const expanderEl        = leftEl.previousElementSibling
+            this.expanderArea.scrollTop     = scrollTop
+            this.middleArea.scrollTop       = scrollTop
 
-            expanderEl.scrollTop    = scrollTop
-            middleEl.scrollTop      = scrollTop
-            leftEl.scrollTop        = scrollTop
-            leftEl.scrollLeft       = rightEl.scrollLeft
+            this.leftArea.scrollTop         = scrollTop
+            this.leftArea.scrollLeft        = rightEl.scrollLeft
         }
 
 
@@ -181,15 +175,15 @@ export class JsonDeepDiffComponent extends Mixin(
 
                 const offset        = entryBox.top - leftAreaBox.top + this.leftArea.scrollTop
 
-                const leftHighlighterEl = this.leftHighlighter
+                const leftHighlighterEl         = this.leftHighlighter
 
                 leftHighlighterEl.style.top     = offset + 'px'
                 leftHighlighterEl.style.height  = entry.style.height
 
-                const rightHighlighterEl = this.rightHighlighter
+                const rightHighlighterEl        = this.rightHighlighter
 
-                rightHighlighterEl.style.top     = offset + 'px'
-                rightHighlighterEl.style.height  = entry.style.height
+                rightHighlighterEl.style.top    = offset + 'px'
+                rightHighlighterEl.style.height = entry.style.height
             }
         }
 
