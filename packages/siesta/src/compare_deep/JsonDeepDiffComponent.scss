@@ -51,7 +51,6 @@ $contour_active : #9c9c9c;
 }
 
 .json-deep-diff-middle {
-    width : 30px;
     text-align: center;
     color: $contour_active;
 
@@ -65,6 +64,8 @@ $contour_active : #9c9c9c;
 
     margin-left: 0.5ch;
     margin-right: 0.5ch;
+    padding-left: 1ch;
+    padding-right: 1ch;
 
     //scrollbar-color: auto #f2f2f2;
     //
