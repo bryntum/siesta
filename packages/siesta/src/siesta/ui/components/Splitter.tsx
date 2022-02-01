@@ -1,13 +1,98 @@
 /** @jsx ChronoGraphJSX.createElement */
 
 import { Box } from "@bryntum/chronograph/src/chrono2/data/Box.js"
+import { Base, ClassUnion, Mixin } from "typescript-mixin-class"
 import { ChronoGraphJSX } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
 import { ComponentElement } from "../../../chronograph-jsx/ElementReactivity.js"
 
 ChronoGraphJSX
 
+
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+type CompanionInfo = { el : HTMLElement, rect : DOMRect, 'pointer-events' : string, 'user-select' : string }
+
+export class SplitterDragContext extends Base {
+    startX                  : number            = undefined
+    startY                  : number            = undefined
+
+    companions              : CompanionInfo[]   = undefined
+
+    prevBodyCursor          : string            = undefined
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class AbstractSplitter extends Mixin(
+    [],
+    (base : ClassUnion) =>
+
+    class AbstractSplitter extends base {
+        mode            : 'horizontal' | 'vertical'     = 'horizontal'
+
+
+        getSplitterCompanions () : HTMLElement[] {
+            throw new Error("Abstract method")
+        }
+
+
+        onSplitterPointerDown (e : MouseEvent) {
+            const context       = SplitterDragContext.new({
+                startX      : e.clientX,
+                startY      : e.clientY,
+                companions  : this.getSplitterCompanions().map(el => ({
+                    el                      : el,
+                    rect                    : el.getBoundingClientRect(),
+                    'pointer-events'        : el.style[ 'pointer-events' ],
+                    'user-select'           : el.style[ 'user-select' ]
+                })),
+                prevBodyCursor      : document.body.style.cursor
+            })
+
+            this.onSplitterDragStart(context)
+
+            let pointerMoveListener
+
+            document.addEventListener('pointermove', pointerMoveListener = (e : MouseEvent) => this.onSplitterDrag(context, e))
+
+            document.addEventListener('pointerup', (e : MouseEvent) => {
+                document.removeEventListener('pointermove', pointerMoveListener)
+
+                this.onSplitterDragStop(context)
+            }, { once : true })
+        }
+
+
+        onSplitterDragStart (context : SplitterDragContext) {
+            document.body.style.cursor  = this.mode === 'horizontal' ? 'col-resize' : 'row-resize'
+
+            context.companions.forEach(info => {
+                info.el.style[ 'pointer-events' ]    = 'none'
+                info.el.style[ 'user-select' ]       = 'none'
+            })
+        }
+
+
+        onSplitterDrag (context : SplitterDragContext, e : MouseEvent) {
+        }
+
+
+        onSplitterDragStop (context : SplitterDragContext) {
+            document.body.style.cursor  = context.prevBodyCursor
+
+            context.companions.forEach(info => {
+                const el                        = info.el
+
+                el.style[ 'pointer-events' ]    = info[ 'pointer-events' ]
+                el.style[ 'user-select' ]       = info[ 'user-select' ]
+            })
+        }
+    }
+){}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TODO inherit from AbstractSplitter
 export class Splitter extends Component {
     props : Component[ 'props' ] & {
         mode?           : Splitter[ 'mode' ]
