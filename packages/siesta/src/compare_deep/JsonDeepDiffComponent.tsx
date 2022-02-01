@@ -164,7 +164,8 @@ export class JsonDeepDiffComponent extends Mixin(
             return this.el.children[ 3 ] as HTMLElement
         }
 
-
+        // TODO implement `mouseOut`
+        // only need to highlight the atomics? highlighting the structure is not that needed?
         onMouseOver (e : Event) {
             const target            = e.target as HTMLElement
             const entry             = target.closest('diff-entry') as HTMLElement
