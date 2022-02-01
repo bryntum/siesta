@@ -9,6 +9,7 @@
         "siesta": "bin/siesta.js"
     },
     "scripts": {
+        "dev": "npm run wds & npm run sass",
         "wds": "npx wds --node-resolve",
         "sass": "npx sass --watch resources/styling/ src/",
         "deno": "deno run --allow-all --unstable --quiet --no-check",
