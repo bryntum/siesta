@@ -82,9 +82,4 @@ export class Colorer extends Base {
     text (text : string) : string {
         throw new Error("implement me")
     }
-
-
-    wrappings () : [ string, string ] {
-        return zeroWrapping
-    }
 }
