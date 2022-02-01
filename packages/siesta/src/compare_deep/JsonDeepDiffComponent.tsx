@@ -7,6 +7,7 @@ import { Base, ClassUnion, Mixin } from "../class/Mixin.js"
 import { RenderCanvas, RenderingXmlFragmentWithCanvas } from "../jsx/RenderBlock.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { XmlRendererStreaming } from "../jsx/XmlRenderer.js"
+import { AbstractSplitter, SplitterDragContext } from "../siesta/ui/components/Splitter.js"
 import { lastElement } from "../util/Helpers.js"
 import { XmlRendererDifference } from "./CompareDeepDiffRendering.js"
 import { Difference, DifferenceRenderingContext, DifferenceRenderingStream } from "./DeepDiffRendering.js"
@@ -17,8 +18,8 @@ ChronoGraphJSX
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class JsonDeepDiffComponent extends Mixin(
-    [ Component ],
-    (base : ClassUnion<typeof Component>) =>
+    [ AbstractSplitter, Component ],
+    (base : ClassUnion<typeof AbstractSplitter, typeof Component>) =>
 
     class JsonDeepDiffComponent extends base {
         context             : XmlRendererDifference             = XmlRendererDifference.new()
@@ -79,7 +80,7 @@ export class JsonDeepDiffComponent extends Mixin(
                         { convertXmlElement(renderers[ 1 ].output.flush(), true) }
                     </div>
                 </div>
-                <div class="json-deep-diff-middle">
+                <div class="json-deep-diff-middle" on:pointerdown={ e => this.onSplitterPointerDown(e) }>
                     <div className='json-deep-diff-content'>{ convertXmlElement(renderers[ 2 ].output.flush(), true) }</div>
                 </div>
                 <div class="json-deep-diff-right" on:scroll={ e => this.onRightContentScroll(e) } on:mouseover={ e => this.onMouseOver(e) }>
@@ -153,8 +154,16 @@ export class JsonDeepDiffComponent extends Mixin(
         }
 
 
+        get expanderArea () : HTMLElement {
+            return this.el.children[ 0 ] as HTMLElement
+        }
+
         get leftArea () : HTMLElement {
             return this.el.children[ 1 ] as HTMLElement
+        }
+
+        get middleArea () : HTMLElement {
+            return this.el.children[ 2 ] as HTMLElement
         }
 
         get rightArea () : HTMLElement {
@@ -182,6 +191,23 @@ export class JsonDeepDiffComponent extends Mixin(
                 rightHighlighterEl.style.top     = offset + 'px'
                 rightHighlighterEl.style.height  = entry.style.height
             }
+        }
+
+
+        getSplitterCompanions () : HTMLElement[] {
+            return [ this.leftArea, this.rightArea ]
+        }
+
+
+        onSplitterDrag (context : SplitterDragContext, e : MouseEvent) {
+            const dx            = e.clientX - context.startX
+
+            const leftWidth     = context.companions[ 0 ].rect.width
+            const rightWidth    = context.companions[ 1 ].rect.width
+
+            const flex          = (leftWidth + dx) / (rightWidth - dx)
+
+            this.leftArea.style.flex    = String(flex)
         }
     }
 ){}
