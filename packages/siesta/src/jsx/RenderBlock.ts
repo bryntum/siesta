@@ -421,6 +421,8 @@ export class RenderCanvas extends Base {
 
     pendingNewLine      : boolean                   = false
 
+    maxWidthFact        : number                    = 0
+
 
     newLinePending () {
         if (this.canvas.length === 1 && this.canvas[ 0 ].length === 0) return
@@ -439,9 +441,13 @@ export class RenderCanvas extends Base {
 
         if (/\n/.test(str)) throw new Error("Should not contain new line characters")
 
-        lastElement(this.canvas).push(str, len)
+        const lastLine  = this.lastLine
 
-        if (lastElement(this.canvas).length > this.maxWidth) throw new Error("Should not exceed max width")
+        lastLine.push(str, len)
+
+        if (lastLine.length > this.maxWidth) throw new Error("Should not exceed max width")
+
+        if (lastLine.length > this.maxWidthFact) this.maxWidthFact = lastLine.length
     }
 
 
@@ -463,5 +469,10 @@ export class RenderCanvas extends Base {
 
     get height () : number {
         return this.canvas.length
+    }
+
+
+    get lastLine () : Line {
+        return lastElement(this.canvas)
     }
 }
