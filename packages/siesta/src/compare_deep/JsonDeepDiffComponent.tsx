@@ -70,7 +70,12 @@ export class JsonDeepDiffComponent extends Mixin(
                 <div class="json-deep-diff-expander" on:click={ e => this.onExpanderClick(e) }>
                     <div className='json-deep-diff-content'>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</div>
                 </div>
-                <div class="json-deep-diff-left" on:scroll={ e => this.onLeftContentScroll(e) } on:mouseover={ e => this.onMouseOver(e) }>
+                <div
+                    class="json-deep-diff-left"
+                    on:scroll={ e => this.onLeftContentScroll(e) }
+                    on:mouseover={ e => this.onMouseOver(e) }
+                    on:mouseout={ e => this.onMouseOut(e) }
+                >
                     <div className="json-deep-diff-highlighter"></div>
                     {/*TODO: `style:width` here does not work w/o a function wrapper: () =>*/}
                     <div className='json-deep-diff-content' style:width = { () => `${ maxWidth }ch` }>
@@ -80,7 +85,12 @@ export class JsonDeepDiffComponent extends Mixin(
                 <div class="json-deep-diff-middle" on:pointerdown={ e => this.onSplitterPointerDown(e) }>
                     <div className='json-deep-diff-content'>{ convertXmlElement(renderers[ 2 ].output.flush(), true) }</div>
                 </div>
-                <div class="json-deep-diff-right" on:scroll={ e => this.onRightContentScroll(e) } on:mouseover={ e => this.onMouseOver(e) }>
+                <div
+                    class="json-deep-diff-right"
+                    on:scroll={ e => this.onRightContentScroll(e) }
+                    on:mouseover={ e => this.onMouseOver(e) }
+                    on:mouseout={ e => this.onMouseOut(e) }
+                >
                     <div className="json-deep-diff-highlighter"></div>
                     <div className='json-deep-diff-content' style:width = { () => `${ maxWidth }ch` }>
                         { convertXmlElement(renderers[ 3 ].output.flush(), true) }
@@ -161,7 +171,6 @@ export class JsonDeepDiffComponent extends Mixin(
             return this.el.children[ 3 ] as HTMLElement
         }
 
-        // TODO implement `mouseOut`
         // only need to highlight the atomics? highlighting the structure is not that needed?
         onMouseOver (e : Event) {
             const target            = e.target as HTMLElement
@@ -176,15 +185,25 @@ export class JsonDeepDiffComponent extends Mixin(
                 const leftHighlighterEl         = this.leftHighlighter
 
                 leftHighlighterEl.style.top     = offset + 'px'
-                leftHighlighterEl.style.height  = entry.style.height
+                leftHighlighterEl.style.height  = entryBox.height + 'px'
 
                 const rightHighlighterEl        = this.rightHighlighter
 
                 rightHighlighterEl.style.top    = offset + 'px'
-                rightHighlighterEl.style.height = entry.style.height
+                rightHighlighterEl.style.height = entryBox.height + 'px'
             }
         }
 
+
+        onMouseOut (e : Event) {
+            const target            = e.target as HTMLElement
+            const entry             = target.closest('diff-entry') as HTMLElement
+
+            if (entry) {
+                this.leftHighlighter.style.height   = '0px'
+                this.rightHighlighter.style.height  = '0px'
+            }
+        }
 
         getSplitterCompanions () : HTMLElement[] {
             return [ this.leftArea, this.rightArea ]
