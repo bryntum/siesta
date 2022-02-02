@@ -808,8 +808,10 @@ export class JsonDeepDiffElement extends Mixin(
             const middleCanvas      = renderers[ 1 ].canvas
             const rightCanvas       = renderers[ 2 ].canvas
 
+            // "pre-render" some content
             leftCanvas.writePlain('Received')
-            middleCanvas.writePlain('')
+            // this write will set the minimum width for middle canvas to 1 char
+            middleCanvas.writePlain(' ')
             rightCanvas.writePlain('Expected')
 
             renderers.forEach(renderer => {
@@ -825,7 +827,7 @@ export class JsonDeepDiffElement extends Mixin(
                 if (iterations.every(iteration => iteration.done)) break
 
                 if (iterations.every(iteration => !iteration.done)) {
-                    const maxHeight     = Math.max(iterations[ 1 ].value.height, iterations[ 3 ].value.height)
+                    const maxHeight     = Math.max(iterations[ 0 ].value.height, iterations[ 2 ].value.height)
 
                     iterations.forEach((iteration, index) => {
                         // this comparison is only used for typing purposes
@@ -843,9 +845,6 @@ export class JsonDeepDiffElement extends Mixin(
                     throw new Error("Elements flow de-synchronization")
             }
 
-            // if middle stream is empty - set its content width to 1 char
-            const middleCanvasMaxWidthFact  = Math.max(middleCanvas.maxWidthFact, 1)
-
             const height            = leftCanvas.height
 
             if (renderers.some(renderer => renderer.canvas.height !== height)) throw new Error("Rendering flow de-synchronization")
@@ -860,7 +859,7 @@ export class JsonDeepDiffElement extends Mixin(
                 const equalLengthRemainderLeft  = leftCanvas.maxWidthFact - leftLine.length
                 context.writeStyledSameLineText(' '.repeat(equalLengthRemainderLeft), equalLengthRemainderLeft)
 
-                const equalLengthRemainderMiddle = middleCanvasMaxWidthFact - middleLine.length
+                const equalLengthRemainderMiddle = middleCanvas.maxWidthFact - middleLine.length
 
                 context.writeStyledSameLineText(' │', 2)
                 context.writeStyledSameLineText(' '.repeat(equalLengthRemainderMiddle), equalLengthRemainderMiddle)
@@ -871,7 +870,7 @@ export class JsonDeepDiffElement extends Mixin(
                 const equalLengthRemainderRight  = rightCanvas.maxWidthFact - rightLine.length
                 context.writeStyledSameLineText(' '.repeat(equalLengthRemainderRight), equalLengthRemainderRight)
 
-                context.write('\n')
+                if (i !== height - 1) context.write('\n')
             }
         }
     }
