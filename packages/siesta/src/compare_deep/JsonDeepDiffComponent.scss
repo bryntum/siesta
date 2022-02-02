@@ -54,6 +54,9 @@ $contour_active : #9c9c9c;
     text-align: center;
     color: $contour_active;
 
+    // if no indices has been rendered, still keep the inner content at 1 char, plus 2 chars for padding (border-box)
+    min-width: 3ch;
+
     border-left: 1px solid $contour;
     border-right: 1px solid $contour;
     background-color: var(--background-color);
