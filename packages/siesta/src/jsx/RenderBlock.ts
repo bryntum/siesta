@@ -301,22 +301,24 @@ export class XmlRenderBlock extends Mixin(
         get inlineBuffer () : Line[] {
             if (this.$inlineBuffer !== undefined) return this.$inlineBuffer
 
-            return this.$inlineBuffer   = [ Line.new() ]
+            return this.$inlineBuffer   = []
         }
 
 
         write (str : string) {
             const inlineBuffer  = this.blockLevelParent.inlineBuffer
 
-            const lines     = saneSplit(str, '\n')
+            const lines         = saneSplit(str, '\n')
 
             lines.forEach((line, index) => {
                 let sourcePos               = 0
 
                 while (sourcePos < line.length) {
-                    const available     = index === 0 ? this.maxWidth - lastElement(inlineBuffer).length : this.maxWidth
+                    const available     = index === 0 ? this.maxWidth - (inlineBuffer.length > 0 ? lastElement(inlineBuffer).length : 0) : this.maxWidth
 
                     const partial       = line.substr(sourcePos, available)
+
+                    if (inlineBuffer.length === 0) inlineBuffer.push(Line.new())
 
                     lastElement(inlineBuffer).push(this.element.styleText(partial, this), partial.length)
 
@@ -333,6 +335,8 @@ export class XmlRenderBlock extends Mixin(
         writeStyledSameLineText (str : string, len : number) {
             const inlineBuffer  = this.blockLevelParent.inlineBuffer
 
+            if (inlineBuffer.length === 0) inlineBuffer.push(Line.new())
+
             lastElement(inlineBuffer).push(str, len)
         }
 
@@ -342,17 +346,16 @@ export class XmlRenderBlock extends Mixin(
 
             const inlineBuffer  = this.blockLevelParent.inlineBuffer
 
-            if (!(inlineBuffer.length === 1 && inlineBuffer[ 0 ].length === 0))
-                inlineBuffer.forEach((line, index, array) => {
-                    const indentation       = this.currentIndentation
-                    const styled            = this.element.styleIndentation(indentation, this)
+            inlineBuffer.forEach((line, index, array) => {
+                const indentation       = this.currentIndentation
+                const styled            = this.element.styleIndentation(indentation, this)
 
-                    canvas.write(styled, indentation.length)
+                canvas.write(styled, indentation.length)
 
-                    canvas.write(line.toString(), line.length)
+                canvas.write(line.toString(), line.length)
 
-                    if (index !== array.length - 1) canvas.newLine()
-                })
+                if (index !== array.length - 1) canvas.newLine()
+            })
 
             this.blockLevelParent.$inlineBuffer = undefined
         }
@@ -411,7 +414,7 @@ export class XmlRenderBlock extends Mixin(
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class RenderCanvas extends Base {
-    canvas              : Line[]                    = [ Line.new() ]
+    canvas              : Line[]                    = []
 
     maxWidth            : number                    = Number.MAX_SAFE_INTEGER
 
@@ -421,7 +424,7 @@ export class RenderCanvas extends Base {
 
 
     newLinePending () {
-        if (this.canvas.length === 1 && this.canvas[ 0 ].length === 0) return
+        if (this.canvas.length === 0) return
 
         this.pendingNewLine = true
     }
@@ -436,6 +439,8 @@ export class RenderCanvas extends Base {
         }
 
         if (/\n/.test(str)) throw new Error("Should not contain new line characters")
+
+        if (this.canvas.length === 0) this.newLine()
 
         const lastLine  = this.lastLine
 
