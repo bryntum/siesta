@@ -47,17 +47,12 @@ export class RenderingXmlFragment extends Base {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Enjoy the old-good mutable state style in this class
 export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
     renderer        : XmlRendererStreaming              = undefined
 
     canvas          : RenderCanvas                      = undefined
 
     blockByElement  : Map<XmlElement, XmlRenderBlock>   = new Map()
-
-    // mutable mess
-    isRenderingExistingChildren : boolean               = false
-    lastChild                   : XmlNode               = undefined
 
 
     start (el : XmlElement) {
@@ -73,67 +68,61 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
 
 
     write (el : XmlNode) {
-        const currentElement        = this.currentElement
-        const lastChild             = this.lastChild !== undefined ? this.lastChild : lastElement(currentElement.childNodes)
+        this.finalizeLastChildOfCurrent()
 
-        if (lastChild && !isString(lastChild)) {
-            const lastChildBlock    = this.blockByElement.get(lastChild)
+        super.write(el)
 
-            lastChild.afterRenderContent(lastChildBlock)
-            lastChild.renderStreamingDone(lastChildBlock)
-        }
+        this.writeExisting(this.currentElement, el, this.currentElement.childNodes.length)
+    }
 
-        const currentBlock          = this.blockByElement.get(currentElement)
 
-        currentElement.afterRenderChildStreaming(currentBlock, lastChild, currentElement.childNodes.length - 1)
+    writeExisting (currentElement : XmlElement, childNode : XmlNode, index : number, finalize : boolean = false) {
+        const currentBlock      = this.blockByElement.get(currentElement)
 
-        if (!this.isRenderingExistingChildren) super.write(el)
+        currentElement.beforeRenderChildStreaming(currentBlock, childNode, index)
 
-        currentElement.beforeRenderChildStreaming(currentBlock, lastChild, currentElement.childNodes.length - 1)
-
-        if (isString(el))
-            currentBlock.write(el)
+        if (isString(childNode))
+            currentBlock.write(childNode)
         else {
-            const childBlock    = currentBlock.deriveChildBlock(el, currentElement.childNodes.length - 1)
+            const childBlock    = currentBlock.deriveChildBlock(childNode, index)
 
-            this.blockByElement.set(el, childBlock)
+            this.blockByElement.set(childNode, childBlock)
 
-            el.beforeRenderContent(childBlock)
+            childNode.beforeRenderContent(childBlock)
 
-            // handle the case, when the element just written already has some children
-            // in such case, we need to render all them recursively
-            this.currentElement = el
-
-            const before    = this.isRenderingExistingChildren
-
-            this.isRenderingExistingChildren    = true
-
-            el.childNodes.forEach((childNode, index) => {
-                const prevLastChild = this.lastChild
-
-                this.lastChild      = index === 0 ? null : el.childNodes[ index - 1 ]
-
-                if (isString(childNode))
-                    childBlock.write(childNode)
+            childNode.childNodes.forEach((grandChild, index) => {
+                if (isString(grandChild))
+                    childBlock.write(grandChild)
                 else {
-                    this.push(childNode)
-                    this.pop()
+                    this.writeExisting(childNode, grandChild, index, true)
                 }
-                this.lastChild      = prevLastChild
             })
 
-            this.currentElement                 = currentElement
-            this.isRenderingExistingChildren    = before
+            if (finalize) this.finalizeRendering(childNode)
         }
+
+        if (finalize) currentElement.afterRenderChildStreaming(currentBlock, childNode, index)
+    }
+
+
+    finalizeRendering (el : XmlElement) {
+        const renderBlock       = this.blockByElement.get(el)
+
+        el.afterRenderContent(renderBlock)
+        el.renderStreamingDone(renderBlock)
+    }
+
+
+    finalizeLastChildOfCurrent () {
+        const lastChildOfCurrent    = lastElement(this.currentElement.childNodes)
+
+        if (lastChildOfCurrent && !isString(lastChildOfCurrent)) this.finalizeRendering(lastChildOfCurrent)
     }
 
 
     pop () {
-        const currentElement        = this.currentElement
-        const currentBlock          = this.blockByElement.get(currentElement)
-
-        currentElement.afterRenderContent(currentBlock)
-        currentElement.renderStreamingDone(currentBlock)
+        this.finalizeLastChildOfCurrent()
+        this.finalizeRendering(this.currentElement)
 
         super.pop()
     }
