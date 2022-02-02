@@ -341,6 +341,13 @@ export class XmlRenderBlock extends Mixin(
         }
 
 
+        writeStyledSameLineText (str : string, len : number) {
+            const inlineBuffer  = this.blockLevelParent.inlineBuffer
+
+            lastElement(inlineBuffer).push(str, len)
+        }
+
+
         flushInlineBuffer () {
             const canvas        = this.canvas
 
@@ -448,6 +455,11 @@ export class RenderCanvas extends Base {
         if (lastLine.length > this.maxWidth) throw new Error("Should not exceed max width")
 
         if (lastLine.length > this.maxWidthFact) this.maxWidthFact = lastLine.length
+    }
+
+
+    writePlain (str : string) {
+        this.write(str, str.length)
     }
 
 

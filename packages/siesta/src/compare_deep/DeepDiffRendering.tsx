@@ -1,11 +1,17 @@
 import { CI } from "chained-iterator"
 import { Base, ClassUnion, Mixin } from "typescript-mixin-class"
 import { exclude, Serializable, serializable } from "typescript-serializable-mixin"
-import { RenderingXmlFragment } from "../jsx/RenderBlock.js"
+import {
+    RenderCanvas,
+    RenderingXmlFragment,
+    RenderingXmlFragmentWithCanvas,
+    XmlRenderBlock
+} from "../jsx/RenderBlock.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
+import { XmlRendererStreaming } from "../jsx/XmlRenderer.js"
 import { luid, LUID } from "../siesta/common/LUID.js"
-import { ArbitraryObjectKey } from "../util/Helpers.js"
+import { ArbitraryObjectKey, lastElement } from "../util/Helpers.js"
 import { Missing } from "./DeepDiff.js"
 
 
@@ -15,6 +21,7 @@ export class MissingValue extends XmlElement {
 }
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type DifferenceRenderingStream   = 'expander' | 'left' | 'middle' | 'right'
 
 export class DifferenceRenderingContext extends Base {
@@ -37,6 +44,7 @@ export class DifferenceRenderingContext extends Base {
 }
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceRenderingSyncPoint extends Base {
     type            : 'before' | 'after'        = 'after'
 }
@@ -113,6 +121,13 @@ export class Difference extends Mixin(
             this[ valueProp ]   = Missing
 
             this.same           = false
+        }
+
+
+        template () : JsonDeepDiffElement {
+            return JsonDeepDiffElement.new({
+                difference  : this
+            })
         }
     }
 ){}
@@ -291,7 +306,9 @@ export class DifferenceComposite extends DifferenceReferenceable {
 
 
     * renderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) output.push(<diff-inner class="indented"></diff-inner>)
+        const hasInner  = this.entries.length > 0
+
+        if (context.isContent && hasInner) output.push(<diff-inner class="indented"></diff-inner>)
 
         for (let i = 0; i < this.entries.length; i++) {
             const child     = this.entries[ i ]
@@ -313,7 +330,7 @@ export class DifferenceComposite extends DifferenceReferenceable {
             yield* this.afterRenderChildGen(output, context, child, i)
         }
 
-        if (context.isContent) output.pop()
+        if (context.isContent && hasInner) output.pop()
     }
 
 
@@ -654,3 +671,204 @@ export class DifferenceHeterogeneous extends Difference {
     //     </DifferenceTemplateHeterogeneous>
     // }
 }
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class XmlRendererDifference extends Mixin(
+    [ XmlRendererStreaming ],
+    (base : ClassUnion<typeof XmlRendererStreaming>) =>
+
+    class XmlRendererDifference extends base {
+
+        initialize (props? : Partial<XmlRendererDifference>) {
+            super.initialize(props)
+
+            this.blockLevelElements.add('diff-entry')
+            this.blockLevelElements.add('diff-inner')
+        }
+    }
+){}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class JsonDeepDiffContentRendering extends Base {
+    renderer        : XmlRendererDifference     = undefined
+
+    maxWidth        : number                    = Number.MAX_SAFE_INTEGER
+
+    stream          : DifferenceRenderingStream = undefined
+
+    difference      : Difference                = undefined
+
+    output          : RenderingXmlFragmentWithCanvas    = undefined
+
+    canvas          : RenderCanvas              = undefined
+
+
+    initialize (props? : Partial<JsonDeepDiffContentRendering>) {
+        super.initialize(props)
+
+        this.canvas     = RenderCanvas.new({ maxWidth : this.maxWidth })
+
+        this.output     = RenderingXmlFragmentWithCanvas.new({
+            canvas          : this.canvas,
+            renderer        : this.renderer
+        })
+
+        this.output.start(
+            XmlElement.new({
+                tagName         : 'div',
+                attributes      : { class : 'json-deep-diff-content-root' }
+            })
+        )
+    }
+
+
+    * render () : Generator<{ el : XmlElement, height : number }> {
+        const iterator      = this.difference.renderGen(this.output, DifferenceRenderingContext.new({ stream : this.stream }))
+
+        const heightStart   : Map<XmlElement, number>  = new Map()
+
+        for (const syncPoint of iterator) {
+            if (syncPoint.type === 'before') {
+                heightStart.set(this.output.currentElement, this.canvas.height)
+            }
+            else if (syncPoint.type === 'after') {
+                const el    = lastElement(this.output.currentElement.childNodes) as XmlElement
+
+                yield {
+                    el,
+                    height  : this.canvas.height - heightStart.get(el)
+                }
+            }
+        }
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class JsonDeepDiffElement extends Mixin(
+    [ XmlElement ],
+    (base : ClassUnion<typeof XmlElement>) =>
+
+    class JsonDeepDiffElement extends base {
+        tagName             : 'div'             = 'div'
+
+        difference          : Difference        = undefined
+
+
+        getMiddleAreaMaxWidth (context : XmlRenderBlock) : number {
+            const renderer      = JsonDeepDiffContentRendering.new({
+                stream      : 'middle',
+                difference  : this.difference,
+                renderer    : context.renderer
+            })
+
+            CI(renderer.render()).flush()
+
+            return renderer.canvas.maxWidthFact
+        }
+
+
+        renderContent (context : XmlRenderBlock) {
+            // we have to render the middle stream twice, this first render pass
+            // provides us with its max width, so we can calculate the width available
+            // for left/right streams
+            const middleAreaMaxWidth    = this.getMiddleAreaMaxWidth(context)
+
+            // the wrapper for content in the middle stream ` |CONTENT| ` is 4 chars length
+            const available     = context.maxWidth - (middleAreaMaxWidth + 4)
+
+            const renderers     = [
+                JsonDeepDiffContentRendering.new({
+                    stream      : 'left',
+                    difference  : this.difference,
+                    renderer    : context.renderer,
+                    // extra 1 space because of the possible oddity of the `available` goes to the left region
+                    maxWidth    : Math.round(available / 2)
+                }),
+                JsonDeepDiffContentRendering.new({
+                    stream      : 'middle',
+                    difference  : this.difference,
+                    renderer    : context.renderer
+                }),
+                JsonDeepDiffContentRendering.new({
+                    stream      : 'right',
+                    difference  : this.difference,
+                    renderer    : context.renderer,
+                    maxWidth    : Math.floor(available / 2)
+                })
+            ]
+
+            const leftCanvas        = renderers[ 0 ].canvas
+            const middleCanvas      = renderers[ 1 ].canvas
+            const rightCanvas       = renderers[ 2 ].canvas
+
+            leftCanvas.writePlain('Received')
+            middleCanvas.writePlain('')
+            rightCanvas.writePlain('Expected')
+
+            renderers.forEach(renderer => {
+                renderer.canvas.newLine()
+                renderer.canvas.newLine()
+            })
+
+            const iterators     = renderers.map(renderer => renderer.render())
+
+            while (true) {
+                const iterations        = iterators.map(iterator => iterator.next())
+
+                if (iterations.every(iteration => iteration.done)) break
+
+                if (iterations.every(iteration => !iteration.done)) {
+                    const maxHeight     = Math.max(iterations[ 1 ].value.height, iterations[ 3 ].value.height)
+
+                    iterations.forEach((iteration, index) => {
+                        // this comparison is only used for typing purposes
+                        // (TS can't track the `every !done` assertion from above)
+                        if (iteration.done === false) {
+                            const el            = iteration.value.el
+                            const renderBlock   = renderers[ index ].output.blockByElement.get(el)
+
+                            renderBlock.write('\n'.repeat(maxHeight - iteration.value.height))
+
+                            el.renderStreamingDone(renderBlock)
+                        }
+                    })
+                } else
+                    throw new Error("Elements flow de-synchronization")
+            }
+
+            // if middle stream is empty - set its content width to 1 char
+            const middleCanvasMaxWidthFact  = Math.max(middleCanvas.maxWidthFact, 1)
+
+            const height            = leftCanvas.height
+
+            if (renderers.some(renderer => renderer.canvas.height !== height)) throw new Error("Rendering flow de-synchronization")
+
+            for (let i = 0; i < height; i++) {
+                const leftLine      = leftCanvas.canvas[ i ]
+                const middleLine    = middleCanvas.canvas[ i ]
+                const rightLine     = rightCanvas.canvas[ i ]
+
+                // TODO optimize the `toString` joining here, can push the line itself
+                context.writeStyledSameLineText(leftLine.toString(), leftLine.length)
+                const equalLengthRemainderLeft  = leftCanvas.maxWidthFact - leftLine.length
+                context.writeStyledSameLineText(' '.repeat(equalLengthRemainderLeft), equalLengthRemainderLeft)
+
+                const equalLengthRemainderMiddle = middleCanvasMaxWidthFact - middleLine.length
+
+                context.writeStyledSameLineText(' │', 2)
+                context.writeStyledSameLineText(' '.repeat(equalLengthRemainderMiddle), equalLengthRemainderMiddle)
+                context.writeStyledSameLineText(middleLine.toString(), middleLine.length)
+                context.writeStyledSameLineText('│ ', 2)
+
+                context.writeStyledSameLineText(rightLine.toString(), rightLine.length)
+                const equalLengthRemainderRight  = rightCanvas.maxWidthFact - rightLine.length
+                context.writeStyledSameLineText(' '.repeat(equalLengthRemainderRight), equalLengthRemainderRight)
+
+                context.write('\n')
+            }
+        }
+    }
+){}

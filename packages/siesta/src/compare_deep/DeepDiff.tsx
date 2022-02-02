@@ -145,7 +145,7 @@ export const compareDeepDiff = function (
     : Difference
 {
     // if we are passed the internal constant `Missing` to convert into `Difference`,
-    // we are probably doing diff for own internal data structures (since its not used anywhere else)
+    // we are probably doing diff for own internal data structures (since it's not used anywhere else)
     // in such case, replace the `Missing` constant with another value,
     // so that code can distinguish it
     if (v1 === Missing) v1 = MissingInternal

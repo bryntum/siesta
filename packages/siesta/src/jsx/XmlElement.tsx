@@ -137,6 +137,8 @@ export class XmlElement extends Mixin(
         }
 
 
+        //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // old rendering code
         isChildIndented (child : XmlNode) : boolean {
             return this.hasClass('indented')
         }
@@ -275,6 +277,8 @@ export class XmlElement extends Mixin(
         ) {
         }
 
+        //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // new rendering code below
 
         styleText (str : string, block : XmlRenderBlock) : string {
             return block.style.colorer.text(str)

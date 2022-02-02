@@ -3,14 +3,14 @@
 import { field } from "@bryntum/chronograph/src/replica2/Entity.js"
 import { ChronoGraphJSX, convertXmlElement } from "../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../chronograph-jsx/Component.js"
-import { Base, ClassUnion, Mixin } from "../class/Mixin.js"
-import { RenderCanvas, RenderingXmlFragmentWithCanvas } from "../jsx/RenderBlock.js"
-import { XmlElement } from "../jsx/XmlElement.js"
-import { XmlRendererStreaming } from "../jsx/XmlRenderer.js"
+import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { AbstractSplitter, SplitterDragContext } from "../siesta/ui/components/Splitter.js"
-import { lastElement } from "../util/Helpers.js"
-import { XmlRendererDifference } from "./CompareDeepDiffRendering.js"
-import { Difference, DifferenceRenderingContext, DifferenceRenderingStream } from "./DeepDiffRendering.js"
+import {
+    Difference,
+    DifferenceRenderingStream,
+    JsonDeepDiffContentRendering,
+    XmlRendererDifference
+} from "./DeepDiffRendering.js"
 
 // added as expression here, otherwise IDE thinks `ChronoGraphJSX` is unused import
 ChronoGraphJSX
@@ -22,7 +22,7 @@ export class JsonDeepDiffComponent extends Mixin(
     (base : ClassUnion<typeof AbstractSplitter, typeof Component>) =>
 
     class JsonDeepDiffComponent extends base {
-        context             : XmlRendererDifference             = XmlRendererDifference.new()
+        // context             : XmlRendererDifference             = XmlRendererDifference.new()
 
         difference          : Difference            = undefined
 
@@ -33,12 +33,9 @@ export class JsonDeepDiffComponent extends Mixin(
         render () : Element {
             const maxWidth         = this.maxWidth
 
-            const renderer      = XmlRendererStreaming.new({
+            const renderer      = XmlRendererDifference.new({
                 // styles      : styles
             })
-
-            renderer.blockLevelElements.add('diff-entry')
-            renderer.blockLevelElements.add('diff-inner')
 
             const streams       = [ 'expander', 'left', 'middle', 'right' ] as DifferenceRenderingStream[]
 
@@ -66,7 +63,7 @@ export class JsonDeepDiffComponent extends Mixin(
                             iteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
                     })
                 } else
-                    throw new Error("Desync")
+                    throw new Error("Elements flow de-synchronization")
             }
 
             return <div class="json-deep-diff">
@@ -206,95 +203,3 @@ export class JsonDeepDiffComponent extends Mixin(
         }
     }
 ){}
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class JsonDeepDiffContentRendering extends Base {
-    renderer        : XmlRendererStreaming      = undefined
-
-    maxWidth        : number                    = Number.MAX_SAFE_INTEGER
-
-    stream          : DifferenceRenderingStream = undefined
-
-    difference      : Difference                = undefined
-
-    output          : RenderingXmlFragmentWithCanvas    = undefined
-
-    canvas          : RenderCanvas              = undefined
-
-
-    initialize (props? : Partial<JsonDeepDiffContentRendering>) {
-        super.initialize(props)
-
-        this.canvas     = RenderCanvas.new({ maxWidth : this.maxWidth })
-
-        this.output     = RenderingXmlFragmentWithCanvas.new({
-            canvas          : this.canvas,
-            renderer        : this.renderer
-        })
-
-        this.output.start(
-            XmlElement.new({
-                tagName         : 'div',
-                attributes      : { class : 'json-deep-diff-content-root' }
-            })
-        )
-    }
-
-
-    * render () : Generator<{ el : XmlElement, height : number }> {
-        const iterator      = this.difference.renderGen(this.output, DifferenceRenderingContext.new({ stream : this.stream }))
-
-        const heightStart   : Map<XmlElement, number>  = new Map()
-
-        for (const syncPoint of iterator) {
-            if (syncPoint.type === 'before') {
-                heightStart.set(this.output.currentElement, this.canvas.height)
-            }
-            else if (syncPoint.type === 'after') {
-                const el    = lastElement(this.output.currentElement.childNodes) as XmlElement
-
-                yield {
-                    el,
-                    height  : this.canvas.height - heightStart.get(el)
-                }
-            }
-        }
-    }
-}
-
-
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// export class JsonDeepDiffContent extends Mixin(
-//     [ Component ],
-//     (base : ClassUnion<typeof Component>) =>
-//
-//     class JsonDeepDiffContent extends base {
-//         // props : Component[ 'props' ] & {
-//         //     expanded?           : JsonDeepDiffContent[ 'expanded' ]
-//         //     stream?             : JsonDeepDiffContent[ 'stream' ]
-//         //     difference?         : JsonDeepDiffContent[ 'difference' ]
-//         //     rootComp?           : JsonDeepDiffContent[ 'rootComp' ]
-//         // }
-//         //
-//         // @field()
-//         // expanded        : boolean                       = true
-//         //
-//         // stream          : DifferenceRenderingStream     = undefined
-//         //
-//         // difference      : Difference                    = undefined
-//         //
-//         // rootComp        : JsonDeepDiffComponent         = undefined
-//         //
-//         // width           : number                        = undefined
-//         //
-//         // @field()
-//         // height          : number                        = undefined
-//
-//
-//         render () : Element {
-//             return <div class='json-deep-diff-content'>{ this.children }</div>
-//         }
-//     }
-// ){}
-//
