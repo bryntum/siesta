@@ -12,6 +12,7 @@ import { XmlElement } from "../jsx/XmlElement.js"
 import { XmlRendererStreaming } from "../jsx/XmlRenderer.js"
 import { luid, LUID } from "../siesta/common/LUID.js"
 import { ArbitraryObjectKey, lastElement } from "../util/Helpers.js"
+import { isString } from "../util/Typeguards.js"
 import { Missing } from "./DeepDiff.js"
 
 
@@ -323,9 +324,14 @@ export class DifferenceComposite extends DifferenceReferenceable {
 
             yield* this.renderChildGen(output, context, child, i)
 
-            output.pop()
-
+            // yielding the sync-point right _before_ the `pop` of the entry
+            // entry is still a "currentElement" of the `output`
+            // since `diff-entry` does not add any custom rendering,
+            // all the entry content is available (only need to flush
+            // the inline buffer of the entry's last child)
             yield DifferenceRenderingSyncPoint.new({ type : 'after' })
+
+            output.pop()
 
             yield* this.afterRenderChildGen(output, context, child, i)
         }
@@ -729,16 +735,20 @@ export class JsonDeepDiffContentRendering extends Base {
 
 
     * render () : Generator<{ el : XmlElement, height : number }> {
-        const iterator      = this.difference.renderGen(this.output, DifferenceRenderingContext.new({ stream : this.stream }))
+        const output                                    = this.output
+        const heightStart   : Map<XmlElement, number>   = new Map()
 
-        const heightStart   : Map<XmlElement, number>  = new Map()
+        const iterator      = this.difference.renderGen(output, DifferenceRenderingContext.new({ stream : this.stream }))
 
         for (const syncPoint of iterator) {
             if (syncPoint.type === 'before') {
-                heightStart.set(this.output.currentElement, this.canvas.height)
+                heightStart.set(output.currentElement, this.canvas.height)
             }
             else if (syncPoint.type === 'after') {
-                const el    = lastElement(this.output.currentElement.childNodes) as XmlElement
+                const el            = output.currentElement
+                const lastChildEl   = lastElement(el.childNodes)
+
+                if (lastChildEl && !isString(lastChildEl)) output.blockByElement.get(lastChildEl).flushInlineBuffer()
 
                 yield {
                     el,
