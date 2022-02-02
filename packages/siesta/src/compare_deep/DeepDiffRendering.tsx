@@ -463,8 +463,12 @@ export class DifferenceArray extends DifferenceComposite {
 
         if (context.isContent) output.write('[')
 
-        // zero-width space
-        if (context.isExpander || context.isMiddle) output.write(String.fromCharCode(0x200B))
+        // zero-width space, previously it was just:
+        //      output.write(String.fromCharCode(0x200B))
+        // but this was messing up the calculations for the text rendering
+        // (since its an unprinted character, that, however, is counted in the JS string length)
+        // so moving it in the HTML/CSS realm, where it is added with `:before` pseudo
+        if (context.isExpander || context.isMiddle) output.write(<span class="json-deep-diff-zero-width-space"></span>)
     }
 
 
@@ -473,8 +477,8 @@ export class DifferenceArray extends DifferenceComposite {
 
         if (context.isContent) output.write(']')
 
-        // zero-width space
-        if (context.isExpander || context.isMiddle) output.write(String.fromCharCode(0x200B))
+        // zero-width space, see the comment above
+        if (context.isExpander || context.isMiddle) output.write(<span class="json-deep-diff-zero-width-space"></span>)
     }
 
 
