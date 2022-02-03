@@ -170,3 +170,35 @@ it('`maxWidth` should work', async t => {
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('New line as a child node string should cause new line in the output', async t => {
+    t.is(
+        renderer.render(
+            <div>a{ '\n\n' }b</div>,
+        ),
+        `a\n\nb`
+    )
+
+    t.is(
+        renderer.render(
+            <div>a{ '\n\n' }</div>,
+        ),
+        `a\n\n`
+    )
+
+    t.is(
+        renderer.render(
+            <div>{ '\n\n' }b</div>,
+        ),
+        `\n\nb`
+    )
+
+    t.is(
+        renderer.render(
+            <div>{ '\n\n' }</div>,
+        ),
+        `\n\n`
+    )
+})
+
+

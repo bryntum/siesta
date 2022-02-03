@@ -308,6 +308,9 @@ export class XmlRenderBlock extends Mixin(
         write (str : string) {
             const inlineBuffer  = this.blockLevelParent.inlineBuffer
 
+            // even if the string being written is empty - we still need to create a new line in the buffer
+            if (inlineBuffer.length === 0) inlineBuffer.push(Line.new())
+
             const lines         = saneSplit(str, '\n')
 
             lines.forEach((line, index) => {
@@ -317,8 +320,6 @@ export class XmlRenderBlock extends Mixin(
                     const available     = index === 0 ? this.maxWidth - (inlineBuffer.length > 0 ? lastElement(inlineBuffer).length : 0) : this.maxWidth
 
                     const partial       = line.substr(sourcePos, available)
-
-                    if (inlineBuffer.length === 0) inlineBuffer.push(Line.new())
 
                     lastElement(inlineBuffer).push(this.element.styleText(partial, this), partial.length)
 
@@ -431,6 +432,9 @@ export class RenderCanvas extends Base {
 
 
     write (str : string, len : number) {
+        // even if we write a zero-length string, we should still create a line in the canvas (if there were none)
+        if (this.canvas.length === 0) this.newLine()
+
         if (str.length === 0) return
 
         if (this.pendingNewLine) {
@@ -439,8 +443,6 @@ export class RenderCanvas extends Base {
         }
 
         if (/\n/.test(str)) throw new Error("Should not contain new line characters")
-
-        if (this.canvas.length === 0) this.newLine()
 
         const lastLine  = this.lastLine
 
