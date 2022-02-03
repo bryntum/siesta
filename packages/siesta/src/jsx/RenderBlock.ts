@@ -67,16 +67,18 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
     }
 
 
-    write (el : XmlNode) {
-        this.finalizeLastChildOfCurrent()
+    write (childNode : XmlNode) {
+        // it is more or less safe to ignore missing block here - if the element is rendered as being child
+        // another element, in the `childNode.startStreamingRendering(childBlock)` line below,
+        // the rendering will happen outside this context and no block will be saved for it
+        // see the comment below too
+        this.finalizeLastChildOfCurrent(true)
 
-        super.write(el)
+        super.write(childNode)
 
-        this.writeExisting(this.currentElement, el, this.currentElement.childNodes.length)
-    }
+        const currentElement    = this.currentElement
+        const index             = this.currentElement.childNodes.length
 
-
-    writeExisting (currentElement : XmlElement, childNode : XmlNode, index : number, finalize : boolean = false) {
         const currentBlock      = this.blockByElement.get(currentElement)
 
         currentElement.beforeRenderChildStreaming(currentBlock, childNode, index)
@@ -88,40 +90,30 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
 
             this.blockByElement.set(childNode, childBlock)
 
-            childNode.beforeRenderContent(childBlock)
-
-            childNode.childNodes.forEach((grandChild, index) => {
-                if (isString(grandChild))
-                    childBlock.write(grandChild)
-                else {
-                    this.writeExisting(childNode, grandChild, index, true)
-                }
-            })
-
-            if (finalize) this.finalizeRendering(childNode)
+            // this will render any existing children of the newly added `childNode`
+            // rendering will happen outside this class context, so no blocks will be
+            // registered for them - thus the `true` argument for `finalizeLastChildOfCurrent` call above
+            childNode.startStreamingRendering(childBlock)
         }
-
-        if (finalize) currentElement.afterRenderChildStreaming(currentBlock, childNode, index)
     }
 
 
-    finalizeRendering (el : XmlElement) {
+    finalizeRendering (el : XmlElement, ignoreMissing : boolean = false) {
         const renderBlock       = this.blockByElement.get(el)
 
-        el.afterRenderContent(renderBlock)
-        el.renderStreamingDone(renderBlock)
+        if (renderBlock || !ignoreMissing) el.finishStreamingRendering(renderBlock)
     }
 
 
-    finalizeLastChildOfCurrent () {
+    finalizeLastChildOfCurrent (ignoreMissing : boolean) {
         const lastChildOfCurrent    = lastElement(this.currentElement.childNodes)
 
-        if (lastChildOfCurrent && !isString(lastChildOfCurrent)) this.finalizeRendering(lastChildOfCurrent)
+        if (lastChildOfCurrent && !isString(lastChildOfCurrent)) this.finalizeRendering(lastChildOfCurrent, ignoreMissing)
     }
 
 
     pop () {
-        this.finalizeLastChildOfCurrent()
+        this.finalizeLastChildOfCurrent(false)
         this.finalizeRendering(this.currentElement)
 
         super.pop()
