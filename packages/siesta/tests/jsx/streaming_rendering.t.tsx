@@ -202,3 +202,78 @@ it('New line as a child node string should cause new line in the output', async 
 })
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Starting new block-level element after the new line should create new line', async t => {
+
+    t.is(
+        renderer.render(
+            <div>
+                <div>{ '\n' }</div>
+                <div>{ '\n' }</div>
+            </div>
+        ),
+        `\n\n\n`
+    )
+
+    t.is(
+        renderer.render(
+            <div>
+                { '\n' }
+                <div>{ '\n' }</div>
+            </div>
+        ),
+        `\n\n\n`
+    )
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Multiple empty block elements should cause a single or zero new line(s) in the output', async t => {
+    t.is(
+        renderer.render(
+            <div>a<div></div><div></div>b</div>,
+        ),
+        `a\nb`
+    )
+
+    t.is(
+        renderer.render(
+            <div>a<div></div><div></div></div>,
+        ),
+        `a`
+    )
+
+    t.is(
+        renderer.render(
+            <div><div></div><div></div>b</div>,
+        ),
+        `b`
+    )
+
+    t.is(
+        renderer.render(
+            <div><div></div><div></div></div>,
+        ),
+        ``
+    )
+})
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+it('Non-empty block element as a child node should cause new line in the output', async t => {
+    t.is(
+        renderer.render(
+            <div>a<div>_</div><div>_</div>b</div>,
+        ),
+        `a\n_\n_\nb`
+    )
+
+    t.is(
+        renderer.render(
+            <div><div>_</div><div>_</div></div>,
+        ),
+        `_\n_`
+    )
+})
+
+

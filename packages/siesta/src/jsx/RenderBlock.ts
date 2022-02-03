@@ -427,12 +427,12 @@ export class RenderCanvas extends Base {
         // even if we write a zero-length string, we should still create a line in the canvas (if there were none)
         if (this.canvas.length === 0) this.newLine()
 
-        if (str.length === 0) return
-
         if (this.pendingNewLine) {
             this.pendingNewLine = false
             this.newLine()
         }
+
+        if (str.length === 0) return
 
         if (/\n/.test(str)) throw new Error("Should not contain new line characters")
 
