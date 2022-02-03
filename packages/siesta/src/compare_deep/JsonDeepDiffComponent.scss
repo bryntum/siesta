@@ -117,6 +117,11 @@ $contour_active : #9c9c9c;
 diff-inner {
     display: block;
     padding-left: 2ch;
+    border-left: 1px solid $gray_lighter;
+}
+
+.json-deep-diff-content-root > * > diff-inner {
+    border-left: none;
 }
 
 diff-entry {
@@ -234,6 +239,7 @@ diff-expander {
     & > diff-inner {
         display: inline;
         padding-left: 0;
+        border-left: none;
 
         & * {
             display: none;
