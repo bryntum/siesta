@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { Serializable, serializable } from "../serializable/Serializable.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { Line, RenderCanvas, XmlRenderBlock } from "./RenderBlock.js"
+import { XmlRenderBlock } from "./RenderBlock.js"
 import { TextBlock } from "./TextBlock.js"
 import { TextJSX } from "./TextJSX.js"
 import { XmlRenderer, XmlRendererStreaming, XmlRenderingDynamicContext } from "./XmlRenderer.js"
@@ -301,12 +301,24 @@ export class XmlElement extends Mixin(
 
 
         renderStreaming (context : XmlRenderBlock) {
+            this.startStreamingRendering(context)
+            this.finishStreamingRendering(context)
+        }
+
+
+        startStreamingRendering (context : XmlRenderBlock) {
             this.beforeRenderContent(context)
+
             this.renderContent(context)
+        }
+
+
+        finishStreamingRendering (context : XmlRenderBlock) {
             this.afterRenderContent(context)
 
             this.renderStreamingDone(context)
         }
+
 
         // keeping this code separate from `afterRenderContent` to let user override that method
         // this code should be executed after all `afterRenderContent` activity is completed
@@ -323,13 +335,16 @@ export class XmlElement extends Mixin(
         }
 
 
-        // should NOT be overridden by user - it is by the `RenderingXmlFragmentWithCanvas`
-        // for the rendering of the initial content, there still might be calls to
-        // `renderChildStreaming` after the call to this method (for the following incremental rendering)
         renderContent (context : XmlRenderBlock) {
             this.childNodes.forEach((child, index) => {
                 this.beforeRenderChildStreaming(context, child, index)
-                this.renderChildStreaming(context, child, index)
+
+                if (isString(child)) {
+                    context.write(child)
+                } else {
+                    child.renderStreaming(context.deriveChildBlock(child, index))
+                }
+
                 this.afterRenderChildStreaming(context, child, index)
             })
         }
@@ -340,17 +355,6 @@ export class XmlElement extends Mixin(
 
 
         beforeRenderChildStreaming (context : XmlRenderBlock, child : XmlNode, index : number) {
-        }
-
-
-        // should NOT be overridden by user - it is not used during incremental rendering
-        // performed with the `RenderingXmlFragmentWithCanvas`
-        renderChildStreaming (context : XmlRenderBlock, child : XmlNode, index : number) {
-            if (isString(child)) {
-                context.write(child)
-            } else {
-                child.renderStreaming(context.deriveChildBlock(child, index))
-            }
         }
 
 
