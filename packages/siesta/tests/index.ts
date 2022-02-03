@@ -28,11 +28,11 @@ project.plan(
         url    : 'jsx',
 
         items       : [
-            'streaming_rendering.t.js',
             'tree.t.js',
             'ul.t.js',
             'text_block.t.js',
-            'xml_element_rendering.t.js'
+            'xml_element_rendering.t.js',
+            'xml_element_streaming_rendering.t.tsx',
         ]
     },
     {
