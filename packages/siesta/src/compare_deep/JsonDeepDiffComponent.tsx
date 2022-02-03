@@ -9,6 +9,7 @@ import {
     Difference,
     DifferenceRenderingStream,
     JsonDeepDiffContentRendering,
+    JsonDeepDiffFitter,
     XmlRendererDifference
 } from "./DeepDiffRendering.js"
 
@@ -56,11 +57,24 @@ export class JsonDeepDiffComponent extends Mixin(
                 if (iterations.every(iteration => !iteration.done)) {
                     const maxHeight     = Math.max(iterations[ 1 ].value.height, iterations[ 3 ].value.height)
 
-                    iterations.forEach(iteration => {
+                    iterations.forEach((iteration, index) => {
                         // this comparison is only used for typing purposes
                         // (TS can't track the `every !done` assertion from above)
-                        if (iteration.done === false)
-                            iteration.value.el.setAttribute('style', `height: ${ 1.5 * maxHeight }em`)
+                        if (iteration.done === false) {
+                            const heightDiff    = maxHeight - iteration.value.height
+
+                            if (heightDiff > 0)
+                                renderers[ index ].output.write(
+                                    JsonDeepDiffFitter.new({
+                                        tagName : 'div',
+                                        attributes : {
+                                            class   : 'json-deep-diff-fitter',
+                                            style   : `height: ${ 1.5 * heightDiff }em`
+                                        },
+                                        height      : heightDiff
+                                    })
+                                )
+                        }
                     })
                 } else
                     throw new Error("Elements flow de-synchronization")

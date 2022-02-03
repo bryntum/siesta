@@ -473,8 +473,9 @@ export class DifferenceArray extends DifferenceComposite {
         //      output.write(String.fromCharCode(0x200B))
         // but this was messing up the calculations for the text rendering
         // (since its an unprinted character, that, however, is counted in the JS string length)
-        // so moving it in the HTML/CSS realm, where it is added with `:before` pseudo
-        if (context.isExpander || context.isMiddle) output.write(<span class="json-deep-diff-zero-width-space"></span>)
+        // so need a special processing for it, which is done in `ZeroWidthSpace`
+        if (context.isExpander || context.isMiddle)
+            output.write(<ZeroWidthSpace class="json-deep-diff-zero-width-space"></ZeroWidthSpace>)
     }
 
 
@@ -484,7 +485,8 @@ export class DifferenceArray extends DifferenceComposite {
         if (context.isContent) output.write(']')
 
         // zero-width space, see the comment above
-        if (context.isExpander || context.isMiddle) output.write(<span class="json-deep-diff-zero-width-space"></span>)
+        if (context.isExpander || context.isMiddle)
+            output.write(<ZeroWidthSpace class="json-deep-diff-zero-width-space"></ZeroWidthSpace>)
     }
 
 
@@ -885,3 +887,33 @@ export class JsonDeepDiffElement extends Mixin(
         }
     }
 ){}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class JsonDeepDiffFitter extends XmlElement {
+    tagName             : 'div'             = 'div'
+
+    height              : number            = 1
+
+
+    renderContent (context : XmlRenderBlock) {
+        if (this.height > 1)
+            // the `height` indicates how many empty lines we need in the output
+            // a single `\n` already creates 2 lines - thus the special handling of such case
+            context.write('\n'.repeat(this.height - 1))
+        else
+            context.writeStyledSameLineText('\u200B', 0)
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Note: this element does not render any child element, instead it inserts a zero-width space in the output
+export class ZeroWidthSpace extends XmlElement {
+    tagName             : 'span'             = 'span'
+
+
+    renderContent (context : XmlRenderBlock) {
+        context.writeStyledSameLineText('\u200B', 0)
+    }
+}
