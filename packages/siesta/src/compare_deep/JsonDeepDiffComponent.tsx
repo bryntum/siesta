@@ -28,7 +28,7 @@ export class JsonDeepDiffComponent extends Mixin(
         difference          : Difference            = undefined
 
         @field()
-        maxWidth            : number                = 15
+        maxWidth            : number                = 35
 
 
         render () : Element {

@@ -197,8 +197,8 @@ export class DifferenceAtomic extends Difference {
     //     </DifferenceTemplateAtomic>
     // }
 
-    content1        : string            = undefined
-    content2        : string            = undefined
+    content1        : string | Missing  = undefined
+    content2        : string | Missing  = undefined
 
     typeOf1         : string            = undefined
     typeOf2         : string            = undefined
@@ -208,9 +208,9 @@ export class DifferenceAtomic extends Difference {
         super.excludeValue(valueProp)
 
         if (valueProp === 'value1')
-            this.content1   = undefined
+            this.content1   = Missing
         else
-            this.content2   = undefined
+            this.content2   = Missing
     }
 
 
@@ -218,18 +218,13 @@ export class DifferenceAtomic extends Difference {
         const stream        = context.stream
 
         if (context.isContent) {
+            const value     = stream === 'left' ? this.content1 : this.content2
+
             output.write(<diff-atomic same={ this.$same } type={ this.type } class={ stream === 'left' ? this.typeOf1 : this.typeOf2 }>
                 {
-                    stream === 'left'
-                        ? this.content1 ?? <MissingValue></MissingValue>
-                        : this.content2 ?? <MissingValue></MissingValue>
+                    value === Missing ? <MissingValue></MissingValue> : value
                 }
             </diff-atomic>)
-        }
-        else if (stream === 'expander') {
-        }
-        else if (stream === 'middle') {
-
         }
     }
 }
@@ -809,8 +804,42 @@ export class DifferenceMap extends DifferenceReferenceable {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceReference extends Difference {
-    value1      : number
-    value2      : number
+    value1      : number | Missing
+    value2      : number | Missing
+
+    ref1        : number | Missing          = Missing
+    ref2        : number | Missing          = Missing
+
+
+    initialize (props : Partial<DifferenceArray>) {
+        super.initialize(props)
+
+        // `value1` and `value2` are not persistable, so need to copy them to another property
+        this.ref1       = this.value1
+        this.ref2       = this.value2
+    }
+
+
+    excludeValue (valueProp : 'value1' | 'value2') {
+        super.excludeValue(valueProp)
+
+        if (valueProp === 'value1')
+            this.ref1   = Missing
+        else
+            this.ref2   = Missing
+    }
+
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isContent) {
+            const ref       = context.stream === 'left' ? this.ref1 : this.ref2
+
+            if (ref === Missing)
+                output.write(<MissingValue></MissingValue>)
+            else
+                output.write(<span class="json-deep-diff-reference">[Circular *{ ref }]</span>)
+        }
+    }
 
 
     // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
@@ -827,6 +856,18 @@ export class DifferenceHeterogeneous extends Difference {
 
     value1      : Difference | Missing
     value2      : Difference | Missing
+
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isContent) {
+            const difference    = context.stream === 'left' ? this.value1 : this.value2
+
+            if (difference === Missing)
+                output.write(<MissingValue></MissingValue>)
+            else
+                yield* difference.renderGen(output, context)
+        }
+    }
 
 
     // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {

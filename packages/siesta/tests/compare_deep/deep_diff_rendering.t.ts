@@ -68,53 +68,44 @@ it('Should render the array diff correctly #2.1', async t => {
     )
 })
 
-// it('Should render the array diff correctly #3', async t => {
-//     const difference2   = compareDeepDiff([ { a : 1 } ], [ 3 ])
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference2.template())),
-//         [
-//             'Received   │ │ Expected',
-//             '           │ │         ',
-//             '[          │ │ [       ',
-//             '  {        │0│   3     ',
-//             '    "a": 1 │ │         ',
-//             '  }        │ │         ',
-//             ']          │ │ ]       '
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference2.template())),
-//         stripZws(rendererPlain.render(difference2.template()))
-//     )
-// })
-//
-//
-// it('Should render the array diff correctly #4', async t => {
-//     const difference3   = compareDeepDiff([ { a : 1 }, { b : 2 } ], [ 3, 4 ])
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference3.template())),
-//         [
-//             'Received   │ │ Expected',
-//             '           │ │         ',
-//             '[          │ │ [       ',
-//             '  {        │0│   3,    ',
-//             '    "a": 1 │ │         ',
-//             '  },       │ │         ',
-//             '  {        │1│   4     ',
-//             '    "b": 2 │ │         ',
-//             '  }        │ │         ',
-//             ']          │ │ ]       '
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference3.template())),
-//         stripZws(rendererPlain.render(difference3.template()))
-//     )
-// })
+
+it('Should render the array diff correctly #3', async t => {
+    const difference2   = compareDeepDiff([ { a : 1 } ], [ 3 ])
+
+    t.is(
+        stripZws(rendererPlain.render(difference2.template())),
+        [
+            'Received   │ │ Expected',
+            '           │ │         ',
+            '[          │ │ [       ',
+            '  {        │0│   3     ',
+            '    "a": 1 │ │         ',
+            '  }        │ │         ',
+            ']          │ │ ]       '
+        ].join('\n')
+    )
+})
+
+
+it('Should render the array diff correctly #4', async t => {
+    const difference3   = compareDeepDiff([ { a : 1 }, { b : 2 } ], [ 3, 4 ])
+
+    t.is(
+        stripZws(rendererPlain.render(difference3.template())),
+        [
+            'Received   │ │ Expected',
+            '           │ │         ',
+            '[          │ │ [       ',
+            '  {        │0│   3,    ',
+            '    "a": 1 │ │         ',
+            '  },       │ │         ',
+            '  {        │1│   4     ',
+            '    "b": 2 │ │         ',
+            '  }        │ │         ',
+            ']          │ │ ]       '
+        ].join('\n')
+    )
+})
 
 
 it('Should render the array diff correctly #5', async t => {
@@ -643,225 +634,169 @@ it('Should render the object diff correctly #7', async t => {
 //         stripZws(rendererPlain.render(difference3.template()))
 //     )
 // })
-//
-//
-// it('Should render the diff of circular data structures correctly #1', async t => {
-//     const a1    = { a : undefined }
-//     a1.a        = a1
-//
-//     const a2    = { a : undefined }
-//     a2.a        = a2
-//
-//     const difference0   = compareDeepDiff(a1, a2)
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received             │ │ Expected            ',
-//             '                     │ │                     ',
-//             '<ref *1> {           │ │ <ref *1> {          ',
-//             '  "a": [Circular *1] │ │   "a": [Circular *1]',
-//             '}                    │ │ }                   ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff of circular data structures correctly #2', async t => {
-//     const a1    = { a : undefined }
-//     a1.a        = a1
-//
-//     const a2    = { a : undefined }
-//     a2.a        = a2
-//
-//     const difference0   = compareDeepDiff([ a1, a2 ], [ a1, false ])
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received               │ │ Expected              ',
-//             '                       │ │                       ',
-//             '[                      │ │ [                     ',
-//             '  <ref *1> {           │0│   <ref *1> {          ',
-//             '    "a": [Circular *1] │ │     "a": [Circular *1]',
-//             '  },                   │ │   },                  ',
-//             '  <ref *2> {           │1│   false               ',
-//             '    "a": [Circular *2] │ │                       ',
-//             '  }                    │ │                       ',
-//             ']                      │ │ ]                     ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff of circular data structures correctly #3', async t => {
-//     const a1    = { a : undefined }
-//     a1.a        = a1
-//
-//     const a2    = { a : undefined }
-//     a2.a        = a2
-//
-//     const a3    = { a : a2 }
-//
-//     const difference0   = compareDeepDiff(a1, a3)
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received               │ │ Expected              ',
-//             '                       │ │                       ',
-//             '<ref *1> {             │ │ {                     ',
-//             '  "a": <circular *1> { │ │   "a": <ref *1> {     ',
-//             '    "a": [Circular *1] │ │     "a": [Circular *1]',
-//             '  }                    │ │   }                   ',
-//             '}                      │ │ }                     ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff of circular data structures correctly #4', async t => {
-//     const a = {
-//         prop : {
-//             maxDepth : 4
-//         }
-//     }
-//
-//     const circular = { ref : undefined }
-//     circular.ref = circular
-//
-//     const b = {
-//         prop : circular
-//     }
-//
-//     const difference0   = compareDeepDiff(a, b)
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received          │ │ Expected                ',
-//             '                  │ │                         ',
-//             '{                 │ │ {                       ',
-//             '  "prop": {       │ │   "prop": <ref *1> {    ',
-//             '    "maxDepth": 4 │ │     ░                   ',
-//             '    ░             │ │     "ref": [Circular *1]',
-//             '  }               │ │   }                     ',
-//             '}                 │ │ }                       ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff of circular data structures correctly #5', async t => {
-//     const child     = { parent : undefined, children : [] }
-//     const parent    = { parent : undefined, children : [ child ] }
-//     child.parent    = parent
-//
-//     const difference0   = compareDeepDiff(child, parent)
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received                 │ │ Expected                      ',
-//             '                         │ │                               ',
-//             '<ref *1> {               │ │ <ref *1> {                    ',
-//             '  "parent": {            │ │   "parent": undefined,        ',
-//             '    "parent": undefined, │ │                               ',
-//             '    "children": [        │ │                               ',
-//             '      [Circular *1]      │ │                               ',
-//             '    ]                    │ │                               ',
-//             '  },                     │ │                               ',
-//             '  "children": [          │ │   "children": [               ',
-//             '    ░                    │0│     {                         ',
-//             '                         │ │       "parent": [Circular *1],',
-//             '                         │ │       "children": []          ',
-//             '                         │ │     }                         ',
-//             '  ]                      │ │   ]                           ',
-//             '}                        │ │ }                             ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff of internal data correctly #1', async t => {
-//     const difference0   = compareDeepDiff(
-//         DifferenceReference.new({ value1 : 1, same : false }),
-//         false
-//     )
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received                     │ │ Expected',
-//             '                             │ │         ',
-//             'DifferenceReference {        │ │ false   ',
-//             '  "value1": 1,               │ │         ',
-//             `  "value2": Symbol(Missing), │ │         `,
-//             '  "same": false              │ │         ',
-//             '}                            │ │         ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff of heterogeneous data correctly #1', async t => {
-//     const difference0   = compareDeepDiff([ { a : { b : 2 } }, [] ], [ [ 1, 2 ], { c : 2 } ])
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received     │ │ Expected  ',
-//             '             │ │           ',
-//             '[            │ │ [         ',
-//             '  {          │0│   [       ',
-//             '    "a": {   │ │     1,    ',
-//             '      "b": 2 │ │     2     ',
-//             '    }        │ │   ],      ',
-//             '  },         │ │           ',
-//             '  []         │1│   {       ',
-//             '             │ │     "c": 2',
-//             '             │ │   }       ',
-//             ']            │ │ ]         ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
+
+
+it('Should render the diff of circular data structures correctly #1', async t => {
+    const a1    = { a : undefined }
+    a1.a        = a1
+
+    const a2    = { a : undefined }
+    a2.a        = a2
+
+    const difference0   = compareDeepDiff(a1, a2)
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received             │ │ Expected            ',
+            '                     │ │                     ',
+            '<ref *1> {           │ │ <ref *1> {          ',
+            '  "a": [Circular *1] │ │   "a": [Circular *1]',
+            '}                    │ │ }                   ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff of circular data structures correctly #2', async t => {
+    const a1    = { a : undefined }
+    a1.a        = a1
+
+    const a2    = { a : undefined }
+    a2.a        = a2
+
+    const difference0   = compareDeepDiff([ a1, a2 ], [ a1, false ])
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received               │ │ Expected              ',
+            '                       │ │                       ',
+            '[                      │ │ [                     ',
+            '  <ref *1> {           │0│   <ref *1> {          ',
+            '    "a": [Circular *1] │ │     "a": [Circular *1]',
+            '  },                   │ │   },                  ',
+            '  <ref *2> {           │1│   false               ',
+            '    "a": [Circular *2] │ │                       ',
+            '  }                    │ │                       ',
+            ']                      │ │ ]                     ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff of circular data structures correctly #3', async t => {
+    const a1    = { a : undefined }
+    a1.a        = a1
+
+    const a2    = { a : undefined }
+    a2.a        = a2
+
+    const a3    = { a : a2 }
+
+    const difference0   = compareDeepDiff(a1, a3)
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received               │ │ Expected              ',
+            '                       │ │                       ',
+            '<ref *1> {             │ │ {                     ',
+            '  "a": <circular *1> { │ │   "a": <ref *1> {     ',
+            '    "a": [Circular *1] │ │     "a": [Circular *1]',
+            '  }                    │ │   }                   ',
+            '}                      │ │ }                     ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff of circular data structures correctly #4', async t => {
+    const a = {
+        prop : {
+            maxDepth : 4
+        }
+    }
+
+    const circular = { ref : undefined }
+    circular.ref = circular
+
+    const b = {
+        prop : circular
+    }
+
+    const difference0   = compareDeepDiff(a, b)
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received          │ │ Expected                ',
+            '                  │ │                         ',
+            '{                 │ │ {                       ',
+            '  "prop": {       │ │   "prop": <ref *1> {    ',
+            '    "maxDepth": 4 │ │     ░                   ',
+            '    ░             │ │     "ref": [Circular *1]',
+            '  }               │ │   }                     ',
+            '}                 │ │ }                       ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff of circular data structures correctly #5', async t => {
+    const child     = { parent : undefined, children : [] }
+    const parent    = { parent : undefined, children : [ child ] }
+    child.parent    = parent
+
+    const difference0   = compareDeepDiff(child, parent)
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received                 │ │ Expected                      ',
+            '                         │ │                               ',
+            '<ref *1> {               │ │ <ref *1> {                    ',
+            '  "parent": {            │ │   "parent": undefined,        ',
+            '    "parent": undefined, │ │                               ',
+            '    "children": [        │ │                               ',
+            '      [Circular *1]      │ │                               ',
+            '    ]                    │ │                               ',
+            '  },                     │ │                               ',
+            '  "children": [          │ │   "children": [               ',
+            '    ░                    │0│     {                         ',
+            '                         │ │       "parent": [Circular *1],',
+            '                         │ │       "children": []          ',
+            '                         │ │     }                         ',
+            '  ]                      │ │   ]                           ',
+            '}                        │ │ }                             ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff of heterogeneous data correctly #1', async t => {
+    const difference0   = compareDeepDiff([ { a : { b : 2 } }, [] ], [ [ 1, 2 ], { c : 2 } ])
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received     │ │ Expected  ',
+            '             │ │           ',
+            '[            │ │ [         ',
+            '  {          │0│   [       ',
+            '    "a": {   │ │     1,    ',
+            '      "b": 2 │ │     2     ',
+            '    }        │ │   ],      ',
+            '  },         │ │           ',
+            '  []         │1│   {       ',
+            '             │ │     "c": 2',
+            '             │ │   }       ',
+            ']            │ │ ]         ',
+        ].join('\n')
+    )
+})
+
+
 // it('Should render the diff of heterogeneous data correctly #2', async t => {
 //     const difference0   = compareDeepDiff([ { a : { b : 2 } }, new Set([ 1 ]) ], [ 1, { c : 2 } ])
 //

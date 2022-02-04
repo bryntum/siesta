@@ -591,5 +591,8 @@ export const comparePrimitiveAndFuzzyMatchers = function (
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const serializeAtomic = function (v : unknown) : string {
-    return JSON.stringify(v)
+    if (v === undefined)
+        return 'undefined'
+    else
+        return JSON.stringify(v)
 }
