@@ -51,6 +51,20 @@ it('Should render the array diff correctly #2.1', async t => {
             ']        │ │ ]       '
         ].join('\n')
     )
+
+    const difference2   = compareDeepDiff([ 1 ], [ 0, 0 ])
+
+    t.is(
+        stripZws(rendererPlain.render(difference2.template())),
+        [
+            'Received │ │ Expected',
+            '         │ │         ',
+            '[        │ │ [       ',
+            '  1      │0│   0,    ',
+            '  ░      │1│   0     ',
+            ']        │ │ ]       '
+        ].join('\n')
+    )
 })
 
 // it('Should render the array diff correctly #3', async t => {
