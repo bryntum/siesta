@@ -32,7 +32,7 @@ project.plan(
             'ul.t.js',
             'text_block.t.js',
             'xml_element_rendering.t.js',
-            'xml_element_streaming_rendering.t.tsx',
+            'xml_element_streaming_rendering.t.js',
         ]
     },
     {

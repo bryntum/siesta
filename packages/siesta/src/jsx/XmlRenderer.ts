@@ -148,6 +148,8 @@ export class XmlRendererStreaming extends Mixin(
 
             el.renderStreaming(rootBlock.deriveChildBlock(el, 0))
 
+            rootBlock.flushInlineBuffer()
+
             return canvas
         }
     }

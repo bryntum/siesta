@@ -56,6 +56,8 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
 
 
     start (el : XmlElement) {
+        if (this.renderer.getDisplayType(el) !== 'block') throw new Error("Should always start with block-level element")
+
         super.start(el)
 
         this.blockByElement.set(el, XmlRenderBlock.new({
@@ -117,6 +119,10 @@ export class RenderingXmlFragmentWithCanvas extends RenderingXmlFragment {
         this.finalizeRendering(this.currentElement)
 
         super.pop()
+
+        // NOTE - only 1 top-level `pop` is allowed
+        // finalize rendering of the starting element
+        if (!this.currentElement.parent) this.finalizeRendering(this.currentElement)
     }
 }
 

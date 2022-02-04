@@ -31,6 +31,15 @@ it('Nesting/chaining inline elements should continue the inline flow', async t =
         ),
         `123/456/789`
     )
+
+    t.is(
+        renderer.render(
+            <div class="indented">
+                <span>123</span><span>456</span><span>789</span>
+            </div>
+        ),
+        `  123456789`
+    )
 })
 
 

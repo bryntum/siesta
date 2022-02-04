@@ -323,11 +323,12 @@ export class XmlElement extends Mixin(
         // keeping this code separate from `afterRenderContent` to let user override that method
         // this code should be executed after all `afterRenderContent` activity is completed
         renderStreamingDone (context : XmlRenderBlock) {
-            context.flushInlineBuffer()
-
-            // when the rendering of the block-level element has complete,
-            // need to insert pending new line into canvas
-            if (context.type === 'block') context.canvas.newLinePending()
+            if (context.type === 'block') {
+                context.flushInlineBuffer()
+                // when the rendering of the block-level element has complete,
+                // need to insert pending new line into canvas
+                context.canvas.newLinePending()
+            }
         }
 
 
