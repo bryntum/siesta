@@ -129,7 +129,7 @@ export const equalDeep = (
     v2          : unknown,
     options     : DeepCompareOptions    = defaultDeepCompareOptions
 ) : boolean =>
-    compareDeepDiff(v1, v2, options).same
+    compareDeepDiff(v1, v2, options).$same
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -207,7 +207,7 @@ export const compareDeepDiff = function (
             return DifferenceReference.new({
                 value1  : v1Visit[ 1 ].refId1,
                 value2  : v2Visit[ 1 ].refId2,
-                same    : v1Visit[ 0 ] === v2Visit[ 0 ]
+                $same   : v1Visit[ 0 ] === v2Visit[ 0 ]
             })
         }
         // if one day we decide to support the `cycleIsPartOfDataStructure` option
@@ -274,7 +274,7 @@ export const compareDeepDiff = function (
             typeOf1     : diffTypeOf(v1),
             typeOf2     : diffTypeOf(v2),
 
-            same        : compareAtomic(v1, v2)
+            $same       : compareAtomic(v1, v2)
         })
     }
 }
@@ -345,7 +345,7 @@ const compareKeys = function <K, V>(
             const innerState    = state.in()
 
             const difference    = compareDeepDiff(item1, item2, options, innerState, convertingToDiff)
-            const equal         = difference.same
+            const equal         = difference.$same
 
             if (equal) {
                 state.out(innerState)
@@ -500,7 +500,7 @@ const compareFunctionDeepDiff = function (
     func1 : Function, func2 : Function,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 ) : Difference {
-    const difference = DifferenceReferenceable.new({ value1 : func1, value2 : func2, same : func1 === func2 })
+    const difference = DifferenceReferenceable.new({ value1 : func1, value2 : func2, $same : func1 === func2 })
 
     state.markVisited(func1, func2, difference, convertingToDiff)
 
@@ -518,7 +518,7 @@ const compareRegExpDeepDiff = function (
     const difference    = DifferenceReferenceable.new({
         value1  : regexp1,
         value2  : regexp2,
-        same    : regexpProps.every(propertyName => regexp1[ propertyName ] === regexp2[ propertyName])
+        $same   : regexpProps.every(propertyName => regexp1[ propertyName ] === regexp2[ propertyName])
     })
 
     state.markVisited(regexp1, regexp2, difference, convertingToDiff)
@@ -532,7 +532,7 @@ const compareDateDeepDiff = function (
     date1 : Date, date2 : Date,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 ) : Difference {
-    const difference = DifferenceReferenceable.new({ value1 : date1, value2 : date2, same : date1.getTime() === date2.getTime() })
+    const difference = DifferenceReferenceable.new({ value1 : date1, value2 : date2, $same : date1.getTime() === date2.getTime() })
 
     if (!options.compareDateByValue) state.markVisited(date1, date2, difference, convertingToDiff)
 
@@ -584,7 +584,7 @@ export const comparePrimitiveAndFuzzyMatchers = function (
 
     const matchersDiff  = compareFuzzyMatchersDeepDiff(v1, v2, options, state, undefined)
 
-    if (matchersDiff) return matchersDiff.same
+    if (matchersDiff) return matchersDiff.$same
 
     return compareAtomic(v1, v2, strictEquality)
 }

@@ -17,16 +17,18 @@ import { Missing } from "./DeepDiff.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class MissingValue extends XmlElement {
-    tagName             : 'missing_value'           = 'missing_value'
-}
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type DifferenceRenderingStream   = 'expander' | 'left' | 'middle' | 'right'
 
 export class DifferenceRenderingContext extends Base {
     stream          : DifferenceRenderingStream     = undefined
+
+
+    get contentStream () : 'left' | 'right' {
+        if (this.stream === 'left') return 'left'
+        if (this.stream === 'right') return 'right'
+
+        throw new Error("Should only be called on left/right streams")
+    }
 
 
     get isContent () : boolean {
@@ -101,9 +103,9 @@ export class Difference extends Mixin(
         @exclude()
         value2          : unknown | Missing         = Missing
 
-        same            : boolean                   = false
+        $same           : boolean                   = false
 
-        type            : DifferenceType            = undefined
+        $type           : DifferenceType            = undefined
 
 
         initialize (props : Partial<Difference>) {
@@ -113,15 +115,28 @@ export class Difference extends Mixin(
                 const has1  = this.value1 !== Missing
                 const has2  = this.value2 !== Missing
 
-                this.type   = has1 && has2 ? 'both' : has1 ? 'onlyIn1' : 'onlyIn2'
+                this.$type  = has1 && has2 ? 'both' : has1 ? 'onlyIn1' : 'onlyIn2'
             }
+        }
+
+
+        get same () : boolean {
+            return this.$same
+        }
+
+
+        get type () : DifferenceType {
+            return this.$type
         }
 
 
         excludeValue (valueProp : 'value1' | 'value2') {
             this[ valueProp ]   = Missing
 
-            this.same           = false
+            this.$same          = false
+
+            // meh, mutations
+            if (this.type === 'both') this.$type = valueProp === 'value1' ? 'onlyIn2' : 'onlyIn1'
         }
 
 
@@ -129,6 +144,13 @@ export class Difference extends Mixin(
             return JsonDeepDiffElement.new({
                 difference  : this
             })
+        }
+
+
+        isMissingIn (stream : 'left' | 'right') : boolean {
+            const type      = this.type
+
+            return stream === 'left' && type === 'onlyIn2' || stream === 'right' && type === 'onlyIn1'
         }
     }
 ){}
@@ -144,7 +166,7 @@ const compareDifferences = (difference1 : Difference, difference2 : Difference) 
     else if (type1 !== 'both' && type2 === 'both')
         return 1
     else if (type1 === 'both' && type2 === 'both')
-        return (difference1.same ? 0 : 1) - (difference2.same ? 0 : 1)
+        return (difference1.$same ? 0 : 1) - (difference2.$same ? 0 : 1)
     else if (type1 === 'onlyIn1' && type2 === 'onlyIn2')
         return -1
     else if (type1 === 'onlyIn2' && type2 === 'onlyIn1')
@@ -188,7 +210,7 @@ export class DifferenceAtomic extends Difference {
         const stream        = context.stream
 
         if (context.isContent) {
-            output.write(<diff-atomic same={ this.same } type={ this.type } class={ stream === 'left' ? this.typeOf1 : this.typeOf2 }>
+            output.write(<diff-atomic same={ this.$same } type={ this.type } class={ stream === 'left' ? this.typeOf1 : this.typeOf2 }>
                 {
                     stream === 'left'
                         ? this.content1 ?? <MissingValue></MissingValue>
@@ -275,7 +297,7 @@ export class DifferenceReferenceable extends Difference {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceComposite extends DifferenceReferenceable {
 
-    entries         : DifferenceRendering[]         = []
+    entries         : DifferenceCompositeEntry[]    = []
 
 
     // separator
@@ -314,8 +336,6 @@ export class DifferenceComposite extends DifferenceReferenceable {
         for (let i = 0; i < this.entries.length; i++) {
             const child     = this.entries[ i ]
 
-            yield* this.beforeRenderChildGen(output, context, child, i)
-
             // the entry element presents in all flows and this is what
             // is synchronizing the height across the streams
             output.push(<diff-entry></diff-entry>)
@@ -332,8 +352,6 @@ export class DifferenceComposite extends DifferenceReferenceable {
             yield DifferenceRenderingSyncPoint.new({ type : 'after' })
 
             output.pop()
-
-            yield* this.afterRenderChildGen(output, context, child, i)
         }
 
         if (context.isContent && hasInner) output.pop()
@@ -343,7 +361,7 @@ export class DifferenceComposite extends DifferenceReferenceable {
     * beforeRenderChildGen (
         output              : RenderingXmlFragment,
         context             : DifferenceRenderingContext,
-        child               : DifferenceRendering,
+        child               : DifferenceCompositeEntry,
         index               : number
     )
         : Generator<DifferenceRenderingSyncPoint>
@@ -354,19 +372,23 @@ export class DifferenceComposite extends DifferenceReferenceable {
     * renderChildGen (
         output              : RenderingXmlFragment,
         context             : DifferenceRenderingContext,
-        child               : DifferenceRendering,
+        child               : DifferenceCompositeEntry,
         index               : number
     )
         : Generator<DifferenceRenderingSyncPoint>
     {
+        yield* this.beforeRenderChildGen(output, context, child, index)
+
         yield* child.renderGen(output, context)
+
+        yield* this.afterRenderChildGen(output, context, child, index)
     }
 
 
     * afterRenderChildGen (
         output              : RenderingXmlFragment,
         context             : DifferenceRenderingContext,
-        child               : DifferenceRendering,
+        child               : DifferenceCompositeEntry,
         index               : number
     )
         : Generator<DifferenceRenderingSyncPoint>
@@ -379,42 +401,70 @@ export class DifferenceComposite extends DifferenceReferenceable {
     }
 
 
-    // needCommaAfterChild (
-    //     child               : Child,
-    //     index               : number,
-    //     stream              : DifferenceRenderingContext
-    // )
-    //     : boolean
-    // {
-    //     const nextChild     = this.getChild(index + 1)
-    //
-    //     if (
-    //         child.isMissingIn(stream)
-    //         ||
-    //         nextChild === undefined
-    //         ||
-    //         stream === 'left' && nextChild.isMissingIn(stream)
-    //         ||
-    //         stream === 'right' && nextChild.isMissingIn(stream) && this.getOnlyIn2Size() === 0
-    //     ) {
-    //         return false
-    //     } else {
-    //         return super.needCommaAfterChild(child, index, renderer, context)
-    //     }
-    // }
+    needCommaAfterChild (
+        child               : Difference,
+        index               : number,
+        context             : DifferenceRenderingContext
+    )
+        : boolean
+    {
+        const stream        = context.contentStream
+        const nextChild     = this.entries[ index + 1 ]
+
+        if (
+            child.isMissingIn(stream)
+            ||
+            nextChild === undefined
+            ||
+            stream === 'left' && nextChild.isMissingIn(stream)
+            ||
+            stream === 'right' && nextChild.isMissingIn(stream) && this.getOnlyIn2Size() === 0
+        ) {
+            return false
+        } else {
+            return index !== this.entries.length - 1
+        }
+    }
 }
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class DifferenceArrayEntry extends DifferenceRendering {
+export class DifferenceCompositeEntry extends Difference {
     index       : number            = undefined
+
     difference  : Difference        = undefined
 
-    zz
+
+    excludeValue (valueProp : 'value1' | 'value2') {
+        this.difference.excludeValue(valueProp)
+    }
+
+
+    get type () : DifferenceType {
+        return this.difference.type
+    }
+
+
+    get same () : boolean {
+        return this.difference.same
+    }
+
+    '--'
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        yield* this.difference.renderGen(output, context)
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class DifferenceArrayEntry extends DifferenceCompositeEntry {
+
+    '--'
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isMiddle) output.write(<span class="json-deep-diff-middle-index">{ this.index }</span>)
 
-        yield* this.difference.renderGen(output, context)
+        yield* super.renderGen(output, context)
     }
 }
 
@@ -424,21 +474,20 @@ export class DifferenceArray extends DifferenceComposite {
     value1          : unknown[]
     value2          : unknown[]
 
-    same            : boolean           = true
+    $same           : boolean           = true
 
     entries         : DifferenceArrayEntry[]
 
-    // comparisons     : { index : number, difference : Difference }[]      = []
+    length          : number            = undefined
+    length2         : number            = undefined
 
 
-    // forEachChild (func : (child : { index : number, difference : Difference }, index : number) => any) {
-    //     this.comparisons.forEach(func)
-    // }
-    //
-    //
-    // getChild (index : number) : { index : number; difference : Difference } {
-    //     return this.comparisons[ index ]
-    // }
+    initialize (props : Partial<DifferenceArray>) {
+        super.initialize(props)
+
+        this.length     = this.value1.length
+        this.length2    = this.value2.length
+    }
 
 
     excludeValue (valueProp : 'value1' | 'value2') {
@@ -451,12 +500,26 @@ export class DifferenceArray extends DifferenceComposite {
     addComparison (index : number, difference : Difference) {
         this.entries.push(DifferenceArrayEntry.new({ index, difference }))
 
-        if (this.same && !difference.same) this.same = false
+        if (this.$same && !difference.$same) this.$same = false
+    }
+
+
+    * afterRenderChildGen (
+        output              : RenderingXmlFragment,
+        context             : DifferenceRenderingContext,
+        child               : Difference,
+        index               : number
+    )
+        : Generator<DifferenceRenderingSyncPoint>
+    {
+        yield* super.afterRenderChildGen(output, context, child, index)
+
+        if (context.isContent && this.needCommaAfterChild(child, index, context)) output.write(',')
     }
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) output.push(<diff-array id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-array>)
+        if (context.isContent) output.push(<diff-array id={ `${ context.stream }-${ this.id }` } same={ this.$same } type={ this.type }></diff-array>)
 
         yield* super.renderGen(output, context)
 
@@ -490,6 +553,30 @@ export class DifferenceArray extends DifferenceComposite {
     }
 
 
+    needCommaAfterChild (
+        child               : DifferenceArrayEntry,
+        index               : number,
+        context             : DifferenceRenderingContext
+    )
+        : boolean
+    {
+        const stream        = context.contentStream
+
+        if (
+            child.isMissingIn(stream)
+            ||
+            (stream === 'right' && child.index >= this.length2 - 1)
+            ||
+            (stream === 'left' && child.index >= this.length - 1)
+        ) {
+            return false
+        } else {
+            return super.needCommaAfterChild(child, index, context)
+        }
+    }
+
+
+
     // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
     //     return <DifferenceTemplateArray
     //         type={ this.type } same={ this.same }
@@ -514,7 +601,7 @@ export class DifferenceObject extends DifferenceReferenceable {
 
     onlyIn2Size     : number                    = 0
 
-    same            : boolean                   = true
+    $same           : boolean                   = true
 
     comparisons     : { key : ArbitraryObjectKey, difference : Difference }[]  = []
 
@@ -529,7 +616,7 @@ export class DifferenceObject extends DifferenceReferenceable {
     addComparison (key : ArbitraryObjectKey, difference : Difference) {
         this.comparisons.push({ key, difference })
 
-        if (this.same && !difference.same) this.same = false
+        if (this.$same && !difference.$same) this.$same = false
     }
 
 
@@ -568,7 +655,7 @@ export class DifferenceSet extends DifferenceReferenceable {
 
     onlyIn2Size     : number                    = 0
 
-    same            : boolean                   = true
+    $same           : boolean                   = true
 
     comparisons     : { difference : Difference }[]     = []
 
@@ -583,7 +670,7 @@ export class DifferenceSet extends DifferenceReferenceable {
     addComparison (difference : Difference) {
         this.comparisons.push({ difference })
 
-        if (this.same && !difference.same) this.same = false
+        if (this.$same && !difference.$same) this.$same = false
     }
 
 
@@ -611,7 +698,7 @@ export class DifferenceMap extends DifferenceReferenceable {
 
     onlyIn2Size     : number                    = 0
 
-    same            : boolean                   = true
+    $same           : boolean                   = true
 
     comparisons     : { differenceKeys : Difference, differenceValues : Difference }[]     = []
 
@@ -629,7 +716,7 @@ export class DifferenceMap extends DifferenceReferenceable {
     addComparison (differenceKeys : Difference, differenceValues : Difference) {
         this.comparisons.push({ differenceKeys, differenceValues })
 
-        if (this.same && (!differenceKeys.same || !differenceValues.same)) this.same = false
+        if (this.$same && (!differenceKeys.$same || !differenceValues.$same)) this.$same = false
     }
 
 
@@ -747,14 +834,16 @@ export class JsonDeepDiffContentRendering extends Base {
                 heightStart.set(output.currentElement, this.canvas.height)
             }
             else if (syncPoint.type === 'after') {
-                const el            = output.currentElement
-                const lastChildEl   = lastElement(el.childNodes)
+                const currentElement    = output.currentElement
+                const lastChildEl       = lastElement(currentElement.childNodes)
 
                 if (lastChildEl && !isString(lastChildEl)) output.blockByElement.get(lastChildEl).flushInlineBuffer()
 
+                output.blockByElement.get(currentElement).flushInlineBuffer()
+
                 yield {
-                    el,
-                    height  : this.canvas.height - heightStart.get(el)
+                    el      : currentElement,
+                    height  : this.canvas.height - heightStart.get(currentElement)
                 }
             }
         }
@@ -915,5 +1004,16 @@ export class ZeroWidthSpace extends XmlElement {
 
     renderContent (context : XmlRenderBlock) {
         context.writeStyledSameLineText('\u200B', 0)
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class MissingValue extends XmlElement {
+    tagName             : 'missing_value'           = 'missing_value'
+
+
+    renderContent (context : XmlRenderBlock) {
+        context.write('░')
     }
 }

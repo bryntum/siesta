@@ -256,6 +256,12 @@ diff-expander {
 }
 
 
+missing_value {
+    &:before {
+        content: "░";
+    }
+}
+
 span.json-deep-diff-zero-width-space:before {
     content: "\200B";
 }
