@@ -3,6 +3,7 @@ import { compareDeepDiff } from "../../src/compare_deep/DeepDiff.js"
 import { XmlRendererDifference } from "../../src/compare_deep/DeepDiffRendering.js"
 
 const rendererPlain     = XmlRendererDifference.new({})
+// strip zero-width spaces
 const stripZws          = (str : string) => str.replace(/\u200B/g, '')
 
 
@@ -193,27 +194,22 @@ it('Should render the array diff correctly #2.1', async t => {
 //         stripZws(rendererPlain.render(difference5.template()))
 //     )
 // })
-//
-//
-// it('Should render the object diff correctly #1', async t => {
-//     const difference0   = compareDeepDiff({}, {})
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received │ │ Expected',
-//             '         │ │         ',
-//             '{}       │ │ {}      ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
+
+
+it('Should render the object diff correctly #1', async t => {
+    const difference0   = compareDeepDiff({}, {})
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received │ │ Expected',
+            '         │ │         ',
+            '{}       │ │ {}      ',
+        ].join('\n')
+    )
+})
+
+
 // it('Should render the object diff correctly #2', async t => {
 //     const difference1   = compareDeepDiff({ a : 1 }, { a : 2 })
 //

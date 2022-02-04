@@ -11,7 +11,7 @@ import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { XmlRendererStreaming } from "../jsx/XmlRenderer.js"
 import { luid, LUID } from "../siesta/common/LUID.js"
-import { ArbitraryObjectKey, lastElement } from "../util/Helpers.js"
+import { ArbitraryObjectKey, constructorNameOf, lastElement } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { Missing } from "./DeepDiff.js"
 
@@ -300,8 +300,12 @@ export class DifferenceComposite extends DifferenceReferenceable {
     entries         : DifferenceCompositeEntry[]    = []
 
 
-    // separator
-    dummyProp
+    excludeValue (valueProp : 'value1' | 'value2') {
+        super.excludeValue(valueProp)
+
+        this.entries.forEach(entry => entry.difference.excludeValue(valueProp))
+    }
+
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isExpander) {
@@ -328,8 +332,21 @@ export class DifferenceComposite extends DifferenceReferenceable {
     }
 
 
+    renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        // zero-width space, previously it was just:
+        //      output.write(String.fromCharCode(0x200B))
+        // but this was messing up the calculations for the text rendering
+        // (since its an unprinted character, that, however, is counted in the JS string length)
+        // so need a special processing for it, which is done in `ZeroWidthSpace`
+        if (context.isExpander || context.isMiddle)
+            output.write(<ZeroWidthSpace class="json-deep-diff-zero-width-space"></ZeroWidthSpace>)
+    }
+
+
     * renderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         const hasInner  = this.entries.length > 0
+
+        this.renderCompositeHeader(output, context)
 
         if (context.isContent && hasInner) output.push(<diff-inner class="indented"></diff-inner>)
 
@@ -355,6 +372,15 @@ export class DifferenceComposite extends DifferenceReferenceable {
         }
 
         if (context.isContent && hasInner) output.pop()
+
+        this.renderCompositeFooter(output, context)
+    }
+
+
+    renderCompositeFooter (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        // zero-width space, see the comment above
+        if (context.isExpander || context.isMiddle)
+            output.write(<ZeroWidthSpace class="json-deep-diff-zero-width-space"></ZeroWidthSpace>)
     }
 
 
@@ -393,6 +419,7 @@ export class DifferenceComposite extends DifferenceReferenceable {
     )
         : Generator<DifferenceRenderingSyncPoint>
     {
+        if (context.isContent && this.needCommaAfterChild(child, index, context)) output.write(',')
     }
 
 
@@ -504,20 +531,6 @@ export class DifferenceArray extends DifferenceComposite {
     }
 
 
-    * afterRenderChildGen (
-        output              : RenderingXmlFragment,
-        context             : DifferenceRenderingContext,
-        child               : Difference,
-        index               : number
-    )
-        : Generator<DifferenceRenderingSyncPoint>
-    {
-        yield* super.afterRenderChildGen(output, context, child, index)
-
-        if (context.isContent && this.needCommaAfterChild(child, index, context)) output.write(',')
-    }
-
-
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isContent) output.push(<diff-array id={ `${ context.stream }-${ this.id }` } same={ this.$same } type={ this.type }></diff-array>)
 
@@ -527,29 +540,17 @@ export class DifferenceArray extends DifferenceComposite {
     }
 
 
-    * beforeRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        yield* super.beforeRenderContentGen(output, context)
+    renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeHeader(output, context)
 
         if (context.isContent) output.write('[')
-
-        // zero-width space, previously it was just:
-        //      output.write(String.fromCharCode(0x200B))
-        // but this was messing up the calculations for the text rendering
-        // (since its an unprinted character, that, however, is counted in the JS string length)
-        // so need a special processing for it, which is done in `ZeroWidthSpace`
-        if (context.isExpander || context.isMiddle)
-            output.write(<ZeroWidthSpace class="json-deep-diff-zero-width-space"></ZeroWidthSpace>)
     }
 
 
-    * afterRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        yield* super.afterRenderContentGen(output, context)
+    renderCompositeFooter (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeFooter(output, context)
 
         if (context.isContent) output.write(']')
-
-        // zero-width space, see the comment above
-        if (context.isExpander || context.isMiddle)
-            output.write(<ZeroWidthSpace class="json-deep-diff-zero-width-space"></ZeroWidthSpace>)
     }
 
 
@@ -595,28 +596,70 @@ export class DifferenceArray extends DifferenceComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class DifferenceObject extends DifferenceReferenceable {
+export class DifferenceObjectEntry extends DifferenceCompositeEntry {
+    key             : ArbitraryObjectKey        = undefined
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class DifferenceObject extends DifferenceComposite {
     value1          : object | Missing
     value2          : object | Missing
 
-    onlyIn2Size     : number                    = 0
+    onlyIn2Size         : number                = 0
+    constructorName     : string                = undefined
+    constructorName2    : string                = undefined
+
+    size                : number                = 0
+    size2               : number                = 0
 
     $same           : boolean                   = true
 
-    comparisons     : { key : ArbitraryObjectKey, difference : Difference }[]  = []
+    entries         : DifferenceObjectEntry[]
 
 
-    excludeValue (valueProp : 'value1' | 'value2') {
-        super.excludeValue(valueProp)
+    initialize (props : Partial<DifferenceArray>) {
+        super.initialize(props)
 
-        this.comparisons.forEach(comparison => comparison.difference.excludeValue(valueProp))
+        this.constructorName    = this.value1 !== Missing ? constructorNameOf(this.value1) : undefined
+        this.constructorName2   = this.value2 !== Missing ? constructorNameOf(this.value2) : undefined
+        this.size               = this.value1 !== Missing ? Object.keys(this.value1).length : undefined
+        this.size2              = this.value2 !== Missing ? Object.keys(this.value2).length : undefined
     }
 
 
     addComparison (key : ArbitraryObjectKey, difference : Difference) {
-        this.comparisons.push({ key, difference })
+        this.entries.push(DifferenceObjectEntry.new({ key, difference }))
 
         if (this.$same && !difference.$same) this.$same = false
+    }
+
+
+    getOnlyIn2Size () : number {
+        return this.onlyIn2Size
+    }
+
+
+    renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeHeader(output, context)
+
+        if (context.isContent) output.write('{')
+    }
+
+
+    renderCompositeFooter (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeFooter(output, context)
+
+        if (context.isContent) output.write('}')
+    }
+
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isContent) output.push(<diff-object id={ `${ context.stream }-${ this.id }` } same={ this.$same } type={ this.type }></diff-object>)
+
+        yield* super.renderGen(output, context)
+
+        if (context.isContent) output.pop()
     }
 
 
