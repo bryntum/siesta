@@ -31,6 +31,14 @@ export class DifferenceRenderingContext extends Base {
     }
 
 
+    get oppositeContentStream () : 'left' | 'right' {
+        if (this.stream === 'left') return 'right'
+        if (this.stream === 'right') return 'left'
+
+        throw new Error("Should only be called on left/right streams")
+    }
+
+
     get isContent () : boolean {
         return this.stream === 'left' || this.stream === 'right'
     }
@@ -344,36 +352,41 @@ export class DifferenceComposite extends DifferenceReferenceable {
 
 
     * renderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        const hasInner  = this.entries.length > 0
+        if (context.isContent && this.isMissingIn(context.contentStream)) {
+            output.write(<MissingValue></MissingValue>)
+        } else {
+            const hasInner              = this.entries.length > 0
+            const suppressSyncPoints    = this.type !== 'both'
 
-        this.renderCompositeHeader(output, context)
+            this.renderCompositeHeader(output, context)
 
-        if (context.isContent && hasInner) output.push(<diff-inner class="indented"></diff-inner>)
+            if (context.isContent && hasInner) output.push(<diff-inner class="indented"></diff-inner>)
 
-        for (let i = 0; i < this.entries.length; i++) {
-            const entry     = this.entries[ i ]
+            for (let i = 0; i < this.entries.length; i++) {
+                const entry     = this.entries[ i ]
 
-            // the entry element presents in all flows and this is what
-            // is synchronizing the height across the streams
-            output.push(<diff-entry same={ entry.same } type={ entry.type }></diff-entry>)
+                // the entry element presents in all flows and this is what
+                // is synchronizing the height across the streams
+                output.push(<diff-entry same={ entry.same } type={ entry.type }></diff-entry>)
 
-            yield DifferenceRenderingSyncPoint.new({ type : 'before' })
+                if (!suppressSyncPoints) yield DifferenceRenderingSyncPoint.new({ type : 'before' })
 
-            yield* this.renderChildGen(output, context, entry, i)
+                yield* this.renderChildGen(output, context, entry, i)
 
-            // yielding the sync-point right _before_ the `pop` of the entry
-            // entry is still a "currentElement" of the `output`
-            // since `diff-entry` does not add any custom rendering,
-            // all the entry content is available (only need to flush
-            // the inline buffer of the entry's last child)
-            yield DifferenceRenderingSyncPoint.new({ type : 'after' })
+                // yielding the sync-point right _before_ the `pop` of the entry
+                // entry is still a "currentElement" of the `output`
+                // since `diff-entry` does not add any custom rendering,
+                // all the entry content is available (only need to flush
+                // the inline buffer of the entry's last child)
+                if (!suppressSyncPoints) yield DifferenceRenderingSyncPoint.new({ type : 'after' })
 
-            output.pop()
+                output.pop()
+            }
+
+            if (context.isContent && hasInner) output.pop()
+
+            this.renderCompositeFooter(output, context)
         }
-
-        if (context.isContent && hasInner) output.pop()
-
-        this.renderCompositeFooter(output, context)
     }
 
 
@@ -898,6 +911,9 @@ export class JsonDeepDiffContentRendering extends Base {
                     el      : currentElement,
                     height  : this.canvas.height - heightStart.get(currentElement)
                 }
+            }
+            else {
+                throw new Error("Unknown sync point type")
             }
         }
     }
