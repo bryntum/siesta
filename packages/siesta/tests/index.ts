@@ -57,7 +57,8 @@ project.plan(
         items       : [
             'compare_deep_diff.t.js',
             'compare_deep_diff_matchers.t.js',
-            'compare_deep_diff_rendering_max_width.t.js'
+            'compare_deep_diff_rendering_max_width.t.js',
+            'deep_diff_rendering.t.js'
         ]
     },
     {
