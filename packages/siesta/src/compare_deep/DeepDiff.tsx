@@ -267,9 +267,8 @@ export const compareDeepDiff = function (
             value1      : v1,
             value2      : v2,
 
-            // TODO should use serializer
-            content1    : JSON.stringify(v1),
-            content2    : JSON.stringify(v2),
+            content1    : serializeAtomic(v1),
+            content2    : serializeAtomic(v2),
 
             typeOf1     : diffTypeOf(v1),
             typeOf2     : diffTypeOf(v2),
@@ -587,4 +586,10 @@ export const comparePrimitiveAndFuzzyMatchers = function (
     if (matchersDiff) return matchersDiff.$same
 
     return compareAtomic(v1, v2, strictEquality)
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const serializeAtomic = function (v : unknown) : string {
+    return JSON.stringify(v)
 }

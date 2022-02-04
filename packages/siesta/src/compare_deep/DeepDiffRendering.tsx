@@ -13,7 +13,7 @@ import { XmlRendererStreaming } from "../jsx/XmlRenderer.js"
 import { luid, LUID } from "../siesta/common/LUID.js"
 import { ArbitraryObjectKey, constructorNameOf, lastElement } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
-import { Missing } from "./DeepDiff.js"
+import { Missing, serializeAtomic } from "./DeepDiff.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -486,8 +486,6 @@ export class DifferenceCompositeEntry extends Difference {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceArrayEntry extends DifferenceCompositeEntry {
 
-    '--'
-
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isMiddle) output.write(<span class="json-deep-diff-middle-index">{ this.index }</span>)
 
@@ -597,7 +595,19 @@ export class DifferenceArray extends DifferenceComposite {
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class DifferenceObjectEntry extends DifferenceCompositeEntry {
-    key             : ArbitraryObjectKey        = undefined
+    key             : string            = undefined
+
+    '---'
+
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isContent) {
+            output.write(<diff-object-key>{ this.key }</diff-object-key>)
+            output.write(': ')
+        }
+
+        yield* super.renderGen(output, context)
+    }
 }
 
 
@@ -629,7 +639,7 @@ export class DifferenceObject extends DifferenceComposite {
 
 
     addComparison (key : ArbitraryObjectKey, difference : Difference) {
-        this.entries.push(DifferenceObjectEntry.new({ key, difference }))
+        this.entries.push(DifferenceObjectEntry.new({ key : serializeAtomic(key), difference }))
 
         if (this.$same && !difference.$same) this.$same = false
     }
@@ -977,12 +987,19 @@ export class JsonDeepDiffElement extends Mixin(
                         // this comparison is only used for typing purposes
                         // (TS can't track the `every !done` assertion from above)
                         if (iteration.done === false) {
-                            const el            = iteration.value.el
-                            const renderBlock   = renderers[ index ].output.blockByElement.get(el)
+                            const heightDiff    = maxHeight - iteration.value.height
 
-                            renderBlock.write('\n'.repeat(maxHeight - iteration.value.height))
-
-                            el.renderStreamingDone(renderBlock)
+                            if (heightDiff > 0)
+                                renderers[ index ].output.write(
+                                    JsonDeepDiffFitter.new({
+                                        tagName : 'div',
+                                        attributes : {
+                                            class   : 'json-deep-diff-fitter',
+                                            style   : `height: ${ 1.5 * heightDiff }em`
+                                        },
+                                        height      : heightDiff
+                                    })
+                                )
                         }
                     })
                 } else
