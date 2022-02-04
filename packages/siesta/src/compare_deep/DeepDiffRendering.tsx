@@ -351,15 +351,15 @@ export class DifferenceComposite extends DifferenceReferenceable {
         if (context.isContent && hasInner) output.push(<diff-inner class="indented"></diff-inner>)
 
         for (let i = 0; i < this.entries.length; i++) {
-            const child     = this.entries[ i ]
+            const entry     = this.entries[ i ]
 
             // the entry element presents in all flows and this is what
             // is synchronizing the height across the streams
-            output.push(<diff-entry></diff-entry>)
+            output.push(<diff-entry same={ entry.same } type={ entry.type }></diff-entry>)
 
             yield DifferenceRenderingSyncPoint.new({ type : 'before' })
 
-            yield* this.renderChildGen(output, context, child, i)
+            yield* this.renderChildGen(output, context, entry, i)
 
             // yielding the sync-point right _before_ the `pop` of the entry
             // entry is still a "currentElement" of the `output`
@@ -601,7 +601,7 @@ export class DifferenceObjectEntry extends DifferenceCompositeEntry {
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) {
+        if (context.isContent && !this.isMissingIn(context.contentStream)) {
             output.write(<diff-object-key>{ this.key }</diff-object-key>)
             output.write(': ')
         }

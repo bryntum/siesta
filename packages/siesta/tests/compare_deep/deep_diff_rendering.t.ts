@@ -226,124 +226,99 @@ it('Should render the object diff correctly #2', async t => {
 })
 
 
-// it('Should render the object diff correctly #3', async t => {
-//     const difference2   = compareDeepDiff({ a : 1 }, { b : 2 })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference2.template())),
-//         [
-//             'Received │ │ Expected',
-//             '         │ │         ',
-//             '{        │ │ {       ',
-//             '  "a": 1 │ │   ░     ',
-//             '  ░      │ │   "b": 2',
-//             '}        │ │ }       ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference2.template())),
-//         stripZws(rendererPlain.render(difference2.template()))
-//     )
-// })
-//
-//
-// it('Should render the object diff correctly #4', async t => {
-//     const difference3   = compareDeepDiff({ a : 1, b : 2 }, { a : 1, c : 3 })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference3.template())),
-//         [
-//             'Received  │ │ Expected ',
-//             '          │ │          ',
-//             '{         │ │ {        ',
-//             '  "a": 1, │ │   "a": 1,',
-//             '  "b": 2  │ │   ░      ',
-//             '  ░       │ │   "c": 3 ',
-//             '}         │ │ }        ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference3.template())),
-//         stripZws(rendererPlain.render(difference3.template()))
-//     )
-// })
-//
-//
-// it('Should render the object diff correctly #4.1', async t => {
-//     const difference3   = compareDeepDiff({ a : 1, b : 2 }, { a : 1 })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference3.template())),
-//         [
-//             'Received  │ │ Expected',
-//             '          │ │         ',
-//             '{         │ │ {       ',
-//             '  "a": 1, │ │   "a": 1',
-//             '  "b": 2  │ │   ░     ',
-//             '}         │ │ }       ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference3.template())),
-//         stripZws(rendererPlain.render(difference3.template()))
-//     )
-// })
-//
-//
-// it('Should render the object diff correctly #5', async t => {
-//     const difference4   = compareDeepDiff({ a : 1, b : 2, d : 4 }, { a : 1, c : 3, e : 5 })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference4.template())),
-//         [
-//             'Received  │ │ Expected ',
-//             '          │ │          ',
-//             '{         │ │ {        ',
-//             '  "a": 1, │ │   "a": 1,',
-//             '  "b": 2, │ │   ░      ',
-//             '  "d": 4  │ │   ░      ',
-//             '  ░       │ │   "c": 3,',
-//             '  ░       │ │   "e": 5 ',
-//             '}         │ │ }        ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference4.template())),
-//         stripZws(rendererPlain.render(difference4.template()))
-//     )
-// })
-//
-//
-// it('Should render the object diff correctly #6', async t => {
-//     const difference5   = compareDeepDiff({ a : 1, b : { c : 2, d : 4 } }, { a : 1, b : { c : 3, e : 5 } })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference5.template())),
-//         [
-//             'Received    │ │ Expected   ',
-//             '            │ │            ',
-//             '{           │ │ {          ',
-//             '  "a": 1,   │ │   "a": 1,  ',
-//             '  "b": {    │ │   "b": {   ',
-//             '    "c": 2, │ │     "c": 3,',
-//             '    "d": 4  │ │     ░      ',
-//             '    ░       │ │     "e": 5 ',
-//             '  }         │ │   }        ',
-//             '}           │ │ }          ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference5.template())),
-//         stripZws(rendererPlain.render(difference5.template()))
-//     )
-// })
-//
-//
+it('Should render the object diff correctly #3', async t => {
+    const difference2   = compareDeepDiff({ a : 1 }, { b : 2 })
+
+    t.is(
+        stripZws(rendererPlain.render(difference2.template())),
+        [
+            'Received │ │ Expected',
+            '         │ │         ',
+            '{        │ │ {       ',
+            '  "a": 1 │ │   ░     ',
+            '  ░      │ │   "b": 2',
+            '}        │ │ }       ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the object diff correctly #4', async t => {
+    const difference3   = compareDeepDiff({ a : 1, b : 2 }, { a : 1, c : 3 })
+
+    t.is(
+        stripZws(rendererPlain.render(difference3.template())),
+        [
+            'Received  │ │ Expected ',
+            '          │ │          ',
+            '{         │ │ {        ',
+            '  "a": 1, │ │   "a": 1,',
+            '  "b": 2  │ │   ░      ',
+            '  ░       │ │   "c": 3 ',
+            '}         │ │ }        ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the object diff correctly #4.1', async t => {
+    const difference3   = compareDeepDiff({ a : 1, b : 2 }, { a : 1 })
+
+    t.is(
+        stripZws(rendererPlain.render(difference3.template())),
+        [
+            'Received  │ │ Expected',
+            '          │ │         ',
+            '{         │ │ {       ',
+            '  "a": 1, │ │   "a": 1',
+            '  "b": 2  │ │   ░     ',
+            '}         │ │ }       ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the object diff correctly #5', async t => {
+    const difference4   = compareDeepDiff({ a : 1, b : 2, d : 4 }, { a : 1, c : 3, e : 5 })
+
+    t.is(
+        stripZws(rendererPlain.render(difference4.template())),
+        [
+            'Received  │ │ Expected ',
+            '          │ │          ',
+            '{         │ │ {        ',
+            '  "a": 1, │ │   "a": 1,',
+            '  "b": 2, │ │   ░      ',
+            '  "d": 4  │ │   ░      ',
+            '  ░       │ │   "c": 3,',
+            '  ░       │ │   "e": 5 ',
+            '}         │ │ }        ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the object diff correctly #6', async t => {
+    const difference5   = compareDeepDiff({ a : 1, b : { c : 2, d : 4 } }, { a : 1, b : { c : 3, e : 5 } })
+
+    t.is(
+        stripZws(rendererPlain.render(difference5.template())),
+        [
+            'Received    │ │ Expected   ',
+            '            │ │            ',
+            '{           │ │ {          ',
+            '  "a": 1,   │ │   "a": 1,  ',
+            '  "b": {    │ │   "b": {   ',
+            '    "c": 2, │ │     "c": 3,',
+            '    "d": 4  │ │     ░      ',
+            '    ░       │ │     "e": 5 ',
+            '  }         │ │   }        ',
+            '}           │ │ }          ',
+        ].join('\n')
+    )
+})
+
+
 // it('Should render the object diff correctly #7', async t => {
 //     const difference6   = compareDeepDiff({ a : 1, b : [ 2, 3 ], c : [ 6, 7 ] }, { a : 1, b : [ 3, 4, 5 ] })
 //
