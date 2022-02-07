@@ -1127,7 +1127,7 @@ export class JsonDeepDiffElement extends Mixin(
             // we have to render the middle stream twice, this first render pass
             // provides us with its max width, so we can calculate the width available
             // for left/right streams
-            const middleAreaMaxWidth    = this.getMiddleAreaMaxWidth(context)
+            const middleAreaMaxWidth    = Math.max(this.getMiddleAreaMaxWidth(context), 1)
 
             // the wrapper for content in the middle stream ` |CONTENT| ` is 4 chars length
             const available     = context.maxWidth - (middleAreaMaxWidth + 4)

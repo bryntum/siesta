@@ -9,7 +9,7 @@ $contour_active : #9c9c9c;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    font-family: monospace;
+    font-family: "JetBrains Mono", monospace;
     box-sizing: border-box;
 
     --background-color: #f2f2f2;
@@ -24,6 +24,8 @@ $contour_active : #9c9c9c;
         // try commenting this line and scroll to bottom - see how the expander element is misplaced
         overflow-x: scroll;
     }
+
+    overflow: hidden;
 }
 
 
@@ -120,7 +122,7 @@ diff-inner {
     border-left: 1px solid $gray_lighter;
 }
 
-.json-deep-diff-content-root > * > diff-inner {
+.json-deep-diff-content-root > diff-entry > * > diff-inner {
     border-left: none;
 }
 

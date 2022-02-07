@@ -396,7 +396,7 @@ export class XmlRenderBlock extends Mixin(
                     renderer        : this.renderer,
                     parentBlock     : this,
                     element,
-                    maxWidth        : this.maxWidth - indent[ 0 ].length
+                    maxWidth        : Math.max(this.maxWidth - indent[ 0 ].length, 1)
                 })
             } else
                 return XmlRenderBlock.new({
@@ -446,7 +446,7 @@ export class RenderCanvas extends Base {
 
         lastLine.push(str, len)
 
-        if (lastLine.length > this.maxWidth) throw new Error("Should not exceed max width")
+        // if (lastLine.length > this.maxWidth) throw new Error("Should not exceed max width")
 
         if (lastLine.length > this.maxWidthFact) this.maxWidthFact = lastLine.length
     }
