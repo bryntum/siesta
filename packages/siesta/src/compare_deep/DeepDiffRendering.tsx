@@ -31,11 +31,16 @@ export class DifferenceRenderingContext extends Base {
     }
 
 
-    get oppositeContentStream () : 'left' | 'right' {
-        if (this.stream === 'left') return 'right'
-        if (this.stream === 'right') return 'left'
+    // get oppositeContentStream () : 'left' | 'right' {
+    //     if (this.stream === 'left') return 'right'
+    //     if (this.stream === 'right') return 'left'
+    //
+    //     throw new Error("Should only be called on left/right streams")
+    // }
 
-        throw new Error("Should only be called on left/right streams")
+
+    choose<V> (v1 : V, v2 : V) : V {
+        return this.contentStream === 'left' ? v1 : v2
     }
 
 
@@ -250,7 +255,7 @@ export class DifferenceAtomic extends Difference {
         const stream        = context.stream
 
         if (context.isContent) {
-            const value     = stream === 'left' ? this.content1 : this.content2
+            const value     = context.choose(this.content1, this.content2)
 
             output.write(<diff-atomic same={ this.same } type={ this.type }>
                 {
@@ -282,25 +287,15 @@ export class DifferenceReferenceable extends Mixin(
 
 
         renderReferenceablePrefix (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
-            const circularId    = this.getCircularId(context)
+            const circularId    = context.choose(this.circular1, this.circular2)
 
             if (circularId !== undefined)
                 output.write(<span class="circular-id">{ `<circular *${ circularId }> ` }</span>)
             else {
-                const refId     = this.getRefId(context)
+                const refId     = context.choose(this.refId1, this.refId2)
 
                 if (refId !== undefined) output.write(<span class="reference-id">{ `<ref *${ refId }> ` }</span>)
             }
-        }
-
-
-        getCircularId (context : DifferenceRenderingContext) : number {
-            return context.stream === 'left' ? this.circular1 : this.circular2
-        }
-
-
-        getRefId (context : DifferenceRenderingContext) : number {
-            return context.stream === 'left' ? this.refId1 : this.refId2
         }
 
 
@@ -692,7 +687,7 @@ export class DifferenceObject extends DifferenceComposite {
         super.renderCompositeHeader(output, context)
 
         if (context.isContent) {
-            const className     = context.contentStream === 'left' ? this.constructorName : this.constructorName2
+            const className     = context.choose(this.constructorName, this.constructorName2)
 
             if (className && className !== 'Object') output.write(className + ' ')
 
@@ -797,7 +792,7 @@ export class DifferenceSet extends DifferenceComposite {
     renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
         super.renderCompositeHeader(output, context)
 
-        if (context.isContent) output.write(`Set (${ context.contentStream === 'left' ? this.size : this.size2 }) {`)
+        if (context.isContent) output.write(`Set (${ context.choose(this.size, this.size2) }) {`)
     }
 
 
@@ -907,7 +902,7 @@ export class DifferenceMap extends DifferenceComposite {
     renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
         super.renderCompositeHeader(output, context)
 
-        if (context.isContent) output.write(`Map (${ context.contentStream === 'left' ? this.size : this.size2 }) {`)
+        if (context.isContent) output.write(`Map (${ context.choose(this.size, this.size2) }) {`)
     }
 
 
@@ -970,7 +965,7 @@ export class DifferenceReference extends Difference {
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isContent) {
-            const ref       = context.stream === 'left' ? this.ref1 : this.ref2
+            const ref       = context.choose(this.ref1, this.ref2)
 
             if (ref === Missing)
                 output.write(<MissingValue></MissingValue>)
@@ -995,10 +990,22 @@ export class DifferenceHeterogeneous extends Difference {
     value1      : Difference | Missing
     value2      : Difference | Missing
 
+    difference1     : Difference | Missing
+    difference2     : Difference | Missing
+
+
+    initialize (props : Partial<Difference>) {
+        super.initialize(props)
+
+        // `value1/2` are not persistent, need to copy the diffs into different properties
+        this.difference1    = this.value1
+        this.difference2    = this.value2
+    }
+
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isContent) {
-            const difference    = context.stream === 'left' ? this.value1 : this.value2
+            const difference    = context.choose(this.difference1, this.difference2)
 
             if (difference === Missing)
                 output.write(<MissingValue></MissingValue>)
