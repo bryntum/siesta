@@ -220,7 +220,7 @@ export class DifferenceAtomic extends Difference {
         if (context.isContent) {
             const value     = stream === 'left' ? this.content1 : this.content2
 
-            output.write(<diff-atomic same={ this.$same } type={ this.type } class={ stream === 'left' ? this.typeOf1 : this.typeOf2 }>
+            output.write(<diff-atomic same={ this.same } type={ this.type } class={ stream === 'left' ? this.typeOf1 : this.typeOf2 }>
                 {
                     value === Missing ? <MissingValue></MissingValue> : value
                 }
@@ -523,13 +523,6 @@ export class DifferenceArray extends DifferenceComposite {
     }
 
 
-    excludeValue (valueProp : 'value1' | 'value2') {
-        super.excludeValue(valueProp)
-
-        this.entries.forEach(comparison => comparison.difference.excludeValue(valueProp))
-    }
-
-
     addComparison (index : number, difference : Difference) {
         this.entries.push(DifferenceArrayEntry.new({ index, difference }))
 
@@ -538,7 +531,7 @@ export class DifferenceArray extends DifferenceComposite {
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) output.push(<diff-array id={ `${ context.stream }-${ this.id }` } same={ this.$same } type={ this.type }></diff-array>)
+        if (context.isContent) output.push(<diff-array id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-array>)
 
         yield* super.renderGen(output, context)
 
@@ -673,7 +666,7 @@ export class DifferenceObject extends DifferenceComposite {
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) output.push(<diff-object id={ `${ context.stream }-${ this.id }` } same={ this.$same } type={ this.type }></diff-object>)
+        if (context.isContent) output.push(<diff-object id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-object>)
 
         yield* super.renderGen(output, context)
 
@@ -710,30 +703,66 @@ export class DifferenceObject extends DifferenceComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class DifferenceSet extends DifferenceReferenceable {
+export class DifferenceSetEntry extends DifferenceCompositeEntry {
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class DifferenceSet extends DifferenceComposite {
     value1          : Set<unknown>
     value2          : Set<unknown>
 
     onlyIn2Size     : number                    = 0
 
+    size            : number            = undefined
+    size2           : number            = undefined
+
     $same           : boolean                   = true
 
-    comparisons     : { difference : Difference }[]     = []
+    entries         : DifferenceSetEntry[]
 
 
-    excludeValue (valueProp : 'value1' | 'value2') {
-        super.excludeValue(valueProp)
+    initialize (props : Partial<DifferenceArray>) {
+        super.initialize(props)
 
-        this.comparisons.forEach(comparison => comparison.difference.excludeValue(valueProp))
+        this.size       = this.value1.size
+        this.size2      = this.value2.size
+    }
+
+
+    getOnlyIn2Size () : number {
+        return this.onlyIn2Size
     }
 
 
     addComparison (difference : Difference) {
-        this.comparisons.push({ difference })
+        this.entries.push(DifferenceSetEntry.new({ difference }))
 
         if (this.$same && !difference.$same) this.$same = false
     }
 
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isContent) output.push(<diff-set id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-set>)
+
+        yield* super.renderGen(output, context)
+
+        if (context.isContent) output.pop()
+    }
+
+
+    renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeHeader(output, context)
+
+        if (context.isContent) output.write(`Set (${ context.contentStream === 'left' ? this.size : this.size2 }) {`)
+    }
+
+
+    renderCompositeFooter (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeFooter(output, context)
+
+        if (context.isContent) output.write('}')
+    }
 
     // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
     //     return <DifferenceTemplateSet

@@ -320,105 +320,85 @@ it('Should render the object diff correctly #7', async t => {
 })
 
 
-// it('Should render the set diff correctly #1', async t => {
-//     const difference2   = compareDeepDiff(new Set([]), new Set([]))
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference2.template())),
-//         [
-//             'Received   │ │ Expected  ',
-//             '           │ │           ',
-//             'Set (0) {} │ │ Set (0) {}',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference2.template())),
-//         stripZws(rendererPlain.render(difference2.template()))
-//     )
-// })
-//
-//
-// it('Should render the set diff correctly #2', async t => {
-//     const difference1   = compareDeepDiff(new Set([ 1, 2 ]), new Set([ 2, 3 ]))
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference1.template())),
-//         [
-//             'Received  │ │ Expected ',
-//             '          │ │          ',
-//             'Set (2) { │ │ Set (2) {',
-//             '  2,      │ │   2,     ',
-//             '  1       │ │   ░      ',
-//             '  ░       │ │   3      ',
-//             '}         │ │ }        ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference1.template())),
-//         stripZws(rendererPlain.render(difference1.template()))
-//     )
-// })
-//
-//
-// it('Should render the set diff correctly #3', async t => {
-//     const difference1   = compareDeepDiff(new Set([ { a : 1 }, { b : 2 } ]), new Set([ { a : 1 }, { c : 3 } ]))
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference1.template())),
-//         [
-//             'Received   │ │ Expected  ',
-//             '           │ │           ',
-//             'Set (2) {  │ │ Set (2) { ',
-//             '  {        │ │   {       ',
-//             '    "a": 1 │ │     "a": 1',
-//             '  },       │ │   },      ',
-//             '  {        │ │   ░       ',
-//             '    "b": 2 │ │           ',
-//             '  }        │ │           ',
-//             '  ░        │ │   {       ',
-//             '           │ │     "c": 3',
-//             '           │ │   }       ',
-//             '}          │ │ }         ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference1.template())),
-//         stripZws(rendererPlain.render(difference1.template()))
-//     )
-// })
-//
-//
-// it('Should render the set diff correctly #4', async t => {
-//     const difference1   = compareDeepDiff(new Set([ [ 1, 2 ] ]), new Set([ [ 3, 4 ] ]))
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference1.template())),
-//         [
-//             'Received  │ │ Expected ',
-//             '          │ │          ',
-//             'Set (1) { │ │ Set (1) {',
-//             '  [       │ │   ░      ',
-//             '    1,    │0│          ',
-//             '    2     │1│          ',
-//             '  ]       │ │          ',
-//             '  ░       │ │   [      ',
-//             '          │0│     3,   ',
-//             '          │1│     4    ',
-//             '          │ │   ]      ',
-//             '}         │ │ }        ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference1.template())),
-//         stripZws(rendererPlain.render(difference1.template()))
-//     )
-// })
-//
-//
+it('Should render the set diff correctly #1', async t => {
+    const difference2   = compareDeepDiff(new Set([]), new Set([]))
+
+    t.is(
+        stripZws(rendererPlain.render(difference2.template())),
+        [
+            'Received   │ │ Expected  ',
+            '           │ │           ',
+            'Set (0) {} │ │ Set (0) {}',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the set diff correctly #2', async t => {
+    const difference1   = compareDeepDiff(new Set([ 1, 2 ]), new Set([ 2, 3 ]))
+
+    t.is(
+        stripZws(rendererPlain.render(difference1.template())),
+        [
+            'Received  │ │ Expected ',
+            '          │ │          ',
+            'Set (2) { │ │ Set (2) {',
+            '  2,      │ │   2,     ',
+            '  1       │ │   ░      ',
+            '  ░       │ │   3      ',
+            '}         │ │ }        ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the set diff correctly #3', async t => {
+    const difference1   = compareDeepDiff(new Set([ { a : 1 }, { b : 2 } ]), new Set([ { a : 1 }, { c : 3 } ]))
+
+    t.is(
+        stripZws(rendererPlain.render(difference1.template())),
+        [
+            'Received   │ │ Expected  ',
+            '           │ │           ',
+            'Set (2) {  │ │ Set (2) { ',
+            '  {        │ │   {       ',
+            '    "a": 1 │ │     "a": 1',
+            '  },       │ │   },      ',
+            '  {        │ │   ░       ',
+            '    "b": 2 │ │           ',
+            '  }        │ │           ',
+            '  ░        │ │   {       ',
+            '           │ │     "c": 3',
+            '           │ │   }       ',
+            '}          │ │ }         ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the set diff correctly #4', async t => {
+    const difference1   = compareDeepDiff(new Set([ [ 1, 2 ] ]), new Set([ [ 3, 4 ] ]))
+
+    t.is(
+        stripZws(rendererPlain.render(difference1.template())),
+        [
+            'Received  │ │ Expected ',
+            '          │ │          ',
+            'Set (1) { │ │ Set (1) {',
+            '  [       │ │   ░      ',
+            '    1,    │0│          ',
+            '    2     │1│          ',
+            '  ]       │ │          ',
+            '  ░       │ │   [      ',
+            '          │0│     3,   ',
+            '          │1│     4    ',
+            '          │ │   ]      ',
+            '}         │ │ }        ',
+        ].join('\n')
+    )
+})
+
+
 // it('Should render the map diff correctly #1', async t => {
 //     const difference0   = compareDeepDiff(new Map([]), new Map([]))
 //
