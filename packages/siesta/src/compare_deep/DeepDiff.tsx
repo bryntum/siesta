@@ -1,6 +1,7 @@
 import { Base } from "../class/Base.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { ArbitraryObject, isAtomicValue, typeOf } from "../util/Helpers.js"
+import { isFunction } from "../util/Typeguards.js"
 import {
     Difference,
     DifferenceArray,
@@ -9,7 +10,7 @@ import {
     DifferenceMap,
     DifferenceObject,
     DifferenceReference,
-    DifferenceReferenceable,
+    DifferenceReferenceable, DifferenceReferenceableAtomic,
     DifferenceSet
 } from "./DeepDiffRendering.js"
 
@@ -267,12 +268,6 @@ export const compareDeepDiff = function (
             value1      : v1,
             value2      : v2,
 
-            content1    : serializeAtomic(v1),
-            content2    : serializeAtomic(v2),
-
-            typeOf1     : diffTypeOf(v1),
-            typeOf2     : diffTypeOf(v2),
-
             $same       : compareAtomic(v1, v2)
         })
     }
@@ -499,7 +494,7 @@ const compareFunctionDeepDiff = function (
     func1 : Function, func2 : Function,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 ) : Difference {
-    const difference = DifferenceReferenceable.new({ value1 : func1, value2 : func2, $same : func1 === func2 })
+    const difference = DifferenceReferenceableAtomic.new({ value1 : func1, value2 : func2, $same : func1 === func2 })
 
     state.markVisited(func1, func2, difference, convertingToDiff)
 
@@ -514,9 +509,10 @@ const compareRegExpDeepDiff = function (
 ) : Difference {
     const regexpProps   = [ 'source', 'dotAll', 'global', 'ignoreCase', 'multiline', 'sticky', 'unicode' ]
 
-    const difference    = DifferenceReferenceable.new({
+    const difference    = DifferenceReferenceableAtomic.new({
         value1  : regexp1,
         value2  : regexp2,
+
         $same   : regexpProps.every(propertyName => regexp1[ propertyName ] === regexp2[ propertyName])
     })
 
@@ -531,7 +527,7 @@ const compareDateDeepDiff = function (
     date1 : Date, date2 : Date,
     options : DeepCompareOptions, state : DeepCompareState, convertingToDiff : 'value1' | 'value2' | undefined
 ) : Difference {
-    const difference = DifferenceReferenceable.new({ value1 : date1, value2 : date2, $same : date1.getTime() === date2.getTime() })
+    const difference = DifferenceReferenceableAtomic.new({ value1 : date1, value2 : date2, $same : date1.getTime() === date2.getTime() })
 
     if (!options.compareDateByValue) state.markVisited(date1, date2, difference, convertingToDiff)
 
@@ -591,7 +587,12 @@ export const comparePrimitiveAndFuzzyMatchers = function (
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export const serializeAtomic = function (v : unknown) : string {
-    if (v === undefined)
+    const type      = typeOf(v)
+
+    if (type === 'RegExp' || type === 'Date' || isFunction(v)) {
+        return String(v)
+    }
+    else if (v === undefined)
         return 'undefined'
     else
         return JSON.stringify(v)

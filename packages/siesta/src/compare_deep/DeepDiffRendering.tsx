@@ -11,7 +11,7 @@ import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
 import { XmlRendererStreaming } from "../jsx/XmlRenderer.js"
 import { luid, LUID } from "../siesta/common/LUID.js"
-import { ArbitraryObjectKey, constructorNameOf, lastElement } from "../util/Helpers.js"
+import { ArbitraryObjectKey, constructorNameOf, lastElement, typeOf } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { Missing, serializeAtomic } from "./DeepDiff.js"
 
@@ -197,11 +197,22 @@ export class DifferenceAtomic extends Difference {
     //     </DifferenceTemplateAtomic>
     // }
 
-    content1        : string | Missing  = undefined
-    content2        : string | Missing  = undefined
+    content1        : string | Missing  = Missing
+    content2        : string | Missing  = Missing
 
     typeOf1         : string            = undefined
     typeOf2         : string            = undefined
+
+
+    initialize (props : Partial<Difference>) {
+        super.initialize(props)
+
+        this.content1       = serializeAtomic(this.value1)
+        this.content2       = serializeAtomic(this.value2)
+
+        this.typeOf1        = typeOf(this.value1)
+        this.typeOf2        = typeOf(this.value2)
+    }
 
 
     excludeValue (valueProp : 'value1' | 'value2') {
@@ -214,13 +225,13 @@ export class DifferenceAtomic extends Difference {
     }
 
 
-    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+    * renderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         const stream        = context.stream
 
         if (context.isContent) {
             const value     = stream === 'left' ? this.content1 : this.content2
 
-            output.write(<diff-atomic same={ this.same } type={ this.type } class={ stream === 'left' ? this.typeOf1 : this.typeOf2 }>
+            output.write(<diff-atomic same={ this.same } type={ this.type }>
                 {
                     value === Missing ? <MissingValue></MissingValue> : value
                 }
@@ -231,70 +242,75 @@ export class DifferenceAtomic extends Difference {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class DifferenceReferenceable extends Difference {
-    // these properties contain the "reference id" (rendered as <ref *1>) - the id, other
-    // data can reference to (rendered as [Circular *1]
-    refId1          : number            = undefined
-    refId2          : number            = undefined
+export class DifferenceReferenceable extends Mixin(
+    [ Difference ],
+    (base : ClassUnion<typeof Difference>) =>
 
-    // these properties contain the reference id, when the same data structure
-    // is traversed several times, because the other side has a cycle of different
-    // structure, in such case this repeated traversal is indicated with
-    // <circular *1>
-    circular1       : number            = undefined
-    circular2       : number            = undefined
+    class DifferenceReferenceable extends base {
+        // these properties contain the "reference id" (rendered as <ref *1>) - the id, other
+        // data can reference to (rendered as [Circular *1]
+        refId1          : number            = undefined
+        refId2          : number            = undefined
+
+        // these properties contain the reference id, when the same data structure
+        // is traversed several times, because the other side has a cycle of different
+        // structure, in such case this repeated traversal is indicated with
+        // <circular *1>
+        circular1       : number            = undefined
+        circular2       : number            = undefined
 
 
-    renderReferenceablePrefix (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
-        const circularId    = this.getCircularId(context)
+        renderReferenceablePrefix (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+            const circularId    = this.getCircularId(context)
 
-        if (circularId !== undefined)
-            output.write(<span class="circular-id">{ `<circular *${ circularId }> ` }</span>)
-        else {
-            const refId     = this.getRefId(context)
+            if (circularId !== undefined)
+                output.write(<span class="circular-id">{ `<circular *${ circularId }> ` }</span>)
+            else {
+                const refId     = this.getRefId(context)
 
-            if (refId !== undefined) output.write(<span class="reference-id">{ `<ref *${ refId }> ` }</span>)
+                if (refId !== undefined) output.write(<span class="reference-id">{ `<ref *${ refId }> ` }</span>)
+            }
+        }
+
+
+        getCircularId (context : DifferenceRenderingContext) : number {
+            return context.stream === 'left' ? this.circular1 : this.circular2
+        }
+
+
+        getRefId (context : DifferenceRenderingContext) : number {
+            return context.stream === 'left' ? this.refId1 : this.refId2
+        }
+
+
+        * beforeRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+            if (context.isContent) this.renderReferenceablePrefix(output, context)
+
+            yield* super.beforeRenderContentGen(output, context)
         }
     }
+){}
 
 
-    getCircularId (context : DifferenceRenderingContext) : number {
-        return context.stream === 'left' ? this.circular1 : this.circular2
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class DifferenceReferenceableAtomic extends Mixin(
+    // unordered mixins combination! order of clashing methods is not defined
+    [ DifferenceReferenceable, DifferenceAtomic ],
+    (base : ClassUnion<typeof DifferenceReferenceable, typeof DifferenceAtomic>) =>
+
+    class DifferenceReferenceableAtomic extends base {
+
+        // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
+        //     return <DifferenceTemplateReferenceableAtomic
+        //         type={ this.type } same={ this.same } refId={ this.refId1 } refId2={ this.refId2 }
+        //         circular1 = { this.circular1 } circular2 = { this.circular2 }
+        //     >
+        //         { this.value1 === Missing ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(this.value1) }
+        //         { this.value2 === Missing ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(this.value2) }
+        //     </DifferenceTemplateReferenceableAtomic>
+        // }
     }
-
-
-    getRefId (context : DifferenceRenderingContext) : number {
-        return context.stream === 'left' ? this.refId1 : this.refId2
-    }
-
-
-    * beforeRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) this.renderReferenceablePrefix(output, context)
-
-        yield* super.beforeRenderContentGen(output, context)
-    }
-}
-
-
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// export class DifferenceReferenceableAtomic extends Mixin(
-//     // unordered mixins combination! order of clashing methods is not defined
-//     [ DifferenceReferenceable, DifferenceAtomic ],
-//     (base : ClassUnion<typeof DifferenceReferenceable, typeof DifferenceAtomic>) =>
-//
-//     class DifferenceReferenceableAtomic extends base {
-//
-//         // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-//         //     return <DifferenceTemplateReferenceableAtomic
-//         //         type={ this.type } same={ this.same } refId={ this.refId1 } refId2={ this.refId2 }
-//         //         circular1 = { this.circular1 } circular2 = { this.circular2 }
-//         //     >
-//         //         { this.value1 === Missing ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(this.value1) }
-//         //         { this.value2 === Missing ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(this.value2) }
-//         //     </DifferenceTemplateReferenceableAtomic>
-//         // }
-//     }
-// ){}
+){}
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -654,7 +670,13 @@ export class DifferenceObject extends DifferenceComposite {
     renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
         super.renderCompositeHeader(output, context)
 
-        if (context.isContent) output.write('{')
+        if (context.isContent) {
+            const className     = context.contentStream === 'left' ? this.constructorName : this.constructorName2
+
+            if (className && className !== 'Object') output.write(className + ' ')
+
+            output.write('{')
+        }
     }
 
 
@@ -714,8 +736,8 @@ export class DifferenceSet extends DifferenceComposite {
 
     onlyIn2Size     : number                    = 0
 
-    size            : number            = undefined
-    size2           : number            = undefined
+    size            : number                    = undefined
+    size2           : number                    = undefined
 
     $same           : boolean                   = true
 
@@ -782,32 +804,98 @@ export class DifferenceSet extends DifferenceComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class DifferenceMap extends DifferenceReferenceable {
+export class DifferenceMapEntry extends DifferenceCompositeEntry {
+    differenceKeys          : Difference        = undefined
+
+    '---'
+
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isContent && this.isMissingIn(context.contentStream)) {
+            output.write(<MissingValue></MissingValue>)
+        } else {
+            if (context.isContent && !this.isMissingIn(context.contentStream)) {
+                output.push(<diff-map-key></diff-map-key>)
+
+                yield* this.differenceKeys.renderGen(output, context)
+
+                output.pop()
+
+                output.write(' => ')
+            } else {
+                yield* this.differenceKeys.renderGen(output, context)
+            }
+
+            yield* super.renderGen(output, context)
+        }
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class DifferenceMap extends DifferenceComposite {
     value1          : Map<unknown, unknown>
     value2          : Map<unknown, unknown>
+
+    size            : number                    = undefined
+    size2           : number                    = undefined
 
     onlyIn2Size     : number                    = 0
 
     $same           : boolean                   = true
 
-    comparisons     : { differenceKeys : Difference, differenceValues : Difference }[]     = []
+    entries         : DifferenceMapEntry[]
+
+
+    initialize (props : Partial<DifferenceArray>) {
+        super.initialize(props)
+
+        this.size       = this.value1.size
+        this.size2      = this.value2.size
+    }
+
+
+    getOnlyIn2Size () : number {
+        return this.onlyIn2Size
+    }
 
 
     excludeValue (valueProp : 'value1' | 'value2') {
         super.excludeValue(valueProp)
 
-        this.comparisons.forEach(comparison => {
-            comparison.differenceKeys.excludeValue(valueProp)
-            comparison.differenceValues.excludeValue(valueProp)
-        })
+        this.entries.forEach(entry => entry.differenceKeys.excludeValue(valueProp))
     }
 
 
-    addComparison (differenceKeys : Difference, differenceValues : Difference) {
-        this.comparisons.push({ differenceKeys, differenceValues })
+    addComparison (differenceKeys : Difference, difference : Difference) {
+        this.entries.push(DifferenceMapEntry.new({ differenceKeys, difference }))
 
-        if (this.$same && (!differenceKeys.$same || !differenceValues.$same)) this.$same = false
+        if (this.$same && (!differenceKeys.$same || !difference.$same)) this.$same = false
     }
+
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isContent) output.push(<diff-map id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-map>)
+
+        yield* super.renderGen(output, context)
+
+        if (context.isContent) output.pop()
+    }
+
+
+    renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeHeader(output, context)
+
+        if (context.isContent) output.write(`Map (${ context.contentStream === 'left' ? this.size : this.size2 }) {`)
+    }
+
+
+    renderCompositeFooter (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeFooter(output, context)
+
+        if (context.isContent) output.write('}')
+    }
+
 
 
     // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
