@@ -185,6 +185,27 @@ const compareDifferences = (difference1 : Difference, difference2 : Difference) 
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceWrapper' })
+export class DifferenceWrapper extends Difference {
+    difference      : Difference        = undefined
+
+    '---'
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        output.push(<diff-entry same={ this.difference.same } type={ this.difference.type }></diff-entry>)
+
+        yield DifferenceRenderingSyncPoint.new({ type : 'before' })
+
+        yield* this.difference.renderGen(output, context)
+
+        yield DifferenceRenderingSyncPoint.new({ type : 'after' })
+
+        output.pop()
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceAtomic' })
 export class DifferenceAtomic extends Difference {
 
@@ -1143,7 +1164,6 @@ export class JsonDeepDiffElement extends Mixin(
             rightCanvas.writePlain('Expected')
 
             renderers.forEach(renderer => {
-                renderer.canvas.newLine()
                 renderer.canvas.newLine()
             })
 

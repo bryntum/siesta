@@ -359,6 +359,6 @@ const prependZeros = (num : number) : string => {
 }
 
 
-const dateToString = (date : Date) : string => {
+export const dateToString = (date : Date) : string => {
     return `new Date("${ date.getFullYear() }/${ prependZeros(date.getMonth()) }/${ prependZeros(date.getDate()) } ${ prependZeros(date.getHours()) }:${ prependZeros(date.getMinutes()) }:${ prependZeros(date.getSeconds()) }.${ date.getMilliseconds() }")`
 }

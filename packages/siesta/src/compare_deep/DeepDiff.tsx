@@ -1,7 +1,9 @@
 import { Base } from "../class/Base.js"
 import { TextJSX } from "../jsx/TextJSX.js"
+import { dateToString } from "../serializer/SerializerXml.js"
 import { ArbitraryObject, isAtomicValue, typeOf } from "../util/Helpers.js"
-import { isFunction } from "../util/Typeguards.js"
+import { isDate, isFunction } from "../util/Typeguards.js"
+import { FuzzyMatcher } from "./DeepDiffFuzzyMatcher.js"
 import {
     Difference,
     DifferenceArray,
@@ -11,7 +13,7 @@ import {
     DifferenceObject,
     DifferenceReference,
     DifferenceReferenceable, DifferenceReferenceableAtomic,
-    DifferenceSet
+    DifferenceSet, DifferenceWrapper
 } from "./DeepDiffRendering.js"
 
 
@@ -29,7 +31,7 @@ const diffTypeOf        = (a : unknown) : string => 'diff-' + typeOf(a).toLowerC
 export const valueAsDifference = (value : unknown, valueProp : 'value1' | 'value2', options : DeepCompareOptions, state : DeepCompareState) : Difference => {
     if (value === Missing) value = MissingInternal
 
-    const difference = compareDeepDiff(value, value, options, state, valueProp)
+    const difference = compareDeepDiffImpl(value, value, options, state, valueProp)
 
     difference.excludeValue(valueProp === 'value1' ? 'value2' : 'value1')
 
@@ -130,11 +132,22 @@ export const equalDeep = (
     v2          : unknown,
     options     : DeepCompareOptions    = defaultDeepCompareOptions
 ) : boolean =>
-    compareDeepDiff(v1, v2, options).$same
+    compareDeepDiffImpl(v1, v2, options).$same
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const compareDeepDiff = function (
+export const compareDeepDiff = (
+    v1                  : unknown,
+    v2                  : unknown,
+    options             : DeepCompareOptions    = defaultDeepCompareOptions
+)
+    : Difference =>
+    DifferenceWrapper.new({
+        difference      : compareDeepDiffImpl(v1, v2, options)
+    })
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const compareDeepDiffImpl = function (
     v1                  : unknown,
     v2                  : unknown,
     options             : DeepCompareOptions    = defaultDeepCompareOptions,
@@ -289,7 +302,7 @@ const compareArrayDeepDiff = function (
     state.markVisited(array1, array2, difference, convertingToDiff)
 
     for (let i = 0; i < minLength; i++) {
-        const diff      = compareDeepDiff(array1[ i ], array2[ i ], options, state, convertingToDiff)
+        const diff      = compareDeepDiffImpl(array1[ i ], array2[ i ], options, state, convertingToDiff)
 
         difference.addComparison(i, diff)
     }
@@ -329,7 +342,7 @@ const compareKeys = function <K, V>(
             common.push({
                 el1             : item1,
                 el2             : item1,
-                difference      : compareStructurally ? compareDeepDiff(item1, item1, options, state, convertingToDiff) : null
+                difference      : compareStructurally ? compareDeepDiffImpl(item1, item1, options, state, convertingToDiff) : null
             })
             onlyIn2.delete(item1)
         }
@@ -338,7 +351,7 @@ const compareKeys = function <K, V>(
         else if (compareStructurally && !isAtomicValue(item1) && Array.from(onlyIn2).some(item2 => {
             const innerState    = state.in()
 
-            const difference    = compareDeepDiff(item1, item2, options, innerState, convertingToDiff)
+            const difference    = compareDeepDiffImpl(item1, item2, options, innerState, convertingToDiff)
             const equal         = difference.$same
 
             if (equal) {
@@ -401,7 +414,7 @@ const compareMapDeepDiff = function (
 
     common.forEach(commonEntry => difference.addComparison(
         commonEntry.difference,
-        compareDeepDiff(map1.get(commonEntry.el1), map2.get(commonEntry.el2), options, state, convertingToDiff)
+        compareDeepDiffImpl(map1.get(commonEntry.el1), map2.get(commonEntry.el2), options, state, convertingToDiff)
     ))
 
     onlyIn1.forEach(el1 =>
@@ -442,7 +455,7 @@ const compareObjectDeepDiff = function (
         const key1      = common[ i ].el1
         const key2      = common[ i ].el2
 
-        const diff      = compareDeepDiff(object1[ key1 ], object2[ key2 ], options, state, convertingToDiff)
+        const diff      = compareDeepDiffImpl(object1[ key1 ], object2[ key2 ], options, state, convertingToDiff)
 
         difference.addComparison(key1, diff)
     }
@@ -477,7 +490,7 @@ const compareErrorDeepDiff = function (
         const key1      = common[ i ].el1
         const key2      = common[ i ].el2
 
-        const diff      = compareDeepDiff(object1[ key1 ], object2[ key2 ], options, state, convertingToDiff)
+        const diff      = compareDeepDiffImpl(object1[ key1 ], object2[ key2 ], options, state, convertingToDiff)
 
         difference.addComparison(key1, diff)
     }
@@ -547,15 +560,15 @@ const compareFuzzyMatchersDeepDiff = function (
 )
     : Difference | undefined
 {
-    // const v1IsMatcher   = v1 instanceof FuzzyMatcher
-    // const v2IsMatcher   = v2 instanceof FuzzyMatcher
-    //
-    // if (v1IsMatcher && !v2IsMatcher) {
-    //     return (v1 as FuzzyMatcher).equalsToDiff(v2, false, options, state, convertingToDiff)
-    // }
-    // else if (v2IsMatcher && !v1IsMatcher) {
-    //     return (v2 as FuzzyMatcher).equalsToDiff(v1, true, options, state, convertingToDiff)
-    // }
+    const v1IsMatcher   = v1 instanceof FuzzyMatcher
+    const v2IsMatcher   = v2 instanceof FuzzyMatcher
+
+    if (v1IsMatcher && !v2IsMatcher) {
+        return (v1 as FuzzyMatcher).equalsToDiff(v2, false, options, state, convertingToDiff)
+    }
+    else if (v2IsMatcher && !v1IsMatcher) {
+        return (v2 as FuzzyMatcher).equalsToDiff(v1, true, options, state, convertingToDiff)
+    }
 
     return undefined
 }
@@ -589,8 +602,17 @@ export const comparePrimitiveAndFuzzyMatchers = function (
 export const serializeAtomic = function (v : unknown) : string {
     const type      = typeOf(v)
 
-    if (type === 'RegExp' || type === 'Date' || isFunction(v)) {
+    if (type === 'RegExp') {
         return String(v)
+    }
+    else if (v instanceof FuzzyMatcher) {
+        return v.toString()
+    }
+    else if (isDate(v)) {
+        return dateToString(v)
+    }
+    else if (isFunction(v)) {
+        return `[${ type }]`
     }
     else if (v === undefined)
         return 'undefined'

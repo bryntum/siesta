@@ -1,5 +1,6 @@
 import { it } from "../../index.js"
 import { compareDeepDiff } from "../../src/compare_deep/DeepDiff.js"
+import { any, anyInstanceOf, anyNumberApprox, anyStringLike } from "../../src/compare_deep/DeepDiffFuzzyMatcher.js"
 import { XmlRendererDifference } from "../../src/compare_deep/DeepDiffRendering.js"
 
 const rendererPlain     = XmlRendererDifference.new({})
@@ -793,235 +794,164 @@ it('Should render the diff of Date correctly #1', async t => {
 })
 
 
-// it('Should render the diff with empty array correctly', async t => {
-//     const a = {
-//         "descriptor": {
-//             "parentNode": undefined
-//         }
-//     }
-//
-//     const b = {
-//         "descriptor": {
-//             "tags": [],
-//             "isTodo": false
-//         }
-//     }
-//
-//     const difference0   = compareDeepDiff(a, b)
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received                    │ │ Expected           ',
-//             '                            │ │                    ',
-//             '{                           │ │ {                  ',
-//             '  "descriptor": {           │ │   "descriptor": {  ',
-//             '    "parentNode": undefined │ │     ░              ',
-//             '    ░                       │ │     "tags": [],    ',
-//             '    ░                       │ │     "isTodo": false',
-//             '  }                         │ │   }                ',
-//             '}                           │ │ }                  ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the colored diff in the same way as non-colored #1', async t => {
-//     const a = {
-//         "descriptor": {
-//             "parentNode": undefined,
-//             "childNodes": undefined
-//         }
-//     }
-//
-//     const b = {
-//         "descriptor": {
-//             "parentNode": {
-//                 "url": "."
-//             },
-//             "childNodes": undefined
-//         }
-//     }
-//
-//     const difference0   = compareDeepDiff(a, b)
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff with number matcher correctly #1', async t => {
-//     const difference0   = compareDeepDiff({ a : 10 }, { a : anyNumberApprox(10, { threshold : 1 }) })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received  │ │ Expected   ',
-//             '          │ │            ',
-//             '{         │ │ {          ',
-//             '  "a": 10 │ │   "a": 10±1',
-//             '}         │ │ }          ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff with number matcher correctly #2', async t => {
-//     const difference0   = compareDeepDiff({ a : 10 }, { a : anyNumberApprox(10, { percent : 3 }) })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received  │ │ Expected    ',
-//             '          │ │             ',
-//             '{         │ │ {           ',
-//             '  "a": 10 │ │   "a": 10±3%',
-//             '}         │ │ }           ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff with number matcher correctly #3', async t => {
-//     const difference0   = compareDeepDiff({ a : 10.12 }, { a : anyNumberApprox(10.1234, { digits : 2 }) })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received     │ │ Expected      ',
-//             '             │ │               ',
-//             '{            │ │ {             ',
-//             '  "a": 10.12 │ │   "a": 10.12xx',
-//             '}            │ │ }             ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff with string matcher correctly #1', async t => {
-//     const difference0   = compareDeepDiff({ a : 'foobar' }, { a : anyStringLike(/FOO/i) })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received        │ │ Expected                         ',
-//             '                │ │                                  ',
-//             '{               │ │ {                                ',
-//             '  "a": "foobar" │ │   "a": any string matching /FOO/i',
-//             '}               │ │ }                                ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff with string matcher correctly #2', async t => {
-//     const difference0   = compareDeepDiff({ a : 'foobar' }, { a : anyStringLike('oob') })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received        │ │ Expected                          ',
-//             '                │ │                                   ',
-//             '{               │ │ {                                 ',
-//             '  "a": "foobar" │ │   "a": any string containing "oob"',
-//             '}               │ │ }                                 ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff with "anyInstanceOf" matcher correctly #1', async t => {
-//     const difference0   = compareDeepDiff({ a : 'foobar' }, { a : anyInstanceOf(String) })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received        │ │ Expected           ',
-//             '                │ │                    ',
-//             '{               │ │ {                  ',
-//             '  "a": "foobar" │ │   "a": any [String]',
-//             '}               │ │ }                  ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff with "anyInstanceOf" matcher correctly #2', async t => {
-//     class MyClass {}
-//
-//     const difference0   = compareDeepDiff({ a : new MyClass() }, { a : any(MyClass) })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received          │ │ Expected            ',
-//             '                  │ │                     ',
-//             '{                 │ │ {                   ',
-//             '  "a": MyClass {} │ │   "a": any [MyClass]',
-//             '}                 │ │ }                   ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
-//
-//
-// it('Should render the diff with "any" matcher correctly #1', async t => {
-//     const difference0   = compareDeepDiff({ a : 123 }, { a : any() })
-//
-//     t.is(
-//         stripZws(rendererPlain.render(difference0.template())),
-//         [
-//             'Received   │ │ Expected  ',
-//             '           │ │           ',
-//             '{          │ │ {         ',
-//             '  "a": 123 │ │   "a": any',
-//             '}          │ │ }         ',
-//         ].join('\n')
-//     )
-//
-//     t.is(
-//         stripAnsiControlCharacters(rendererNodejs.render(difference0.template())),
-//         stripZws(rendererPlain.render(difference0.template()))
-//     )
-// })
+it('Should render the diff with empty array correctly', async t => {
+    const a = {
+        "descriptor": {
+            "parentNode": undefined
+        }
+    }
+
+    const b = {
+        "descriptor": {
+            "tags": [],
+            "isTodo": false
+        }
+    }
+
+    const difference0   = compareDeepDiff(a, b)
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received                    │ │ Expected           ',
+            '                            │ │                    ',
+            '{                           │ │ {                  ',
+            '  "descriptor": {           │ │   "descriptor": {  ',
+            '    "parentNode": undefined │ │     ░              ',
+            '    ░                       │ │     "tags": [],    ',
+            '    ░                       │ │     "isTodo": false',
+            '  }                         │ │   }                ',
+            '}                           │ │ }                  ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with number matcher correctly #1', async t => {
+    const difference0   = compareDeepDiff({ a : 10 }, { a : anyNumberApprox(10, { threshold : 1 }) })
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received  │ │ Expected   ',
+            '          │ │            ',
+            '{         │ │ {          ',
+            '  "a": 10 │ │   "a": 10±1',
+            '}         │ │ }          ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with number matcher correctly #2', async t => {
+    const difference0   = compareDeepDiff({ a : 10 }, { a : anyNumberApprox(10, { percent : 3 }) })
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received  │ │ Expected    ',
+            '          │ │             ',
+            '{         │ │ {           ',
+            '  "a": 10 │ │   "a": 10±3%',
+            '}         │ │ }           ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with number matcher correctly #3', async t => {
+    const difference0   = compareDeepDiff({ a : 10.12 }, { a : anyNumberApprox(10.1234, { digits : 2 }) })
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received     │ │ Expected      ',
+            '             │ │               ',
+            '{            │ │ {             ',
+            '  "a": 10.12 │ │   "a": 10.12xx',
+            '}            │ │ }             ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with string matcher correctly #1', async t => {
+    const difference0   = compareDeepDiff({ a : 'foobar' }, { a : anyStringLike(/FOO/i) })
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received        │ │ Expected                         ',
+            '                │ │                                  ',
+            '{               │ │ {                                ',
+            '  "a": "foobar" │ │   "a": any string matching /FOO/i',
+            '}               │ │ }                                ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with string matcher correctly #2', async t => {
+    const difference0   = compareDeepDiff({ a : 'foobar' }, { a : anyStringLike('oob') })
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received        │ │ Expected                          ',
+            '                │ │                                   ',
+            '{               │ │ {                                 ',
+            '  "a": "foobar" │ │   "a": any string containing "oob"',
+            '}               │ │ }                                 ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with "anyInstanceOf" matcher correctly #1', async t => {
+    const difference0   = compareDeepDiff({ a : 'foobar' }, { a : anyInstanceOf(String) })
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received        │ │ Expected           ',
+            '                │ │                    ',
+            '{               │ │ {                  ',
+            '  "a": "foobar" │ │   "a": any [String]',
+            '}               │ │ }                  ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with "anyInstanceOf" matcher correctly #2', async t => {
+    class MyClass {}
+
+    const difference0   = compareDeepDiff({ a : new MyClass() }, { a : any(MyClass) })
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received          │ │ Expected            ',
+            '                  │ │                     ',
+            '{                 │ │ {                   ',
+            '  "a": MyClass {} │ │   "a": any [MyClass]',
+            '}                 │ │ }                   ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with "any" matcher correctly #1', async t => {
+    const difference0   = compareDeepDiff({ a : 123 }, { a : any() })
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received   │ │ Expected  ',
+            '           │ │           ',
+            '{          │ │ {         ',
+            '  "a": 123 │ │   "a": any',
+            '}          │ │ }         ',
+        ].join('\n')
+    )
+})
