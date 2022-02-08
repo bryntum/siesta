@@ -390,9 +390,9 @@ export class DifferenceComposite extends DifferenceReferenceable {
             if (context.isContent && hasInner) output.push(<diff-inner class="indented"></diff-inner>)
             if (context.isExpander && hasInner) output.push(
                 <diff-expander-inner>
-                    {/*<diff-expander-line></diff-expander-line>*/}
                     {
                         !suppressSyncPoints && <diff-expander-controls>
+                            <diff-expander-line></diff-expander-line>
                             <diff-expander-opener></diff-expander-opener>
                             <diff-expander-closer></diff-expander-closer>
                         </diff-expander-controls>
