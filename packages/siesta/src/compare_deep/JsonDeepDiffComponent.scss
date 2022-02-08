@@ -3,7 +3,7 @@
 
 $contour : #d4d4d4;
 $contour_active : #9c9c9c;
-
+$body_background_color: #fefefe;
 
 .json-deep-diff {
     display: flex;
@@ -130,85 +130,163 @@ diff-entry {
     display: block;
 }
 
-
-diff-expander {
+diff-expander-inner {
     display: block;
     position: relative;
 
-    --control-width: 1ch;
-
-    &:hover {
-        & diff-expander-line {
-            display: none;
-        }
-
-        & > diff-expander-line {
-            display: block;
-        }
-    }
-
-
-    & diff-expander-line {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-
-        border-right: 1px solid;
-
-        border-right-color: $contour;
-    }
-
     & > diff-expander-controls {
         position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-
-        &:hover {
-            & > diff-expander-opener, & > diff-expander-closer {
-                color: $contour_active;
-                right: calc(-1 * var(--control-width) / 2);
-            }
-
-            border-right: 1px solid $contour_active;
-        }
 
         & > diff-expander-opener, & > diff-expander-closer {
             font-family: 'Font Awesome 5 Free';
             font-weight: 400;
-            font-size: 0.6em;
             position: absolute;
+            width: 100%;
+            height: 1.5em;
+
+            left: 0;
+
             color: $contour;
             cursor: pointer;
-            right: calc(-1 * var(--control-width) / 2 + 1px);
+
+            &:after {
+                font-size: 0.6em;
+                position: absolute;
+                right: calc(-1 * var(--control-width) / 2 + 1px);
+            }
 
             &:before {
+                font-size: 0.6em;
+                position: absolute;
+
                 font-weight: 900;
                 content: "\f0c8";
-                position: absolute;
-                left: 0;
-                top: 0;
+
+                right: calc(-1 * var(--control-width) / 2 + 1px);
+
                 z-index: -1;
                 // TODO, IMPORTANT: should match the widget's background-color
                 // this is to hide the border
-                color: #fefefe;
+                color: $body_background_color;
             }
             z-index: 1;
         }
 
         & > diff-expander-opener {
-            top: 0;
+            top: -1.5em;
             &:after {
                 content: "\f146";
             }
         }
 
         & > diff-expander-closer {
-            bottom: 0;
+            bottom: -1.5em;
             &:after {
                 content: "\f146";
             }
         }
     }
+
+
+    //& diff-expander-line {
+    //    position: absolute;
+    //    top: 0;
+    //    left: 0;
+    //
+    //    width: 100%;
+    //    height: 100%;
+    //
+    //    border-right: 1px solid;
+    //    border-right-color: $contour;
+    //}
+}
+
+diff-expander {
+    //display: block;
+    position: relative;
+
+    --control-width: 1ch;
+
+    & .diff-collapsed {
+        position: unset;
+    }
+
+    //&:hover {
+    //    & diff-expander-line {
+    //        display: none;
+    //    }
+    //
+    //    & > diff-expander-line {
+    //        display: block;
+    //    }
+    //}
+
+
+    //& diff-expander-line {
+    //    position: absolute;
+    //    width: 100%;
+    //    height: 100%;
+    //
+    //    border-right: 1px solid;
+    //
+    //    border-right-color: $contour;
+    //}
+
+    //& > diff-expander-controls {
+    //    position: absolute;
+    //    width: 100%;
+    //    height: 100%;
+    //
+    //    &:hover {
+    //        & > diff-expander-opener, & > diff-expander-closer {
+    //            color: $contour_active;
+    //            right: calc(-1 * var(--control-width) / 2);
+    //        }
+    //
+    //        border-right: 1px solid $contour_active;
+    //    }
+    //
+    //    & > diff-expander-opener, & > diff-expander-closer {
+    //        font-family: 'Font Awesome 5 Free';
+    //        font-weight: 400;
+    //        font-size: 0.6em;
+    //        position: absolute;
+    //        color: $contour;
+    //        cursor: pointer;
+    //        right: calc(-1 * var(--control-width) / 2 + 1px);
+    //
+    //        &:before {
+    //            font-weight: 900;
+    //            content: "\f0c8";
+    //            position: absolute;
+    //            left: 0;
+    //            top: 0;
+    //            z-index: -1;
+    //            // TODO, IMPORTANT: should match the widget's background-color
+    //            // this is to hide the border
+    //            color: #fefefe;
+    //        }
+    //        z-index: 1;
+    //    }
+    //
+    //    & > diff-expander-opener {
+    //        top: 0;
+    //        &:after {
+    //            content: "\f146";
+    //        }
+    //    }
+    //
+    //    & > diff-expander-closer {
+    //        bottom: 0;
+    //        &:after {
+    //            content: "\f146";
+    //        }
+    //    }
+    //}
 }
 
 // in 2022, conditional CSS is still actual
@@ -221,19 +299,68 @@ diff-expander {
 }
 
 
-.diff-entry-collapsed {
-    height: 1.5em !important;
+//.diff-entry-collapsed {
+//    //height: 1.5em !important;
+//
+//    & > diff-expander > diff-expander-inner > diff-expander-controls {
+//        & > diff-expander-opener {
+//            &:after {
+//                content: "\f0fe";
+//            }
+//        }
+//
+//        & > diff-expander-closer {
+//            display: none;
+//        }
+//    }
+//}
 
-    & > diff-expander > diff-expander-controls {
-        & > diff-expander-opener {
-            &:after {
-                content: "\f0fe";
-            }
-        }
+.json-deep-diff-expander .json-deep-diff-content-root > diff-entry > diff-expander.diff-collapsed {
+    display: block;
+}
 
-        & > diff-expander-closer {
-            display: none;
-        }
+.json-deep-diff-expander .diff-collapsed {
+    //display: block;
+    z-index: 0;
+
+    &:before {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: $body_background_color;
+        font-size: 0.6em;
+        content: "\f0c8";
+        position: absolute;
+        //right: calc(-0.5ch + 1px);
+        right: calc(-1 * var(--control-width) / 2 + 1px);
+        z-index: 0;
+    }
+
+    &:after {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 400;
+        color: $contour;
+        font-size: 0.6em;
+        content: "\f0fe";
+        position: absolute;
+        //right: calc(-0.5ch + 1px);
+        right: calc(-1 * var(--control-width) / 2 + 1px);
+        z-index: 2;
+    }
+
+    & > diff-expander-inner {
+
+        //& > diff-expander-controls {
+        //    & > diff-expander-opener {
+        //        &:after {
+        //            content: "\f0fe";
+        //        }
+        //    }
+        //
+        //    & > diff-expander-closer {
+        //        display: none;
+        //    }
+        //}
+        display: none;
     }
 }
 

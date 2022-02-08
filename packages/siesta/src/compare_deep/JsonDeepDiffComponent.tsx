@@ -126,7 +126,20 @@ export class JsonDeepDiffComponent extends Mixin(
                 const middleEl  = document.getElementById(`middle-${ diffId }`);
 
                 [ expander, leftEl, middleEl, rightEl ].forEach(el => {
-                    (el.closest('diff-entry') || el.parentElement).classList.toggle('diff-entry-collapsed')
+                    // (el.closest('diff-entry') || el.parentElement).classList.toggle('diff-entry-collapsed')
+                    el.classList.toggle('diff-collapsed')
+                })
+            }
+            else if (target.matches('.diff-collapsed')) {
+                const expander  = target
+                const diffId    = /expander-(\d+)/.exec(expander.id)[ 1 ]
+
+                const leftEl    = document.getElementById(`left-${ diffId }`)
+                const rightEl   = document.getElementById(`right-${ diffId }`)
+                const middleEl  = document.getElementById(`middle-${ diffId }`);
+
+                [ expander, leftEl, middleEl, rightEl ].forEach(el => {
+                    // (el.closest('diff-entry') || el.parentElement).classList.toggle('diff-entry-collapsed')
                     el.classList.toggle('diff-collapsed')
                 })
             }

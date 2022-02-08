@@ -346,11 +346,11 @@ export class DifferenceComposite extends DifferenceReferenceable {
         if (context.isExpander) {
             output.push(
                 <diff-expander id={ `${ context.stream }-${ this.id }` }>
-                    <diff-expander-line></diff-expander-line>
-                    <diff-expander-controls>
-                        <diff-expander-opener></diff-expander-opener>
-                        <diff-expander-closer></diff-expander-closer>
-                    </diff-expander-controls>
+                    {/*<diff-expander-line></diff-expander-line>*/}
+                    {/*<diff-expander-controls>*/}
+                    {/*    <diff-expander-opener></diff-expander-opener>*/}
+                    {/*    <diff-expander-closer></diff-expander-closer>*/}
+                    {/*</diff-expander-controls>*/}
                 </diff-expander>
             )
         } else if (context.isMiddle) {
@@ -388,6 +388,17 @@ export class DifferenceComposite extends DifferenceReferenceable {
             this.renderCompositeHeader(output, context)
 
             if (context.isContent && hasInner) output.push(<diff-inner class="indented"></diff-inner>)
+            if (context.isExpander && hasInner) output.push(
+                <diff-expander-inner>
+                    {/*<diff-expander-line></diff-expander-line>*/}
+                    {
+                        !suppressSyncPoints && <diff-expander-controls>
+                            <diff-expander-opener></diff-expander-opener>
+                            <diff-expander-closer></diff-expander-closer>
+                        </diff-expander-controls>
+                    }
+                </diff-expander-inner>
+            )
 
             for (let i = 0; i < this.entries.length; i++) {
                 const entry     = this.entries[ i ]
@@ -411,6 +422,7 @@ export class DifferenceComposite extends DifferenceReferenceable {
             }
 
             if (context.isContent && hasInner) output.pop()
+            if (context.isExpander && hasInner) output.pop()
 
             this.renderCompositeFooter(output, context)
         }
@@ -1134,6 +1146,7 @@ export class JsonDeepDiffElement extends Mixin(
             // we have to render the middle stream twice, this first render pass
             // provides us with its max width, so we can calculate the width available
             // for left/right streams
+            // middle stream might be empty, set the min width to 1
             const middleAreaMaxWidth    = Math.max(this.getMiddleAreaMaxWidth(context), 1)
 
             // the wrapper for content in the middle stream ` |CONTENT| ` is 4 chars length
