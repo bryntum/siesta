@@ -1026,8 +1026,11 @@ export class DifferenceHeterogeneous extends Difference {
 
             if (difference === Missing)
                 output.write(<MissingValue></MissingValue>)
-            else
+            else {
+                output.push(<diff-hetero></diff-hetero>)
                 yield* difference.renderGen(output, context)
+                output.pop()
+            }
         }
     }
 
