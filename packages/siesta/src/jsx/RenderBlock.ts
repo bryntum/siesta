@@ -156,14 +156,8 @@ export type RGBColor = [ number, number, number ]
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// the string, colored with ANSI escape sequences, may have different "actual" and "printable" lengths
-// so we need to track the "printable" length separately
 export class Style extends Base {
     block               : XmlRenderBlock        = undefined
-
-    // `undefined` means - look at the parent
-    // any other value (including `null`) means - the value computed
-    // `null` means - value computed, not set
 
     $colorer            : Colorer               = undefined
 
@@ -179,11 +173,15 @@ export class Style extends Base {
         const color     = this.color
         if (color) c = c.rgb(color[ 0 ], color[ 1 ], color[ 2 ])
 
-        const bgColor     = this.backgroundColor
+        const bgColor   = this.backgroundColor
         if (bgColor) c = c.bgRgb(bgColor[ 0 ], bgColor[ 1 ], bgColor[ 2 ])
 
         return this.$colorer  = c
     }
+
+    // `undefined` means - look at the parent
+    // any other value (including `null`) means - the value computed
+    // `null` means - value computed, not set (analog of `unset` in CSS)
 
 
     $underline          : boolean           = undefined
