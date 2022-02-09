@@ -558,7 +558,11 @@ export class DifferenceCompositeEntry extends Difference {
 export class DifferenceArrayEntry extends DifferenceCompositeEntry {
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isMiddle) output.write(<span class="json-deep-diff-middle-index">{ this.index }</span>)
+        if (context.isMiddle) {
+            const cls   = `json-deep-diff-middle-index ${ this.same ? 'diff-same' : '' }`
+
+            output.write(<span class={ cls }>{ this.index }</span>)
+        }
 
         yield* super.renderGen(output, context)
     }
@@ -1082,6 +1086,13 @@ export class XmlRendererDifference extends Mixin(
             this.blockLevelElements.add('diff-entry')
             this.blockLevelElements.add('diff-inner')
         }
+
+
+        getElementClass (el : XmlElement) : string {
+            const insideHetero  = CI(el.parentAxis()).some(el => el.tagName === 'diff-hetero')
+
+            return el.class + (insideHetero ? ' diff-hetero' : '')
+        }
     }
 ){}
 
@@ -1326,5 +1337,15 @@ export class MissingValue extends XmlElement {
 
     renderContent (context : XmlRenderBlock) {
         context.write('░')
+    }
+
+
+    get class () : string {
+        return 'gray'
+    }
+
+
+    set class (value : string | string[]) {
+        super.class = value
     }
 }

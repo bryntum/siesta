@@ -44,6 +44,10 @@ export class XmlElement extends Mixin(
         }
 
 
+        get class () : string {
+            return this.$attributes ? this.attributes.class ?? null : null
+        }
+
         set class (value : string | string[]) {
             this.attributes.class   = isString(value) ? value : value.join(' ')
         }

@@ -26,6 +26,8 @@ Supported styles:
 
 @use '../common/_colors.scss' as *;
 
+@use '../../../src/compare_deep/DeepDiff.scss';
+
 .underline {
     text-decoration: underline
 }

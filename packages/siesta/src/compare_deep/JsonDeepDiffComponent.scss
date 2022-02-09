@@ -9,7 +9,19 @@ $body_background_color: #fefefe;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
+
+    overflow: hidden;
+
     font-family: "JetBrains Mono", monospace;
+
+    // we use `font-weight: bolder;` for generic styling of non-equal data
+    // the reason is that it works best in terminal, both for dark/light modes
+    // however in html, we don't want that, thus, reset the `font-weight`
+    // with directly targeting selector (`*` does not increase specificity as it might seem)
+    & * {
+        font-weight: lighter;
+    }
+
     box-sizing: border-box;
 
     --background-color: #f2f2f2;
@@ -24,8 +36,6 @@ $body_background_color: #fefefe;
         // try commenting this line and scroll to bottom - see how the expander element is misplaced
         overflow-x: scroll;
     }
-
-    overflow: hidden;
 }
 
 
@@ -326,55 +336,7 @@ span.json-deep-diff-zero-width-space:before {
     content: "\200B";
 }
 
-// Browser CSS
-//diff-atomic[same=false] {
-//    color : $secondary_pass_darker;
-//}
-//diff-atomic[type=onlyIn1] {
-//    color : $primary_fail;
-//}
-//diff-atomic[type=onlyIn2] {
-//    color : $primary_pass;
-//}
-//
-//
-//[same=false] {
-//    color : color.scale($gray, $lightness: -75%);
-//}
-//
-//[same=true] {
-//    color : color.scale($gray, $lightness: 15%);
-//}
-//
-//[type=onlyIn1] {
-//    color : $primary_fail;
-//}
-//
-//[type=onlyIn2] {
-//    color : $primary_pass;
-//}
-
+// this rule can not be expressed in the simplified TextJSX CSS, moved it here to "real" CSS
 diff-hetero [type] {
     color: $deccent_darker !important;
-}
-
-// TextJSX CSS
-.diff-atomic-not-same {
-    color : $secondary_pass_darker;
-}
-
-.diff-not-same {
-    color : color.scale($gray, $lightness: -75%);
-}
-
-.diff-same {
-    color : color.scale($gray, $lightness: 15%);
-}
-
-.diff-only-in-1 {
-    color : $primary_fail;
-}
-
-.diff-only-in-2 {
-    color : $primary_pass;
 }

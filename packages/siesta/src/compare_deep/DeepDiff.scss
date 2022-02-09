@@ -1,0 +1,31 @@
+@use "sass:color";
+@use '../../resources/styling/common/_colors.scss' as *;
+
+// simplified TextJSX CSS (class-name only selectors)
+.diff-atomic-not-same {
+    color : $secondary_pass_darker;
+}
+
+.diff-not-same {
+    //color : color.scale($gray, $lightness: -75%);
+    // this styling is the only thing that works best for highlighting text
+    // both for dark/light modes
+    // so its preferable over the "absolute" color
+    font-weight: bolder;
+}
+
+.diff-same {
+    color : color.scale($gray, $lightness: 15%);
+}
+
+.diff-only-in-1 {
+    color : $primary_fail;
+}
+
+.diff-only-in-2 {
+    color : $primary_pass;
+}
+
+.diff-hetero {
+    color : $secondary_pass_darker;
+}

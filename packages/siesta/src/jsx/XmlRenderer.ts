@@ -127,11 +127,16 @@ export class XmlRendererStreaming extends Mixin(
             }
         }
 
+        // extensibility hook
+        getElementClass (el : XmlElement) : string {
+            return el.class
+        }
+
 
         applyStyleRules (block : XmlRenderBlock) {
             const el        = block.element
 
-            saneSplit(el.attributes.class ?? '', /\s+/).forEach(className => {
+            saneSplit(this.getElementClass(el) ?? '', /\s+/).forEach(className => {
                 const rule     = this.styles.get(className)
 
                 if (rule) rule(block.style)
