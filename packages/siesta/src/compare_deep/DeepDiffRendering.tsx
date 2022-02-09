@@ -143,6 +143,17 @@ export class Difference extends Mixin(
         }
 
 
+        get cls () : string {
+            return this.same
+                ? 'diff-same'
+                : this.type === 'onlyIn1'
+                    ? 'diff-only-in-1'
+                    : this.type === 'onlyIn2'
+                        ? 'diff-only-in-2'
+                        : 'diff-not-same'
+        }
+
+
         excludeValue (valueProp : 'value1' | 'value2') {
             this[ valueProp ]   = Missing
 
@@ -197,7 +208,7 @@ export class DifferenceWrapper extends Difference {
     '---'
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        output.push(<diff-entry /*same={ this.difference.same } type={ this.difference.type }*/></diff-entry>)
+        output.push(<diff-entry></diff-entry>)
 
         yield DifferenceRenderingSyncPoint.new({ type : 'before' })
 
@@ -257,7 +268,15 @@ export class DifferenceAtomic extends Difference {
         if (context.isContent) {
             const value     = context.choose(this.content1, this.content2)
 
-            output.write(<diff-atomic same={ this.same } type={ this.type }>
+            const cls       = this.same
+                ? 'diff-same'
+                : this.type === 'onlyIn1'
+                    ? 'diff-only-in-1'
+                    : this.type === 'onlyIn2'
+                        ? 'diff-only-in-2'
+                        : 'diff-atomic-not-same'
+
+            output.write(<diff-atomic class={ cls } same={ this.same } type={ this.type }>
                 {
                     value === Missing ? <MissingValue></MissingValue> : value
                 }
@@ -405,7 +424,7 @@ export class DifferenceComposite extends DifferenceReferenceable {
 
                 // the entry element presents in all flows and this is what
                 // is synchronizing the height across the streams
-                output.push(<diff-entry /*same={ entry.same } type={ entry.type }*/></diff-entry>)
+                output.push(<diff-entry></diff-entry>)
 
                 if (!suppressSyncPoints) yield DifferenceRenderingSyncPoint.new({ type : 'before' })
 
@@ -575,7 +594,7 @@ export class DifferenceArray extends DifferenceComposite {
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) output.push(<diff-array id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-array>)
+        if (context.isContent) output.push(<diff-array id={ `${ context.stream }-${ this.id }` } class={ this.cls } same={ this.same } type={ this.type }></diff-array>)
 
         yield* super.renderGen(output, context)
 
@@ -647,8 +666,14 @@ export class DifferenceObjectEntry extends DifferenceCompositeEntry {
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isContent && !this.isMissingIn(context.contentStream)) {
+            const cls   = this.type === 'both'
+                ? 'diff-same'
+                : this.type === 'onlyIn1'
+                    ? 'diff-only-in-1'
+                    : 'diff-only-in-2'
+
             output.write(
-                <diff-object-key same={ this.difference.type === 'both' ? 'true' : undefined } type={ this.difference.type }>
+                <diff-object-key class={ cls } same={ this.type === 'both' ? 'true' : undefined } type={ this.type }>
                     { this.key }
                 </diff-object-key>
             )
@@ -720,7 +745,7 @@ export class DifferenceObject extends DifferenceComposite {
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) output.push(<diff-object id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-object>)
+        if (context.isContent) output.push(<diff-object id={ `${ context.stream }-${ this.id }` } class={ this.cls } same={ this.same } type={ this.type }></diff-object>)
 
         yield* super.renderGen(output, context)
 
@@ -797,7 +822,7 @@ export class DifferenceSet extends DifferenceComposite {
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) output.push(<diff-set id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-set>)
+        if (context.isContent) output.push(<diff-set id={ `${ context.stream }-${ this.id }` } class={ this.cls } same={ this.same } type={ this.type }></diff-set>)
 
         yield* super.renderGen(output, context)
 
@@ -847,7 +872,7 @@ export class DifferenceMapEntry extends DifferenceCompositeEntry {
             output.write(<MissingValue></MissingValue>)
         } else {
             if (context.isContent && !this.isMissingIn(context.contentStream)) {
-                output.push(<diff-map-key same={ this.differenceKeys.same } type={ this.differenceKeys.type }></diff-map-key>)
+                output.push(<diff-map-key class={ this.cls } same={ this.differenceKeys.same } type={ this.differenceKeys.type }></diff-map-key>)
 
                 yield* this.differenceKeys.renderGen(output, context)
 
@@ -908,7 +933,7 @@ export class DifferenceMap extends DifferenceComposite {
 
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        if (context.isContent) output.push(<diff-map id={ `${ context.stream }-${ this.id }` } same={ this.same } type={ this.type }></diff-map>)
+        if (context.isContent) output.push(<diff-map id={ `${ context.stream }-${ this.id }` } class={ this.cls } same={ this.same } type={ this.type }></diff-map>)
 
         yield* super.renderGen(output, context)
 

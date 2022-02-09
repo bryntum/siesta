@@ -326,28 +326,55 @@ span.json-deep-diff-zero-width-space:before {
     content: "\200B";
 }
 
-
-diff-atomic[same=false] {
-    color : $secondary_pass_darker;
-}
-
-
-[same=false] {
-    color : color.scale($gray, $lightness: -75%);
-}
-
-[same=true] {
-    color : color.scale($gray, $lightness: 15%);
-}
-
-[type=onlyIn1] {
-    color : $primary_fail !important;
-}
-
-[type=onlyIn2] {
-    color : $primary_pass !important;
-}
+// Browser CSS
+//diff-atomic[same=false] {
+//    color : $secondary_pass_darker;
+//}
+//diff-atomic[type=onlyIn1] {
+//    color : $primary_fail;
+//}
+//diff-atomic[type=onlyIn2] {
+//    color : $primary_pass;
+//}
+//
+//
+//[same=false] {
+//    color : color.scale($gray, $lightness: -75%);
+//}
+//
+//[same=true] {
+//    color : color.scale($gray, $lightness: 15%);
+//}
+//
+//[type=onlyIn1] {
+//    color : $primary_fail;
+//}
+//
+//[type=onlyIn2] {
+//    color : $primary_pass;
+//}
 
 diff-hetero [type] {
     color: $deccent_darker !important;
+}
+
+// TextJSX CSS
+.diff-atomic-not-same {
+    color : $secondary_pass_darker;
+}
+
+.diff-not-same {
+    color : color.scale($gray, $lightness: -75%);
+}
+
+.diff-same {
+    color : color.scale($gray, $lightness: 15%);
+}
+
+.diff-only-in-1 {
+    color : $primary_fail;
+}
+
+.diff-only-in-2 {
+    color : $primary_pass;
 }
