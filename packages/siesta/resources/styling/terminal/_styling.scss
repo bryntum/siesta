@@ -4,18 +4,17 @@ Only supports selectors from a single class name for now:
 
     .some_class {}
 
-Any other selectors like: '.some_class .another_class' are explicitly not supported
+Any other more complex selectors like: '.some_class .another_class' are explicitly not supported
 
 Supported styles:
 
 - `color`, as
     color   : rgb(11, 22, 33)
     color   : #abcdef
-    color   : white
 
 - `background-color` in the same format
 
-- `text-decoration: underline` (the only recognized values are `underline` and `inverse`)
+- `text-decoration: underline` (the only recognized values are `underline` and `inverse`, the latter is text-specific)
 
 - `font-weight: bolder` (the only recognized value is `bolder`)
 
