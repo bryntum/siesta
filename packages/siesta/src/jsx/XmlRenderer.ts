@@ -89,12 +89,17 @@ export class XmlRenderingDynamicContext extends Mixin(
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// should mutate the `style` object
+export type StyleRule   = (style : Style) => any
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export class XmlRendererStreaming extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
 
     class XmlRenderer extends base {
-        styles                  : Map<string, (style : Style) => any>  = new Map()
+        styles                  : Map<string, StyleRule>  = new Map()
 
         indentLevel             : number        = 2
 
