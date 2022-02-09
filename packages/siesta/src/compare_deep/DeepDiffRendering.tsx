@@ -1132,6 +1132,10 @@ export class JsonDeepDiffElement extends Mixin(
     (base : ClassUnion<typeof XmlElement>) =>
 
     class JsonDeepDiffElement extends base {
+        props           : XmlElement[ 'props' ] & {
+            difference      : Difference
+        }
+
         tagName             : 'div'             = 'div'
 
         difference          : Difference        = undefined
