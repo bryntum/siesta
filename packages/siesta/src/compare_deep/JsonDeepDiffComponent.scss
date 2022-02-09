@@ -104,7 +104,7 @@ $body_background_color: #fefefe;
 .json-deep-diff-highlighter {
     position: absolute;
     width: 100%;
-    height: 0px;
+    height: 0;
     pointer-events: none;
     background-color: rgba($gray_lighter, 0.15);
 }
@@ -315,6 +315,8 @@ diff-expander {
 
 
 missing_value {
+    color: $gray !important;
+
     &:before {
         content: "░";
     }
@@ -324,9 +326,24 @@ span.json-deep-diff-zero-width-space:before {
     content: "\200B";
 }
 
-//[same=false] {
-//    color : $primary_fail_darker;
-//}
+
+diff-atomic[same=false] {
+    color : $secondary_pass_darker;
+}
+
+
+[same=false] {
+    color : color.scale($gray, $lightness: -75%);
+}
+
 [same=true] {
-    color : $gray;
+    color : color.scale($gray, $lightness: 15%);
+}
+
+[type=onlyIn1] {
+    color : $primary_fail !important;
+}
+
+[type=onlyIn2] {
+    color : $primary_pass !important;
 }

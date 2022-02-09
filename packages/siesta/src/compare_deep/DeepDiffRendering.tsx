@@ -197,7 +197,7 @@ export class DifferenceWrapper extends Difference {
     '---'
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-        output.push(<diff-entry same={ this.difference.same } type={ this.difference.type }></diff-entry>)
+        output.push(<diff-entry /*same={ this.difference.same } type={ this.difference.type }*/></diff-entry>)
 
         yield DifferenceRenderingSyncPoint.new({ type : 'before' })
 
@@ -405,7 +405,7 @@ export class DifferenceComposite extends DifferenceReferenceable {
 
                 // the entry element presents in all flows and this is what
                 // is synchronizing the height across the streams
-                output.push(<diff-entry same={ entry.same } type={ entry.type }></diff-entry>)
+                output.push(<diff-entry /*same={ entry.same } type={ entry.type }*/></diff-entry>)
 
                 if (!suppressSyncPoints) yield DifferenceRenderingSyncPoint.new({ type : 'before' })
 
@@ -647,7 +647,11 @@ export class DifferenceObjectEntry extends DifferenceCompositeEntry {
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isContent && !this.isMissingIn(context.contentStream)) {
-            output.write(<diff-object-key>{ this.key }</diff-object-key>)
+            output.write(
+                <diff-object-key same={ this.difference.type === 'both' ? 'true' : undefined } type={ this.difference.type }>
+                    { this.key }
+                </diff-object-key>
+            )
             output.write(': ')
         }
 
@@ -843,13 +847,14 @@ export class DifferenceMapEntry extends DifferenceCompositeEntry {
             output.write(<MissingValue></MissingValue>)
         } else {
             if (context.isContent && !this.isMissingIn(context.contentStream)) {
-                output.push(<diff-map-key></diff-map-key>)
+                output.push(<diff-map-key same={ this.differenceKeys.same } type={ this.differenceKeys.type }></diff-map-key>)
 
                 yield* this.differenceKeys.renderGen(output, context)
 
+                output.write(' => ')
+
                 output.pop()
 
-                output.write(' => ')
             } else {
                 yield* this.differenceKeys.renderGen(output, context)
             }
