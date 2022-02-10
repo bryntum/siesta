@@ -1,7 +1,7 @@
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { XmlRendererDifference } from "../../compare_deep/CompareDeepDiffRendering.js"
+import { XmlRendererDifference } from "../../compare_deep/DeepDiffRendering.js"
 import { Hook } from "../../hook/Hook.js"
-import { TextBlock } from "../../jsx/TextBlock.js"
+import { RenderCanvas } from "../../jsx/RenderBlock.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { ArbitraryObject } from "../../util/Helpers.js"
 
@@ -49,7 +49,7 @@ export class ConsoleXmlRenderer extends Mixin(
 
 
         write (el : XmlElement) {
-            this.printLn(this.render(el, TextBlock.new({ maxLen : this.getMaxLen() })))
+            this.printLn(this.render(el, RenderCanvas.new({ maxWidth : this.getMaxLen() })))
         }
     }
 ) {}

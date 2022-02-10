@@ -7,7 +7,7 @@ import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { ChronoGraphJSX, ElementSource, PropertySource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
 import { ComponentElement, ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
-import { TextBlock } from "../../../jsx/TextBlock.js"
+import { RenderCanvas } from "../../../jsx/RenderBlock.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { LogLevel } from "../../../logger/Logger.js"
 import { relative } from "../../../util/Path.js"
@@ -189,7 +189,7 @@ export class AssertionComponent extends Mixin(
                                         {
                                             dashboard.renderer.render(
                                                 sourcePointTemplate(sourcePoint, this.launchInfo.testSources, sourceContext),
-                                                TextBlock.new({ maxLen : dashboard.renderer.getMaxLen() })
+                                                RenderCanvas.new({ maxWidth : dashboard.renderer.getMaxLen() })
                                             )
                                         }
                                     </pre>
@@ -199,7 +199,7 @@ export class AssertionComponent extends Mixin(
                             !passed && assertion.annotation
                                 ?
                                     <pre class='assertion_annotation'>{
-                                        dashboard.renderer.render(assertion.annotation, TextBlock.new({ maxLen : dashboard.renderer.getMaxLen() }))
+                                        dashboard.renderer.render(assertion.annotation, RenderCanvas.new({ maxWidth : dashboard.renderer.getMaxLen() }))
                                     }</pre>
                                 : null
                         ]

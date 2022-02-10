@@ -293,6 +293,12 @@ export class XmlElement extends Mixin(
             return indent
         }
 
+        // TODO this is a bit of mess (or may be not?)
+        // used for the tree lines styling
+        styleChildIndentation (indent : string, childBlock : XmlRenderBlock) : string | undefined {
+            return undefined
+        }
+
 
         customIndentation (renderer : XmlRendererStreaming) : string[] {
             return [ this.hasClass('indented') ? ' '.repeat(renderer.indentLevel) : '' ]

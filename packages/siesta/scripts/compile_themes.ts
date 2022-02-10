@@ -24,20 +24,20 @@ export const compileTheme = (themeFilename : string) => {
             const match         = /^\.([^.]*)$/.exec(selector)
 
             if (match) {
-                const colorer   = [ 'c => c' ]
+                const styleMutations    = []
 
                 for (let i = 0; i < rule.style.length; i++) {
                     const styleName     = rule.style[ i ]
 
-                    const colorerCall   = styleToColorer(styleName, rule.style[ styleName ])
+                    const mutation      = styleToMutation(styleName, rule.style[ styleName ])
 
-                    if (colorerCall === undefined) {
+                    if (mutation === undefined) {
                         console.log(`Ignoring unrecognized style : ${ styleName } : ${ rule.style[ styleName ] }`)
                     } else
-                        colorer.push(colorerCall)
+                        styleMutations.push(mutation)
                 }
 
-                output.push(`styles.set('${ match[ 1 ] }', ${ colorer.join('') })`)
+                output.push(`styles.set('${ match[ 1 ] }', style => { ${ (styleMutations.join('; '))  } })`)
 
             } else {
                 console.log("//----------------------")
@@ -62,22 +62,27 @@ compileTheme('theme_universal.scss')
 compileTheme('theme_accessible.scss')
 
 //---------------------------------------------------------------------------------------------------------------------
-function styleToColorer (styleName : string, styleValue : string) : string | undefined {
+function styleToMutation (styleName : string, styleValue : string) : string | undefined {
     switch (styleName) {
         case 'color':
-            return colorToColorer(styleValue, false)
+            return `style.color = ${ colorToArray(styleValue )}`
         case 'background-color':
-            return colorToColorer(styleValue, true)
+            return `style.backgroundColor = ${ colorToArray(styleValue )}`
 
         case 'text-decoration':
-            if (styleValue === 'underline') return '.underline'
-            if (styleValue === 'inverse') return '.inverse'
+            if (styleValue === 'underline')
+                return `style.underline = true`
+            if (styleValue === 'inverse')
+                return `style.inverse = true`
 
+            // any other values of `text-decoration` are not recognized
             return undefined
 
         case 'font-weight':
-            if (styleValue === 'bolder') return '.bold'
+            if (styleValue === 'bolder')
+                return `style.bold = true`
 
+            // any other values of `font-weight` are not recognized
             return undefined
     }
 
@@ -85,14 +90,11 @@ function styleToColorer (styleName : string, styleValue : string) : string | und
 }
 
 
-function colorToColorer (colorStyleValue : string, isBackground : boolean = false) : string {
-    let match   = /^rgb(.*)/.exec(colorStyleValue)
+function colorToArray (colorStyleValue : string) : string {
+    const match     = /^#(\w\w)(\w\w)(\w\w)/.exec(colorStyleValue)
 
-    if (match) return `.${ isBackground ? 'bgRgb' : 'rgb' }${ match[ 1 ] }`
-
-    match       = /^#(\w\w)(\w\w)(\w\w)/.exec(colorStyleValue)
-
-    if (match) return `.${ isBackground ? 'bgRgb' : 'rgb' }(0x${ match[ 1 ] }, 0x${ match[ 2 ] }, 0x${ match[ 3 ] })`
-
-    return `.${ isBackground ? 'bgKeyword' : 'keyword' }("${ colorStyleValue }")`
+    if (match)
+        return `[ 0x${ match[ 1 ] }, 0x${ match[ 2 ] }, 0x${ match[ 3 ] } ]`
+    else
+        throw new Error(`Unrecognized color: ${ colorStyleValue }`)
 }

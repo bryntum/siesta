@@ -1,6 +1,7 @@
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { serializable } from "../serializable/Serializable.js"
 import { isString } from "../util/Typeguards.js"
+import { XmlRenderBlock } from "./RenderBlock.js"
 import { TextBlock } from "./TextBlock.js"
 import { XmlElement, XmlNode } from "./XmlElement.js"
 import { XmlRenderer, XmlRendererStreaming } from "./XmlRenderer.js"
@@ -52,6 +53,12 @@ export class TreeStreamed extends Mixin(
 
         props           : XmlElement[ 'props' ] & {
             isTopLevelLastNode?     : boolean
+        }
+
+
+        styleChildIndentation (indent : string, childBlock : XmlRenderBlock) : string | undefined {
+            // TODO should actually apply the `tree_line` class styling
+            return childBlock.renderer.c.gray.text(indent)
         }
 
 

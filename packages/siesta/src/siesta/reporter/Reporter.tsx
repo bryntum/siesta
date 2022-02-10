@@ -3,7 +3,7 @@ import { ClassUnion, Mixin } from "../../class/Mixin.js"
 import { Hook } from "../../hook/Hook.js"
 import { CI } from "../../iterator/Iterator.js"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { Tree } from "../../jsx/Tree.js"
+import { TreeStreamed as Tree } from "../../jsx/Tree.js"
 import { XmlElement } from "../../jsx/XmlElement.js"
 import { LogLevel } from "../../logger/Logger.js"
 import { relative } from "../../util/Path.js"
@@ -289,7 +289,7 @@ export class Reporter extends Mixin(
 
 
         testFileRunning () : XmlElement {
-            return <div class="test_file_runs"> RUNS </div>
+            return <span class="test_file_runs"> RUNS </span>
         }
 
 
@@ -324,7 +324,7 @@ export class Reporter extends Mixin(
                 <span class="assertion_name">{ assertion.name }</span>
                 <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
                 { assertion.sourcePoint && !shouldShowSourceContext ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
-                { !passed && canShowSourceContext && shouldShowSourceContext ? [ <div></div>, sourcePointTemplate(assertion.sourcePoint, sources, this.sourceContext) ] : false }
+                { !passed && canShowSourceContext && shouldShowSourceContext ? [ '\n', sourcePointTemplate(assertion.sourcePoint, sources, this.sourceContext) ] : false }
                 { passed ? false : assertion.annotation }
             </div>
         }
@@ -349,7 +349,7 @@ export class Reporter extends Mixin(
                 Launching { this.projectData.launchType === 'project' ? 'test suite project' : 'test file' }:{ ' ' }
                 <span class="project_title">{ this.projectData.projectPlan.title }</span>{ ' ' }
                 in { this.projectData.environment.name } { this.projectData.environment.version }
-                <div></div>
+                { '\n' }
             </div>
         }
 
@@ -357,17 +357,17 @@ export class Reporter extends Mixin(
         testSuiteFooter () : XmlElement {
             let text : XmlElement       = <div></div>
 
-            if (this.resultsRunningMap.size > 0 && this.resultsCompleted.size > 0) text.appendChild(<div></div>)
+            if (this.resultsRunningMap.size > 0 && this.resultsCompleted.size > 0) text.appendChild('\u200b')
 
             this.resultsRunningMap.forEach(testDesc => {
                 text.appendChild(
-                    this.testFileRunning(),
-                    ' ',
-                    this.testNodeUrlTemplate(testDesc)
+                    <div>
+                        { this.testFileRunning() } { this.testNodeUrlTemplate(testDesc) }
+                    </div>
                 )
             })
 
-            text.appendChild(<div></div>)
+            text.appendChild('\u200b')
 
             text.appendChild(<div class="summary">
                 { 'Test files : ' }
@@ -450,7 +450,7 @@ export const sourcePointTemplate = ({ line, char } : SourcePoint, sources : stri
         </div>)
     }
 
-    template.appendChild(<div></div>)
+    template.appendChild('\u200b')
 
     return template
 }

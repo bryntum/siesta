@@ -344,11 +344,7 @@ export class XmlRenderBlock extends Mixin(
             const inlineBuffer  = this.blockLevelParent.inlineBuffer
 
             inlineBuffer.forEach((line, index, array) => {
-                const indentation       = this.currentIndentation
-                const styled            = this.element.styleIndentation(indentation, this)
-
-                canvas.write(styled, indentation.length)
-
+                canvas.write(...this.currentIndentation)
                 canvas.write(line.toString(), line.length)
 
                 if (index !== array.length - 1) canvas.newLine()
@@ -363,17 +359,29 @@ export class XmlRenderBlock extends Mixin(
         }
 
 
-        $currentIndentation     : string            = undefined
+        $currentIndentation         : [ string, number ]   = undefined
 
-        get currentIndentation () : string {
+        get currentIndentation () : [ string, number ] {
             if (this.$currentIndentation !== undefined) return this.$currentIndentation
 
-            let canMemoize      = this.canMemoizeIndentation
-            let indentation     = lastElement(this.indent)
+            let canMemoize          = this.canMemoizeIndentation
+            const indentationStr    = lastElement(this.indent)
+
+            const parentElement     = this.parentBlock?.element
+
+            const indentation       = [
+                parentElement?.styleChildIndentation(indentationStr, this) ?? this.element.styleIndentation(indentationStr, this),
+                indentationStr.length
+            ] as [ string, number ]
 
             if (this.indent.length > 1) this.indent.pop()
 
-            if (this.parentBlock) indentation = this.parentBlock.currentIndentation + indentation
+            if (this.parentBlock) {
+                const parentIndentation = this.parentBlock.currentIndentation
+
+                indentation[ 0 ]    = parentIndentation[ 0 ] + indentation[ 0 ]
+                indentation[ 1 ]    += parentIndentation[ 1 ]
+            }
 
             return canMemoize ? this.$currentIndentation = indentation : indentation
         }

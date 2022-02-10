@@ -285,4 +285,18 @@ it('Non-empty block element as a child node should cause new line in the output'
     )
 })
 
-
+// TODO decide if this is correct behaviour (contradicts with previous tests)
+// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// it('Non-empty block element as a child node should cause new line in the output', async t => {
+//     t.is(
+//         renderer.render(
+//             <div>
+//                 { '\n' }
+//                 <div>Text</div>
+//             </div>,
+//         ),
+//         `\nText`
+//     )
+// })
+//
+//
