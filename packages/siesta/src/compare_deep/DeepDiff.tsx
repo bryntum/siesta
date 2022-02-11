@@ -28,6 +28,11 @@ const diffTypeOf        = (a : unknown) : string => 'diff-' + typeOf(a).toLowerC
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TODO!! this method needs to be optimized
+// it is used to convert the value into the corresponding Difference with `onlyInX` type
+// and it does that, but very inefficiently - comparing the value with itself (potentially quadratic cost for maps keys)
+// then removing one side (`excludeValue`, so it first allocates memory and then immediately frees it)
+// but it works at least
 export const valueAsDifference = (value : unknown, valueProp : 'value1' | 'value2', options : DeepCompareOptions, state : DeepCompareState) : Difference => {
     if (value === Missing) value = MissingInternal
 
@@ -126,7 +131,7 @@ const defaultDeepCompareOptions : DeepCompareOptions = {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// TODO should stop at 1st difference
+// TODO should stop at 1st difference and ideally omit the Difference's allocation
 export const equalDeep = (
     v1          : unknown,
     v2          : unknown,
