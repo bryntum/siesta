@@ -1,0 +1,366 @@
+@use "sass:color";
+@use '../../resources/styling/common/colors' as *;
+
+$contour : #d4d4d4;
+$contour_active : #9c9c9c;
+$body_background_color: #fefefe;
+
+// TODO expander CSS has to be shared with deep diff
+
+.serial {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+    overflow: hidden;
+
+    font-family: "JetBrains Mono", monospace;
+
+    // we use `font-weight: bolder;` for generic styling of non-equal data
+    // the reason is that it works best in terminal, both for dark/light modes
+    // however in html, we don't want that, thus, reset the `font-weight`
+    // with directly targeting selector (`*` does not increase specificity as it might seem)
+    & * {
+        font-weight: lighter;
+    }
+
+    box-sizing: border-box;
+
+    --background-color: #f2f2f2;
+
+    border: 1px solid $contour_active;
+
+    & > * {
+        height: 100%;
+        overflow-y: hidden;
+        // all containers need to have the same scroll-height canvas, otherwise scroll-sync breaks
+        // the horizontal scrollbar appears to be important for this
+        // try commenting this line and scroll to bottom - see how the expander element is misplaced
+        overflow-x: scroll;
+    }
+}
+
+
+.serial-expander {
+    --expander-width: 2.5ch;
+
+    width : var(--expander-width);
+
+    & > .serial-content {
+        margin-right: 0.5ch;
+        height: 100%;
+    }
+
+    & > .serial-content, & > .serial-content > .serial-content-root {
+        background-color: var(--background-color);
+    }
+
+    user-select: none;
+
+    //scrollbar-color: auto #f2f2f2;
+    //
+    //&::-webkit-scrollbar-track {
+    //    background: #f2f2f2;
+    //}
+}
+
+.serial-middle {
+    text-align: center;
+    color: $contour_active;
+
+    // if no indices has been rendered, still keep the inner content at 1 char, plus 2 chars for padding (border-box)
+    min-width: 3ch;
+
+    border-left: 1px solid $contour;
+    border-right: 1px solid $contour;
+    background-color: var(--background-color);
+
+    & > .serial-content {
+        height: 100%;
+    }
+
+    margin-left: 0.5ch;
+    margin-right: 0.5ch;
+    padding-left: 1ch;
+    padding-right: 1ch;
+
+    //scrollbar-color: auto #f2f2f2;
+    //
+    //&::-webkit-scrollbar-track {
+    //    background: #f2f2f2;
+    //}
+
+    user-select: none;
+
+    cursor: col-resize;
+
+    .serial-middle-index {
+        font-size: 0.7em;
+        vertical-align: top;
+    }
+}
+
+.serial-left, .serial-right {
+    flex : 1;
+    min-width: 0;
+    position: relative;
+
+    overflow: scroll;
+
+    background-color: transparent;
+    & * {
+        background-color: inherit;
+    }
+}
+
+.serial-highlighter {
+    position: absolute;
+    width: 100%;
+    height: 0;
+    pointer-events: none;
+    background-color: rgba($gray_lighter, 0.15);
+}
+
+.serial-content {
+    word-break: break-all;
+    line-height: 1.5em;
+    // required for highlighter positioning
+    position: relative;
+}
+
+serial-inner {
+    display: block;
+    padding-left: 2ch;
+    border-left: 1px solid $gray_lighter;
+}
+
+.serial-content-root > serial-entry > * > serial-inner {
+    border-left: none;
+}
+
+serial-entry {
+    display: block;
+}
+
+
+@mixin control-tool {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 400;
+
+    font-size: 0.6em;
+    position: absolute;
+    right: calc(-1 * var(--control-width) / 2 + 1px);
+}
+
+
+serial-expander-inner {
+    display: block;
+    position: relative;
+
+    & > serial-expander-controls {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        & > serial-expander-opener, & > serial-expander-closer {
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 400;
+            position: absolute;
+            width: 100%;
+            height: 1.5em;
+
+            left: 0;
+
+            color: $contour;
+            cursor: pointer;
+
+            &:after {
+                @include control-tool;
+            }
+
+            &:before {
+                @include control-tool;
+
+                font-weight: 900;
+                content: "\f0c8";
+
+                z-index: -1;
+                // TODO, IMPORTANT: should match the widget's background-color
+                // this is to hide the border
+                color: $body_background_color;
+            }
+            // need z-index on host element for :before/:after z-indexes to work correctly
+            z-index: 0;
+        }
+
+        & > serial-expander-opener {
+            top: -1.5em;
+            &:after {
+                content: "\f146";
+            }
+        }
+
+        & > serial-expander-closer {
+            bottom: -1.5em;
+            &:after {
+                content: "\f146";
+            }
+        }
+    }
+
+
+    & serial-expander-line {
+        position: absolute;
+
+        top: -0.75em;
+        bottom: -0.75em;
+
+        width: 100%;
+
+        border-right: 1px solid;
+        border-right-color: $contour;
+    }
+}
+
+
+serial-expander {
+    position: relative;
+
+    --control-width: 1ch;
+
+    // hard to explain, but this is what keeps the layout
+    & .serial-collapsed {
+        position: unset;
+    }
+
+    &:hover {
+        & serial-expander-line {
+            display: none;
+        }
+
+        & > serial-expander-inner > serial-expander-controls > serial-expander-line {
+            display: block;
+        }
+    }
+    & > serial-expander-inner > serial-expander-controls {
+        &:hover {
+            & > serial-expander-opener, & > serial-expander-closer {
+                color: $contour_active;
+                right: calc(-1 * var(--control-width) / 2);
+                z-index: 10;
+            }
+
+            & > serial-expander-line {
+                border-right: 1px solid $contour_active;
+            }
+        }
+    }
+}
+
+
+// in 2022, conditional CSS is still actual
+// some mess with the font-awesome font width
+// chrome treats every char as single, FF as 2 chars
+@-moz-document url-prefix() {
+    serial-expander {
+        --control-width: 2ch;
+    }
+}
+
+// top-level expand/collapse tool, needs block level context for positioning
+.serial-expander .serial-content-root > serial-entry > serial-expander.serial-collapsed {
+    display: block;
+}
+
+.serial-expander .serial-collapsed {
+    z-index: 0;
+
+    &:before {
+        @include control-tool;
+        content: "\f0c8";
+
+        color: $body_background_color;
+        font-weight: 900;
+        z-index: 0;
+    }
+
+    &:hover:after {
+        color: $contour_active;
+    }
+
+    &:after {
+        @include control-tool;
+        content: "\f0fe";
+
+        color: $contour;
+        z-index: 1;
+    }
+
+    & > serial-expander-inner {
+        display: none;
+    }
+}
+
+.serial-collapsed {
+    // the inner part in collapsed form becomes inline and contains only the `…` symbol
+    & > serial-inner {
+        display: inline;
+        padding-left: 0;
+        // hide the vertical ruler
+        border-left: none;
+
+        & * {
+            display: none;
+        }
+
+        &:before {
+            content: '…'
+        }
+    }
+
+    & serial-entry {
+        display: none;
+    }
+}
+
+
+span.serial-zero-width-space:before {
+    content: "\200B";
+}
+
+
+.serial-pair {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+
+    overflow: hidden;
+
+    border: 1px solid $contour_active;
+
+    & > .serial {
+        border: none;
+    }
+}
+
+.serial-pair-middle {
+    color: $contour_active;
+
+    width: 1ch;
+
+    border-left: 1px solid $contour;
+    border-right: 1px solid $contour;
+    background-color: #f2f2f2;
+
+    user-select: none;
+
+    cursor: col-resize;
+}
+
+
+.serial-pair-left, .serial-pair-right {
+    flex : 1;
+    min-width: 0;
+}
