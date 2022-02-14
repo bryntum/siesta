@@ -706,7 +706,7 @@ export class DifferenceObject extends DifferenceComposite {
     entries         : DifferenceObjectEntry[]
 
 
-    initialize (props : Partial<DifferenceArray>) {
+    initialize (props : Partial<DifferenceObject>) {
         super.initialize(props)
 
         this.constructorName    = this.value1 !== Missing ? constructorNameOf(this.value1) : undefined
@@ -805,7 +805,7 @@ export class DifferenceSet extends DifferenceComposite {
     entries         : DifferenceSetEntry[]
 
 
-    initialize (props : Partial<DifferenceArray>) {
+    initialize (props : Partial<DifferenceSet>) {
         super.initialize(props)
 
         this.size       = this.value1.size
@@ -909,7 +909,7 @@ export class DifferenceMap extends DifferenceComposite {
     entries         : DifferenceMapEntry[]
 
 
-    initialize (props : Partial<DifferenceArray>) {
+    initialize (props : Partial<DifferenceMap>) {
         super.initialize(props)
 
         this.size       = this.value1.size
@@ -990,7 +990,7 @@ export class DifferenceReference extends Difference {
     ref2        : number | Missing          = Missing
 
 
-    initialize (props : Partial<DifferenceArray>) {
+    initialize (props : Partial<DifferenceReference>) {
         super.initialize(props)
 
         // `value1` and `value2` are not persistable, so need to copy them to another property
@@ -1040,7 +1040,7 @@ export class DifferenceHeterogeneous extends Difference {
     difference2     : Difference | Missing
 
 
-    initialize (props : Partial<Difference>) {
+    initialize (props : Partial<DifferenceHeterogeneous>) {
         super.initialize(props)
 
         // `value1/2` are not persistent, need to copy the diffs into different properties

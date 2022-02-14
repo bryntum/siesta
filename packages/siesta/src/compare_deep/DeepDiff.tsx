@@ -144,12 +144,16 @@ export const equalDeep = (
 export const compareDeepDiff = (
     v1                  : unknown,
     v2                  : unknown,
-    options             : DeepCompareOptions    = defaultDeepCompareOptions
+    opts                : Partial<DeepCompareOptions>   = defaultDeepCompareOptions
 )
     : Difference =>
-    DifferenceWrapper.new({
+{
+    const options   = Object.assign({}, defaultDeepCompareOptions, opts)
+
+    return DifferenceWrapper.new({
         difference      : compareDeepDiffImpl(v1, v2, options)
     })
+}
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const compareDeepDiffImpl = function (

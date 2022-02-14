@@ -6,8 +6,8 @@ import { Component } from "../chronograph-jsx/Component.js"
 import { ClassUnion, Mixin } from "../class/Mixin.js"
 import { AbstractSplitter, SplitterDragContext } from "../siesta/ui/components/Splitter.js"
 import {
-    Difference,
     DifferenceRenderingStream,
+    DifferenceWrapper,
     JsonDeepDiffContentRendering,
     JsonDeepDiffFitter,
     XmlRendererDifference
@@ -25,7 +25,7 @@ export class JsonDeepDiffComponent extends Mixin(
     class JsonDeepDiffComponent extends base {
         // context             : XmlRendererDifference             = XmlRendererDifference.new()
 
-        difference          : Difference            = undefined
+        difference          : DifferenceWrapper     = undefined
 
         @field()
         maxWidth            : number                = 100

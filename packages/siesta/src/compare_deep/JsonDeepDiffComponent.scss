@@ -44,7 +44,7 @@ $body_background_color: #fefefe;
 
     width : var(--expander-width);
 
-    .json-deep-diff-content {
+    & > .json-deep-diff-content {
         margin-right: 0.5ch;
         height: 100%;
     }
