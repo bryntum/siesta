@@ -350,11 +350,7 @@ export class XmlElement extends Mixin(
             this.childNodes.forEach((child, index) => {
                 this.beforeRenderChildStreaming(context, child, index)
 
-                if (isString(child)) {
-                    context.write(child)
-                } else {
-                    child.renderStreaming(context.deriveChildBlock(child, index))
-                }
+                this.renderChildStreaming(context, child, index)
 
                 this.afterRenderChildStreaming(context, child, index)
             })
@@ -366,6 +362,15 @@ export class XmlElement extends Mixin(
 
 
         beforeRenderChildStreaming (context : XmlRenderBlock, child : XmlNode, index : number) {
+        }
+
+
+        renderChildStreaming (context : XmlRenderBlock, child : XmlNode, index : number) {
+            if (isString(child)) {
+                context.write(child)
+            } else {
+                child.renderStreaming(context.deriveChildBlock(child, index))
+            }
         }
 
 

@@ -392,7 +392,9 @@ export class XmlRenderBlock extends Mixin(
                 this.flushInlineBuffer()
                 this.canvas.newLinePending()
 
-                const indent    = this.element.childCustomIndentation(this.renderer, element, index)
+                const indent    =
+                    this.renderer.customIndentation(this)
+                    ?? this.element.childCustomIndentation(this.renderer, element, index)
                     ?? element.customIndentation(this.renderer)
 
                 return XmlRenderBlock.new({

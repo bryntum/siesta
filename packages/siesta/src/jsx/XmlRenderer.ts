@@ -133,6 +133,11 @@ export class XmlRendererStreaming extends Mixin(
         }
 
 
+        customIndentation (block : XmlRenderBlock) : string[] {
+            return undefined
+        }
+
+
         applyStyleRules (block : XmlRenderBlock) {
             const el        = block.element
 
