@@ -4,9 +4,8 @@ import { Serializable, serializable } from "../serializable/Serializable.js"
 import { saneSplit } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { XmlRenderBlock } from "./RenderBlock.js"
-import { TextBlock } from "./TextBlock.js"
 import { TextJSX } from "./TextJSX.js"
-import { XmlRenderer, XmlRendererStreaming, XmlRenderingDynamicContext } from "./XmlRenderer.js"
+import { XmlRendererStreaming } from "./XmlRenderer.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type XmlNode = string | XmlElement
@@ -136,150 +135,10 @@ export class XmlElement extends Mixin(
         }
 
 
-        getDisplayType (renderer : XmlRenderer) : 'block' | 'inline' {
+        getDisplayType (renderer : XmlRendererStreaming) : 'block' | 'inline' {
             return renderer.getDisplayType(this)
         }
 
-
-        //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // old rendering code
-        isChildIndented (child : XmlNode) : boolean {
-            return this.hasClass('indented')
-        }
-
-
-        indentChildOutput (renderer : XmlRenderer, child : XmlNode, index : number, output : TextBlock) : TextBlock {
-            output.indentMut(renderer.indentLevel, false)
-
-            return output
-        }
-
-
-        renderToTextBlock (renderer : XmlRenderer, output : TextBlock, parentContext? : XmlRenderingDynamicContext) {
-            const context               = renderer.createDynamicContext(this, parentContext)
-
-            this.renderSelf(renderer, output, context)
-
-            this.colorizeSelf(renderer, output, context)
-        }
-
-
-        colorizeSelf (renderer : XmlRenderer, output : TextBlock, context : XmlRenderingDynamicContext) {
-            const stylingRules  = renderer.getRulesFor(this)
-
-            if (stylingRules.length > 0)
-                output.colorizeMut(stylingRules.reduce((colorer, rule) => rule(colorer), renderer.c))
-        }
-
-
-        renderSelf (
-            renderer        : XmlRenderer,
-            output          : TextBlock,
-            context         : XmlRenderingDynamicContext
-        ) {
-            this.beforeRenderChildren(renderer, output, context)
-            this.renderChildren(renderer, output, context)
-            this.afterRenderChildren(renderer, output, context)
-        }
-
-
-        beforeRenderChildren (
-            renderer    : XmlRenderer,
-            output      : TextBlock,
-            context     : XmlRenderingDynamicContext
-        ) {
-        }
-
-
-        renderChildren (
-            renderer    : XmlRenderer,
-            output      : TextBlock,
-            context     : XmlRenderingDynamicContext
-        ) {
-            this.childNodes.forEach((child, index) => {
-                this.beforeRenderChild(child, index, renderer, output, context)
-                this.renderChild(child, index, renderer, output, context)
-                this.afterRenderChild(child, index, renderer, output, context)
-            })
-        }
-
-
-        afterRenderChildren (renderer : XmlRenderer, output : TextBlock, context : XmlRenderingDynamicContext) {
-        }
-
-
-        beforeRenderChild (
-            child               : XmlNode,
-            index               : number,
-            renderer            : XmlRenderer,
-            output              : TextBlock,
-            context             : XmlRenderingDynamicContext
-        ) {
-        }
-
-
-        renderChild (
-            child               : XmlNode,
-            index               : number,
-            renderer            : XmlRenderer,
-            output              : TextBlock,
-            context             : XmlRenderingDynamicContext
-        ) {
-            this.renderChildInner(child, index, renderer, output, context)
-        }
-
-
-        renderChildInner (
-            child               : XmlNode,
-            index               : number,
-            renderer            : XmlRenderer,
-            output              : TextBlock,
-            context             : XmlRenderingDynamicContext
-        ) {
-            const isBlockLevel      = isString(child) ? false : child.getDisplayType(renderer) === 'block'
-            const isChildIndented   = this.isChildIndented(child)
-
-            const childBlock    = TextBlock.new({
-                maxLen      : output.maxLen - (isChildIndented ? renderer.indentLevel : 0) - output.currentIndentation.length,
-                reserved    : isBlockLevel ? 0 : output.lastLineContentLength
-            })
-
-            if (isString(child)) {
-                childBlock.push(child)
-            } else {
-                child.renderToTextBlock(renderer, childBlock, context)
-            }
-
-            if (isChildIndented) this.indentChildOutput(renderer, child, index, childBlock)
-
-            // this.colorizeChild(child, index, renderer, childBlock, context)
-
-            if (isBlockLevel) output.openBlock()
-
-            output.pullFrom(childBlock)
-
-            if (isBlockLevel) output.closeBlock()
-        }
-
-
-        // colorizeChild (
-        //     child               : XmlNode,
-        //     index               : number,
-        //     renderer            : XmlRenderer,
-        //     childBlock          : TextBlock,
-        //     context             : XmlRenderingDynamicContext
-        // ) {
-        // }
-
-
-        afterRenderChild (
-            child               : XmlNode,
-            index               : number,
-            renderer            : XmlRenderer,
-            output              : TextBlock,
-            context             : XmlRenderingDynamicContext
-        ) {
-        }
 
         //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         // new rendering code below
