@@ -1,26 +1,24 @@
 import { Base } from "../class/Base.js"
-import { TextJSX } from "../jsx/TextJSX.js"
-import { SerializationMapEntry } from "../serializer/SerializerRendering.js"
-import { dateToString } from "../serializer/SerializerXml.js"
-import { ArbitraryObject, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
-import { isDate, isFunction } from "../util/Typeguards.js"
 import { FuzzyMatcher } from "../compare_deep/DeepDiffFuzzyMatcher.js"
+import { TextJSX } from "../jsx/TextJSX.js"
+import { XmlElement } from "../jsx/XmlElement.js"
+import { ArbitraryObject, constructorNameOf, typeOf } from "../util/Helpers.js"
 import {
-    SerialObjectEntry,
     Serial,
     SerialArray,
     SerialAtomic,
     serializeAtomic,
-    SerialObject,
-    SerialReferenceable,
-    SerialSet,
-    SerialWrapper,
     SerialMap,
     SerialMapEntry,
+    SerialObject,
+    SerialObjectEntry,
     SerialOutOfBreadth,
     SerialOutOfDepth,
     SerialReference,
-    SerialReferenceableAtomic
+    SerialReferenceable,
+    SerialReferenceableAtomic,
+    SerialSet,
+    SerialWrapper
 } from "./SerialRendering.js"
 
 
@@ -82,6 +80,19 @@ export const serialize = (
     const options       = Object.assign({}, defaultSerialOptions, opts)
 
     return SerialWrapper.new({ serialization : serialImpl(v1, options) })
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const serializeToElement = (
+    v1                  : unknown,
+    opts                : SerialOptions    = defaultSerialOptions
+)
+    : XmlElement =>
+{
+    const options       = Object.assign({}, defaultSerialOptions, opts)
+
+    return SerialWrapper.new({ serialization : serialImpl(v1, options) }).template()
 }
 
 

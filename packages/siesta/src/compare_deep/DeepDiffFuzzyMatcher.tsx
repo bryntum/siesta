@@ -1,15 +1,9 @@
-import { Visitor } from "typescript-serializable-mixin"
 import { Base } from "../class/Base.js"
 import { AnyConstructor } from "../class/Mixin.js"
 import { TextJSX } from "../jsx/TextJSX.js"
-import { serializationVisitSymbol, SerializerXml } from "../serializer/SerializerXml.js"
 import { DowngradePrimitives, typeOf } from "../util/Helpers.js"
 import { isNumber, isRegExp } from "../util/Typeguards.js"
-import {
-    DeepCompareOptions,
-    DeepCompareState,
-    valueAsDifference
-} from "./DeepDiff.js"
+import { DeepCompareOptions, DeepCompareState, valueAsDifference } from "./DeepDiff.js"
 import { Difference, DifferenceAtomic, DifferenceHeterogeneous } from "./DeepDiffRendering.js"
 
 
@@ -17,11 +11,6 @@ import { Difference, DifferenceAtomic, DifferenceHeterogeneous } from "./DeepDif
 export class FuzzyMatcher extends Base {
 
     toString () : string {
-        throw new Error("Abstract method")
-    }
-
-
-    [ serializationVisitSymbol ] (visitor : Visitor, depth : number) : this {
         throw new Error("Abstract method")
     }
 
@@ -139,13 +128,6 @@ export class FuzzyMatcherNumberApproximation extends FuzzyMatcher {
     }
 
 
-    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-        visitor.write(<number>{ this }</number>)
-
-        return this
-    }
-
-
     equalsToDiff (
         v : number, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
         convertingToDiff    : 'value1' | 'value2' | undefined = undefined
@@ -219,13 +201,6 @@ export class FuzzyMatcherNumberBetween extends FuzzyMatcher {
     }
 
 
-    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-        visitor.write(<number>{ this }</number>)
-
-        return this
-    }
-
-
     equalsToDiff (
         v : number, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
         convertingToDiff    : 'value1' | 'value2' | undefined = undefined
@@ -288,13 +263,6 @@ export class FuzzyMatcherString extends FuzzyMatcher {
             return `any string matching ${ this.pattern }`
         else
             return `any string containing "${ this.pattern }"`
-    }
-
-
-    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-        visitor.write(<special>{ this }</special>)
-
-        return this
     }
 
 
@@ -362,13 +330,6 @@ export class FuzzyMatcherInstance extends FuzzyMatcher {
     }
 
 
-    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-        visitor.write(<special>{ this }</special>)
-
-        return this
-    }
-
-
     equalsToDiff (
         v : unknown, flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
         convertingToDiff    : 'value1' | 'value2' | undefined = undefined
@@ -417,13 +378,6 @@ export class FuzzyMatcherAny extends FuzzyMatcher {
 
     toString () : string {
         return `any`
-    }
-
-
-    [ serializationVisitSymbol ] (visitor : SerializerXml, depth : number) : this {
-        visitor.write(<special>{ this }</special>)
-
-        return this
     }
 
 

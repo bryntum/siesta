@@ -1,6 +1,8 @@
+import { ClassUnion, Mixin } from "typescript-mixin-class"
+import { Serializable, serializable } from "typescript-serializable-mixin"
 import { Base } from "../class/Base.js"
 import { TextJSX } from "../jsx/TextJSX.js"
-import { dateToString } from "../serializer/SerializerXml.js"
+import { dateToString } from "../serializer2/SerialRendering.js"
 import { ArbitraryObject, isAtomicValue, typeOf } from "../util/Helpers.js"
 import { isDate, isFunction } from "../util/Typeguards.js"
 import { FuzzyMatcher } from "./DeepDiffFuzzyMatcher.js"
@@ -12,13 +14,21 @@ import {
     DifferenceMap,
     DifferenceObject,
     DifferenceReference,
-    DifferenceReferenceable, DifferenceReferenceableAtomic,
+    DifferenceReferenceable, DifferenceReferenceableAtomic, DifferenceRendering,
     DifferenceSet, DifferenceWrapper
 } from "./DeepDiffRendering.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const Missing    = Symbol('Missing')
+@serializable({ id : 'MissingCls' })
+export class MissingCls extends Mixin(
+    [ Serializable, Base ],
+    (base : ClassUnion<typeof Serializable, typeof Base>) =>
+    class extends base {
+    }
+) {}
+
+export const Missing    = MissingCls.new()
 export type Missing     = typeof Missing
 
 // a replacer for `Missing` - to render the diff for internal diff data structures correctly
@@ -146,7 +156,7 @@ export const compareDeepDiff = (
     v2                  : unknown,
     opts                : Partial<DeepCompareOptions>   = defaultDeepCompareOptions
 )
-    : Difference =>
+    : DifferenceWrapper =>
 {
     const options   = Object.assign({}, defaultDeepCompareOptions, opts)
 

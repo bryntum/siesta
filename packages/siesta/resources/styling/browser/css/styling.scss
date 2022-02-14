@@ -9,7 +9,9 @@
 @use '../../../../src/siesta/ui/test_result/TestOverlay.scss';
 @use '../../../../src/siesta/ui/test_result/Translator.scss';
 @use '../../../../src/siesta/ui/test_result/LaunchInfoComponent.scss';
+
 @use '../../../../src/compare_deep/JsonDeepDiffComponent.scss';
+@use '../../../../src/serializer2/SerialComponent.scss';
 
 @use '../../terminal/_styling.scss';
 

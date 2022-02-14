@@ -1,6 +1,6 @@
 import { it } from "../../index.js"
 import { compareDeepDiff } from "../../src/compare_deep/DeepDiff.js"
-import { XmlRendererDifference } from "../../src/compare_deep/DeepDiffRendering.js"
+import { XmlRendererDifference } from "../../src/compare_deep/DeepDiffXmlRendererDifference.js"
 import { RenderCanvas } from "../../src/jsx/RenderBlock.js"
 
 const renderer          = XmlRendererDifference.new({})

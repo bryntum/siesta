@@ -1,10 +1,10 @@
 import { Base } from "../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { DeepCompareOptions } from "../../compare_deep/CompareDeepDiff.js"
-import { XmlRendererDifference } from "../../compare_deep/CompareDeepDiffRendering.js"
+import { DeepCompareOptions } from "../../compare_deep/DeepDiff.js"
+import { XmlRendererDifference } from "../../compare_deep/DeepDiffXmlRendererDifference.js"
 import { CI } from "../../iterator/Iterator.js"
 import { serializable, Serializable } from "../../serializable/Serializable.js"
-import { SerializerXml } from "../../serializer/SerializerXml.js"
+import { SerialOptions } from "../../serializer2/Serial.js"
 import { TreeNode } from "../../tree/TreeNode.js"
 import { ArbitraryObject, cloneObject, objectEntriesDeep, prototypeValue } from "../../util/Helpers.js"
 import { isAbsolute, joinUrls, stripDirname, stripTrailingSlash } from "../../util/Path.js"
@@ -249,8 +249,8 @@ export class TestDescriptor extends TestDescriptorPre {
     @prototypeValue(50)
     waitForPollInterval : number
 
-    serializerConfig    : Partial<SerializerXml>            = { maxBreadth : 10, maxDepth : 4 }
-    stringifierConfig   : Partial<XmlRendererDifference>    = { prettyPrint : true }
+    serializerConfig    : Partial<SerialOptions>            = { maxBreadth : 10, maxDepth : 4 }
+    stringifierConfig   : Partial<XmlRendererDifference>    = {}
     deepCompareConfig   : DeepCompareOptions                = undefined
 
     // TODO should probably index by `urlAbs` instead of `filename`??

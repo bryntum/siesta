@@ -1,7 +1,7 @@
 import { it } from "../../index.js"
 import { compareDeepDiff } from "../../src/compare_deep/DeepDiff.js"
 import { any, anyInstanceOf, anyNumberApprox, anyStringLike } from "../../src/compare_deep/DeepDiffFuzzyMatcher.js"
-import { XmlRendererDifference } from "../../src/compare_deep/DeepDiffRendering.js"
+import { XmlRendererDifference } from "../../src/compare_deep/DeepDiffXmlRendererDifference.js"
 
 const rendererPlain     = XmlRendererDifference.new({})
 // strip zero-width spaces

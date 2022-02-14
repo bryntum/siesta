@@ -1,6 +1,6 @@
 import { Base } from "../../../class/Base.js"
 import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
-import { compareDeepDiff, comparePrimitiveAndFuzzyMatchers } from "../../../compare_deep/CompareDeepDiff.js"
+import { compareDeepDiff, comparePrimitiveAndFuzzyMatchers } from "../../../compare_deep/DeepDiff.js"
 import {
     any,
     anyNumberApprox,
@@ -9,11 +9,11 @@ import {
     FuzzyMatcherNumberApproximation,
     FuzzyMatcherString,
     NumberApproximation
-} from "../../../compare_deep/FuzzyMatcherDiff.js"
+} from "../../../compare_deep/DeepDiffFuzzyMatcher.js"
 import { CI } from "../../../iterator/Iterator.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../../jsx/XmlElement.js"
-import { SerializerXml } from "../../../serializer/SerializerXml.js"
+import { serialize, serializeToElement, SerialOptions } from "../../../serializer2/Serial.js"
 import { DowngradePrimitives } from "../../../util/Helpers.js"
 import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
@@ -219,10 +219,14 @@ export class AssertionCompare extends Mixin(
                 passed,
                 description,
 
-                annotation  : passed ? undefined : negated ? NotEqualAnnotationTemplate.el({
-                    value               : value2,
-                    t                   : this
-                }) : <div>{ difference.template(this.descriptor.serializerConfig) }<div></div></div>
+                annotation  : passed
+                    ? undefined
+                    : negated
+                        ? NotEqualAnnotationTemplate.el({
+                            value               : value2,
+                            t                   : this
+                        })
+                        : difference.template()
             }))
         }
 
@@ -708,16 +712,16 @@ export class AssertionCompare extends Mixin(
 export class AnnotationTemplate extends Base {
     t                   : TestNodeResult            = undefined
 
-    $serializerConfig   : Partial<SerializerXml>    = undefined
+    $serializerConfig   : Partial<SerialOptions>    = undefined
 
 
-    get serializerConfig () : Partial<SerializerXml> {
+    get serializerConfig () : Partial<SerialOptions> {
         if (this.$serializerConfig !== undefined) return this.$serializerConfig
 
         return this.$serializerConfig = this.t ? this.t.descriptor.serializerConfig : { maxDepth : 4, maxBreadth : 4 }
     }
 
-    set serializerConfig (value : Partial<SerializerXml>) {
+    set serializerConfig (value : Partial<SerialOptions>) {
         this.$serializerConfig = value
     }
 
@@ -763,47 +767,19 @@ export class GotExpectTemplate extends AnnotationTemplate {
             {
                 this.hasOwnProperty('got') && <div class='got'>
                     <div class="underlined got_title">{ this.gotTitle }:</div>
-                    <div class="indented got_value">{ SerializerXml.serialize(this.got, this.serializerConfig) }</div>
+                    <div class="indented got_value">{ serializeToElement(this.got, this.serializerConfig) }</div>
                 </div>
             }
             { this.description2 }
             {
                 this.hasOwnProperty('expect') && <div class='expect'>
                     <div class="underlined expect_title">{ this.expectTitle }:</div>
-                    <div class="indented expect_value">{ SerializerXml.serialize(this.expect, this.serializerConfig) }</div>
+                    <div class="indented expect_value">{ serializeToElement(this.expect, this.serializerConfig) }</div>
                 </div>
             }
         </div>
     }
 }
-
-
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// export class DeepEqualAnnotationTemplate extends AnnotationTemplate {
-//     differences         : Difference[]              = []
-//
-//
-//     toXmlElement () : XmlElement {
-//         return <div>
-//             {/*Provided values are different. Here {*/}
-//             {/*    differences.length === 1*/}
-//             {/*        ?*/}
-//             {/*    'is the difference found'*/}
-//             {/*        :*/}
-//             {/*    differences.length <= this.maxIsDeeplyDifferences*/}
-//             {/*        ?*/}
-//             {/*    'are the differences found'*/}
-//             {/*        :*/}
-//             {/*    `are the ${ this.maxIsDeeplyDifferences } differences from ${ differences.length } total`*/}
-//             {/*}:*/}
-//             <ul>{
-//                 this.differences.map(difference =>
-//                     <li class="difference">{ difference.asXmlNode(this.serializerConfig) }</li>
-//                 )
-//             }</ul>
-//         </div>
-//     }
-// }
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -816,7 +792,7 @@ export class NotEqualAnnotationTemplate extends AnnotationTemplate {
             The values we received and expect are equal. We expect the opposite.
             <div class='got'>
                 <div class="underlined got_title">Both values are:</div>
-                <div class="indented got_value">{ SerializerXml.serialize(this.value, this.serializerConfig) }</div>
+                <div class="indented got_value">{ serializeToElement(this.value, this.serializerConfig) }</div>
             </div>
         </div>
     }

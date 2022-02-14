@@ -9,11 +9,11 @@ import {
 } from "../jsx/RenderBlock.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { XmlElement } from "../jsx/XmlElement.js"
-import { XmlRendererStreaming } from "../jsx/XmlRenderer.js"
 import { luid, LUID } from "../siesta/common/LUID.js"
 import { ArbitraryObjectKey, constructorNameOf, lastElement, typeOf } from "../util/Helpers.js"
 import { isString } from "../util/Typeguards.js"
 import { Missing, serializeAtomic } from "./DeepDiff.js"
+import { XmlRendererDifference } from "./DeepDiffXmlRendererDifference.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -72,6 +72,7 @@ export class DifferenceRendering extends Mixin(
     (base : ClassUnion<typeof Base>) =>
 
     class DifferenceRendering extends base {
+
         * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
             yield* this.beforeRenderContentGen(output, context)
             yield* this.renderContentGen(output, context)
@@ -96,7 +97,6 @@ export class DifferenceRendering extends Mixin(
         }
     }
 ){}
-
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -164,13 +164,6 @@ export class Difference extends Mixin(
         }
 
 
-        template () : JsonDeepDiffElement {
-            return JsonDeepDiffElement.new({
-                difference  : this
-            })
-        }
-
-
         isMissingIn (stream : 'left' | 'right') : boolean {
             const type      = this.type
 
@@ -181,6 +174,7 @@ export class Difference extends Mixin(
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TODO keeping for now, clean up if not needed
 const compareDifferences = (difference1 : Difference, difference2 : Difference) : number => {
     const type1     = difference1.type
     const type2     = difference1.type
@@ -218,6 +212,13 @@ export class DifferenceWrapper extends Difference {
 
         output.pop()
     }
+
+
+    template () : JsonDeepDiffElement {
+        return JsonDeepDiffElement.new({
+            difference  : this
+        })
+    }
 }
 
 
@@ -244,8 +245,8 @@ export class DifferenceAtomic extends Difference {
     initialize (props : Partial<Difference>) {
         super.initialize(props)
 
-        this.content1       = serializeAtomic(this.value1)
-        this.content2       = serializeAtomic(this.value2)
+        this.content1       = this.value1 !== Missing ? serializeAtomic(this.value1) : Missing
+        this.content2       = this.value2 !== Missing ? serializeAtomic(this.value2) : Missing
 
         this.typeOf1        = typeOf(this.value1)
         this.typeOf2        = typeOf(this.value2)
@@ -278,7 +279,7 @@ export class DifferenceAtomic extends Difference {
 
             output.write(<diff-atomic class={ cls } same={ this.same } type={ this.type }>
                 {
-                    value === Missing ? <MissingValue></MissingValue> : value
+                    this.isMissingIn(context.contentStream) ? <MissingValue></MissingValue> : value
                 }
             </diff-atomic>)
         }
@@ -328,6 +329,7 @@ export class DifferenceReferenceable extends Mixin(
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceReferenceableAtomic' })
 export class DifferenceReferenceableAtomic extends Mixin(
     // unordered mixins combination! order of clashing methods is not defined
     [ DifferenceReferenceable, DifferenceAtomic ],
@@ -526,6 +528,7 @@ export class DifferenceComposite extends DifferenceReferenceable {
 }
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceCompositeEntry' })
 export class DifferenceCompositeEntry extends Difference {
     index       : number            = undefined
 
@@ -555,6 +558,7 @@ export class DifferenceCompositeEntry extends Difference {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceArrayEntry' })
 export class DifferenceArrayEntry extends DifferenceCompositeEntry {
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
@@ -570,6 +574,7 @@ export class DifferenceArrayEntry extends DifferenceCompositeEntry {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceArray' })
 export class DifferenceArray extends DifferenceComposite {
     value1          : unknown[]
     value2          : unknown[]
@@ -662,6 +667,7 @@ export class DifferenceArray extends DifferenceComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceObjectEntry' })
 export class DifferenceObjectEntry extends DifferenceCompositeEntry {
     key             : string            = undefined
 
@@ -690,6 +696,7 @@ export class DifferenceObjectEntry extends DifferenceCompositeEntry {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceObject' })
 export class DifferenceObject extends DifferenceComposite {
     value1          : object | Missing
     value2          : object | Missing
@@ -786,11 +793,13 @@ export class DifferenceObject extends DifferenceComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceSetEntry' })
 export class DifferenceSetEntry extends DifferenceCompositeEntry {
 }
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceSet' })
 export class DifferenceSet extends DifferenceComposite {
     value1          : Set<unknown>
     value2          : Set<unknown>
@@ -865,6 +874,7 @@ export class DifferenceSet extends DifferenceComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceMapEntry' })
 export class DifferenceMapEntry extends DifferenceCompositeEntry {
     differenceKeys          : Difference        = undefined
 
@@ -895,6 +905,7 @@ export class DifferenceMapEntry extends DifferenceCompositeEntry {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceMap' })
 export class DifferenceMap extends DifferenceComposite {
     value1          : Map<unknown, unknown>
     value2          : Map<unknown, unknown>
@@ -982,6 +993,7 @@ export class DifferenceMap extends DifferenceComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceReference' })
 export class DifferenceReference extends Difference {
     value1      : number | Missing
     value2      : number | Missing
@@ -1013,7 +1025,7 @@ export class DifferenceReference extends Difference {
         if (context.isContent) {
             const ref       = context.choose(this.ref1, this.ref2)
 
-            if (ref === Missing)
+            if (this.isMissingIn(context.contentStream))
                 output.write(<MissingValue></MissingValue>)
             else
                 output.write(<span class="json-deep-diff-reference">[Circular *{ ref }]</span>)
@@ -1029,15 +1041,16 @@ export class DifferenceReference extends Difference {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceHeterogeneous' })
 export class DifferenceHeterogeneous extends Difference {
     // heterogeneous values (values of different type) are pretty much always unequal
     // however, they can be equal in the case of comparing with fuzzy matcher (like `anyInstanceOf/any`)
 
-    value1      : Difference | Missing
-    value2      : Difference | Missing
+    value1      : Difference
+    value2      : Difference
 
-    difference1     : Difference | Missing
-    difference2     : Difference | Missing
+    difference1     : Difference            = undefined
+    difference2     : Difference            = undefined
 
 
     initialize (props : Partial<DifferenceHeterogeneous>) {
@@ -1046,6 +1059,11 @@ export class DifferenceHeterogeneous extends Difference {
         // `value1/2` are not persistent, need to copy the diffs into different properties
         this.difference1    = this.value1
         this.difference2    = this.value2
+
+        // TODO!!! had to clear the `value1` and `value2` because those properties might be visited
+        // by the serializer prior the `difference1/2` and thus, `difference1/2` will contain just references
+        // to the values, but `value1/2` are not persisted...
+        this.value1 = this.value2 = undefined
     }
 
 
@@ -1053,7 +1071,7 @@ export class DifferenceHeterogeneous extends Difference {
         if (context.isContent) {
             const difference    = context.choose(this.difference1, this.difference2)
 
-            if (difference === Missing)
+            if (this.isMissingIn(context.contentStream))
                 output.write(<MissingValue></MissingValue>)
             else {
                 output.push(<diff-hetero></diff-hetero>)
@@ -1071,30 +1089,6 @@ export class DifferenceHeterogeneous extends Difference {
     //     </DifferenceTemplateHeterogeneous>
     // }
 }
-
-
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class XmlRendererDifference extends Mixin(
-    [ XmlRendererStreaming ],
-    (base : ClassUnion<typeof XmlRendererStreaming>) =>
-
-    class XmlRendererDifference extends base {
-
-        initialize (props? : Partial<XmlRendererDifference>) {
-            super.initialize(props)
-
-            this.blockLevelElements.add('diff-entry')
-            this.blockLevelElements.add('diff-inner')
-        }
-
-
-        getElementClass (el : XmlElement) : string {
-            const insideHetero  = CI(el.parentAxis()).some(el => el.tagName === 'diff-hetero')
-
-            return el.class + (insideHetero ? ' diff-hetero' : '')
-        }
-    }
-){}
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1163,25 +1157,26 @@ export class JsonDeepDiffContentRendering extends Base {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'JsonDeepDiffElement' })
 export class JsonDeepDiffElement extends Mixin(
     [ XmlElement ],
     (base : ClassUnion<typeof XmlElement>) =>
 
     class JsonDeepDiffElement extends base {
         props           : XmlElement[ 'props' ] & {
-            difference      : Difference
+            difference      : JsonDeepDiffElement[ 'difference' ]
         }
 
-        tagName             : 'div'             = 'div'
+        tagName             : 'div'                 = 'div'
 
-        difference          : Difference        = undefined
+        difference          : DifferenceWrapper     = undefined
 
 
         getMiddleAreaMaxWidth (context : XmlRenderBlock) : number {
             const renderer      = JsonDeepDiffContentRendering.new({
                 stream      : 'middle',
                 difference  : this.difference,
-                renderer    : context.renderer
+                renderer    : context.renderer as XmlRendererDifference
             })
 
             CI(renderer.render()).flush()
@@ -1204,19 +1199,19 @@ export class JsonDeepDiffElement extends Mixin(
                 JsonDeepDiffContentRendering.new({
                     stream      : 'left',
                     difference  : this.difference,
-                    renderer    : context.renderer,
+                    renderer    : context.renderer as XmlRendererDifference,
                     // extra 1 space because of the possible oddity of the `available` goes to the left region
                     maxWidth    : Math.round(available / 2)
                 }),
                 JsonDeepDiffContentRendering.new({
                     stream      : 'middle',
                     difference  : this.difference,
-                    renderer    : context.renderer
+                    renderer    : context.renderer as XmlRendererDifference
                 }),
                 JsonDeepDiffContentRendering.new({
                     stream      : 'right',
                     difference  : this.difference,
-                    renderer    : context.renderer,
+                    renderer    : context.renderer as XmlRendererDifference,
                     maxWidth    : Math.floor(available / 2)
                 })
             ]

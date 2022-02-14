@@ -1,5 +1,5 @@
 import { AnyFunction, ClassUnion, Mixin } from "../../class/Mixin.js"
-import { XmlRendererDifference } from "../../compare_deep/DeepDiffRendering.js"
+import { XmlRendererDifference } from "../../compare_deep/DeepDiffXmlRendererDifference.js"
 import { Hook } from "../../hook/Hook.js"
 import { RenderCanvas } from "../../jsx/RenderBlock.js"
 import { XmlElement } from "../../jsx/XmlElement.js"

@@ -242,6 +242,7 @@ export class SerialReferenceable extends Mixin(
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialReferenceableAtomic' })
 export class SerialReferenceableAtomic extends Mixin(
     // unordered mixins combination! order of clashing methods is not defined
     [ SerialReferenceable, SerialAtomic ],
@@ -394,6 +395,7 @@ export class SerialComposite extends SerialReferenceable {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialCompositeEntry' })
 export class SerialCompositeEntry extends Serial {
     serialization  : Serial        = undefined
 
@@ -427,6 +429,7 @@ export class SerialWrapper extends Serial {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialArray' })
 export class SerialArray extends SerialComposite {
     $value          : unknown[]
 
@@ -469,6 +472,7 @@ export class SerialArray extends SerialComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialObjectEntry' })
 export class SerialObjectEntry extends SerialCompositeEntry {
     key             : string            = undefined
 
@@ -487,6 +491,7 @@ export class SerialObjectEntry extends SerialCompositeEntry {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialObject' })
 export class SerialObject extends SerialComposite {
     $value              : object
 
@@ -544,6 +549,7 @@ export class SerialObject extends SerialComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialSet' })
 export class SerialSet extends SerialComposite {
     $value          : Set<unknown>
 
@@ -596,6 +602,7 @@ export class SerialSet extends SerialComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialMapEntry' })
 export class SerialMapEntry extends SerialCompositeEntry {
     serialKeys          : Serial            = undefined
 
@@ -622,6 +629,7 @@ export class SerialMapEntry extends SerialCompositeEntry {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialMap' })
 export class SerialMap extends SerialComposite {
     $value          : Map<unknown, unknown>
 
@@ -676,6 +684,7 @@ export class SerialMap extends SerialComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialReference' })
 export class SerialReference extends Serial {
     $value      : number
 
@@ -684,51 +693,6 @@ export class SerialReference extends Serial {
         if (context.isContent) output.write(<span class="serial-reference">[Circular *{ this.value }]</span>)
     }
 }
-
-
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// export class DifferenceHeterogeneous extends Serialization {
-//     // heterogeneous values (values of different type) are pretty much always unequal
-//     // however, they can be equal in the case of comparing with fuzzy matcher (like `anyInstanceOf/any`)
-//
-//     value1      : Serialization | NoValue
-//     value2      : Serialization | NoValue
-//
-//     difference1     : Serialization | NoValue
-//     difference2     : Serialization | NoValue
-//
-//
-//     initialize (props : Partial<Serialization>) {
-//         super.initialize(props)
-//
-//         // `value1/2` are not persistent, need to copy the diffs into different properties
-//         this.difference1    = this.value1
-//         this.difference2    = this.value2
-//     }
-//
-//
-//     * renderGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
-//         if (context.isContent) {
-//             const difference    = context.choose(this.difference1, this.difference2)
-//
-//             if (difference === NoValue)
-//                 output.write(<MissingValue></MissingValue>)
-//             else {
-//                 output.push(<diff-hetero></diff-hetero>)
-//                 yield* difference.renderGen(output, context)
-//                 output.pop()
-//             }
-//         }
-//     }
-//
-//
-//     // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-//     //     return <DifferenceTemplateHeterogeneous type={ this.type } same={ this.same }>
-//     //         { this.value1 !== Missing ? this.value1.templateInner(serializerConfig, diffState) : <MissingValue></MissingValue> }
-//     //         { this.value2 !== Missing ? this.value2.templateInner(serializerConfig, diffState) : <MissingValue></MissingValue> }
-//     //     </DifferenceTemplateHeterogeneous>
-//     // }
-// }
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -797,6 +761,7 @@ export class SerialContentRendering extends Base {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialElement' })
 export class SerialElement extends Mixin(
     [ XmlElement ],
     (base : ClassUnion<typeof XmlElement>) =>
@@ -831,125 +796,125 @@ export class SerialElement extends Mixin(
 ){}
 
 
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class SerialPairElement extends Mixin(
-    [ XmlElement ],
-    (base : ClassUnion<typeof XmlElement>) =>
-
-    class SerialPairElement extends base {
-        props           : XmlElement[ 'props' ] & {
-            serialization       : SerialElement[ 'serialization' ]
-        }
-
-        tagName         : 'div'             = 'div'
-
-        serialization1  : Serial     = undefined
-
-        serialization2  : Serial     = undefined
-
-
-        renderContent (context : XmlRenderBlock) {
-            // // the wrapper for content in the middle stream ` |CONTENT| ` is 4 chars length
-            // const available     = context.maxWidth - (middleAreaMaxWidth + 4)
-            //
-            // const renderers     = [
-            //     SerialContentRendering.new({
-            //         stream      : 'left',
-            //         serialization  : this.serialization,
-            //         renderer    : context.renderer,
-            //         // extra 1 space because of the possible oddity of the `available` goes to the left region
-            //         maxWidth    : Math.round(available / 2)
-            //     }),
-            //     SerialContentRendering.new({
-            //         stream      : 'middle',
-            //         serialization  : this.serialization,
-            //         renderer    : context.renderer
-            //     }),
-            //     SerialContentRendering.new({
-            //         stream      : 'right',
-            //         serialization  : this.serialization,
-            //         renderer    : context.renderer,
-            //         maxWidth    : Math.floor(available / 2)
-            //     })
-            // ]
-            //
-            // const leftCanvas        = renderers[ 0 ].canvas
-            // const middleCanvas      = renderers[ 1 ].canvas
-            // const rightCanvas       = renderers[ 2 ].canvas
-            //
-            // // "pre-render" some content
-            // leftCanvas.writePlain('Received')
-            // // this write will set the minimum width for middle canvas to 1 char
-            // middleCanvas.writePlain(' ')
-            // rightCanvas.writePlain('Expected')
-            //
-            // renderers.forEach(renderer => {
-            //     renderer.canvas.newLine()
-            // })
-            //
-            // const iterators     = renderers.map(renderer => renderer.render())
-            //
-            // while (true) {
-            //     const iterations        = iterators.map(iterator => iterator.next())
-            //
-            //     if (iterations.every(iteration => iteration.done)) break
-            //
-            //     if (iterations.every(iteration => !iteration.done)) {
-            //         const maxHeight     = Math.max(iterations[ 0 ].value.height, iterations[ 2 ].value.height)
-            //
-            //         iterations.forEach((iteration, index) => {
-            //             // this comparison is only used for typing purposes
-            //             // (TS can't track the `every !done` assertion from above)
-            //             if (iteration.done === false) {
-            //                 const heightDiff    = maxHeight - iteration.value.height
-            //
-            //                 if (heightDiff > 0)
-            //                     renderers[ index ].output.write(
-            //                         Fitter.new({
-            //                             tagName : 'div',
-            //                             attributes : {
-            //                                 class   : 'json-deep-diff-fitter',
-            //                                 style   : `height: ${ 1.5 * heightDiff }em`
-            //                             },
-            //                             height      : heightDiff
-            //                         })
-            //                     )
-            //             }
-            //         })
-            //     } else
-            //         throw new Error("Elements flow de-synchronization")
-            // }
-            //
-            // const height            = leftCanvas.height
-            //
-            // if (renderers.some(renderer => renderer.canvas.height !== height)) throw new Error("Rendering flow de-synchronization")
-            //
-            // for (let i = 0; i < height; i++) {
-            //     const leftLine      = leftCanvas.canvas[ i ]
-            //     const middleLine    = middleCanvas.canvas[ i ]
-            //     const rightLine     = rightCanvas.canvas[ i ]
-            //
-            //     // TODO optimize the `toString` joining here, can push the line itself
-            //     context.writeStyledSameLineText(leftLine.toString(), leftLine.length)
-            //     const equalLengthRemainderLeft  = leftCanvas.maxWidthFact - leftLine.length
-            //     context.writeStyledSameLineText(' '.repeat(equalLengthRemainderLeft), equalLengthRemainderLeft)
-            //
-            //     const equalLengthRemainderMiddle = middleCanvas.maxWidthFact - middleLine.length
-            //
-            //     context.writeStyledSameLineText(' │', 2)
-            //     context.writeStyledSameLineText(' '.repeat(equalLengthRemainderMiddle), equalLengthRemainderMiddle)
-            //     context.writeStyledSameLineText(middleLine.toString(), middleLine.length)
-            //     context.writeStyledSameLineText('│ ', 2)
-            //
-            //     context.writeStyledSameLineText(rightLine.toString(), rightLine.length)
-            //     const equalLengthRemainderRight  = rightCanvas.maxWidthFact - rightLine.length
-            //     context.writeStyledSameLineText(' '.repeat(equalLengthRemainderRight), equalLengthRemainderRight)
-            //
-            //     if (i !== height - 1) context.write('\n')
-            // }
-        }
-    }
-){}
+// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// export class SerialPairElement extends Mixin(
+//     [ XmlElement ],
+//     (base : ClassUnion<typeof XmlElement>) =>
+//
+//     class SerialPairElement extends base {
+//         props           : XmlElement[ 'props' ] & {
+//             serialization       : SerialElement[ 'serialization' ]
+//         }
+//
+//         tagName         : 'div'             = 'div'
+//
+//         serialization1  : Serial     = undefined
+//
+//         serialization2  : Serial     = undefined
+//
+//
+//         renderContent (context : XmlRenderBlock) {
+//             // // the wrapper for content in the middle stream ` |CONTENT| ` is 4 chars length
+//             // const available     = context.maxWidth - (middleAreaMaxWidth + 4)
+//             //
+//             // const renderers     = [
+//             //     SerialContentRendering.new({
+//             //         stream      : 'left',
+//             //         serialization  : this.serialization,
+//             //         renderer    : context.renderer,
+//             //         // extra 1 space because of the possible oddity of the `available` goes to the left region
+//             //         maxWidth    : Math.round(available / 2)
+//             //     }),
+//             //     SerialContentRendering.new({
+//             //         stream      : 'middle',
+//             //         serialization  : this.serialization,
+//             //         renderer    : context.renderer
+//             //     }),
+//             //     SerialContentRendering.new({
+//             //         stream      : 'right',
+//             //         serialization  : this.serialization,
+//             //         renderer    : context.renderer,
+//             //         maxWidth    : Math.floor(available / 2)
+//             //     })
+//             // ]
+//             //
+//             // const leftCanvas        = renderers[ 0 ].canvas
+//             // const middleCanvas      = renderers[ 1 ].canvas
+//             // const rightCanvas       = renderers[ 2 ].canvas
+//             //
+//             // // "pre-render" some content
+//             // leftCanvas.writePlain('Received')
+//             // // this write will set the minimum width for middle canvas to 1 char
+//             // middleCanvas.writePlain(' ')
+//             // rightCanvas.writePlain('Expected')
+//             //
+//             // renderers.forEach(renderer => {
+//             //     renderer.canvas.newLine()
+//             // })
+//             //
+//             // const iterators     = renderers.map(renderer => renderer.render())
+//             //
+//             // while (true) {
+//             //     const iterations        = iterators.map(iterator => iterator.next())
+//             //
+//             //     if (iterations.every(iteration => iteration.done)) break
+//             //
+//             //     if (iterations.every(iteration => !iteration.done)) {
+//             //         const maxHeight     = Math.max(iterations[ 0 ].value.height, iterations[ 2 ].value.height)
+//             //
+//             //         iterations.forEach((iteration, index) => {
+//             //             // this comparison is only used for typing purposes
+//             //             // (TS can't track the `every !done` assertion from above)
+//             //             if (iteration.done === false) {
+//             //                 const heightDiff    = maxHeight - iteration.value.height
+//             //
+//             //                 if (heightDiff > 0)
+//             //                     renderers[ index ].output.write(
+//             //                         Fitter.new({
+//             //                             tagName : 'div',
+//             //                             attributes : {
+//             //                                 class   : 'json-deep-diff-fitter',
+//             //                                 style   : `height: ${ 1.5 * heightDiff }em`
+//             //                             },
+//             //                             height      : heightDiff
+//             //                         })
+//             //                     )
+//             //             }
+//             //         })
+//             //     } else
+//             //         throw new Error("Elements flow de-synchronization")
+//             // }
+//             //
+//             // const height            = leftCanvas.height
+//             //
+//             // if (renderers.some(renderer => renderer.canvas.height !== height)) throw new Error("Rendering flow de-synchronization")
+//             //
+//             // for (let i = 0; i < height; i++) {
+//             //     const leftLine      = leftCanvas.canvas[ i ]
+//             //     const middleLine    = middleCanvas.canvas[ i ]
+//             //     const rightLine     = rightCanvas.canvas[ i ]
+//             //
+//             //     // TODO optimize the `toString` joining here, can push the line itself
+//             //     context.writeStyledSameLineText(leftLine.toString(), leftLine.length)
+//             //     const equalLengthRemainderLeft  = leftCanvas.maxWidthFact - leftLine.length
+//             //     context.writeStyledSameLineText(' '.repeat(equalLengthRemainderLeft), equalLengthRemainderLeft)
+//             //
+//             //     const equalLengthRemainderMiddle = middleCanvas.maxWidthFact - middleLine.length
+//             //
+//             //     context.writeStyledSameLineText(' │', 2)
+//             //     context.writeStyledSameLineText(' '.repeat(equalLengthRemainderMiddle), equalLengthRemainderMiddle)
+//             //     context.writeStyledSameLineText(middleLine.toString(), middleLine.length)
+//             //     context.writeStyledSameLineText('│ ', 2)
+//             //
+//             //     context.writeStyledSameLineText(rightLine.toString(), rightLine.length)
+//             //     const equalLengthRemainderRight  = rightCanvas.maxWidthFact - rightLine.length
+//             //     context.writeStyledSameLineText(' '.repeat(equalLengthRemainderRight), equalLengthRemainderRight)
+//             //
+//             //     if (i !== height - 1) context.write('\n')
+//             // }
+//         }
+//     }
+// ){}
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -7,8 +7,11 @@ import { entity } from "@bryntum/chronograph/src/schema2/Schema.js"
 import { ChronoGraphJSX, ElementSource, PropertySource } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
 import { ComponentElement, ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
+import { JsonDeepDiffElement } from "../../../compare_deep/DeepDiffRendering.js"
+import { JsonDeepDiffComponent } from "../../../compare_deep/JsonDeepDiffComponent.js"
 import { RenderCanvas } from "../../../jsx/RenderBlock.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
+import { XmlElement } from "../../../jsx/XmlElement.js"
 import { LogLevel } from "../../../logger/Logger.js"
 import { relative } from "../../../util/Path.js"
 import { ProjectSerializableData } from "../../project/ProjectDescriptor.js"
@@ -146,6 +149,16 @@ export class AssertionComponent extends Mixin(
         launchInfo      : TestLaunchInfo            = undefined
 
 
+        upgradeComponent (cmp : XmlElement) : Component | undefined {
+            if (cmp instanceof JsonDeepDiffElement)
+                return JsonDeepDiffComponent.new({
+                    difference  : cmp.difference
+                })
+
+            return undefined
+        }
+
+
         render () : Element {
             const testNode                  = this.testNode
             const assertion                 = this.assertion
@@ -198,7 +211,7 @@ export class AssertionComponent extends Mixin(
                                     null,
                             !passed && assertion.annotation
                                 ?
-                                    <pre class='assertion_annotation'>{
+                                    this.upgradeComponent(assertion.annotation)?.el ?? <pre class='assertion_annotation'>{
                                         dashboard.renderer.render(assertion.annotation, RenderCanvas.new({ maxWidth : dashboard.renderer.getMaxLen() }))
                                     }</pre>
                                 : null

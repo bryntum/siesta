@@ -6,7 +6,7 @@ import { importer } from "../../Importer.js"
 import { XmlNode } from "../../jsx/XmlElement.js"
 import { Logger, LogLevel, LogMethod } from "../../logger/Logger.js"
 import { parse } from "../../serializable/Serializable.js"
-import { SerializerXml } from "../../serializer/SerializerXml.js"
+import { serializeToElement } from "../../serializer2/Serial.js"
 import { ArbitraryObject, ArbitraryObjectKey, isDeno, isNodejs, prototypeValue } from "../../util/Helpers.js"
 import { stripBasename, stripDirname } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
@@ -668,9 +668,9 @@ export class Test extends TestPre {
 
     prepareLogMessage (...messages : unknown[]) : XmlNode[] {
         if (messages.length === 1)
-            return messages.map(message => isString(message) ? message : SerializerXml.serialize(message, this.descriptor.serializerConfig))
+            return messages.map(message => isString(message) ? message : serializeToElement(message, this.descriptor.serializerConfig))
         else
-            return [ SerializerXml.serialize(messages, this.descriptor.serializerConfig) ]
+            return [ serializeToElement(messages, this.descriptor.serializerConfig) ]
     }
 
 

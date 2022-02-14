@@ -6,7 +6,7 @@ import { XmlElement, XmlNode } from "../../jsx/XmlElement.js"
 import { LogLevel, LogMethod } from "../../logger/Logger.js"
 import { LoggerHookable } from "../../logger/LoggerHookable.js"
 import { parse, stringify } from "../../serializable/Serializable.js"
-import { SerializerXml } from "../../serializer/SerializerXml.js"
+import { serialize } from "../../serializer2/Serial.js"
 import { cloneObject, isDeno, isNodejs } from "../../util/Helpers.js"
 import { stripBasename } from "../../util/Path.js"
 import { isString } from "../../util/Typeguards.js"
@@ -123,7 +123,7 @@ export class LauncherTerminal extends Mixin(
 
         prepareLogMessage (...messages : unknown[]) : XmlNode[] {
             // if (messages.length === 1)
-                return messages.map(message => isString(message) ? message : SerializerXml.serialize(message/*, this.descriptor.serializerConfig*/))
+                return messages.map(message => isString(message) ? message : serialize(message/*, this.descriptor.serializerConfig*/).template())
             // else
             //     return [ SerializerXml.serialize(messages/*, this.descriptor.serializerConfig*/) ]
         }

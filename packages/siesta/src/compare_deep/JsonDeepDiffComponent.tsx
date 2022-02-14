@@ -9,9 +9,9 @@ import {
     DifferenceRenderingStream,
     DifferenceWrapper,
     JsonDeepDiffContentRendering,
-    JsonDeepDiffFitter,
-    XmlRendererDifference
+    JsonDeepDiffFitter
 } from "./DeepDiffRendering.js"
+import { XmlRendererDifference } from "./DeepDiffXmlRendererDifference.js"
 
 // added as expression here, otherwise IDE thinks `ChronoGraphJSX` is unused import
 ChronoGraphJSX
@@ -23,8 +23,6 @@ export class JsonDeepDiffComponent extends Mixin(
     (base : ClassUnion<typeof AbstractSplitter, typeof Component>) =>
 
     class JsonDeepDiffComponent extends base {
-        // context             : XmlRendererDifference             = XmlRendererDifference.new()
-
         difference          : DifferenceWrapper     = undefined
 
         @field()
@@ -32,12 +30,8 @@ export class JsonDeepDiffComponent extends Mixin(
 
 
         render () : Element {
-            const maxWidth         = this.maxWidth
-
-            const renderer      = XmlRendererDifference.new({
-                // styles      : styles
-            })
-
+            const maxWidth      = this.maxWidth
+            const renderer      = XmlRendererDifference.new()
             const streams       = [ 'expander', 'left', 'middle', 'right' ] as DifferenceRenderingStream[]
 
             const renderers     = streams.map(stream => JsonDeepDiffContentRendering.new({
@@ -126,7 +120,6 @@ export class JsonDeepDiffComponent extends Mixin(
                 const middleEl  = document.getElementById(`middle-${ diffId }`);
 
                 [ expander, leftEl, middleEl, rightEl ].forEach(el => {
-                    // (el.closest('diff-entry') || el.parentElement).classList.toggle('diff-entry-collapsed')
                     el.classList.toggle('diff-collapsed')
                 })
             }
@@ -139,7 +132,6 @@ export class JsonDeepDiffComponent extends Mixin(
                 const middleEl  = document.getElementById(`middle-${ diffId }`);
 
                 [ expander, leftEl, middleEl, rightEl ].forEach(el => {
-                    // (el.closest('diff-entry') || el.parentElement).classList.toggle('diff-entry-collapsed')
                     el.classList.toggle('diff-collapsed')
                 })
             }

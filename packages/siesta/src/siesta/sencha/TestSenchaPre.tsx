@@ -1,6 +1,6 @@
 import { AnyFunction } from "typescript-mixin-class"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { SerializerXml } from "../../serializer/SerializerXml.js"
+import { serializeToElement } from "../../serializer2/Serial.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { waitFor, WaitForResult } from "../../util/TimeHelpers.js"
 import { isString } from "../../util/Typeguards.js"
@@ -439,7 +439,7 @@ export class TestSenchaPre extends TestBrowser {
                     ? <div>
                         Component query <span class="underlined">{ query }</span> match { results.length } component(s).{'\n'}
 
-                        <div class="indented">{ SerializerXml.serialize(results[ 0 ]) }</div>
+                        <div class="indented">{ serializeToElement(results[ 0 ]) }</div>
                     </div>
                     : <div>
                         Component query <span class="underlined">{ query }</span> did not match any component
