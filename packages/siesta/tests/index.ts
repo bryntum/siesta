@@ -48,7 +48,8 @@ project.plan(
 
         items       : [
             'serializer_xml.t.js',
-            'serializer_rendering.t.js'
+            'serializer_rendering.t.js',
+            'streaming_serializer_rendering.t.js'
         ]
     },
     {

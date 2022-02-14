@@ -167,6 +167,22 @@ export class SerialOutOfBreadth extends Serial {
 }
 
 
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'SerialOutOfDepth' })
+export class SerialOutOfDepth extends Serial {
+    constructorName         : string        = undefined
+
+    '---'
+
+    * renderContentGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
+        const stream        = context.stream
+
+        if (context.isContent) {
+            output.write(<serial-out-of-depth>{ `▼ ${ this.constructorName ?? '' } {…}` }</serial-out-of-depth>)
+        }
+    }
+}
+
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'SerialAtomic' })
@@ -179,8 +195,10 @@ export class SerialAtomic extends Serial {
     initialize (props : Partial<Serial>) {
         super.initialize(props)
 
-        this.content        = serializeAtomic(this.value)
-        this.typeOf         = typeOf(this.value)
+        if (this.content === undefined) {
+            this.content        = serializeAtomic(this.value)
+            this.typeOf         = typeOf(this.value)
+        }
     }
 
 
@@ -657,53 +675,17 @@ export class SerialMap extends SerialComposite {
 }
 
 
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// export class DifferenceReference extends Serialization {
-//     value1      : number | NoValue
-//     value2      : number | NoValue
-//
-//     ref1        : number | NoValue          = NoValue
-//     ref2        : number | NoValue          = NoValue
-//
-//
-//     initialize (props : Partial<DifferenceArray>) {
-//         super.initialize(props)
-//
-//         // `value1` and `value2` are not persistable, so need to copy them to another property
-//         this.ref1       = this.value1
-//         this.ref2       = this.value2
-//     }
-//
-//
-//     excludeValue (valueProp : 'value1' | 'value2') {
-//         super.excludeValue(valueProp)
-//
-//         if (valueProp === 'value1')
-//             this.ref1   = NoValue
-//         else
-//             this.ref2   = NoValue
-//     }
-//
-//
-//     * renderGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
-//         if (context.isContent) {
-//             const ref       = context.choose(this.ref1, this.ref2)
-//
-//             if (ref === NoValue)
-//                 output.write(<MissingValue></MissingValue>)
-//             else
-//                 output.write(<span class="json-deep-diff-reference">[Circular *{ ref }]</span>)
-//         }
-//     }
-//
-//
-//     // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-//     //     return <DifferenceTemplateReference type={ this.type } same={ this.same } refId1={ this.value1 } refId2={ this.value2 }>
-//     //     </DifferenceTemplateReference>
-//     // }
-// }
-//
-//
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export class SerialReference extends Serial {
+    $value      : number
+
+
+    * renderGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
+        if (context.isContent) output.write(<span class="serial-reference">[Circular *{ this.value }]</span>)
+    }
+}
+
+
 // //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // export class DifferenceHeterogeneous extends Serialization {
 //     // heterogeneous values (values of different type) are pretty much always unequal

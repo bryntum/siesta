@@ -2,17 +2,25 @@ import { Base } from "../class/Base.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { SerializationMapEntry } from "../serializer/SerializerRendering.js"
 import { dateToString } from "../serializer/SerializerXml.js"
-import { ArbitraryObject, isAtomicValue, typeOf } from "../util/Helpers.js"
+import { ArbitraryObject, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
 import { isDate, isFunction } from "../util/Typeguards.js"
 import { FuzzyMatcher } from "../compare_deep/DeepDiffFuzzyMatcher.js"
 import {
     SerialObjectEntry,
     Serial,
     SerialArray,
-    SerialAtomic, serializeAtomic,
+    SerialAtomic,
+    serializeAtomic,
     SerialObject,
-    SerialReferenceable, SerialSet,
-    SerialWrapper, SerialMap, SerialMapEntry, SerialOutOfBreadth
+    SerialReferenceable,
+    SerialSet,
+    SerialWrapper,
+    SerialMap,
+    SerialMapEntry,
+    SerialOutOfBreadth,
+    SerialOutOfDepth,
+    SerialReference,
+    SerialReferenceableAtomic
 } from "./SerialRendering.js"
 
 
@@ -93,9 +101,7 @@ const serialImpl = function (
 )
     : Serial
 {
-    state.depth++
-
-    // if (state.depth > options.maxDepth) return SerialOutOfDepth.new()
+    if (state.depth++ > options.maxDepth) return SerialOutOfDepth.new({ constructorName : constructorNameOf(v1) })
 
     const matchersDiff  = serializeFuzzyMatchers(v1, options, state)
 
@@ -110,11 +116,9 @@ const serialImpl = function (
 
         if (refId1 === undefined) refId1 = v1Visit[ 1 ].refId = state.refIdSource++
 
-        // return SerialReference.new({
-        //     value1  : v1Visit[ 1 ].refId1,
-        //     value2  : v2Visit[ 1 ].refId2,
-        //     $same   : v1Visit[ 0 ] === v2Visit[ 0 ]
-        // })
+        return SerialReference.new({
+            value  : v1Visit[ 1 ].refId,
+        })
     }
 
     const type1         = typeOf(v1)
@@ -131,18 +135,18 @@ const serialImpl = function (
     else if (type1 === 'Set') {
         return out(state, serializeSet(v1 as Set<unknown>, options, state))
     }
-    // else if (type1 === 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
-    //     return compareFunctionDeepDiff(v1 as Function, v2 as Function, options, state, convertingToDiff)
-    // }
-    // else if (type1 === 'RegExp') {
-    //     return compareRegExpDeepDiff(v1 as RegExp, v2 as RegExp, options, state, convertingToDiff)
-    // }
-    // else if (type1 === 'Date') {
-    //     return compareDateDeepDiff(v1 as Date, v2 as Date, options, state, convertingToDiff)
-    // }
-    // else if (type1 === 'Error') {
-    //     return compareErrorDeepDiff(v1 as Error, v2 as Error, options, state, convertingToDiff)
-    // }
+    else if (type1 === 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
+        return compareFunctionDeepDiff(v1 as Function, options, state)
+    }
+    else if (type1 === 'RegExp') {
+        return compareRegExpDeepDiff(v1 as RegExp, options, state)
+    }
+    else if (type1 === 'Date') {
+        return compareDateDeepDiff(v1 as Date, options, state)
+    }
+    else if (type1 === 'Error') {
+        return compareErrorDeepDiff(v1 as Error, options, state)
+    }
     // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
     else {
         return SerialAtomic.new({
@@ -261,85 +265,78 @@ const serializeObject = function (
 }
 
 
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// const compareErrorDeepDiff = function (
-//     object1 : Error, object2 : Error,
-//     options : SerialOptions, state : SerialState, convertingToDiff : 'value1' | 'value2' | undefined
-// )
-//     : Serial
-// {
-//     const difference = DifferenceObject.new({ value1 : object1, value2 : object2 })
-//
-//     state.markVisited(object1, object2, difference, convertingToDiff)
-//
-//     const { common, onlyIn1, onlyIn2 }  = compareKeys(
-//         new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state, convertingToDiff
-//     )
-//
-//     common.push({ el1 : 'message', el2 : 'message', difference : null })
-//
-//     difference.onlyIn2Size              = onlyIn2.size
-//
-//     for (let i = 0; i < common.length; i++) {
-//         const key1      = common[ i ].el1
-//         const key2      = common[ i ].el2
-//
-//         const diff      = serialImpl(object1[ key1 ], object2[ key2 ], options, state, convertingToDiff)
-//
-//         difference.addComparison(key1, diff)
-//     }
-//
-//     onlyIn1.forEach(key1 => difference.addComparison(key1, valueAsDifference(object1[ key1 ], 'value1', options, state)))
-//     onlyIn2.forEach(key2 => difference.addComparison(key2, valueAsDifference(object2[ key2 ], 'value2', options, state)))
-//
-//     return difference
-// }
-//
-//
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// const compareFunctionDeepDiff = function (
-//     func1 : Function, func2 : Function,
-//     options : SerialOptions, state : SerialState, convertingToDiff : 'value1' | 'value2' | undefined
-// ) : Difference Serial
-//     const difference = DifferenceReferenceableAtomic.new({ value1 : func1, value2 : func2, $same : func1 === func2 })
-//
-//     state.markVisited(func1, func2, difference, convertingToDiff)
-//
-//     return difference
-// }
-//
-//
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// const compareRegExpDeepDiff = function (
-//     regexp1 : RegExp, regexp2 : RegExp,
-//     options : SerialOptions, state : SerialState, convertingToDiff : 'value1' | 'value2' | undefined
-// ) : Difference Serial
-//     const regexpProps   = [ 'source', 'dotAll', 'global', 'ignoreCase', 'multiline', 'sticky', 'unicode' ]
-//
-//     const difference    = DifferenceReferenceableAtomic.new({
-//         value1  : regexp1,
-//         value2  : regexp2,
-//
-//         $same   : regexpProps.every(propertyName => regexp1[ propertyName ] === regexp2[ propertyName])
-//     })
-//
-//     state.markVisited(regexp1, regexp2, difference, convertingToDiff)
-//
-//     return difference
-// }
-//
-//
-// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// const compareDateDeepDiff = function (
-//     date1 : Date, date2 : Date,
-//     options : SerialOptions, state : SerialState, convertingToDiff : 'value1' | 'value2' | undefined
-// ) : Difference Serial
-//     const difference = DifferenceReferenceableAtomic.new({ value1 : date1, value2 : date2, $same : date1.getTime() === date2.getTime() })
-//
-//     if (!options.compareDateByValue) state.markVisited(date1, date2, difference, convertingToDiff)
-//
-//     return difference
-// }
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const compareErrorDeepDiff = function (
+    object1 : Error, options : SerialOptions, state : SerialState
+)
+    : Serial
+{
+    const serial = SerialObject.new({ value : object1 })
+
+    state.markVisited(object1, serial)
+
+    const keys      = new Set(Object.keys(object1))
+
+    keys.add('message')
+
+    let i           = 0
+
+    for (const key of keys) {
+        if (i < options.maxBreadth) {
+            const key1      = keys[ i ]
+
+            serial.entries.push(SerialObjectEntry.new({
+                key             : serializeAtomic(key1),
+                serialization   : serialImpl(object1[ key1 ], options, state)
+            }))
+        }
+        else {
+            serial.entries.push(SerialOutOfBreadth.new({ remains : keys.size - options.maxBreadth }))
+            break
+        }
+        i++
+    }
+
+    return serial
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const compareFunctionDeepDiff = function (
+    func1 : Function, options : SerialOptions, state : SerialState
+) : Serial {
+    const difference = SerialReferenceableAtomic.new({ value : func1 })
+
+    state.markVisited(func1, difference)
+
+    return difference
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const compareRegExpDeepDiff = function (
+    regexp1 : RegExp, options : SerialOptions, state : SerialState
+) : Serial {
+    const regexpProps   = [ 'source', 'dotAll', 'global', 'ignoreCase', 'multiline', 'sticky', 'unicode' ]
+
+    const difference    = SerialReferenceableAtomic.new({ value : regexp1 })
+
+    state.markVisited(regexp1, difference)
+
+    return difference
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const compareDateDeepDiff = function (
+    date1 : Date, options : SerialOptions, state : SerialState
+) : Serial {
+    const difference = SerialReferenceableAtomic.new({ value : date1 })
+
+    state.markVisited(date1, difference)
+
+    return difference
+}
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -350,14 +347,9 @@ const serializeFuzzyMatchers = function (
 )
     : Serial | undefined
 {
-    // const v1IsMatcher   = v1 instanceof FuzzyMatcher
-    //
-    // if (v1IsMatcher) {
-    //     return (v1 as FuzzyMatcher).equalsToDiff(v2, false, options, state, convertingToDiff)
-    // }
-    // else if (v2IsMatcher && !v1IsMatcher) {
-    //     return (v2 as FuzzyMatcher).equalsToDiff(v1, true, options, state, convertingToDiff)
-    // }
-
-    return undefined
+    if (v1 instanceof FuzzyMatcher) {
+        return SerialAtomic.new({ content : v1.toString(), typeOf : 'fuzzy-matcher' })
+    }
+    else
+        return undefined
 }
