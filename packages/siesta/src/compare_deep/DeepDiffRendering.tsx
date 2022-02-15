@@ -66,13 +66,13 @@ export class DifferenceRendering extends Mixin(
     class DifferenceRendering extends base {
 
         * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
-            yield* this.beforeRenderContentGen(output, context)
+            this.beforeRenderContentGen(output, context)
             yield* this.renderContentGen(output, context)
-            yield* this.afterRenderContentGen(output, context)
+            this.afterRenderContentGen(output, context)
         }
 
 
-        * beforeRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        beforeRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
         }
 
 
@@ -80,7 +80,7 @@ export class DifferenceRendering extends Mixin(
         }
 
 
-        * afterRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        afterRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
         }
 
 
@@ -302,10 +302,10 @@ export class DifferenceReferenceable extends Mixin(
         }
 
 
-        * beforeRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        beforeRenderContentGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
             if (context.isContent) this.renderReferenceablePrefix(output, context)
 
-            yield* super.beforeRenderContentGen(output, context)
+            super.beforeRenderContentGen(output, context)
         }
     }
 ){}
@@ -419,13 +419,12 @@ export class DifferenceComposite extends DifferenceReferenceable {
     }
 
 
-    * beforeRenderChildGen (
+    beforeRenderChildGen (
         output              : RenderingXmlFragment,
         context             : DifferenceRenderingContext,
         child               : DifferenceCompositeEntry,
         index               : number
     )
-        : Generator<DifferenceRenderingSyncPoint>
     {
     }
 
@@ -438,21 +437,20 @@ export class DifferenceComposite extends DifferenceReferenceable {
     )
         : Generator<DifferenceRenderingSyncPoint>
     {
-        yield* this.beforeRenderChildGen(output, context, child, index)
+        this.beforeRenderChildGen(output, context, child, index)
 
         yield* child.renderGen(output, context)
 
-        yield* this.afterRenderChildGen(output, context, child, index)
+        this.afterRenderChildGen(output, context, child, index)
     }
 
 
-    * afterRenderChildGen (
+    afterRenderChildGen (
         output              : RenderingXmlFragment,
         context             : DifferenceRenderingContext,
         child               : DifferenceCompositeEntry,
         index               : number
     )
-        : Generator<DifferenceRenderingSyncPoint>
     {
         if (context.isContent && this.needCommaAfterChild(child, index, context)) output.write(',')
     }
