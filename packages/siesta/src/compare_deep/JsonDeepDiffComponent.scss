@@ -25,6 +25,13 @@ $body_background_color: #fefefe;
     box-sizing: border-box;
 
     --background-color: #f2f2f2;
+    --min-height: 150px;
+    --max-height: 400px;
+
+    & > * {
+        min-height: var(--min-height);
+        max-height: var(--max-height);
+    }
 
     border: 1px solid $contour_active;
 
