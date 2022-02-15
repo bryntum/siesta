@@ -92,15 +92,15 @@ export class SerialRendering extends Mixin(
     [ Base ],
     (base : ClassUnion<typeof Base>) =>
 
-    class DifferenceRendering extends base {
+    class SerialRendering extends base {
         * renderGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
-            yield* this.beforeRenderContentGen(output, context)
+            this.beforeRenderContentGen(output, context)
             yield* this.renderContentGen(output, context)
-            yield* this.afterRenderContentGen(output, context)
+            this.afterRenderContentGen(output, context)
         }
 
 
-        * beforeRenderContentGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
+        beforeRenderContentGen (output : RenderingXmlFragment, context : SerialRenderingContext) {
         }
 
 
@@ -108,7 +108,7 @@ export class SerialRendering extends Mixin(
         }
 
 
-        * afterRenderContentGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
+        afterRenderContentGen (output : RenderingXmlFragment, context : SerialRenderingContext) {
         }
 
 
@@ -125,7 +125,7 @@ export class Serial extends Mixin(
     [ SerialRendering, Serializable, Base ],
     (base : ClassUnion<typeof SerialRendering, typeof Serializable, typeof Base>) =>
 
-    class Serialization extends base {
+    class Serial extends base {
         id              : LUID                      = luid()
 
         parent          : SerialComposite           = undefined
@@ -232,10 +232,10 @@ export class SerialReferenceable extends Mixin(
         }
 
 
-        * beforeRenderContentGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
+        beforeRenderContentGen (output : RenderingXmlFragment, context : SerialRenderingContext) {
             if (context.isContent) this.renderReferenceablePrefix(output, context)
 
-            yield* super.beforeRenderContentGen(output, context)
+            super.beforeRenderContentGen(output, context)
         }
     }
 ){}
@@ -342,13 +342,12 @@ export class SerialComposite extends SerialReferenceable {
     }
 
 
-    * beforeRenderChildGen (
+    beforeRenderChildGen (
         output              : RenderingXmlFragment,
         context             : SerialRenderingContext,
         child               : Serial,
         index               : number
     )
-        : Generator<SerialRenderingSyncPoint>
     {
     }
 
@@ -361,21 +360,20 @@ export class SerialComposite extends SerialReferenceable {
     )
         : Generator<SerialRenderingSyncPoint>
     {
-        yield* this.beforeRenderChildGen(output, context, child, index)
+        this.beforeRenderChildGen(output, context, child, index)
 
         yield* child.renderGen(output, context)
 
-        yield* this.afterRenderChildGen(output, context, child, index)
+        this.afterRenderChildGen(output, context, child, index)
     }
 
 
-    * afterRenderChildGen (
+    afterRenderChildGen (
         output              : RenderingXmlFragment,
         context             : SerialRenderingContext,
         child               : Serial,
         index               : number
     )
-        : Generator<SerialRenderingSyncPoint>
     {
         if (context.isContent && this.needCommaAfterChild(child, index, context)) output.write(<NonPrettyPrintSpace>,</NonPrettyPrintSpace>)
     }

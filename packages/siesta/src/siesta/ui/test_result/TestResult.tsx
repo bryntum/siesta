@@ -211,9 +211,10 @@ export class AssertionComponent extends Mixin(
                                     null,
                             !passed && assertion.annotation
                                 ?
-                                    this.upgradeComponent(assertion.annotation)?.el ?? <pre class='assertion_annotation'>{
-                                        dashboard.renderer.render(assertion.annotation, RenderCanvas.new({ maxWidth : dashboard.renderer.getMaxLen() }))
-                                    }</pre>
+                                    this.upgradeComponent(assertion.annotation)?.el
+                                        ?? <pre class='assertion_annotation'>{
+                                            dashboard.renderer.render(assertion.annotation, RenderCanvas.new({ maxWidth : dashboard.renderer.getMaxLen() }))
+                                        }</pre>
                                 : null
                         ]
                     }

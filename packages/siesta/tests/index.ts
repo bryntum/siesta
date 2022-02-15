@@ -30,8 +30,6 @@ project.plan(
         items       : [
             'tree.t.js',
             'ul.t.js',
-            'text_block.t.js',
-            'xml_element_rendering.t.js',
             'xml_element_streaming_rendering.t.js',
         ]
     },
@@ -47,8 +45,6 @@ project.plan(
         url    : 'serializer',
 
         items       : [
-            'serializer_xml.t.js',
-            'serializer_rendering.t.js',
             'streaming_serializer_rendering.t.js'
         ]
     },
@@ -56,11 +52,6 @@ project.plan(
         url    : 'compare_deep',
 
         items       : [
-            // old
-            'compare_deep_diff.t.js',
-            'compare_deep_diff_matchers.t.js',
-            'compare_deep_diff_rendering_max_width.t.js',
-            // new
             'deep_diff_rendering.t.js',
             'deep_diff.t.js',
             'deep_diff_matchers.t.js',

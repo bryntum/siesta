@@ -324,8 +324,14 @@ export class Reporter extends Mixin(
                 <span class="assertion_name">{ assertion.name }</span>
                 <span class="assertion_description">{ assertion.description ? ' ' + assertion.description : '' }</span>
                 { assertion.sourcePoint && !shouldShowSourceContext ? [ ' at line ', <span class="assertion_source_line">{ assertion.sourcePoint.line }</span> ] : false }
-                { !passed && canShowSourceContext && shouldShowSourceContext ? [ '\n', sourcePointTemplate(assertion.sourcePoint, sources, this.sourceContext) ] : false }
-                { passed ? false : assertion.annotation }
+                {
+                    !passed && canShowSourceContext && shouldShowSourceContext
+                        // TODO `<div>{ '\u200b' }</div>` seems to be the only way to add an empty line,
+                        //  `\n` causes 2 lines, nothing - no empty lines, need to fix this
+                        ? [ '\n', sourcePointTemplate(assertion.sourcePoint, sources, this.sourceContext), <div>{ '\u200b' }</div> ]
+                        : null
+                }
+                { passed ? null : assertion.annotation }
             </div>
         }
 
@@ -449,8 +455,6 @@ export const sourcePointTemplate = ({ line, char } : SourcePoint, sources : stri
             <span class="primary_fail">{ ' '.repeat(char - 1) + '^' }</span>
         </div>)
     }
-
-    template.appendChild('\u200b')
 
     return template
 }

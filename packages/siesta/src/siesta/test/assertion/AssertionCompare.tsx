@@ -13,7 +13,7 @@ import {
 import { CI } from "../../../iterator/Iterator.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
 import { XmlElement, XmlNode } from "../../../jsx/XmlElement.js"
-import { serialize, serializeToElement, SerialOptions } from "../../../serializer2/Serial.js"
+import { serializeToElement, SerialOptions } from "../../../serializer2/Serial.js"
 import { DowngradePrimitives } from "../../../util/Helpers.js"
 import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
@@ -64,9 +64,6 @@ export class AssertionCompare extends Mixin(
     (base : ClassUnion<typeof TestNodeResult>) =>
 
     class AssertionCompare extends base {
-
-        // maxEqualityDifferences          : number        = 5
-
 
         //⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼⎼
         // region truthy assertions
@@ -219,14 +216,18 @@ export class AssertionCompare extends Mixin(
                 passed,
                 description,
 
-                annotation  : passed
-                    ? undefined
-                    : negated
-                        ? NotEqualAnnotationTemplate.el({
-                            value               : value2,
-                            t                   : this
-                        })
-                        : difference.template()
+                // TODO probably does not make sense to use special annotation for negated version?
+                // we just show the diff
+                // annotation  : passed
+                //     ? undefined
+                //     : negated
+                //         ? NotEqualAnnotationTemplate.el({
+                //             value               : value2,
+                //             t                   : this
+                //         })
+                //         : difference.template()
+
+                annotation  : passed ? undefined : difference.template()
             }))
         }
 

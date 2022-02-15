@@ -77,17 +77,16 @@ export class SerialComponent extends Mixin(
 
             return <div class="serial">
                 <div class="serial-expander" on:click={ e => this.onExpanderClick(e) }>
-                    <div className='serial-content'>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</div>
+                    <div class='serial-content'>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</div>
                 </div>
                 <div
                     class="serial-left"
-                    // on:scroll={ e => this.onLeftContentScroll(e) }
                     on:mouseover={ e => this.onMouseOver(e) }
                     on:mouseout={ e => this.onMouseOut(e) }
                 >
                     <div className="serial-highlighter"></div>
                     {/*TODO: `style:width` here does not work w/o a function wrapper: () =>*/}
-                    <div className='serial-content' style:width = { () => `${ maxWidth }ch` }>
+                    <div class='serial-content' style:width = { () => `${ maxWidth }ch` }>
                         { convertXmlElement(renderers[ 1 ].output.flush(), true) }
                     </div>
                 </div>
@@ -128,11 +127,6 @@ export class SerialComponent extends Mixin(
         }
 
 
-        // get rightHighlighter () : HTMLElement {
-        //     return this.rightArea.children[ 0 ] as HTMLElement
-        // }
-
-
         get expanderArea () : HTMLElement {
             return this.el.children[ 0 ] as HTMLElement
         }
@@ -141,13 +135,6 @@ export class SerialComponent extends Mixin(
             return this.el.children[ 1 ] as HTMLElement
         }
 
-        // get middleArea () : HTMLElement {
-        //     return this.el.children[ 2 ] as HTMLElement
-        // }
-        //
-        // get rightArea () : HTMLElement {
-        //     return this.el.children[ 3 ] as HTMLElement
-        // }
 
         // only need to highlight the atomics? highlighting the structure is not that needed?
         onMouseOver (e : Event) {
@@ -164,11 +151,6 @@ export class SerialComponent extends Mixin(
 
                 leftHighlighterEl.style.top     = offset + 'px'
                 leftHighlighterEl.style.height  = entryBox.height + 'px'
-
-                // const rightHighlighterEl        = this.rightHighlighter
-                //
-                // rightHighlighterEl.style.top    = offset + 'px'
-                // rightHighlighterEl.style.height = entryBox.height + 'px'
             }
         }
 
@@ -179,25 +161,8 @@ export class SerialComponent extends Mixin(
 
             if (entry) {
                 this.leftHighlighter.style.height   = '0px'
-                // this.rightHighlighter.style.height  = '0px'
             }
         }
-
-        // getSplitterCompanions () : HTMLElement[] {
-        //     return [ this.leftArea, this.rightArea ]
-        // }
-        //
-        //
-        // onSplitterDrag (context : SplitterDragContext, e : MouseEvent) {
-        //     const dx            = e.clientX - context.startX
-        //
-        //     const leftWidth     = context.companions[ 0 ].rect.width
-        //     const rightWidth    = context.companions[ 1 ].rect.width
-        //
-        //     const flex          = (leftWidth + dx) / (rightWidth - dx)
-        //
-        //     this.leftArea.style.flex    = String(flex)
-        // }
     }
 ){}
 
