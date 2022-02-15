@@ -31,14 +31,6 @@ export class DifferenceRenderingContext extends Base {
     }
 
 
-    // get oppositeContentStream () : 'left' | 'right' {
-    //     if (this.stream === 'left') return 'right'
-    //     if (this.stream === 'right') return 'left'
-    //
-    //     throw new Error("Should only be called on left/right streams")
-    // }
-
-
     choose<V> (v1 : V, v2 : V) : V {
         return this.contentStream === 'left' ? v1 : v2
     }
@@ -226,15 +218,6 @@ export class DifferenceWrapper extends Difference {
 @serializable({ id : 'DifferenceAtomic' })
 export class DifferenceAtomic extends Difference {
 
-    // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-    //     return <DifferenceTemplateAtomic
-    //         type={ this.type } same={ this.same }
-    //     >
-    //         { this.value1 === Missing ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(this.value1) }
-    //         { this.value2 === Missing ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(this.value2) }
-    //     </DifferenceTemplateAtomic>
-    // }
-
     content1        : string | Missing  = Missing
     content2        : string | Missing  = Missing
 
@@ -336,16 +319,6 @@ export class DifferenceReferenceableAtomic extends Mixin(
     (base : ClassUnion<typeof DifferenceReferenceable, typeof DifferenceAtomic>) =>
 
     class DifferenceReferenceableAtomic extends base {
-
-        // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-        //     return <DifferenceTemplateReferenceableAtomic
-        //         type={ this.type } same={ this.same } refId={ this.refId1 } refId2={ this.refId2 }
-        //         circular1 = { this.circular1 } circular2 = { this.circular2 }
-        //     >
-        //         { this.value1 === Missing ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(this.value1) }
-        //         { this.value2 === Missing ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(this.value2) }
-        //     </DifferenceTemplateReferenceableAtomic>
-        // }
     }
 ){}
 
@@ -365,20 +338,9 @@ export class DifferenceComposite extends DifferenceReferenceable {
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isExpander) {
-            output.push(
-                <diff-expander id={ `${ context.stream }-${ this.id }` }>
-                    {/*<diff-expander-line></diff-expander-line>*/}
-                    {/*<diff-expander-controls>*/}
-                    {/*    <diff-expander-opener></diff-expander-opener>*/}
-                    {/*    <diff-expander-closer></diff-expander-closer>*/}
-                    {/*</diff-expander-controls>*/}
-                </diff-expander>
-            )
+            output.push(<diff-expander id={ `${ context.stream }-${ this.id }` }></diff-expander>)
         } else if (context.isMiddle) {
-            output.push(
-                <diff-middle id={ `${ context.stream }-${ this.id }` }>
-                </diff-middle>
-            )
+            output.push(<diff-middle id={ `${ context.stream }-${ this.id }` }></diff-middle>)
         }
 
         yield* super.renderGen(output, context)
@@ -646,23 +608,6 @@ export class DifferenceArray extends DifferenceComposite {
             return super.needCommaAfterChild(child, index, context)
         }
     }
-
-
-
-    // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-    //     return <DifferenceTemplateArray
-    //         type={ this.type } same={ this.same }
-    //         length={ this.value1.length } length2={ this.value2.length }
-    //         refId = { this.refId1 } refId2 = { this.refId2 }
-    //         circular1 = { this.circular1 } circular2 = { this.circular2 }
-    //     >{
-    //         this.comparisons.map(({ index, difference }) =>
-    //             <DifferenceTemplateArrayEntry type={ difference.type } index={ index } same={ difference.same }>
-    //                 { difference.templateInner(serializerConfig, diffState) }
-    //             </DifferenceTemplateArrayEntry>
-    //         )
-    //     }</DifferenceTemplateArray>
-    // }
 }
 
 
@@ -762,33 +707,6 @@ export class DifferenceObject extends DifferenceComposite {
 
         if (context.isContent) output.pop()
     }
-
-
-    // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-    //     return <DifferenceTemplateObject
-    //         type={ this.type } same={ this.same }
-    //         constructorName={ this.value1 !== Missing ? constructorNameOf(this.value1) : undefined }
-    //         constructorName2={ this.value2 !== Missing ? constructorNameOf(this.value2) : undefined }
-    //         size={ this.value1 !== Missing ? Object.keys(this.value1).length : undefined }
-    //         size2={ this.value2 !== Missing ? Object.keys(this.value2).length : undefined }
-    //         onlyIn2Size={ this.onlyIn2Size }
-    //         refId={ this.refId1 } refId2={ this.refId2 }
-    //         circular1 = { this.circular1 } circular2 = { this.circular2 }
-    //     >{
-    //         this.comparisons
-    //             .sort((comp1, comp2) => compareDifferences(comp1.difference, comp2.difference))
-    //             .map(
-    //                 ({ key, difference }) =>
-    //                 <DifferenceTemplateObjectEntry type={ difference.type }>
-    //                     <DifferenceTemplateAtomic type={ difference.type } same={ difference.type === 'both' ? true : false }>
-    //                         { difference.type === 'onlyIn2' ? <MissingValue></MissingValue> : diffState[ 0 ].serialize(key) }
-    //                         { difference.type === 'onlyIn1' ? <MissingValue></MissingValue> : diffState[ 1 ].serialize(key) }
-    //                     </DifferenceTemplateAtomic>
-    //                     { difference.templateInner(serializerConfig, diffState) }
-    //                 </DifferenceTemplateObjectEntry>
-    //             )
-    //     }</DifferenceTemplateObject>
-    // }
 }
 
 
@@ -855,21 +773,6 @@ export class DifferenceSet extends DifferenceComposite {
 
         if (context.isContent) output.write('}')
     }
-
-    // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-    //     return <DifferenceTemplateSet
-    //         type={ this.type } same={ this.same }
-    //         size={ this.value1.size } size2={ this.value2.size }
-    //         onlyIn2Size={ this.onlyIn2Size }
-    //         refId={ this.refId1 } refId2={ this.refId2 }
-    //         circular1 = { this.circular1 } circular2 = { this.circular2 }
-    //     >{
-    //         this.comparisons.map(({ difference }) =>
-    //             <DifferenceTemplateSetEntry type={ difference.type }>
-    //                 { difference.templateInner(serializerConfig, diffState) }
-    //             </DifferenceTemplateSetEntry>)
-    //     }</DifferenceTemplateSet>
-    // }
 }
 
 
@@ -968,27 +871,6 @@ export class DifferenceMap extends DifferenceComposite {
 
         if (context.isContent) output.write('}')
     }
-
-
-
-    // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-    //     return <DifferenceTemplateMap
-    //         type={ this.type } same={ this.same }
-    //         size={ this.value1.size } size2={ this.value2.size }
-    //         onlyIn2Size={ this.onlyIn2Size }
-    //         refId={ this.refId1 } refId2={ this.refId2 }
-    //         circular1 = { this.circular1 } circular2 = { this.circular2 }
-    //     >{
-    //         this.comparisons
-    //             .sort((comp1, comp2) => compareDifferences(comp1.differenceValues, comp2.differenceValues))
-    //             .map(({ differenceKeys, differenceValues }) =>
-    //                 <DifferenceTemplateMapEntry type={ differenceKeys.type }>
-    //                     { differenceKeys.templateInner(serializerConfig, diffState) }
-    //                     { differenceValues.templateInner(serializerConfig, diffState) }
-    //                 </DifferenceTemplateMapEntry>
-    //             )
-    //     }</DifferenceTemplateMap>
-    // }
 }
 
 
@@ -1031,12 +913,6 @@ export class DifferenceReference extends Difference {
                 output.write(<span class="json-deep-diff-reference">[Circular *{ ref }]</span>)
         }
     }
-
-
-    // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-    //     return <DifferenceTemplateReference type={ this.type } same={ this.same } refId1={ this.value1 } refId2={ this.value2 }>
-    //     </DifferenceTemplateReference>
-    // }
 }
 
 
@@ -1080,14 +956,6 @@ export class DifferenceHeterogeneous extends Difference {
             }
         }
     }
-
-
-    // templateInner (serializerConfig : Partial<SerializerXml>, diffState : [ SerializerXml, SerializerXml ]) : XmlElement {
-    //     return <DifferenceTemplateHeterogeneous type={ this.type } same={ this.same }>
-    //         { this.value1 !== Missing ? this.value1.templateInner(serializerConfig, diffState) : <MissingValue></MissingValue> }
-    //         { this.value2 !== Missing ? this.value2.templateInner(serializerConfig, diffState) : <MissingValue></MissingValue> }
-    //     </DifferenceTemplateHeterogeneous>
-    // }
 }
 
 

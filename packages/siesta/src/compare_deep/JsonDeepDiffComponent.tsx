@@ -76,7 +76,8 @@ export class JsonDeepDiffComponent extends Mixin(
 
             return <div class="json-deep-diff">
                 <div class="json-deep-diff-expander" on:click={ e => this.onExpanderClick(e) }>
-                    <div className='json-deep-diff-content'>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</div>
+                    <div class="json-deep-diff-header"></div>
+                    <div class='json-deep-diff-content'>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</div>
                 </div>
                 <div
                     class="json-deep-diff-left"
@@ -84,14 +85,16 @@ export class JsonDeepDiffComponent extends Mixin(
                     on:mouseover={ e => this.onMouseOver(e) }
                     on:mouseout={ e => this.onMouseOut(e) }
                 >
-                    <div className="json-deep-diff-highlighter"></div>
+                    <div class="json-deep-diff-highlighter"></div>
+                    <div class="json-deep-diff-header">Received</div>
                     {/*TODO: `style:width` here does not work w/o a function wrapper: () =>*/}
-                    <div className='json-deep-diff-content' style:width = { () => `${ maxWidth }ch` }>
+                    <div class='json-deep-diff-content' style:width = { () => `${ maxWidth }ch` }>
                         { convertXmlElement(renderers[ 1 ].output.flush(), true) }
                     </div>
                 </div>
                 <div class="json-deep-diff-middle" on:pointerdown={ e => this.onSplitterPointerDown(e) }>
-                    <div className='json-deep-diff-content'>{ convertXmlElement(renderers[ 2 ].output.flush(), true) }</div>
+                    <div class="json-deep-diff-header"></div>
+                    <div class='json-deep-diff-content'>{ convertXmlElement(renderers[ 2 ].output.flush(), true) }</div>
                 </div>
                 <div
                     class="json-deep-diff-right"
@@ -99,8 +102,9 @@ export class JsonDeepDiffComponent extends Mixin(
                     on:mouseover={ e => this.onMouseOver(e) }
                     on:mouseout={ e => this.onMouseOut(e) }
                 >
-                    <div className="json-deep-diff-highlighter"></div>
-                    <div className='json-deep-diff-content' style:width = { () => `${ maxWidth }ch` }>
+                    <div class="json-deep-diff-highlighter"></div>
+                    <div class="json-deep-diff-header">Expected</div>
+                    <div class='json-deep-diff-content' style:width = { () => `${ maxWidth }ch` }>
                         { convertXmlElement(renderers[ 3 ].output.flush(), true) }
                     </div>
                 </div>
