@@ -1,12 +1,12 @@
 import { Base } from "../class/Base.js"
 import { FuzzyMatcher } from "../compare_deep/DeepDiffFuzzyMatcher.js"
 import { TextJSX } from "../jsx/TextJSX.js"
-import { XmlElement } from "../jsx/XmlElement.js"
 import { ArbitraryObject, constructorNameOf, typeOf } from "../util/Helpers.js"
 import {
     Serial,
     SerialArray,
     SerialAtomic,
+    SerialElement,
     serializeAtomic,
     SerialMap,
     SerialMapEntry,
@@ -107,11 +107,11 @@ const serialImpl = function (
 )
     : Serial
 {
-    if (state.depth++ > options.maxDepth) return SerialOutOfDepth.new({ constructorName : constructorNameOf(v1) })
+    if (state.depth++ > options.maxDepth) return out(state, SerialOutOfDepth.new({ constructorName : constructorNameOf(v1) }))
 
     const matchersDiff  = serializeFuzzyMatchers(v1, options, state)
 
-    if (matchersDiff) return matchersDiff
+    if (matchersDiff) return out(state, matchersDiff)
 
     const v1Visit       = state.visited.get(v1)
 
@@ -122,9 +122,9 @@ const serialImpl = function (
 
         if (refId1 === undefined) refId1 = v1Visit[ 1 ].refId = state.refIdSource++
 
-        return SerialReference.new({
+        return out(state, SerialReference.new({
             value  : v1Visit[ 1 ].refId,
-        })
+        }))
     }
 
     const type1         = typeOf(v1)
@@ -142,22 +142,22 @@ const serialImpl = function (
         return out(state, serializeSet(v1 as Set<unknown>, options, state))
     }
     else if (type1 === 'Function' || type1 === 'AsyncFunction' || type1 === 'GeneratorFunction' || type1 === 'AsyncGeneratorFunction') {
-        return compareFunctionDeepDiff(v1 as Function, options, state)
+        return out(state, serializeFunction(v1 as Function, options, state))
     }
     else if (type1 === 'RegExp') {
-        return compareRegExpDeepDiff(v1 as RegExp, options, state)
+        return out(state, serializeRegExp(v1 as RegExp, options, state))
     }
     else if (type1 === 'Date') {
-        return compareDateDeepDiff(v1 as Date, options, state)
+        return out(state, serializeDate(v1 as Date, options, state))
     }
     else if (type1 === 'Error') {
-        return compareErrorDeepDiff(v1 as Error, options, state)
+        return out(state, serializeError(v1 as Error, options, state))
     }
     // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
     else {
-        return SerialAtomic.new({
+        return out(state, SerialAtomic.new({
             value      : v1
-        })
+        }))
     }
 }
 
@@ -272,7 +272,7 @@ const serializeObject = function (
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const compareErrorDeepDiff = function (
+const serializeError = function (
     object1 : Error, options : SerialOptions, state : SerialState
 )
     : Serial
@@ -308,7 +308,7 @@ const compareErrorDeepDiff = function (
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const compareFunctionDeepDiff = function (
+const serializeFunction = function (
     func1 : Function, options : SerialOptions, state : SerialState
 ) : Serial {
     const difference = SerialReferenceableAtomic.new({ value : func1 })
@@ -320,7 +320,7 @@ const compareFunctionDeepDiff = function (
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const compareRegExpDeepDiff = function (
+const serializeRegExp = function (
     regexp1 : RegExp, options : SerialOptions, state : SerialState
 ) : Serial {
     const regexpProps   = [ 'source', 'dotAll', 'global', 'ignoreCase', 'multiline', 'sticky', 'unicode' ]
@@ -334,7 +334,7 @@ const compareRegExpDeepDiff = function (
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const compareDateDeepDiff = function (
+const serializeDate = function (
     date1 : Date, options : SerialOptions, state : SerialState
 ) : Serial {
     const difference = SerialReferenceableAtomic.new({ value : date1 })
