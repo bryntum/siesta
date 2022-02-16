@@ -88,12 +88,7 @@ export const serializeToElement = (
     v1                  : unknown,
     opts                : SerialOptions    = defaultSerialOptions
 )
-    : XmlElement =>
-{
-    const options       = Object.assign({}, defaultSerialOptions, opts)
-
-    return SerialWrapper.new({ serialization : serialImpl(v1, options) }).template()
-}
+    : SerialElement => serialize(v1, opts).template()
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
