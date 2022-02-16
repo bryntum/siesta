@@ -1,7 +1,7 @@
 import { Base } from "../class/Base.js"
 import { FuzzyMatcher } from "../compare_deep/DeepDiffFuzzyMatcher.js"
 import { TextJSX } from "../jsx/TextJSX.js"
-import { ArbitraryObject, constructorNameOf, typeOf } from "../util/Helpers.js"
+import { ArbitraryObject, constructorNameOf, isAtomicValue, typeOf } from "../util/Helpers.js"
 import {
     Serial,
     SerialArray,
@@ -107,7 +107,11 @@ const serialImpl = function (
 )
     : Serial
 {
-    if (state.depth++ > options.maxDepth) return out(state, SerialOutOfDepth.new({ constructorName : constructorNameOf(v1) }))
+    state.depth++
+
+    // allow serialization of out-of-depth atomic values, since they are 1 line usually (except long strings)
+    // and we show the out-of-depth symbol anyway
+    if (!isAtomicValue(v1) && state.depth > options.maxDepth) return out(state, SerialOutOfDepth.new({ constructorName : constructorNameOf(v1) }))
 
     const matchersDiff  = serializeFuzzyMatchers(v1, options, state)
 
