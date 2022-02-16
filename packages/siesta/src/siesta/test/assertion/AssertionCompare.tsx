@@ -1,4 +1,4 @@
-import { Base } from "../../../class/Base.js"
+import { exclude, serializable } from "typescript-serializable-mixin"
 import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { compareDeepDiff, comparePrimitiveAndFuzzyMatchers } from "../../../compare_deep/DeepDiff.js"
 import {
@@ -11,9 +11,11 @@ import {
     NumberApproximation
 } from "../../../compare_deep/DeepDiffFuzzyMatcher.js"
 import { CI } from "../../../iterator/Iterator.js"
+import { XmlRenderBlock } from "../../../jsx/RenderBlock.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
-import { XmlElement, XmlNode } from "../../../jsx/XmlElement.js"
+import { XmlElement } from "../../../jsx/XmlElement.js"
 import { serializeToElement, SerialOptions } from "../../../serializer2/Serial.js"
+import { SerialElement } from "../../../serializer2/SerialRendering.js"
 import { DowngradePrimitives } from "../../../util/Helpers.js"
 import { isDate, isNumber, isRegExp, isString } from "../../../util/Typeguards.js"
 import { Assertion, TestNodeResult } from "../TestResult.js"
@@ -710,9 +712,14 @@ export class AssertionCompare extends Mixin(
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class AnnotationTemplate extends Base {
+@serializable({ id : 'AnnotationTemplate' })
+export class AnnotationTemplate extends XmlElement {
+    tagName             : string                    = 'div'
+
+    @exclude()
     t                   : TestNodeResult            = undefined
 
+    @exclude()
     $serializerConfig   : Partial<SerialOptions>    = undefined
 
 
@@ -732,25 +739,47 @@ export class AnnotationTemplate extends Base {
     }
 
 
+    renderContent (context : XmlRenderBlock) {
+        this.toXmlElement().renderContent(context)
+    }
+
+
     static el<T extends typeof AnnotationTemplate> (this : T, props? : Partial<InstanceType<T>>) : XmlElement {
-        return this.new(props).toXmlElement()
+        return this.new(props)
     }
 }
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'GotExpectTemplate' })
 export class GotExpectTemplate extends AnnotationTemplate {
-    description         : XmlNode       = undefined
+    description         : string        = undefined
 
-    description2        : XmlNode       = undefined
+    description2        : string        = undefined
 
+    @exclude()
     got                 : unknown
+
+    gotEl               : SerialElement = undefined
 
     gotTitle            : string        = 'Received'
 
+    @exclude()
     expect              : unknown
 
+    expectEl            : SerialElement = undefined
+
     expectTitle         : string        = 'Expected'
+
+
+    initialize (props? : Partial<GotExpectTemplate>) {
+        super.initialize(props)
+
+        this.gotEl      = this.hasOwnProperty('got') ? serializeToElement(this.got, this.serializerConfig) : undefined
+        this.expectEl   = this.hasOwnProperty('expect') ? serializeToElement(this.expect, this.serializerConfig) : undefined
+
+        this.got        = this.expect = undefined
+    }
 
 
     // getTitleLengthEquality (label : 'got' | 'expect') : string {
@@ -766,16 +795,16 @@ export class GotExpectTemplate extends AnnotationTemplate {
         return <div class="got_expected">
             { this.description }
             {
-                this.hasOwnProperty('got') && <div class='got'>
+                this.gotEl && <div class='got'>
                     <div class="underlined got_title">{ this.gotTitle }:</div>
-                    <div class="indented got_value">{ serializeToElement(this.got, this.serializerConfig) }</div>
+                    <div class="indented got_value">{ this.gotEl }</div>
                 </div>
             }
             { this.description2 }
             {
-                this.hasOwnProperty('expect') && <div class='expect'>
+                this.expectEl && <div class='expect'>
                     <div class="underlined expect_title">{ this.expectTitle }:</div>
-                    <div class="indented expect_value">{ serializeToElement(this.expect, this.serializerConfig) }</div>
+                    <div class="indented expect_value">{ this.expectEl }</div>
                 </div>
             }
         </div>
@@ -784,8 +813,21 @@ export class GotExpectTemplate extends AnnotationTemplate {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'NotEqualAnnotationTemplate' })
 export class NotEqualAnnotationTemplate extends AnnotationTemplate {
+    @exclude()
     value           : unknown           = undefined
+
+    valueEl         : SerialElement     = undefined
+
+
+    initialize (props? : Partial<GotExpectTemplate>) {
+        super.initialize(props)
+
+        this.valueEl    = serializeToElement(this.value, this.serializerConfig)
+
+        this.value      = undefined
+    }
 
 
     toXmlElement () : XmlElement {
@@ -793,7 +835,7 @@ export class NotEqualAnnotationTemplate extends AnnotationTemplate {
             The values we received and expect are equal. We expect the opposite.
             <div class='got'>
                 <div class="underlined got_title">Both values are:</div>
-                <div class="indented got_value">{ serializeToElement(this.value, this.serializerConfig) }</div>
+                <div class="indented got_value">{ this.valueEl }</div>
             </div>
         </div>
     }
