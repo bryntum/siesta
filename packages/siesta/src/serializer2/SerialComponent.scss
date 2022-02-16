@@ -24,6 +24,14 @@ $body_background_color: #fefefe;
         font-weight: lighter;
     }
 
+    --min-height: 150px;
+    --max-height: 400px;
+
+    & > * {
+        min-height: var(--min-height);
+        max-height: var(--max-height);
+    }
+
     box-sizing: border-box;
 
     --background-color: #f2f2f2;
@@ -43,6 +51,7 @@ $body_background_color: #fefefe;
 
 .serial-expander {
     --expander-width: 2.5ch;
+    position: relative;
 
     width : var(--expander-width);
 
@@ -52,6 +61,17 @@ $body_background_color: #fefefe;
     }
 
     & > .serial-content, & > .serial-content > .serial-content-root {
+        background-color: var(--background-color);
+    }
+
+    // had to use separate element for background color
+    & > .serial-expander-background {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        // god bless the modern css
+        width: calc(100% - 0.5ch);
         background-color: var(--background-color);
     }
 

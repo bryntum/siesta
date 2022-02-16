@@ -77,6 +77,7 @@ export class JsonDeepDiffComponent extends Mixin(
             return <div class="json-deep-diff">
                 <div class="json-deep-diff-expander" on:click={ e => this.onExpanderClick(e) }>
                     <div class="json-deep-diff-header"></div>
+                    <div class="json-deep-diff-expander-background"></div>
                     <div class='json-deep-diff-content'>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</div>
                 </div>
                 <div

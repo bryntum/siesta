@@ -59,6 +59,7 @@ $body_background_color: #fefefe;
 
 .json-deep-diff-expander {
     --expander-width: 2.5ch;
+    position: relative;
 
     width : var(--expander-width);
 
@@ -73,6 +74,17 @@ $body_background_color: #fefefe;
 
     & > .json-deep-diff-header {
         margin-right: 0.5ch;
+        background-color: var(--background-color);
+    }
+
+    // had to use separate element for background color
+    & > .json-deep-diff-expander-background {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        // god bless the modern css
+        width: calc(100% - 0.5ch);
         background-color: var(--background-color);
     }
 

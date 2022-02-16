@@ -77,6 +77,7 @@ export class SerialComponent extends Mixin(
 
             return <div class="serial">
                 <div class="serial-expander" on:click={ e => this.onExpanderClick(e) }>
+                    <div class="serial-expander-background"></div>
                     <div class='serial-content'>{ convertXmlElement(renderers[ 0 ].output.flush(), true) }</div>
                 </div>
                 <div
