@@ -1,7 +1,9 @@
 import { ClassUnion, Mixin } from "../../class/Mixin.js"
+import { TextJSX } from "../../jsx/TextJSX.js"
 import { isNodejs } from "../../util/Helpers.js"
 import { EnvironmentType } from "../common/Environment.js"
 import { ExitCodes } from "../launcher/Types.js"
+import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { Runtime } from "../runtime/Runtime.js"
 import { RuntimeBrowser } from "../runtime/RuntimeBrowser.js"
 import { TestDescriptorBrowser } from "../test/TestDescriptorBrowser.js"
@@ -27,23 +29,24 @@ export class ProjectBrowser extends Mixin(
 
         override async launchStandalone () {
             if (isNodejs()) {
-                const styles                = (await import("../reporter/styling/theme_universal.js")).styles
-                const colorerClass          = (await import('../../jsx/ColorerNodejs.js')).ColorerNodejs
-                const c                     = colorerClass.new()
-                const style                 = (clsName : string) => styles.get(clsName)(c)
+                const renderer              = ConsoleXmlRenderer.new({
+                    doPrint         : str => process.stdout.write(str),
+                    styles          : (await import("../reporter/styling/theme_universal.js")).styles,
+                    colorerClass    : (await import('../../jsx/ColorerNodejs.js')).ColorerNodejs
+                })
 
-                console.log(
-`${ style('exception_icon').text(' ERROR ') } Browser project launched directly as Node.js script.
-Please use Siesta launcher instead and web url:
-  ${ style('accented').text('npx siesta http://web_path/to/your/project.js') }`
+                renderer.write(
+                    <div>
+                        <span class="exception_icon"> ERROR </span> Browser project launched directly as Node.js script.{ '\n' }
+                        Please use Siesta launcher instead and web url:{ '\n' }
+                        <span class="accented">  npx siesta http://web_path/to/your/project.js</span>
+                    </div>
                 )
 
                 process.exitCode            = ExitCodes.INCORRECT_ENVIRONMENT
-
-                return
             }
-
-            return super.launchStandalone()
+            else
+                return super.launchStandalone()
         }
     }
 ) {}

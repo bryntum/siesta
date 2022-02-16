@@ -7,6 +7,7 @@ import { awaitDomInteractive, elementFromPoint } from "../../util_browser/Dom.js
 import { isHTMLLinkElement, isHTMLScriptElement } from "../../util_browser/Typeguards.js"
 import { Launcher } from "../launcher/Launcher.js"
 import { ExitCodes } from "../launcher/Types.js"
+import { ConsoleXmlRenderer } from "../reporter/ConsoleXmlRenderer.js"
 import { PointerMovePrecision } from "../simulate/SimulatorMouse.js"
 import { ActionTarget, Simulator } from "../simulate/Types.js"
 import { UserAgentOnPage } from "../simulate/UserAgent.js"
@@ -306,20 +307,21 @@ export class TestBrowser extends Mixin(
         // TODO refactor the whole launching infrastructure
         static async launchStandalone () {
             if (isNodejs()) {
-                const styles                = (await import("../reporter/styling/theme_universal.js")).styles
-                const colorerClass          = (await import('../../jsx/ColorerNodejs.js')).ColorerNodejs
-                const c                     = colorerClass.new()
-                const style                 = (clsName : string) => styles.get(clsName)(c)
+                const renderer              = ConsoleXmlRenderer.new({
+                    doPrint         : str => process.stdout.write(str),
+                    styles          : (await import("../reporter/styling/theme_universal.js")).styles,
+                    colorerClass    : (await import('../../jsx/ColorerNodejs.js')).ColorerNodejs
+                })
 
-                console.log(
-`${ style('exception_icon').text(' ERROR ') } Browser test launched directly as Node.js script.
-Please use Siesta launcher instead and web url:
-  ${ style('accented').text('npx siesta http://web_path/to/your/test.js') }`
+                renderer.write(
+                    <div>
+                        <span class="exception_icon"> ERROR </span> Browser test launched directly as Node.js script.{ '\n' }
+                        Please use Siesta launcher instead and web url:{ '\n' }
+                        <span class="accented">  http://web_path/to/your/test.js</span>
+                    </div>
                 )
 
                 process.exitCode            = ExitCodes.INCORRECT_ENVIRONMENT
-
-                return
             } else
                 super.launchStandalone()
         }
