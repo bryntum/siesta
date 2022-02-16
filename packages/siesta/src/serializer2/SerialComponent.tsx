@@ -81,6 +81,7 @@ export class SerialComponent extends Mixin(
                 </div>
                 <div
                     class="serial-left"
+                    on:scroll={ e => this.onLeftContentScroll(e) }
                     on:mouseover={ e => this.onMouseOver(e) }
                     on:mouseout={ e => this.onMouseOut(e) }
                 >
@@ -133,6 +134,14 @@ export class SerialComponent extends Mixin(
 
         get leftArea () : HTMLElement {
             return this.el.children[ 1 ] as HTMLElement
+        }
+
+
+        onLeftContentScroll (e : Event) {
+            const leftEl                    = this.leftArea
+            const scrollTop                 = leftEl.scrollTop
+
+            this.expanderArea.scrollTop     = scrollTop
         }
 
 
