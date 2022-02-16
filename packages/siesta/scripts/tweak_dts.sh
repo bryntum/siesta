@@ -84,8 +84,14 @@ sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/si
 sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/siesta/test/assertion/AssertionAsync.d.ts"
 sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/siesta/test/assertion/AssertionAsync.d.ts"
 
-sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/serializer/SerialRendering.d.ts"
+#sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/serializer/SerialRendering.d.ts"
 sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/serializer/SerialRendering.d.ts"
 
-sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/compare_deep/DeepDiffRendering.d.ts"
+#sed -i -e '1s!^!import { Base } from "typescript-mixin-class/src/class/Base"\n!' "src/compare_deep/DeepDiffRendering.d.ts"
 sed -i -e 's!import("typescript-mixin-class/src/class/Base").Base!Base!' "src/compare_deep/DeepDiffRendering.d.ts"
+sed -i -e 's!get same(): boolean;!!' "src/compare_deep/DeepDiffRendering.d.ts"
+sed -i -e 's!get type(): DifferenceType;!!' "src/compare_deep/DeepDiffRendering.d.ts"
+sed -i -e 's!get class(): string;!!' "src/compare_deep/DeepDiffRendering.d.ts"
+sed -i -e 's!set class.*!!' "src/compare_deep/DeepDiffRendering.d.ts"
+
+

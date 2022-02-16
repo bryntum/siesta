@@ -187,7 +187,7 @@ export class SerialAtomic extends Serial {
     typeOf          : string            = undefined
 
 
-    initialize (props : Partial<Serial>) {
+    initialize (props? : Partial<SerialAtomic>) {
         super.initialize(props)
 
         if (this.content === undefined) {
@@ -435,7 +435,7 @@ export class SerialArray extends SerialComposite {
     length          : number            = undefined
 
 
-    initialize (props : Partial<SerialArray>) {
+    initialize (props? : Partial<SerialArray>) {
         super.initialize(props)
 
         this.length     = this.value.length
@@ -499,7 +499,7 @@ export class SerialObject extends SerialComposite {
     entries             : (SerialObjectEntry | SerialOutOfBreadth)[]
 
 
-    initialize (props : Partial<SerialObject>) {
+    initialize (props? : Partial<SerialObject>) {
         super.initialize(props)
 
         this.constructorName    = constructorNameOf(this.value)
@@ -553,7 +553,7 @@ export class SerialSet extends SerialComposite {
     size            : number                    = undefined
 
 
-    initialize (props : Partial<SerialSet>) {
+    initialize (props? : Partial<SerialSet>) {
         super.initialize(props)
 
         this.size       = this.value.size
@@ -635,7 +635,7 @@ export class SerialMap extends SerialComposite {
     entries         : (SerialMapEntry | SerialOutOfBreadth)[]
 
 
-    initialize (props : Partial<SerialMap>) {
+    initialize (props? : Partial<SerialMap>) {
         super.initialize(props)
 
         this.size       = this.value.size
@@ -688,7 +688,7 @@ export class SerialReference extends Serial {
     refId       : number            = undefined
 
 
-    initialize (props : Partial<SerialMap>) {
+    initialize (props? : Partial<SerialReference>) {
         super.initialize(props)
 
         this.refId      = this.value
