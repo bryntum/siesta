@@ -58,7 +58,9 @@ export class AssertionType extends Mixin(
                 description,
                 annotation      : passed ? undefined : GotExpectTemplate.el({
                     got                 : value,
-                    description2        : <div>Expect { negated ? 'not ' : '' }an instance of <span class="accented">{ cls.name || cls.toString() }</span></div>,
+                    // TODO restore the html-capability for `description/description2`
+                    description2        : `Expect ${ negated ? 'not ' : '' }an instance of ${ cls.name || cls.toString() }`,
+                    // description2        : <div>Expect { negated ? 'not ' : '' }an instance of <span class="accented">{ cls.name || cls.toString() }</span></div>,
                     t                   : this
                 })
             }))
