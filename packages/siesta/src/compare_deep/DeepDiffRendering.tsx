@@ -191,7 +191,11 @@ const compareDifferences = (difference1 : Difference, difference2 : Difference) 
 export class DifferenceWrapper extends Difference {
     difference      : Difference        = undefined
 
-    '---'
+
+    get same () : boolean {
+        return this.difference.same
+    }
+
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         output.push(<diff-entry></diff-entry>)
