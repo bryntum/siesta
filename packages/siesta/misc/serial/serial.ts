@@ -1,6 +1,6 @@
 import { ReactiveHTMLElement } from "../../src/chronograph-jsx/ElementReactivity.js"
 import { serialize } from "./serial.js"
-import { SerialComponent, SerialPairComponent } from "../../src/serializer2/SerialComponent.js"
+import { SerialComponent, SerialPairComponent } from "../../src/serializer/SerialComponent.js"
 
 const difference1     = serialize(new Set([ { a : 1 } ]))
 const difference2     = serialize([ 1, 2 ])

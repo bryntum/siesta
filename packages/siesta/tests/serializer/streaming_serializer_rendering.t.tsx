@@ -1,7 +1,7 @@
 import { it, iit } from "../../index.js"
 import { any, anyInstanceOf, anyNumberApprox, anyNumberBetween } from "../../src/compare_deep/DeepDiffFuzzyMatcher.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
-import { XmlRendererSerial } from "../../src/serializer2/SerialRendering.js"
+import { XmlRendererSerial } from "../../src/serializer/SerialRendering.js"
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const renderer          = XmlRendererSerial.new()

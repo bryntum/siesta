@@ -1,7 +1,7 @@
 import { CI } from "chained-iterator"
 import { ClassUnion, Mixin } from "typescript-mixin-class"
 import { XmlElement } from "../jsx/XmlElement.js"
-import { XmlRendererSerial } from "../serializer2/SerialRendering.js"
+import { XmlRendererSerial } from "../serializer/SerialRendering.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

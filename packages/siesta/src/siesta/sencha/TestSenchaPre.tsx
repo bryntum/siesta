@@ -1,6 +1,6 @@
 import { AnyFunction } from "typescript-mixin-class"
 import { TextJSX } from "../../jsx/TextJSX.js"
-import { serializeToElement } from "../../serializer2/Serial.js"
+import { serializeToElement } from "../../serializer/Serial.js"
 import { prototypeValue } from "../../util/Helpers.js"
 import { waitFor, WaitForResult } from "../../util/TimeHelpers.js"
 import { isString } from "../../util/Typeguards.js"

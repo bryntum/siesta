@@ -6,8 +6,8 @@ import { ChronoGraphJSX } from "../../../chronograph-jsx/ChronoGraphJSX.js"
 import { Component } from "../../../chronograph-jsx/Component.js"
 import { ReactiveElement } from "../../../chronograph-jsx/ElementReactivity.js"
 import { TextJSX } from "../../../jsx/TextJSX.js"
-import { SerialComponent } from "../../../serializer2/SerialComponent.js"
-import { SerialElement } from "../../../serializer2/SerialRendering.js"
+import { SerialComponent } from "../../../serializer/SerialComponent.js"
+import { SerialElement } from "../../../serializer/SerialRendering.js"
 
 ChronoGraphJSX
 

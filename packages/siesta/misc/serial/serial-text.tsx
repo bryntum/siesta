@@ -3,7 +3,7 @@ import { RenderCanvas } from "../../src/jsx/RenderBlock.js"
 import { TextJSX } from "../../src/jsx/TextJSX.js"
 import { styles } from "../../src/siesta/reporter/styling/theme_universal.js"
 import { serialize } from "./serial.js"
-import { SerialElement, XmlRendererSerial } from "../../src/serializer2/SerialRendering.js"
+import { SerialElement, XmlRendererSerial } from "../../src/serializer/SerialRendering.js"
 
 const serial      = serialize([ 1, 2 ] )
 
