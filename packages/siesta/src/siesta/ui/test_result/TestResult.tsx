@@ -16,6 +16,7 @@ import { LogLevel } from "../../../logger/Logger.js"
 import { relative } from "../../../util/Path.js"
 import { ProjectSerializableData } from "../../project/ProjectDescriptor.js"
 import { sourcePointTemplate } from "../../reporter/Reporter.js"
+import { GotExpectTemplate } from "../../test/assertion/AssertionCompare.js"
 import { TestDescriptor } from "../../test/TestDescriptor.js"
 import {
     Assertion,
@@ -29,6 +30,7 @@ import { TestNodeResultReactive } from "../../test/TestResultReactive.js"
 import { TreeComponent } from "../components/TreeComponent.js"
 import { DashboardCore } from "../DashboardCore.js"
 import { TestLaunchInfo } from "../TestLaunchInfo.js"
+import { GotExpectComponent } from "./GotExpectComponent.js"
 
 ChronoGraphJSX
 
@@ -153,6 +155,15 @@ export class AssertionComponent extends Mixin(
             if (cmp instanceof JsonDeepDiffElement)
                 return JsonDeepDiffComponent.new({
                     difference  : cmp.difference
+                })
+            else if (cmp instanceof GotExpectTemplate)
+                return GotExpectComponent.new({
+                    description     : cmp.description,
+                    description2    : cmp.description2,
+                    gotEl           : cmp.gotEl,
+                    expectEl        : cmp.expectEl,
+                    gotTitle        : cmp.gotTitle,
+                    expectTitle     : cmp.expectTitle
                 })
 
             return undefined
