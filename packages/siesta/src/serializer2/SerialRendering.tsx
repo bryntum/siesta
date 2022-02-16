@@ -141,11 +141,6 @@ export class Serial extends Mixin(
         set value (value : this[ '$value' ]) {
             this.$value = value
         }
-
-
-        template () : SerialElement {
-            return SerialElement.new({ serialization : this })
-        }
     }
 ){}
 
@@ -410,7 +405,11 @@ export class SerialCompositeEntry extends Serial {
 export class SerialWrapper extends Serial {
     serialization   : Serial          = undefined
 
-    '---'
+
+    template () : SerialElement {
+        return SerialElement.new({ serialization : this })
+    }
+
 
     * renderGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
         output.push(<serial-entry></serial-entry>)
@@ -771,7 +770,7 @@ export class SerialElement extends Mixin(
 
         tagName             : 'div'             = 'div'
 
-        serialization       : Serial            = undefined
+        serialization       : SerialWrapper     = undefined
 
 
         renderContent (context : XmlRenderBlock) {
