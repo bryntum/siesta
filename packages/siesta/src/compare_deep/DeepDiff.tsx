@@ -294,14 +294,18 @@ const compareDeepDiffImpl = function (
     else if (type1 === 'Error') {
         return compareErrorDeepDiff(v1 as Error, v2 as Error, options, state, convertingToDiff)
     }
-    // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
-    else {
+    else if (isAtomicValue(v1)) {
         return DifferenceAtomic.new({
             value1      : v1,
             value2      : v2,
 
             $same       : compareAtomic(v1, v2)
         })
+    }
+    // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
+    else {
+        // fallback to object comparison for unknown types
+        return compareObjectDeepDiff(v1 as ArbitraryObject, v2 as ArbitraryObject, options, state, convertingToDiff)
     }
 }
 

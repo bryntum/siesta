@@ -79,6 +79,13 @@ project.plan(
         ]
     },
     {
+        url       : 'compare_deep',
+
+        items       : [
+            'deep_diff.t.js',
+        ]
+    },
+    {
         url       : 'serializer',
 
         items       : [

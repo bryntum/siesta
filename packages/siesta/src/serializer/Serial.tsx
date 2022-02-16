@@ -157,11 +157,12 @@ const serialImpl = function (
     else if (type1 === 'Error') {
         return out(state, serializeError(v1 as Error, options, state))
     }
+    else if (isAtomicValue(v1)) {
+        return out(state, SerialAtomic.new({ value : v1 }))
+    }
     // TODO support TypedArrays, ArrayBuffer, SharedArrayBuffer
     else {
-        return out(state, SerialAtomic.new({
-            value      : v1
-        }))
+        return out(state, serializeObject(v1 as ArbitraryObject, options, state))
     }
 }
 

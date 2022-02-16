@@ -685,9 +685,18 @@ export class SerialMap extends SerialComposite {
 export class SerialReference extends Serial {
     $value      : number
 
+    refId       : number            = undefined
+
+
+    initialize (props : Partial<SerialMap>) {
+        super.initialize(props)
+
+        this.refId      = this.value
+    }
+
 
     * renderGen (output : RenderingXmlFragment, context : SerialRenderingContext) : Generator<SerialRenderingSyncPoint> {
-        if (context.isContent) output.write(<span class="serial-reference">[Circular *{ this.value }]</span>)
+        if (context.isContent) output.write(<span class="serial-reference">[Circular *{ this.refId }]</span>)
     }
 }
 

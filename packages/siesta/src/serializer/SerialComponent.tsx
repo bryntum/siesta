@@ -19,18 +19,12 @@ export class SerialComponent extends Mixin(
     class SerialComponent extends base {
         props : Component[ 'props' ] & {
             serial          : SerialComponent[ 'serial' ]
-            maxWidth        : SerialComponent[ 'maxWidth' ]
         }
 
         serial              : SerialWrapper         = undefined
 
-        @field()
-        maxWidth            : number                = 100
-
 
         render () : Element {
-            const maxWidth         = this.maxWidth
-
             const renderer      = XmlRendererSerial.new({ prettyPrint : true })
 
             const streams : RenderingStream[]      = [ 'expander', 'content' ]
@@ -38,8 +32,7 @@ export class SerialComponent extends Mixin(
             const renderers     = streams.map(stream => SerialContentRendering.new({
                 stream,
                 serialization  : this.serial,
-                renderer,
-                maxWidth
+                renderer
             }))
 
             const iterators     = renderers.map(renderer => renderer.render())
@@ -88,7 +81,7 @@ export class SerialComponent extends Mixin(
                 >
                     <div className="serial-highlighter"></div>
                     {/*TODO: `style:width` here does not work w/o a function wrapper: () =>*/}
-                    <div class='serial-content' style:width = { () => `${ maxWidth }ch` }>
+                    <div class='serial-content'>
                         { convertXmlElement(renderers[ 1 ].output.flush(), true) }
                     </div>
                 </div>
@@ -177,70 +170,70 @@ export class SerialComponent extends Mixin(
 ){}
 
 
-//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export class SerialPairComponent extends Mixin(
-    [ AbstractSplitter, Component ],
-    (base : ClassUnion<typeof AbstractSplitter, typeof Component>) =>
-
-    class SerialPairComponent extends base {
-        props : Component[ 'props' ] & {
-            serial1         : SerialPairComponent[ 'serial1' ]
-            serial2         : SerialPairComponent[ 'serial2' ]
-            maxWidth        : SerialPairComponent[ 'maxWidth' ]
-        }
-
-        serial1             : SerialWrapper         = undefined
-        serial2             : SerialWrapper         = undefined
-
-        @field()
-        maxWidth            : number                = 100
-
-
-        render () : Element {
-            return <div class="serial-pair">
-                <SerialComponent
-                    class={ 'serial-pair-left' }
-                    serial={ this.serial1 }
-                    maxWidth={ this.maxWidth }
-                ></SerialComponent>
-                <div class="serial-pair-middle" on:pointerdown={ e => this.onSplitterPointerDown(e) }></div>
-                <SerialComponent
-                    class={ 'serial-pair-right' }
-                    serial={ this.serial2 }
-                    maxWidth={ this.maxWidth }
-                ></SerialComponent>
-            </div>
-        }
-
-
-        get leftArea () : HTMLElement {
-            return this.el.children[ 0 ] as HTMLElement
-        }
-
-        // get middleArea () : HTMLElement {
-        //     return this.el.children[ 2 ] as HTMLElement
-        // }
-
-
-        get rightArea () : HTMLElement {
-            return this.el.children[ 2 ] as HTMLElement
-        }
-
-
-        getSplitterCompanions () : HTMLElement[] {
-            return [ this.leftArea, this.rightArea ]
-        }
-
-
-        onSplitterDrag (context : SplitterDragContext, e : MouseEvent) {
-            const dx            = e.clientX - context.startX
-
-            const leftWidth     = context.companions[ 0 ].rect.width
-            const rightWidth    = context.companions[ 1 ].rect.width
-
-            const flex          = (leftWidth + dx) / (rightWidth - dx)
-
-            this.leftArea.style.flex    = String(flex)
-        }
-    }
-){}
+// //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// export class SerialPairComponent extends Mixin(
+//     [ AbstractSplitter, Component ],
+//     (base : ClassUnion<typeof AbstractSplitter, typeof Component>) =>
+//
+//     class SerialPairComponent extends base {
+//         props : Component[ 'props' ] & {
+//             serial1         : SerialPairComponent[ 'serial1' ]
+//             serial2         : SerialPairComponent[ 'serial2' ]
+//             maxWidth        : SerialPairComponent[ 'maxWidth' ]
+//         }
+//
+//         serial1             : SerialWrapper         = undefined
+//         serial2             : SerialWrapper         = undefined
+//
+//         @field()
+//         maxWidth            : number                = 100
+//
+//
+//         render () : Element {
+//             return <div class="serial-pair">
+//                 <SerialComponent
+//                     class={ 'serial-pair-left' }
+//                     serial={ this.serial1 }
+//                     maxWidth={ this.maxWidth }
+//                 ></SerialComponent>
+//                 <div class="serial-pair-middle" on:pointerdown={ e => this.onSplitterPointerDown(e) }></div>
+//                 <SerialComponent
+//                     class={ 'serial-pair-right' }
+//                     serial={ this.serial2 }
+//                     maxWidth={ this.maxWidth }
+//                 ></SerialComponent>
+//             </div>
+//         }
+//
+//
+//         get leftArea () : HTMLElement {
+//             return this.el.children[ 0 ] as HTMLElement
+//         }
+//
+//         // get middleArea () : HTMLElement {
+//         //     return this.el.children[ 2 ] as HTMLElement
+//         // }
+//
+//
+//         get rightArea () : HTMLElement {
+//             return this.el.children[ 2 ] as HTMLElement
+//         }
+//
+//
+//         getSplitterCompanions () : HTMLElement[] {
+//             return [ this.leftArea, this.rightArea ]
+//         }
+//
+//
+//         onSplitterDrag (context : SplitterDragContext, e : MouseEvent) {
+//             const dx            = e.clientX - context.startX
+//
+//             const leftWidth     = context.companions[ 0 ].rect.width
+//             const rightWidth    = context.companions[ 1 ].rect.width
+//
+//             const flex          = (leftWidth + dx) / (rightWidth - dx)
+//
+//             this.leftArea.style.flex    = String(flex)
+//         }
+//     }
+// ){}
