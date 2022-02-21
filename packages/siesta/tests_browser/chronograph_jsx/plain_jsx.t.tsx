@@ -278,3 +278,28 @@ it('Should correctly merge reactive style property and reactive individual style
     t.is(el.style.width, '10px', 'Individual style property overwrites the "style" attribute')
     t.is(el.style.height, '')
 })
+
+
+it('Should support reactive properties other than `class` and `style`', async t => {
+    const box1      = Box.new('value1')
+    const box2      = Box.new('value2')
+
+    const el        = <div attribute1={ () => box1 } attribute2={ box2 }></div> as
+        (ReactiveHTMLElement & { attribute1 : string, attribute2 : string })
+
+    document.body.appendChild(el)
+
+    globalGraph.commit()
+
+    t.is(el.attribute1, 'value1')
+    t.is(el.attribute2, 'value2')
+
+    //-------------------
+    box1.write('new1')
+    box2.write('new2')
+
+    globalGraph.commit()
+
+    t.is(el.attribute1, 'new1')
+    t.is(el.attribute2, 'new2')
+})

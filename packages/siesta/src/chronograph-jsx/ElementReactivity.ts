@@ -40,6 +40,7 @@ export class ElementReactivity extends Mixin(
 
         classActivators         : Record<string, PropertySourceNormalized<boolean>> = undefined
         styleProperties         : Record<string, PropertySourceNormalized<string>>  = undefined
+        reactiveProperties      : Record<string, PropertySourceNormalized<unknown>> = undefined
 
         reactiveChildren        : ElementSourceNormalized[]     = undefined
 
@@ -71,6 +72,13 @@ export class ElementReactivity extends Mixin(
         }
 
 
+        addReactiveProperty (className : string, source : PropertySourceNormalized<unknown>) {
+            if (!this.reactiveProperties) this.reactiveProperties = {}
+
+            this.reactiveProperties[ className ] = source
+        }
+
+
         addClassActivator (className : string, source : PropertySourceNormalized<boolean>) {
             if (!this.classActivators) this.classActivators = {}
 
@@ -93,6 +101,8 @@ export class ElementReactivity extends Mixin(
 
             if (categorizedProperties.classAttribute) this.addClassAttributeSource(categorizedProperties.classAttribute)
             if (categorizedProperties.styleAttribute) this.addStyleAttributeSource(categorizedProperties.styleAttribute)
+
+            categorizedProperties.otherProperties.forEach(([ key, source ]) => this.addReactiveProperty(key, source))
         }
 
 
