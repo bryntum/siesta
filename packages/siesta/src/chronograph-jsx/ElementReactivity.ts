@@ -102,7 +102,9 @@ export class ElementReactivity extends Mixin(
             if (categorizedProperties.classAttribute) this.addClassAttributeSource(categorizedProperties.classAttribute)
             if (categorizedProperties.styleAttribute) this.addStyleAttributeSource(categorizedProperties.styleAttribute)
 
-            categorizedProperties.otherProperties.forEach(([ key, source ]) => this.addReactiveProperty(key, source))
+            categorizedProperties.otherProperties.forEach(([ key, source ]) => {
+                if (isReactive(source)) this.addReactiveProperty(key, source)
+            })
         }
 
 
@@ -215,6 +217,34 @@ export class ElementReactivity extends Mixin(
         }
 
 
+        $reactivePropertiesBoxes : BoxUnbound<unknown>[]        = undefined
+
+        get reactivePropertiesBoxes () : BoxUnbound<unknown>[] {
+            if (this.$reactivePropertiesBoxes !== undefined) return this.$reactivePropertiesBoxes
+
+            const reactive : BoxUnbound<unknown>[]      = []
+
+            Object.entries(this.reactiveProperties || []).forEach(([ prop, source ]) => {
+                if (!isReactive(source)) {
+                    setProperty(this.el, prop, source)
+                }
+                else {
+                    const box       = CalculableBox.new({
+                        calculation : () => resolvePropertySource(source)
+                    })
+
+                    box.commitValueOptimisticHook.on(
+                        (self, newValue, oldValue) => (this.el as HTMLElement)[ prop ] = newValue
+                    )
+
+                    reactive.push(box)
+                }
+            })
+
+            return this.$reactivePropertiesBoxes = reactive
+        }
+
+
         $effect : CalculableBox<Node[]>   = undefined
 
         get effect () : CalculableBox<Node[]> {
@@ -241,7 +271,8 @@ export class ElementReactivity extends Mixin(
                         this.classAttributeBox,
                         this.styleAttributeBox,
                         ...this.classActivatorBoxes,
-                        ...this.stylePropertiesBoxes
+                        ...this.stylePropertiesBoxes,
+                        ...this.reactivePropertiesBoxes
                     ].forEach(box => box && box.read())
 
                     if (this.reactiveChildren) {
@@ -282,7 +313,7 @@ export class ElementReactivity extends Mixin(
             reactivity.adoptReactiveProperties(categorizedProperties)
 
             categorizedProperties.otherProperties.forEach(
-                ([ propertyName, value ]) => setProperty(element, propertyName, value)
+                ([ propertyName, value ]) => !isReactive(value) && setProperty(element, propertyName, value)
             )
 
             if (normalizedChildren.hasReactivity) {

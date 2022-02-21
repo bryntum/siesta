@@ -91,6 +91,7 @@ export class Component extends Mixin(
         initialize (props? : Partial<Component>) {
             const categorizedProperties     = this.categorizedProperties = categorizeProperties(props)
 
+            // TODO should filter the reactive sources from the `otherProperties`
             super.initialize(Object.fromEntries(categorizedProperties.otherProperties))
             categorizedProperties.otherProperties   = []
 
