@@ -2,10 +2,10 @@ import { exclude, serializable } from "typescript-serializable-mixin"
 import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { compareDeepDiff, comparePrimitiveAndFuzzyMatchers } from "../../../compare_deep/DeepDiff.js"
 import {
-    any,
+    any, anyArrayContaining,
     anyNumberApprox,
     anyStringLike,
-    Approximation,
+    Approximation, FuzzyMatcherArrayContaining,
     FuzzyMatcherNumberApproximation,
     FuzzyMatcherString,
     NumberApproximation
@@ -671,11 +671,9 @@ export class AssertionCompare extends Mixin(
 
 
         /**
-         * Return a fuzzy matcher instance.
+         * A wrapper for the [[any]] fuzzy matcher helper
          *
          * @category Fuzzy comparison
-         *
-         * @param args
          */
         any<T extends [] | [ AnyConstructor ]> (...args : T) : T extends [] ? any : T extends [ AnyConstructor<infer I> ] ? DowngradePrimitives<I> : never {
             // @ts-ignore
@@ -683,11 +681,9 @@ export class AssertionCompare extends Mixin(
         }
 
         /**
-         * Returns a fuzzy matcher instance.
+         * A wrapper for the [[anyNumberApprox]] fuzzy matcher helper.
          *
          * @category Fuzzy comparison
-         *
-         * @param args
          */
         anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : FuzzyMatcherNumberApproximation {
             return anyNumberApprox(value, approx)
@@ -695,17 +691,23 @@ export class AssertionCompare extends Mixin(
 
 
         /**
-         * Returns a fuzzy matcher instance.
+         * A wrapper for the [[anyStringLike]] fuzzy matcher helper.
          *
          * @category Fuzzy comparison
-         *
-         * @param args
          */
         anyStringLike (pattern : string | RegExp) : FuzzyMatcherString {
             return anyStringLike(pattern)
         }
-        // eof backward compat
 
+
+        /**
+         * A wrapper for the [[anyArrayContaining]] fuzzy matcher helper.
+         *
+         * @category Fuzzy comparison
+         */
+        anyArrayContaining (expected : unknown[]) : FuzzyMatcherArrayContaining {
+            return anyArrayContaining(expected)
+        }
         // endregion
     }
 ) {}

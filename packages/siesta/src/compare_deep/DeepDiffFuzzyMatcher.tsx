@@ -3,7 +3,7 @@ import { AnyConstructor } from "../class/Mixin.js"
 import { TextJSX } from "../jsx/TextJSX.js"
 import { DowngradePrimitives, typeOf } from "../util/Helpers.js"
 import { isNumber, isRegExp } from "../util/Typeguards.js"
-import { DeepCompareOptions, DeepCompareState, valueAsDifference } from "./DeepDiff.js"
+import { compareDeepDiffImpl, DeepCompareOptions, DeepCompareState, valueAsDifference } from "./DeepDiff.js"
 import { Difference, DifferenceAtomic, DifferenceHeterogeneous } from "./DeepDiffRendering.js"
 
 
@@ -299,6 +299,74 @@ export class FuzzyMatcherString extends FuzzyMatcher {
  * @param pattern
  */
 export const anyStringLike = (pattern : string | RegExp) : FuzzyMatcherString => FuzzyMatcherString.new({ pattern })
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/**
+ * The instance of this fuzzy matcher will match any array, containing all elements from the `expected` array.
+ * The order in which the elements of the expected array are encountered in the received array is not significant,
+ * however all of them should be found in the received array.
+ *
+ * This class is usually instantiated with the helper test class method [[Test.anyArrayContaining]]
+ *
+ * For example:
+ *
+ * ```ts
+ *
+ * t.is([ 1, 2, 3 ], t.anyArrayContaining([ 3, 1 ])) // passes
+ * ```
+ */
+export class FuzzyMatcherArrayContaining extends FuzzyMatcher {
+    /**
+     * An array with the expected elements
+     */
+    expected        : unknown[]     = []
+
+
+    toString () : string {
+        return `any array containing ${ this.expected }`
+    }
+
+
+    equalsToDiff (
+        v : unknown[], flipped : boolean, options : DeepCompareOptions, state : DeepCompareState = DeepCompareState.new(),
+        convertingToDiff    : 'value1' | 'value2' | undefined = undefined
+    ) : Difference {
+        const v1        = flipped ? v : this
+        const v2        = flipped ? this : v
+
+        const type1     = flipped ? typeOf(v) : 'Array'
+        const type2     = flipped ? 'Array' : typeOf(v)
+
+        if (type1 !== type2)
+            return DifferenceHeterogeneous.new({
+                value1  : valueAsDifference(v1, 'value1', options, state),
+                value2  : valueAsDifference(v2, 'value2', options, state)
+            })
+        else {
+            const same      = this.expected.every(expectedEl =>
+                v.some(receivedEl =>
+                    compareDeepDiffImpl(expectedEl, receivedEl, options, state, convertingToDiff).same === true
+                )
+            )
+
+            return DifferenceHeterogeneous.new({
+                $same   : same,
+                value1  : valueAsDifference(v1, 'value1', options, state),
+                value2  : valueAsDifference(v2, 'value2', options, state)
+            })
+        }
+    }
+}
+
+/**
+ * This method returns an [[FuzzyMatcherArrayContaining]] instance, configured with the `expected` argument.
+ *
+ * See also [[any]], [[anyInstanceOf]], [[anyNumberApprox]], [[anyNumberBetween]], [[anyStringLike]]
+ *
+ * @param expected
+ */
+export const anyArrayContaining = (expected : unknown[]) : FuzzyMatcherArrayContaining => FuzzyMatcherArrayContaining.new({ expected })
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

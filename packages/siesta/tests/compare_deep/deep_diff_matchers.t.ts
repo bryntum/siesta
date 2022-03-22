@@ -1,6 +1,12 @@
 import { it } from "../../index.js"
 import { equalDeep } from "../../src/compare_deep/DeepDiff.js"
-import { any, anyInstanceOf, anyNumberApprox, anyStringLike } from "../../src/compare_deep/DeepDiffFuzzyMatcher.js"
+import {
+    any,
+    anyArrayContaining,
+    anyInstanceOf,
+    anyNumberApprox,
+    anyStringLike
+} from "../../src/compare_deep/DeepDiffFuzzyMatcher.js"
 
 
 it('Deep compare should work for number fuzzy matcher', async t => {
@@ -93,4 +99,19 @@ it('Deep compare should work for "any" fuzzy matcher', async t => {
     t.equal(equalDeep(new Date, any()), true)
 
     t.equal(equalDeep([ 1, 2, 3 ], any()), true)
+})
+
+
+it('Deep compare should work for "anyArrayContaining" fuzzy matcher', async t => {
+    t.equal(equalDeep([], anyArrayContaining([])), true)
+
+    t.equal(equalDeep([], anyArrayContaining([ 1 ])), false)
+
+    t.equal(equalDeep([ 1 ], anyArrayContaining([ 1 ])), true)
+
+    t.equal(equalDeep([ 1, 2, 3 ], anyArrayContaining([ 2 ])), true)
+
+    t.equal(equalDeep([ 1, { a : 1 }, 3, { b : 2 } ], anyArrayContaining([ { a : 1 }, { b : 2 } ])), true)
+
+    t.equal(equalDeep([ 1, { a : 1 }, 3, { b : 2 } ], anyArrayContaining([ { a : 1 }, { b : t.any(Number) } ])), true)
 })

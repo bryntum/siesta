@@ -166,7 +166,9 @@ export const compareDeepDiff = (
 }
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const compareDeepDiffImpl = function (
+// TODO private, was not supposed to be exported
+// but is needed for `anyArrayContaining` matcher
+export const compareDeepDiffImpl = function (
     v1                  : unknown,
     v2                  : unknown,
     options             : DeepCompareOptions    = defaultDeepCompareOptions,
