@@ -252,7 +252,7 @@ export class AssertionCompare extends Mixin(
             this.assertStructuralEqualityInternal('ne(received, expected)', !this.isAssertionNegated, value1, value2, description)
         }
 
-
+        // TODO this should be a mere `===` comparison
         /**
          * This assertion passes if the received (left) and expected (right) values are "structurally" equal, the
          * so called "deep" equality.
@@ -271,6 +271,28 @@ export class AssertionCompare extends Mixin(
          * @param description
          */
         equal<V> (received : V, expected : V, description : string = '') {
+            this.assertStructuralEqualityInternal('equal(received, expected)', this.isAssertionNegated, received, expected, description)
+        }
+
+
+        /**
+         * This assertion passes if the received (left) and expected (right) values are "structurally" equal, the
+         * so called "deep" equality.
+         *
+         * `Map`, `Set` and other native JavaScript data types are supported. Currently these objects are compared
+         * by their content, any extra properties, set on them, will not be compared. We plan to support this
+         * use case if there will be a demand for it.
+         *
+         * Cyclic data structures are supported. Fuzzy matchers, like [[any]], [[anyNumberApprox]], etc are supported
+         * inside the `expected` data.
+         *
+         * @category Equality
+         *
+         * @param received
+         * @param expected
+         * @param description
+         */
+        equalDeep<V> (received : V, expected : V, description : string = '') {
             this.assertStructuralEqualityInternal('equal(received, expected)', this.isAssertionNegated, received, expected, description)
         }
 
