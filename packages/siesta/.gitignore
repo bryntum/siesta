@@ -50,6 +50,10 @@
 /resources/html_report/**/*.js
 /resources/html_report/**/*.js.map
 /resources/html_report/**/*.d.ts
+/misc/playground/**/*.js
+/misc/playground/**/*.jsx
+/misc/playground/**/*.js.map
+/misc/playground/**/*.d.ts
 /index.js
 /index.js.map
 /index.d.ts

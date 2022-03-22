@@ -1,9 +1,10 @@
-import { ReactiveHTMLElement } from "../../src/chronograph-jsx/ElementReactivity.js"
-import { compareDeepDiff } from "../../src/compare_deep/DeepDiff.js"
-import { JsonDeepDiffComponent } from "../../src/compare_deep/JsonDeepDiffComponent.js"
+import { ReactiveHTMLElement } from "../../../src/chronograph-jsx/ElementReactivity.js"
+import { compareDeepDiff } from "../../../src/compare_deep/DeepDiff.js"
+import { any, anyArrayContaining, anyNumberApprox } from "../../../src/compare_deep/DeepDiffFuzzyMatcher.js"
+import { JsonDeepDiffComponent } from "../../../src/compare_deep/JsonDeepDiffComponent.js"
 
 const difference      = compareDeepDiff(
-    { a : 1 }, { z : 1 }
+    [ 1, 2, 3 ], anyArrayContaining([ any(Number), 4, 5 ])
 
         // {
         //     map : new Map([ [ { key1 : 'value1' }, 1 ] ]),

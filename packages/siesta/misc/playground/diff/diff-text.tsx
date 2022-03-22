@@ -1,11 +1,11 @@
-import { ColorerNodejs } from "../../src/jsx/ColorerNodejs.js"
-import { RenderCanvas } from "../../src/jsx/RenderBlock.js"
-import { TextJSX } from "../../src/jsx/TextJSX.js"
-import { TreeStreamed } from "../../src/jsx/Tree.js"
-import { styles } from "../../src/siesta/reporter/styling/theme_universal.js"
-import { compareDeepDiff } from "../../src/compare_deep/DeepDiff.js"
-import { JsonDeepDiffElement} from "../../src/compare_deep/DeepDiffRendering.js"
-import { XmlRendererDifference } from "../../src/compare_deep/DeepDiffXmlRendererDifference.js"
+import { ColorerNodejs } from "../../../src/jsx/ColorerNodejs.js"
+import { RenderCanvas } from "../../../src/jsx/RenderBlock.js"
+import { TextJSX } from "../../../src/jsx/TextJSX.js"
+import { TreeStreamed } from "../../../src/jsx/Tree.js"
+import { styles } from "../../../src/siesta/reporter/styling/theme_universal.js"
+import { compareDeepDiff } from "../../../src/compare_deep/DeepDiff.js"
+import { JsonDeepDiffElement} from "../../../src/compare_deep/DeepDiffRendering.js"
+import { XmlRendererDifference } from "../../../src/compare_deep/DeepDiffXmlRendererDifference.js"
 
 const difference      = compareDeepDiff(
     {
