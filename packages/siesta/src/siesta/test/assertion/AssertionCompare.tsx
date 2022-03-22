@@ -685,7 +685,8 @@ export class AssertionCompare extends Mixin(
          *
          * @category Fuzzy comparison
          */
-        anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : FuzzyMatcherNumberApproximation {
+        anyNumberApprox (value : number, approx : Approximation = { percent : 5 }) : number {
+            // @ts-ignore
             return anyNumberApprox(value, approx)
         }
 
@@ -695,7 +696,8 @@ export class AssertionCompare extends Mixin(
          *
          * @category Fuzzy comparison
          */
-        anyStringLike (pattern : string | RegExp) : FuzzyMatcherString {
+        anyStringLike (pattern : string | RegExp) : string {
+            // @ts-ignore
             return anyStringLike(pattern)
         }
 
@@ -705,7 +707,8 @@ export class AssertionCompare extends Mixin(
          *
          * @category Fuzzy comparison
          */
-        anyArrayContaining (expected : unknown[]) : FuzzyMatcherArrayContaining {
+        anyArrayContaining (expected : unknown[]) : [] {
+            // @ts-ignore
             return anyArrayContaining(expected)
         }
 
@@ -715,7 +718,8 @@ export class AssertionCompare extends Mixin(
          *
          * @category Fuzzy comparison
          */
-        anyObjectContaining (expected : Record<string, unknown>) : FuzzyMatcherObjectContaining {
+        anyObjectContaining (expected : Record<string, unknown>) : Record<string, unknown> {
+            // @ts-ignore
             return anyObjectContaining(expected)
         }
         // endregion
