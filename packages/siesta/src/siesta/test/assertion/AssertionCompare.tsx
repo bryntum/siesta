@@ -3,10 +3,10 @@ import { AnyConstructor, ClassUnion, Mixin } from "../../../class/Mixin.js"
 import { compareDeepDiff, comparePrimitiveAndFuzzyMatchers } from "../../../compare_deep/DeepDiff.js"
 import {
     any, anyArrayContaining,
-    anyNumberApprox,
+    anyNumberApprox, anyObjectContaining,
     anyStringLike,
     Approximation, FuzzyMatcherArrayContaining,
-    FuzzyMatcherNumberApproximation,
+    FuzzyMatcherNumberApproximation, FuzzyMatcherObjectContaining,
     FuzzyMatcherString,
     NumberApproximation
 } from "../../../compare_deep/DeepDiffFuzzyMatcher.js"
@@ -707,6 +707,16 @@ export class AssertionCompare extends Mixin(
          */
         anyArrayContaining (expected : unknown[]) : FuzzyMatcherArrayContaining {
             return anyArrayContaining(expected)
+        }
+
+
+        /**
+         * A wrapper for the [[anyObjectContaining]] fuzzy matcher helper.
+         *
+         * @category Fuzzy comparison
+         */
+        anyObjectContaining (expected : Record<string, unknown>) : FuzzyMatcherObjectContaining {
+            return anyObjectContaining(expected)
         }
         // endregion
     }

@@ -4,7 +4,7 @@ import {
     any,
     anyArrayContaining,
     anyInstanceOf,
-    anyNumberApprox,
+    anyNumberApprox, anyObjectContaining,
     anyStringLike
 } from "../../src/compare_deep/DeepDiffFuzzyMatcher.js"
 
@@ -114,4 +114,17 @@ it('Deep compare should work for "anyArrayContaining" fuzzy matcher', async t =>
     t.equal(equalDeep([ 1, { a : 1 }, 3, { b : 2 } ], anyArrayContaining([ { a : 1 }, { b : 2 } ])), true)
 
     t.equal(equalDeep([ 1, { a : 1 }, 3, { b : 2 } ], anyArrayContaining([ { a : 1 }, { b : t.any(Number) } ])), true)
+})
+
+
+it('Deep compare should work for "anyObjectContaining" fuzzy matcher', async t => {
+    t.equal(equalDeep({}, anyObjectContaining({})), true)
+
+    t.equal(equalDeep({}, anyObjectContaining({ a : 1 })), false)
+
+    t.equal(equalDeep({ a : 1 }, anyObjectContaining({ a : 1 })), true)
+
+    t.equal(equalDeep({ a : { b : 2 }, c : 3 }, anyObjectContaining({ a : { b : 2 } })), true)
+
+    t.equal(equalDeep({ a : { b : 2 }, c : 3 }, anyObjectContaining({ a : { b : t.any(Number) } })), true)
 })
