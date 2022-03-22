@@ -614,6 +614,129 @@ export class DifferenceArray extends DifferenceComposite {
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceFuzzyArrayEntry' })
+export class DifferenceFuzzyArrayEntry extends DifferenceCompositeEntry {
+
+    // isFirstMissing      : boolean           = false
+
+
+    '---'
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isMiddle && this.index !== undefined) {
+            const cls   = `json-deep-diff-middle-index ${ this.same ? 'diff-same' : '' }`
+
+            output.write(<span class={ cls }>{ this.index }</span>)
+        }
+
+        yield* super.renderGen(output, context)
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceFuzzyArray' })
+export class DifferenceFuzzyArray extends DifferenceComposite {
+    value1          : unknown[]
+    value2          : unknown[]
+
+    $same           : boolean           = true
+
+    entries         : DifferenceFuzzyArrayEntry[]
+
+    length          : number            = 0
+    length2         : number            = 0
+
+    onlyIn2Size     : number            = 0
+
+
+    initialize (props : Partial<DifferenceArray>) {
+        this.$type      = 'both'
+
+        super.initialize(props)
+
+        // this.length     = this.value1.length
+        // this.length2    = this.value2.length
+    }
+
+
+    addComparison (index : number, difference : Difference) {
+        this.entries.push(DifferenceFuzzyArrayEntry.new({ index, difference }))
+
+        if (this.$same && !difference.$same) this.$same = false
+    }
+
+
+    getOnlyIn2Size () : number {
+        return this.onlyIn2Size
+    }
+
+    // TODO see the comment in the `FuzzyMatcherArrayContaining`
+    // beforeRenderChildGen (
+    //     output              : RenderingXmlFragment,
+    //     context             : DifferenceRenderingContext,
+    //     child               : DifferenceFuzzyArrayEntry,
+    //     index               : number
+    // )
+    // {
+    //     // console.log("isFirstMissing", child.isFirstMissing)
+    //     //
+    //     // if (context.stream === 'right' && child.isFirstMissing) output.write(<div class='diff-missing-header'>Missing:</div>)
+    // }
+
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isContent) output.push(<diff-array id={ `${ context.stream }-${ this.id }` } class={ this.cls } same={ this.same } type={ this.type }></diff-array>)
+
+        yield* super.renderGen(output, context)
+
+        if (context.isContent) output.pop()
+    }
+
+
+    renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeHeader(output, context)
+
+        if (context.isContent)
+            if (context.stream === 'right')
+                output.write('fuzzy[')
+            else
+                output.write('[')
+    }
+
+
+    renderCompositeFooter (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeFooter(output, context)
+
+        if (context.isContent) output.write(']')
+    }
+
+
+    needCommaAfterChild (
+        child               : DifferenceArrayEntry,
+        index               : number,
+        context             : DifferenceRenderingContext
+    )
+        : boolean
+    {
+        const stream        = context.contentStream
+
+        if (
+            child.isMissingIn(stream)
+            ||
+            (stream === 'right' && child.index >= this.length2 - 1)
+            ||
+            (stream === 'left' && child.index >= this.length - 1)
+        ) {
+            return false
+        } else {
+            return super.needCommaAfterChild(child, index, context)
+        }
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceObjectEntry' })
 export class DifferenceObjectEntry extends DifferenceCompositeEntry {
     key             : string            = undefined

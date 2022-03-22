@@ -10,7 +10,13 @@ import {
     DeepCompareState,
     valueAsDifference
 } from "./DeepDiff.js"
-import { Difference, DifferenceAtomic, DifferenceHeterogeneous } from "./DeepDiffRendering.js"
+import {
+    Difference,
+    DifferenceAtomic,
+    DifferenceFuzzyArray,
+    DifferenceFuzzyArrayEntry,
+    DifferenceHeterogeneous
+} from "./DeepDiffRendering.js"
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -336,7 +342,7 @@ export class FuzzyMatcherArrayContaining extends FuzzyMatcher {
 
 
     toString () : string {
-        return `any array containing ${ this.expected }`
+        return `any array containing [${ this.expected }]`
     }
 
 
@@ -346,23 +352,87 @@ export class FuzzyMatcherArrayContaining extends FuzzyMatcher {
     )
         : Difference
     {
-        const same      = typeOf(v) !== 'Array'
-            ? false
-            : this.expected.every(expectedEl =>
-                v.some(receivedEl =>
-                    compareDeepDiffImpl(receivedEl, expectedEl, options, state, convertingToDiff).same === true
-                )
+        if (typeOf(v) !== 'Array') {
+            const selfDiff = DifferenceFuzzyArray.new()
+
+            this.expected.forEach((expectedEl, index) =>
+                selfDiff.entries.push(DifferenceFuzzyArrayEntry.new({
+                    // isFirstMissing  : index === 0,
+                    difference      : valueAsDifference(expectedEl, 'value1', options, state)
+                }))
             )
 
-        const selfAtomicDifference = DifferenceAtomic.new({
-            [ flipped ? 'value2' : 'value1' ] : this
+            return DifferenceHeterogeneous.new({
+                value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfDiff,
+                value2      : flipped ? selfDiff : valueAsDifference(v, 'value2', options, state)
+            })
+        }
+
+        const selfDiff      = DifferenceFuzzyArray.new()
+
+        const unmatched : unknown[]                         = []
+        const entries   : DifferenceFuzzyArrayEntry[]       = new Array(v.length).fill(undefined)
+
+        for (let j = 0; j < this.expected.length; j++) {
+            const expectedEl    = this.expected[ j ]
+
+            let matched         = false
+
+            for (let i = 0; i < v.length; i++) {
+                const innerState    = state.in()
+
+                // TODO take `flipped` into account?
+                const difference    = compareDeepDiffImpl(v[ i ], expectedEl, options, innerState, convertingToDiff)
+
+                if (difference.$same) {
+                    state.out(innerState)
+
+                    // TODO should actually track the repeated matches and visualize them in separate group/color?
+                    // (as it is done currently with the `Missing` header in the `beforeRenderChildGen` of the `DifferenceFuzzyArray`)
+                    // for example, comparing [ 1, 2, 3 ] and [ 3, t.anyNumberApprox(3) ]
+                    // both elements in the expected array matches the same element in the received array
+                    // right now only the match for the 1st element of the expected array is visualized
+                    //
+                    if (entries[ i ] === undefined) {
+                        entries[ i ]    = DifferenceFuzzyArrayEntry.new({ index : i, difference })
+                    }
+
+                    matched         = true
+
+                    break
+                }
+            }
+
+            if (!matched) unmatched.push(expectedEl)
+        }
+
+        entries.forEach((entry, index) => {
+            selfDiff.entries.push(
+                entry === undefined
+                    ? DifferenceFuzzyArrayEntry.new({
+                        index,
+                        // TODO take `flipped` into account?
+                        difference  : valueAsDifference(v[ index ], 'value1', options, state)
+                    })
+                    : entry
+            )
         })
 
-        return DifferenceHeterogeneous.new({
-            $same       : same,
-            value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfAtomicDifference,
-            value2      : flipped ? selfAtomicDifference : valueAsDifference(v, 'value2', options, state)
-        })
+        unmatched.forEach((unmatchedEl, index) =>
+            selfDiff.entries.push(
+                DifferenceFuzzyArrayEntry.new({
+                    // isFirstMissing  : index === 0,
+                    // TODO take `flipped` into account?
+                    difference      : valueAsDifference(unmatchedEl, 'value2', options, state)
+                })
+            )
+        )
+
+        selfDiff.$same          = unmatched.length === 0
+        selfDiff.onlyIn2Size    = unmatched.length
+        selfDiff.length         = v.length
+
+        return selfDiff
     }
 }
 
