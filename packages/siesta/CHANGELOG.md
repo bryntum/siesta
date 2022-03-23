@@ -1,5 +1,7 @@
 # Release history for Siesta:
 
+## v6.0.0-beta-1        2022-03-23 14:39
+
 ## v6.0.0-alpha-5        2021-12-21 09:21
 
 ## v6.0.0-alpha-4        2021-11-01 12:37
