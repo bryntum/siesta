@@ -1,6 +1,12 @@
 import { it } from "../../index.js"
 import { compareDeepDiff } from "../../src/compare_deep/DeepDiff.js"
-import { any, anyInstanceOf, anyNumberApprox, anyStringLike } from "../../src/compare_deep/DeepDiffFuzzyMatcher.js"
+import {
+    any, anyArrayContaining,
+    anyInstanceOf,
+    anyNumberApprox,
+    anyObjectContaining,
+    anyStringLike
+} from "../../src/compare_deep/DeepDiffFuzzyMatcher.js"
 import { XmlRendererDifference } from "../../src/compare_deep/DeepDiffXmlRendererDifference.js"
 
 const rendererPlain     = XmlRendererDifference.new({})
@@ -952,6 +958,74 @@ it('Should render the diff with "any" matcher correctly #1', async t => {
             '{          │ │ {         ',
             '  "a": 123 │ │   "a": any',
             '}          │ │ }         ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with "anyObjectContaining" matcher correctly #1', async t => {
+    const difference0   = compareDeepDiff({ a : 1, b : 2 }, anyObjectContaining({ a : 1 }))
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received  │ │ Expected',
+            '          │ │         ',
+            '{         │ │ ~{      ',
+            '  "a": 1, │ │   "a": 1',
+            '  "b": 2  │ │   ░     ',
+            '}         │ │ }       ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with "anyObjectContaining" matcher correctly #2', async t => {
+    const difference0   = compareDeepDiff({ a : 1 }, anyObjectContaining({ a : 1, b : 2 }))
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received │ │ Expected ',
+            '         │ │          ',
+            '{        │ │ ~{       ',
+            '  "a": 1 │ │   "a": 1,',
+            '  ░      │ │   "b": 2 ',
+            '}        │ │ }        ',
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with "anyArrayContaining" matcher correctly #1', async t => {
+    const difference0   = compareDeepDiff([ 1, 2 ], anyArrayContaining([ 1 ]))
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received │ │ Expected',
+            '         │ │         ',
+            '[        │ │ ~[      ',
+            '  1,     │0│   1     ',
+            '  2      │1│   ░     ',
+            ']        │ │ ]       '
+        ].join('\n')
+    )
+})
+
+
+it('Should render the diff with "anyArrayContaining" matcher correctly #2', async t => {
+    const difference0   = compareDeepDiff([ 1 ], anyArrayContaining([ 1, 2 ]))
+
+    t.is(
+        stripZws(rendererPlain.render(difference0.template())),
+        [
+            'Received │ │ Expected',
+            '         │ │         ',
+            '[        │ │ ~[      ',
+            '  1      │0│   1,    ',
+            '  ░      │ │   2     ',
+            ']        │ │ ]       '
         ].join('\n')
     )
 })

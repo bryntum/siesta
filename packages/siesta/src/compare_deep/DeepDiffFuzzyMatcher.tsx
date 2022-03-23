@@ -432,6 +432,7 @@ export class FuzzyMatcherArrayContaining extends FuzzyMatcher {
         selfDiff.$same          = unmatched.length === 0
         selfDiff.onlyIn2Size    = unmatched.length
         selfDiff.length         = v.length
+        selfDiff.length2        = v.length + unmatched.length
 
         return selfDiff
     }
