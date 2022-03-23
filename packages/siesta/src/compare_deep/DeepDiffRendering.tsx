@@ -768,8 +768,8 @@ export class DifferenceObjectEntry extends DifferenceCompositeEntry {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 @serializable({ id : 'DifferenceObject' })
 export class DifferenceObject extends DifferenceComposite {
-    value1          : object | Missing
-    value2          : object | Missing
+    value1              : object | Missing
+    value2              : object | Missing
 
     onlyIn2Size         : number                = 0
     constructorName     : string                = undefined
@@ -778,9 +778,9 @@ export class DifferenceObject extends DifferenceComposite {
     size                : number                = 0
     size2               : number                = 0
 
-    $same           : boolean                   = true
+    $same               : boolean               = true
 
-    entries         : DifferenceObjectEntry[]
+    entries             : DifferenceObjectEntry[]
 
 
     initialize (props : Partial<DifferenceObject>) {
