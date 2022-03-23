@@ -65,7 +65,10 @@ compileTheme('theme_accessible.scss')
 function styleToMutation (styleName : string, styleValue : string) : string | undefined {
     switch (styleName) {
         case 'color':
-            return `style.color = ${ colorToArray(styleValue )}`
+            if (styleValue === 'inherit')
+                return `style.color = undefined`
+            else
+                return `style.color = ${ colorToArray(styleValue )}`
         case 'background-color':
             return `style.backgroundColor = ${ colorToArray(styleValue )}`
 
