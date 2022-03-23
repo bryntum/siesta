@@ -1,7 +1,10 @@
 @use "sass:color";
 @use '../../resources/styling/common/_colors.scss' as *;
 
-// simplified TextJSX CSS (class-name only selectors)
+//
+// simplified TextJSX CSS in this file (class-name only selectors)
+//
+
 .diff-atomic-not-same {
     color : $secondary_pass_darker;
 }
