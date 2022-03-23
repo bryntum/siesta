@@ -1,0 +1,85 @@
+<!DOCTYPE html><html class="default no-js"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>Guide: Code coverage | @bryntum/siesta</title><meta name="description" content="Documentation for @bryntum/siesta"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/custom.css"/><script async src="../assets/search.js" id="search-script"></script></head><body><script>document.body.classList.add(localStorage.getItem("tsd-theme") || "os")</script><header><div class="tsd-page-toolbar"><div class="container"><div class="table-wrap"><div class="table-cell" id="tsd-search" data-base=".."><div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption">Search</label><input type="text" id="tsd-search-field"/></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="../index.html" class="title">@bryntum/siesta</a></div><div class="table-cell" id="tsd-widgets"><div id="tsd-filter"><a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a><div class="tsd-filter-group"><div class="tsd-select" id="tsd-filter-visibility"><span class="tsd-select-label">All</span><ul class="tsd-select-list"><li data-value="public">Public</li><li data-value="protected">Public/Protected</li><li data-value="private" class="selected">All</li></ul></div> <input type="checkbox" id="tsd-filter-inherited" checked/><label class="tsd-widget" for="tsd-filter-inherited">Inherited</label></div></div><a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a></div></div></div></div><div class="tsd-page-title"><div class="container"><ul class="tsd-breadcrumb"><li><a href="../modules.html">@bryntum/siesta</a></li><li><a href="Guide__Code_coverage.html">Guide: Code coverage</a></li></ul><h1>Module Guide: Code coverage</h1></div></div></header><div class="container container-main"><div class="row"><div class="col-8 col-content"><section class="tsd-panel-group tsd-index-group"><h2>Index</h2><section class="tsd-panel tsd-index-panel"><div class="tsd-index-content"><section class="tsd-index-section "><h3>Variables</h3><ul class="tsd-index-list"><li class="tsd-kind-variable tsd-parent-kind-module"><a href="Guide__Code_coverage.html#CodeCoverageGuide" class="tsd-kind-icon">Code<wbr/>Coverage<wbr/>Guide</a></li></ul></section></div></section></section><section class="tsd-panel-group tsd-member-group "><h2>Variables</h2><section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module"><a id="CodeCoverageGuide" class="tsd-anchor"></a><h3>Code<wbr/>Coverage<wbr/>Guide</h3><div class="tsd-signature tsd-kind-icon">Code<wbr/>Coverage<wbr/>Guide<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;&quot;</span><span class="tsd-signature-symbol"> = &#39;&#39;</span></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/bryntum/siesta/blob/e2b6ed2/packages/siesta/src/guides/code_coverage/code_coverage.ts#L7">siesta/src/guides/code_coverage/code_coverage.ts:7</a></li></ul></aside><div class="tsd-comment tsd-typography"><div class="lead">
+
+<a href="#code-coverage-with-siesta" id="code-coverage-with-siesta" style="color: inherit; text-decoration: none;">
+  <h1>Code coverage with Siesta</h1>
+</a>
+<p>Code coverage report provides information about which parts of your codebase are actually executed while running your test suite.
+It is said, that such code is &quot;covered with tests&quot;. Code, that has not been executed while running the test suite, is called 
+&quot;uncovered&quot;. Basically, there are no tests for uncovered code.</p>
+<p>The meaning of the code coverage information should not be overestimated. &quot;Covered&quot; code 
+still can contain algorithmic bugs and errors. &quot;Covered&quot; code may not be exercised directly by the test logic, but
+instead called as helper code (indirect coverage). </p>
+<p>So you can&#39;t say for sure, that &quot;covered&quot; code is 100% reliable and bugs free.</p>
+<p>The only reliable information code coverage report provides is what code is <em>not</em> covered with tests at all.
+Still, even this information is valuable. Definitely, all important parts of your codebase should not contain &quot;uncovered&quot; code. </p>
+
+<a href="#how-it-works" id="how-it-works" style="color: inherit; text-decoration: none;">
+  <h2>How it works</h2>
+</a>
+<p>Siesta is using native <code>v8</code> code coverage information, which is very fast. This, however, means, that when running tests in browsers, 
+code coverage will only work in Chrome. </p>
+<p>Siesta aims to provide just a thin integration level over the current state-of-art code coverage libraries (currently, 
+these are <a href="https://github.com/istanbuljs/nyc">Istanbul/Nyc</a> and <a href="https://github.com/bcoe/c8">c8</a>). 
+This is to be able to freely upgrade those libraries and stay up to date with their new features and bug fixes.</p>
+<p>The code coverage reports are generated directly by the Istanbul library.</p>
+
+<a href="#collecting-code-coverage" id="collecting-code-coverage" style="color: inherit; text-decoration: none;">
+  <h2>Collecting code coverage </h2>
+</a>
+<p>To enable the code coverage, specify the value for the <code>--coverage-reporter</code> command line option. It will enable the 
+code coverage collection and generate a report, after the test suite has completed. Recognized values are the names of the Istanbul reporter packages, 
+listed <a href="https://github.com/istanbuljs/istanbuljs/tree/master/packages/istanbul-reports/lib">here</a>.
+Most often used ones are: <code>html</code>, <code>html-spa</code> and <code>text</code>. Note, that <code>text</code> report will just output the information to the <code>stdout</code> and not save it file.
+This option can be repeated several times, resulting in several report generated. </p>
+<p>Other options for code coverage are:</p>
+<ul>
+<li><p><code>--coverage-include</code> - The glob pattern for files to include for instrumentation, can be repeated several times. 
+Globs are resolved using <a href="https://www.npmjs.com/package/minimatch">minimatch</a> package, the better documentation can be found in 
+<a href="https://www.npmjs.com/package/glob">glob</a> package. Note, that a glob pattern like <code>*.some.js</code> will only match the root-level <code>*.some.js</code> files,
+to match such files in all directories, specify it as <code>**/*.some.js</code>. By default, all files are included.</p>
+</li>
+<li><p><code>--coverage-exclude</code> - The glob pattern for files to exclude from instrumentation, can be repeated several times. Default value is: </p>
+<pre><code><span class="hl-4">&quot;coverage/**&quot;</span><span class="hl-0">, </span><span class="hl-4">&quot;packages/*/test{,s}/**&quot;</span><span class="hl-0">, </span><span class="hl-4">&quot;**/*.d.ts&quot;</span><span class="hl-0">, </span><span class="hl-4">&quot;test{,s}/**&quot;</span><span class="hl-0">, </span><br/><span class="hl-4">&quot;test{,-*}.{js,cjs,mjs,ts,tsx,jsx}&quot;</span><span class="hl-0">, </span><br/><span class="hl-4">&quot;**/*{.,-}test.{js,cjs,mjs,ts,tsx,jsx}&quot;</span><span class="hl-0">, </span><span class="hl-4">&quot;**/__tests__/**&quot;</span><span class="hl-0">, </span><br/><span class="hl-4">&quot;**/{ava,babel,nyc}.config.{js,cjs,mjs}&quot;</span><span class="hl-0">, </span><span class="hl-4">&quot;**/jest.config.{js,cjs,mjs,ts}&quot;</span><span class="hl-0">,</span><br/><span class="hl-4">&quot;**/{karma,rollup,webpack}.config.js&quot;</span><span class="hl-0">, </span><span class="hl-4">&quot;**/.{eslint,mocha}rc.{js,cjs}&quot;</span><span class="hl-0">]]</span>
+</code></pre>
+<p>Note, that specifying a value for this option will override the default, except the exclusion of <code>node_modules</code> folder. To force the inclusion
+of <code>node_modules</code> folder, specify the negated exclusion pattern: <code>!**/node_modules/</code></p>
+</li>
+<li><p><code>--coverage-report-dir</code> - Specifies the output directory for the code coverage reports, default value is <code>./coverage/</code> </p>
+</li>
+<li><p><code>--coverage-clean</code> - Default value is <code>true</code>. Setting this option to <code>false</code> will prevent nyc from clearing the <code>--coverage-temp-directory</code> folder 
+before running the test suite. This option can be used to combine the code coverage information from several test suite launches into a single report.</p>
+</li>
+</ul>
+<p>** Important note **. On Windows, <a href="https://stackoverflow.com/questions/24173825/what-does-single-quote-do-in-windows-batch-files">one need to use double quotes</a>, 
+when providing value for the <code>--coverage-include</code> and <code>--coverage-exclude</code> options.</p>
+
+<a href="#code-coverage-in-browser" id="code-coverage-in-browser" style="color: inherit; text-decoration: none;">
+  <h2>Code coverage in browser </h2>
+</a>
+<p>None of the current code coverage tools support code coverage for browsers. Because of that, Siesta performs some workarounds.</p>
+<p>Notably, the protocol of all source file urls is changed from <code>http/https</code> to <code>file</code>. Port, if it presents in the url
+is turned into a path segment, so <code>http://localhost:8000/src/file.js</code> becomes <code>file://localhost/8000/src/file.js</code>.</p>
+<p>Please take this into account, when examining code coverage reports.</p>
+
+<a href="#code-coverage-in-deno" id="code-coverage-in-deno" style="color: inherit; text-decoration: none;">
+  <h2>Code coverage in Deno </h2>
+</a>
+<p>Currently, code coverage in Deno, does not work, because of <a href="https://github.com/denoland/deno/issues/13206">this issue</a>.
+We&#39;ll be implementing it as soon as the issue is resolved. </p>
+
+<a href="#examples" id="examples" style="color: inherit; text-decoration: none;">
+  <h2>Examples</h2>
+</a>
+<p>For example, to collect the code coverage information from your Node.js test suite:</p>
+<pre><code class="language-shell"><span class="hl-0">&gt; npx siesta path/to/siesta/project.js --coverage-reporter html --coverage-include </span><span class="hl-4">&#39;**/src/**/*.js&#39;</span>
+</code></pre>
+<p>For example, to collect the code coverage information from the browser:</p>
+<pre><code class="language-shell"><span class="hl-0">&gt; npx siesta http://path/to/siesta/project.js --coverage-reporter html --coverage-include </span><span class="hl-4">&#39;**/src/**/*.js&#39;</span>
+</code></pre>
+
+<a href="#copyright-and-license" id="copyright-and-license" style="color: inherit; text-decoration: none;">
+  <h1>COPYRIGHT AND LICENSE</h1>
+</a>
+<p>MIT License</p>
+<p>Copyright (c) 2009-2021 Bryntum, Nickolay Platonov</p>
+</div></div></section></section></div><div class="col-4 col-menu menu-sticky-wrap menu-highlight"><nav class="tsd-navigation primary"><ul><li class=""><a href="../modules.html">Modules</a></li><li class=" tsd-kind-module"><a href="Guide__Auto_waiting.html">Guide: <wbr/>Auto waiting</a></li><li class="current tsd-kind-module"><a href="Guide__Code_coverage.html">Guide: <wbr/>Code coverage</a></li><li class=" tsd-kind-module"><a href="Guide__Getting_started_Deno.html">Guide: <wbr/>Getting started <wbr/>Deno</a></li><li class=" tsd-kind-module"><a href="Guide__Getting_started_Node_js.html">Guide: <wbr/>Getting started <wbr/>Node.js</a></li><li class=" tsd-kind-module"><a href="Guide__Getting_started_Sencha.html">Guide: <wbr/>Getting started <wbr/>Sencha</a></li><li class=" tsd-kind-module"><a href="Guide__Getting_started_browser.html">Guide: <wbr/>Getting started browser</a></li><li class=" tsd-kind-module"><a href="Guide__Reports.html">Guide: <wbr/>Reports</a></li><li class=" tsd-kind-module"><a href="Guide__Siesta_project.html">Guide: <wbr/>Siesta project</a></li><li class=" tsd-kind-module"><a href="Guide__Special_key_names.html">Guide: <wbr/>Special key names</a></li><li class=" tsd-kind-module"><a href="Guide__Testing_advanced.html">Guide: <wbr/>Testing advanced</a></li><li class=" tsd-kind-module"><a href="Guide__Testing_basics.html">Guide: <wbr/>Testing basics</a></li><li class=" tsd-kind-module"><a href="browser.html">browser</a></li><li class=" tsd-kind-module"><a href="deno.html">deno</a></li><li class=" tsd-kind-module"><a href="index.html">index</a></li><li class=" tsd-kind-module"><a href="nodejs.html">nodejs</a></li><li class=" tsd-kind-module"><a href="sencha.html">sencha</a></li></ul></nav><nav class="tsd-navigation secondary menu-sticky"><ul><li class="tsd-kind-variable tsd-parent-kind-module"><a href="Guide__Code_coverage.html#CodeCoverageGuide" class="tsd-kind-icon">Code<wbr/>Coverage<wbr/>Guide</a></li></ul></nav></div></div></div><footer class="with-border-bottom"><div class="container"><h2>Legend</h2><div class="tsd-legend-group"><ul class="tsd-legend"><li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li><li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li><li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li></ul></div><h2>Settings</h2><p>Theme <select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></p></div></footer><div class="container tsd-generator"><p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div><div class="overlay"></div><script src="../assets/main.js"></script></body></html>
