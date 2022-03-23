@@ -23,9 +23,10 @@ export class XmlRendererDifference extends Mixin(
 
 
         getElementClass (el : XmlElement) : string {
-            const insideHetero  = CI(el.parentAxis()).some(el => el.tagName === 'diff-hetero')
+            const insideHetero          = CI(el.parentAxis()).some(el => el.tagName === 'diff-hetero')
+            const insideFuzzyObject     = CI(el.parentAxis()).some(el => el.hasClass('diff-fuzzy-object-only-in-1-entry'))
 
-            return el.class + (insideHetero ? ' diff-hetero' : '')
+            return el.class + (insideHetero ? ' diff-hetero' : '') + (insideFuzzyObject ? ' diff-fuzzy' : '')
         }
     }
 ){}

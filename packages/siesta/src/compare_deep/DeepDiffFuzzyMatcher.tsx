@@ -4,8 +4,8 @@ import { TextJSX } from "../jsx/TextJSX.js"
 import { DowngradePrimitives, isAtomicValue, typeOf } from "../util/Helpers.js"
 import { isNumber, isRegExp } from "../util/Typeguards.js"
 import {
-    compareDeepDiff,
     compareDeepDiffImpl,
+    compareKeys,
     DeepCompareOptions,
     DeepCompareState,
     valueAsDifference
@@ -15,6 +15,7 @@ import {
     DifferenceAtomic,
     DifferenceFuzzyArray,
     DifferenceFuzzyArrayEntry,
+    DifferenceFuzzyObject,
     DifferenceHeterogeneous
 } from "./DeepDiffRendering.js"
 
@@ -481,21 +482,41 @@ export class FuzzyMatcherObjectContaining extends FuzzyMatcher {
     )
         : Difference
     {
-        const same      = isAtomicValue(v)
-            ? false
-            : Object
-                .entries(this.expected)
-                .every(([ key, value ]) => compareDeepDiff(v[ key ], value, options).same)
+        if (isAtomicValue(v)) {
+            const selfDiff = valueAsDifference(this.expected, 'value2', options, state)
 
-        const selfAtomicDifference = DifferenceAtomic.new({
-            [ flipped ? 'value2' : 'value1' ] : this
-        })
+            return DifferenceHeterogeneous.new({
+                value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfDiff,
+                value2      : flipped ? selfDiff : valueAsDifference(v, 'value2', options, state)
+            })
+        }
 
-        return DifferenceHeterogeneous.new({
-            $same       : same,
-            value1      : flipped ? valueAsDifference(v, 'value1', options, state) : selfAtomicDifference,
-            value2      : flipped ? selfAtomicDifference : valueAsDifference(v, 'value2', options, state)
-        })
+        const object1       = v
+        const object2       = this.expected
+
+        const difference = DifferenceFuzzyObject.new({ value1 : object1, value2 : object2 })
+
+        state.markVisited(object1, object2, difference, convertingToDiff)
+
+        const { common, onlyIn1, onlyIn2 }  = compareKeys(
+            new Set(Object.keys(object1)), new Set(Object.keys(object2)), false, options, state, convertingToDiff
+        )
+
+        difference.onlyIn2Size              = onlyIn2.size
+
+        for (let i = 0; i < common.length; i++) {
+            const key1      = common[ i ].el1
+            const key2      = common[ i ].el2
+
+            const diff      = compareDeepDiffImpl(object1[ key1 ], object2[ key2 ], options, state, convertingToDiff)
+
+            difference.addComparison(key1, diff)
+        }
+
+        onlyIn1.forEach(key1 => difference.addComparison(key1, valueAsDifference(object1[ key1 ], 'value1', options, state), true))
+        onlyIn2.forEach(key2 => difference.addComparison(key2, valueAsDifference(object2[ key2 ], 'value2', options, state)))
+
+        return difference
     }
 }
 

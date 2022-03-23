@@ -340,6 +340,11 @@ export class DifferenceComposite extends DifferenceReferenceable {
     }
 
 
+    getEntryCls (entry : DifferenceCompositeEntry) : string {
+        return undefined
+    }
+
+
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isExpander) {
             output.push(<diff-expander id={ `${ context.stream }-${ this.id }` }></diff-expander>)
@@ -392,7 +397,7 @@ export class DifferenceComposite extends DifferenceReferenceable {
 
                 // the entry element presents in all flows and this is what
                 // is synchronizing the height across the streams
-                output.push(<diff-entry></diff-entry>)
+                output.push(<diff-entry class={ this.getEntryCls(entry) }></diff-entry>)
 
                 if (!suppressSyncPoints) yield DifferenceRenderingSyncPoint.new({ type : 'before' })
 
@@ -699,7 +704,7 @@ export class DifferenceFuzzyArray extends DifferenceComposite {
 
         if (context.isContent)
             if (context.stream === 'right')
-                output.write('fuzzy[')
+                output.write('~[')
             else
                 output.write('[')
     }
@@ -827,6 +832,91 @@ export class DifferenceObject extends DifferenceComposite {
 
     * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
         if (context.isContent) output.push(<diff-object id={ `${ context.stream }-${ this.id }` } class={ this.cls } same={ this.same } type={ this.type }></diff-object>)
+
+        yield* super.renderGen(output, context)
+
+        if (context.isContent) output.pop()
+    }
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceFuzzyObjectEntry' })
+export class DifferenceFuzzyObjectEntry extends DifferenceObjectEntry {
+}
+
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+@serializable({ id : 'DifferenceFuzzyObject' })
+export class DifferenceFuzzyObject extends DifferenceComposite {
+    value1              : object | Missing
+    value2              : object | Missing
+
+    onlyIn2Size         : number                = 0
+    constructorName     : string                = undefined
+    constructorName2    : string                = undefined
+
+    size                : number                = 0
+    size2               : number                = 0
+
+    $same               : boolean               = true
+
+    entries             : DifferenceFuzzyObjectEntry[]
+
+
+    initialize (props : Partial<DifferenceObject>) {
+        super.initialize(props)
+
+        this.constructorName    = this.value1 !== Missing ? constructorNameOf(this.value1) : undefined
+        this.constructorName2   = this.value2 !== Missing ? constructorNameOf(this.value2) : undefined
+        this.size               = this.value1 !== Missing ? Object.keys(this.value1).length : undefined
+        this.size2              = this.value2 !== Missing ? Object.keys(this.value2).length : undefined
+    }
+
+
+    addComparison (key : ArbitraryObjectKey, difference : Difference, ignoreSameFlag : boolean = false) {
+        this.entries.push(DifferenceFuzzyObjectEntry.new({ key : serializeAtomic(key), difference }))
+
+        if (!ignoreSameFlag && this.$same && !difference.$same) this.$same = false
+    }
+
+
+    getOnlyIn2Size () : number {
+        return this.onlyIn2Size
+    }
+
+
+    getEntryCls (entry : DifferenceFuzzyObjectEntry) : string {
+        return entry.type === 'onlyIn1' ? 'diff-fuzzy-object-only-in-1-entry' : super.getEntryCls(entry)
+    }
+
+
+    renderCompositeHeader (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeHeader(output, context)
+
+        if (context.isContent) {
+            const className     = context.choose(this.constructorName, this.constructorName2)
+
+            if (className && className !== 'Object') output.write(className + ' ')
+
+            output.write(context.stream === 'right' ? '~{' : '{')
+        }
+    }
+
+
+    renderCompositeFooter (output : RenderingXmlFragment, context : DifferenceRenderingContext) {
+        super.renderCompositeFooter(output, context)
+
+        if (context.isContent) output.write('}')
+    }
+
+
+    * renderGen (output : RenderingXmlFragment, context : DifferenceRenderingContext) : Generator<DifferenceRenderingSyncPoint> {
+        if (context.isContent)
+            if (context.stream === 'left')
+                output.push(<diff-fuzzy-object-received id={ `${ context.stream }-${ this.id }` } class={ this.cls } same={ this.same } type={ this.type }></diff-fuzzy-object-received>)
+            else
+                output.push(<diff-fuzzy-object id={ `${ context.stream }-${ this.id }` } class={ this.cls } same={ this.same } type={ this.type }></diff-fuzzy-object>)
 
         yield* super.renderGen(output, context)
 

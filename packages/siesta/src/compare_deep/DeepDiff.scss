@@ -29,6 +29,13 @@
     color : $primary_pass;
 }
 
+// text-only class
 .diff-hetero {
     color : $secondary_pass_darker;
+}
+
+// text-only class
+.diff-fuzzy {
+    color : inherit;
+    font-weight: bolder;
 }

@@ -346,7 +346,8 @@ const compareArrayDeepDiff = function (
 
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const compareKeys = function <K, V>(
+// TODO private, was not supposed to be exported, but used in the FuzzyMatcherObjectContaining.equalsToDiff
+export const compareKeys = function <K, V>(
     setMap1                 : Set<K> | Map<K, V>,
     setMap2                 : Set<K> | Map<K, V>,
     compareStructurally     : boolean,
